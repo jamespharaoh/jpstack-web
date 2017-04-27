@@ -22,8 +22,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -176,155 +176,167 @@ class ChatChatCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		chat =
-			chatHelper.findRequired (
-				command.getParentId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		message =
-			inbox.getMessage ();
-
-		fromChatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		affiliate =
-			chatUserLogic.getAffiliate (
-				fromChatUser);
-
-		toChatUser =
-			chatUserHelper.findRequired (
-				commandRef.get ());
-
-		// treat as join if the user has no affiliate
-
-		Optional <InboxAttemptRec> joinInboxAttempt =
-			tryJoin (
-				taskLogger);
-
-		if (joinInboxAttempt.isPresent ())
-			return joinInboxAttempt.get ();
-
-		// look for keywords to interpret
-
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (
-					rest)
 		) {
 
-			if (! match.rest ().isEmpty ())
-				continue;
+			chat =
+				chatHelper.findRequired (
+					command.getParentId ());
 
-			Optional <InboxAttemptRec> keywordInboxAttempt =
-				checkKeyword (
+			message =
+				inbox.getMessage ();
+
+			fromChatUser =
+				chatUserHelper.findOrCreate (
 					taskLogger,
-					match.simpleKeyword (),
-					"");
+					chat,
+					message);
 
-			if (keywordInboxAttempt.isPresent ())
-				return keywordInboxAttempt.get ();
+			affiliate =
+				chatUserLogic.getAffiliate (
+					fromChatUser);
+
+			toChatUser =
+				chatUserHelper.findRequired (
+					commandRef.get ());
+
+			// treat as join if the user has no affiliate
+
+			Optional <InboxAttemptRec> joinInboxAttempt =
+				tryJoin (
+					taskLogger);
+
+			if (joinInboxAttempt.isPresent ())
+				return joinInboxAttempt.get ();
+
+			// look for keywords to interpret
+
+			for (
+				KeywordFinder.Match match
+					: keywordFinder.find (
+						rest)
+			) {
+
+				if (! match.rest ().isEmpty ())
+					continue;
+
+				Optional <InboxAttemptRec> keywordInboxAttempt =
+					checkKeyword (
+						taskLogger,
+						match.simpleKeyword (),
+						"");
+
+				if (keywordInboxAttempt.isPresent ())
+					return keywordInboxAttempt.get ();
+
+			}
+
+			// send the message to the other user
+
+			return doChat (
+				taskLogger);
 
 		}
-
-		// send the message to the other user
-
-		return doChat (
-			taskLogger);
 
 	}
 
 	InboxAttemptRec doBlock (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doBlock");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doBlock");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		// create the chatblock, if it doesn't already exist
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatBlockRec chatBlock =
-			chatBlockHelper.find (
-				fromChatUser,
-				toChatUser);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		if (chatBlock == null) {
+			// create the chatblock, if it doesn't already exist
 
-			chatBlockHelper.insert (
+			ChatBlockRec chatBlock =
+				chatBlockHelper.find (
+					fromChatUser,
+					toChatUser);
+
+			if (chatBlock == null) {
+
+				chatBlockHelper.insert (
+					taskLogger,
+					chatBlockHelper.createInstance ()
+
+					.setChatUser (
+						fromChatUser)
+
+					.setBlockedChatUser (
+						toChatUser)
+
+					.setTimestamp (
+						transaction.now ())
+
+				);
+
+			}
+
+			// send message through magic number
+
+			TextRec text =
+				textHelper.findOrCreateFormat (
+					taskLogger,
+					"User %s has now been blocked",
+					toChatUser.getCode ());
+
+			CommandRec magicCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic");
+
+			CommandRec helpCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"help");
+
+			ServiceRec systemService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"system");
+
+			chatSendLogic.sendMessageMagic (
 				taskLogger,
-				chatBlockHelper.createInstance ()
+				fromChatUser,
+				optionalOf (
+					message.getThreadId ()),
+				text,
+				magicCommand,
+				systemService,
+				helpCommand.getId ());
 
-				.setChatUser (
-					fromChatUser)
+			// process inbox
 
-				.setBlockedChatUser (
-					toChatUser)
-
-				.setTimestamp (
-					transaction.now ())
-
-			);
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
 
 		}
-
-		// send message through magic number
-
-		TextRec text =
-			textHelper.findOrCreateFormat (
-				taskLogger,
-				"User %s has now been blocked",
-				toChatUser.getCode ());
-
-		CommandRec magicCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic");
-
-		CommandRec helpCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"help");
-
-		ServiceRec systemService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"system");
-
-		chatSendLogic.sendMessageMagic (
-			taskLogger,
-			fromChatUser,
-			optionalOf (
-				message.getThreadId ()),
-			text,
-			magicCommand,
-			systemService,
-			helpCommand.getId ());
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 
@@ -339,26 +351,82 @@ class ChatChatCommand
 	InboxAttemptRec doChat (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doChat");
+		try (
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doChat");
 
-		if (toChatUser == null) {
+		) {
 
-			taskLogger.warningFormat (
-				"Message %d ",
-				integerToDecimalString (
-					inbox.getId ()),
-				"ignored as recipient user id %d ",
-				integerToDecimalString (
-					commandRef.get ()),
-				"does not exist");
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			if (toChatUser == null) {
+
+				taskLogger.warningFormat (
+					"Message %d ",
+					integerToDecimalString (
+						inbox.getId ()),
+					"ignored as recipient user id %d ",
+					integerToDecimalString (
+						commandRef.get ()),
+					"does not exist");
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// process inbox
+
+			String rejectedReason =
+				chatMessageLogic.chatMessageSendFromUser (
+					taskLogger,
+					fromChatUser,
+					toChatUser,
+					rest,
+					optionalOf (
+						message.getThreadId ()),
+					ChatMessageMethod.sms,
+					emptyList ());
+
+			if (rejectedReason != null) {
+
+				failedMessageHelper.insert (
+					taskLogger,
+					failedMessageHelper.createInstance ()
+
+					.setMessage (
+						message)
+
+					.setError (
+						rejectedReason));
+
+			}
+
+			// do auto join
+
+			if (chat.getAutoJoinOnSend ()) {
+
+				chatMiscLogic.userAutoJoin (
+					taskLogger,
+					fromChatUser,
+					message,
+					true);
+
+			}
+
+			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
 				taskLogger,
@@ -371,56 +439,6 @@ class ChatChatCommand
 
 		}
 
-		// process inbox
-
-		String rejectedReason =
-			chatMessageLogic.chatMessageSendFromUser (
-				taskLogger,
-				fromChatUser,
-				toChatUser,
-				rest,
-				optionalOf (
-					message.getThreadId ()),
-				ChatMessageMethod.sms,
-				emptyList ());
-
-		if (rejectedReason != null) {
-
-			failedMessageHelper.insert (
-				taskLogger,
-				failedMessageHelper.createInstance ()
-
-				.setMessage (
-					message)
-
-				.setError (
-					rejectedReason));
-
-		}
-
-		// do auto join
-
-		if (chat.getAutoJoinOnSend ()) {
-
-			chatMiscLogic.userAutoJoin (
-				taskLogger,
-				fromChatUser,
-				message,
-				true);
-
-		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
-
 	}
 
 	Optional <InboxAttemptRec> checkKeyword (
@@ -428,114 +446,126 @@ class ChatChatCommand
 			@NonNull String keyword,
 			@NonNull String rest) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkKeyword");
+		try (
 
-		Optional <ChatKeywordRec> chatKeywordOptional =
-			chatKeywordHelper.findByCode (
-				chat,
-				gsmStringSimplifyAllowNonGsm (
-					keyword));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkKeyword");
 
-		if (
-			optionalIsNotPresent (
-				chatKeywordOptional)
 		) {
+
+			Optional <ChatKeywordRec> chatKeywordOptional =
+				chatKeywordHelper.findByCode (
+					chat,
+					gsmStringSimplifyAllowNonGsm (
+						keyword));
+
+			if (
+				optionalIsNotPresent (
+					chatKeywordOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ChatKeywordRec chatKeyword =
+				chatKeywordOptional.get ();
+
+			if (chatKeyword.getChatBlock ()) {
+
+				return optionalOf (
+					doBlock (
+						taskLogger));
+
+			}
+
+			if (chatKeyword.getChatInfo ()) {
+
+				return optionalOf (
+					doInfo ());
+
+			}
+
+			if (
+				chatKeyword.getGlobal ()
+				&& chatKeyword.getCommand () != null
+			) {
+
+				return optionalOf (
+					commandManager.handle (
+						taskLogger,
+						inbox,
+						chatKeyword.getCommand (),
+						optionalAbsent (),
+						rest));
+
+			}
+
 			return optionalAbsent ();
-		}
-
-		ChatKeywordRec chatKeyword =
-			chatKeywordOptional.get ();
-
-		if (chatKeyword.getChatBlock ()) {
-
-			return optionalOf (
-				doBlock (
-					taskLogger));
 
 		}
-
-		if (chatKeyword.getChatInfo ()) {
-
-			return optionalOf (
-				doInfo ());
-
-		}
-
-		if (
-			chatKeyword.getGlobal ()
-			&& chatKeyword.getCommand () != null
-		) {
-
-			return optionalOf (
-				commandManager.handle (
-					taskLogger,
-					inbox,
-					chatKeyword.getCommand (),
-					optionalAbsent (),
-					rest));
-
-		}
-
-		return optionalAbsent ();
 
 	}
 
 	Optional <InboxAttemptRec> tryJoin (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"tryJoin");
+		try (
 
-		if (
-			isNotNull (
-				chatUserLogic.getAffiliateId (
-					fromChatUser))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"tryJoin");
+
 		) {
-			return optionalAbsent ();
+
+			if (
+				isNotNull (
+					chatUserLogic.getAffiliateId (
+						fromChatUser))
+			) {
+				return optionalAbsent ();
+			}
+
+			// TODO the scheme is set randomly here
+
+			// TODO how does this code even get invoked? if a user has not
+			// joined then how can they be replying to a magic number from a
+			// user. maybe from a broadcast, but that is all a bit fucked up.
+
+			taskLogger.warningFormat (
+				"Chat request from unjoined user %s",
+				integerToDecimalString (
+					fromChatUser.getId ()));
+
+			ChatSchemeRec chatScheme =
+				chat.getChatSchemes ().iterator ().next ();
+
+			return Optional.of (
+				chatJoinerProvider.get ()
+
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					JoinType.chatSimple)
+
+				.chatSchemeId (
+					chatScheme.getId ())
+
+				.inbox (
+					inbox)
+
+				.rest (
+					rest)
+
+				.handleInbox (
+					taskLogger,
+					command)
+
+			);
+
 		}
-
-		// TODO the scheme is set randomly here
-
-		// TODO how does this code even get invoked? if a user has not
-		// joined then how can they be replying to a magic number from a
-		// user. maybe from a broadcast, but that is all a bit fucked up.
-
-		taskLogger.warningFormat (
-			"Chat request from unjoined user %s",
-			integerToDecimalString (
-				fromChatUser.getId ()));
-
-		ChatSchemeRec chatScheme =
-			chat.getChatSchemes ().iterator ().next ();
-
-		return Optional.of (
-			chatJoinerProvider.get ()
-
-			.chatId (
-				chat.getId ())
-
-			.joinType (
-				JoinType.chatSimple)
-
-			.chatSchemeId (
-				chatScheme.getId ())
-
-			.inbox (
-				inbox)
-
-			.rest (
-				rest)
-
-			.handleInbox (
-				taskLogger,
-				command)
-
-		);
 
 	}
 

@@ -68,6 +68,7 @@ class HtmlFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <String> interfaceValue,

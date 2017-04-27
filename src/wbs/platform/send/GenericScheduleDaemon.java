@@ -14,7 +14,7 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -62,23 +62,23 @@ class GenericScheduleDaemon <
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		taskLogger.debugFormat (
-			"Looking for scheduled broadcasts to send");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"GenericScheduleDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Looking for scheduled broadcasts to send");
 
 			List <Job> jobs =
 				helper ().findScheduledJobs (
@@ -113,16 +113,16 @@ class GenericScheduleDaemon <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runJob (%s)",
-				integerToDecimalString (
-					jobId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runJob (%s)",
+					integerToDecimalString (
+						jobId));
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"GenericScheduleDaemon.runJob (jobId)",

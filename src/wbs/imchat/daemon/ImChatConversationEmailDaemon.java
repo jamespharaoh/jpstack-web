@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -56,23 +56,23 @@ class ImChatConversationEmailDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		taskLogger.debugFormat (
-			"Checking for conversations to send an email");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ImChatConversationEmailDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Checking for conversations to send an email");
 
 			List <ImChatConversationRec> conversations =
 				imChatConversationHelper.findPendingEmailLimit (
@@ -99,14 +99,14 @@ class ImChatConversationEmailDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long conversationId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doConversation");
-
 		try (
 
-			Transaction updateTransaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doConversation");
+
+			OwnedTransaction updateTransaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (
@@ -141,7 +141,7 @@ class ImChatConversationEmailDaemon
 
 			try (
 
-				Transaction emailTransaction =
+				OwnedTransaction emailTransaction =
 					database.beginReadOnly (
 						taskLogger,
 						stringFormat (
@@ -161,6 +161,7 @@ class ImChatConversationEmailDaemon
 						conversationId);
 
 				imChatLogic.conversationEmailSend (
+					taskLogger,
 					conversation);
 
 			}

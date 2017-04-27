@@ -50,26 +50,32 @@ class DatabaseInitTask
 	public
 	void init () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"init");
+		try (
 
-		String configFilename =
-			System.getenv (
-				"WBS_CONFIG_XML");
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"init");
 
-		if (configFilename == null) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Please set WBS_CONFIG_XML"));
+			String configFilename =
+				System.getenv (
+					"WBS_CONFIG_XML");
+
+			if (configFilename == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Please set WBS_CONFIG_XML"));
+
+			}
+
+			wbsConfig =
+				WbsConfig.readFilename (
+					taskLogger,
+					configFilename);
 
 		}
-
-		wbsConfig =
-			WbsConfig.readFilename (
-				taskLogger,
-				configFilename);
 
 	}
 

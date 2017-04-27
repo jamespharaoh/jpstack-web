@@ -4,16 +4,15 @@ import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneEleme
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.io.FileUtils.fileWriteBytes;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.io.FileOutputStream;
 import java.util.List;
 
 import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.IOUtils;
 
 import wbs.api.mvc.ApiAction;
 
@@ -21,7 +20,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -78,7 +77,7 @@ class ChatUserImageUploadPostAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserImageUploadPostAction.goApi ()",
@@ -170,10 +169,9 @@ class ChatUserImageUploadPostAction
 								"/tmp/%s",
 								randomLogic.generateLowercase (10));
 
-						IOUtils.write (
-							fileItem.get (),
-							new FileOutputStream (
-								filename));
+						fileWriteBytes (
+							filename,
+							fileItem.get ());
 
 						taskLogger.debugFormat (
 							"Written %s bytes to temporary file %s",
@@ -241,7 +239,7 @@ class ChatUserImageUploadPostAction
 
 				try (
 
-					Transaction errorTransaction =
+					OwnedTransaction errorTransaction =
 						database.beginReadWrite (
 							taskLogger,
 							"ChatUserImageUploadPostAction.goApi ()",

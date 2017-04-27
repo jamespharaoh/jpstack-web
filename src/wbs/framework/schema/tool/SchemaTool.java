@@ -67,53 +67,65 @@ class SchemaTool {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"schemaCreate");
+		try (
 
-		defineTables (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"schemaCreate");
 
-		createSchemaSqlScript ();
+		) {
 
-		executeSchemaSqlScript (
-			taskLogger);
+			defineTables (
+				taskLogger);
 
-		createObjectTypes (
-			taskLogger);
+			createSchemaSqlScript ();
+
+			executeSchemaSqlScript (
+				taskLogger);
+
+			createObjectTypes (
+				taskLogger);
+
+		}
 
 	}
 
 	void defineTables (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defineTables");
+		try (
 
-		schema =
-			schemaFromModel.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defineTables");
 
-			.taskLog (
-				taskLogger)
+		) {
 
-			.enumTypes (
-				schemaTypesHelper.enumTypes ())
+			schema =
+				schemaFromModel.get ()
 
-			.modelsByClass (
-				entityHelper.modelsByClass ())
+				.taskLog (
+					taskLogger)
 
-			.build ();
+				.enumTypes (
+					schemaTypesHelper.enumTypes ())
 
-		if (taskLogger.errors ()) {
+				.modelsByClass (
+					entityHelper.modelsByClass ())
 
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
-					integerToDecimalString (
-						taskLogger.errorCount ())));
+				.build ();
+
+			if (taskLogger.errors ()) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Aborting due to %s errors",
+						integerToDecimalString (
+							taskLogger.errorCount ())));
+
+			}
 
 		}
 
@@ -160,19 +172,19 @@ class SchemaTool {
 	void executeSchemaSqlScript (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"executeSchemaSqlScript");
-
-		// execute sql
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"executeSchemaSqlScript");
 
 			Connection connection =
 				dataSource.getConnection ();
 
 		) {
+
+		// execute sql
 
 			connection.setAutoCommit (
 				false);
@@ -260,12 +272,12 @@ class SchemaTool {
 	void createObjectTypes (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createObjectTypes");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createObjectTypes");
 
 			Connection connection =
 				dataSource.getConnection ();
@@ -315,14 +327,20 @@ class SchemaTool {
 
 					} else {
 
-						ResultSet objectTypeIdResultSet =
-							nextObjectTypeIdStatement.executeQuery ();
+						try (
 
-						objectTypeIdResultSet.next ();
+							ResultSet objectTypeIdResultSet =
+								nextObjectTypeIdStatement.executeQuery ();
 
-						objectTypeId =
-							objectTypeIdResultSet.getInt (
-								1);
+						) {
+
+							objectTypeIdResultSet.next ();
+
+							objectTypeId =
+								objectTypeIdResultSet.getInt (
+									1);
+
+						}
 
 					}
 

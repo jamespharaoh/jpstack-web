@@ -107,71 +107,76 @@ class SimpleConsoleContextBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildContextType ();
-		buildSimpleContext ();
-
-		List<ResolvedConsoleContextLink> resolvedContextLinks =
-			consoleMetaManager.resolveContextLink (
-				name);
-
-		for (
-			ResolvedConsoleContextLink resolvedContextLink
-				: resolvedContextLinks
 		) {
 
-			buildResolvedContexts (
-				resolvedContextLink);
+			setDefaults ();
 
-			buildResolvedTabs (
-				resolvedContextLink);
+			buildContextType ();
+			buildSimpleContext ();
+
+			List<ResolvedConsoleContextLink> resolvedContextLinks =
+				consoleMetaManager.resolveContextLink (
+					name);
+
+			for (
+				ResolvedConsoleContextLink resolvedContextLink
+					: resolvedContextLinks
+			) {
+
+				buildResolvedContexts (
+					resolvedContextLink);
+
+				buildResolvedTabs (
+					resolvedContextLink);
+
+			}
+
+			ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
+				new ConsoleContextBuilderContainerImplementation<ObjectType> ()
+
+				.taskLogger (
+					container.taskLogger ())
+
+				.consoleHelper (
+					null)
+
+				.structuralName (
+					structuralName)
+
+				.extensionPointName (
+					structuralName)
+
+				.pathPrefix (
+					structuralName)
+
+				.newBeanNamePrefix (
+					structuralName)
+
+				.existingBeanNamePrefix (
+					structuralName)
+
+				.tabLocation (
+					"end")
+
+				.friendlyName (
+					camelToSpaces (
+						structuralName));
+
+			builder.descend (
+				taskLogger,
+				nextBuilderContainer,
+				spec.children (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
 
 		}
-
-		ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
-
-			.taskLogger (
-				container.taskLogger ())
-
-			.consoleHelper (
-				null)
-
-			.structuralName (
-				structuralName)
-
-			.extensionPointName (
-				structuralName)
-
-			.pathPrefix (
-				structuralName)
-
-			.newBeanNamePrefix (
-				structuralName)
-
-			.existingBeanNamePrefix (
-				structuralName)
-
-			.tabLocation (
-				"end")
-
-			.friendlyName (
-				camelToSpaces (
-					structuralName));
-
-		builder.descend (
-			taskLogger,
-			nextBuilderContainer,
-			spec.children (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
-
 
 	}
 

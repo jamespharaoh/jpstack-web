@@ -51,25 +51,31 @@ class ConsoleMetaModuleFactory
 	Object makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"makeComponent");
+		try (
 
-		ConsoleMetaModuleImplementation consoleMetaModule =
-			consoleMetaModuleProvider.get ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeComponent");
 
-		ConsoleContextMetaBuilderContainer contextMetaBuilderContainer =
-			new ConsoleContextMetaBuilderContainer ();
+		) {
 
-		consoleMetaModuleBuilder.descend (
-			taskLogger,
-			contextMetaBuilderContainer,
-			consoleSpec.builders (),
-			consoleMetaModule,
-			MissingBuilderBehaviour.ignore);
+			ConsoleMetaModuleImplementation consoleMetaModule =
+				consoleMetaModuleProvider.get ();
 
-		return consoleMetaModule;
+			ConsoleContextMetaBuilderContainer contextMetaBuilderContainer =
+				new ConsoleContextMetaBuilderContainer ();
+
+			consoleMetaModuleBuilder.descend (
+				taskLogger,
+				contextMetaBuilderContainer,
+				consoleSpec.builders (),
+				consoleMetaModule,
+				MissingBuilderBehaviour.ignore);
+
+			return consoleMetaModule;
+
+		}
 
 	}
 

@@ -1,36 +1,62 @@
 package wbs.platform.php;
 
-import java.io.EOFException;
-import java.io.FilterInputStream;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import lombok.NonNull;
+
+import wbs.utils.io.RuntimeEofException;
+import wbs.utils.io.RuntimeIoException;
 
 public
 class PhpUnserializer {
 
 	private static
 	int readInt (
-			CountingInputStream in,
-			char termChar)
-		throws IOException {
+			@NonNull CountingInputStream in,
+			char termChar) {
 
 		// NB this method works with negatives internally as the range is higher
+
 		int c;
+
 		int i = 0;
+
 		boolean first = true;
 		boolean negative = false;
+
 		while ((c = in.read()) != termChar) {
-			if (c == -1)
-				throw new PhpUnserializeException("Unexpected end of input");
+
+			if (c == -1) {
+
+				throw new PhpUnserializeException (
+					"Unexpected end of input");
+
+			}
+
 			if (c == '-' && first) {
+
 				negative = true;
+
 			} else if (c >= '0' && c <= '9') {
+
 				i = (i * 10) - (c - '0');
+
 			} else {
-				throw new PhpUnserializeException("Expected digit or '"
-						+ termChar + "' at " + in.getBytes());
+
+				throw new PhpUnserializeException (
+					stringFormat (
+						"Expected digit or '%s' at %s",
+						Character.toString (
+							termChar),
+						integerToDecimalString (
+							in.getBytes ())));
+
 			}
 			first = false;
 		}
@@ -41,54 +67,101 @@ class PhpUnserializer {
 
 	private static
 	void expect (
-			CountingInputStream in,
-			char expectChar)
-			throws IOException {
+			@NonNull CountingInputStream in,
+			char expectChar) {
 
 		int i =
 			in.read ();
 
-		if (i == -1)
-			throw new PhpUnserializeException("Unexpected end of input");
-		if (i != expectChar)
-			throw new PhpUnserializeException("Expected '" + expectChar
-					+ "' at " + in.getBytes());
+		if (i == -1) {
+
+			throw new PhpUnserializeException (
+				"Unexpected end of input");
+
+		}
+
+		if (i != expectChar) {
+
+			throw new PhpUnserializeException (
+				stringFormat (
+					"Expected '%s' at %s",
+					Character.toString (
+						(char) expectChar),
+					integerToDecimalString (
+						in.getBytes ())));
+
+		}
+
 	}
 
-	private static PhpEntity unserializeS (CountingInputStream in) throws IOException {
-		expect (in, ':');
-		int len = readInt (in, ':');
-		if (len < 0)
-			throw new PhpUnserializeException ("" + in.getBytes ()
-					+ " Invalid string length " + len + " at " + in.getBytes ());
-		expect (in, '"');
-		byte[] data = new byte [len];
+	private static
+	PhpEntity unserializeS (
+			@NonNull CountingInputStream inputStream) {
+
+		expect (
+			inputStream,
+			':');
+
+		int stringLength =
+			readInt (
+				inputStream,
+				':');
+
+		if (stringLength < 0) {
+
+			throw new PhpUnserializeException (
+				stringFormat (
+					"Invalid string length %s at %s",
+					integerToDecimalString (
+						stringLength),
+					integerToDecimalString (
+						inputStream.getBytes ())));
+
+		}
+
+		expect (inputStream, '"');
+		byte[] data = new byte [stringLength];
 		int pos = 0;
-		while (pos < len) {
-			int num = in.read (data, pos, len - pos);
+		while (pos < stringLength) {
+			int num = inputStream.read (data, pos, stringLength - pos);
 			if (num < 0)
 				throw new PhpUnserializeException ("Unexpected end of input");
 			pos += num;
 		}
-		expect (in, '"');
-		expect (in, ';');
+		expect (inputStream, '"');
+		expect (inputStream, ';');
 		return new PhpString (data);
 	}
 
-	private static PhpEntity unserializeB(CountingInputStream in)
-			throws IOException {
-		expect(in, ':');
+	private static
+	PhpEntity unserializeB (
+			@NonNull CountingInputStream in) {
+
+		expect (
+			in,
+			':');
+
 		int i = readInt(in, ';');
-		if (i < 0 || i > 1)
-			throw new PhpUnserializeException("Expected 0 or 1 at "
-					+ in.getBytes());
-		return i == 1 ? PhpBoolean.pTrue : PhpBoolean.pFalse;
+
+		if (i < 0 || i > 1) {
+
+			throw new PhpUnserializeException (
+				stringFormat (
+					"Expected 0 or 1 at %s",
+					integerToDecimalString (
+						in.getBytes())));
+
+		}
+
+		return i == 1
+			? PhpBoolean.pTrue
+			: PhpBoolean.pFalse;
+
 	}
 
 	private static
 	PhpEntity unserializeI (
-			CountingInputStream in)
-		throws IOException {
+			@NonNull CountingInputStream in) {
 
 		expect (in, ':');
 
@@ -100,11 +173,17 @@ class PhpUnserializer {
 
 	private static
 	PhpEntity unserializeA (
-			CountingInputStream in)
-		throws IOException {
+			@NonNull CountingInputStream in) {
 
-		expect(in, ':');
-		int len = readInt(in, ':');
+		expect (
+			in,
+			':');
+
+		int len =
+			readInt (
+				in,
+				':');
+
 		expect(in, '{');
 		Map<PhpEntity, PhpEntity> map = new LinkedHashMap<PhpEntity, PhpEntity>();
 		while (len-- > 0) {
@@ -116,11 +195,10 @@ class PhpUnserializer {
 
 	private static
 	PhpEntity unserializeN (
-			CountingInputStream in)
-		throws IOException {
+			@NonNull CountingInputStream inputStream) {
 
 		expect (
-			in,
+			inputStream,
 			';');
 
 		return PhpNull.instance;
@@ -129,8 +207,7 @@ class PhpUnserializer {
 
 	private static
 	PhpEntity unserializeDouble (
-			CountingInputStream countingInputStream)
-		throws IOException {
+			@NonNull CountingInputStream countingInputStream) {
 
 		// read past the colon
 
@@ -174,44 +251,83 @@ class PhpUnserializer {
 
 	private static
 	PhpEntity unserialize (
-			CountingInputStream in)
-		throws IOException {
+			@NonNull CountingInputStream inputStream) {
 
-		int c = in.read ();
+		int c = inputStream.read ();
 
-		if (c < 0)
-			throw new EOFException ();
-		switch (c) {
-		case 'b':
-			return unserializeB (in);
-		case 'i':
-			return unserializeI (in);
-		case 's':
-			return unserializeS (in);
-		case 'a':
-			return unserializeA (in);
-		case 'N':
-			return unserializeN (in);
-		case 'd':
-			return unserializeDouble (in);
+		if (c < 0) {
+			throw new RuntimeEofException ();
 		}
-		throw new PhpUnserializeException ("Unknown data type: '" + c + "' at " + in.getBytes ());
+
+		switch (c) {
+
+		case 'b':
+
+			return unserializeB (
+				inputStream);
+
+		case 'i':
+
+			return unserializeI (
+				inputStream);
+
+		case 's':
+
+			return unserializeS (
+				inputStream);
+
+		case 'a':
+
+			return unserializeA (
+				inputStream);
+
+		case 'N':
+
+			return unserializeN (
+				inputStream);
+
+		case 'd':
+
+			return unserializeDouble (inputStream);
+
+		}
+
+		throw new PhpUnserializeException (
+			stringFormat (
+				"Unknown data type: '%s' at '%s'",
+				Character.toString (
+					(char) c),
+				integerToDecimalString (
+					inputStream.getBytes ())));
+
 	}
 
 	public static
 	PhpEntity unserialize (
-			InputStream inputStream)
-		throws IOException {
+			@NonNull InputStream inputStream) {
 
-		return unserialize (
-			new CountingInputStream (
-				inputStream));
+		try (
+
+			CountingInputStream countingInputStream =
+				new CountingInputStream (
+					inputStream);
+
+		) {
+
+			return unserialize (
+				countingInputStream);
+
+		}
 
 	}
 
 	private static
 	class CountingInputStream
-		extends FilterInputStream {
+		extends InputStream
+		implements AutoCloseable {
+
+		private
+		InputStream delegate;
 
 		private
 		long bytes = 0;
@@ -221,25 +337,34 @@ class PhpUnserializer {
 
 		private
 		CountingInputStream (
-				InputStream newIn) {
+				@NonNull InputStream delegate) {
 
-			super (
-				newIn);
+			this.delegate =
+				delegate;
 
 		}
 
 		@Override
 		public
-		int read ()
-			throws IOException {
+		int read () {
 
-			int i =
-				in.read ();
+			try {
 
-			if (i >= 0)
-				bytes ++;
+				int character =
+					delegate.read ();
 
-			return i;
+				if (character >= 0) {
+					bytes ++;
+				}
+
+				return character;
+
+			} catch (IOException ioException ) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
@@ -248,35 +373,51 @@ class PhpUnserializer {
 		int read (
 				byte[] b,
 				int off,
-				int len)
-			throws IOException {
+				int len) {
 
-			int ret =
-				in.read (
-					b,
-					off,
-					len);
+			try {
 
-			bytes +=
-				ret;
+				int ret =
+					delegate.read (
+						b,
+						off,
+						len);
 
-			return ret;
+				bytes +=
+					ret;
+
+				return ret;
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
 		@Override
 		public
 		long skip (
-				long n)
-			throws IOException {
+				long n) {
 
-			long ret =
-				in.skip (n);
+			try {
 
-			bytes +=
-				ret;
+				long ret =
+					delegate.skip (n);
 
-			return ret;
+				bytes +=
+					ret;
+
+				return ret;
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
@@ -285,7 +426,7 @@ class PhpUnserializer {
 		void mark (
 				int readlimit) {
 
-			in.mark (
+			delegate.mark (
 				readlimit);
 
 			markBytes =
@@ -295,13 +436,21 @@ class PhpUnserializer {
 
 		@Override
 		public synchronized
-		void reset ()
-			throws IOException {
+		void reset () {
 
-			in.reset ();
+			try {
 
-			bytes =
-				markBytes;
+				delegate.reset ();
+
+				bytes =
+					markBytes;
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
@@ -309,6 +458,23 @@ class PhpUnserializer {
 		long getBytes () {
 
 			return bytes;
+
+		}
+
+		@Override
+		public
+		void close () {
+
+			try {
+
+				delegate.close ();
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 

@@ -24,7 +24,7 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -175,636 +175,678 @@ class ChatCoreFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		networks =
-			networkHelper.findAll ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		users =
-			userHelper.findAll ();
+		) {
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+			networks =
+				networkHelper.findAll ();
 
-		createRoutes (
-			taskLogger,
-			transaction);
+			users =
+				userHelper.findAll ();
 
-		createChatServices (
-			taskLogger,
-			transaction);
+			createMenuItems (
+				taskLogger,
+				transaction);
 
-		createChatTemplates (
-			taskLogger,
-			transaction);
+			createRoutes (
+				taskLogger,
+				transaction);
 
-		createChatSchemes (
-			taskLogger,
-			transaction);
+			createChatServices (
+				taskLogger,
+				transaction);
 
-		createChatUsers (
-			taskLogger,
-			transaction);
+			createChatTemplates (
+				taskLogger,
+				transaction);
 
-		createChatMessages (
-			taskLogger,
-			transaction);
+			createChatSchemes (
+				taskLogger,
+				transaction);
+
+			createChatUsers (
+				taskLogger,
+				transaction);
+
+			createChatMessages (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"chat")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Chat")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setDescription (
-				"Chat")
+				.setCode (
+					"chat")
 
-			.setLabel (
-				"Chat")
+				.setName (
+					"Chat")
 
-			.setTargetPath (
-				"/chats")
+				.setDescription (
+					"Chat")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Chat")
 
-		);
+				.setTargetPath (
+					"/chats")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 
 	private
 	void createRoutes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createRoutes");
+		try (
 
-		routeHelper.insert (
-			taskLogger,
-			routeHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRoutes");
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+		) {
 
-			.setCode (
-				"chat_5_00")
+			routeHelper.insert (
+				taskLogger,
+				routeHelper.createInstance ()
 
-			.setName (
-				"Chat £5.00")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Chat billed £5.00")
+				.setCode (
+					"chat_5_00")
 
-			.setNumber (
-				"c500")
+				.setName (
+					"Chat £5.00")
 
-			.setOutCharge (
-				500l)
+				.setDescription (
+					"Chat billed £5.00")
 
-			.setCanSend (
-				true)
+				.setNumber (
+					"c500")
 
-			.setCanReceive (
-				true)
+				.setOutCharge (
+					500l)
 
-			.setDeliveryReports (
-				true)
+				.setCanSend (
+					true)
 
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"simulator"))
+				.setCanReceive (
+					true)
 
-		);
+				.setDeliveryReports (
+					true)
 
-		routeHelper.insert (
-			taskLogger,
-			routeHelper.createInstance ()
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"simulator"))
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"chat_free")
+			routeHelper.insert (
+				taskLogger,
+				routeHelper.createInstance ()
 
-			.setName (
-				"Chat free")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Chat free")
+				.setCode (
+					"chat_free")
 
-			.setCanSend (
-				true)
+				.setName (
+					"Chat free")
 
-			.setDeliveryReports (
-				true)
+				.setDescription (
+					"Chat free")
 
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"simulator"))
+				.setCanSend (
+					true)
 
-		);
+				.setDeliveryReports (
+					true)
 
-		routeHelper.insert (
-			taskLogger,
-			routeHelper.createInstance ()
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"simulator"))
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"chat_magic")
+			routeHelper.insert (
+				taskLogger,
+				routeHelper.createInstance ()
 
-			.setName (
-				"Chat magic")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Chat magic")
+				.setCode (
+					"chat_magic")
 
-			.setCanReceive (
-				true)
+				.setName (
+					"Chat magic")
 
-			.setCommand (
-				commandHelper.findByCodeRequired (
-					GlobalId.root,
-					"magic_number"))
+				.setDescription (
+					"Chat magic")
 
-		);
+				.setCanReceive (
+					true)
 
-		transaction.flush ();
+				.setCommand (
+					commandHelper.findByCodeRequired (
+						GlobalId.root,
+						"magic_number"))
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createChatServices (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatServices");
+		try (
 
-		chatHelper.insert (
-			taskLogger,
-			chatHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatServices");
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+		) {
 
-			.setCode (
-				"test")
+			chatHelper.insert (
+				taskLogger,
+				chatHelper.createInstance ()
 
-			.setName (
-				"Test")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Test")
+				.setCode (
+					"test")
 
-			.setCurrency (
-				currencyHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"gbp"))
+				.setName (
+					"Test")
 
-			.setGazetteer (
-				gazetteerHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+				.setDescription (
+					"Test")
 
-			/* TODO should not reference by id
-			.setTicketManager (
-				ticketManagerHelper.find (
-					1))
-			*/
+				.setCurrency (
+					currencyHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"gbp"))
 
-		);
+				.setGazetteer (
+					gazetteerHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
-		transaction.flush ();
+				/* TODO should not reference by id
+				.setTicketManager (
+					ticketManagerHelper.find (
+						1))
+				*/
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createChatTemplates (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatTemplates");
+		try (
 
-		chatHelpTemplateHelper.insert (
-			taskLogger,
-			chatHelpTemplateHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatTemplates");
 
-			.setChat (
-				chatHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+		) {
 
-			.setType (
-				"system")
+			chatHelpTemplateHelper.insert (
+				taskLogger,
+				chatHelpTemplateHelper.createInstance ()
 
-			.setCode (
-				"spend_warning_1")
+				.setChat (
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
-			.setDescription (
-				"Spend warning 1")
+				.setType (
+					"system")
 
-			.setText (
-				"spend 1")
+				.setCode (
+					"spend_warning_1")
 
-		);
+				.setDescription (
+					"Spend warning 1")
 
-		chatHelpTemplateHelper.insert (
-			taskLogger,
-			chatHelpTemplateHelper.createInstance ()
+				.setText (
+					"spend 1")
 
-			.setChat (
-				chatHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+			);
 
-			.setType (
-				"system")
+			chatHelpTemplateHelper.insert (
+				taskLogger,
+				chatHelpTemplateHelper.createInstance ()
 
-			.setCode (
-				"spend_warning_2")
+				.setChat (
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
-			.setDescription (
-				"Spend warning 2")
+				.setType (
+					"system")
 
-			.setText (
-				"spend 2")
+				.setCode (
+					"spend_warning_2")
 
-		);
+				.setDescription (
+					"Spend warning 2")
 
-		transaction.flush ();
+				.setText (
+					"spend 2")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createChatSchemes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatSchemes");
+		try (
 
-		chatSchemeHelper.insert (
-			taskLogger,
-			chatSchemeHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatSchemes");
 
-			.setChat (
-				chatHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+		) {
 
-			.setCode (
-				"left")
+			chatSchemeHelper.insert (
+				taskLogger,
+				chatSchemeHelper.createInstance ()
 
-			.setName (
-				"Left")
+				.setChat (
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
-			.setDescription (
-				"Left")
+				.setCode (
+					"left")
 
-			.setRbBillRoute (
-				routeHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"chat_5_00"))
+				.setName (
+					"Left")
 
-			.setRbFreeRouter (
-				routerHelper.findByCodeRequired (
+				.setDescription (
+					"Left")
+
+				.setRbBillRoute (
 					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
-						"chat_free"),
-					"static"))
+						"chat_5_00"))
 
-			.setMagicRouter (
-				routerHelper.findByCodeRequired (
+				.setRbFreeRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
+
+				.setMagicRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
+
+				.setWapRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
+
+			);
+
+			chatSchemeHelper.insert (
+				taskLogger,
+				chatSchemeHelper.createInstance ()
+
+				.setChat (
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
+
+				.setCode (
+					"right")
+
+				.setName (
+					"Right")
+
+				.setDescription (
+					"Right")
+
+				.setRbBillRoute (
 					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
-						"chat_free"),
-					"static"))
+						"chat_5_00"))
 
-			.setWapRouter (
-				routerHelper.findByCodeRequired (
-					routeHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"chat_free"),
-					"static"))
+				.setRbFreeRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
 
-		);
+				.setMagicRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
 
-		chatSchemeHelper.insert (
-			taskLogger,
-			chatSchemeHelper.createInstance ()
+				.setWapRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"chat_free"),
+						"static"))
 
-			.setChat (
-				chatHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+			);
 
-			.setCode (
-				"right")
+			transaction.flush ();
 
-			.setName (
-				"Right")
+			chatSchemes =
+				chatSchemeHelper.findAll ();
 
-			.setDescription (
-				"Right")
-
-			.setRbBillRoute (
-				routeHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"chat_5_00"))
-
-			.setRbFreeRouter (
-				routerHelper.findByCodeRequired (
-					routeHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"chat_free"),
-					"static"))
-
-			.setMagicRouter (
-				routerHelper.findByCodeRequired (
-					routeHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"chat_free"),
-					"static"))
-
-			.setWapRouter (
-				routerHelper.findByCodeRequired (
-					routeHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"chat_free"),
-					"static"))
-
-		);
-
-		transaction.flush ();
-
-		chatSchemes =
-			chatSchemeHelper.findAll ();
+		}
 
 	}
 
 	private
 	void createChatUsers (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatUsers");
+		try (
 
-		List <Optional <MediaRec>> imageMedias =
-			ImmutableList.<Optional <MediaRec>> builder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatUsers");
 
-			.addAll (
-				iterableMap (
-					mediaId ->
-						optionalOf (
-							mediaHelper.findRequired (
-								mediaId)),
-					MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
-
-			.addAll (
-				iterableMap (
-					mediaId ->
-						optionalAbsent (),
-					MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
-
-			.build ();
-
-		for (
-			int index = 0;
-			index < 260;
-			index ++
 		) {
 
-			String code =
-				chatUserCode ();
+			List <Optional <MediaRec>> imageMedias =
+				ImmutableList.<Optional <MediaRec>> builder ()
 
-			String numberString =
-				String.format (
-					"447979%s",
-					code);
+				.addAll (
+					iterableMap (
+						mediaId ->
+							optionalOf (
+								mediaHelper.findRequired (
+									mediaId)),
+						MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
 
-			NumberRec number =
-				numberHelper.insert (
-					taskLogger,
-					numberHelper.createInstance ()
+				.addAll (
+					iterableMap (
+						mediaId ->
+							optionalAbsent (),
+						MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
 
-				.setNumber (
-					numberString)
+				.build ();
 
-				.setNetwork (
-					randomLogic.sample (
-						networks))
+			for (
+				int index = 0;
+				index < 260;
+				index ++
+			) {
 
-			);
+				String code =
+					chatUserCode ();
 
-			Gender gender =
-				randomLogic.sample (
-					Gender.values ());
+				String numberString =
+					String.format (
+						"447979%s",
+						code);
 
-			String name =
-				randomLogic.sample (
-					namesByGender.get (
-						gender));
-
-			ChatUserRec chatUser =
-				chatUserHelper.insert (
-					taskLogger,
-					chatUserHelper.createInstance ()
-
-				.setChat (
-					chatHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"test"))
-
-				.setCode (
-					code)
-
-				.setCreated (
-					transaction.now ())
-
-				.setChatScheme (
-					randomLogic.sample (
-						chatSchemes))
-
-				.setType (
-					ChatUserType.user)
-
-				.setNumber (
-					number)
-
-				.setOldNumber (
-					number)
-
-				.setGender (
-					gender)
-
-				.setOrient (
-					randomLogic.sample (
-						Orient.values ()))
-
-				.setName (
-					name)
-
-				.setInfoText (
-					textHelper.findOrCreateFormat (
+				NumberRec number =
+					numberHelper.insert (
 						taskLogger,
-						"Info for %s",
-						name))
+						numberHelper.createInstance ()
 
-				.setCreditMode (
-					ChatUserCreditMode.billedMessages)
+					.setNumber (
+						numberString)
 
-			);
+					.setNetwork (
+						randomLogic.sample (
+							networks))
 
-			chatUserAddImage (
-				taskLogger,
-				transaction,
-				chatUser,
-				imageMedias);
+				);
 
-			chatUsers.add (
-				chatUser);
+				Gender gender =
+					randomLogic.sample (
+						Gender.values ());
+
+				String name =
+					randomLogic.sample (
+						namesByGender.get (
+							gender));
+
+				ChatUserRec chatUser =
+					chatUserHelper.insert (
+						taskLogger,
+						chatUserHelper.createInstance ()
+
+					.setChat (
+						chatHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"test"))
+
+					.setCode (
+						code)
+
+					.setCreated (
+						transaction.now ())
+
+					.setChatScheme (
+						randomLogic.sample (
+							chatSchemes))
+
+					.setType (
+						ChatUserType.user)
+
+					.setNumber (
+						number)
+
+					.setOldNumber (
+						number)
+
+					.setGender (
+						gender)
+
+					.setOrient (
+						randomLogic.sample (
+							Orient.values ()))
+
+					.setName (
+						name)
+
+					.setInfoText (
+						textHelper.findOrCreateFormat (
+							taskLogger,
+							"Info for %s",
+							name))
+
+					.setCreditMode (
+						ChatUserCreditMode.billedMessages)
+
+				);
+
+				chatUserAddImage (
+					taskLogger,
+					transaction,
+					chatUser,
+					imageMedias);
+
+				chatUsers.add (
+					chatUser);
+
+			}
+
+			for (
+				int index = 0;
+				index < 260;
+				index ++
+			) {
+
+				String code =
+					chatUserCode ();
+
+				Gender gender =
+					randomLogic.sample (
+						Gender.values ());
+
+				String name =
+					randomLogic.sample (
+						namesByGender.get (
+							gender));
+
+				ChatUserRec chatUser =
+					chatUserHelper.insert (
+						taskLogger,
+						chatUserHelper.createInstance ()
+
+					.setChat (
+						chatHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"test"))
+
+					.setCode (
+						code)
+
+					.setCreated (
+						transaction.now ())
+
+					.setType (
+						ChatUserType.monitor)
+
+					.setGender (
+						gender)
+
+					.setOrient (
+						randomLogic.sample (
+							Orient.values ()))
+
+					.setName (
+						name)
+
+					.setInfoText (
+						textHelper.findOrCreateFormat (
+							taskLogger,
+							"Info for %s",
+							name))
+
+					.setCreditMode (
+						ChatUserCreditMode.free)
+
+				);
+
+				chatUserAddImage (
+					taskLogger,
+					transaction,
+					chatUser,
+					imageMedias);
+
+				chatMonitors.add (
+					chatUser);
+
+			}
+
+			transaction.flush ();
 
 		}
-
-		for (
-			int index = 0;
-			index < 260;
-			index ++
-		) {
-
-			String code =
-				chatUserCode ();
-
-			Gender gender =
-				randomLogic.sample (
-					Gender.values ());
-
-			String name =
-				randomLogic.sample (
-					namesByGender.get (
-						gender));
-
-			ChatUserRec chatUser =
-				chatUserHelper.insert (
-					taskLogger,
-					chatUserHelper.createInstance ()
-
-				.setChat (
-					chatHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"test"))
-
-				.setCode (
-					code)
-
-				.setCreated (
-					transaction.now ())
-
-				.setType (
-					ChatUserType.monitor)
-
-				.setGender (
-					gender)
-
-				.setOrient (
-					randomLogic.sample (
-						Orient.values ()))
-
-				.setName (
-					name)
-
-				.setInfoText (
-					textHelper.findOrCreateFormat (
-						taskLogger,
-						"Info for %s",
-						name))
-
-				.setCreditMode (
-					ChatUserCreditMode.free)
-
-			);
-
-			chatUserAddImage (
-				taskLogger,
-				transaction,
-				chatUser,
-				imageMedias);
-
-			chatMonitors.add (
-				chatUser);
-
-		}
-
-		transaction.flush ();
 
 	}
 
@@ -836,258 +878,270 @@ class ChatCoreFixtureProvider
 	private
 	void chatUserAddImage (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull List <Optional <MediaRec>> imageMedias) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserAddImage");
+		try (
 
-		Optional <MediaRec> mediaOptional =
-			randomLogic.sample (
-				imageMedias);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserAddImage");
 
-		if (
-			optionalIsNotPresent (
-				mediaOptional)
 		) {
-			return;
+
+			Optional <MediaRec> mediaOptional =
+				randomLogic.sample (
+					imageMedias);
+
+			if (
+				optionalIsNotPresent (
+					mediaOptional)
+			) {
+				return;
+			}
+
+			ChatUserImageRec chatUserImage =
+				chatUserImageHelper.insert (
+					taskLogger,
+					chatUserImageHelper.createInstance ()
+
+				.setChatUser (
+					chatUser)
+
+				.setType (
+					ChatUserImageType.image)
+
+				.setIndex (
+					0l)
+
+				.setStatus (
+					ChatUserInfoStatus.console)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setFullMedia (
+					mediaOptional.get ())
+
+				.setMedia (
+					mediaOptional.get ())
+
+			);
+
+			chatUser.setMainChatUserImage (
+				chatUserImage);
+
+			chatUser.getChatUserImages ().add (
+				chatUserImage);
+
+			chatUser.getChatUserImageList ().add (
+				chatUserImage);
+
 		}
-
-		ChatUserImageRec chatUserImage =
-			chatUserImageHelper.insert (
-				taskLogger,
-				chatUserImageHelper.createInstance ()
-
-			.setChatUser (
-				chatUser)
-
-			.setType (
-				ChatUserImageType.image)
-
-			.setIndex (
-				0l)
-
-			.setStatus (
-				ChatUserInfoStatus.console)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setFullMedia (
-				mediaOptional.get ())
-
-			.setMedia (
-				mediaOptional.get ())
-
-		);
-
-		chatUser.setMainChatUserImage (
-			chatUserImage);
-
-		chatUser.getChatUserImages ().add (
-			chatUserImage);
-
-		chatUser.getChatUserImageList ().add (
-			chatUserImage);
 
 	}
 
 	private
 	void createChatMessages (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatMessages");
+		try (
 
-		// chat messages, between users
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatMessages");
 
-		for (
-			int index = 0;
-			index < 1000;
-			index ++
 		) {
 
-			TextRec messageText =
-				textHelper.findOrCreateFormat (
+			// chat messages, between users
+
+			for (
+				int index = 0;
+				index < 1000;
+				index ++
+			) {
+
+				TextRec messageText =
+					textHelper.findOrCreateFormat (
+						taskLogger,
+						"Chat message user to user %s",
+						integerToDecimalString (
+							index));
+
+				chatMessageHelper.insert (
 					taskLogger,
-					"Chat message user to user %s",
-					integerToDecimalString (
-						index));
+					chatMessageHelper.createInstance ()
 
-			chatMessageHelper.insert (
-				taskLogger,
-				chatMessageHelper.createInstance ()
+					.setChat (
+						chatHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"test"))
 
-				.setChat (
-					chatHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"test"))
+					.setFromUser (
+						randomLogic.sample (
+							chatUsers))
 
-				.setFromUser (
-					randomLogic.sample (
-						chatUsers))
+					.setToUser (
+						randomLogic.sample (
+							chatUsers))
 
-				.setToUser (
-					randomLogic.sample (
-						chatUsers))
+					.setTimestamp (
+						pastInstant (
+							transaction.now ()))
 
-				.setTimestamp (
-					pastInstant (
-						transaction.now ()))
+					.setSource (
+						ChatMessageMethod.api)
 
-				.setSource (
-					ChatMessageMethod.api)
+					.setMethod (
+						ChatMessageMethod.api)
 
-				.setMethod (
-					ChatMessageMethod.api)
+					.setOriginalText (
+						messageText)
 
-				.setOriginalText (
-					messageText)
+					.setEditedText (
+						messageText)
 
-				.setEditedText (
-					messageText)
+					.setStatus (
+						ChatMessageStatus.sent)
 
-				.setStatus (
-					ChatMessageStatus.sent)
+				);
 
-			);
+				if (index % 100 == 0) {
+					transaction.flush ();
+				}
 
-			if (index % 100 == 0) {
-				transaction.flush ();
 			}
 
-		}
+			transaction.flush ();
 
-		transaction.flush ();
+			// chat messages, to monitors
 
-		// chat messages, to monitors
+			for (
+				int index = 0;
+				index < 1000;
+				index ++
+			) {
 
-		for (
-			int index = 0;
-			index < 1000;
-			index ++
-		) {
+				TextRec messageText =
+					textHelper.findOrCreateFormat (
+						taskLogger,
+						"Chat message to monitor %s",
+						integerToDecimalString (
+							index));
 
-			TextRec messageText =
-				textHelper.findOrCreateFormat (
+				chatMessageHelper.insert (
 					taskLogger,
-					"Chat message to monitor %s",
-					integerToDecimalString (
-						index));
+					chatMessageHelper.createInstance ()
 
-			chatMessageHelper.insert (
-				taskLogger,
-				chatMessageHelper.createInstance ()
+					.setChat (
+						chatHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"test"))
 
-				.setChat (
-					chatHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"test"))
+					.setFromUser (
+						randomLogic.sample (
+							chatUsers))
 
-				.setFromUser (
-					randomLogic.sample (
-						chatUsers))
+					.setToUser (
+						randomLogic.sample (
+							chatMonitors))
 
-				.setToUser (
-					randomLogic.sample (
-						chatMonitors))
+					.setTimestamp (
+						pastInstant (
+							transaction.now ()))
 
-				.setTimestamp (
-					pastInstant (
-						transaction.now ()))
+					.setMethod (
+						ChatMessageMethod.api)
 
-				.setMethod (
-					ChatMessageMethod.api)
+					.setOriginalText (
+						messageText)
 
-				.setOriginalText (
-					messageText)
+					.setEditedText (
+						messageText)
 
-				.setEditedText (
-					messageText)
+					.setStatus (
+						ChatMessageStatus.sent)
 
-				.setStatus (
-					ChatMessageStatus.sent)
+				);
 
-			);
+				if (index % 100 == 0) {
+					transaction.flush ();
+				}
 
-			if (index % 100 == 0) {
-				transaction.flush ();
 			}
 
-		}
+			transaction.flush ();
 
-		transaction.flush ();
+			// chat messages, from monitors
 
-		// chat messages, from monitors
+			for (
+				int index = 0;
+				index < 1000;
+				index ++
+			) {
 
-		for (
-			int index = 0;
-			index < 1000;
-			index ++
-		) {
+				TextRec messageText =
+					textHelper.findOrCreateFormat (
+						taskLogger,
+						"Chat message from monitor %s",
+						integerToDecimalString (
+							index));
 
-			TextRec messageText =
-				textHelper.findOrCreateFormat (
+				chatMessageHelper.insert (
 					taskLogger,
-					"Chat message from monitor %s",
-					integerToDecimalString (
-						index));
+					chatMessageHelper.createInstance ()
 
-			chatMessageHelper.insert (
-				taskLogger,
-				chatMessageHelper.createInstance ()
+					.setChat (
+						chatHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"test"))
 
-				.setChat (
-					chatHelper.findByCodeRequired (
-						GlobalId.root,
-						"test",
-						"test"))
+					.setFromUser (
+						randomLogic.sample (
+							chatMonitors))
 
-				.setFromUser (
-					randomLogic.sample (
-						chatMonitors))
+					.setToUser (
+						randomLogic.sample (
+							chatUsers))
 
-				.setToUser (
-					randomLogic.sample (
-						chatUsers))
+					.setTimestamp (
+						pastInstant (
+							transaction.now ()))
 
-				.setTimestamp (
-					pastInstant (
-						transaction.now ()))
+					.setSender (
+						randomLogic.sample (
+							users))
 
-				.setSender (
-					randomLogic.sample (
-						users))
+					.setMethod (
+						ChatMessageMethod.api)
 
-				.setMethod (
-					ChatMessageMethod.api)
+					.setOriginalText (
+						messageText)
 
-				.setOriginalText (
-					messageText)
+					.setEditedText (
+						messageText)
 
-				.setEditedText (
-					messageText)
+					.setStatus (
+						ChatMessageStatus.sent)
 
-				.setStatus (
-					ChatMessageStatus.sent)
+				);
 
-			);
+				if (index % 100 == 0) {
+					transaction.flush ();
+				}
 
-			if (index % 100 == 0) {
-				transaction.flush ();
 			}
 
-		}
+			transaction.flush ();
 
-		transaction.flush ();
+		}
 
 	}
 

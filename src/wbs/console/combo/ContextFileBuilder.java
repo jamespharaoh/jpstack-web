@@ -78,22 +78,28 @@ class ContextFileBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextFile (
-				taskLogger,
-				resolvedExtensionPoint);
+			setDefaults ();
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextFile (
+					taskLogger,
+					resolvedExtensionPoint);
+
+			}
 
 		}
 
@@ -103,24 +109,35 @@ class ContextFileBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
-		consoleModule.addContextFile (
-			fileName,
-			consoleFileProvider.get ()
+		try (
 
-				.getResponderName (
-					getResponderName)
-
-				.getActionName (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					optionalFromNullable (
-						getActionName))
+					"buildContextFile");
 
-				.postActionName (
-					parentTaskLogger,
-					optionalFromNullable (
-						postActionName)),
+		) {
 
-			resolvedExtensionPoint.contextTypeNames ());
+			consoleModule.addContextFile (
+				fileName,
+				consoleFileProvider.get ()
+
+					.getResponderName (
+						getResponderName)
+
+					.getActionName (
+						parentTaskLogger,
+						optionalFromNullable (
+							getActionName))
+
+					.postActionName (
+						parentTaskLogger,
+						optionalFromNullable (
+							postActionName)),
+
+				resolvedExtensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

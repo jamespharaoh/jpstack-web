@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -64,14 +64,14 @@ class ServiceHooks
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"serviceHooks.setup ()",
@@ -121,50 +121,56 @@ class ServiceHooks
 			return;
 		}
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSingletons");
+		try (
 
-		Optional <SliceRec> slice =
-			objectManager.getAncestor (
-				SliceRec.class,
-				parent);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSingletons");
 
-		ObjectTypeRec parentType =
-			objectTypeDao.findById (
-				parentHelper.objectTypeId ());
-
-		for (
-			Long serviceTypeId
-				: serviceTypeIdsByParentTypeId.get (
-					parentHelper.objectTypeId ())
 		) {
 
-			ServiceTypeRec serviceType =
-				serviceTypeDao.findRequired (
-					serviceTypeId);
+			Optional <SliceRec> slice =
+				objectManager.getAncestor (
+					SliceRec.class,
+					parent);
 
-			serviceHelper.insert (
-				taskLogger,
-				serviceHelper.createInstance ()
+			ObjectTypeRec parentType =
+				objectTypeDao.findById (
+					parentHelper.objectTypeId ());
 
-				.setServiceType (
-					serviceType)
+			for (
+				Long serviceTypeId
+					: serviceTypeIdsByParentTypeId.get (
+						parentHelper.objectTypeId ())
+			) {
 
-				.setCode (
-					serviceType.getCode ())
+				ServiceTypeRec serviceType =
+					serviceTypeDao.findRequired (
+						serviceTypeId);
 
-				.setParentType (
-					parentType)
+				serviceHelper.insert (
+					taskLogger,
+					serviceHelper.createInstance ()
 
-				.setParentId (
-					parent.getId ())
+					.setServiceType (
+						serviceType)
 
-				.setSlice (
-					slice.orNull ())
+					.setCode (
+						serviceType.getCode ())
 
-			);
+					.setParentType (
+						parentType)
+
+					.setParentId (
+						parent.getId ())
+
+					.setSlice (
+						slice.orNull ())
+
+				);
+
+			}
 
 		}
 

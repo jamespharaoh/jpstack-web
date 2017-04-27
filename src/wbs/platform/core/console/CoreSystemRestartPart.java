@@ -106,46 +106,52 @@ class CoreSystemRestartPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		apiDeployments =
-			iterableFilterToList (
-				apiDeployment ->
-					userPrivChecker.canRecursive (
-						taskLogger,
-						apiDeployment,
-						"restart"),
-				apiDeploymentHelper.findAllNotDeletedEntities ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		Collections.sort (
-			apiDeployments);
+		) {
 
-		consoleDeployments =
-			iterableFilterToList (
-				consoleDeployment ->
-					userPrivChecker.canRecursive (
-						taskLogger,
-						consoleDeployment,
-						"restart"),
-				consoleDeploymentHelper.findAllNotDeletedEntities ());
+			apiDeployments =
+				iterableFilterToList (
+					apiDeployment ->
+						userPrivChecker.canRecursive (
+							taskLogger,
+							apiDeployment,
+							"restart"),
+					apiDeploymentHelper.findAllNotDeletedEntities ());
 
-		Collections.sort (
-			consoleDeployments);
+			Collections.sort (
+				apiDeployments);
 
-		daemonDeployments =
-			iterableFilterToList (
-				daemonDeployment ->
-					userPrivChecker.canRecursive (
-						taskLogger,
-						daemonDeployment,
-						"restart"),
-				daemonDeploymentHelper.findAllNotDeletedEntities ());
+			consoleDeployments =
+				iterableFilterToList (
+					consoleDeployment ->
+						userPrivChecker.canRecursive (
+							taskLogger,
+							consoleDeployment,
+							"restart"),
+					consoleDeploymentHelper.findAllNotDeletedEntities ());
 
-		Collections.sort (
-			daemonDeployments);
+			Collections.sort (
+				consoleDeployments);
+
+			daemonDeployments =
+				iterableFilterToList (
+					daemonDeployment ->
+						userPrivChecker.canRecursive (
+							taskLogger,
+							daemonDeployment,
+							"restart"),
+					daemonDeploymentHelper.findAllNotDeletedEntities ());
+
+			Collections.sort (
+				daemonDeployments);
+
+		}
 
 	}
 
@@ -154,47 +160,53 @@ class CoreSystemRestartPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Restart server components");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlParagraphWriteFormat (
-			"Use these controls to restart server compoments. This may be ",
-			"necessary from time to time if they encounter certain types of ",
-			"problem.");
+		) {
 
-		htmlFormOpenPost ();
+			htmlHeadingTwoWrite (
+				"Restart server components");
 
-		htmlTableOpenDetails ();
+			htmlParagraphWriteFormat (
+				"Use these controls to restart server compoments. This may be ",
+				"necessary from time to time if they encounter certain types of ",
+				"problem.");
 
-		htmlTableHeaderRowWrite (
-			"Name",
-			"Description",
-			"Status",
-			"Restart");
+			htmlFormOpenPost ();
 
-		htmlTableRowSeparatorWrite ();
+			htmlTableOpenDetails ();
 
-		renderApiDeployments (
-			taskLogger);
+			htmlTableHeaderRowWrite (
+				"Name",
+				"Description",
+				"Status",
+				"Restart");
 
-		htmlTableRowSeparatorWrite ();
+			htmlTableRowSeparatorWrite ();
 
-		renderDaemonDeployments (
-			taskLogger);
+			renderApiDeployments (
+				taskLogger);
 
-		htmlTableRowSeparatorWrite ();
+			htmlTableRowSeparatorWrite ();
 
-		renderConsoleDeployments (
-			taskLogger);
+			renderDaemonDeployments (
+				taskLogger);
 
-		htmlTableClose ();
+			htmlTableRowSeparatorWrite ();
 
-		htmlFormClose ();
+			renderConsoleDeployments (
+				taskLogger);
+
+			htmlTableClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 

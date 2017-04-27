@@ -103,141 +103,147 @@ class ModelRecordGenerator {
 	void generateRecord (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateRecord");
-
-		if (modelMeta.type ().record ()) {
-
-			recordClassName =
-				stringFormat (
-					"%sRec",
-					capitalise (
-						modelMeta.name ()));
-
-		} else if (modelMeta.type ().component ()) {
-
-			recordClassName =
-				capitalise (
-					modelMeta.name ());
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
-		// create directory
-
-		String directory =
-			stringFormat (
-				"work/generated/%s/model",
-				plugin.packageName ().replace ('.', '/'));
-
-		directoryCreateWithParents (
-			directory);
-
-		// write interface
-
-		String filename =
-			stringFormat (
-				"%s/%s.java",
-				directory,
-				recordClassName);
-
 		try (
 
-			FormatWriter formatWriter =
-				new AtomicFileWriter (
-					filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateRecord");
 
 		) {
 
-			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
+			if (modelMeta.type ().record ()) {
 
-				.formatWriter (
-					formatWriter)
+				recordClassName =
+					stringFormat (
+						"%sRec",
+						capitalise (
+							modelMeta.name ()));
 
-				.packageNameFormat (
-					"%s.model",
-					plugin.packageName ());
+			} else if (modelMeta.type ().component ()) {
 
-			JavaClassWriter modelWriter =
-				javaClassWriterProvider.get ()
+				recordClassName =
+					capitalise (
+						modelMeta.name ());
 
-				.className (
-					recordClassName)
+			} else {
 
-				.addClassModifier (
-					"public")
-
-				.addImplements (
-					imports ->
-						stringFormat (
-							"%s <%s>",
-							imports.register (
-								modelInterfacesByType.get (
-									modelMeta.type ())),
-							imports.registerFormat (
-								"%s.model.%s",
-								modelMeta.plugin ().packageName (),
-								recordClassName)));
-
-			for (
-				ModelImplementsInterfaceSpec implementsInterface
-					: modelMeta.implementsInterfaces ()
-			) {
-
-				modelWriter.addImplementsFormat (
-					"%s.%s",
-					implementsInterface.packageName (),
-					implementsInterface.name ());
+				throw new RuntimeException ();
 
 			}
 
-			modelWriter
+			// create directory
 
-				.addBlock (
-					this::writeConstructor)
+			String directory =
+				stringFormat (
+					"work/generated/%s/model",
+					plugin.packageName ().replace ('.', '/'));
 
-				.addBlock (
-					this::writeFields)
+			directoryCreateWithParents (
+				directory);
 
-				.addBlock (
-					this::writeCollections)
+			// write interface
 
-				.addBlock (
-					this::writeEquals);
+			String filename =
+				stringFormat (
+					"%s/%s.java",
+					directory,
+					recordClassName);
 
-			if (modelMeta.type ().record ()) {
+			try (
+
+				FormatWriter formatWriter =
+					new AtomicFileWriter (
+						filename);
+
+			) {
+
+				JavaClassUnitWriter classUnitWriter =
+					javaClassUnitWriterProvider.get ()
+
+					.formatWriter (
+						formatWriter)
+
+					.packageNameFormat (
+						"%s.model",
+						plugin.packageName ());
+
+				JavaClassWriter modelWriter =
+					javaClassWriterProvider.get ()
+
+					.className (
+						recordClassName)
+
+					.addClassModifier (
+						"public")
+
+					.addImplements (
+						imports ->
+							stringFormat (
+								"%s <%s>",
+								imports.register (
+									modelInterfacesByType.get (
+										modelMeta.type ())),
+								imports.registerFormat (
+									"%s.model.%s",
+									modelMeta.plugin ().packageName (),
+									recordClassName)));
+
+				for (
+					ModelImplementsInterfaceSpec implementsInterface
+						: modelMeta.implementsInterfaces ()
+				) {
+
+					modelWriter.addImplementsFormat (
+						"%s.%s",
+						implementsInterface.packageName (),
+						implementsInterface.name ());
+
+				}
 
 				modelWriter
 
 					.addBlock (
-						this::writeCompareTo)
+						this::writeConstructor)
 
 					.addBlock (
-						this::writeToString);
+						this::writeFields)
+
+					.addBlock (
+						this::writeCollections)
+
+					.addBlock (
+						this::writeEquals);
+
+				if (modelMeta.type ().record ()) {
+
+					modelWriter
+
+						.addBlock (
+							this::writeCompareTo)
+
+						.addBlock (
+							this::writeToString);
+
+				}
+
+				classUnitWriter.addBlock (
+					modelWriter);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				classUnitWriter.write (
+					taskLogger);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				formatWriter.commit ();
 
 			}
-
-			classUnitWriter.addBlock (
-				modelWriter);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			classUnitWriter.write (
-				taskLogger);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			formatWriter.commit ();
 
 		}
 
@@ -327,43 +333,49 @@ class ModelRecordGenerator {
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeFields");
+		try (
 
-		if (modelMeta.fields ().isEmpty ()) {
-			return;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeFields");
+
+		) {
+
+			if (modelMeta.fields ().isEmpty ()) {
+				return;
+			}
+
+			formatWriter.writeLineFormat (
+				"// fields");
+
+			formatWriter.writeNewline ();
+
+			ModelFieldWriterContext nextContext =
+				new ModelFieldWriterContext ()
+
+				.modelMeta (
+					modelMeta)
+
+				.recordClassName (
+					recordClassName);
+
+			ModelFieldWriterTarget nextTarget =
+				new ModelFieldWriterTarget ()
+
+				.imports (
+					imports)
+
+				.formatWriter (
+					formatWriter);
+
+			modelWriterBuilder.write (
+				taskLogger,
+				nextContext,
+				modelMeta.fields (),
+				nextTarget);
+
 		}
-
-		formatWriter.writeLineFormat (
-			"// fields");
-
-		formatWriter.writeNewline ();
-
-		ModelFieldWriterContext nextContext =
-			new ModelFieldWriterContext ()
-
-			.modelMeta (
-				modelMeta)
-
-			.recordClassName (
-				recordClassName);
-
-		ModelFieldWriterTarget nextTarget =
-			new ModelFieldWriterTarget ()
-
-			.imports (
-				imports)
-
-			.formatWriter (
-				formatWriter);
-
-		modelWriterBuilder.write (
-			taskLogger,
-			nextContext,
-			modelMeta.fields (),
-			nextTarget);
 
 	}
 
@@ -373,43 +385,49 @@ class ModelRecordGenerator {
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeCollections");
+		try (
 
-		if (modelMeta.collections ().isEmpty ()) {
-			return;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeCollections");
+
+		) {
+
+			if (modelMeta.collections ().isEmpty ()) {
+				return;
+			}
+
+			formatWriter.writeLineFormat (
+				"// collections");
+
+			formatWriter.writeNewline ();
+
+			ModelFieldWriterContext nextContext =
+				new ModelFieldWriterContext ()
+
+				.modelMeta (
+					modelMeta)
+
+				.recordClassName (
+					recordClassName);
+
+			ModelFieldWriterTarget nextTarget =
+				new ModelFieldWriterTarget ()
+
+				.imports (
+					imports)
+
+				.formatWriter (
+					formatWriter);
+
+			modelWriterBuilder.write (
+				taskLogger,
+				nextContext,
+				modelMeta.collections (),
+				nextTarget);
+
 		}
-
-		formatWriter.writeLineFormat (
-			"// collections");
-
-		formatWriter.writeNewline ();
-
-		ModelFieldWriterContext nextContext =
-			new ModelFieldWriterContext ()
-
-			.modelMeta (
-				modelMeta)
-
-			.recordClassName (
-				recordClassName);
-
-		ModelFieldWriterTarget nextTarget =
-			new ModelFieldWriterTarget ()
-
-			.imports (
-				imports)
-
-			.formatWriter (
-				formatWriter);
-
-		modelWriterBuilder.write (
-			taskLogger,
-			nextContext,
-			modelMeta.collections (),
-			nextTarget);
 
 	}
 

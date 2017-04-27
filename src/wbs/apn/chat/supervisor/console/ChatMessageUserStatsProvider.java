@@ -62,71 +62,77 @@ class ChatMessageUserStatsProvider
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getStats");
+		try (
 
-		if (period.granularity () != StatsGranularity.hour)
-			throw new IllegalArgumentException ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getStats");
 
-		List <ChatRec> chats =
-			new ArrayList<> ();
+		) {
 
-		if (conditions.containsKey ("chatId")) {
+			if (period.granularity () != StatsGranularity.hour)
+				throw new IllegalArgumentException ();
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					(Long)
-					conditions.get (
-						"chatId"));
+			List <ChatRec> chats =
+				new ArrayList<> ();
 
-			chats.add (
-				chat);
+			if (conditions.containsKey ("chatId")) {
 
-		} else {
+				ChatRec chat =
+					chatHelper.findRequired (
+						(Long)
+						conditions.get (
+							"chatId"));
 
-			chats =
-				chatHelper.findAll ();
-
-		}
-
-		StatsDataSet combinedStatsDataSet =
-			new StatsDataSet ();
-
-		Set<Object> userIds =
-			new HashSet<Object> ();
-
-		for (ChatRec chat : chats) {
-
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					chat,
-					"supervisor")
-			) {
-				continue;
-			}
-
-			StatsDataSet singleStatsDataSet =
-				getStatsForChat (
-					taskLogger,
-					period,
+				chats.add (
 					chat);
 
-			userIds.addAll (
-				singleStatsDataSet.indexValues ().get ("userId"));
+			} else {
 
-			combinedStatsDataSet.data ().addAll (
-				singleStatsDataSet.data ());
+				chats =
+					chatHelper.findAll ();
+
+			}
+
+			StatsDataSet combinedStatsDataSet =
+				new StatsDataSet ();
+
+			Set<Object> userIds =
+				new HashSet<Object> ();
+
+			for (ChatRec chat : chats) {
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						chat,
+						"supervisor")
+				) {
+					continue;
+				}
+
+				StatsDataSet singleStatsDataSet =
+					getStatsForChat (
+						taskLogger,
+						period,
+						chat);
+
+				userIds.addAll (
+					singleStatsDataSet.indexValues ().get ("userId"));
+
+				combinedStatsDataSet.data ().addAll (
+					singleStatsDataSet.data ());
+
+			}
+
+			combinedStatsDataSet.indexValues ().put (
+				"userId",
+				userIds);
+
+			return combinedStatsDataSet;
 
 		}
-
-		combinedStatsDataSet.indexValues ().put (
-			"userId",
-			userIds);
-
-		return combinedStatsDataSet;
 
 	}
 
@@ -135,205 +141,211 @@ class ChatMessageUserStatsProvider
 			@NonNull StatsPeriod period,
 			@NonNull ChatRec chat) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getStatsForChat");
+		try (
 
-		// setup data structures
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getStatsForChat");
 
-		Map<Long,long[]> countPerUser =
-			new TreeMap<> ();
-
-		Map<Long,long[]> charsPerUser =
-			new TreeMap<> ();
-
-		Map<Long,long[]> finalCountPerUser =
-			new TreeMap<> ();
-
-		Set<Object> userIds =
-			new HashSet<> ();
-
-		// retrieve messages
-
-		ChatMessageSearch chatMessageSearch =
-			new ChatMessageSearch ();
-
-		chatMessageSearch
-			.chatId (chat.getId ())
-			.timestampAfter (period.startTime ())
-			.timestampBefore (period.endTime ());
-
-		List <ChatMessageRec> chatMessages =
-			chatMessageHelper.search (
-				taskLogger,
-				chatMessageSearch);
-
-		// aggregate stats
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			Instant chatMessageTimestamp =
-				chatMessage.getTimestamp ();
+			// setup data structures
 
-			int hour =
-				period.assign (
-					chatMessageTimestamp);
+			Map<Long,long[]> countPerUser =
+				new TreeMap<> ();
 
-			// count outbound messages
+			Map<Long,long[]> charsPerUser =
+				new TreeMap<> ();
 
-			if (chatMessage.getSender () != null) {
+			Map<Long,long[]> finalCountPerUser =
+				new TreeMap<> ();
 
-				if (! userIds.contains (
-						chatMessage.getSender ().getId ())) {
+			Set<Object> userIds =
+				new HashSet<> ();
 
-					userIds.add (
-						chatMessage.getSender ().getId ());
+			// retrieve messages
 
-					countPerUser.put (
-						chatMessage.getSender ().getId (),
-						new long [
-							toJavaIntegerRequired (
-								period.size ())]);
+			ChatMessageSearch chatMessageSearch =
+				new ChatMessageSearch ();
 
-					charsPerUser.put (
-						chatMessage.getSender ().getId (),
-						new long [
-							toJavaIntegerRequired (
-								period.size ())]);
+			chatMessageSearch
+				.chatId (chat.getId ())
+				.timestampAfter (period.startTime ())
+				.timestampBefore (period.endTime ());
 
-					finalCountPerUser.put (
-						chatMessage.getSender ().getId (),
-						new long [
-							toJavaIntegerRequired (
-								period.size ())]);
+			List <ChatMessageRec> chatMessages =
+				chatMessageHelper.search (
+					taskLogger,
+					chatMessageSearch);
 
-				}
-
-				long[] userCounts =
-					countPerUser.get (
-						chatMessage.getSender ().getId ());
-
-				userCounts [hour] ++;
-
-				long[] userChars =
-					charsPerUser.get (
-						chatMessage.getSender ().getId ());
-
-				long length =
-					chatMessage.getOriginalText ().getText ().length ();
-
-				userChars [
-					hour] +=
-						length;
-
-				ChatContactRec chatContact =
-					chatMessage.getChatContact ();
-
-				ChatContactRec inverseChatContact =
-					chatContact.getInverseChatContact ();
-
-				if (
-
-					// is the last message
-
-					chatMessage
-						.getIndex ()
-					== chatContact
-						.getNumChatMessages () - 1
-
-					&& (
-
-						// no reverse contact
-
-						inverseChatContact
-						== null
-
-						// no reverse message
-
-						|| inverseChatContact
-							.getLastDeliveredMessageTime ()
-						== null
-
-						// reverse message is older
-
-						|| earlierThan (
-							inverseChatContact.getLastDeliveredMessageTime (),
-							chatMessage.getTimestamp ())
-
-					)
-
-				) {
-
-					long[] finalCounts =
-						finalCountPerUser.get (
-							chatMessage.getSender ().getId ());
-
-					finalCounts [hour] ++;
-
-				}
-
-			}
-
-		}
-
-		// create return value
-
-		StatsDataSet statsDataSet =
-			new StatsDataSet ();
-
-		statsDataSet.indexValues ()
-			.put ("userId", userIds);
-
-		for (
-			int hour = 0;
-			hour < period.size ();
-			hour ++
-		) {
+			// aggregate stats
 
 			for (
-				Object userIdObject
-					: userIds
+				ChatMessageRec chatMessage
+					: chatMessages
 			) {
 
-				Long userId =
-					(Long)
-					userIdObject;
+				Instant chatMessageTimestamp =
+					chatMessage.getTimestamp ();
 
-				statsDataSet.data ().add (
-					new StatsDatum ()
+				int hour =
+					period.assign (
+						chatMessageTimestamp);
 
-					.startTime (
-						period.step (hour))
+				// count outbound messages
 
-					.addIndex (
-						"chatId",
-						chat.getId ())
+				if (chatMessage.getSender () != null) {
 
-					.addIndex (
-						"userId",
-						userId)
+					if (! userIds.contains (
+							chatMessage.getSender ().getId ())) {
 
-					.addValue (
-						"messagesSent",
-						countPerUser.get (userId) [hour])
+						userIds.add (
+							chatMessage.getSender ().getId ());
 
-					.addValue (
-						"charactersSent",
-						charsPerUser.get (userId) [hour])
+						countPerUser.put (
+							chatMessage.getSender ().getId (),
+							new long [
+								toJavaIntegerRequired (
+									period.size ())]);
 
-					.addValue (
-						"finalMessagesSent",
-						finalCountPerUser.get (userId) [hour]));
+						charsPerUser.put (
+							chatMessage.getSender ().getId (),
+							new long [
+								toJavaIntegerRequired (
+									period.size ())]);
+
+						finalCountPerUser.put (
+							chatMessage.getSender ().getId (),
+							new long [
+								toJavaIntegerRequired (
+									period.size ())]);
+
+					}
+
+					long[] userCounts =
+						countPerUser.get (
+							chatMessage.getSender ().getId ());
+
+					userCounts [hour] ++;
+
+					long[] userChars =
+						charsPerUser.get (
+							chatMessage.getSender ().getId ());
+
+					long length =
+						chatMessage.getOriginalText ().getText ().length ();
+
+					userChars [
+						hour] +=
+							length;
+
+					ChatContactRec chatContact =
+						chatMessage.getChatContact ();
+
+					ChatContactRec inverseChatContact =
+						chatContact.getInverseChatContact ();
+
+					if (
+
+						// is the last message
+
+						chatMessage
+							.getIndex ()
+						== chatContact
+							.getNumChatMessages () - 1
+
+						&& (
+
+							// no reverse contact
+
+							inverseChatContact
+							== null
+
+							// no reverse message
+
+							|| inverseChatContact
+								.getLastDeliveredMessageTime ()
+							== null
+
+							// reverse message is older
+
+							|| earlierThan (
+								inverseChatContact.getLastDeliveredMessageTime (),
+								chatMessage.getTimestamp ())
+
+						)
+
+					) {
+
+						long[] finalCounts =
+							finalCountPerUser.get (
+								chatMessage.getSender ().getId ());
+
+						finalCounts [hour] ++;
+
+					}
+
+				}
 
 			}
 
-		}
+			// create return value
 
-		return statsDataSet;
+			StatsDataSet statsDataSet =
+				new StatsDataSet ();
+
+			statsDataSet.indexValues ()
+				.put ("userId", userIds);
+
+			for (
+				int hour = 0;
+				hour < period.size ();
+				hour ++
+			) {
+
+				for (
+					Object userIdObject
+						: userIds
+				) {
+
+					Long userId =
+						(Long)
+						userIdObject;
+
+					statsDataSet.data ().add (
+						new StatsDatum ()
+
+						.startTime (
+							period.step (hour))
+
+						.addIndex (
+							"chatId",
+							chat.getId ())
+
+						.addIndex (
+							"userId",
+							userId)
+
+						.addValue (
+							"messagesSent",
+							countPerUser.get (userId) [hour])
+
+						.addValue (
+							"charactersSent",
+							charsPerUser.get (userId) [hour])
+
+						.addValue (
+							"finalMessagesSent",
+							finalCountPerUser.get (userId) [hour]));
+
+				}
+
+			}
+
+			return statsDataSet;
+
+		}
 
 	}
 

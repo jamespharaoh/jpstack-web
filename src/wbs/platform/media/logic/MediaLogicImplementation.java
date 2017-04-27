@@ -57,6 +57,8 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 import wbs.platform.media.model.MediaTypeRec;
 
+import wbs.utils.io.RuntimeIoException;
+
 @SingletonComponent ("mediaLogic")
 public
 class MediaLogicImplementation
@@ -356,68 +358,74 @@ class MediaLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateContent");
+		try (
 
-		// work out hash code
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateContent");
 
-		Long shortHash =
-			fromJavaInteger (
-				Arrays.hashCode (
-					data));
+		) {
 
-		// look for existing content
+			// work out hash code
 
-		List <ContentRec> list =
-			contentHelper.findByShortHash (
-				shortHash);
+			Long shortHash =
+				fromJavaInteger (
+					Arrays.hashCode (
+						data));
 
-		long index = 0;
+			// look for existing content
 
-		for (
-			ContentRec content
-				: list) {
+			List <ContentRec> list =
+				contentHelper.findByShortHash (
+					shortHash);
 
-			if (
-				Arrays.equals (
-					content.getData (),
+			long index = 0;
+
+			for (
+				ContentRec content
+					: list) {
+
+				if (
+					Arrays.equals (
+						content.getData (),
+						data)
+				) {
+					return content;
+				}
+
+				if (content.getI () >= index) {
+
+					index =
+						content.getI () + 1;
+
+				}
+
+			}
+
+			// create a new content object
+
+			ContentRec content =
+				contentHelper.insert (
+					taskLogger,
+					contentHelper.createInstance ()
+
+				.setData (
 					data)
-			) {
-				return content;
-			}
 
-			if (content.getI () >= index) {
+				.setHash (
+					shortHash)
 
-				index =
-					content.getI () + 1;
+				.setI (
+					index)
 
-			}
+			);
+
+			// return
+
+			return content;
 
 		}
-
-		// create a new content object
-
-		ContentRec content =
-			contentHelper.insert (
-				taskLogger,
-				contentHelper.createInstance ()
-
-			.setData (
-				data)
-
-			.setHash (
-				shortHash)
-
-			.setI (
-				index)
-
-		);
-
-		// return
-
-		return content;
 
 	}
 
@@ -430,64 +438,70 @@ class MediaLogicImplementation
 			@NonNull String filename,
 			@NonNull Optional <String> encoding) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMedia");
+		try (
 
-		if (
-			contains (
-				imageTypes,
-				mimeType)
-		) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMedia");
 
-			return createMediaFromImage (
-				taskLogger,
-				data,
-				mimeType,
-				filename);
-
-		} else if (
-			contains (
-				textualTypes,
-				mimeType)
 		) {
 
 			if (
-				optionalIsNotPresent (
-					encoding)
+				contains (
+					imageTypes,
+					mimeType)
 			) {
 
-				throw new IllegalArgumentException (
-					"Encoding must be specified for textual content");
+				return createMediaFromImage (
+					taskLogger,
+					data,
+					mimeType,
+					filename);
+
+			} else if (
+				contains (
+					textualTypes,
+					mimeType)
+			) {
+
+				if (
+					optionalIsNotPresent (
+						encoding)
+				) {
+
+					throw new IllegalArgumentException (
+						"Encoding must be specified for textual content");
+
+				}
+
+				return createTextualMedia (
+					taskLogger,
+					data,
+					mimeType,
+					filename,
+					encoding.get ());
+
+			} else if (
+				contains (
+					videoTypes,
+					mimeType)
+			) {
+
+				return createMediaFromVideo (
+					taskLogger,
+					data,
+					mimeType,
+					filename);
+
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unknown media type \"%s\"",
+						mimeType));
 
 			}
-
-			return createTextualMedia (
-				taskLogger,
-				data,
-				mimeType,
-				filename,
-				encoding.get ());
-
-		} else if (
-			contains (
-				videoTypes,
-				mimeType)
-		) {
-
-			return createMediaFromVideo (
-				taskLogger,
-				data,
-				mimeType,
-				filename);
-
-		} else {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Unknown media type \"%s\"",
-					mimeType));
 
 		}
 
@@ -504,28 +518,34 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaFromImage");
+		try (
 
-		// encode the image
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaFromImage");
 
-		byte[] data =
-			writeImage (
+		) {
+
+			// encode the image
+
+			byte[] data =
+				writeImage (
+					image,
+					defaultMimeType);
+
+			return createMediaWithThumbnail (
+				taskLogger,
+				data,
 				image,
-				defaultMimeType);
+				mimeType,
+				filename,
+				fromJavaInteger (
+					image.getWidth ()),
+				fromJavaInteger (
+					image.getHeight ()));
 
-		return createMediaWithThumbnail (
-			taskLogger,
-			data,
-			image,
-			mimeType,
-			filename,
-			fromJavaInteger (
-				image.getWidth ()),
-			fromJavaInteger (
-				image.getHeight ()));
+		}
 
 	}
 
@@ -537,21 +557,27 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaFromImage");
+		try (
 
-		Optional <BufferedImage> imageOptional =
-			readImage (
-				taskLogger,
-				data,
-				mimeType);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaFromImage");
 
-		if (
-			optionalIsPresent (
-				imageOptional)
 		) {
+
+			Optional <BufferedImage> imageOptional =
+				readImage (
+					taskLogger,
+					data,
+					mimeType);
+
+			if (
+				optionalIsNotPresent (
+					imageOptional)
+			) {
+				return optionalAbsent ();
+			}
 
 			BufferedImage image =
 				imageOptional.get ();
@@ -568,10 +594,6 @@ class MediaLogicImplementation
 					fromJavaInteger (
 						image.getHeight ())));
 
-		} else {
-
-			return Optional.absent ();
-
 		}
 
 	}
@@ -587,46 +609,52 @@ class MediaLogicImplementation
 			@NonNull Long width,
 			@NonNull Long height) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaWithThumbnail");
+		try (
 
-		// create the 100x100 thumbnail
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaWithThumbnail");
 
-		BufferedImage image100 =
-			resampleImageToFit (
-				thumbnailImage,
-				100l,
-				100l);
+		) {
 
-		byte[] data100 =
-			writeImage (
-				image100,
-				defaultMimeType);
+			// create the 100x100 thumbnail
 
-		// create the 32x32 thumbnail
+			BufferedImage image100 =
+				resampleImageToFit (
+					thumbnailImage,
+					100l,
+					100l);
 
-		BufferedImage image32 =
-			resampleImageToFit (
-				thumbnailImage,
-				32l,
-				32l);
+			byte[] data100 =
+				writeImage (
+					image100,
+					defaultMimeType);
 
-		byte[] data32 =
-			writeImage (
-				image32,
-				defaultMimeType);
+			// create the 32x32 thumbnail
 
-		return createMediaWithThumbnail (
-			taskLogger,
-			data,
-			data100,
-			data32,
-			mimeType,
-			filename,
-			width,
-			height);
+			BufferedImage image32 =
+				resampleImageToFit (
+					thumbnailImage,
+					32l,
+					32l);
+
+			byte[] data32 =
+				writeImage (
+					image32,
+					defaultMimeType);
+
+			return createMediaWithThumbnail (
+				taskLogger,
+				data,
+				data100,
+				data32,
+				mimeType,
+				filename,
+				width,
+				height);
+
+		}
 
 	}
 
@@ -642,50 +670,56 @@ class MediaLogicImplementation
 			@NonNull Long width,
 			@NonNull Long height) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaWithThumbnail");
+		try (
 
-		MediaTypeRec mediaType =
-			findMediaTypeRequired (
-				mimeType);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaWithThumbnail");
 
-		return mediaHelper.insert (
-			taskLogger,
-			mediaHelper.createInstance ()
+		) {
 
-			.setFilename (
-				filename)
+			MediaTypeRec mediaType =
+				findMediaTypeRequired (
+					mimeType);
 
-			.setContent (
-				findOrCreateContent (
-					taskLogger,
-					data))
+			return mediaHelper.insert (
+				taskLogger,
+				mediaHelper.createInstance ()
 
-			.setThumb100Content (
-				findOrCreateContent (
-					taskLogger,
-					thumb100))
+				.setFilename (
+					filename)
 
-			.setThumb32Content (
-				findOrCreateContent (
-					taskLogger,
-					thumb32))
+				.setContent (
+					findOrCreateContent (
+						taskLogger,
+						data))
 
-			.setMediaType (
-				mediaType)
+				.setThumb100Content (
+					findOrCreateContent (
+						taskLogger,
+						thumb100))
 
-			.setThumbMediaType (
-				mediaType)
+				.setThumb32Content (
+					findOrCreateContent (
+						taskLogger,
+						thumb32))
 
-			.setWidth (
-				width)
+				.setMediaType (
+					mediaType)
 
-			.setHeight (
-				height)
+				.setThumbMediaType (
+					mediaType)
 
-		);
+				.setWidth (
+					width)
+
+				.setHeight (
+					height)
+
+			);
+
+		}
 
 	}
 
@@ -697,37 +731,43 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaFromVideo");
+		try (
 
-		Optional <BufferedImage> videoFrameImageOptional =
-			videoFrame (
-				taskLogger,
-				data);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaFromVideo");
 
-		if (
-			optionalIsNotPresent (
-				videoFrameImageOptional)
 		) {
-			return Optional.<MediaRec>absent ();
+
+			Optional <BufferedImage> videoFrameImageOptional =
+				videoFrame (
+					taskLogger,
+					data);
+
+			if (
+				optionalIsNotPresent (
+					videoFrameImageOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			BufferedImage videoFrameImage =
+				videoFrameImageOptional.get ();
+
+			return optionalOf (
+				createMediaWithThumbnail (
+					taskLogger,
+					data,
+					videoFrameImage,
+					mimeType,
+					filename,
+					fromJavaInteger (
+						videoFrameImage.getWidth ()),
+					fromJavaInteger (
+						videoFrameImage.getHeight ())));
+
 		}
-
-		BufferedImage videoFrameImage =
-			videoFrameImageOptional.get ();
-
-		return Optional.of (
-			createMediaWithThumbnail (
-				taskLogger,
-				data,
-				videoFrameImage,
-				mimeType,
-				filename,
-				fromJavaInteger (
-					videoFrameImage.getWidth ()),
-				fromJavaInteger (
-					videoFrameImage.getHeight ())));
 
 	}
 
@@ -739,29 +779,37 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaFromAudio");
+		try (
 
-		MediaTypeRec mediaType =
-			findMediaTypeRequired (
-				mimeType);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaFromAudio");
 
-		return mediaHelper.insert (
-			taskLogger,
-			mediaHelper.createInstance ()
+		) {
 
-			.setFilename (
-				filename)
+			MediaTypeRec mediaType =
+				findMediaTypeRequired (
+					mimeType);
 
-			.setContent (
-				findOrCreateContent (
-					taskLogger,
-					data))
+			return mediaHelper.insert (
+				taskLogger,
+				mediaHelper.createInstance ()
 
-			.setMediaType (
-				mediaType));
+				.setFilename (
+					filename)
+
+				.setContent (
+					findOrCreateContent (
+						taskLogger,
+						data))
+
+				.setMediaType (
+					mediaType)
+
+			);
+
+		}
 
 	}
 
@@ -785,32 +833,38 @@ class MediaLogicImplementation
 			@NonNull String filename,
 			@NonNull String encoding) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createTextualMedia");
+		try (
 
-		return optionalOf (
-			mediaHelper.insert (
-				taskLogger,
-				mediaHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTextualMedia");
 
-			.setMediaType (
-				findMediaTypeRequired (
-					mimeType))
+		) {
 
-			.setContent (
-				findOrCreateContent (
+			return optionalOf (
+				mediaHelper.insert (
 					taskLogger,
-					data))
+					mediaHelper.createInstance ()
 
-			.setFilename (
-				filename)
+				.setMediaType (
+					findMediaTypeRequired (
+						mimeType))
 
-			.setEncoding (
-				encoding)
+				.setContent (
+					findOrCreateContent (
+						taskLogger,
+						data))
 
-		));
+				.setFilename (
+					filename)
+
+				.setEncoding (
+					encoding)
+
+			));
+
+		}
 
 	}
 
@@ -822,33 +876,39 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createTextMedia");
+		try (
 
-		return mediaHelper.insert (
-			taskLogger,
-			mediaHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTextMedia");
 
-			.setMediaType (
-				findMediaTypeRequired (
-					mimeType))
+		) {
 
-			.setContent (
-				findOrCreateContent (
-					taskLogger,
-					stringToBytes (
-						text,
-						"utf-8")))
+			return mediaHelper.insert (
+				taskLogger,
+				mediaHelper.createInstance ()
 
-			.setFilename (
-				filename)
+				.setMediaType (
+					findMediaTypeRequired (
+						mimeType))
 
-			.setEncoding (
-				"utf-8")
+				.setContent (
+					findOrCreateContent (
+						taskLogger,
+						stringToBytes (
+							text,
+							"utf-8")))
 
-		);
+				.setFilename (
+					filename)
+
+				.setEncoding (
+					"utf-8")
+
+			);
+
+		}
 
 	}
 
@@ -942,53 +1002,59 @@ class MediaLogicImplementation
 			@NonNull byte[] data,
 			@NonNull String mimeType) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readImage");
+		try (
 
-		for (
-			ImageReader imageReader
-				: iterable (
-					ImageIO.getImageReadersByMIMEType (
-						mimeType))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readImage");
+
 		) {
 
-			taskLogger.debugFormat (
-				"Attempt to read image of type %s with %s bytes with %s",
-				mimeType,
-				integerToDecimalString (
-					data.length),
-				imageReader.toString ());
+			for (
+				ImageReader imageReader
+					: iterable (
+						ImageIO.getImageReadersByMIMEType (
+							mimeType))
+			) {
 
-			imageReader.setInput (
-				new ByteArrayImageInputStream (data));
-
-			try {
-
-				return Optional.of (
-					imageReader.read (0));
-
-			} catch (IOException exception) {
-
-				taskLogger.warningFormatException (
-					exception,
-					"Failed to read image of type %s with %s bytes",
+				taskLogger.debugFormat (
+					"Attempt to read image of type %s with %s bytes with %s",
 					mimeType,
 					integerToDecimalString (
-						data.length));
+						data.length),
+					imageReader.toString ());
+
+				imageReader.setInput (
+					new ByteArrayImageInputStream (data));
+
+				try {
+
+					return Optional.of (
+						imageReader.read (0));
+
+				} catch (IOException exception) {
+
+					taskLogger.warningFormatException (
+						exception,
+						"Failed to read image of type %s with %s bytes",
+						mimeType,
+						integerToDecimalString (
+							data.length));
+
+				}
 
 			}
 
+			taskLogger.warningFormat (
+				"Exhausted options to read image of type %s with %s bytes",
+				mimeType,
+				integerToDecimalString (
+					data.length));
+
+			return optionalAbsent ();
+
 		}
-
-		taskLogger.warningFormat (
-			"Exhausted options to read image of type %s with %s bytes",
-			mimeType,
-			integerToDecimalString (
-				data.length));
-
-		return optionalAbsent ();
 
 	}
 
@@ -1005,24 +1071,38 @@ class MediaLogicImplementation
 						mimeType))
 		) {
 
-			ByteArrayOutputStream byteArrayOutputStream =
-				new ByteArrayOutputStream ();
+			try (
 
-			imageWriter.setOutput (
-				new MemoryCacheImageOutputStream (
-					byteArrayOutputStream));
+				ByteArrayOutputStream byteArrayOutputStream =
+					new ByteArrayOutputStream ();
 
-			try {
+				MemoryCacheImageOutputStream imageOutputStream =
+					new MemoryCacheImageOutputStream (
+						byteArrayOutputStream);
 
-				imageWriter.write (
-					new IIOImage (
-						image,
-						null,
-						null));
+			) {
 
-				return byteArrayOutputStream.toByteArray ();
+				imageWriter.setOutput (
+					imageOutputStream);
 
-			} catch (IOException exception) {
+				try {
+
+					imageWriter.write (
+						new IIOImage (
+							image,
+							null,
+							null));
+
+					return byteArrayOutputStream.toByteArray ();
+
+				} catch (IOException exception) {
+
+				}
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeException (
+					ioException);
 
 			}
 
@@ -1045,35 +1125,49 @@ class MediaLogicImplementation
 						"image/jpeg"))
 		) {
 
-			ByteArrayOutputStream byteArrayOutputStream =
-				new ByteArrayOutputStream ();
+			try (
 
-			imageWriter.setOutput (
-				new MemoryCacheImageOutputStream (
-					byteArrayOutputStream));
+				ByteArrayOutputStream byteArrayOutputStream =
+					new ByteArrayOutputStream ();
 
-			ImageWriteParam imageWriteParam =
-				imageWriter.getDefaultWriteParam ();
+				MemoryCacheImageOutputStream imageOutputStream =
+					new MemoryCacheImageOutputStream (
+							byteArrayOutputStream);
 
-			imageWriteParam.setCompressionMode (
-				ImageWriteParam.MODE_EXPLICIT);
+			) {
 
-			imageWriteParam.setCompressionQuality (
-				jpegQuality);
+				imageWriter.setOutput (
+					imageOutputStream);
 
-			try {
+				ImageWriteParam imageWriteParam =
+					imageWriter.getDefaultWriteParam ();
 
-				imageWriter.write (
-					null,
-					new IIOImage (
-						image,
+				imageWriteParam.setCompressionMode (
+					ImageWriteParam.MODE_EXPLICIT);
+
+				imageWriteParam.setCompressionQuality (
+					jpegQuality);
+
+				try {
+
+					imageWriter.write (
 						null,
-						null),
-					imageWriteParam);
+						new IIOImage (
+							image,
+							null,
+							null),
+						imageWriteParam);
 
-				return byteArrayOutputStream.toByteArray ();
+					return byteArrayOutputStream.toByteArray ();
 
-			} catch (IOException exception) {
+				} catch (IOException exception) {
+
+				}
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
 
 			}
 
@@ -1437,28 +1531,34 @@ class MediaLogicImplementation
 			@NonNull String profileName,
 			@NonNull byte[] data) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"videoConvert");
+		try (
 
-		FfmpegProfile ffmpegProfile =
-			ffmpegProfiles.get (
-				profileName);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"videoConvert");
 
-		try {
+		) {
 
-			return Optional.of (
-				runFilterAdvanced (
-					taskLogger,
-					data,
-					"",
-					"." + ffmpegProfile.fileExtension,
-					ffmpegProfile.toFfmpeg ()));
+			FfmpegProfile ffmpegProfile =
+				ffmpegProfiles.get (
+					profileName);
 
-		} catch (Exception exception) {
+			try {
 
-			return Optional.<byte[]>absent ();
+				return optionalOf (
+					runFilterAdvanced (
+						taskLogger,
+						data,
+						"",
+						"." + ffmpegProfile.fileExtension,
+						ffmpegProfile.toFfmpeg ()));
+
+			} catch (Exception exception) {
+
+				return optionalAbsent ();
+
+			}
 
 		}
 
@@ -1470,14 +1570,16 @@ class MediaLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"videoFrameBytes");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"videoFrameBytes");
 
-			return Optional.of (
+		) {
+
+			return optionalOf (
 				runFilter (
 					taskLogger,
 					data,
@@ -1497,8 +1599,7 @@ class MediaLogicImplementation
 
 			Thread.currentThread ().interrupt ();
 
-			return Optional.absent ();
-
+			return optionalAbsent ();
 
 		}
 
@@ -1510,29 +1611,31 @@ class MediaLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"videoFrame");
+		try (
 
-		Optional <byte[]> videoFrameBytesOptional =
-			videoFrameBytes (
-				taskLogger,
-				data);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"videoFrame");
 
-		if (
-			optionalIsPresent (
-				videoFrameBytesOptional)
 		) {
+
+			Optional <byte[]> videoFrameBytesOptional =
+				videoFrameBytes (
+					taskLogger,
+					data);
+
+			if (
+				optionalIsNotPresent (
+					videoFrameBytesOptional)
+			) {
+				return optionalAbsent ();
+			}
 
 			return readImage (
 				taskLogger,
 				videoFrameBytesOptional.get (),
 				"image/jpeg");
-
-		} else {
-
-			return Optional.absent ();
 
 		}
 

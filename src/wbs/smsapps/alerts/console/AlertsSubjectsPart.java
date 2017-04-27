@@ -72,47 +72,53 @@ class AlertsSubjectsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"Type",
-			"Object",
-			"Include");
-
-		for (
-			AlertsSubjectRec alertsSubject
-				: alertsSubjects
 		) {
 
-			Record <?> object =
-				objectManager.findObject (
-					new GlobalId (
-						alertsSubject.getObjectType ().getId (),
-						alertsSubject.getObjectId ()));
+			htmlTableOpenDetails ();
 
-			htmlTableRowOpen ();
+			htmlTableHeaderRowWrite (
+				"Type",
+				"Object",
+				"Include");
 
-			htmlTableCellWrite (
-				alertsSubject.getObjectType ().getCode ());
+			for (
+				AlertsSubjectRec alertsSubject
+					: alertsSubjects
+			) {
 
-			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				object);
+				Record <?> object =
+					objectManager.findObject (
+						new GlobalId (
+							alertsSubject.getObjectType ().getId (),
+							alertsSubject.getObjectId ()));
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					alertsSubject.getInclude ()));
+				htmlTableRowOpen ();
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					alertsSubject.getObjectType ().getCode ());
+
+				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					object);
+
+				htmlTableCellWrite (
+					booleanToYesNo (
+						alertsSubject.getInclude ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

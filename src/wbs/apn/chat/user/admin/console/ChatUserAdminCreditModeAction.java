@@ -11,7 +11,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -75,86 +75,93 @@ class ChatUserAdminCreditModeAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// check privs
-
-		if (! requestContext.canContext (
-				"chat.userCredit")) {
-
-			requestContext.addError (
-				"Access denied");
-
-			return null;
-
-		}
-
-		// get params
-
-		ChatUserCreditMode newCreditMode =
-			toEnum (
-				ChatUserCreditMode.class,
-				requestContext.parameterRequired (
-					"creditMode"));
-
-		if (newCreditMode == null) {
-
-			requestContext.addError (
-				"Please select a valid credit mode");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminCreditModeAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+			// check privs
 
-			ChatUserCreditMode oldCreditMode =
-				chatUser.getCreditMode ();
+			if (! requestContext.canContext (
+					"chat.userCredit")) {
 
-			// if it changed
+				requestContext.addError (
+					"Access denied");
 
-			if (newCreditMode != oldCreditMode) {
-
-				// update chat user
-
-				chatUserLogic.creditModeChange (
-					chatUser,
-					newCreditMode);
-
-				// and log event
-
-				eventLogic.createEvent (
-					taskLogger,
-					"chat_user_credit_mode",
-					userConsoleLogic.userRequired (),
-					chatUser,
-					oldCreditMode.toString (),
-					newCreditMode.toString ());
+				return null;
 
 			}
 
-			transaction.commit ();
+			// get params
 
-			// we're done
+			ChatUserCreditMode newCreditMode =
+				toEnum (
+					ChatUserCreditMode.class,
+					requestContext.parameterRequired (
+						"creditMode"));
 
-			requestContext.addNotice (
-				"Credit mode updated");
+			if (newCreditMode == null) {
 
-			return null;
+				requestContext.addError (
+					"Please select a valid credit mode");
+
+				return null;
+
+			}
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatUserAdminCreditModeAction.goReal ()",
+						this);
+
+			) {
+
+				ChatUserRec chatUser =
+					chatUserHelper.findFromContextRequired ();
+
+				ChatUserCreditMode oldCreditMode =
+					chatUser.getCreditMode ();
+
+				// if it changed
+
+				if (newCreditMode != oldCreditMode) {
+
+					// update chat user
+
+					chatUserLogic.creditModeChange (
+						taskLogger,
+						chatUser,
+						newCreditMode);
+
+					// and log event
+
+					eventLogic.createEvent (
+						taskLogger,
+						"chat_user_credit_mode",
+						userConsoleLogic.userRequired (),
+						chatUser,
+						oldCreditMode.toString (),
+						newCreditMode.toString ());
+
+				}
+
+				transaction.commit ();
+
+				// we're done
+
+				requestContext.addNotice (
+					"Credit mode updated");
+
+				return null;
+
+			}
 
 		}
 

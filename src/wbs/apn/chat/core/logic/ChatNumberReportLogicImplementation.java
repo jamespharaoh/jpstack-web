@@ -14,8 +14,8 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -47,74 +47,80 @@ class ChatNumberReportLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"isNumberReportSuccessful");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"isNumberReportSuccessful");
 
-		Instant sixMonthsAgo =
-			transaction
-				.now ()
-				.minus (Duration.standardDays (365 / 2));
-
-		Optional<ChatUserNumberReportRec> numberReportOptional =
-			chatUserNumberReportHelper.find (
-				number.getId ());
-
-		if (
-			optionalIsNotPresent (
-				numberReportOptional)
 		) {
 
-			// no DR yet for this number
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			Instant sixMonthsAgo =
+				transaction
+					.now ()
+					.minus (Duration.standardDays (365 / 2));
+
+			Optional<ChatUserNumberReportRec> numberReportOptional =
+				chatUserNumberReportHelper.find (
+					number.getId ());
+
+			if (
+				optionalIsNotPresent (
+					numberReportOptional)
+			) {
+
+				// no DR yet for this number
+
+				taskLogger.debugFormat (
+					"REPORT NULL %s",
+					number.getNumber ());
+
+				return true;
+
+			}
+
+			ChatUserNumberReportRec numberReport =
+				numberReportOptional.get ();
+
+			if (numberReport.getLastSuccess () != null) {
+
+				taskLogger.debugFormat (
+					"REPORT LAST SUCCESS %s %s",
+					numberReport.getLastSuccess ().toString (),
+					number.getNumber ());
+
+				return laterThan (
+					numberReport.getLastSuccess (),
+					sixMonthsAgo);
+
+			}
+
+			if (numberReport.getFirstFailure () != null) {
+
+				taskLogger.debugFormat (
+					"REPORT FIRST FAILURE %s %s",
+					numberReport.getFirstFailure ().toString (),
+					number.getNumber ());
+
+				return laterThan (
+					numberReport.getFirstFailure (),
+					sixMonthsAgo);
+
+			}
+
+			// shouldn't happen
 
 			taskLogger.debugFormat (
-				"REPORT NULL %s",
+				"REPORT ERROR %s",
 				number.getNumber ());
 
 			return true;
 
 		}
-
-		ChatUserNumberReportRec numberReport =
-			numberReportOptional.get ();
-
-		if (numberReport.getLastSuccess () != null) {
-
-			taskLogger.debugFormat (
-				"REPORT LAST SUCCESS %s %s",
-				numberReport.getLastSuccess ().toString (),
-				number.getNumber ());
-
-			return laterThan (
-				numberReport.getLastSuccess (),
-				sixMonthsAgo);
-
-		}
-
-		if (numberReport.getFirstFailure () != null) {
-
-			taskLogger.debugFormat (
-				"REPORT FIRST FAILURE %s %s",
-				numberReport.getFirstFailure ().toString (),
-				number.getNumber ());
-
-			return laterThan (
-				numberReport.getFirstFailure (),
-				sixMonthsAgo);
-
-		}
-
-		// shouldn't happen
-
-		taskLogger.debugFormat (
-			"REPORT ERROR %s",
-			number.getNumber ());
-
-		return true;
 
 	}
 
@@ -124,51 +130,57 @@ class ChatNumberReportLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"isNumberReportPastPermanentDeliveryConstraint");
+		try (
 
-		Optional<ChatUserNumberReportRec> numberReportOptional =
-			chatUserNumberReportHelper.find (
-				number.getId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"isNumberReportPastPermanentDeliveryConstraint");
 
-		if (
-			optionalIsNotPresent (
-				numberReportOptional)
 		) {
 
-			// no DR yet for this number
+			Optional <ChatUserNumberReportRec> numberReportOptional =
+				chatUserNumberReportHelper.find (
+					number.getId ());
 
-			taskLogger.debugFormat (
-				"REPORT PERMANENT NULL %s",
-				number.getNumber ());
+			if (
+				optionalIsNotPresent (
+					numberReportOptional)
+			) {
+
+				// no DR yet for this number
+
+				taskLogger.debugFormat (
+					"REPORT PERMANENT NULL %s",
+					number.getNumber ());
+
+				return false;
+
+			}
+
+			ChatUserNumberReportRec numberReport =
+				numberReportOptional.get ();
+
+			if (numberReport.getPermanentFailureReceived () != null) {
+
+				long count =
+					numberReport.getPermanentFailureCount ();
+
+				taskLogger.debugFormat (
+					"REPORT PERMANENT COUNT %s %s",
+					integerToDecimalString (
+						count),
+					number.getNumber ());
+
+				// disabled at sam's request
+				// if (count >= 42)
+				// return true;
+
+			}
 
 			return false;
 
 		}
-
-		ChatUserNumberReportRec numberReport =
-			numberReportOptional.get ();
-
-		if (numberReport.getPermanentFailureReceived () != null) {
-
-			long count =
-				numberReport.getPermanentFailureCount ();
-
-			taskLogger.debugFormat (
-				"REPORT PERMANENT COUNT %s %s",
-				integerToDecimalString (
-					count),
-				number.getNumber ());
-
-			// disabled at sam's request
-			// if (count >= 42)
-			// return true;
-
-		}
-
-		return false;
 
 	}
 

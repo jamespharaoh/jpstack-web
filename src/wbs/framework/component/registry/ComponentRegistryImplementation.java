@@ -802,12 +802,12 @@ class ComponentRegistryImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String outputPath) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputComponentDefinitions");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputComponentDefinitions");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -1213,209 +1213,215 @@ class ComponentRegistryImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Class <?> instantiateClass) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initComponentDefinitionFields");
+		try (
 
-		for (
-			Field field
-				: FieldUtils.getAllFields (
-					instantiateClass)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initComponentDefinitionFields");
+
 		) {
 
-			PrototypeDependency prototypeDependencyAnnotation =
-				field.getAnnotation (
-					PrototypeDependency.class);
-
-			SingletonDependency singletonDependencyAnnotation =
-				field.getAnnotation (
-					SingletonDependency.class);
-
-			ClassSingletonDependency classSingletonDependencyAnnotation =
-				field.getAnnotation (
-					ClassSingletonDependency.class);
-
-			WeakSingletonDependency weakSingletonDependencyAnnotation =
-				field.getAnnotation (
-					WeakSingletonDependency.class);
-
-			UninitializedDependency uninitializedDependencyAnnotation =
-				field.getAnnotation (
-					UninitializedDependency.class);
-
-			long numAnnotations =
-				iterableCount (
-					presentInstances (
-						optionalFromNullable (
-							prototypeDependencyAnnotation),
-						optionalFromNullable (
-							singletonDependencyAnnotation),
-						optionalFromNullable (
-							classSingletonDependencyAnnotation),
-						optionalFromNullable (
-							weakSingletonDependencyAnnotation),
-						optionalFromNullable (
-							uninitializedDependencyAnnotation)));
-
-			if (
-				equalToZero (
-					numAnnotations)
-			) {
-				continue;
-			}
-
-			if (
-				moreThanOne (
-					numAnnotations)
+			for (
+				Field field
+					: FieldUtils.getAllFields (
+						instantiateClass)
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask ());
+				PrototypeDependency prototypeDependencyAnnotation =
+					field.getAnnotation (
+						PrototypeDependency.class);
 
-			}
+				SingletonDependency singletonDependencyAnnotation =
+					field.getAnnotation (
+						SingletonDependency.class);
 
-			Boolean prototype =
-				isNotNull (
-					prototypeDependencyAnnotation)
-				|| isNotNull (
-					uninitializedDependencyAnnotation);
+				ClassSingletonDependency classSingletonDependencyAnnotation =
+					field.getAnnotation (
+						ClassSingletonDependency.class);
 
-			Boolean scoped =
-				isNotNull (
-					classSingletonDependencyAnnotation);
+				WeakSingletonDependency weakSingletonDependencyAnnotation =
+					field.getAnnotation (
+						WeakSingletonDependency.class);
 
-			Boolean initialized =
-				isNull (
-					uninitializedDependencyAnnotation);
+				UninitializedDependency uninitializedDependencyAnnotation =
+					field.getAnnotation (
+						UninitializedDependency.class);
 
-			Boolean weak =
-				isNotNull (
-					weakSingletonDependencyAnnotation);
+				long numAnnotations =
+					iterableCount (
+						presentInstances (
+							optionalFromNullable (
+								prototypeDependencyAnnotation),
+							optionalFromNullable (
+								singletonDependencyAnnotation),
+							optionalFromNullable (
+								classSingletonDependencyAnnotation),
+							optionalFromNullable (
+								weakSingletonDependencyAnnotation),
+							optionalFromNullable (
+								uninitializedDependencyAnnotation)));
 
-			Named namedAnnotation =
-				field.getAnnotation (
-					Named.class);
-
-			if (
-				isNotNull (
-					namedAnnotation)
-			) {
-
-				if (scoped) {
-					throw new RuntimeException ();
-				}
-
-				String targetComponentName =
-					ifNull (
-						nullIfEmptyString (
-							namedAnnotation.value ()),
-						field.getName ());
-
-				initInjectedFieldByName (
-					taskLogger,
-					componentDefinition,
-					targetComponentName,
-					field,
-					prototype,
-					initialized,
-					weak);
-
-			} else if (scoped) {
-
-				String targetComponentName =
-					stringFormat (
-						"%s:%s",
-						classNameFull (
-							field.getDeclaringClass ()),
-						classNameFull (
-							field.getType ()));
-
-				initInjectedFieldByName (
-					taskLogger,
-					componentDefinition,
-					targetComponentName,
-					field,
-					prototype,
-					initialized,
-					weak);
-
-			} else {
-
-				List <Annotation> qualifierAnnotations =
-					new ArrayList <Annotation> ();
-
-				for (
-					Annotation annotation
-						: field.getDeclaredAnnotations ()
+				if (
+					equalToZero (
+						numAnnotations)
 				) {
-
-					if (annotation instanceof Named)
-						continue;
-
-					Qualifier metaAnnotation =
-						annotation.annotationType ().getAnnotation (
-							Qualifier.class);
-
-					if (metaAnnotation == null)
-						continue;
-
-					qualifierAnnotations.add (
-						annotation);
-
+					continue;
 				}
 
-				if (qualifierAnnotations.size () > 1) {
+				if (
+					moreThanOne (
+						numAnnotations)
+				) {
 
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask ());
 
 				}
 
-				InjectedProperty injectedProperty =
-					new InjectedProperty ()
+				Boolean prototype =
+					isNotNull (
+						prototypeDependencyAnnotation)
+					|| isNotNull (
+						uninitializedDependencyAnnotation);
 
-					.componentDefinition (
-						componentDefinition)
+				Boolean scoped =
+					isNotNull (
+						classSingletonDependencyAnnotation);
 
-					.field (
-						field)
+				Boolean initialized =
+					isNull (
+						uninitializedDependencyAnnotation);
 
-					.initialized (
-						isNull (
-							uninitializedDependencyAnnotation))
+				Boolean weak =
+					isNotNull (
+						weakSingletonDependencyAnnotation);
 
-					.weak (
-						weak);
+				Named namedAnnotation =
+					field.getAnnotation (
+						Named.class);
 
-				initInjectedPropertyField (
-					taskLogger,
-					componentDefinition,
-					field,
-					injectedProperty);
+				if (
+					isNotNull (
+						namedAnnotation)
+				) {
 
-				if (qualifierAnnotations.size () == 1) {
+					if (scoped) {
+						throw new RuntimeException ();
+					}
 
-					initInjectedPropertyTargetByQualifier (
+					String targetComponentName =
+						ifNull (
+							nullIfEmptyString (
+								namedAnnotation.value ()),
+							field.getName ());
+
+					initInjectedFieldByName (
 						taskLogger,
 						componentDefinition,
-						qualifierAnnotations.get (0),
-						injectedProperty,
+						targetComponentName,
+						field,
+						prototype,
+						initialized,
+						weak);
+
+				} else if (scoped) {
+
+					String targetComponentName =
+						stringFormat (
+							"%s:%s",
+							classNameFull (
+								field.getDeclaringClass ()),
+							classNameFull (
+								field.getType ()));
+
+					initInjectedFieldByName (
+						taskLogger,
+						componentDefinition,
+						targetComponentName,
+						field,
+						prototype,
+						initialized,
 						weak);
 
 				} else {
 
-					initInjectedPropertyTargetByClass (
+					List <Annotation> qualifierAnnotations =
+						new ArrayList <Annotation> ();
+
+					for (
+						Annotation annotation
+							: field.getDeclaredAnnotations ()
+					) {
+
+						if (annotation instanceof Named)
+							continue;
+
+						Qualifier metaAnnotation =
+							annotation.annotationType ().getAnnotation (
+								Qualifier.class);
+
+						if (metaAnnotation == null)
+							continue;
+
+						qualifierAnnotations.add (
+							annotation);
+
+					}
+
+					if (qualifierAnnotations.size () > 1) {
+
+						throw new RuntimeExceptionWithTask (
+							activityManager.currentTask ());
+
+					}
+
+					InjectedProperty injectedProperty =
+						new InjectedProperty ()
+
+						.componentDefinition (
+							componentDefinition)
+
+						.field (
+							field)
+
+						.initialized (
+							isNull (
+								uninitializedDependencyAnnotation))
+
+						.weak (
+							weak);
+
+					initInjectedPropertyField (
 						taskLogger,
 						componentDefinition,
 						field,
-						injectedProperty,
-						weak);
+						injectedProperty);
+
+					if (qualifierAnnotations.size () == 1) {
+
+						initInjectedPropertyTargetByQualifier (
+							taskLogger,
+							componentDefinition,
+							qualifierAnnotations.get (0),
+							injectedProperty,
+							weak);
+
+					} else {
+
+						initInjectedPropertyTargetByClass (
+							taskLogger,
+							componentDefinition,
+							field,
+							injectedProperty,
+							weak);
+
+					}
+
+					componentDefinition.injectedProperties ().add (
+						injectedProperty);
 
 				}
-
-				componentDefinition.injectedProperties ().add (
-					injectedProperty);
 
 			}
 
@@ -1878,101 +1884,107 @@ class ComponentRegistryImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <ComponentDefinition> definitions) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"orderByStrongDependencies");
+		try (
 
-		List <ComponentDefinition> unorderedDefinitions =
-			new ArrayList<> (
-				definitions);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"orderByStrongDependencies");
 
-		List <ComponentDefinition> orderedDefinitions =
-			new ArrayList<> ();
-
-		Set <String> orderedDefinitionNames =
-			new HashSet<> ();
-
-		while (
-			collectionIsNotEmpty (
-				unorderedDefinitions)
 		) {
 
-			boolean madeProgress = false;
+			List <ComponentDefinition> unorderedDefinitions =
+				new ArrayList<> (
+					definitions);
 
-			ListIterator <ComponentDefinition>
-				unorderedDefinitionIterator =
-					unorderedDefinitions.listIterator ();
+			List <ComponentDefinition> orderedDefinitions =
+				new ArrayList<> ();
 
-			OUTER: while (
-				unorderedDefinitionIterator.hasNext ()
+			Set <String> orderedDefinitionNames =
+				new HashSet<> ();
+
+			while (
+				collectionIsNotEmpty (
+					unorderedDefinitions)
 			) {
 
-				ComponentDefinition definition =
-					unorderedDefinitionIterator.next ();
+				boolean madeProgress = false;
 
-				for (
-					String targetDefinitionName
-						: definition.strongDependencies ()
+				ListIterator <ComponentDefinition>
+					unorderedDefinitionIterator =
+						unorderedDefinitions.listIterator ();
+
+				OUTER: while (
+					unorderedDefinitionIterator.hasNext ()
 				) {
 
-					if (
-						doesNotContain (
-							orderedDefinitionNames,
-							targetDefinitionName)
+					ComponentDefinition definition =
+						unorderedDefinitionIterator.next ();
+
+					for (
+						String targetDefinitionName
+							: definition.strongDependencies ()
 					) {
-						continue OUTER;
+
+						if (
+							doesNotContain (
+								orderedDefinitionNames,
+								targetDefinitionName)
+						) {
+							continue OUTER;
+						}
+
 					}
 
-				}
+					taskLogger.debugFormat (
+						"Ordered component definition %s",
+						definition.name ());
 
-				taskLogger.debugFormat (
-					"Ordered component definition %s",
-					definition.name ());
+					orderedDefinitions.add (
+						definition);
 
-				orderedDefinitions.add (
-					definition);
+					orderedDefinitionNames.add (
+						definition.name ());
 
-				orderedDefinitionNames.add (
-					definition.name ());
+					unorderedDefinitionIterator.remove ();
 
-				unorderedDefinitionIterator.remove ();
-
-				madeProgress = true;
-
-			}
-
-			if (! madeProgress) {
-
-				for (
-					ComponentDefinition definition
-						: unorderedDefinitions
-				) {
-
-					List <String> unresolvedDependencyNames =
-						new ArrayList<> (
-							Sets.difference (
-								definition.strongDependencies (),
-								orderedDefinitionNames));
-
-					Collections.sort (
-						unresolvedDependencyNames);
-
-					taskLogger.errorFormat (
-						"Unable to resolve dependencies for %s (%s)",
-						definition.name (),
-						joinWithCommaAndSpace (
-							unresolvedDependencyNames));
+					madeProgress = true;
 
 				}
 
-				break;
+				if (! madeProgress) {
+
+					for (
+						ComponentDefinition definition
+							: unorderedDefinitions
+					) {
+
+						List <String> unresolvedDependencyNames =
+							new ArrayList<> (
+								Sets.difference (
+									definition.strongDependencies (),
+									orderedDefinitionNames));
+
+						Collections.sort (
+							unresolvedDependencyNames);
+
+						taskLogger.errorFormat (
+							"Unable to resolve dependencies for %s (%s)",
+							definition.name (),
+							joinWithCommaAndSpace (
+								unresolvedDependencyNames));
+
+					}
+
+					break;
+
+				}
 
 			}
+
+			return orderedDefinitions;
 
 		}
-
-		return orderedDefinitions;
 
 	}
 

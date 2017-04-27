@@ -2,6 +2,8 @@ package wbs.platform.queue.console;
 
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
@@ -12,12 +14,9 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-
-import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
 
@@ -26,8 +25,8 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.record.Record;
@@ -193,162 +192,182 @@ class QueueConsoleLogic {
 			@NonNull QueueRec queue,
 			@NonNull UserRec user) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"claimQueueItem");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"claimQueueItem");
 
-		// find the next waiting item
+		) {
 
-		SortedQueueSubjects subjects =
-			queueSubjectSorterProvider.get ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.queueCache (
-				dummyQueueCache)
+			// find the next waiting item
 
-			.queue (
-				queue)
+			SortedQueueSubjects subjects =
+				queueSubjectSorterProvider.get ()
 
-			.loggedInUser (
-				userConsoleLogic.userRequired ())
+				.queueCache (
+					dummyQueueCache)
 
-			.effectiveUser (
-				user)
+				.queue (
+					queue)
 
-			.sort (
-				taskLogger);
+				.loggedInUser (
+					userConsoleLogic.userRequired ())
 
-		if (subjects.availableSubjects ().isEmpty ())
-			return null;
+				.effectiveUser (
+					user)
 
-		QueueSubjectRec queueSubject =
-			subjects.availableSubjects ().get (0).subject ();
+				.sort (
+					taskLogger);
 
-		long nextQueueItemId =
-			+ queueSubject.getTotalItems ()
-			- queueSubject.getActiveItems ();
+			if (subjects.availableSubjects ().isEmpty ())
+				return null;
 
-		QueueItemRec queueItem =
-			queueItemHelper.findByIndexRequired (
-				queueSubject,
-				nextQueueItemId);
+			QueueSubjectRec queueSubject =
+				subjects.availableSubjects ().get (0).subject ();
 
-		// sanity checks
+			long nextQueueItemId =
+				+ queueSubject.getTotalItems ()
+				- queueSubject.getActiveItems ();
 
-		if (queueItem.getState () != QueueItemState.pending)
-			throw new IllegalStateException ();
+			QueueItemRec queueItem =
+				queueItemHelper.findByIndexRequired (
+					queueSubject,
+					nextQueueItemId);
 
-		if (queueItem.getQueueItemClaim () != null)
-			throw new IllegalStateException ();
+			// sanity checks
 
-		// create queue item claim
+			if (queueItem.getState () != QueueItemState.pending)
+				throw new IllegalStateException ();
 
-		QueueItemClaimRec queueItemClaim =
-			queueItemClaimHelper.insert (
+			if (queueItem.getQueueItemClaim () != null)
+				throw new IllegalStateException ();
+
+			// create queue item claim
+
+			QueueItemClaimRec queueItemClaim =
+				queueItemClaimHelper.insert (
+					taskLogger,
+					queueItemClaimHelper.createInstance ()
+
+				.setQueueItem (
+					queueItem)
+
+				.setUser (
+					user)
+
+				.setStartTime (
+					transaction.now ())
+
+				.setStatus (
+					QueueItemClaimStatus.claimed)
+
+			);
+
+			// update queue item
+
+			queueItem
+
+				.setState (
+					QueueItemState.claimed)
+
+				.setQueueItemClaim (
+					queueItemClaim);
+
+			// update slice
+
+			sliceLogic.updateSliceInactivityTimestamp (
 				taskLogger,
-				queueItemClaimHelper.createInstance ()
+				user.getSlice (),
+				optionalAbsent ());
 
-			.setQueueItem (
-				queueItem)
+			// and return
 
-			.setUser (
-				user)
+			return queueItem;
 
-			.setStartTime (
-				transaction.now ())
-
-			.setStatus (
-				QueueItemClaimStatus.claimed)
-
-		);
-
-		// update queue item
-
-		queueItem
-
-			.setState (
-				QueueItemState.claimed)
-
-			.setQueueItemClaim (
-				queueItemClaim);
-
-		// update slice
-
-		sliceLogic.updateSliceInactivityTimestamp (
-			user.getSlice (),
-			Optional.<Instant>absent ());
-
-		// and return
-
-		return queueItem;
+		}
 
 	}
 
 	public
 	void unclaimQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemRec queueItem,
 			@NonNull UserRec user) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		QueueSubjectRec queueSubject =
-			queueItem.getQueueSubject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"unclaimQueueItem");
 
-		// sanity checks
+		) {
 
-		long currentItemIndex =
-			+ queueSubject.getTotalItems ()
-			- queueSubject.getActiveItems ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		if (queueItem.getIndex () != currentItemIndex)
-			throw new IllegalStateException ();
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
 
-		if (queueItem.getState () != QueueItemState.claimed) {
+			// sanity checks
 
-			throw new RuntimeException (
-				stringFormat (
-					"Cannot unclaim queue item in %s state",
-					enumName (
-						queueItem.getState ())));
+			long currentItemIndex =
+				+ queueSubject.getTotalItems ()
+				- queueSubject.getActiveItems ();
+
+			if (queueItem.getIndex () != currentItemIndex)
+				throw new IllegalStateException ();
+
+			if (queueItem.getState () != QueueItemState.claimed) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Cannot unclaim queue item in %s state",
+						enumName (
+							queueItem.getState ())));
+
+			}
+
+			if (queueItem.getQueueItemClaim ().getUser () != user) {
+
+				throw new RuntimeException (
+					"Trying to unclaim item belonging to another user");
+
+			}
+
+			// update queue item claim
+
+			queueItem.getQueueItemClaim ()
+
+				.setEndTime (
+					transaction.now ())
+
+				.setStatus (
+					QueueItemClaimStatus.unclaimed);
+
+			// update the queue item
+
+			queueItem
+
+				.setState (
+					QueueItemState.pending)
+
+				.setQueueItemClaim (
+					null);
+
+			// update slice
+
+			sliceLogic.updateSliceInactivityTimestamp (
+				taskLogger,
+				user.getSlice (),
+				optionalAbsent ());
 
 		}
-
-		if (queueItem.getQueueItemClaim ().getUser () != user) {
-
-			throw new RuntimeException (
-				"Trying to unclaim item belonging to another user");
-
-		}
-
-		// update queue item claim
-
-		queueItem.getQueueItemClaim ()
-
-			.setEndTime (
-				transaction.now ())
-
-			.setStatus (
-				QueueItemClaimStatus.unclaimed);
-
-		// update the queue item
-
-		queueItem
-
-			.setState (
-				QueueItemState.pending)
-
-			.setQueueItemClaim (
-				null);
-
-		// update slice
-
-		sliceLogic.updateSliceInactivityTimestamp (
-			user.getSlice (),
-			Optional.<Instant>absent ());
 
 	}
 
@@ -359,86 +378,93 @@ class QueueConsoleLogic {
 			@NonNull UserRec oldUser,
 			@NonNull UserRec newUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reclaimQueueItem");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reclaimQueueItem");
 
-		QueueSubjectRec queueSubject =
-			queueItem.getQueueSubject ();
+		) {
 
-		// sanity checks
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		long currentItemIndex =
-			+ queueSubject.getTotalItems ()
-			- queueSubject.getActiveItems ();
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
 
-		if (queueItem.getIndex () != currentItemIndex)
-			throw new IllegalStateException ();
+			// sanity checks
 
-		if (queueItem.getState () != QueueItemState.claimed) {
+			long currentItemIndex =
+				+ queueSubject.getTotalItems ()
+				- queueSubject.getActiveItems ();
 
-			throw new IllegalStateException (
-				stringFormat (
-					"Cannot reclaim queue item in %s state",
-					enumName (
-						queueItem.getState ())));
+			if (queueItem.getIndex () != currentItemIndex)
+				throw new IllegalStateException ();
 
-		}
+			if (queueItem.getState () != QueueItemState.claimed) {
 
-		if (queueItem.getQueueItemClaim ().getUser () != oldUser) {
+				throw new IllegalStateException (
+					stringFormat (
+						"Cannot reclaim queue item in %s state",
+						enumName (
+							queueItem.getState ())));
 
-			throw new IllegalStateException (
-				"Item being reclaimed does not belong to expected user");
+			}
 
-		}
+			if (queueItem.getQueueItemClaim ().getUser () != oldUser) {
 
-		// update old queue item claim
+				throw new IllegalStateException (
+					"Item being reclaimed does not belong to expected user");
 
-		queueItem.getQueueItemClaim ()
+			}
 
-			.setEndTime (
-				transaction.now ())
+			// update old queue item claim
 
-			.setStatus (
-				QueueItemClaimStatus.forcedUnclaim);
+			queueItem.getQueueItemClaim ()
 
-		// create new queue item claim
+				.setEndTime (
+					transaction.now ())
 
-		QueueItemClaimRec queueItemClaim =
-			queueItemClaimHelper.insert (
+				.setStatus (
+					QueueItemClaimStatus.forcedUnclaim);
+
+			// create new queue item claim
+
+			QueueItemClaimRec queueItemClaim =
+				queueItemClaimHelper.insert (
+					taskLogger,
+					queueItemClaimHelper.createInstance ()
+
+				.setQueueItem (
+					queueItem)
+
+				.setUser (
+					newUser)
+
+				.setStartTime (
+					transaction.now ())
+
+				.setStatus (
+					QueueItemClaimStatus.claimed)
+
+			);
+
+			// update queue item
+
+			queueItem
+
+				.setQueueItemClaim (
+					queueItemClaim);
+
+			// update slice
+
+			sliceLogic.updateSliceInactivityTimestamp (
 				taskLogger,
-				queueItemClaimHelper.createInstance ()
+				newUser.getSlice (),
+				optionalAbsent ());
 
-			.setQueueItem (
-				queueItem)
-
-			.setUser (
-				newUser)
-
-			.setStartTime (
-				transaction.now ())
-
-			.setStatus (
-				QueueItemClaimStatus.claimed)
-
-		);
-
-		// update queue item
-
-		queueItem
-
-			.setQueueItemClaim (
-				queueItemClaim);
-
-		// update slice
-
-		sliceLogic.updateSliceInactivityTimestamp (
-			newUser.getSlice (),
-			Optional.<Instant>absent ());
+		}
 
 	}
 
@@ -447,28 +473,34 @@ class QueueConsoleLogic {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canSupervise");
+		try (
 
-		QueueTypeSpec queueTypeSpec =
-			queueTypeSpec (
-				queue.getQueueType ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canSupervise");
 
-		String[] supervisorParts =
-			queueTypeSpec.supervisorPriv ().split (":");
+		) {
 
-		Record<?> supervisorDelegate =
-			(Record<?>)
-			objectManager.dereferenceObsolete (
-				queue,
-				supervisorParts [0]);
+			QueueTypeSpec queueTypeSpec =
+				queueTypeSpec (
+					queue.getQueueType ());
 
-		return privChecker.canRecursive (
-			taskLogger,
-			supervisorDelegate,
-			supervisorParts [1]);
+			String[] supervisorParts =
+				queueTypeSpec.supervisorPriv ().split (":");
+
+			Record <?> supervisorDelegate =
+				genericCastUnchecked (
+					objectManager.dereferenceRequired (
+						queue,
+						supervisorParts [0]));
+
+			return privChecker.canRecursive (
+				taskLogger,
+				supervisorDelegate,
+				supervisorParts [1]);
+
+		}
 
 	}
 

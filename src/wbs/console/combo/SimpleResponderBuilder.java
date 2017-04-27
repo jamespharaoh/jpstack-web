@@ -67,31 +67,43 @@ class SimpleResponderBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildResponder (
-			taskLogger);
+		) {
+
+			setDefaults ();
+
+			buildResponder (
+				taskLogger);
+
+		}
 
 	}
 
 	void buildResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildResponder");
+		try (
 
-		consoleModule.addResponder (
-			responderName,
-			consoleModule.beanResponder (
-				taskLogger,
-				responderBeanName));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResponder");
+
+		) {
+
+			consoleModule.addResponder (
+				responderName,
+				consoleModule.beanResponder (
+					taskLogger,
+					responderBeanName));
+
+		}
 
 	}
 

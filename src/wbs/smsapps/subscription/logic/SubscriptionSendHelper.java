@@ -15,8 +15,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
@@ -247,92 +247,98 @@ class SubscriptionSendHelper
 			@NonNull SubscriptionRec subscription,
 			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendStart");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendStart");
 
-		// create a batch
-
-		BatchSubjectRec batchSubject =
-			batchLogic.batchSubject (
-				taskLogger,
-				subscription,
-				"send");
-
-		BatchRec batch =
-			batchHelper.insert (
-				taskLogger,
-				batchHelper.createInstance ()
-
-			.setParentType (
-				objectTypeHelper.findRequired (
-					subscriptionSendHelper.objectTypeId ()))
-
-			.setParentId (
-				subscriptionSend.getId ())
-
-			.setSubject (
-				batchSubject)
-
-			.setCode (
-				batchSubject.getCode ())
-
-		);
-
-		// update send
-
-		subscriptionSend
-
-			.setState (
-				SubscriptionSendState.sending)
-
-			.setSentTime (
-				transaction.now ())
-
-			.setBatch (
-				batch);
-
-		// create send numbers
-
-		for (
-			SubscriptionNumberRec subscriptionNumber
-				: subscription.getActiveSubscriptionNumbers ()
 		) {
 
-			SubscriptionSubRec subscriptionSub =
-				subscriptionNumber.getActiveSubscriptionSub ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			SubscriptionListRec subscriptionList =
-				subscriptionSub.getSubscriptionList ();
+			// create a batch
 
-			SubscriptionSendPartRec subscriptionSendPart =
-				subscriptionSend.getPartsByList ().get (
-					subscriptionList.getId ());
+			BatchSubjectRec batchSubject =
+				batchLogic.batchSubject (
+					taskLogger,
+					subscription,
+					"send");
 
-			if (subscriptionSendPart == null)
-				continue;
+			BatchRec batch =
+				batchHelper.insert (
+					taskLogger,
+					batchHelper.createInstance ()
 
-			subscriptionSendNumberHelper.insert (
-				taskLogger,
-				subscriptionSendNumberHelper.createInstance ()
+				.setParentType (
+					objectTypeHelper.findRequired (
+						subscriptionSendHelper.objectTypeId ()))
 
-				.setSubscriptionSend (
-					subscriptionSend)
+				.setParentId (
+					subscriptionSend.getId ())
 
-				.setNumber (
-					subscriptionNumber.getNumber ())
+				.setSubject (
+					batchSubject)
 
-				.setSubscriptionSub (
-					subscriptionNumber.getActiveSubscriptionSub ())
-
-				.setState (
-					SubscriptionSendNumberState.queued)
+				.setCode (
+					batchSubject.getCode ())
 
 			);
+
+			// update send
+
+			subscriptionSend
+
+				.setState (
+					SubscriptionSendState.sending)
+
+				.setSentTime (
+					transaction.now ())
+
+				.setBatch (
+					batch);
+
+			// create send numbers
+
+			for (
+				SubscriptionNumberRec subscriptionNumber
+					: subscription.getActiveSubscriptionNumbers ()
+			) {
+
+				SubscriptionSubRec subscriptionSub =
+					subscriptionNumber.getActiveSubscriptionSub ();
+
+				SubscriptionListRec subscriptionList =
+					subscriptionSub.getSubscriptionList ();
+
+				SubscriptionSendPartRec subscriptionSendPart =
+					subscriptionSend.getPartsByList ().get (
+						subscriptionList.getId ());
+
+				if (subscriptionSendPart == null)
+					continue;
+
+				subscriptionSendNumberHelper.insert (
+					taskLogger,
+					subscriptionSendNumberHelper.createInstance ()
+
+					.setSubscriptionSend (
+						subscriptionSend)
+
+					.setNumber (
+						subscriptionNumber.getNumber ())
+
+					.setSubscriptionSub (
+						subscriptionNumber.getActiveSubscriptionSub ())
+
+					.setState (
+						SubscriptionSendNumberState.queued)
+
+				);
+
+			}
 
 		}
 
@@ -369,33 +375,39 @@ class SubscriptionSendHelper
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendItem");
+		try (
 
-		SubscriptionSubRec subscriptionSub =
-			subscriptionSendNumber.getSubscriptionSub ();
-
-		SubscriptionNumberRec subscriptionNumber =
-			subscriptionSub.getSubscriptionNumber ();
-
-		if (
-
-			subscriptionNumber.getBalance ()
-				>= subscription.getDebitsPerSend ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendItem");
 
 		) {
 
-			subscriptionLogic.sendNow (
-				taskLogger,
-				subscriptionSendNumber);
+			SubscriptionSubRec subscriptionSub =
+				subscriptionSendNumber.getSubscriptionSub ();
 
-		} else {
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionSub.getSubscriptionNumber ();
 
-			subscriptionLogic.sendLater (
-				taskLogger,
-				subscriptionSendNumber);
+			if (
+
+				subscriptionNumber.getBalance ()
+					>= subscription.getDebitsPerSend ()
+
+			) {
+
+				subscriptionLogic.sendNow (
+					taskLogger,
+					subscriptionSendNumber);
+
+			} else {
+
+				subscriptionLogic.sendLater (
+					taskLogger,
+					subscriptionSendNumber);
+
+			}
 
 		}
 

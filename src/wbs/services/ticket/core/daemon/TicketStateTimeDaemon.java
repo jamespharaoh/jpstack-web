@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -83,62 +83,68 @@ class TicketStateTimeDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		// TODO disabled for now
-
-		if (
-			Boolean.parseBoolean (
-				"true")
-		) {
-			return;
-		}
-
-		taskLogger.debugFormat (
-			"Getting all unqueued tickets");
-
-		// get all the unqueued tickets
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"TicketStateTimeDaemon.runOnce ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
 
 		) {
 
-			List <TicketRec> tickets =
-				ticketHelper.findUnqueuedTickets ();
+			// TODO disabled for now
 
-			transaction.close ();
+			if (
+				Boolean.parseBoolean (
+					"true")
+			) {
+				return;
+			}
 
-			// then call doTicketTimeCheck for each one
+			taskLogger.debugFormat (
+				"Getting all unqueued tickets");
 
-			for (
-				TicketRec ticket
-					: tickets
+			// get all the unqueued tickets
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"TicketStateTimeDaemon.runOnce ()",
+						this);
+
 			) {
 
-				try {
+				List <TicketRec> tickets =
+					ticketHelper.findUnqueuedTickets ();
 
-					doTicketTimeCheck (
-						taskLogger,
-						ticket.getId ());
+				transaction.close ();
 
-				} catch (Exception exception) {
+				// then call doTicketTimeCheck for each one
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						"TicketStateTimeDaemon",
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.tryAgainLater);
+				for (
+					TicketRec ticket
+						: tickets
+				) {
+
+					try {
+
+						doTicketTimeCheck (
+							taskLogger,
+							ticket.getId ());
+
+					} catch (Exception exception) {
+
+						exceptionLogger.logThrowable (
+							taskLogger,
+							"daemon",
+							"TicketStateTimeDaemon",
+							exception,
+							optionalAbsent (),
+							GenericExceptionResolution.tryAgainLater);
+
+					}
 
 				}
 
@@ -153,25 +159,25 @@ class TicketStateTimeDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long ticketId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doTicketTimeCheck");
-
-		taskLogger.debugFormat (
-			"Checking timestamp for ticket",
-			integerToDecimalString (
-				ticketId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doTicketTimeCheck");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Checking timestamp for ticket",
+				integerToDecimalString (
+					ticketId));
 
 			// find the ticket
 

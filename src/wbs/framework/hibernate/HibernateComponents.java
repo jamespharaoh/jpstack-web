@@ -46,44 +46,50 @@ class HibernateComponents {
 	SessionFactory hibernateSessionFactory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"hibernateSessionFactory");
+		try (
 
-		Properties configProperties =
-			mapToProperties (
-				ImmutableMap.<String, String> builder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"hibernateSessionFactory");
 
-			.put (
-				"hibernate.dialect",
-				"org.hibernate.dialect.PostgreSQLDialect")
+		) {
 
-			.put (
-				"hibernate.show_sql",
-				booleanToYesNo (
-					wbsConfig.database ().showSql ()))
+			Properties configProperties =
+				mapToProperties (
+					ImmutableMap.<String, String> builder ()
 
-			.put (
-				"hibernate.format_sql",
-				booleanToYesNo (
-					wbsConfig.database ().formatSql ()))
+				.put (
+					"hibernate.dialect",
+					"org.hibernate.dialect.PostgreSQLDialect")
 
-			.put (
-				"hibernate.connection.isolation",
-				"8")
+				.put (
+					"hibernate.show_sql",
+					booleanToYesNo (
+						wbsConfig.database ().showSql ()))
 
-			.build ()
+				.put (
+					"hibernate.format_sql",
+					booleanToYesNo (
+						wbsConfig.database ().formatSql ()))
 
-		);
+				.put (
+					"hibernate.connection.isolation",
+					"8")
 
-		return hibernateSessionFactoryBuilderProvider.get ()
+				.build ()
 
-			.configProperties (
-				configProperties)
+			);
 
-			.build (
-				taskLogger);
+			return hibernateSessionFactoryBuilderProvider.get ()
+
+				.configProperties (
+					configProperties)
+
+				.build (
+					taskLogger);
+
+		}
 
 	}
 

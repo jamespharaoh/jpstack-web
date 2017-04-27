@@ -29,8 +29,8 @@ import org.apache.http.message.BasicNameValuePair;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -83,41 +83,52 @@ class DigitalSelectSender
 			@NonNull OutboxRec outbox)
 		throws SendFailureException {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findOrThrow (
-				outbox.getRoute ().getId (),
-				() -> new RuntimeException (
-					stringFormat (
-						"No digital select route out %s",
-						integerToDecimalString (
-							outbox.getRoute ().getId ()))));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getMessage");
 
-		State state =
-			new State ()
+		) {
 
-			.outbox (
-				outbox)
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.message (
-				outbox.getMessage ())
+			DigitalSelectRouteOutRec digitalSelectRouteOut =
+				digitalSelectRouteOutHelper.findOrThrow (
+					outbox.getRoute ().getId (),
+					() -> new RuntimeException (
+						stringFormat (
+							"No digital select route out %s",
+							integerToDecimalString (
+								outbox.getRoute ().getId ()))));
 
-			.route (
-				outbox.getRoute ())
+			State state =
+				new State ()
 
-			.digitalSelectRouteOut (
-				digitalSelectRouteOut);
+				.outbox (
+					outbox)
 
-		transaction.fetch (
-			state.outbox (),
-			state.message (),
-			state.message ().getText (),
-			state.route (),
-			state.digitalSelectRouteOut ());
+				.message (
+					outbox.getMessage ())
 
-		return state;
+				.route (
+					outbox.getRoute ())
+
+				.digitalSelectRouteOut (
+					digitalSelectRouteOut);
+
+			transaction.fetch (
+				state.outbox (),
+				state.message (),
+				state.message ().getText (),
+				state.route (),
+				state.digitalSelectRouteOut ());
+
+			return state;
+
+		}
 
 	}
 
@@ -128,43 +139,49 @@ class DigitalSelectSender
 			@NonNull State state)
 		throws SendFailureException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessage");
+		try (
 
-		taskLogger.noticeFormat (
-			"Sending message %s",
-			integerToDecimalString (
-				state.message ().getId ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessage");
 
-		try {
+		) {
 
-			openConnection (
-				taskLogger,
-				state);
-
-			return readResponse (
-				taskLogger,
-				state);
-
-		} catch (IOException exception) {
-
-			throw tempFailure (
-				"IO error " + exception.getMessage ());
-
-		} finally {
+			taskLogger.noticeFormat (
+				"Sending message %s",
+				integerToDecimalString (
+					state.message ().getId ()));
 
 			try {
 
-				if (state.httpClient () != null)
-					state.httpClient ().close ();
+				openConnection (
+					taskLogger,
+					state);
+
+				return readResponse (
+					taskLogger,
+					state);
 
 			} catch (IOException exception) {
 
-				taskLogger.warningFormatException (
-					exception,
-					"Got IO exception teardown http client");
+				throw tempFailure (
+					"IO error " + exception.getMessage ());
+
+			} finally {
+
+				try {
+
+					if (state.httpClient () != null)
+						state.httpClient ().close ();
+
+				} catch (IOException exception) {
+
+					taskLogger.warningFormatException (
+						exception,
+						"Got IO exception teardown http client");
+
+				}
 
 			}
 
@@ -178,67 +195,73 @@ class DigitalSelectSender
 			@NonNull State state)
 		throws IOException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"openConnection");
+		try (
 
-		state.httpClient (
-			HttpClientBuilder.create ()
-				.build ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"openConnection");
 
-		HttpPost post =
-			new HttpPost (
-				state.digitalSelectRouteOut ().getUrl ());
+		) {
 
-		UrlEncodedFormEntity formEntity =
-			new UrlEncodedFormEntity (
-				ImmutableList.<NameValuePair>of (
+			state.httpClient (
+				HttpClientBuilder.create ()
+					.build ());
 
-					new BasicNameValuePair (
-						"username",
-						state.digitalSelectRouteOut ().getUsername ()),
+			HttpPost post =
+				new HttpPost (
+					state.digitalSelectRouteOut ().getUrl ());
 
-					new BasicNameValuePair (
-						"password",
-						state.digitalSelectRouteOut ().getPassword ()),
+			UrlEncodedFormEntity formEntity =
+				new UrlEncodedFormEntity (
+					ImmutableList.<NameValuePair>of (
 
-					new BasicNameValuePair (
-						"receiver",
-						"+" + state.message ().getNumTo ()),
+						new BasicNameValuePair (
+							"username",
+							state.digitalSelectRouteOut ().getUsername ()),
 
-					new BasicNameValuePair (
-						"content",
-						state.message ().getText ().getText ()),
+						new BasicNameValuePair (
+							"password",
+							state.digitalSelectRouteOut ().getPassword ()),
 
-					new BasicNameValuePair (
-						"reference",
-						Long.toString (
-							state.message ().getId ())),
+						new BasicNameValuePair (
+							"receiver",
+							"+" + state.message ().getNumTo ()),
 
-					new BasicNameValuePair (
-						"sender",
-						internationalNumberPattern
-								.matcher (state.message ().getNumFrom ())
-								.matches ()
-							? "+" + state.message ().getNumFrom ()
-							: state.message ().getNumFrom ())),
+						new BasicNameValuePair (
+							"content",
+							state.message ().getText ().getText ()),
 
-				"utf-8");
+						new BasicNameValuePair (
+							"reference",
+							Long.toString (
+								state.message ().getId ())),
 
-		post.setEntity (
-			formEntity);
+						new BasicNameValuePair (
+							"sender",
+							internationalNumberPattern
+									.matcher (state.message ().getNumFrom ())
+									.matches ()
+								? "+" + state.message ().getNumFrom ()
+								: state.message ().getNumFrom ())),
 
-		taskLogger.debugFormat (
-			"Making request to %s with %s",
-			state.digitalSelectRouteOut ().getUrl (),
-			IOUtils.toString (
-				formEntity.getContent ()));
+					"utf-8");
 
-		state.httpResponse (
-			state
-				.httpClient ()
-				.execute (post));
+			post.setEntity (
+				formEntity);
+
+			taskLogger.debugFormat (
+				"Making request to %s with %s",
+				state.digitalSelectRouteOut ().getUrl (),
+				IOUtils.toString (
+					formEntity.getContent ()));
+
+			state.httpResponse (
+				state
+					.httpClient ()
+					.execute (post));
+
+		}
 
 	}
 
@@ -255,68 +278,74 @@ class DigitalSelectSender
 			IOException,
 			SendFailureException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readResponse");
+		try (
 
-		String responseString =
-			IOUtils.toString (
-				state.httpResponse ().getEntity ().getContent ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readResponse");
 
-		taskLogger.debugFormat (
-			"Message %s response: %s",
-			integerToDecimalString (
-				state.message ().getId ()),
-			responseString);
+		) {
 
-		StatusLine statusLine =
-			state.httpResponse ().getStatusLine ();
+			String responseString =
+				IOUtils.toString (
+					state.httpResponse ().getEntity ().getContent ());
 
-		if (statusLine.getStatusCode () != 200) {
-
-			String errorMessage =
-				stringFormat (
-					"Got error %s from remote system: %s",
-					integerToDecimalString (
-						statusLine.getStatusCode ()),
-					responseString);
-
-			taskLogger.errorFormat (
-				"%s",
-				errorMessage);
-
-			throw tempFailure (
-				errorMessage);
-
-		}
-
-		Matcher matcher =
-			responsePattern.matcher (
+			taskLogger.debugFormat (
+				"Message %s response: %s",
+				integerToDecimalString (
+					state.message ().getId ()),
 				responseString);
 
-		if (! matcher.matches ()) {
+			StatusLine statusLine =
+				state.httpResponse ().getStatusLine ();
 
-			String errorMessage =
-				stringFormat (
-					"Got invalid response from remote system: %s",
+			if (statusLine.getStatusCode () != 200) {
+
+				String errorMessage =
+					stringFormat (
+						"Got error %s from remote system: %s",
+						integerToDecimalString (
+							statusLine.getStatusCode ()),
+						responseString);
+
+				taskLogger.errorFormat (
+					"%s",
+					errorMessage);
+
+				throw tempFailure (
+					errorMessage);
+
+			}
+
+			Matcher matcher =
+				responsePattern.matcher (
 					responseString);
 
-			taskLogger.errorFormat (
-				"%s",
-				errorMessage);
+			if (! matcher.matches ()) {
 
-			throw tempFailure (
-				errorMessage);
+				String errorMessage =
+					stringFormat (
+						"Got invalid response from remote system: %s",
+						responseString);
+
+				taskLogger.errorFormat (
+					"%s",
+					errorMessage);
+
+				throw tempFailure (
+					errorMessage);
+
+			}
+
+			String otherId =
+				matcher.group (1);
+
+			return Optional.of (
+				ImmutableList.of (
+					otherId));
 
 		}
-
-		String otherId =
-			matcher.group (1);
-
-		return Optional.of (
-			ImmutableList.of (
-				otherId));
 
 	}
 

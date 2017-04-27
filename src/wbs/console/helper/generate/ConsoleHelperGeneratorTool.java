@@ -42,75 +42,87 @@ class ConsoleHelperGeneratorTool {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateConsoleHelpers");
+		try (
 
-		List <Model <?>> models =
-			entityHelper.models ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateConsoleHelpers");
 
-		taskLogger.noticeFormat (
-			"About to generate %s console helpers",
-			integerToDecimalString (
-				collectionSize (
-					models)));
-
-		long numSuccess = 0;
-		long numFailures = 0;
-
-		for (
-			Model <?> model
-				: models
 		) {
 
-			TaskLogger nestedTaskLogger =
-				logContext.nestTaskLogger (
-					taskLogger,
-					stringFormat (
-						"generateConsoleHelpers.forEachModel (%s)",
-						model.objectName ()));
+			List <Model <?>> models =
+				entityHelper.models ();
 
-			consoleHelperGeneratorProvider.get ()
+			taskLogger.noticeFormat (
+				"About to generate %s console helpers",
+				integerToDecimalString (
+					collectionSize (
+						models)));
 
-				.taskLogger (
-					nestedTaskLogger)
+			long numSuccess = 0;
+			long numFailures = 0;
 
-				.model (
-					model)
+			for (
+				Model <?> model
+					: models
+			) {
 
-				.generateHelper ();
+				try (
 
-			if (nestedTaskLogger.errors ()) {
+					TaskLogger nestedTaskLogger =
+						logContext.nestTaskLogger (
+							taskLogger,
+							stringFormat (
+								"generateConsoleHelpers.forEachModel (%s)",
+								model.objectName ()));
 
-				taskLogger.errorFormat (
-					"Error writing console helper for %s",
-					model.objectName ());
+				) {
 
-				numFailures ++;
+					consoleHelperGeneratorProvider.get ()
 
-			} else {
+						.taskLogger (
+							nestedTaskLogger)
 
-				numSuccess ++;
+						.model (
+							model)
+
+						.generateHelper ();
+
+					if (nestedTaskLogger.errors ()) {
+
+						taskLogger.errorFormat (
+							"Error writing console helper for %s",
+							model.objectName ());
+
+						numFailures ++;
+
+					} else {
+
+						numSuccess ++;
+
+					}
+
+				}
 
 			}
 
-		}
-
-		taskLogger.noticeFormat (
-			"Successfully generated %s console helpers",
-			integerToDecimalString (
-				numSuccess));
-
-		if (
-			moreThanZero (
-				numFailures)
-		) {
-
-			taskLogger.errorFormat (
-				"Failed to generate %s console helpers",
+			taskLogger.noticeFormat (
+				"Successfully generated %s console helpers",
 				integerToDecimalString (
-					numFailures));
+					numSuccess));
+
+			if (
+				moreThanZero (
+					numFailures)
+			) {
+
+				taskLogger.errorFormat (
+					"Failed to generate %s console helpers",
+					integerToDecimalString (
+						numFailures));
+
+			}
 
 		}
 

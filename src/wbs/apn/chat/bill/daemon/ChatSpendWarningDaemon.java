@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -68,25 +68,23 @@ class ChatSpendWarningDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		taskLogger.debugFormat (
-			"Looking for users to send spend warning to");
-
-		// get a list of users who need a spend warning
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ChatSpendWarningDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Looking for users to send spend warning to");
 
 			List <ChatUserRec> chatUsers =
 				chatUserHelper.findWantingWarning ();
@@ -127,16 +125,16 @@ class ChatSpendWarningDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"doUser (%s)",
-				integerToDecimalString (
-					chatUserId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"doUser (%s)",
+					integerToDecimalString (
+						chatUserId));
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatSpendWarningDaemon.doUser (chatUserId)",

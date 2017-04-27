@@ -48,134 +48,140 @@ class ChatMessageStatsProvider
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getStats");
+		try (
 
-		if (period.granularity () != StatsGranularity.hour)
-			throw new IllegalArgumentException ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getStats");
 
-		if (! conditions.containsKey ("chatId"))
-			throw new IllegalArgumentException ();
-
-		// setup data structures
-
-		long[] receivedTotal =
-			new long [
-				toJavaIntegerRequired (
-					period.size ())];
-
-		long[] sentTotal =
-			new long [
-				toJavaIntegerRequired (
-					period.size ())];
-
-		long[] missedTotal =
-			new long [
-				toJavaIntegerRequired (
-					period.size ())];
-
-		long[] charsTotal =
-			new long [
-				toJavaIntegerRequired (
-					period.size ())];
-
-		// retrieve messages
-
-		List <ChatMessageRec> chatMessages =
-			chatMessageHelper.search (
-				taskLogger,
-				new ChatMessageSearch ()
-
-			.chatId (
-				(Long)
-				conditions.get (
-					"chatId"))
-
-			.timestampAfter (
-				period.startTime ())
-
-			.timestampBefore (
-				period.endTime ())
-
-		);
-
-		// aggregate stats
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			Instant chatMessageTimestamp =
-				chatMessage.getTimestamp ();
+			if (period.granularity () != StatsGranularity.hour)
+				throw new IllegalArgumentException ();
 
-			int hour =
-				period.assign (
-					chatMessageTimestamp);
+			if (! conditions.containsKey ("chatId"))
+				throw new IllegalArgumentException ();
 
-			int length =
-				chatMessage.getOriginalText ().getText ().length ();
+			// setup data structures
 
-			if (chatMessage.getSender () != null) {
+			long[] receivedTotal =
+				new long [
+					toJavaIntegerRequired (
+						period.size ())];
 
-				sentTotal [hour] ++;
-				missedTotal [hour] --;
-				charsTotal [hour] += length;
+			long[] sentTotal =
+				new long [
+					toJavaIntegerRequired (
+						period.size ())];
 
-			}
+			long[] missedTotal =
+				new long [
+					toJavaIntegerRequired (
+						period.size ())];
 
-			if (chatMessage.getToUser ().getType () == ChatUserType.monitor) {
+			long[] charsTotal =
+				new long [
+					toJavaIntegerRequired (
+						period.size ())];
 
-				receivedTotal [hour]++;
-				missedTotal [hour]++;
+			// retrieve messages
 
-			}
+			List <ChatMessageRec> chatMessages =
+				chatMessageHelper.search (
+					taskLogger,
+					new ChatMessageSearch ()
 
-		}
-
-		// create return value
-
-		StatsDataSet dataSet =
-			new StatsDataSet ();
-
-		for (
-			int hour = 0;
-			hour < period.size ();
-			hour ++
-		) {
-
-			dataSet.data ().add (
-				new StatsDatum ()
-
-				.startTime (
-					period.step (hour))
-
-				.addIndex (
-					"chatId",
+				.chatId (
+					(Long)
 					conditions.get (
 						"chatId"))
 
-				.addValue (
-					"messagesReceived",
-					receivedTotal [hour])
+				.timestampAfter (
+					period.startTime ())
 
-				.addValue (
-					"messagesSent",
-					sentTotal [hour])
+				.timestampBefore (
+					period.endTime ())
 
-				.addValue (
-					"messagesMissed",
-					missedTotal [hour])
+			);
 
-				.addValue (
-					"charactersSent",
-					charsTotal [hour]));
+			// aggregate stats
+
+			for (
+				ChatMessageRec chatMessage
+					: chatMessages
+			) {
+
+				Instant chatMessageTimestamp =
+					chatMessage.getTimestamp ();
+
+				int hour =
+					period.assign (
+						chatMessageTimestamp);
+
+				int length =
+					chatMessage.getOriginalText ().getText ().length ();
+
+				if (chatMessage.getSender () != null) {
+
+					sentTotal [hour] ++;
+					missedTotal [hour] --;
+					charsTotal [hour] += length;
+
+				}
+
+				if (chatMessage.getToUser ().getType () == ChatUserType.monitor) {
+
+					receivedTotal [hour]++;
+					missedTotal [hour]++;
+
+				}
+
+			}
+
+			// create return value
+
+			StatsDataSet dataSet =
+				new StatsDataSet ();
+
+			for (
+				int hour = 0;
+				hour < period.size ();
+				hour ++
+			) {
+
+				dataSet.data ().add (
+					new StatsDatum ()
+
+					.startTime (
+						period.step (hour))
+
+					.addIndex (
+						"chatId",
+						conditions.get (
+							"chatId"))
+
+					.addValue (
+						"messagesReceived",
+						receivedTotal [hour])
+
+					.addValue (
+						"messagesSent",
+						sentTotal [hour])
+
+					.addValue (
+						"messagesMissed",
+						missedTotal [hour])
+
+					.addValue (
+						"charactersSent",
+						charsTotal [hour]));
+
+			}
+
+			return dataSet;
 
 		}
-
-		return dataSet;
 
 	}
 

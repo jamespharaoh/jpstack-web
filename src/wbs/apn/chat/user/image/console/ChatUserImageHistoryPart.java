@@ -109,110 +109,116 @@ class ChatUserImageHistoryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"Type",
-			"Index",
-			"Preview",
-			"Timestamp",
-			"Status",
-			"Moderator",
-			"Moderated");
-
-		if (chatUserImages.isEmpty ()) {
-
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				"No history to show",
-				htmlColumnSpanAttribute (7l));
-
-			htmlTableRowClose ();
-
-		}
-
-		for (
-			ChatUserImageRec chatUserImage
-				: chatUserImages
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			// type
+			htmlTableHeaderRowWrite (
+				"Type",
+				"Index",
+				"Preview",
+				"Timestamp",
+				"Status",
+				"Moderator",
+				"Moderated");
 
-			htmlTableCellWrite (
-				chatUserImage.getType ().name ());
+			if (chatUserImages.isEmpty ()) {
 
-			// index
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUserImage.getIndex (),
-					() -> integerToDecimalString (
-						chatUserImage.getIndex () + 1)));
+				htmlTableCellWrite (
+					"No history to show",
+					htmlColumnSpanAttribute (7l));
 
-			// media
-
-			htmlTableCellOpen (
-				htmlAttribute (
-					"style",
-					"text-align: center"));
-
-			if (
-				isNotNull (
-					chatUserImage.getMedia ())
-			) {
-
-				mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					chatUserImage.getMedia ());
-
-			} else {
-
-				formatWriter.writeLineFormat (
-					"(none)");
+				htmlTableRowClose ();
 
 			}
 
-			htmlTableCellClose ();
+			for (
+				ChatUserImageRec chatUserImage
+					: chatUserImages
+			) {
 
-			// timestamp
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithoutTimezoneString (
-					chatUserImage.getTimestamp ()));
+				// type
 
-			// status
+				htmlTableCellWrite (
+					chatUserImage.getType ().name ());
 
-			htmlTableCellWrite (
-				chatUserImage.getStatus ().name ());
+				// index
 
-			// moderator
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatUserImage.getIndex (),
+						() -> integerToDecimalString (
+							chatUserImage.getIndex () + 1)));
 
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					chatUserImage.getModerator (),
-					userConsoleLogic.sliceRequired ()));
+				// media
 
-			// moderation time
+				htmlTableCellOpen (
+					htmlAttribute (
+						"style",
+						"text-align: center"));
 
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithoutTimezoneString (
-					chatUserImage.getModerationTime ()));
+				if (
+					isNotNull (
+						chatUserImage.getMedia ())
+				) {
 
-			// end row
+					mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						chatUserImage.getMedia ());
 
-			htmlTableRowClose ();
+				} else {
+
+					formatWriter.writeLineFormat (
+						"(none)");
+
+				}
+
+				htmlTableCellClose ();
+
+				// timestamp
+
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithoutTimezoneString (
+						chatUserImage.getTimestamp ()));
+
+				// status
+
+				htmlTableCellWrite (
+					chatUserImage.getStatus ().name ());
+
+				// moderator
+
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						chatUserImage.getModerator (),
+						userConsoleLogic.sliceRequired ()));
+
+				// moderation time
+
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithoutTimezoneString (
+						chatUserImage.getModerationTime ()));
+
+				// end row
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

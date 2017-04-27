@@ -1,5 +1,7 @@
 package wbs.platform.media.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -8,8 +10,10 @@ import lombok.NonNull;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
@@ -22,6 +26,9 @@ class MediaAudioResponder
 	extends ConsoleResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleHelper mediaHelper;
@@ -57,15 +64,28 @@ class MediaAudioResponder
 
 	@Override
 	public
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"audio/mpeg");
+		try (
 
-		requestContext.setHeader (
-			"Content-Length",
-			Integer.toString (data.length));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"audio/mpeg");
+
+			requestContext.setHeader (
+				"Content-Length",
+				integerToDecimalString (
+					data.length));
+
+		}
 
 	}
 

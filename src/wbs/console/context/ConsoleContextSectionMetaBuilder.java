@@ -74,87 +74,93 @@ class ConsoleContextSectionMetaBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// link to parent
+		) {
 
-		consoleMetaModule.addContextLink (
-			contextLinkProvider.get ()
+			setDefaults ();
 
-			.localName (
-				spec.name ())
+			// link to parent
 
-			.linkName (
-				structuralName)
+			consoleMetaModule.addContextLink (
+				contextLinkProvider.get ()
 
-			.label (
-				label)
+				.localName (
+					spec.name ())
 
-			.extensionPointName (
-				container.extensionPointName ())
+				.linkName (
+					structuralName)
 
-			.tabLocation (
-				spec.name ()));
+				.label (
+					label)
 
-		// extension point for children
+				.extensionPointName (
+					container.extensionPointName ())
 
-		consoleMetaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+				.tabLocation (
+					spec.name ()));
 
-			.name (
-				"section:" + structuralName)
+			// extension point for children
 
-			.contextTypeNames (
-				ImmutableList.<String>of (
-					structuralName))
+			consoleMetaModule.addExtensionPoint (
+				rootExtensionPointProvider.get ()
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					structuralName))
+				.name (
+					"section:" + structuralName)
 
-			.parentContextNames (
-				ImmutableList.<String>of ())
+				.contextTypeNames (
+					ImmutableList.<String>of (
+						structuralName))
 
-		);
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						structuralName))
 
-		// context hints
+				.parentContextNames (
+					ImmutableList.<String>of ())
 
-		consoleMetaModule.addContextHint (
-			new ConsoleContextHint ()
+			);
 
-			.linkName (
-				structuralName)
+			// context hints
 
-			.singular (
-				true)
+			consoleMetaModule.addContextHint (
+				new ConsoleContextHint ()
 
-			.plural (
-				false)
+				.linkName (
+					structuralName)
 
-		);
+				.singular (
+					true)
 
-		// build children
+				.plural (
+					false)
 
-		ConsoleContextMetaBuilderContainer nextContainer =
-			new ConsoleContextMetaBuilderContainer ()
+			);
 
-			.structuralName (
-				structuralName)
+			// build children
 
-			.extensionPointName (
-				"section:" + structuralName);
+			ConsoleContextMetaBuilderContainer nextContainer =
+				new ConsoleContextMetaBuilderContainer ()
 
-		builder.descend (
-			taskLogger,
-			nextContainer,
-			spec.children (),
-			consoleMetaModule,
-			MissingBuilderBehaviour.ignore);
+				.structuralName (
+					structuralName)
+
+				.extensionPointName (
+					"section:" + structuralName);
+
+			builder.descend (
+				taskLogger,
+				nextContainer,
+				spec.children (),
+				consoleMetaModule,
+				MissingBuilderBehaviour.ignore);
+
+		}
 
 	}
 

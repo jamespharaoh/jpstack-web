@@ -58,6 +58,7 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected <Record>
 	Record get (
 			@NonNull Class<Record> theClass,
@@ -73,9 +74,10 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected <Record>
 	Record get (
-			Class<Record> theClass,
+			Class <Record> theClass,
 			int id,
 			LockOptions lockOptions) {
 
@@ -90,9 +92,10 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected <Record>
 	Record load (
-			Class<Record> theClass,
+			Class <Record> theClass,
 			int id) {
 
 		Session session =
@@ -105,6 +108,7 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected <Record>
 	Record save (
 			Record object) {
@@ -112,12 +116,14 @@ class HibernateDao {
 		Session session =
 			database.currentSession ();
 
-		session.save (object);
+		session.save (
+			object);
 
 		return object;
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected <Record>
 	Record delete (
 			Record object) {
@@ -134,6 +140,7 @@ class HibernateDao {
 	protected
 	void flush () {
 
+		@SuppressWarnings ("resource")
 		Session sess =
 			database.currentSession ();
 
@@ -142,32 +149,37 @@ class HibernateDao {
 	}
 
 	@Deprecated
+	@SuppressWarnings ("resource")
 	protected
 	Query createQuery (
-			String query) {
+			@NonNull String query) {
 
 		Session session =
 			database.currentSession ();
 
-		return session.createQuery (query);
+		return session.createQuery (
+			query);
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected
 	Criteria createCriteria (
-			Class<?> theClass) {
+			@NonNull Class <?> theClass) {
 
 		Session session =
 			database.currentSession ();
 
-		return session.createCriteria (theClass);
+		return session.createCriteria (
+			theClass);
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected
 	Criteria createCriteria (
-			Class<?> theClass,
-			String name) {
+			@NonNull Class <?> theClass,
+			@NonNull String name) {
 
 		Session session =
 			database.currentSession ();
@@ -178,10 +190,11 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected
 	<Record>
 	Record refresh (
-			Record object) {
+			@NonNull Record object) {
 
 		Session session =
 			database.currentSession ();
@@ -195,6 +208,7 @@ class HibernateDao {
 
 	}
 
+	@SuppressWarnings ("resource")
 	protected
 	<Record>
 	Record refresh (
@@ -431,75 +445,81 @@ class HibernateDao {
 			@NonNull List <Long> objectIds,
 			@NonNull List <?> unorderedList) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrdered");
+		try (
 
-		HashMap <Long, RowType> indexedList =
-			new HashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrdered");
 
-		for (
-			int index = 0;
-			index < unorderedList.size ();
-			index ++
 		) {
 
-			RowType object =
-				rowTypeClass.cast (
-					unorderedList.get (
-						index));
+			HashMap <Long, RowType> indexedList =
+				new HashMap<> ();
 
-			if (
-				isNull (
-					object)
+			for (
+				int index = 0;
+				index < unorderedList.size ();
+				index ++
 			) {
 
-				throw new RuntimeException ();
+				RowType object =
+					rowTypeClass.cast (
+						unorderedList.get (
+							index));
+
+				if (
+					isNull (
+						object)
+				) {
+
+					throw new RuntimeException ();
+
+				}
+
+				Long objectId =
+					object.getId ();
+
+				indexedList.put (
+					objectId,
+					object);
 
 			}
 
-			Long objectId =
-				object.getId ();
+			List <Optional <RowType>> orderedList =
+				new ArrayList<> ();
 
-			indexedList.put (
-				objectId,
-				object);
-
-		}
-
-		List <Optional <RowType>> orderedList =
-			new ArrayList<> ();
-
-		for (
-			Long objectId
-				: objectIds
-		) {
-
-			RowType object =
-				indexedList.get (
-					objectId);
-
-			if (
-				isNull (
-					object)
+			for (
+				Long objectId
+					: objectIds
 			) {
 
-				taskLogger.warningFormat (
-					"%s with id %s not found",
-					rowTypeClass.getSimpleName (),
-					integerToDecimalString (
-						objectId));
+				RowType object =
+					indexedList.get (
+						objectId);
+
+				if (
+					isNull (
+						object)
+				) {
+
+					taskLogger.warningFormat (
+						"%s with id %s not found",
+						rowTypeClass.getSimpleName (),
+						integerToDecimalString (
+							objectId));
+
+				}
+
+				orderedList.add (
+					optionalFromNullable (
+						object));
 
 			}
 
-			orderedList.add (
-				optionalFromNullable (
-					object));
+			return orderedList;
 
 		}
-
-		return orderedList;
 
 	}
 

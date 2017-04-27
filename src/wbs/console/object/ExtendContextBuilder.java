@@ -78,16 +78,22 @@ class ExtendContextBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildChildren (
-			taskLogger,
-			builder);
+		) {
+
+			setDefaults ();
+
+			buildChildren (
+				taskLogger,
+				builder);
+
+		}
 
 	}
 
@@ -95,62 +101,68 @@ class ExtendContextBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildChildren");
+		try (
 
-		List <ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
-			consoleMetaManager.resolveExtensionPoint (
-				extensionPointName);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildChildren");
 
-		if (resolvedExtensionPoints == null) {
+		) {
 
-			taskLogger.warningFormat (
-				"Extend context %s in %s doesn't resolve",
-				extensionPointName,
-				spec.consoleSpec ().name ());
+			List <ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
+				consoleMetaManager.resolveExtensionPoint (
+					extensionPointName);
 
-			return;
+			if (resolvedExtensionPoints == null) {
+
+				taskLogger.warningFormat (
+					"Extend context %s in %s doesn't resolve",
+					extensionPointName,
+					spec.consoleSpec ().name ());
+
+				return;
+
+			}
+
+			ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
+				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
+
+				.taskLogger (
+					container.taskLogger ())
+
+				.consoleHelper (
+					consoleHelper)
+
+				.structuralName (
+					baseName)
+
+				.extensionPointName (
+					extensionPointName)
+
+				.pathPrefix (
+					baseName)
+
+				.newBeanNamePrefix (
+					consoleHelper.objectName ())
+
+				.existingBeanNamePrefix (
+					consoleHelper.objectName ())
+
+				.tabLocation (
+					extensionPointName)
+
+				.friendlyName (
+					consoleHelper.friendlyName ());
+
+			builder.descend (
+				taskLogger,
+				nextBuilderContainer,
+				spec.children (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
 
 		}
-
-		ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-			.taskLogger (
-				container.taskLogger ())
-
-			.consoleHelper (
-				consoleHelper)
-
-			.structuralName (
-				baseName)
-
-			.extensionPointName (
-				extensionPointName)
-
-			.pathPrefix (
-				baseName)
-
-			.newBeanNamePrefix (
-				consoleHelper.objectName ())
-
-			.existingBeanNamePrefix (
-				consoleHelper.objectName ())
-
-			.tabLocation (
-				extensionPointName)
-
-			.friendlyName (
-				consoleHelper.friendlyName ());
-
-		builder.descend (
-			taskLogger,
-			nextBuilderContainer,
-			spec.children (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
 
 	}
 

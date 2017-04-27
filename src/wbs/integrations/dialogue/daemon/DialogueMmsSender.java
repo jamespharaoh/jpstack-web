@@ -130,35 +130,41 @@ class DialogueMmsSender
 			@NonNull DialogueMmsOutbox dialogueMmsOutbox)
 		throws SendFailureException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessage");
-
-		taskLogger.debugFormat (
-			"Sending %s",
-			integerToDecimalString (
-				dialogueMmsOutbox.outbox.getMessage ().getId ()));
-
 		try (
 
-			CloseableHttpResponse httpResponse =
-				doRequest (
-					taskLogger,
-					dialogueMmsOutbox);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessage");
 
 		) {
 
-			return doResponse (
-				taskLogger,
-				httpResponse);
+			taskLogger.debugFormat (
+				"Sending %s",
+				integerToDecimalString (
+					dialogueMmsOutbox.outbox.getMessage ().getId ()));
 
-		} catch (IOException exception) {
+			try (
 
-			throw tempFailure (
-				stringFormat (
-					"Got IO error: %s",
-					exception.getMessage ()));
+				CloseableHttpResponse httpResponse =
+					doRequest (
+						taskLogger,
+						dialogueMmsOutbox);
+
+			) {
+
+				return doResponse (
+					taskLogger,
+					httpResponse);
+
+			} catch (IOException exception) {
+
+				throw tempFailure (
+					stringFormat (
+						"Got IO error: %s",
+						exception.getMessage ()));
+
+			}
 
 		}
 
@@ -318,104 +324,110 @@ class DialogueMmsSender
 			IOException,
 			SendFailureException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doResponse");
+		try (
 
-		MyHandler handler =
-			new MyHandler ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doResponse");
 
-		try {
+		) {
 
-			BufferedReader bufferedReader =
-				new BufferedReader (
-					new InputStreamReader (
-						response.getEntity ().getContent ()));
+			MyHandler handler =
+				new MyHandler ();
 
-			StringBuilder stringBuilder =
-				new StringBuilder ();
+			try {
 
-			String line;
+				BufferedReader bufferedReader =
+					new BufferedReader (
+						new InputStreamReader (
+							response.getEntity ().getContent ()));
 
-			while ((line = bufferedReader.readLine ()) != null) {
+				StringBuilder stringBuilder =
+					new StringBuilder ();
 
-				stringBuilder.append (
-					line);
+				String line;
+
+				while ((line = bufferedReader.readLine ()) != null) {
+
+					stringBuilder.append (
+						line);
+
+				}
+
+				taskLogger.noticeFormat (
+					"Response: %s",
+					stringBuilder.toString ());
+
+				ByteArrayInputStream byteArrayInputStream =
+					new ByteArrayInputStream (
+						stringToUtf8 (
+							stringBuilder.toString ()));
+
+				SAXParserFactory saxParserFactory =
+					SAXParserFactory.newInstance ();
+
+				SAXParser saxParser =
+					saxParserFactory.newSAXParser ();
+
+				saxParser.parse (
+					byteArrayInputStream,
+					handler);
+
+			} catch (ParserConfigurationException exception) {
+
+				throw new RuntimeException (
+					exception);
+
+			} catch (SAXException exception) {
+
+				return null;
 
 			}
 
-			taskLogger.noticeFormat (
-				"Response: %s",
-				stringBuilder.toString ());
+			if (handler.statusCode == null) {
 
-			ByteArrayInputStream byteArrayInputStream =
-				new ByteArrayInputStream (
-					stringToUtf8 (
-						stringBuilder.toString ()));
+				taskLogger.errorFormat (
+					"Invalid XML received: no MessageStatusCode");
 
-			SAXParserFactory saxParserFactory =
-				SAXParserFactory.newInstance ();
+				throw tempFailure (
+					"Invalid XML received: no MessageStatusCode");
 
-			SAXParser saxParser =
-				saxParserFactory.newSAXParser ();
+			}
 
-			saxParser.parse (
-				byteArrayInputStream,
-				handler);
+			if (handler.statusText == null) {
 
-		} catch (ParserConfigurationException exception) {
+				taskLogger.errorFormat (
+					"Invalid XML received: no MessageStatusText");
 
-			throw new RuntimeException (
-				exception);
+				throw tempFailure (
+					"Invalid XML received: no MessageStatusText");
 
-		} catch (SAXException exception) {
+			}
 
-			return null;
+			if (!handler.statusCode.equals("00")
+					|| !handler.messageStatusCode.equals("00")) {
 
-		}
+				throw permFailure("Error: " + handler.statusCode + " "
+						+ handler.messageStatusCode + " (" + handler.statusText
+						+ ")");
+			}
 
-		if (handler.statusCode == null) {
+			if (handler.messageId == null) {
 
-			taskLogger.errorFormat (
-				"Invalid XML received: no MessageStatusCode");
+				taskLogger.errorFormat (
+					"Invalid XML received: no MessageId");
 
-			throw tempFailure (
-				"Invalid XML received: no MessageStatusCode");
+				throw tempFailure (
+					"Invalid XML received: no MessageId");
 
-		}
+			}
 
-		if (handler.statusText == null) {
-
-			taskLogger.errorFormat (
-				"Invalid XML received: no MessageStatusText");
-
-			throw tempFailure (
-				"Invalid XML received: no MessageStatusText");
+			return Optional.of (
+				ImmutableList.of (
+					handler.messageId));
 
 		}
-
-		if (!handler.statusCode.equals("00")
-				|| !handler.messageStatusCode.equals("00")) {
-
-			throw permFailure("Error: " + handler.statusCode + " "
-					+ handler.messageStatusCode + " (" + handler.statusText
-					+ ")");
-		}
-
-		if (handler.messageId == null) {
-
-			taskLogger.errorFormat (
-				"Invalid XML received: no MessageId");
-
-			throw tempFailure (
-				"Invalid XML received: no MessageId");
-
-		}
-
-		return Optional.of (
-			ImmutableList.of (
-				handler.messageId));
 
 	}
 

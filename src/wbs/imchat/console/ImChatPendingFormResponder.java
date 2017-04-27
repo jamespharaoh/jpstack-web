@@ -124,52 +124,58 @@ class ImChatPendingFormResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		message =
-			imChatMessageHelper.findFromContextRequired ();
-
-		conversation =
-			message.getImChatConversation ();
-
-		customer =
-			conversation.getImChatCustomer ();
-
-		imChat =
-			customer.getImChat ();
-
-		summaryUrl =
-			requestContext.resolveApplicationUrlFormat (
-				"/imChat.pending",
-				"/%u",
-				integerToDecimalString (
-					message.getId ()),
-				"/imChat.pending.summary");
-
-		ImmutableList.Builder<ImChatTemplateRec> templatesBuilder =
-			ImmutableList.<ImChatTemplateRec>builder ();
-
-		for (
-			ImChatTemplateRec template
-				: imChat.getTemplates ()
 		) {
 
-			if (template.getDeleted ())
-				continue;
+			super.prepare (
+				taskLogger);
 
-			templatesBuilder.add (
-				template);
+			message =
+				imChatMessageHelper.findFromContextRequired ();
+
+			conversation =
+				message.getImChatConversation ();
+
+			customer =
+				conversation.getImChatCustomer ();
+
+			imChat =
+				customer.getImChat ();
+
+			summaryUrl =
+				requestContext.resolveApplicationUrlFormat (
+					"/imChat.pending",
+					"/%u",
+					integerToDecimalString (
+						message.getId ()),
+					"/imChat.pending.summary");
+
+			ImmutableList.Builder<ImChatTemplateRec> templatesBuilder =
+				ImmutableList.<ImChatTemplateRec>builder ();
+
+			for (
+				ImChatTemplateRec template
+					: imChat.getTemplates ()
+			) {
+
+				if (template.getDeleted ())
+					continue;
+
+				templatesBuilder.add (
+					template);
+
+			}
+
+			templates =
+				templatesBuilder.build ();
 
 		}
-
-		templates =
-			templatesBuilder.build ();
 
 	}
 
@@ -178,33 +184,39 @@ class ImChatPendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		htmlScriptBlockOpen ();
+		) {
 
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
+			super.renderHtmlHeadContents (
+				taskLogger);
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = 'about:blank';");
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"window.setTimeout (function () {");
+			formatWriter.writeLineFormat (
+				"top.show_inbox (true);");
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j';",
-			summaryUrl);
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = 'about:blank';");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}, 1);");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"window.setTimeout (function () {");
 
-		htmlScriptBlockClose ();
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j';",
+				summaryUrl);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}, 1);");
+
+			htmlScriptBlockClose ();
+
+		}
 
 	}
 
@@ -213,21 +225,27 @@ class ImChatPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		requestContext.flushNotices (
-			formatWriter);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		renderLinks ();
+		) {
 
-		htmlHeadingTwoWrite (
-			"Reply to IM chat");
+			requestContext.flushNotices (
+				formatWriter);
 
-		renderForm (
-			taskLogger);
+			renderLinks ();
+
+			htmlHeadingTwoWrite (
+				"Reply to IM chat");
+
+			renderForm (
+				taskLogger);
+
+		}
 
 	}
 
@@ -235,58 +253,64 @@ class ImChatPendingFormResponder
 	void renderForm (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderForm");
+		try (
 
-		// form open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderForm");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrlFormat (
-				"/imChat.pending",
-				"/%u",
-				integerToDecimalString (
-					message.getId ()),
-				"/imChat.pending.form"));
-
-		// table open
-
-		htmlTableOpenList (
-			htmlIdAttribute (
-				"templates"));
-
-		// table headers
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Name",
-			"Message",
-			"Action");
-
-		renderBilledTemplate ();
-		renderFreeTemplate ();
-
-		for (
-			ImChatTemplateRec template
-				: templates
 		) {
 
-			renderTemplate (
-				template);
+			// form open
+
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrlFormat (
+					"/imChat.pending",
+					"/%u",
+					integerToDecimalString (
+						message.getId ()),
+					"/imChat.pending.form"));
+
+			// table open
+
+			htmlTableOpenList (
+				htmlIdAttribute (
+					"templates"));
+
+			// table headers
+
+			htmlTableHeaderRowWrite (
+				"",
+				"Name",
+				"Message",
+				"Action");
+
+			renderBilledTemplate ();
+			renderFreeTemplate ();
+
+			for (
+				ImChatTemplateRec template
+					: templates
+			) {
+
+				renderTemplate (
+					template);
+
+			}
+
+			renderIgnore (
+				taskLogger);
+
+			// table close
+
+			htmlTableClose ();
+
+			// form close
+
+			htmlFormClose ();
 
 		}
-
-		renderIgnore (
-			taskLogger);
-
-		// table close
-
-		htmlTableClose ();
-
-		// form close
-
-		htmlFormClose ();
 
 	}
 
@@ -575,69 +599,75 @@ class ImChatPendingFormResponder
 	void renderIgnore (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderIgnore");
+		try (
 
-		if (
-			! privChecker.canRecursive (
-				taskLogger,
-				imChat,
-				"supervisor")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderIgnore");
+
 		) {
-			return;
+
+			if (
+				! privChecker.canRecursive (
+					taskLogger,
+					imChat,
+					"supervisor")
+			) {
+				return;
+			}
+
+			// table row open
+
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					"template"));
+
+			// radio button
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" id=\"radio-template-ignore\"",
+				" class=\"template-radio\"",
+				" type=\"radio\"",
+				" name=\"template\"",
+				" value=\"ignore\"",
+				">");
+
+			htmlTableCellClose ();
+
+			// template name
+
+			htmlTableCellWrite (
+				"Ignore");
+
+			// message
+
+			htmlTableCellWrite (
+				"");
+
+			// send
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" class=\"template-submit\"",
+				" type=\"submit\"",
+				" name=\"ignore\"",
+				" value=\"Ignore\"",
+				" disabled",
+				">");
+
+			htmlTableCellClose ();
+
+			// table row close
+
+			htmlTableRowClose ();
+
 		}
-
-		// table row open
-
-		htmlTableRowOpen (
-			htmlClassAttribute (
-				"template"));
-
-		// radio button
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" id=\"radio-template-ignore\"",
-			" class=\"template-radio\"",
-			" type=\"radio\"",
-			" name=\"template\"",
-			" value=\"ignore\"",
-			">");
-
-		htmlTableCellClose ();
-
-		// template name
-
-		htmlTableCellWrite (
-			"Ignore");
-
-		// message
-
-		htmlTableCellWrite (
-			"");
-
-		// send
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" class=\"template-submit\"",
-			" type=\"submit\"",
-			" name=\"ignore\"",
-			" value=\"Ignore\"",
-			" disabled",
-			">");
-
-		htmlTableCellClose ();
-
-		// table row close
-
-		htmlTableRowClose ();
 
 	}
 

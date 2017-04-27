@@ -169,85 +169,91 @@ class ChatReportRevSharePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		searchFields =
-			chatReportConsoleModule.formFieldSetRequired (
-				"monthReportSearch",
-				ChatReportRevShareForm.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		resultsFields =
-			chatReportConsoleModule.formFieldSetRequired (
-				"simpleReportResults",
-				ChatReportRevShareItem.class);
+		) {
 
-		// get search form
+			searchFields =
+				chatReportConsoleModule.formFieldSetRequired (
+					"monthReportSearch",
+					ChatReportRevShareForm.class);
 
-		LocalDate today =
-			LocalDate.now ();
+			resultsFields =
+				chatReportConsoleModule.formFieldSetRequired (
+					"simpleReportResults",
+					ChatReportRevShareItem.class);
 
-		form =
-			new ChatReportRevShareForm ()
+			// get search form
 
-			.month (
-				today.toString (
-					"YYYY-MM"));
+			LocalDate today =
+				LocalDate.now ();
 
-		formFieldLogic.update (
-			taskLogger,
-			requestContext,
-			searchFields,
-			form,
-			ImmutableMap.of (),
-			"search");
+			form =
+				new ChatReportRevShareForm ()
 
-		chat =
-			chatHelper.findFromContextRequired ();
+				.month (
+					today.toString (
+						"YYYY-MM"));
 
-		totalReport =
-			new ChatReportRevShareItem ()
+			formFieldLogic.update (
+				taskLogger,
+				requestContext,
+				searchFields,
+				form,
+				ImmutableMap.of (),
+				"search");
 
-			.setCurrency (
-				chat.getCurrency ())
+			chat =
+				chatHelper.findFromContextRequired ();
 
-			.setPath (
-				"TOTAL");
+			totalReport =
+				new ChatReportRevShareItem ()
 
-		startDate =
-			LocalDate.parse (
-				stringFormat (
-					"%s-01",
-					form.month ()));
+				.setCurrency (
+					chat.getCurrency ())
 
-		endDate =
-			startDate.plusMonths (1);
+				.setPath (
+					"TOTAL");
 
-		// add stat sources
+			startDate =
+				LocalDate.parse (
+					stringFormat (
+						"%s-01",
+						form.month ()));
 
-		addSmsMessages ();
-		addCredits ();
+			endDate =
+				startDate.plusMonths (1);
 
-		addJoiners (
-			taskLogger);
+			// add stat sources
 
-		addChatMessages (
-			taskLogger);
+			addSmsMessages ();
+			addCredits ();
 
-		// sort chat reports
+			addJoiners (
+				taskLogger);
 
-		List <ChatReportRevShareItem> chatReportsTemp =
-			new ArrayList<> (
-				chatReportsByAffiliate.values ());
+			addChatMessages (
+				taskLogger);
 
-		Collections.sort (
-			chatReportsTemp);
+			// sort chat reports
 
-		chatReportsSorted =
-			ImmutableList.copyOf (
+			List <ChatReportRevShareItem> chatReportsTemp =
+				new ArrayList<> (
+					chatReportsByAffiliate.values ());
+
+			Collections.sort (
 				chatReportsTemp);
+
+			chatReportsSorted =
+				ImmutableList.copyOf (
+					chatReportsTemp);
+
+		}
 
 	}
 
@@ -422,45 +428,51 @@ class ChatReportRevSharePart
 	void addJoiners (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"addJoiners");
+		try (
 
-		List <ChatUserRec> joiners =
-			chatUserHelper.search (
-				taskLogger,
-				new ChatUserSearch ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addJoiners");
 
-			.chatId (
-				chat.getId ())
-
-			.firstJoin (
-				TextualInterval.forInterval (
-					userConsoleLogic.timezone (),
-					startDate,
-					endDate))
-
-		);
-
-		for (
-			ChatUserRec chatUser
-				: joiners
 		) {
 
-			AffiliateRec affiliate =
-				chatUserLogic.getAffiliate (
-					chatUser);
+			List <ChatUserRec> joiners =
+				chatUserHelper.search (
+					taskLogger,
+					new ChatUserSearch ()
 
-			ChatReportRevShareItem affiliateReport =
-				getReport (
-					affiliate);
+				.chatId (
+					chat.getId ())
 
-			affiliateReport.setJoiners (
-				affiliateReport.getJoiners () + 1);
+				.firstJoin (
+					TextualInterval.forInterval (
+						userConsoleLogic.timezone (),
+						startDate,
+						endDate))
 
-			totalReport.setJoiners (
-				totalReport.getJoiners () + 1);
+			);
+
+			for (
+				ChatUserRec chatUser
+					: joiners
+			) {
+
+				AffiliateRec affiliate =
+					chatUserLogic.getAffiliate (
+						chatUser);
+
+				ChatReportRevShareItem affiliateReport =
+					getReport (
+						affiliate);
+
+				affiliateReport.setJoiners (
+					affiliateReport.getJoiners () + 1);
+
+				totalReport.setJoiners (
+					totalReport.getJoiners () + 1);
+
+			}
 
 		}
 
@@ -671,66 +683,72 @@ class ChatReportRevSharePart
 	void addChatMessages (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"addChatMessages");
+		try (
 
-		Optional <ChatMonthCostRec> chatMonthCostOptional =
-			chatMonthCostHelper.findByCode (
-				chat,
-				form.month ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addChatMessages");
 
-		if (
-			optionalIsNotPresent (
-				chatMonthCostOptional)
-		) {
-			return;
-		}
-
-		ChatMonthCostRec chatMonthCost =
-			chatMonthCostOptional.get ();
-
-		List <ChatMessageRec> chatMessages =
-			chatMessageHelper.search (
-				taskLogger,
-				new ChatMessageSearch ()
-
-			.hasSender (
-				true)
-
-			.timestampAfter (
-				startDate.toDateTimeAtStartOfDay ().toInstant ())
-
-			.timestampBefore (
-				startDate.toDateTimeAtStartOfDay ().toInstant ())
-
-		);
-
-		long staffCostPerMessage =
-			chatMessages.isEmpty ()
-				? 0
-				: chatMonthCost.getStaffCost ()
-					/ chatMessages.size ();
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			AffiliateRec affiliate =
-				chatUserLogic.getAffiliate (
-					chatMessage.getToUser ());
+			Optional <ChatMonthCostRec> chatMonthCostOptional =
+				chatMonthCostHelper.findByCode (
+					chat,
+					form.month ());
 
-			ChatReportRevShareItem affiliateReport =
-				getReport (
-					affiliate);
+			if (
+				optionalIsNotPresent (
+					chatMonthCostOptional)
+			) {
+				return;
+			}
 
-			affiliateReport.setStaffCost (
-				affiliateReport.getStaffCost () + staffCostPerMessage);
+			ChatMonthCostRec chatMonthCost =
+				chatMonthCostOptional.get ();
 
-			totalReport.setStaffCost (
-				totalReport.getStaffCost () + staffCostPerMessage);
+			List <ChatMessageRec> chatMessages =
+				chatMessageHelper.search (
+					taskLogger,
+					new ChatMessageSearch ()
+
+				.hasSender (
+					true)
+
+				.timestampAfter (
+					startDate.toDateTimeAtStartOfDay ().toInstant ())
+
+				.timestampBefore (
+					startDate.toDateTimeAtStartOfDay ().toInstant ())
+
+			);
+
+			long staffCostPerMessage =
+				chatMessages.isEmpty ()
+					? 0
+					: chatMonthCost.getStaffCost ()
+						/ chatMessages.size ();
+
+			for (
+				ChatMessageRec chatMessage
+					: chatMessages
+			) {
+
+				AffiliateRec affiliate =
+					chatUserLogic.getAffiliate (
+						chatMessage.getToUser ());
+
+				ChatReportRevShareItem affiliateReport =
+					getReport (
+						affiliate);
+
+				affiliateReport.setStaffCost (
+					affiliateReport.getStaffCost () + staffCostPerMessage);
+
+				totalReport.setStaffCost (
+					totalReport.getStaffCost () + staffCostPerMessage);
+
+			}
 
 		}
 
@@ -741,89 +759,121 @@ class ChatReportRevSharePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		goSearchForm (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		goReport (
-			taskLogger);
+		) {
+
+			goSearchForm (
+				taskLogger);
+
+			goReport (
+				taskLogger);
+
+		}
 
 	}
 
 	void goSearchForm (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goSearchForm");
+		try (
 
-		htmlFormOpenGetAction (
-			requestContext.resolveLocalUrl (
-				"/chatReport.revShare"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goSearchForm");
 
-		htmlTableOpenDetails ();
+		) {
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			searchFields,
-			Optional.absent (),
-			form,
-			ImmutableMap.of (),
-			FormType.search,
-			"search");
+			htmlFormOpenGetAction (
+				requestContext.resolveLocalUrl (
+					"/chatReport.revShare"));
 
-		htmlTableDetailsRowWriteHtml (
-			"Actions",
-			stringFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"search\"",
-				">"));
+			htmlTableOpenDetails ();
 
-		htmlTableClose ();
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				searchFields,
+				Optional.absent (),
+				form,
+				ImmutableMap.of (),
+				FormType.search,
+				"search");
 
-		htmlFormClose ();
+			htmlTableDetailsRowWriteHtml (
+				"Actions",
+				stringFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"search\"",
+					">"));
+
+			htmlTableClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 
 	void goReport (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReport");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Stats");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReport");
 
-		// table open
-
-		htmlTableOpenList ();
-
-		// header
-
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			resultsFields);
-
-		htmlTableRowClose ();
-
-		// row
-
-		for (
-			ChatReportRevShareItem chatReport
-				: chatReportsSorted
 		) {
+
+			htmlHeadingTwoWrite (
+				"Stats");
+
+			// table open
+
+			htmlTableOpenList ();
+
+			// header
+
+			htmlTableRowOpen ();
+
+			formFieldLogic.outputTableHeadings (
+				formatWriter,
+				resultsFields);
+
+			htmlTableRowClose ();
+
+			// row
+
+			for (
+				ChatReportRevShareItem chatReport
+					: chatReportsSorted
+			) {
+
+				htmlTableRowOpen ();
+
+				formFieldLogic.outputTableCellsList (
+					taskLogger,
+					formatWriter,
+					resultsFields,
+					chatReport,
+					emptyMap (),
+					true);
+
+				htmlTableRowClose ();
+
+			}
+
+			// total
 
 			htmlTableRowOpen ();
 
@@ -831,31 +881,17 @@ class ChatReportRevSharePart
 				taskLogger,
 				formatWriter,
 				resultsFields,
-				chatReport,
-				emptyMap (),
+				totalReport,
+				ImmutableMap.of (),
 				true);
 
 			htmlTableRowClose ();
 
+			// table close
+
+			htmlTableClose ();
+
 		}
-
-		// total
-
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableCellsList (
-			taskLogger,
-			formatWriter,
-			resultsFields,
-			totalReport,
-			ImmutableMap.of (),
-			true);
-
-		htmlTableRowClose ();
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

@@ -65,82 +65,88 @@ class ChildrenCollectionWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				naivePluralise (
-					spec.typeName ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
-
-		if (
-			isNull (
-				fieldTypePluginModel)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Field '%s.%s' ",
-					context.modelMeta ().name (),
-					fieldName,
-					"has type '%s' ",
-					spec.typeName (),
-					"which does not exist"));
+			String fieldName =
+				ifNull (
+					spec.name (),
+					naivePluralise (
+						spec.typeName ()));
 
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
+
+			if (
+				isNull (
+					fieldTypePluginModel)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field '%s.%s' ",
+						context.modelMeta ().name (),
+						fieldName,
+						"has type '%s' ",
+						spec.typeName (),
+						"which does not exist"));
+
+
+			}
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
+
+			// write field
+
+			new JavaPropertyWriter ()
+
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
+
+				.typeName (
+					imports ->
+						stringFormat (
+							"%s <%s>",
+							imports.register (
+								Set.class),
+							imports.register (
+								fullFieldTypeName)))
+
+				.propertyName (
+					fieldName)
+
+				.defaultValue (
+					imports ->
+						stringFormat (
+							"new %s <%s> ()",
+							imports.register (
+								LinkedHashSet.class),
+							imports.register (
+								fullFieldTypeName)))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
 
 		}
-
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
-
-		// write field
-
-		new JavaPropertyWriter ()
-
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
-
-			.typeName (
-				imports ->
-					stringFormat (
-						"%s <%s>",
-						imports.register (
-							Set.class),
-						imports.register (
-							fullFieldTypeName)))
-
-			.propertyName (
-				fieldName)
-
-			.defaultValue (
-				imports ->
-					stringFormat (
-						"new %s <%s> ()",
-						imports.register (
-							LinkedHashSet.class),
-						imports.register (
-							fullFieldTypeName)))
-
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
 
 	}
 

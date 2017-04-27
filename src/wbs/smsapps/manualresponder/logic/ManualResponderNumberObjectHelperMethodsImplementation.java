@@ -41,40 +41,46 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// find or create number
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		ManualResponderNumberRec manualResponderNumber =
-			manualResponderNumberHelper.find (
-				manualResponder,
-				number);
+		) {
 
-		if (manualResponderNumber == null) {
+			// find or create number
 
-			manualResponderNumber =
-				manualResponderNumberHelper.insert (
-					taskLogger,
-					manualResponderNumberHelper.createInstance ()
+			ManualResponderNumberRec manualResponderNumber =
+				manualResponderNumberHelper.find (
+					manualResponder,
+					number);
 
-				.setManualResponder (
-					manualResponder)
+			if (manualResponderNumber == null) {
 
-				.setNumber (
-					number)
+				manualResponderNumber =
+					manualResponderNumberHelper.insert (
+						taskLogger,
+						manualResponderNumberHelper.createInstance ()
 
-				.setCode (
-					randomLogic.generateNumericNoZero (
-						8))
+					.setManualResponder (
+						manualResponder)
 
-			);
+					.setNumber (
+						number)
+
+					.setCode (
+						randomLogic.generateNumericNoZero (
+							8))
+
+				);
+
+			}
+
+			return manualResponderNumber;
 
 		}
-
-		return manualResponderNumber;
 
 	}
 

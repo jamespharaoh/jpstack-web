@@ -78,86 +78,94 @@ class ChatGraphsDailyUsersImageResponder
 			@NonNull Instant minTime,
 			@NonNull Instant maxTime) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareData");
+		try (
 
-		Map <String, Object> searchMap =
-			new LinkedHashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareData");
 
-		searchMap.put (
-			"startTimeAfter",
-			minTime);
-
-		searchMap.put (
-			"startTimeBefore",
-			maxTime);
-
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
-
-		searchMap.put (
-			"chatId",
-			chat.getId ());
-
-		Optional <Long> chatAffiliateIdOptional =
-			requestContext.stuffInteger (
-				"chatAffiliateId");
-
-		if (
-			optionalIsPresent (
-				chatAffiliateIdOptional)
 		) {
 
+			Map <String, Object> searchMap =
+				new LinkedHashMap<> ();
+
 			searchMap.put (
-				"chatAffiliateId",
-				chatAffiliateIdOptional.get ());
+				"startTimeAfter",
+				minTime);
 
-		}
+			searchMap.put (
+				"startTimeBefore",
+				maxTime);
 
-		Collection <ChatUserSessionRec> chatUserSessions =
-			chatUserSessionHelper.search (
-				taskLogger,
-				searchMap);
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
 
-		List <Set <ChatUserRec>> chatUserSets =
-			new ArrayList<> ();
+			searchMap.put (
+				"chatId",
+				chat.getId ());
 
-		for (int i = 0; i < values.size (); i ++) {
+			Optional <Long> chatAffiliateIdOptional =
+				requestContext.stuffInteger (
+					"chatAffiliateId");
 
-			chatUserSets.add (
-				new HashSet<> ());
+			if (
+				optionalIsPresent (
+					chatAffiliateIdOptional)
+			) {
 
-		}
+				searchMap.put (
+					"chatAffiliateId",
+					chatAffiliateIdOptional.get ());
 
-		timezone =
-			chatMiscLogic.timezone (
-				chat);
+			}
 
-		for (ChatUserSessionRec chatUserSession
-				: chatUserSessions) {
+			Collection <ChatUserSessionRec> chatUserSessions =
+				chatUserSessionHelper.search (
+					taskLogger,
+					searchMap);
 
-			int index =
-				+ chatUserSession.getStartTime ()
-					.toDateTime (
-						timezone)
-					.getDayOfMonth ()
-				- 1;
+			List <Set <ChatUserRec>> chatUserSets =
+				new ArrayList<> ();
 
-			chatUserSets.get (index).add (
-				chatUserSession.getChatUser ());
+			for (int i = 0; i < values.size (); i ++) {
 
-		}
+				chatUserSets.add (
+					new HashSet<> ());
 
-		values =
-			new ArrayList<Integer> ();
+			}
 
-		for (Set<ChatUserRec> chatUserSet
-				: chatUserSets) {
+			timezone =
+				chatMiscLogic.timezone (
+					chat);
 
-			values.add (
-				chatUserSet.size ());
+			for (ChatUserSessionRec chatUserSession
+					: chatUserSessions) {
+
+				int index =
+					+ chatUserSession.getStartTime ()
+						.toDateTime (
+							timezone)
+						.getDayOfMonth ()
+					- 1;
+
+				chatUserSets.get (index).add (
+					chatUserSession.getChatUser ());
+
+			}
+
+			values =
+				new ArrayList<> ();
+
+			for (
+				Set<ChatUserRec> chatUserSet
+					: chatUserSets
+			) {
+
+				values.add (
+					chatUserSet.size ());
+
+			}
 
 		}
 

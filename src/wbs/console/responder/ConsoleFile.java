@@ -6,13 +6,11 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
@@ -297,67 +295,73 @@ class ConsoleFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doGet");
+		try (
 
-		if (
-
-			privLookup != null
-
-			&& ! privLookup.lookup (
-				consoleRequestContext.consoleContextStuffRequired ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doGet");
 
 		) {
 
-			throw new HttpForbiddenException (
-				optionalOf (
-					privLookup.describe ()),
-				emptyList ());
+			if (
+
+				privLookup != null
+
+				&& ! privLookup.lookup (
+					consoleRequestContext.consoleContextStuffRequired ())
+
+			) {
+
+				throw new HttpForbiddenException (
+					optionalOf (
+						privLookup.describe ()),
+					emptyList ());
+
+			}
+
+			super.doGet (
+				taskLogger);
 
 		}
-
-		super.doGet (
-			taskLogger);
 
 	}
 
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doPost");
+		try (
 
-		if (
-
-			privLookup != null
-
-			&& ! privLookup.lookup (
-				consoleRequestContext.consoleContextStuffRequired ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doPost");
 
 		) {
 
-			throw new HttpForbiddenException (
-				optionalAbsent (),
-				emptyList ());
+			if (
+
+				privLookup != null
+
+				&& ! privLookup.lookup (
+					consoleRequestContext.consoleContextStuffRequired ())
+
+			) {
+
+				throw new HttpForbiddenException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			super.doPost (
+				taskLogger);
 
 		}
-
-		super.doPost (
-			taskLogger);
 
 	}
 

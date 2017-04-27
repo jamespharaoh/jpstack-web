@@ -2,6 +2,7 @@ package wbs.smsapps.forwarder.api;
 
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.UnsupportedEncodingException;
@@ -21,9 +22,10 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcException;
@@ -32,6 +34,7 @@ import wbs.platform.rpc.core.RpcType;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.web.TextResponder;
+
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
@@ -39,6 +42,7 @@ import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -147,7 +151,7 @@ class ForwarderApiLogicImplementation
 			RequestContext requestContext,
 			ForwarderRec forwarder) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		ForwarderMessageInRec forwarderMessageIn =
@@ -199,7 +203,7 @@ class ForwarderApiLogicImplementation
 			RequestContext requestContext,
 			ForwarderRec forwarder) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		ForwarderMessageInRec forwarderMessageIn =
@@ -238,7 +242,7 @@ class ForwarderApiLogicImplementation
 			@NonNull ForwarderRec forwarder)
 		throws ReportableException {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		// get the message id
@@ -360,13 +364,13 @@ class ForwarderApiLogicImplementation
 	ForwarderRec rpcAuth (
 			RpcSource source) {
 
-		List<String> errors =
-			new ArrayList<String> ();
+		List <String> errors =
+			new ArrayList<> ();
 
 		// check params are present
 
-		Map<String,Object> params =
-			unsafeMapStringObject (
+		Map <String, Object> params =
+			genericCastUnchecked (
 				source.obtain (
 					authRequestDefinition,
 					errors,
@@ -462,26 +466,6 @@ class ForwarderApiLogicImplementation
 		// return
 
 		return forwarder;
-
-	}
-
-	@Override
-	@SuppressWarnings ("unchecked")
-	public
-	Map<String,Object> unsafeMapStringObject (
-			Object input) {
-
-		return (Map<String,Object>) input;
-
-	}
-
-	@Override
-	@SuppressWarnings ("unchecked")
-	public
-	List<Map<String,Object>> unsafeListMapStringObject (
-			Object input) {
-
-		return (List<Map<String,Object>>) input;
 
 	}
 

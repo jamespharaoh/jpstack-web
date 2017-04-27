@@ -31,6 +31,7 @@ class FormatWriterUtils {
 
 	}
 
+	@SuppressWarnings ("resource")
 	public static
 	void clearCurrentFormatWriter (
 			@NonNull FormatWriter formatWriter) {
@@ -76,13 +77,19 @@ class FormatWriterUtils {
 	String formatWriterConsumerToString (
 			@NonNull Consumer <FormatWriter> consumer) {
 
-		StringFormatWriter formatWriter =
-			new StringFormatWriter ();
+		try (
 
-		consumer.accept (
-			formatWriter);
+			StringFormatWriter formatWriter =
+				new StringFormatWriter ();
 
-		return formatWriter.toString ();
+		) {
+
+			consumer.accept (
+				formatWriter);
+
+			return formatWriter.toString ();
+
+		}
 
 	}
 

@@ -55,26 +55,30 @@ class SupervisorSimplePartBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String beanName =
-			spec.beanName ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PagePartFactory pagePartFactory =
-			nextTaskLogger ->
-				componentManager.getComponentRequired (
-					nextTaskLogger,
-					beanName,
-					PagePart.class);
+		) {
 
-		supervisorConfigBuilder.pagePartFactories ().add  (
-			pagePartFactory);
+			String beanName =
+				spec.beanName ();
+
+			PagePartFactory pagePartFactory =
+				nextTaskLogger ->
+					componentManager.getComponentRequired (
+						nextTaskLogger,
+						beanName,
+						PagePart.class);
+
+			supervisorConfigBuilder.pagePartFactories ().add  (
+				pagePartFactory);
+
+		}
 
 	}
-
 
 }

@@ -251,42 +251,48 @@ public class FonixSmsSenderHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixMessageSender fonixSender) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"performSend");
+		try (
 
-		PerformSendResult result =
-			new PerformSendResult ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"performSend");
 
-		// encode
+		) {
 
-		try {
+			PerformSendResult result =
+				new PerformSendResult ();
 
-			fonixSender.send ();
+			// encode
 
-			fonixSender.receive ();
+			try {
 
-			result.responseTrace (
-				fonixSender.responseTrace ());
+				fonixSender.send ();
 
-			fonixSender.decode (
-				taskLogger);
+				fonixSender.receive ();
 
-			return result
+				result.responseTrace (
+					fonixSender.responseTrace ());
 
-				.status (
-					PerformSendStatus.success);
+				fonixSender.decode (
+					taskLogger);
 
-		} catch (Exception exception) {
+				return result
 
-			return result
+					.status (
+						PerformSendStatus.success);
 
-				.status (
-					PerformSendStatus.communicationError)
+			} catch (Exception exception) {
 
-				.exception (
-					exception);
+				return result
+
+					.status (
+						PerformSendStatus.communicationError)
+
+					.exception (
+						exception);
+
+			}
 
 		}
 

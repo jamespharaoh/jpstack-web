@@ -2,14 +2,12 @@ package wbs.console.responder;
 
 import static wbs.utils.etc.Misc.doNothing;
 
-import java.io.IOException;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -30,7 +28,7 @@ class ConsoleResponder
 	// state
 
 	protected
-	Transaction transaction;
+	OwnedTransaction transaction;
 
 	// implementation
 
@@ -51,13 +49,18 @@ class ConsoleResponder
 	}
 
 	protected
-	void setHtmlHeaders ()
-		throws IOException {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
 	void render (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
 
 	}
 
@@ -69,17 +72,16 @@ class ConsoleResponder
 	@Override
 	public final
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"execute");
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ConsoleResponder.execute ()",
@@ -96,7 +98,8 @@ class ConsoleResponder
 			prepare (
 				taskLogger);
 
-			setHtmlHeaders ();
+			setHtmlHeaders (
+				taskLogger);
 
 			render (
 				taskLogger);

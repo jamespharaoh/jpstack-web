@@ -1,5 +1,6 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
@@ -43,7 +44,6 @@ import java.util.Set;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Data;
@@ -215,219 +215,225 @@ class ManualResponderRequestPendingSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		customerDetailsFields =
-			manualResponderRequestPendingConsoleModule.formFieldSetRequired (
-				"customer-details",
-				SmsCustomerRec.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		manualResponderRequest =
-			manualResponderRequestHelper.findFromContextRequired ();
+		) {
 
-		manualResponderNumber =
-			manualResponderRequest.getManualResponderNumber ();
+			customerDetailsFields =
+				manualResponderRequestPendingConsoleModule.formFieldSetRequired (
+					"customer-details",
+					SmsCustomerRec.class);
 
-		manualResponder =
-			manualResponderNumber.getManualResponder ();
+			manualResponderRequest =
+				manualResponderRequestHelper.findFromContextRequired ();
 
-		message =
-			manualResponderRequest.getMessage ();
+			manualResponderNumber =
+				manualResponderRequest.getManualResponderNumber ();
 
-		number =
-			manualResponderRequest.getNumber ();
+			manualResponder =
+				manualResponderNumber.getManualResponder ();
 
-		network =
-			number.getNetwork ();
+			message =
+				manualResponderRequest.getMessage ();
 
-		smsCustomer =
-			manualResponderNumber != null
-				? manualResponderNumber.getSmsCustomer ()
+			number =
+				manualResponderRequest.getNumber ();
+
+			network =
+				number.getNetwork ();
+
+			smsCustomer =
+				manualResponderNumber != null
+					? manualResponderNumber.getSmsCustomer ()
+					: null;
+
+			smsCustomerSession =
+				smsCustomer != null
+				&& smsCustomer.getNumSessions () > 0
+
+				? smsCustomerSessionHelper.findByIndexRequired (
+					smsCustomer,
+					smsCustomer.getNumSessions () - 1)
+
 				: null;
 
-		smsCustomerSession =
-			smsCustomer != null
-			&& smsCustomer.getNumSessions () > 0
+			// get routes
 
-			? smsCustomerSessionHelper.findByIndexRequired (
-				smsCustomer,
-				smsCustomer.getNumSessions () - 1)
-
-			: null;
-
-		// get routes
-
-		Set <RouteRec> routes =
-			new HashSet<> ();
-
-		for (
-			ManualResponderTemplateRec manualResponderTemplate
-				: manualResponder.getTemplates ()
-		) {
-
-			RouteRec route =
-				routerLogic.resolveRouter (
-					manualResponderTemplate.getRouter ());
-
-			if (route == null)
-				continue;
-
-			if (route.getOutCharge () == 0)
-				continue;
-
-			routes.add (
-				route);
-
-		}
-
-		// get bill counts per route
-
-		Instant startOfToday =
-			LocalDate.now ()
-				.toDateTimeAtStartOfDay ()
-				.toInstant ();
-
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				manualResponder,
-				"default");
-
-		routeBillInfos =
-			new ArrayList <RouteBillInfo> ();
-
-		for (
-			RouteRec route
-				: routes
-		) {
-
-			long total = 0l;
-			long thisService = 0l;
-
-			MessageSearch messageSearch =
-				new MessageSearch ()
-
-				.numberId (
-					number.getId ())
-
-				.routeId (
-					route.getId ())
-
-				.createdTime (
-					TextualInterval.after (
-						userConsoleLogic.timezone (),
-						startOfToday))
-
-				.direction (
-					MessageDirection.out);
-
-			List <MessageRec> messages =
-				messageHelper.search (
-					taskLogger,
-					messageSearch);
+			Set <RouteRec> routes =
+				new HashSet<> ();
 
 			for (
-				MessageRec message
-					: messages
+				ManualResponderTemplateRec manualResponderTemplate
+					: manualResponder.getTemplates ()
 			) {
 
-				if (
-					enumInSafe (
-						message.getStatus (),
-						MessageStatus.undelivered,
-						MessageStatus.cancelled,
-						MessageStatus.reportTimedOut)
-				) {
+				RouteRec route =
+					routerLogic.resolveRouter (
+						manualResponderTemplate.getRouter ());
 
+				if (route == null)
 					continue;
 
-				}
+				if (route.getOutCharge () == 0)
+					continue;
 
-				if (
-					enumNotInSafe (
-						message.getStatus (),
-						MessageStatus.pending,
-						MessageStatus.sent,
-						MessageStatus.submitted,
-						MessageStatus.delivered)
-				) {
-
-					taskLogger.errorFormat (
-						"Counting message in unknown state \"%s\"",
-						enumNameSpaces (
-							message.getStatus ()));
-
-				}
-
-				total +=
-					route.getOutCharge ();
-
-				if (
-					referenceEqualWithClass (
-						ServiceRec.class,
-						message.getService (),
-						defaultService)
-				) {
-
-					thisService +=
-						route.getOutCharge ();
-
-				}
+				routes.add (
+					route);
 
 			}
 
-			routeBillInfos.add (
-				new RouteBillInfo ()
+			// get bill counts per route
 
-				.route (
-					route)
+			Instant startOfToday =
+				LocalDate.now ()
+					.toDateTimeAtStartOfDay ()
+					.toInstant ();
 
-				.total (
-					total)
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					manualResponder,
+					"default");
 
-				.thisService (
-					thisService)
+			routeBillInfos =
+				new ArrayList <RouteBillInfo> ();
 
-			);
+			for (
+				RouteRec route
+					: routes
+			) {
 
-		}
+				long total = 0l;
+				long thisService = 0l;
 
-		Collections.sort (
-			routeBillInfos);
+				MessageSearch messageSearch =
+					new MessageSearch ()
 
-		// check spend limit
+					.numberId (
+						number.getId ())
 
-		if (
-			isNotNull (
-				manualResponder.getSmsSpendLimiter ())
-		) {
+					.routeId (
+						route.getId ())
 
-			spendAvailable =
-				smsSpendLimitLogic.spendCheck (
+					.createdTime (
+						TextualInterval.after (
+							userConsoleLogic.timezone (),
+							startOfToday))
+
+					.direction (
+						MessageDirection.out);
+
+				List <MessageRec> messages =
+					messageHelper.search (
+						taskLogger,
+						messageSearch);
+
+				for (
+					MessageRec message
+						: messages
+				) {
+
+					if (
+						enumInSafe (
+							message.getStatus (),
+							MessageStatus.undelivered,
+							MessageStatus.cancelled,
+							MessageStatus.reportTimedOut)
+					) {
+
+						continue;
+
+					}
+
+					if (
+						enumNotInSafe (
+							message.getStatus (),
+							MessageStatus.pending,
+							MessageStatus.sent,
+							MessageStatus.submitted,
+							MessageStatus.delivered)
+					) {
+
+						taskLogger.errorFormat (
+							"Counting message in unknown state \"%s\"",
+							enumNameSpaces (
+								message.getStatus ()));
+
+					}
+
+					total +=
+						route.getOutCharge ();
+
+					if (
+						referenceEqualWithClass (
+							ServiceRec.class,
+							message.getService (),
+							defaultService)
+					) {
+
+						thisService +=
+							route.getOutCharge ();
+
+					}
+
+				}
+
+				routeBillInfos.add (
+					new RouteBillInfo ()
+
+					.route (
+						route)
+
+					.total (
+						total)
+
+					.thisService (
+						thisService)
+
+				);
+
+			}
+
+			Collections.sort (
+				routeBillInfos);
+
+			// check spend limit
+
+			if (
+				isNotNull (
+					manualResponder.getSmsSpendLimiter ())
+			) {
+
+				spendAvailable =
+					smsSpendLimitLogic.spendCheck (
+						taskLogger,
+						manualResponder.getSmsSpendLimiter (),
+						manualResponderRequest.getNumber ());
+
+			} else {
+
+				spendAvailable =
+					optionalAbsent ();
+
+			}
+
+			// get request history
+
+			oldRequests =
+				manualResponderRequestHelper.findRecentLimit (
 					taskLogger,
-					manualResponder.getSmsSpendLimiter (),
-					manualResponderRequest.getNumber ());
+					manualResponder,
+					manualResponderRequest.getNumber (),
+					maxResults + 1);
 
-		} else {
-
-			spendAvailable =
-				optionalAbsent ();
+			Collections.sort (
+				oldRequests);
 
 		}
-
-		// get request history
-
-		oldRequests =
-			manualResponderRequestHelper.findRecentLimit (
-				taskLogger,
-				manualResponder,
-				manualResponderRequest.getNumber (),
-				maxResults + 1);
-
-		Collections.sort (
-			oldRequests);
 
 	}
 
@@ -436,223 +442,241 @@ class ManualResponderRequestPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (manualResponderRequest == null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-			formatWriter.writeLineFormat (
-				"<p>Not found</p>");
+		) {
 
-			return;
+			if (manualResponderRequest == null) {
+
+				formatWriter.writeLineFormat (
+					"<p>Not found</p>");
+
+				return;
+
+			}
+
+			htmlDivOpen (
+				htmlClassAttribute (
+					"manual-responder-request-pending-summary"));
+
+			htmlDivOpen (
+				htmlClassAttribute (
+					"layout-container"));
+
+			htmlTableOpenLayout ();
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWriteHtml (
+				() -> goRequestDetails (
+					taskLogger),
+				htmlAttribute (
+					"style",
+					"width: 50%"));
+
+			htmlTableCellWriteHtml (
+				() -> {
+					goCustomerDetails (
+						taskLogger);
+					goNotes ();
+				},
+				htmlAttribute (
+					"style",
+					"width: 50%"));
+
+			htmlTableRowClose ();
+
+			htmlTableClose ();
+
+			htmlDivClose ();
+
+			goBillHistory ();
+
+			goOperatorInfo ();
+
+			goSessionDetails ();
+
+			goRequestHistory (
+				taskLogger);
+
+			htmlDivClose ();
 
 		}
-
-		htmlDivOpen (
-			htmlClassAttribute (
-				"manual-responder-request-pending-summary"));
-
-		htmlDivOpen (
-			htmlClassAttribute (
-				"layout-container"));
-
-		htmlTableOpenLayout ();
-
-		htmlTableRowOpen ();
-
-		htmlTableCellWriteHtml (
-			() -> goRequestDetails (
-				taskLogger),
-			htmlAttribute (
-				"style",
-				"width: 50%"));
-
-		htmlTableCellWriteHtml (
-			() -> {
-				goCustomerDetails (
-					taskLogger);
-				goNotes ();
-			},
-			htmlAttribute (
-				"style",
-				"width: 50%"));
-
-		htmlTableRowClose ();
-
-		htmlTableClose ();
-
-		htmlDivClose ();
-
-		goBillHistory ();
-
-		goOperatorInfo ();
-
-		goSessionDetails ();
-
-		goRequestHistory (
-			taskLogger);
-
-		htmlDivClose ();
 
 	}
 
 	void goRequestDetails (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goRequestDetails");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goRequestDetails");
 
-		htmlTableDetailsRowWriteRaw (
-			"Manual responder",
-			() -> objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				manualResponder));
-
-		htmlTableDetailsRowWrite (
-			"Description",
-			manualResponder.getDescription ());
-
-		if (
-			privChecker.canRecursive (
-				taskLogger,
-				manualResponder,
-				"number")
 		) {
+
+			htmlTableOpenDetails ();
 
 			htmlTableDetailsRowWriteRaw (
-				"Number",
+				"Manual responder",
 				() -> objectManager.writeTdForObjectMiniLink (
 					taskLogger,
-					number));
-
-		}
-
-		if (
-			optionalIsPresent (
-				spendAvailable)
-		) {
+					manualResponder));
 
 			htmlTableDetailsRowWrite (
-				"Daily limit",
-				currencyLogic.formatText (
-					manualResponder
-						.getSmsSpendLimiter ()
-							.getCurrency (),
-					manualResponder
-						.getSmsSpendLimiter ()
-						.getDailySpendLimitAmount ()));
-
-			htmlTableDetailsRowWrite (
-				"Available to spend",
-				currencyLogic.formatText (
-					manualResponder
-						.getSmsSpendLimiter ()
-							.getCurrency (),
-					spendAvailable.get ()));
-
-		}
-
-		htmlTableDetailsRowWriteRaw (
-			"Network",
-			() -> objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				network));
-
-		htmlTableDetailsRowWriteRaw (
-			"Message",
-			() -> objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				message));
-
-		htmlTableDetailsRowWrite (
-			"Message text",
-			message.getText ().getText (),
-			htmlClassAttribute (
-				"bigger"));
-
-		for (
-			MediaRec media
-				: message.getMedias ()
-		) {
+				"Description",
+				manualResponder.getDescription ());
 
 			if (
-				mediaLogic.isText (
-					media)
-			) {
-
-				htmlTableDetailsRowWriteHtml (
-					"Text media",
-					() -> mediaConsoleLogic.writeMediaContent (
-						taskLogger,
-						media));
-
-			} else if (
-				mediaLogic.isImage (
-					media)
+				privChecker.canRecursive (
+					taskLogger,
+					manualResponder,
+					"number")
 			) {
 
 				htmlTableDetailsRowWriteRaw (
-					"Image media",
-					() -> htmlLinkWriteHtml (
-						mediaConsoleLogic.mediaUrlScaled (
-							taskLogger,
-							media,
-							600,
-							600),
-						() -> mediaConsoleLogic.writeMediaThumb100 (
-							taskLogger,
-							media)));
-
-			} else {
-
-				htmlTableDetailsRowWrite (
-					"Media",
-					"(unsupported media type)");
+					"Number",
+					() -> objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						number));
 
 			}
 
-		}
+			if (
+				optionalIsPresent (
+					spendAvailable)
+			) {
 
-		htmlTableClose ();
+				htmlTableDetailsRowWrite (
+					"Daily limit",
+					currencyLogic.formatText (
+						manualResponder
+							.getSmsSpendLimiter ()
+								.getCurrency (),
+						manualResponder
+							.getSmsSpendLimiter ()
+							.getDailySpendLimitAmount ()));
+
+				htmlTableDetailsRowWrite (
+					"Available to spend",
+					currencyLogic.formatText (
+						manualResponder
+							.getSmsSpendLimiter ()
+								.getCurrency (),
+						spendAvailable.get ()));
+
+			}
+
+			htmlTableDetailsRowWriteRaw (
+				"Network",
+				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					network));
+
+			htmlTableDetailsRowWriteRaw (
+				"Message",
+				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					message));
+
+			htmlTableDetailsRowWrite (
+				"Message text",
+				message.getText ().getText (),
+				htmlClassAttribute (
+					"bigger"));
+
+			for (
+				MediaRec media
+					: message.getMedias ()
+			) {
+
+				if (
+					mediaLogic.isText (
+						media)
+				) {
+
+					htmlTableDetailsRowWriteHtml (
+						"Text media",
+						() -> mediaConsoleLogic.writeMediaContent (
+							taskLogger,
+							media));
+
+				} else if (
+					mediaLogic.isImage (
+						media)
+				) {
+
+					htmlTableDetailsRowWriteRaw (
+						"Image media",
+						() -> htmlLinkWriteHtml (
+							mediaConsoleLogic.mediaUrlScaled (
+								taskLogger,
+								media,
+								600,
+								600),
+							() -> mediaConsoleLogic.writeMediaThumb100 (
+								taskLogger,
+								media)));
+
+				} else {
+
+					htmlTableDetailsRowWrite (
+						"Media",
+						"(unsupported media type)");
+
+				}
+
+			}
+
+			htmlTableClose ();
+
+		}
 
 	}
 
 	void goCustomerDetails (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goCustomerDetails");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Customer details");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goCustomerDetails");
 
-		if (
-			isNull (
-				smsCustomer)
 		) {
 
-			formatWriter.writeLineFormat (
-				"<p>Customer management is not configured for this manual ",
-				"responder service.</p>");
+			htmlHeadingThreeWrite (
+				"Customer details");
 
-			return;
+			if (
+				isNull (
+					smsCustomer)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<p>Customer management is not configured for this manual ",
+					"responder service.</p>");
+
+				return;
+
+			}
+
+			formFieldLogic.outputDetailsTable (
+				taskLogger,
+				formatWriter,
+				customerDetailsFields,
+				smsCustomer,
+				emptyMap ());
 
 		}
-
-		formFieldLogic.outputDetailsTable (
-			taskLogger,
-			formatWriter,
-			customerDetailsFields,
-			smsCustomer,
-			ImmutableMap.of ());
 
 	}
 
@@ -850,132 +874,139 @@ class ManualResponderRequestPendingSummaryPart
 	void goRequestHistory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goRequestHistory");
+		try (
 
-		if (oldRequests.isEmpty ())
-			return;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goRequestHistory");
 
-		// title
-
-		htmlHeadingTwoWrite (
-			"Request history");
-
-		// warning if we have omitted old requests
-
-		if (oldRequests.size () > maxResults) {
-
-			formatWriter.writeLineFormat (
-				"<p class=\"warning\">%h</p>",
-				stringFormat (
-					"Only showing the first %s results.",
-					integerToDecimalString (
-						maxResults)));
-
-		}
-
-		// begin table
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Timestamp",
-			null,
-			"Message",
-			"Media",
-			"User");
-
-		// iterate requests
-
-		for (
-			ManualResponderRequestRec oldRequest
-				: oldRequests
 		) {
 
-			htmlTableRowSeparatorWrite ();
+			if (oldRequests.isEmpty ()) {
+				return;
+			}
 
-			// iterate replies, which are shown before their requests
+			// title
+
+			htmlHeadingTwoWrite (
+				"Request history");
+
+			// warning if we have omitted old requests
+
+			if (oldRequests.size () > maxResults) {
+
+				formatWriter.writeLineFormat (
+					"<p class=\"warning\">%h</p>",
+					stringFormat (
+						"Only showing the first %s results.",
+						integerToDecimalString (
+							maxResults)));
+
+			}
+
+			// begin table
+
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Timestamp",
+				null,
+				"Message",
+				"Media",
+				"User");
+
+			// iterate requests
 
 			for (
-				ManualResponderReplyRec oldReply
-					: oldRequest.getReplies ()
+				ManualResponderRequestRec oldRequest
+					: oldRequests
 			) {
 
-				// print reply
+				htmlTableRowSeparatorWrite ();
+
+				// iterate replies, which are shown before their requests
+
+				for (
+					ManualResponderReplyRec oldReply
+						: oldRequest.getReplies ()
+				) {
+
+					// print reply
+
+					htmlTableRowOpen (
+						htmlClassAttribute (
+							"message-out"));
+
+					htmlTableCellWriteHtml (
+						"&nbsp;");
+
+					htmlTableCellWriteHtml (
+						userConsoleLogic.timestampWithTimezoneString (
+							oldReply.getTimestamp ()));
+
+					htmlTableCellWriteHtml (
+						oldReply.getText ().getText ());
+
+					htmlTableCellWrite (
+						"");
+
+					htmlTableCellWrite (
+						ifNotNullThenElseEmDash (
+							oldReply.getUser (),
+							() -> oldReply.getUser ().getUsername ()));
+
+					htmlTableCellClose ();
+
+				}
+
+				// print request
 
 				htmlTableRowOpen (
 					htmlClassAttribute (
-						"message-out"));
+						"message-in"));
 
-				htmlTableCellWriteHtml (
-					"&nbsp;");
-
-				htmlTableCellWriteHtml (
+				htmlTableCellWrite (
 					userConsoleLogic.timestampWithTimezoneString (
-						oldReply.getTimestamp ()));
+						oldRequest.getTimestamp ()),
+					htmlColumnSpanAttribute (2l));
+
+				htmlTableCellWrite (
+					oldRequest.getMessage ().getText ().getText ());
+
+				// print request medias
 
 				htmlTableCellWriteHtml (
-					oldReply.getText ().getText ());
+					() -> oldRequest.getMessage ().getMedias ().forEach (
+						media -> {
+
+					if (
+						mediaLogic.isImage (
+							media)
+					) {
+
+						mediaConsoleLogic.writeMediaThumb32 (
+							taskLogger,
+							media);
+
+					}
+
+				}));
+
+				// leave request user blank
 
 				htmlTableCellWrite (
 					"");
 
-				htmlTableCellWrite (
-					ifNotNullThenElseEmDash (
-						oldReply.getUser (),
-						() -> oldReply.getUser ().getUsername ()));
-
-				htmlTableCellClose ();
+				htmlTableRowClose ();
 
 			}
 
-			// print request
+			// close table
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"message-in"));
-
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithTimezoneString (
-					oldRequest.getTimestamp ()),
-				htmlColumnSpanAttribute (2l));
-
-			htmlTableCellWrite (
-				oldRequest.getMessage ().getText ().getText ());
-
-			// print request medias
-
-			htmlTableCellWriteHtml (
-				() -> oldRequest.getMessage ().getMedias ().forEach (
-					media -> {
-
-				if (
-					mediaLogic.isImage (
-						media)
-				) {
-
-					mediaConsoleLogic.writeMediaThumb32 (
-						taskLogger,
-						media);
-
-				}
-
-			}));
-
-			// leave request user blank
-
-			htmlTableCellWrite (
-				"");
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		// close table
-
-		htmlTableClose ();
 
 	}
 

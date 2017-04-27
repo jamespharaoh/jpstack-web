@@ -122,187 +122,142 @@ class EnumFormFieldBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String name =
-			spec.name ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String fieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+		) {
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			String name =
+				spec.name ();
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String fieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		Boolean hidden =
-			ifNull (
-				spec.hidden (),
-				false);
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		Class <?> propertyClass =
-			optionalGetRequired (
-				objectManager.dereferenceType (
-					optionalOf (
-						context.containerClass ()),
-					optionalOf (
-						fieldName)));
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		String enumConsoleHelperName =
-			ifNullThenRequired (
+			Boolean hidden =
+				ifNull (
+					spec.hidden (),
+					false);
 
-			() -> spec.helperBeanName (),
+			Class <?> propertyClass =
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							fieldName)));
 
-			() -> ifThenElse (
-				isNotNull (
-					propertyClass.getEnclosingClass ()),
+			String enumConsoleHelperName =
+				ifNullThenRequired (
 
-				() -> stringFormat (
-					"%s%sConsoleHelper",
-					uncapitalise (
-						propertyClass.getEnclosingClass ().getSimpleName ()),
-					propertyClass.getSimpleName ()),
+				() -> spec.helperBeanName (),
 
-				() -> stringFormat (
-					"%sConsoleHelper",
-					uncapitalise (
-						propertyClass.getSimpleName ()))
+				() -> ifThenElse (
+					isNotNull (
+						propertyClass.getEnclosingClass ()),
 
-			)
+					() -> stringFormat (
+						"%s%sConsoleHelper",
+						uncapitalise (
+							propertyClass.getEnclosingClass ().getSimpleName ()),
+						propertyClass.getSimpleName ()),
 
-		);
+					() -> stringFormat (
+						"%sConsoleHelper",
+						uncapitalise (
+							propertyClass.getSimpleName ()))
 
-		EnumConsoleHelper enumConsoleHelper =
-			componentManager.getComponentOrElse (
-				taskLogger,
-				enumConsoleHelperName,
-				EnumConsoleHelper.class,
-				() -> new EnumConsoleHelper ()
-					.enumClass (propertyClass)
-					.auto ());
-
-		Optional <Optional <Object>> implicitValue =
-			spec.implicitValue () != null
-				? Optional.of (
-					Optional.of (
-						toEnum (
-							enumConsoleHelper.enumClass (),
-							spec.implicitValue ())))
-				: Optional.absent ();
-
-		// accessor
-
-		FormFieldAccessor accessor =
-			dereferenceFormFieldAccessorProvider.get ()
-
-			.path (
-				fieldName)
-
-			.nativeClass (
-				enumConsoleHelper.enumClass ());
-
-		// native mapping
-
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
-
-		// value validators
-
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
-
-		if (! nullable) {
-
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
-
-		}
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
-
-		// interface mapping
-
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// csv mapping
-
-		FormFieldInterfaceMapping csvMapping =
-			enumCsvFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			enumFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				nullable)
-
-			.enumConsoleHelper (
-				enumConsoleHelper);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// form field
-
-		if (hidden) {
-
-			formFieldSet.addFormItem (
-				hiddenFormFieldProvider.get ()
-
-				.name (
-					name)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.csvMapping (
-					csvMapping)
-
-				.implicitValue (
-					implicitValue)
+				)
 
 			);
 
-		} else if (readOnly) {
+			EnumConsoleHelper enumConsoleHelper =
+				componentManager.getComponentOrElse (
+					taskLogger,
+					enumConsoleHelperName,
+					EnumConsoleHelper.class,
+					() -> new EnumConsoleHelper ()
+						.enumClass (propertyClass)
+						.auto ());
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+			Optional <Optional <Object>> implicitValue =
+				spec.implicitValue () != null
+					? Optional.of (
+						Optional.of (
+							toEnum (
+								enumConsoleHelper.enumClass (),
+								spec.implicitValue ())))
+					: Optional.absent ();
+
+			// accessor
+
+			FormFieldAccessor accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					fieldName)
+
+				.nativeClass (
+					enumConsoleHelper.enumClass ());
+
+			// native mapping
+
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+			// value validators
+
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// csv mapping
+
+			FormFieldInterfaceMapping csvMapping =
+				enumCsvFormFieldInterfaceMappingProvider.get ();
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				enumFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -310,59 +265,110 @@ class EnumFormFieldBuilder
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					nullable)
 
-				.nativeMapping (
-					nativeMapping)
+				.enumConsoleHelper (
+					enumConsoleHelper);
 
-				.interfaceMapping (
-					interfaceMapping)
+			// update hook
 
-				.csvMapping (
-					csvMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.renderer (
-					renderer)
+			// form field
 
-			);
+			if (hidden) {
 
-		} else {
+				formFieldSet.addFormItem (
+					hiddenFormFieldProvider.get ()
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+					.name (
+						name)
 
-				.name (
-					name)
+					.accessor (
+						accessor)
 
-				.label (
-					label)
+					.nativeMapping (
+						nativeMapping)
 
-				.accessor (
-					accessor)
+					.csvMapping (
+						csvMapping)
 
-				.nativeMapping (
-					nativeMapping)
+					.implicitValue (
+						implicitValue)
 
-				.valueValidators (
-					valueValidators)
+				);
 
-				.constraintValidator (
-					constraintValidator)
+			} else if (readOnly) {
 
-				.interfaceMapping (
-					interfaceMapping)
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-				.csvMapping (
-					csvMapping)
+					.name (
+						name)
 
-				.renderer (
-					renderer)
+					.label (
+						label)
 
-				.updateHook (
-					updateHook)
+					.accessor (
+						accessor)
 
-			);
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			} else {
+
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

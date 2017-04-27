@@ -115,87 +115,93 @@ class ChatDateStopCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		CommandTypeRec commandType =
-			command.getCommandType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		if (
-			stringNotEqualSafe (
-				commandType.getCode (),
-				"date_stop")
 		) {
-			throw new RuntimeException ();
-		}
 
-		if (
-			stringNotEqualSafe (
-				commandType.getParentType ().getCode (),
-				"chat_scheme")
-		) {
-			throw new RuntimeException ();
-		}
+			CommandTypeRec commandType =
+				command.getCommandType ();
 
-		ChatSchemeRec chatScheme =
-			chatSchemeHelper.findRequired (
-				command.getParentId ());
+			if (
+				stringNotEqualSafe (
+					commandType.getCode (),
+					"date_stop")
+			) {
+				throw new RuntimeException ();
+			}
 
-		ChatRec chat =
-			chatScheme.getChat ();
+			if (
+				stringNotEqualSafe (
+					commandType.getParentType ().getCode (),
+					"chat_scheme")
+			) {
+				throw new RuntimeException ();
+			}
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			ChatSchemeRec chatScheme =
+				chatSchemeHelper.findRequired (
+					command.getParentId ());
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				chatScheme.getChat ();
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// update dating mode
+
+			chatDateLogic.userDateStuff (
 				taskLogger,
-				chat,
-				message);
+				chatUser,
+				null,
+				optionalOf (
+					message),
+				ChatUserDateMode.none,
+				true);
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			// log help message
 
-		// update dating mode
+			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
+				chatUser,
+				message,
+				rest,
+				optionalOf (
+					command),
+				false);
 
-		chatDateLogic.userDateStuff (
-			taskLogger,
-			chatUser,
-			null,
-			optionalOf (
-				message),
-			ChatUserDateMode.none,
-			true);
+			// process inbox
 
-		// log help message
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
 
-		chatHelpLogLogic.createChatHelpLogIn (
-			taskLogger,
-			chatUser,
-			message,
-			rest,
-			optionalOf (
-				command),
-			false);
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
+		}
 
 	}
 

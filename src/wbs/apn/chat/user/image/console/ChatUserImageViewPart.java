@@ -87,18 +87,24 @@ class ChatUserImageViewPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlParagraphOpen ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		mediaConsoleLogic.writeMediaContent (
-			taskLogger,
-			image.getMedia ());
+		) {
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
+
+			mediaConsoleLogic.writeMediaContent (
+				taskLogger,
+				image.getMedia ());
+
+			htmlParagraphClose ();
+
+		}
 
 	}
 

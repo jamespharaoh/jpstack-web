@@ -1,5 +1,7 @@
 package wbs.framework.servlet;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.io.IOException;
 
 import javax.servlet.Servlet;
@@ -8,6 +10,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import lombok.NonNull;
 
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.DefaultLogContext;
@@ -48,31 +52,38 @@ class BeanServletProxy
 	@Override
 	public
 	void init (
-			ServletConfig servletConfig)
+			@NonNull ServletConfig servletConfig)
 		throws ServletException {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"init");
+		try (
 
-		ServletContext servletContext =
-			servletConfig.getServletContext ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"init");
 
-		ComponentManager componentManager =
-			(ComponentManager)
-			servletContext.getAttribute (
-				"wbs-application-context");
+		) {
 
-		target =
-			componentManager.getComponentRequired (
-				taskLogger,
-				servletConfig.getServletName (),
-				Servlet.class);
+			ServletContext servletContext =
+				servletConfig.getServletContext ();
 
-		taskLogger.makeException ();
+			@SuppressWarnings ("resource")
+			ComponentManager componentManager =
+				genericCastUnchecked (
+					servletContext.getAttribute (
+						"wbs-application-context"));
 
-		target.init (
-			servletConfig);
+			target =
+				componentManager.getComponentRequired (
+					taskLogger,
+					servletConfig.getServletName (),
+					Servlet.class);
+
+			taskLogger.makeException ();
+
+			target.init (
+				servletConfig);
+
+		}
 
 	}
 

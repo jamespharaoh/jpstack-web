@@ -84,17 +84,23 @@ class ConsoleWebSocketApplication
 		void onClose (
 				@NonNull DataFrame frame) {
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"WebSocketImplementation.onClose");
+			try (
 
-			super.onClose (
-				frame);
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"WebSocketImplementation.onClose");
 
-			connectionListener.handleConnectionClosed (
-				taskLogger);
+			) {
 
-			taskLogger.makeException ();
+				super.onClose (
+					frame);
+
+				connectionListener.handleConnectionClosed (
+					taskLogger);
+
+				taskLogger.makeException ();
+
+			}
 
 		}
 
@@ -102,18 +108,24 @@ class ConsoleWebSocketApplication
 		public
 		void onConnect () {
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"WebSocketImplementation.onMessage");
+			try (
 
-			super.onConnect ();
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"WebSocketImplementation.onMessage");
 
-			connectionListener =
-				consoleAsyncManager.newConnection (
-					taskLogger,
-					this);
+			) {
 
-			taskLogger.makeException ();
+				super.onConnect ();
+
+				connectionListener =
+					consoleAsyncManager.newConnection (
+						taskLogger,
+						this);
+
+				taskLogger.makeException ();
+
+			}
 
 		}
 
@@ -122,18 +134,24 @@ class ConsoleWebSocketApplication
 		void onMessage (
 				@NonNull String message) {
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"WebSocketImplementation.onMessage");
+			try (
 
-			super.onMessage (
-				message);
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"WebSocketImplementation.onMessage");
 
-			connectionListener.handleMessageReceived (
-				taskLogger,
-				message);
+			) {
 
-			taskLogger.makeException ();
+				super.onMessage (
+					message);
+
+				connectionListener.handleMessageReceived (
+					taskLogger,
+					message);
+
+				taskLogger.makeException ();
+
+			}
 
 		}
 
@@ -143,22 +161,28 @@ class ConsoleWebSocketApplication
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull String message) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"sendMessage");
+			try (
 
-			try {
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"sendMessage");
 
-				send (
-					message);
+			) {
 
-			} catch (Exception exception) {
+				try {
 
-				taskLogger.errorFormatException (
-					exception,
-					"Error sending message: %s",
-					message);
+					send (
+						message);
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
+						"Error sending message: %s",
+						message);
+
+				}
 
 			}
 

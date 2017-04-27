@@ -117,22 +117,28 @@ class SimpleConsoleContext
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleContextStuff stuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"localPathForStuff");
+		try (
 
-		if (parentContext () != null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"localPathForStuff");
 
-			return parentContext ().localPathForStuff (
-				taskLogger,
-				stuff);
+		) {
 
-		} else {
+			if (parentContext () != null) {
 
-			return super.localPathForStuff (
-				taskLogger,
-				stuff);
+				return parentContext ().localPathForStuff (
+					taskLogger,
+					stuff);
+
+			} else {
+
+				return super.localPathForStuff (
+					taskLogger,
+					stuff);
+
+			}
 
 		}
 
@@ -145,99 +151,105 @@ class SimpleConsoleContext
 			@NonNull PathSupply pathParts,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initContext");
+		try (
 
-		// set privs
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initContext");
 
-		for (
-			PrivKeySpec privKeySpec
-				: privKeySpecs
 		) {
 
-			List <String> privCodeParts =
-				stringSplitColon (
-					privKeySpec.privCode ());
+			// set privs
 
-			if (
-				collectionHasTwoElements (
-					privCodeParts)
+			for (
+				PrivKeySpec privKeySpec
+					: privKeySpecs
 			) {
 
+				List <String> privCodeParts =
+					stringSplitColon (
+						privKeySpec.privCode ());
+
 				if (
-					stringNotEqualSafe (
-						listFirstElementRequired (
-							privCodeParts),
-						"root")
+					collectionHasTwoElements (
+						privCodeParts)
 				) {
+
+					if (
+						stringNotEqualSafe (
+							listFirstElementRequired (
+								privCodeParts),
+							"root")
+					) {
+						throw new RuntimeException ();
+					}
+
+					if (
+						privChecker.canRecursive (
+							taskLogger,
+							GlobalId.root,
+							listSecondElementRequired (
+								privCodeParts))
+					) {
+
+						contextStuff.grant (
+							privKeySpec.name ());
+
+					}
+
+				} else {
+
 					throw new RuntimeException ();
-				}
-
-				if (
-					privChecker.canRecursive (
-						taskLogger,
-						GlobalId.root,
-						listSecondElementRequired (
-							privCodeParts))
-				) {
-
-					contextStuff.grant (
-						privKeySpec.name ());
 
 				}
 
-			} else {
+			}
 
-				throw new RuntimeException ();
+			// set stuff
+
+			if (stuff () != null) {
+
+				for (Map.Entry<String,? extends Object> ent
+						: stuff ().entrySet ()) {
+
+					contextStuff.set (
+						ent.getKey (),
+						ent.getValue ());
+
+				}
 
 			}
 
-		}
+			// run hook
 
-		// set stuff
+			postInitHook (
+				contextStuff);
 
-		if (stuff () != null) {
+			// initialise parent
 
-			for (Map.Entry<String,? extends Object> ent
-					: stuff ().entrySet ()) {
+			ConsoleContext parentContext =
+				parentContext ();
 
-				contextStuff.set (
-					ent.getKey (),
-					ent.getValue ());
+			if (parentContext != null) {
+
+				parentContext.initContext (
+					taskLogger,
+					pathParts,
+					contextStuff);
 
 			}
 
-		}
+			// run post processors
 
-		// run hook
+			if (postProcessorName () != null) {
 
-		postInitHook (
-			contextStuff);
+				consoleManager.runPostProcessors (
+					taskLogger,
+					postProcessorName (),
+					contextStuff);
 
-		// initialise parent
-
-		ConsoleContext parentContext =
-			parentContext ();
-
-		if (parentContext != null) {
-
-			parentContext.initContext (
-				taskLogger,
-				pathParts,
-				contextStuff);
-
-		}
-
-		// run post processors
-
-		if (postProcessorName () != null) {
-
-			consoleManager.runPostProcessors (
-				taskLogger,
-				postProcessorName (),
-				contextStuff);
+			}
 
 		}
 

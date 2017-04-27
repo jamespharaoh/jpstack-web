@@ -63,34 +63,40 @@ class ChatUserImageUploadPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		formFieldSet =
-			chatUserImageConsoleModule.formFieldSetRequired (
-				"uploadForm",
-				ChatUserImageUploadForm.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		chatUserImageType =
-			toEnum (
-				ChatUserImageType.class,
-				requestContext.stuffString (
-					"chatUserImageType"));
+		) {
 
-		uploadForm =
-			new ChatUserImageUploadForm ();
+			formFieldSet =
+				chatUserImageConsoleModule.formFieldSetRequired (
+					"uploadForm",
+					ChatUserImageUploadForm.class);
 
-		if (requestContext.post ()) {
+			chatUserImageType =
+				toEnum (
+					ChatUserImageType.class,
+					requestContext.stuffString (
+						"chatUserImageType"));
 
-			formFieldLogic.update (
-				taskLogger,
-				requestContext,
-				formFieldSet,
-				uploadForm,
-				ImmutableMap.of (),
-				"upload");
+			uploadForm =
+				new ChatUserImageUploadForm ();
+
+			if (requestContext.post ()) {
+
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formFieldSet,
+					uploadForm,
+					ImmutableMap.of (),
+					"upload");
+
+			}
 
 		}
 
@@ -101,54 +107,60 @@ class ChatUserImageUploadPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlParagraphWrite (
-			"Please upload the photo or video.");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		// form open
+		) {
 
-		htmlFormOpenPostActionMultipart (
-			requestContext.resolveLocalUrl (
-				stringFormat (
-					"/chatUser.%s.upload",
-					chatUserImageType.name ())));
+			htmlParagraphWrite (
+				"Please upload the photo or video.");
 
-		// form fields
+			// form open
 
-		htmlTableOpenDetails ();
+			htmlFormOpenPostActionMultipart (
+				requestContext.resolveLocalUrl (
+					stringFormat (
+						"/chatUser.%s.upload",
+						chatUserImageType.name ())));
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFieldSet,
-			Optional.absent (),
-			uploadForm,
-			ImmutableMap.of (),
-			FormType.perform,
-			"upload");
+			// form fields
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
 
-		// form controls
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFieldSet,
+				Optional.absent (),
+				uploadForm,
+				ImmutableMap.of (),
+				FormType.perform,
+				"upload");
 
-		htmlParagraphOpen ();
+			htmlTableClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"upload file\"",
-			">");
+			// form controls
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
 
-		// form close
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"upload file\"",
+				">");
 
-		htmlFormClose ();
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

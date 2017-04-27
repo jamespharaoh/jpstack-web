@@ -87,34 +87,40 @@ class ModelFixtureCreator {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runModelFixtureCreators");
+		try (
 
-		taskLogger.noticeFormat (
-			"About to create model fixtures");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runModelFixtureCreators");
 
-		for (
-			ModelMetaSpec spec
-				: modelMetaLoader.modelMetas ().values ()
 		) {
 
-			Model <?> model =
-				entityHelper.modelsByName ().get (
-					spec.name ());
+			taskLogger.noticeFormat (
+				"About to create model fixtures");
 
-			fixtureBuilder.descend (
-				taskLogger,
-				spec,
-				spec.children (),
-				model,
-				MissingBuilderBehaviour.error);
+			for (
+				ModelMetaSpec spec
+					: modelMetaLoader.modelMetas ().values ()
+			) {
+
+				Model <?> model =
+					entityHelper.modelsByName ().get (
+						spec.name ());
+
+				fixtureBuilder.descend (
+					taskLogger,
+					spec,
+					spec.children (),
+					model,
+					MissingBuilderBehaviour.error);
+
+			}
+
+			taskLogger.noticeFormat (
+				"All model fixtures created successfully");
 
 		}
-
-		taskLogger.noticeFormat (
-			"All model fixtures created successfully");
 
 	}
 

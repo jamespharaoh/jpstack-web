@@ -39,32 +39,38 @@ class ConsoleModuleSpecFactory
 	Object makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"makeComponent");
+		try (
 
-		taskLogger.firstErrorFormat (
-			"Error reading console module spec: %s",
-			xmlResourceName);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeComponent");
 
-		try {
+		) {
 
-			return consoleSpecReader.readClasspath (
-				taskLogger,
+			taskLogger.firstErrorFormat (
+				"Error reading console module spec: %s",
 				xmlResourceName);
 
-		} catch (LoggedErrorsException loggedErrorsException) {
+			try {
 
-			throw taskLogger.makeException ();
+				return consoleSpecReader.readClasspath (
+					taskLogger,
+					xmlResourceName);
 
-		} catch (Exception exception) {
+			} catch (LoggedErrorsException loggedErrorsException) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Error reading console module spec %s",
-					xmlResourceName),
-				exception);
+				throw taskLogger.makeException ();
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Error reading console module spec %s",
+						xmlResourceName),
+					exception);
+
+			}
 
 		}
 

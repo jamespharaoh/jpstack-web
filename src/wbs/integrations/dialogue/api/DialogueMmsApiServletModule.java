@@ -11,7 +11,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.dateToInstantNullSafe;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,8 +19,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -35,7 +32,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -138,19 +135,16 @@ class DialogueMmsApiServletModule
 		@Override
 		public
 		void doPost (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"inFile.doPost");
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"inFile.doPost");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"DialogueMmsApiServletModule.inFile.doPost ()",
@@ -285,11 +279,17 @@ class DialogueMmsApiServletModule
 
 				transaction.commit ();
 
-				FormatWriter formatWriter =
-					requestContext.formatWriter ();
+				try (
 
-				formatWriter.writeLineFormat (
-					"OK");
+					FormatWriter formatWriter =
+						requestContext.formatWriter ();
+
+				) {
+
+					formatWriter.writeLineFormat (
+						"OK");
+
+				}
 
 			}
 
@@ -304,19 +304,16 @@ class DialogueMmsApiServletModule
 		@Override
 		public
 		void doPost (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reportFile.doPost");
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"reportFile.doPost");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"DialogueMmsApiServletModule.reportFile.doPost ()",
@@ -370,7 +367,7 @@ class DialogueMmsApiServletModule
 
 				} catch (NumberFormatException exception) {
 
-					throw new ServletException (
+					throw new RuntimeException (
 						stringFormat (
 							"Ignoring dialogue MMS report with invalid user key, ",
 							"X-Mms-User-Key=%s",
@@ -388,7 +385,7 @@ class DialogueMmsApiServletModule
 						"mms")
 				) {
 
-					throw new ServletException (
+					throw new RuntimeException (
 						"Message is not MMS: " + messageId);
 
 				}

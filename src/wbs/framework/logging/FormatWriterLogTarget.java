@@ -12,12 +12,25 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.exception.ExceptionUtilsImplementation;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.exception.ExceptionUtils;
+
 import wbs.utils.string.FormatWriter;
 
 public
 class FormatWriterLogTarget
 	implements LogTarget {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	ExceptionUtils exceptionUtils;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// state
 
 	private final
 	FormatWriter formatWriter;
@@ -34,42 +47,55 @@ class FormatWriterLogTarget
 	@Override
 	public
 	void writeToLog (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull LogSeverity severity,
 			@NonNull String message,
 			@NonNull Optional <Throwable> exception) {
 
-		formatWriter.writeLineFormat (
-			"%s: %s",
-			uppercase (
-				severity.name ()),
-			message);
+		try (
 
-		if (
-			optionalIsPresent (
-				exception)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeToLog");
+
 		) {
 
-			formatWriter.increaseIndent ();
+			formatWriter.writeLineFormat (
+				"%s: %s",
+				uppercase (
+					severity.name ()),
+				message);
 
-			StringWriter stringWriter =
-				new StringWriter ();
+			if (
+				optionalIsPresent (
+					exception)
+			) {
 
-			ExceptionUtilsImplementation.writeThrowable (
-				exception.get (),
-				new PrintWriter (
-					stringWriter));
+				formatWriter.increaseIndent ();
 
-			List <String> exceptionLines =
-				stringSplitNewline (
-					stringWriter.toString ());
+				StringWriter stringWriter =
+					new StringWriter ();
 
-			exceptionLines.forEach (
-				exceptionLine ->
-					formatWriter.writeLineFormat (
-						"%s",
-						exceptionLine));
+				exceptionUtils.writeThrowable (
+					taskLogger,
+					exception.get (),
+					new PrintWriter (
+						stringWriter));
 
-			formatWriter.decreaseIndent ();
+				List <String> exceptionLines =
+					stringSplitNewline (
+						stringWriter.toString ());
+
+				exceptionLines.forEach (
+					exceptionLine ->
+						formatWriter.writeLineFormat (
+							"%s",
+							exceptionLine));
+
+				formatWriter.decreaseIndent ();
+
+			}
 
 		}
 

@@ -21,7 +21,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -80,23 +80,23 @@ class ChatUserOnlineDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		taskLogger.debugFormat (
-			"Checking online users for action needed");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ChatUserOnlineDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Checking online users for action needed");
 
 			List <ChatUserRec> onlineUsers =
 				chatUserHelper.findOnline (
@@ -123,14 +123,14 @@ class ChatUserOnlineDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doUser");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doUser");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserOnlineDaemon.doUser (chatUserId)",
@@ -215,6 +215,7 @@ class ChatUserOnlineDaemon
 					chatUser.getCode ());
 
 				chatUserLogic.logoff (
+					taskLogger,
 					chatUser,
 					true);
 
@@ -238,6 +239,7 @@ class ChatUserOnlineDaemon
 					chatUser.getCode ());
 
 				chatUserLogic.logoff (
+					taskLogger,
 					chatUser,
 					true);
 

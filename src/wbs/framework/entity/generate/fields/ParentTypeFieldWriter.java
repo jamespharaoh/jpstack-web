@@ -49,34 +49,40 @@ class ParentTypeFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// TODO this class name should not be hard-coded
+		) {
 
-		new JavaPropertyWriter ()
+			// write field
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// TODO this class name should not be hard-coded
 
-			.typeName (
-				"wbs.platform.object.core.model.ObjectTypeRec")
+			new JavaPropertyWriter ()
 
-			.propertyName (
-				ifNull (
-					spec.name (),
-					"parentType"))
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.typeName (
+					"wbs.platform.object.core.model.ObjectTypeRec")
+
+				.propertyName (
+					ifNull (
+						spec.name (),
+						"parentType"))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

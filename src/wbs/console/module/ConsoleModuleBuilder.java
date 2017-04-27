@@ -16,6 +16,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
 import wbs.console.forms.FormItem;
 import wbs.console.helper.core.ConsoleHelper;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -82,58 +83,64 @@ class ConsoleModuleBuilder
 			@NonNull String fieldSetName,
 			@NonNull List <Object> formFieldSpecs) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildFormFieldSet");
+		try (
 
-		FormFieldBuilderContext formFieldBuilderContext =
-			new FormFieldBuilderContextImplementation ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFormFieldSet");
 
-			.containerClass (
-				consoleHelper.objectClass ())
-
-			.consoleHelper (
-				consoleHelper);
-
-		FormFieldSet <Container> formFieldSet =
-			new FormFieldSet <Container> ();
-
-		builder.descend (
-			taskLogger,
-			formFieldBuilderContext,
-			formFieldSpecs,
-			formFieldSet,
-			MissingBuilderBehaviour.error);
-
-		for (
-			FormItem <?> formItem
-				: formFieldSet.formItems ()
 		) {
 
-			formItem.init (
-				fieldSetName);
+			FormFieldBuilderContext formFieldBuilderContext =
+				new FormFieldBuilderContextImplementation ()
 
-		}
+				.containerClass (
+					consoleHelper.objectClass ())
 
-		for (
-			FormField <?, ?, ?, ?> formField
-				: formFieldSet.formFields ()
-		) {
+				.consoleHelper (
+					consoleHelper);
 
-			if (formField.fileUpload ()) {
+			FormFieldSet <Container> formFieldSet =
+				new FormFieldSet <Container> ();
 
-				formFieldSet.fileUpload (
-					true);
+			builder.descend (
+				taskLogger,
+				formFieldBuilderContext,
+				formFieldSpecs,
+				formFieldSet,
+				MissingBuilderBehaviour.error);
+
+			for (
+				FormItem <?> formItem
+					: formFieldSet.formItems ()
+			) {
+
+				formItem.init (
+					fieldSetName);
 
 			}
 
+			for (
+				FormField <?, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				if (formField.fileUpload ()) {
+
+					formFieldSet.fileUpload (
+						true);
+
+				}
+
+			}
+
+			if (formFieldSet.fileUpload () == null)
+				formFieldSet.fileUpload (false);
+
+			return formFieldSet;
+
 		}
-
-		if (formFieldSet.fileUpload () == null)
-			formFieldSet.fileUpload (false);
-
-		return formFieldSet;
 
 	}
 

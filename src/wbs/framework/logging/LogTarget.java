@@ -6,6 +6,7 @@ public
 interface LogTarget {
 
 	void writeToLog (
+			TaskLogger parentTaskLogger,
 			LogSeverity severity,
 			String message,
 			Optional <Throwable> exception);

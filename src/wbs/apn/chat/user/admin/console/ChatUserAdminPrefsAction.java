@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -73,43 +73,43 @@ class ChatUserAdminPrefsAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		String genderParam =
-			nullIfEmptyString (
-				requestContext.parameterRequired (
-					"gender"));
-
-		String orientParam =
-			nullIfEmptyString (
-				requestContext.parameterRequired (
-					"orient"));
-
-		// check params
-
-		if (genderParam == null || orientParam == null) {
-
-			requestContext.addError (
-				"Please select a gender and an orient");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserAdminPrefsAction.goReal ()",
 					this);
 
 		) {
+
+			// get params
+
+			String genderParam =
+				nullIfEmptyString (
+					requestContext.parameterRequired (
+						"gender"));
+
+			String orientParam =
+				nullIfEmptyString (
+					requestContext.parameterRequired (
+						"orient"));
+
+			// check params
+
+			if (genderParam == null || orientParam == null) {
+
+				requestContext.addError (
+					"Please select a gender and an orient");
+
+				return null;
+
+			}
 
 			// lookup database stuff
 

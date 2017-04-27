@@ -115,29 +115,35 @@ class StatusResponder
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		super.setup (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		for (
-			StatusLine statusLine
-				: statusLineManager.getStatusLines ()
 		) {
 
-			PagePart pagePart =
-				statusLine.createPagePart (
-					taskLogger);
+			super.setup (
+				taskLogger);
 
-			pagePart.setup (
-				taskLogger,
-				Collections.emptyMap ());
+			for (
+				StatusLine statusLine
+					: statusLineManager.getStatusLines ()
+			) {
 
-			pageParts.add (
-				pagePart);
+				PagePart pagePart =
+					statusLine.createPagePart (
+						taskLogger);
+
+				pagePart.setup (
+					taskLogger,
+					Collections.emptyMap ());
+
+				pageParts.add (
+					pagePart);
+
+			}
 
 		}
 
@@ -148,18 +154,24 @@ class StatusResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.prepare (
-					taskLogger));
+		) {
+
+			super.prepare (
+				taskLogger);
+
+			pageParts.forEach (
+				pagePart ->
+					pagePart.prepare (
+						taskLogger));
+
+		}
 
 	}
 

@@ -4,12 +4,10 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import lombok.NonNull;
 
@@ -73,13 +71,19 @@ class ConsoleExceptionHandler
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		taskLogger.noticeFormat (
-			"Initialised console exception handler");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
+
+		) {
+
+			taskLogger.noticeFormat (
+				"Initialised console exception handler");
+
+		}
 
 	}
 
@@ -88,145 +92,154 @@ class ConsoleExceptionHandler
 	public
 	void handleException (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Throwable throwable)
-		throws
-			ServletException,
-			IOException {
+			@NonNull Throwable throwable) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleException");
+		try (
 
-		// log it the old fashioned way
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleException");
 
-		taskLogger.errorFormatException (
-			throwable,
-			"Request generated exception: %s",
-			requestContext.requestUri ());
+		) {
 
-		// make an exception log of this calamity
+			// log it the old fashioned way
 
-		try {
-
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"console",
-				stringFormat (
-					"%s %s",
-					requestContext.method (),
-					requestContext.requestUri ()),
+			taskLogger.errorFormatException (
 				throwable,
-				consoleUserHelper.loggedInUserId (),
-				GenericExceptionResolution.ignoreWithUserWarning);
+				"Request generated exception: %s",
+				requestContext.requestUri ());
 
-		} catch (RuntimeException localException) {
+			// make an exception log of this calamity
 
-			taskLogger.fatalFormatException (
-				localException,
-				"Error creating exception log");
+			try {
 
-		}
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"console",
+					stringFormat (
+						"%s %s",
+						requestContext.method (),
+						requestContext.requestUri ()),
+					throwable,
+					consoleUserHelper.loggedInUserId (),
+					GenericExceptionResolution.ignoreWithUserWarning);
 
-		// now if possible reset the output buffer
+			} catch (RuntimeException localException) {
 
-		if (requestContext.canGetWriter ()) {
+				taskLogger.fatalFormatException (
+					localException,
+					"Error creating exception log");
 
-			if (! requestContext.isCommitted ()) {
+			}
 
-				requestContext.reset ();
+			// now if possible reset the output buffer
 
-				errorPageProvider.get ()
+			if (requestContext.canGetWriter ()) {
 
-					.exception (
-						throwable)
+				if (! requestContext.isCommitted ()) {
 
-					.execute (
-						taskLogger);
+					requestContext.reset ();
 
-			} else {
+					errorPageProvider.get ()
 
-				FormatWriter formatWriter =
-					requestContext.formatWriter ();
+						.exception (
+							throwable)
 
-				formatWriter.writeLineFormat (
-					"<p class=\"error\">Internal error</p>");
+						.execute (
+							taskLogger);
 
-				formatWriter.writeLineFormat (
-					"<p>This page cannot be displayed properly, due to an ",
-					"internal error.</p>");
+				} else {
 
-				formatWriter.writeLineFormatIncreaseIndent (
-					"<form method=\"%h\">",
-					requestContext.method ());
+					try (
 
-				for (
-					Map.Entry <String, List <String>> entry
-						: requestContext.parameterMap ().entrySet ()
-				) {
+						FormatWriter formatWriter =
+							requestContext.formatWriter ();
 
-					String name =
-						entry.getKey ();
-
-					List<String> values =
-						entry.getValue ();
-
-					if (
-						stringEqualSafe (
-							name,
-							"__repost")
 					) {
-						continue;
-					}
-
-					for (String value : values) {
 
 						formatWriter.writeLineFormat (
-							"<input",
-							" type=\"hidden\"",
-							" name=\"%h\"",
-							name,
-							" value=\"%h\"",
-							value,
-							">");
-					}
+							"<p class=\"error\">Internal error</p>");
 
-					formatWriter.writeLineFormat (
-						"<input",
-						" type=\"submit\"",
-						" name=\"__repost\"",
-						" value=\"try again\"",
-						">");
+						formatWriter.writeLineFormat (
+							"<p>This page cannot be displayed properly, due to an ",
+							"internal error.</p>");
 
-				}
+						formatWriter.writeLineFormatIncreaseIndent (
+							"<form method=\"%h\">",
+							requestContext.method ());
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					"</form>");
+						for (
+							Map.Entry <String, List <String>> entry
+								: requestContext.parameterMap ().entrySet ()
+						) {
 
-				if (
-					privChecker.canSimple (
-						taskLogger,
-						GlobalId.root,
-						"debug")
-				) {
+							String name =
+								entry.getKey ();
 
-					formatWriter.writeLineFormatIncreaseIndent (
-						"<pre>");
+							List<String> values =
+								entry.getValue ();
 
-					List <String> exceptionDumpLines =
-						stringSplitNewline (
-							exceptionLogic.throwableDump (
-								taskLogger,
-								throwable));
+							if (
+								stringEqualSafe (
+									name,
+									"__repost")
+							) {
+								continue;
+							}
 
-					exceptionDumpLines.forEach (
-						exceptionDumpLine ->
+							for (String value : values) {
+
+								formatWriter.writeLineFormat (
+									"<input",
+									" type=\"hidden\"",
+									" name=\"%h\"",
+									name,
+									" value=\"%h\"",
+									value,
+									">");
+							}
+
 							formatWriter.writeLineFormat (
-								"%s",
-								exceptionDumpLine));
+								"<input",
+								" type=\"submit\"",
+								" name=\"__repost\"",
+								" value=\"try again\"",
+								">");
 
-					formatWriter.writeLineFormatDecreaseIndent (
-						"</pre>");
+						}
+
+						formatWriter.writeLineFormatDecreaseIndent (
+							"</form>");
+
+						if (
+							privChecker.canSimple (
+								taskLogger,
+								GlobalId.root,
+								"debug")
+						) {
+
+							formatWriter.writeLineFormatIncreaseIndent (
+								"<pre>");
+
+							List <String> exceptionDumpLines =
+								stringSplitNewline (
+									exceptionLogic.throwableDump (
+										taskLogger,
+										throwable));
+
+							exceptionDumpLines.forEach (
+								exceptionDumpLine ->
+									formatWriter.writeLineFormat (
+										"%s",
+										exceptionDumpLine));
+
+							formatWriter.writeLineFormatDecreaseIndent (
+								"</pre>");
+
+						}
+
+					}
 
 				}
 

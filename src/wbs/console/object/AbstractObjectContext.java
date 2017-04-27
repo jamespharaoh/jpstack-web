@@ -74,18 +74,24 @@ class AbstractObjectContext
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleContextStuff stuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"localPathForStuff");
+		try (
 
-		return stringFormat (
-			"/%s",
-			encodeId (
-				taskLogger,
-				genericCastUnchecked (
-					stuff.get (
-						requestIdKey ()))));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"localPathForStuff");
+
+		) {
+
+			return stringFormat (
+				"/%s",
+				encodeId (
+					taskLogger,
+					genericCastUnchecked (
+						stuff.get (
+							requestIdKey ()))));
+
+		}
 
 	}
 
@@ -117,21 +123,27 @@ class AbstractObjectContext
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String encodedId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"decodeId");
+		try (
 
-		if (cryptor () != null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"decodeId");
 
-			return cryptor ().decryptInteger (
-				taskLogger,
-				encodedId);
+		) {
 
-		} else {
+			if (cryptor () != null) {
 
-			return Long.parseLong (
-				encodedId);
+				return cryptor ().decryptInteger (
+					taskLogger,
+					encodedId);
+
+			} else {
+
+				return Long.parseLong (
+					encodedId);
+
+			}
 
 		}
 
@@ -142,21 +154,27 @@ class AbstractObjectContext
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long numericId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"encodeId");
+		try (
 
-		if (cryptor () != null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"encodeId");
 
-			return cryptor ().encryptInteger (
-				taskLogger,
-				numericId);
+		) {
 
-		} else {
+			if (cryptor () != null) {
 
-			return Long.toString (
-				numericId);
+				return cryptor ().encryptInteger (
+					taskLogger,
+					numericId);
+
+			} else {
+
+				return Long.toString (
+					numericId);
+
+			}
 
 		}
 
@@ -169,58 +187,64 @@ class AbstractObjectContext
 			@NonNull PathSupply pathParts,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initContext");
+		try (
 
-		Long localId =
-			decodeId (
-				taskLogger,
-				pathParts.next ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initContext");
 
-		contextStuff.set (
-			requestIdKey (),
-			localId);
+		) {
 
-		Object object =
-			objectLookup ().lookupObject (
-				contextStuff);
+			Long localId =
+				decodeId (
+					taskLogger,
+					pathParts.next ());
 
-		if (object == null) {
+			contextStuff.set (
+				requestIdKey (),
+				localId);
 
-			taskLogger.warningFormat (
-				"Can't find object with id %s",
-				integerToDecimalString (
-					localId));
+			Object object =
+				objectLookup ().lookupObject (
+					contextStuff);
 
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
+			if (object == null) {
 
-		}
+				taskLogger.warningFormat (
+					"Can't find object with id %s",
+					integerToDecimalString (
+						localId));
 
-		if (stuff () != null) {
-
-			for (
-				Map.Entry <String, ? extends Object> entry
-					: stuff ().entrySet ()
-			) {
-
-				contextStuff.set (
-					entry.getKey (),
-					entry.getValue ());
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
 
 			}
 
-		}
+			if (stuff () != null) {
 
-		if (postProcessorName () != null) {
+				for (
+					Map.Entry <String, ? extends Object> entry
+						: stuff ().entrySet ()
+				) {
 
-			consoleManager.runPostProcessors (
-				taskLogger,
-				postProcessorName (),
-				contextStuff);
+					contextStuff.set (
+						entry.getKey (),
+						entry.getValue ());
+
+				}
+
+			}
+
+			if (postProcessorName () != null) {
+
+				consoleManager.runPostProcessors (
+					taskLogger,
+					postProcessorName (),
+					contextStuff);
+
+			}
 
 		}
 

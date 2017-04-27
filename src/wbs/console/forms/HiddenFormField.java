@@ -6,8 +6,10 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 
@@ -108,61 +110,67 @@ class HiddenFormField <Container, Generic, Native>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canView");
+		try (
 
-		if (
-			isNull (
-				viewPriv)
-		) {
-			return true;
-		}
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canView");
 
-		List <String> privParts =
-			stringSplitColon (
-				viewPriv);
-
-		if (
-			equalToOne (
-				privParts.size ())
 		) {
 
-			String privCode =
-				privParts.get (0);
+			if (
+				isNull (
+					viewPriv)
+			) {
+				return true;
+			}
 
-			return privChecker.canRecursive (
-				taskLogger,
-				(Record <?>) container,
-				privCode);
+			List <String> privParts =
+				stringSplitColon (
+					viewPriv);
 
-		} else if (
-			equalToTwo (
-				privParts.size ())
-		) {
+			if (
+				equalToOne (
+					privParts.size ())
+			) {
 
-			String delegatePath =
-				privParts.get (0);
+				String privCode =
+					privParts.get (0);
 
-			String privCode =
-				privParts.get (1);
+				return privChecker.canRecursive (
+					taskLogger,
+					(Record <?>) container,
+					privCode);
 
-			Record <?> delegate =
-				(Record <?>)
-				objectManager.dereferenceObsolete (
-					container,
-					delegatePath,
-					hints);
+			} else if (
+				equalToTwo (
+					privParts.size ())
+			) {
 
-			return privChecker.canRecursive (
-				taskLogger,
-				delegate,
-				privCode);
+				String delegatePath =
+					privParts.get (0);
 
-		} else {
+				String privCode =
+					privParts.get (1);
 
-			throw new RuntimeException ();
+				Record <?> delegate =
+					genericCastUnchecked (
+						objectManager.dereferenceRequired (
+							container,
+							delegatePath,
+							hints));
+
+				return privChecker.canRecursive (
+					taskLogger,
+					delegate,
+					privCode);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
@@ -179,55 +187,61 @@ class HiddenFormField <Container, Generic, Native>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormAlwaysHidden");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormAlwaysHidden");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <String> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					csvMapping.genericToInterface (
-						taskLogger,
-						container,
-						hints,
-						genericValue)));
-
-		if (
-			formValuePresent (
-				submission,
-				formName)
 		) {
 
-			interfaceValue =
-				Optional.of (
-					formToInterface (
-						submission,
-						formName));
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <String> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						csvMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			if (
+				formValuePresent (
+					submission,
+					formName)
+			) {
+
+				interfaceValue =
+					Optional.of (
+						formToInterface (
+							submission,
+							formName));
+
+			}
+
+			htmlWriter.writeFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"%h-%h\"",
+				formName,
+				name (),
+				" value=\"%h\"",
+				interfaceValue.or (""),
+				">\n");
 
 		}
-
-		htmlWriter.writeFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"%h-%h\"",
-			formName,
-			name (),
-			" value=\"%h\"",
-			interfaceValue.or (""),
-			">\n");
 
 	}
 
@@ -237,29 +251,35 @@ class HiddenFormField <Container, Generic, Native>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"implicit");
+		try (
 
-		if (
-			optionalIsNotPresent (
-				implicitValue)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"implicit");
+
 		) {
-			return;
+
+			if (
+				optionalIsNotPresent (
+					implicitValue)
+			) {
+				return;
+			}
+
+			Optional <Native> nativeValue =
+				requiredValue (
+					nativeMapping.genericToNative (
+						taskLogger,
+						container,
+						implicitValue.get ()));
+
+			accessor.write (
+				taskLogger,
+				container,
+				nativeValue);
+
 		}
-
-		Optional <Native> nativeValue =
-			requiredValue (
-				nativeMapping.genericToNative (
-					taskLogger,
-					container,
-					implicitValue.get ()));
-
-		accessor.write (
-			taskLogger,
-			container,
-			nativeValue);
 
 	}
 
@@ -272,129 +292,135 @@ class HiddenFormField <Container, Generic, Native>
 			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"update");
+		try (
 
-		// do nothing if no value present in form
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"update");
 
-		if (
-			! formValuePresent (
-				submission,
-				formName)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			// do nothing if no value present in form
 
-				.updated (
-					false)
+			if (
+				! formValuePresent (
+					submission,
+					formName)
+			) {
 
-				.error (
-					Optional.<String>absent ());
+				return new UpdateResult<Generic,Native> ()
 
-		}
+					.updated (
+						false)
 
-		// get interface value from form
+					.error (
+						Optional.<String>absent ());
 
-		String newInterfaceValue =
-			formToInterface (
-				submission,
-				formName);
+			}
 
-		// convert to generic
+			// get interface value from form
 
-		Either<Optional<Generic>,String> interfaceToGenericResult =
-			csvMapping.interfaceToGeneric (
-				container,
-				hints,
-				Optional.of (
-					newInterfaceValue));
+			String newInterfaceValue =
+				formToInterface (
+					submission,
+					formName);
 
-		if (
-			isError (
-				interfaceToGenericResult)
-		) {
+			// convert to generic
 
-			return new UpdateResult<Generic,Native> ()
-
-				.updated (
-					false)
-
-				.error (
+			Either<Optional<Generic>,String> interfaceToGenericResult =
+				csvMapping.interfaceToGeneric (
+					container,
+					hints,
 					Optional.of (
-						interfaceToGenericResult.right ().value ()));
+						newInterfaceValue));
 
-		}
+			if (
+				isError (
+					interfaceToGenericResult)
+			) {
 
-		Optional <Generic> newGenericValue =
-			interfaceToGenericResult.left ().value ();
+				return new UpdateResult<Generic,Native> ()
 
-		// convert to native
+					.updated (
+						false)
 
-		Optional <Native> newNativeValue =
-			requiredValue (
-				nativeMapping.genericToNative (
-					taskLogger,
-					container,
-					newGenericValue));
+					.error (
+						Optional.of (
+							interfaceToGenericResult.right ().value ()));
 
-		// get the current value, if it is the same, do nothing
+			}
 
-		Optional <Native> oldNativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			Optional <Generic> newGenericValue =
+				interfaceToGenericResult.left ().value ();
 
-		Optional <Generic> oldGenericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					oldNativeValue));
+			// convert to native
 
-		if (
-			equalSafe (
-				oldGenericValue,
-				newGenericValue)
-		) {
+			Optional <Native> newNativeValue =
+				requiredValue (
+					nativeMapping.genericToNative (
+						taskLogger,
+						container,
+						newGenericValue));
 
-			return new UpdateResult <Generic, Native> ()
+			// get the current value, if it is the same, do nothing
+
+			Optional <Native> oldNativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> oldGenericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						oldNativeValue));
+
+			if (
+				equalSafe (
+					oldGenericValue,
+					newGenericValue)
+			) {
+
+				return new UpdateResult <Generic, Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						Optional.absent ());
+
+			}
+
+			// set the new value
+
+			accessor.write (
+				taskLogger,
+				container,
+				newNativeValue);
+
+			return new UpdateResult<Generic,Native> ()
 
 				.updated (
-					false)
+					true)
+
+				.oldGenericValue (
+					oldGenericValue)
+
+				.newGenericValue (
+					newGenericValue)
+
+				.oldNativeValue (
+					oldNativeValue)
+
+				.newNativeValue (
+					newNativeValue)
 
 				.error (
-					Optional.absent ());
+					optionalAbsent ());
 
 		}
-
-		// set the new value
-
-		accessor.write (
-			taskLogger,
-			container,
-			newNativeValue);
-
-		return new UpdateResult<Generic,Native> ()
-
-			.updated (
-				true)
-
-			.oldGenericValue (
-				oldGenericValue)
-
-			.newGenericValue (
-				newGenericValue)
-
-			.oldNativeValue (
-				oldNativeValue)
-
-			.newNativeValue (
-				newNativeValue)
-
-			.error (
-				Optional.<String>absent ());
 
 	}
 

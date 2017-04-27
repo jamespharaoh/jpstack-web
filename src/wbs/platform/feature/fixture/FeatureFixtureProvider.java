@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -34,16 +34,22 @@ class FeatureFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
+
+		) {
+
+			createMenuItems (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
@@ -52,42 +58,48 @@ class FeatureFixtureProvider
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"internal"))
+		) {
 
-			.setCode (
-				"feature")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Feature")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"internal"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"feature")
 
-			.setLabel (
-				"Features")
+				.setName (
+					"Feature")
 
-			.setTargetPath (
-				"/features")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Features")
 
-		);
+				.setTargetPath (
+					"/features")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 

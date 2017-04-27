@@ -330,46 +330,52 @@ class ClockworkSmsMessageSender {
 	ClockworkSmsMessageSender decode (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"decode");
+		try (
 
-		// check state
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"decode");
 
-		if (
-			enumNotEqualSafe (
-				state,
-				State.received)
 		) {
-			throw new IllegalStateException ();
-		}
 
-		try {
+			// check state
 
-			// decode response
+			if (
+				enumNotEqualSafe (
+					state,
+					State.received)
+			) {
+				throw new IllegalStateException ();
+			}
 
-			clockworkResponse =
-				(ClockworkSmsMessageResponse)
-				clockworkSmsForeignApiDataFromXml.readInputStream (
-					taskLogger,
-					new ByteArrayInputStream (
-						stringToUtf8 (
-							xmlResponse)),
-					url,
-					ImmutableList.of ());
+			try {
 
-			state =
-				State.decoded;
+				// decode response
 
-			return this;
+				clockworkResponse =
+					(ClockworkSmsMessageResponse)
+					clockworkSmsForeignApiDataFromXml.readInputStream (
+						taskLogger,
+						new ByteArrayInputStream (
+							stringToUtf8 (
+								xmlResponse)),
+						url,
+						ImmutableList.of ());
 
-		} catch (RuntimeException exception) {
+				state =
+					State.decoded;
 
-			state =
-				State.error;
+				return this;
 
-			throw exception;
+			} catch (RuntimeException exception) {
+
+				state =
+					State.error;
+
+				throw exception;
+
+			}
 
 		}
 

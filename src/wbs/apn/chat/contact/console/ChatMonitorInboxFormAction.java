@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -122,318 +122,325 @@ class ChatMonitorInboxFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get stuff
-
-		Long monitorInboxId =
-			requestContext.stuffIntegerRequired (
-				"chatMonitorInboxId");
-
-		// get params
-
-		String text =
-			requestContext.parameterRequired (
-				"text");
-
-		boolean ignore =
-			optionalIsPresent (
-				requestContext.parameter (
-					"ignore"));
-
-		boolean note =
-			optionalIsPresent (
-				requestContext.parameter (
-					"sendAndNote"));
-
-		// check params
-
-		if (! ignore) {
-
-			if (text.length () == 0) {
-
-				requestContext.addError (
-					"Please enter a message");
-
-				return null;
-
-			}
-
-			if (! GsmUtils.gsmStringIsValid (text)) {
-
-				requestContext.addError (
-					"Message text is invalid");
-
-				return null;
-
-			}
-
-			if (
-				moreThan (
-					gsmStringLength (
-						text),
-					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)
-			) {
-
-				requestContext.addError (
-					"Message text is too long");
-
-				return null;
-
-			}
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatMonitorInboxFormAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			ChatMonitorInboxRec chatMonitorInbox =
-				chatMonitorInboxHelper.findRequired (
-					monitorInboxId);
+			// get stuff
 
-			ChatUserRec monitorChatUser =
-				chatMonitorInbox.getMonitorChatUser ();
+			Long monitorInboxId =
+				requestContext.stuffIntegerRequired (
+					"chatMonitorInboxId");
 
-			ChatUserRec userChatUser =
-				chatMonitorInbox.getUserChatUser ();
+			// get params
 
-			ChatRec chat =
-				userChatUser.getChat ();
+			String text =
+				requestContext.parameterRequired (
+					"text");
 
-			if (ignore) {
+			boolean ignore =
+				optionalIsPresent (
+					requestContext.parameter (
+						"ignore"));
 
-				// check if they can ignore
+			boolean note =
+				optionalIsPresent (
+					requestContext.parameter (
+						"sendAndNote"));
 
-				if (
-					! privChecker.canRecursive (
-						taskLogger,
-						chat,
-						"manage")
-				) {
+			// check params
+
+			if (! ignore) {
+
+				if (text.length () == 0) {
 
 					requestContext.addError (
-						"Can't ignore");
+						"Please enter a message");
 
 					return null;
 
 				}
 
-			} else {
-
-				if (
-					lessThan (
-						GsmUtils.gsmStringLength (text),
-						chat.getMinMonitorMessageLength ())
-				) {
+				if (! GsmUtils.gsmStringIsValid (text)) {
 
 					requestContext.addError (
-						stringFormat (
-							"Message text is too short (minimum %s)",
-							integerToDecimalString (
-								chat.getMinMonitorMessageLength ())));
+						"Message text is invalid");
 
 					return null;
 
 				}
 
-				ChatBlockRec chatBlock =
-					chatBlockHelper.find (
-						userChatUser,
-						monitorChatUser);
-
-				boolean blocked =
-					chatBlock != null
-					|| userChatUser.getBlockAll ();
-
-				boolean deleted =
-					chatUserLogic.deleted (
-						userChatUser);
-
-				// create a chat message
-
-				TextRec textRec =
-					textHelper.findOrCreate (
-						taskLogger,
-						text);
-
-				ChatMessageRec chatMessage =
-					chatMessageHelper.insert (
-						taskLogger,
-						chatMessageHelper.createInstance ()
-
-					.setChat (
-						chat)
-
-					.setFromUser (
-						monitorChatUser)
-
-					.setToUser (
-						userChatUser)
-
-					.setTimestamp (
-						transaction.now ())
-
-					.setOriginalText (
-						textRec)
-
-					.setEditedText (
-						blocked
-							? null
-							: textRec)
-
-					.setStatus (
-						blocked
-							? ChatMessageStatus.blocked
-							: ChatMessageStatus.sent)
-
-					.setSender (
-						userConsoleLogic.userRequired ())
-
-				);
-
-				// update contact entry, set monitor warning if first message
-
-				ChatContactRec chatContact =
-					chatContactHelper.findOrCreate (
-						taskLogger,
-						monitorChatUser,
-						userChatUser);
-
 				if (
-					chatContact.getLastDeliveredMessageTime () == null
-					&& ! monitorChatUser.getStealthMonitor ()
+					moreThan (
+						gsmStringLength (
+							text),
+						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+							* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)
 				) {
 
-					chatMessage
+					requestContext.addError (
+						"Message text is too long");
 
-						.setMonitorWarning (
-							true);
-
-				}
-
-				chatContact
-
-					.setLastDeliveredMessageTime (
-						transaction.now ());
-
-				// update chat user stats
-
-				if (! (blocked || deleted)) {
-
-					userChatUser
-
-						.setLastReceive (
-							transaction.now ());
+					return null;
 
 				}
 
-				// send message
+			}
 
-				if (! (blocked || deleted)) {
+			try (
 
-					chatMessageLogic.chatMessageDeliverToUser (
+				OwnedTransaction transaction =
+					database.beginReadWrite (
 						taskLogger,
-						chatMessage);
+						"ChatMonitorInboxFormAction.goReal ()",
+						this);
 
-				}
+			) {
 
-				// charge
+				ChatMonitorInboxRec chatMonitorInbox =
+					chatMonitorInboxHelper.findRequired (
+						monitorInboxId);
 
-				if (! (blocked || deleted)) {
+				ChatUserRec monitorChatUser =
+					chatMonitorInbox.getMonitorChatUser ();
 
-					chatCreditLogic.userReceiveSpend (
-						taskLogger,
-						userChatUser,
-						1l);
+				ChatUserRec userChatUser =
+					chatMonitorInbox.getUserChatUser ();
 
-				}
+				ChatRec chat =
+					userChatUser.getChat ();
 
-				// update monitor last action
+				if (ignore) {
 
-				monitorChatUser
+					// check if they can ignore
 
-					.setLastAction (
-						transaction.now ());
+					if (
+						! privChecker.canRecursive (
+							taskLogger,
+							chat,
+							"manage")
+					) {
 
-				// create a note
+						requestContext.addError (
+							"Can't ignore");
 
-				if (note) {
+						return null;
 
-					chatContactNoteHelper.insert (
-						taskLogger,
-						chatContactNoteHelper.createInstance ()
+					}
 
-						.setUser (
-							userChatUser)
+				} else {
 
-						.setMonitor (
+					if (
+						lessThan (
+							GsmUtils.gsmStringLength (text),
+							chat.getMinMonitorMessageLength ())
+					) {
+
+						requestContext.addError (
+							stringFormat (
+								"Message text is too short (minimum %s)",
+								integerToDecimalString (
+									chat.getMinMonitorMessageLength ())));
+
+						return null;
+
+					}
+
+					ChatBlockRec chatBlock =
+						chatBlockHelper.find (
+							userChatUser,
+							monitorChatUser);
+
+					boolean blocked =
+						chatBlock != null
+						|| userChatUser.getBlockAll ();
+
+					boolean deleted =
+						chatUserLogic.deleted (
+							userChatUser);
+
+					// create a chat message
+
+					TextRec textRec =
+						textHelper.findOrCreate (
+							taskLogger,
+							text);
+
+					ChatMessageRec chatMessage =
+						chatMessageHelper.insert (
+							taskLogger,
+							chatMessageHelper.createInstance ()
+
+						.setChat (
+							chat)
+
+						.setFromUser (
 							monitorChatUser)
 
-						.setNotes (
-							text)
+						.setToUser (
+							userChatUser)
 
 						.setTimestamp (
 							transaction.now ())
 
-						.setConsoleUser (
-							userConsoleLogic.userRequired ())
+						.setOriginalText (
+							textRec)
 
-						.setChat (
-							userChatUser.getChat ())
+						.setEditedText (
+							blocked
+								? null
+								: textRec)
+
+						.setStatus (
+							blocked
+								? ChatMessageStatus.blocked
+								: ChatMessageStatus.sent)
+
+						.setSender (
+							userConsoleLogic.userRequired ())
 
 					);
 
+					// update contact entry, set monitor warning if first message
+
+					ChatContactRec chatContact =
+						chatContactHelper.findOrCreate (
+							taskLogger,
+							monitorChatUser,
+							userChatUser);
+
+					if (
+						chatContact.getLastDeliveredMessageTime () == null
+						&& ! monitorChatUser.getStealthMonitor ()
+					) {
+
+						chatMessage
+
+							.setMonitorWarning (
+								true);
+
+					}
+
+					chatContact
+
+						.setLastDeliveredMessageTime (
+							transaction.now ());
+
+					// update chat user stats
+
+					if (! (blocked || deleted)) {
+
+						userChatUser
+
+							.setLastReceive (
+								transaction.now ());
+
+					}
+
+					// send message
+
+					if (! (blocked || deleted)) {
+
+						chatMessageLogic.chatMessageDeliverToUser (
+							taskLogger,
+							chatMessage);
+
+					}
+
+					// charge
+
+					if (! (blocked || deleted)) {
+
+						chatCreditLogic.userReceiveSpend (
+							taskLogger,
+							userChatUser,
+							1l);
+
+					}
+
+					// update monitor last action
+
+					monitorChatUser
+
+						.setLastAction (
+							transaction.now ());
+
+					// create a note
+
+					if (note) {
+
+						chatContactNoteHelper.insert (
+							taskLogger,
+							chatContactNoteHelper.createInstance ()
+
+							.setUser (
+								userChatUser)
+
+							.setMonitor (
+								monitorChatUser)
+
+							.setNotes (
+								text)
+
+							.setTimestamp (
+								transaction.now ())
+
+							.setConsoleUser (
+								userConsoleLogic.userRequired ())
+
+							.setChat (
+								userChatUser.getChat ())
+
+						);
+
+					}
+
 				}
 
+				// and delete the monitor inbox entry
+
+				queueLogic.processQueueItem (
+					taskLogger,
+					chatMonitorInbox.getQueueItem (),
+					userConsoleLogic.userRequired ());
+
+				chatMonitorInboxHelper.remove (
+					chatMonitorInbox);
+
+				// commit transaction
+
+				transaction.commit ();
+
+				// add notice
+
+				if (ignore) {
+
+					requestContext.addNotice (
+						"Message ignored");
+
+				} else if (note) {
+
+					requestContext.addNotice (
+						"Message sent and note added");
+
+				} else {
+
+					requestContext.addNotice (
+						"Message sent");
+
+				}
+
+				// and return
+
+				return responder (
+					"queueHomeResponder");
+
 			}
-
-			// and delete the monitor inbox entry
-
-			queueLogic.processQueueItem (
-				chatMonitorInbox.getQueueItem (),
-				userConsoleLogic.userRequired ());
-
-			chatMonitorInboxHelper.remove (
-				chatMonitorInbox);
-
-			// commit transaction
-
-			transaction.commit ();
-
-			// add notice
-
-			if (ignore) {
-
-				requestContext.addNotice (
-					"Message ignored");
-
-			} else if (note) {
-
-				requestContext.addNotice (
-					"Message sent and note added");
-
-			} else {
-
-				requestContext.addNotice (
-					"Message sent");
-
-			}
-
-			// and return
-
-			return responder (
-				"queueHomeResponder");
 
 		}
 

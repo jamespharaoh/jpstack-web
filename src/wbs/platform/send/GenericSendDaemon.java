@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -60,14 +60,14 @@ class GenericSendDaemon <
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"GenericSendDaemon.runOnce ()",
@@ -106,27 +106,27 @@ class GenericSendDaemon <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runJob (%s)",
-				integerToDecimalString (
-					jobId));
-
-		taskLogger.debugFormat (
-			"Performing send for %s",
-			integerToDecimalString (
-				jobId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runJob (%s)",
+					integerToDecimalString (
+						jobId));
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"GenericSendDaemon.runJob (jobId)",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Performing send for %s",
+				integerToDecimalString (
+					jobId));
 
 			Job job =
 				helper ().jobHelper ().findRequired (

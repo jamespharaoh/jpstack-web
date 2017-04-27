@@ -23,7 +23,7 @@ import org.joda.time.Instant;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.WbsConnection;
 import wbs.framework.entity.record.UnsavedRecordDetector;
 import wbs.framework.logging.LogContext;
@@ -33,7 +33,7 @@ import wbs.framework.logging.TaskLogger;
 @Accessors (fluent = true)
 public
 class HibernateTransaction
-	implements Transaction {
+	implements OwnedTransaction {
 
 	// singleton components
 
@@ -98,108 +98,114 @@ class HibernateTransaction
 
 	void begin () {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"begin");
-
-		if (
-			isNotNull (
-				realTransaction)
-		) {
-			return;
-		}
-
-		taskLogger.debugFormat (
-			"BEGIN %s %s",
-			integerToDecimalString (
-				id),
-			isReadWrite
-				? "rw"
-				: "ro");
-
-		// create session
-
 		try (
 
-			ActiveTask activeTask =
-				hibernateDatabase.activityManager.start (
-					"database",
-					"HibernateTransaction.begin () - create session",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"begin");
 
 		) {
 
-			session =
-				hibernateDatabase.sessionFactory.withOptions ()
+			if (
+				isNotNull (
+					realTransaction)
+			) {
+				return;
+			}
 
-				.interceptor (
-					hibernateDatabase.hibernateInterceptorProvider.get ())
+			taskLogger.debugFormat (
+				"BEGIN %s %s",
+				integerToDecimalString (
+					id),
+				isReadWrite
+					? "rw"
+					: "ro");
 
-				.openSession ();
+			// create session
+
+			try (
+
+				ActiveTask activeTask =
+					hibernateDatabase.activityManager.start (
+						"database",
+						"HibernateTransaction.begin () - create session",
+						this);
+
+			) {
+
+				session =
+					hibernateDatabase.sessionFactory.withOptions ()
+
+					.interceptor (
+						hibernateDatabase.hibernateInterceptorProvider.get ())
+
+					.openSession ();
+
+			}
+
+			// begin transaction
+
+			try (
+
+				ActiveTask activeTask =
+					hibernateDatabase.activityManager.start (
+						"database",
+						"HibernateTransaction.begin () - begin transaction",
+						this);
+
+			) {
+
+				hibernateTransaction =
+					session.beginTransaction ();
+
+			}
+
+			// get server process id
+
+			try (
+
+				ActiveTask activeTask =
+					hibernateDatabase.activityManager.start (
+						"database",
+						"HibernateTransaction.begin () - get server process id",
+						this);
+
+			) {
+
+				serverProcessId =
+					session.doReturningWork (
+						new ReturningWork<Long> () {
+
+					@Override
+					public
+					Long execute (
+							@NonNull Connection connection)
+						throws SQLException {
+
+						WbsConnection wbsConnection =
+							(WbsConnection) connection;
+
+						return wbsConnection.serverProcessId ();
+
+					}
+
+				});
+
+			}
+
+			// create unsaved record detector frame
+
+			UnsavedRecordDetector.instance.createFrame (
+				this);
+
+			unsavedRecordFrameCreated = true;
+
+			// update state
+
+			begun = true;
 
 		}
-
-		// begin transaction
-
-		try (
-
-			ActiveTask activeTask =
-				hibernateDatabase.activityManager.start (
-					"database",
-					"HibernateTransaction.begin () - begin transaction",
-					this);
-
-		) {
-
-			hibernateTransaction =
-				session.beginTransaction ();
-
-		}
-
-		// get server process id
-
-		try (
-
-			ActiveTask activeTask =
-				hibernateDatabase.activityManager.start (
-					"database",
-					"HibernateTransaction.begin () - get server process id",
-					this);
-
-		) {
-
-			serverProcessId =
-				session.doReturningWork (
-					new ReturningWork<Long> () {
-
-				@Override
-				public
-				Long execute (
-						@NonNull Connection connection)
-					throws SQLException {
-
-					WbsConnection wbsConnection =
-						(WbsConnection) connection;
-
-					return wbsConnection.serverProcessId ();
-
-				}
-
-			});
-
-		}
-
-		// create unsaved record detector frame
-
-		UnsavedRecordDetector.instance.createFrame (
-			this);
-
-		unsavedRecordFrameCreated = true;
-
-		// update state
-
-		begun = true;
 
 	}
 
@@ -207,79 +213,85 @@ class HibernateTransaction
 	public
 	void commit () {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"commit");
+		try (
 
-		// check there is nothing stupid going on
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"commit");
 
-		if (! isReadWrite) {
-
-			throw new RuntimeException (
-				"Tried to commit read-only transaction");
-
-		}
-
-		if (committed) {
-
-			throw new RuntimeException (
-				"Tried to commit transaction twice");
-
-		}
-
-		if (closed) {
-
-			throw new RuntimeException (
-				"Tried to commit closed transaction");
-
-		}
-
-		if (! begun) {
-
-			throw new RuntimeException (
-				"Tried to commit unbegun transaction");
-
-		}
-
-		taskLogger.debugFormat (
-			"COMMIT %s %s",
-			integerToDecimalString (
-				id),
-			isReadWrite
-				? "rw"
-				: "ro");
-
-		// remove us from the transaction stack
-
-		if (stack != null) {
-
-			stack.remove (
-				this);
-
-		}
-
-		// verify unsaved records
-
-		if (
-			isNull (
-				realTransaction)
 		) {
 
-			UnsavedRecordDetector.instance.verifyFrame (
-				this);
+			// check there is nothing stupid going on
+
+			if (! isReadWrite) {
+
+				throw new RuntimeException (
+					"Tried to commit read-only transaction");
+
+			}
+
+			if (committed) {
+
+				throw new RuntimeException (
+					"Tried to commit transaction twice");
+
+			}
+
+			if (closed) {
+
+				throw new RuntimeException (
+					"Tried to commit closed transaction");
+
+			}
+
+			if (! begun) {
+
+				throw new RuntimeException (
+					"Tried to commit unbegun transaction");
+
+			}
+
+			taskLogger.debugFormat (
+				"COMMIT %s %s",
+				integerToDecimalString (
+					id),
+				isReadWrite
+					? "rw"
+					: "ro");
+
+			// remove us from the transaction stack
+
+			if (stack != null) {
+
+				stack.remove (
+					this);
+
+			}
+
+			// verify unsaved records
+
+			if (
+				isNull (
+					realTransaction)
+			) {
+
+				UnsavedRecordDetector.instance.verifyFrame (
+					this);
+
+			}
+
+			// do the commit
+
+			if (hibernateTransaction != null) {
+
+				hibernateTransaction.commit ();
+
+			}
+
+			committed = true;
 
 		}
-
-		// do the commit
-
-		if (hibernateTransaction != null) {
-
-			hibernateTransaction.commit ();
-
-		}
-
-		committed = true;
 
 	}
 
@@ -287,108 +299,114 @@ class HibernateTransaction
 	public
 	void close () {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"close");
+		try (
 
-		// handle repeated close
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"close");
 
-		if (closed) {
+		) {
 
-			if (this.hibernateDatabase.allowRepeatedClose) {
+			// handle repeated close
 
-				return;
+			if (closed) {
 
-			} else {
+				if (this.hibernateDatabase.allowRepeatedClose) {
 
-				throw new RuntimeException (
-					"Tried to close transaction twice");
+					return;
 
-			}
+				} else {
 
-		}
+					throw new RuntimeException (
+						"Tried to close transaction twice");
 
-		closed = true;
-
-		// remove us from the transaction stack
-
-		if (stack != null) {
-
-			stack.remove (
-				this);
-
-		}
-
-		try {
-
-			// rollback if appropriate
-
-			if (hibernateTransaction != null && ! committed) {
-
-				taskLogger.debugFormat (
-					"ROLLBACK %s %s",
-					integerToDecimalString (
-						id),
-					isReadWrite
-						? "rw"
-						: "ro");
-
-				hibernateTransaction.rollback ();
+				}
 
 			}
 
-		} finally {
+			closed = true;
 
-			// always close the session
+			// remove us from the transaction stack
+
+			if (stack != null) {
+
+				stack.remove (
+					this);
+
+			}
 
 			try {
 
-				if (session != null) {
-					session.close ();
+				// rollback if appropriate
+
+				if (hibernateTransaction != null && ! committed) {
+
+					taskLogger.debugFormat (
+						"ROLLBACK %s %s",
+						integerToDecimalString (
+							id),
+						isReadWrite
+							? "rw"
+							: "ro");
+
+					hibernateTransaction.rollback ();
+
 				}
 
-			} catch (Exception exception) {
+			} finally {
 
-				taskLogger.fatalFormatException (
-					exception,
-					"Error teardown session");
-
-			}
-
-			// always close the active task
-
-			try {
-
-				if (
-					isNotNull (
-						activeTask)
-				) {
-					activeTask.close ();
-				}
-
-			} catch (Exception exception) {
-
-				taskLogger.fatalFormatException (
-					exception,
-					"Error teardown active task");
-
-			}
-
-			// always tidy unsaved record detector
-
-			if (unsavedRecordFrameCreated) {
+				// always close the session
 
 				try {
 
-					UnsavedRecordDetector.instance.destroyFrame (
-						this);
+					if (session != null) {
+						session.close ();
+					}
 
 				} catch (Exception exception) {
 
 					taskLogger.fatalFormatException (
 						exception,
-						"Error destroying unsaved record detector frame");
+						"Error teardown session");
+
+				}
+
+				// always close the active task
+
+				try {
+
+					if (
+						isNotNull (
+							activeTask)
+					) {
+						activeTask.close ();
+					}
+
+				} catch (Exception exception) {
+
+					taskLogger.fatalFormatException (
+						exception,
+						"Error teardown active task");
+
+				}
+
+				// always tidy unsaved record detector
+
+				if (unsavedRecordFrameCreated) {
+
+					try {
+
+						UnsavedRecordDetector.instance.destroyFrame (
+							this);
+
+					} catch (Exception exception) {
+
+						taskLogger.fatalFormatException (
+							exception,
+							"Error destroying unsaved record detector frame");
+
+					}
 
 				}
 
@@ -404,7 +422,7 @@ class HibernateTransaction
 		if (closed) {
 
 			throw new IllegalStateException (
-				"Transaction has been closed");
+				"OwnedTransaction has been closed");
 
 		}
 
@@ -421,21 +439,27 @@ class HibernateTransaction
 	void finalize ()
 		throws Throwable {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"finalize");
+		try (
 
-		if (! closed) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"finalize");
 
-			taskLogger.warningFormat (
-				"Finalising un-closed transaction");
+		) {
 
-			close ();
+			if (! closed) {
+
+				taskLogger.warningFormat (
+					"Finalising un-closed transaction");
+
+				close ();
+
+			}
+
+			super.finalize ();
 
 		}
-
-		super.finalize ();
 
 	}
 

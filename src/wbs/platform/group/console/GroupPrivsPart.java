@@ -108,62 +108,68 @@ class GroupPrivsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// build the privs tree
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		List <PrivRec> privs =
-			privHelper.findAll ();
-
-		for (
-			PrivRec priv
-				: privs
 		) {
 
-			if (
-				! privChecker.canGrant (
-					taskLogger,
-					priv.getId ())
-			) {
-				continue;
-			}
+			// build the privs tree
 
-			Record <?> parentObject =
-				objectManager.getParentRequired (
+			List <PrivRec> privs =
+				privHelper.findAll ();
+
+			for (
+				PrivRec priv
+					: privs
+			) {
+
+				if (
+					! privChecker.canGrant (
+						taskLogger,
+						priv.getId ())
+				) {
+					continue;
+				}
+
+				Record <?> parentObject =
+					objectManager.getParentRequired (
+						priv);
+
+				PrivsNode parentNode =
+					findNode (
+						parentObject);
+
+				parentNode.privs.put (
+					priv.getCode (),
 					priv);
 
-			PrivsNode parentNode =
-				findNode (
-					parentObject);
+			}
 
-			parentNode.privs.put (
-				priv.getCode (),
-				priv);
+			// and fill the current priv data sets
+
+			GroupRec group =
+				groupHelper.findFromContextRequired ();
+
+			for (
+				PrivRec priv
+					: group.getPrivs ()
+			) {
+
+				canPrivIds.add (
+					priv.getId ());
+
+			}
+
+			// now check which tree nodes to expand initially
+
+			doExpansion (
+				rootNode);
 
 		}
-
-		// and fill the current priv data sets
-
-		GroupRec group =
-			groupHelper.findFromContextRequired ();
-
-		for (
-			PrivRec priv
-				: group.getPrivs ()
-		) {
-
-			canPrivIds.add (
-				priv.getId ());
-
-		}
-
-		// now check which tree nodes to expand initially
-
-		doExpansion (
-			rootNode);
 
 	}
 

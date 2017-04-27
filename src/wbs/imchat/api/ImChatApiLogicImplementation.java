@@ -30,8 +30,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -515,171 +515,177 @@ class ImChatApiLogicImplementation
 			@NonNull ImChatCustomerRec customer,
 			@NonNull Map <String, String> newDetails) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateCustomerDetails");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateCustomerDetails");
 
-		ImChatRec imChat =
-			customer.getImChat ();
-
-		ImmutableMap.Builder<String,String> returnBuilder =
-			ImmutableMap.builder ();
-
-		for (
-			ImChatCustomerDetailTypeRec detailType
-				: imChat.getCustomerDetailTypes ()
 		) {
 
-			if (
-				doesNotContain (
-					newDetails.keySet (),
-					underscoreToHyphen (
-						detailType.getCode ()))
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ImChatRec imChat =
+				customer.getImChat ();
+
+			ImmutableMap.Builder<String,String> returnBuilder =
+				ImmutableMap.builder ();
+
+			for (
+				ImChatCustomerDetailTypeRec detailType
+					: imChat.getCustomerDetailTypes ()
 			) {
-				continue;
-			}
-
-			String stringValue =
-				newDetails.get (
-					underscoreToHyphen (
-						detailType.getCode ()));
-
-			switch (detailType.getDataType ()) {
-
-			case text:
 
 				if (
-
-					detailType.getRequired ()
-
-					&& stringIsEmpty (
-						stringValue.trim ())
-
-				) {
-
-					returnBuilder.put (
+					doesNotContain (
+						newDetails.keySet (),
 						underscoreToHyphen (
-							detailType.getCode ()),
-						"required");
-
+							detailType.getCode ()))
+				) {
 					continue;
+				}
+
+				String stringValue =
+					newDetails.get (
+						underscoreToHyphen (
+							detailType.getCode ()));
+
+				switch (detailType.getDataType ()) {
+
+				case text:
+
+					if (
+
+						detailType.getRequired ()
+
+						&& stringIsEmpty (
+							stringValue.trim ())
+
+					) {
+
+						returnBuilder.put (
+							underscoreToHyphen (
+								detailType.getCode ()),
+							"required");
+
+						continue;
+
+					}
+
+					break;
+
+				case dateOfBirth:
+
+					if (
+
+						detailType.getRequired ()
+
+						&& stringIsEmpty (
+							stringValue.trim ())
+
+					) {
+
+						returnBuilder.put (
+							underscoreToHyphen (
+								detailType.getCode ()),
+							"required");
+
+						continue;
+
+					}
+
+					Optional <LocalDate> dateOfBirthOptional =
+						DateFinder.find (
+							stringValue,
+							1915);
+
+					if (
+						optionalIsNotPresent (
+							dateOfBirthOptional)
+					) {
+
+						returnBuilder.put (
+							underscoreToHyphen (
+								detailType.getCode ()),
+							"invalid");
+
+						continue;
+
+					}
+
+					LocalDate dateOfBirth =
+						optionalGetRequired (
+							dateOfBirthOptional);
+
+					Long ageInYears =
+						calculateAgeInYears (
+							dateOfBirth,
+							transaction.now (),
+							DateTimeZone.forID (
+								wbsConfig.defaultTimezone ()));
+
+					if (
+
+						isNotNull (
+							detailType.getMinimumAge ())
+
+						&& lessThan (
+							ageInYears,
+							detailType.getMinimumAge ())
+
+					) {
+
+						returnBuilder.put (
+							underscoreToHyphen (
+								detailType.getCode ()),
+							"below-minimum-age");
+
+						continue;
+
+					}
+
+					break;
+
+				default:
+
+					throw new RuntimeException ("TODO");
 
 				}
 
-				break;
+				ImChatCustomerDetailValueRec detailValue =
+					imChatCustomerDetailValueHelper.insert (
+						taskLogger,
+						imChatCustomerDetailValueHelper.createInstance ()
 
-			case dateOfBirth:
+					.setImChatCustomer (
+						customer)
 
-				if (
+					.setImChatCustomerDetailType (
+						detailType)
 
-					detailType.getRequired ()
+					.setValue (
+						stringValue)
 
-					&& stringIsEmpty (
-						stringValue.trim ())
+				);
 
-				) {
+				customer.getDetails ().put (
+					detailType.getId (),
+					detailValue);
 
-					returnBuilder.put (
-						underscoreToHyphen (
-							detailType.getCode ()),
-						"required");
-
-					continue;
-
-				}
-
-				Optional <LocalDate> dateOfBirthOptional =
-					DateFinder.find (
-						stringValue,
-						1915);
-
-				if (
-					optionalIsNotPresent (
-						dateOfBirthOptional)
-				) {
-
-					returnBuilder.put (
-						underscoreToHyphen (
-							detailType.getCode ()),
-						"invalid");
-
-					continue;
-
-				}
-
-				LocalDate dateOfBirth =
-					optionalGetRequired (
-						dateOfBirthOptional);
-
-				Long ageInYears =
-					calculateAgeInYears (
-						dateOfBirth,
-						transaction.now (),
-						DateTimeZone.forID (
-							wbsConfig.defaultTimezone ()));
-
-				if (
-
-					isNotNull (
-						detailType.getMinimumAge ())
-
-					&& lessThan (
-						ageInYears,
-						detailType.getMinimumAge ())
-
-				) {
-
-					returnBuilder.put (
-						underscoreToHyphen (
-							detailType.getCode ()),
-						"below-minimum-age");
-
-					continue;
-
-				}
-
-				break;
-
-			default:
-
-				throw new RuntimeException ("TODO");
-
-			}
-
-			ImChatCustomerDetailValueRec detailValue =
-				imChatCustomerDetailValueHelper.insert (
+				eventLogic.createEvent (
 					taskLogger,
-					imChatCustomerDetailValueHelper.createInstance ()
+					"im_chat_customer_detail_updated",
+					customer,
+					detailType,
+					stringValue);
 
-				.setImChatCustomer (
-					customer)
+			}
 
-				.setImChatCustomerDetailType (
-					detailType)
-
-				.setValue (
-					stringValue)
-
-			);
-
-			customer.getDetails ().put (
-				detailType.getId (),
-				detailValue);
-
-			eventLogic.createEvent (
-				taskLogger,
-				"im_chat_customer_detail_updated",
-				customer,
-				detailType,
-				stringValue);
+			return returnBuilder.build ();
 
 		}
-
-		return returnBuilder.build ();
 
 	}
 

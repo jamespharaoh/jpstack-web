@@ -114,58 +114,64 @@ class QueueDebugPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		formFields =
-			queueConsoleModule.formFieldSetRequired (
-				"queue-debug-form",
-				QueueDebugForm.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		form =
-			new QueueDebugForm ()
+		) {
 
-			.userId (
-				userConsoleLogic.userIdRequired ());
+			formFields =
+				queueConsoleModule.formFieldSetRequired (
+					"queue-debug-form",
+					QueueDebugForm.class);
 
-		formFieldLogic.update (
-			taskLogger,
-			requestContext,
-			formFields,
-			form,
-			emptyMap (),
-			"search");
+			form =
+				new QueueDebugForm ()
 
-		SortedQueueSubjects sortedQueueSubjects =
-			queueSubjectSorterProvider.get ()
+				.userId (
+					userConsoleLogic.userIdRequired ());
 
-			.queueCache (
-				masterQueueCacheProvider.get ())
+			formFieldLogic.update (
+				taskLogger,
+				requestContext,
+				formFields,
+				form,
+				emptyMap (),
+				"search");
 
-			.loggedInUser (
-				userConsoleLogic.userRequired ())
+			SortedQueueSubjects sortedQueueSubjects =
+				queueSubjectSorterProvider.get ()
 
-			.effectiveUser (
-				optionalOrNull (
-					userHelper.find (
-						form.userId ())))
+				.queueCache (
+					masterQueueCacheProvider.get ())
 
-			.sort (
-				taskLogger);
+				.loggedInUser (
+					userConsoleLogic.userRequired ())
 
-		queueInfos =
-			sortedQueueSubjects.allQueues ().stream ()
+				.effectiveUser (
+					optionalOrNull (
+						userHelper.find (
+							form.userId ())))
 
-			.filter (queueInfo ->
-				userPrivChecker.canRecursive (
-					taskLogger,
-					queueInfo.queue (),
-					"supervisor"))
+				.sort (
+					taskLogger);
 
-			.collect (
-				Collectors.toList ());
+			queueInfos =
+				sortedQueueSubjects.allQueues ().stream ()
+
+				.filter (queueInfo ->
+					userPrivChecker.canRecursive (
+						taskLogger,
+						queueInfo.queue (),
+						"supervisor"))
+
+				.collect (
+					Collectors.toList ());
+
+		}
 
 	}
 
@@ -174,54 +180,84 @@ class QueueDebugPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		formFieldLogic.outputFormTable (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFields,
-			optionalAbsent (),
-			form,
-			emptyMap (),
-			"get",
-			requestContext.resolveLocalUrl (
-				"/queue.debug"),
-			"update",
-			FormType.search,
-			"search");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Queue",
-			"Own operator activity",
-			"Preferred user",
-			"Overflow",
-			"Conclusion");
-
-		for (
-			QueueInfo queueInfo
-				: queueInfos
 		) {
 
-			if (
+			formFieldLogic.outputFormTable (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFields,
+				optionalAbsent (),
+				form,
+				emptyMap (),
+				"get",
+				requestContext.resolveLocalUrl (
+					"/queue.debug"),
+				"update",
+				FormType.search,
+				"search");
 
-				isNotNull (
-					form.sliceId ())
+			htmlTableOpenList ();
 
-				&& integerNotEqualSafe (
-					form.sliceId (),
-					queueInfo.slice.getId ())
+			htmlTableHeaderRowWrite (
+				"Queue",
+				"Own operator activity",
+				"Preferred user",
+				"Overflow",
+				"Conclusion");
 
+			for (
+				QueueInfo queueInfo
+					: queueInfos
 			) {
-				continue;
+
+				if (
+
+					isNotNull (
+						form.sliceId ())
+
+					&& integerNotEqualSafe (
+						form.sliceId (),
+						queueInfo.slice.getId ())
+
+				) {
+					continue;
+				}
+
+				renderQueueInfo (
+					taskLogger,
+					queueInfo);
+
 			}
 
-			Record<?> queueParent =
+			htmlTableClose ();
+
+		}
+
+	}
+
+	private
+	void renderQueueInfo (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull QueueInfo queueInfo) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderQueueInfo")
+
+		) {
+
+			Record <?> queueParent =
 				objectManager.getParentRequired (
 					queueInfo.queue ());
 
@@ -597,8 +633,6 @@ class QueueDebugPart
 			}
 
 		}
-
-		htmlTableClose ();
 
 	}
 

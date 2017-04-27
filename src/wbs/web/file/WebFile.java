@@ -1,9 +1,5 @@
 package wbs.web.file;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import wbs.framework.logging.TaskLogger;
 
 /**
@@ -16,21 +12,12 @@ public
 interface WebFile {
 
 	void doGet (
-			TaskLogger taskLogger)
-		throws
-			ServletException,
-			IOException;
+			TaskLogger taskLogger);
 
 	void doPost (
-			TaskLogger taskLogger)
-		throws
-			ServletException,
-			IOException;
+			TaskLogger taskLogger);
 
 	void doOptions (
-			TaskLogger taskLogger)
-		throws
-			ServletException,
-			IOException;
+			TaskLogger taskLogger);
 
 }

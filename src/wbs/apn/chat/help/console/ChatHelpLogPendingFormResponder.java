@@ -124,87 +124,93 @@ class ChatHelpLogPendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		htmlScriptBlockOpen ();
-
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
-
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j';",
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/chatHelpLog.pending",
-					"/%u",
-					integerToDecimalString (
-						chatHelpLog.getId ()),
-					"/chatHelpLog.pending.summary")));
-
-		formatWriter.writeLineFormat (
-			"var helpTemplates = new Array ();");
-
-		for (
-			ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates
 		) {
 
+			super.renderHtmlHeadContents (
+				taskLogger);
+
+			htmlScriptBlockOpen ();
+
 			formatWriter.writeLineFormat (
-				"helpTemplates [%s] = '%j';",
-				integerToDecimalString (
-					chatHelpTemplate.getId ()),
-				chatHelpTemplate.getText ());
+				"top.show_inbox (true);");
+
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j';",
+				requestContext.resolveApplicationUrl (
+					stringFormat (
+						"/chatHelpLog.pending",
+						"/%u",
+						integerToDecimalString (
+							chatHelpLog.getId ()),
+						"/chatHelpLog.pending.summary")));
+
+			formatWriter.writeLineFormat (
+				"var helpTemplates = new Array ();");
+
+			for (
+				ChatHelpTemplateRec chatHelpTemplate
+					: chatHelpTemplates
+			) {
+
+				formatWriter.writeLineFormat (
+					"helpTemplates [%s] = '%j';",
+					integerToDecimalString (
+						chatHelpTemplate.getId ()),
+					chatHelpTemplate.getText ());
+
+			}
+
+			// use template
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function useTemplate () {");
+
+			formatWriter.writeLineFormat (
+				"var templateId = document.getElementById ('template_id');");
+
+			formatWriter.writeLineFormat (
+				"var text = document.getElementById ('text');");
+
+			formatWriter.writeLineFormat (
+				"if (templateId.value == '') return;");
+
+			formatWriter.writeLineFormat (
+				"var template = helpTemplates[templateId.value];");
+
+			formatWriter.writeLineFormat (
+				"if (template) text.value = template;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// show reply
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function showReply () {");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// show info
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function showInfo () {");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// script close
+
+			htmlScriptBlockClose ();
 
 		}
-
-		// use template
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function useTemplate () {");
-
-		formatWriter.writeLineFormat (
-			"var templateId = document.getElementById ('template_id');");
-
-		formatWriter.writeLineFormat (
-			"var text = document.getElementById ('text');");
-
-		formatWriter.writeLineFormat (
-			"if (templateId.value == '') return;");
-
-		formatWriter.writeLineFormat (
-			"var template = helpTemplates[templateId.value];");
-
-		formatWriter.writeLineFormat (
-			"if (template) text.value = template;");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// show reply
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function showReply () {");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// show info
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function showInfo () {");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// script close
-
-		htmlScriptBlockClose ();
 
 	}
 

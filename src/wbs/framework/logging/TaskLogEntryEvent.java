@@ -6,15 +6,27 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import org.joda.time.Instant;
+
 public
 class TaskLogEntryEvent
 	implements TaskLogEvent {
+
+	// state
 
 	private final
 	LogSeverity severity;
 
 	private final
 	String text;
+
+	private final
+	Instant startTime;
+
+	private
+	Instant endTime;
+
+	// constructors
 
 	TaskLogEntryEvent (
 			@NonNull LogSeverity severity,
@@ -26,30 +38,44 @@ class TaskLogEntryEvent
 		this.text =
 			text;
 
+		this.startTime =
+			Instant.now ();
+
+		this.endTime =
+			Instant.now ();
+
 	}
+
+	// accessors
 
 	@Override
 	public
 	LogSeverity eventSeverity () {
-
 		return severity;
-
 	}
 
 	@Override
 	public
 	String eventText () {
-
 		return text;
+	}
 
+	@Override
+	public
+	Instant eventStartTime () {
+		return startTime;
+	}
+
+	@Override
+	public
+	Instant eventEndTime () {
+		return endTime;
 	}
 
 	@Override
 	public
 	List <TaskLogEvent> eventChildren () {
-
 		return emptyList ();
-
 	}
 
 }

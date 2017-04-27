@@ -15,7 +15,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -97,89 +97,95 @@ class SendSmsConfigSendFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull SendSmsConfigSendForm form) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		// send message
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		SendSmsConfigRec sendSmsConfig =
-			sendSmsConfigHelper.findFromContextRequired ();
+		) {
 
-		NumberRec smsNumber =
-			smsNumberHelper.findOrCreate (
+			// send message
+
+			SendSmsConfigRec sendSmsConfig =
+				sendSmsConfigHelper.findFromContextRequired ();
+
+			NumberRec smsNumber =
+				smsNumberHelper.findOrCreate (
+					taskLogger,
+					form.number ());
+
+			TextRec messageBodyText =
+				textHelper.findOrCreate (
+					taskLogger,
+					form.messageBody ());
+
+			MessageRec smsMessage =
+				smsMessageSenderProvider.get ()
+
+				.routerResolve (
+					sendSmsConfig.getSmsRouter ())
+
+				.serviceLookup (
+					sendSmsConfig,
+					"default")
+
+				.numFrom (
+					sendSmsConfig.getOriginator ())
+
+				.number (
+					smsNumber)
+
+				.messageText (
+					messageBodyText)
+
+				.user (
+					userConsoleLogic.userRequired ())
+
+				.send (
+					taskLogger);
+
+			sendSmsMessageHelper.insert (
 				taskLogger,
-				form.number ());
+				sendSmsMessageHelper.createInstance ()
 
-		TextRec messageBodyText =
-			textHelper.findOrCreate (
-				taskLogger,
-				form.messageBody ());
+				.setSendSmsConfig (
+					sendSmsConfig)
 
-		MessageRec smsMessage =
-			smsMessageSenderProvider.get ()
+				.setTimestamp (
+					transaction.now ())
 
-			.routerResolve (
-				sendSmsConfig.getSmsRouter ())
+				.setNumber (
+					smsNumber)
 
-			.serviceLookup (
-				sendSmsConfig,
-				"default")
+				.setOriginator (
+					form.originator ())
 
-			.numFrom (
-				sendSmsConfig.getOriginator ())
+				.setMessageBody (
+					messageBodyText)
 
-			.number (
-				smsNumber)
+				.setUser (
+					userConsoleLogic.userRequired ())
 
-			.messageText (
-				messageBodyText)
+				.setMessage (
+					smsMessage)
 
-			.user (
-				userConsoleLogic.userRequired ())
+			);
 
-			.send (
-				taskLogger);
+			transaction.commit ();
 
-		sendSmsMessageHelper.insert (
-			taskLogger,
-			sendSmsMessageHelper.createInstance ()
+			requestContext.addNotice (
+				"Message sent");
 
-			.setSendSmsConfig (
-				sendSmsConfig)
+			requestContext.setEmptyFormData ();
 
-			.setTimestamp (
-				transaction.now ())
+			return optionalAbsent ();
 
-			.setNumber (
-				smsNumber)
-
-			.setOriginator (
-				form.originator ())
-
-			.setMessageBody (
-				messageBodyText)
-
-			.setUser (
-				userConsoleLogic.userRequired ())
-
-			.setMessage (
-				smsMessage)
-
-		);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Message sent");
-
-		requestContext.setEmptyFormData ();
-
-		return optionalAbsent ();
+		}
 
 	}
 

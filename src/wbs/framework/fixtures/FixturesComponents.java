@@ -40,20 +40,26 @@ class FixturesComponents {
 	TestAccounts testAccounts (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"testAccounts");
+		try (
 
-		return (TestAccounts) (
-			new TestAccounts ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"testAccounts");
 
-			.genericConfigSpec (
-				genericConfigLoader.loadSpec (
-					taskLogger,
-					"config/test-accounts.xml"))
+		) {
 
-		);
+			return (TestAccounts) (
+				new TestAccounts ()
+
+				.genericConfigSpec (
+					genericConfigLoader.loadSpec (
+						taskLogger,
+						"config/test-accounts.xml"))
+
+			);
+
+		}
 
 	}
 

@@ -93,43 +93,49 @@ class JavaClassUnitWriter {
 	void write (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"write");
+		try (
 
-		formatWriter.writeLineFormat (
-			"package %s;",
-			packageName);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"write");
 
-		formatWriter.writeNewline ();
-
-		blocks.forEach (
-			block ->
-				block.writeBlock (
-					taskLogger,
-					new ImportCollector (),
-					new NullFormatWriter ()));
-
-		for (
-			String importClassName
-				: importedClassMappings.values ()
 		) {
 
 			formatWriter.writeLineFormat (
-				"import %s;",
-				importClassName);
+				"package %s;",
+				packageName);
+
+			formatWriter.writeNewline ();
+
+			blocks.forEach (
+				block ->
+					block.writeBlock (
+						taskLogger,
+						new ImportCollector (),
+						new NullFormatWriter ()));
+
+			for (
+				String importClassName
+					: importedClassMappings.values ()
+			) {
+
+				formatWriter.writeLineFormat (
+					"import %s;",
+					importClassName);
+
+			}
+
+			formatWriter.writeNewline ();
+
+			blocks.forEach (
+				block ->
+					block.writeBlock (
+						taskLogger,
+						new ImportResolver (),
+						formatWriter));
 
 		}
-
-		formatWriter.writeNewline ();
-
-		blocks.forEach (
-			block ->
-				block.writeBlock (
-					taskLogger,
-					new ImportResolver (),
-					formatWriter));
 
 	}
 

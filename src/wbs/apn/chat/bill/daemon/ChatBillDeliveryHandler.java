@@ -19,7 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -165,18 +165,18 @@ class ChatBillDeliveryHandler
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
 			HeldLock lock =
 				chatUserDeliveryLocks.easy (
 					ref);
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatBillDeliveryHandler.handle (deliveryId, ref)",

@@ -36,8 +36,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -137,81 +137,87 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec toChatUser,
 			@NonNull Long receivedMessageCount) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userReceiveSpend");
+		try (
 
-		if (toChatUser.getType () == ChatUserType.monitor)
-			return;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userReceiveSpend");
 
-		ChatSchemeRec chatScheme =
-			toChatUser.getChatScheme ();
+		) {
 
-		ChatSchemeChargesRec chatSchemeCharges =
-			chatScheme.getCharges ();
+			if (toChatUser.getType () == ChatUserType.monitor)
+				return;
 
-		// iphone users are never charged
+			ChatSchemeRec chatScheme =
+				toChatUser.getChatScheme ();
 
-		boolean free =
-			toChatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
+			ChatSchemeChargesRec chatSchemeCharges =
+				chatScheme.getCharges ();
 
-		DateTimeZone timeZone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
+			// iphone users are never charged
 
-		LocalDate today =
-			LocalDate.now (
-				timeZone);
+			boolean free =
+				toChatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
 
-		ChatUserSpendRec toChatUserSpend =
-			findOrCreateChatUserSpend (
-				taskLogger,
+			DateTimeZone timeZone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
+
+			LocalDate today =
+				LocalDate.now (
+					timeZone);
+
+			ChatUserSpendRec toChatUserSpend =
+				findOrCreateChatUserSpend (
+					taskLogger,
+					toChatUser,
+					today);
+
+			toChatUserSpend.setReceivedMessageCount (
+				toChatUserSpend.getReceivedMessageCount ()
+					+ receivedMessageCount);
+
+			if (! free) {
+
+				toChatUserSpend.setReceivedMessageCharge (
+					toChatUserSpend.getReceivedMessageCharge ()
+						+ receivedMessageCount
+							* chatSchemeCharges.getChargeChatReceive ());
+			}
+
+			toChatUser.setReceivedMessageCount (
+				toChatUser.getReceivedMessageCount ()
+					+ receivedMessageCount);
+
+			if (! free) {
+
+				toChatUser.setReceivedMessageCharge (
+					toChatUser.getReceivedMessageCharge ()
+						+ receivedMessageCount
+							* chatSchemeCharges.getChargeChatReceive ());
+
+			}
+
+			// charge
+
+			int amount = 0;
+
+			if (! free) {
+
+				amount +=
+					chatSchemeCharges.getChargeChatReceive ()
+						* receivedMessageCount;
+
+			}
+
+			// update the chat user
+
+			chatUserSpendBasic (
 				toChatUser,
-				today);
-
-		toChatUserSpend.setReceivedMessageCount (
-			toChatUserSpend.getReceivedMessageCount ()
-				+ receivedMessageCount);
-
-		if (! free) {
-
-			toChatUserSpend.setReceivedMessageCharge (
-				toChatUserSpend.getReceivedMessageCharge ()
-					+ receivedMessageCount
-						* chatSchemeCharges.getChargeChatReceive ());
-		}
-
-		toChatUser.setReceivedMessageCount (
-			toChatUser.getReceivedMessageCount ()
-				+ receivedMessageCount);
-
-		if (! free) {
-
-			toChatUser.setReceivedMessageCharge (
-				toChatUser.getReceivedMessageCharge ()
-					+ receivedMessageCount
-						* chatSchemeCharges.getChargeChatReceive ());
+				amount);
 
 		}
-
-		// charge
-
-		int amount = 0;
-
-		if (! free) {
-
-			amount +=
-				chatSchemeCharges.getChargeChatReceive ()
-					* receivedMessageCount;
-
-		}
-
-		// update the chat user
-
-		chatUserSpendBasic (
-			toChatUser,
-			amount);
 
 	}
 
@@ -232,171 +238,177 @@ class ChatCreditLogicImplementation
 			int imageProfileCount,
 			int videoProfileCount) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userSpend");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userSpend");
 
-		ChatSchemeChargesRec chatSchemeCharges =
-			chatScheme.getCharges ();
+		) {
 
-		// iphone users are never charged
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		boolean free =
-			chatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
+			ChatSchemeChargesRec chatSchemeCharges =
+				chatScheme.getCharges ();
 
-		// update the chat user spend
+			// iphone users are never charged
 
-		DateTimeZone timeZone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
+			boolean free =
+				chatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
 
-		LocalDate today =
-			LocalDate.now (
-				timeZone);
+			// update the chat user spend
 
-		ChatUserSpendRec chatUserSpend =
-			findOrCreateChatUserSpend (
-				taskLogger,
+			DateTimeZone timeZone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
+
+			LocalDate today =
+				LocalDate.now (
+					timeZone);
+
+			ChatUserSpendRec chatUserSpend =
+				findOrCreateChatUserSpend (
+					taskLogger,
+					chatUser,
+					today);
+
+			chatUserSpend.setUserMessageCount (
+				chatUserSpend.getUserMessageCount ()
+					+ userMessageCount);
+
+			chatUserSpend.setMonitorMessageCount (
+				chatUserSpend.getMonitorMessageCount ()
+					+ monitorMessageCount);
+
+			chatUserSpend.setTextProfileCount (
+				chatUserSpend.getTextProfileCount ()
+					+ textProfileCount);
+
+			chatUserSpend.setImageProfileCount (
+				chatUserSpend.getImageProfileCount ()
+					+ imageProfileCount);
+
+			chatUserSpend.setVideoProfileCount (
+				chatUserSpend.getVideoProfileCount ()
+					+ videoProfileCount);
+
+			if (! free) {
+
+				chatUserSpend.setUserMessageCharge (
+					chatUserSpend.getUserMessageCharge ()
+						+ userMessageCount
+							* chatSchemeCharges.getChargeChatSend ());
+
+				chatUserSpend.setMonitorMessageCharge (
+					chatUserSpend.getMonitorMessageCharge ()
+						+ monitorMessageCount
+							* chatSchemeCharges.getChargeChatSend ());
+
+				chatUserSpend.setTextProfileCharge (
+					chatUserSpend.getTextProfileCharge ()
+						+ textProfileCount
+							* chatSchemeCharges.getChargeChatInfo ());
+
+				chatUserSpend.setImageProfileCharge (
+					chatUserSpend.getImageProfileCharge ()
+						+ imageProfileCount
+							* chatSchemeCharges.getChargeChatPic ()
+							/ chatSchemeCharges.getChargeChatPicDiv ());
+
+				chatUserSpend.setVideoProfileCharge (
+					chatUserSpend.getVideoProfileCharge ()
+						+ videoProfileCount
+							* chatSchemeCharges.getChargeChatVideo ()
+							/ chatSchemeCharges.getChargeChatVideoDiv ());
+
+			}
+
+			// update the chat user
+
+			chatUser.setUserMessageCount (
+				chatUser.getUserMessageCount ()
+					+ userMessageCount);
+
+			chatUser.setMonitorMessageCount (
+				chatUser.getMonitorMessageCount ()
+					+ monitorMessageCount);
+
+			chatUser.setTextProfileCount (
+				chatUser.getTextProfileCount ()
+					+ textProfileCount);
+
+			chatUser.setImageProfileCount (
+				chatUser.getImageProfileCount ()
+					+ imageProfileCount);
+
+			chatUser.setVideoProfileCount (
+				chatUser.getVideoProfileCount ()
+					+ videoProfileCount);
+
+			if (! free) {
+
+				chatUser.setUserMessageCharge (
+					chatUser.getUserMessageCharge ()
+						+ userMessageCount
+							* chatSchemeCharges.getChargeChatSend ());
+
+				chatUser.setMonitorMessageCharge (
+					chatUser.getMonitorMessageCharge ()
+						+ monitorMessageCount
+							* chatSchemeCharges.getChargeChatSend ());
+
+				chatUser.setTextProfileCharge (
+					chatUser.getTextProfileCharge ()
+						+ textProfileCount
+							* chatSchemeCharges.getChargeChatInfo ());
+
+				chatUser.setImageProfileCharge (
+					chatUser.getImageProfileCharge ()
+						+ imageProfileCount
+							* chatSchemeCharges.getChargeChatPic ()
+							/ chatSchemeCharges.getChargeChatPicDiv ());
+
+				chatUser.setVideoProfileCharge (
+					chatUser.getVideoProfileCharge ()
+						+ videoProfileCount
+							* chatSchemeCharges.getChargeChatVideo ()
+							/ chatSchemeCharges.getChargeChatVideoDiv ());
+			}
+
+			// work out the total
+
+			int amount = 0;
+
+			if (! free) {
+
+				amount +=
+					chatSchemeCharges.getChargeChatSend ()
+						* (userMessageCount + monitorMessageCount);
+
+				amount +=
+					chatSchemeCharges.getChargeChatInfo ()
+						* textProfileCount;
+
+				amount +=
+					chatSchemeCharges.getChargeChatPic ()
+						* imageProfileCount
+						/ chatSchemeCharges.getChargeChatPicDiv ();
+
+				amount +=
+					chatSchemeCharges.getChargeChatVideo ()
+						* videoProfileCount
+						/ chatSchemeCharges.getChargeChatVideoDiv ();
+			}
+
+			// update the chat user
+
+			chatUserSpendBasic (
 				chatUser,
-				today);
-
-		chatUserSpend.setUserMessageCount (
-			chatUserSpend.getUserMessageCount ()
-				+ userMessageCount);
-
-		chatUserSpend.setMonitorMessageCount (
-			chatUserSpend.getMonitorMessageCount ()
-				+ monitorMessageCount);
-
-		chatUserSpend.setTextProfileCount (
-			chatUserSpend.getTextProfileCount ()
-				+ textProfileCount);
-
-		chatUserSpend.setImageProfileCount (
-			chatUserSpend.getImageProfileCount ()
-				+ imageProfileCount);
-
-		chatUserSpend.setVideoProfileCount (
-			chatUserSpend.getVideoProfileCount ()
-				+ videoProfileCount);
-
-		if (! free) {
-
-			chatUserSpend.setUserMessageCharge (
-				chatUserSpend.getUserMessageCharge ()
-					+ userMessageCount
-						* chatSchemeCharges.getChargeChatSend ());
-
-			chatUserSpend.setMonitorMessageCharge (
-				chatUserSpend.getMonitorMessageCharge ()
-					+ monitorMessageCount
-						* chatSchemeCharges.getChargeChatSend ());
-
-			chatUserSpend.setTextProfileCharge (
-				chatUserSpend.getTextProfileCharge ()
-					+ textProfileCount
-						* chatSchemeCharges.getChargeChatInfo ());
-
-			chatUserSpend.setImageProfileCharge (
-				chatUserSpend.getImageProfileCharge ()
-					+ imageProfileCount
-						* chatSchemeCharges.getChargeChatPic ()
-						/ chatSchemeCharges.getChargeChatPicDiv ());
-
-			chatUserSpend.setVideoProfileCharge (
-				chatUserSpend.getVideoProfileCharge ()
-					+ videoProfileCount
-						* chatSchemeCharges.getChargeChatVideo ()
-						/ chatSchemeCharges.getChargeChatVideoDiv ());
+				amount);
 
 		}
-
-		// update the chat user
-
-		chatUser.setUserMessageCount (
-			chatUser.getUserMessageCount ()
-				+ userMessageCount);
-
-		chatUser.setMonitorMessageCount (
-			chatUser.getMonitorMessageCount ()
-				+ monitorMessageCount);
-
-		chatUser.setTextProfileCount (
-			chatUser.getTextProfileCount ()
-				+ textProfileCount);
-
-		chatUser.setImageProfileCount (
-			chatUser.getImageProfileCount ()
-				+ imageProfileCount);
-
-		chatUser.setVideoProfileCount (
-			chatUser.getVideoProfileCount ()
-				+ videoProfileCount);
-
-		if (! free) {
-
-			chatUser.setUserMessageCharge (
-				chatUser.getUserMessageCharge ()
-					+ userMessageCount
-						* chatSchemeCharges.getChargeChatSend ());
-
-			chatUser.setMonitorMessageCharge (
-				chatUser.getMonitorMessageCharge ()
-					+ monitorMessageCount
-						* chatSchemeCharges.getChargeChatSend ());
-
-			chatUser.setTextProfileCharge (
-				chatUser.getTextProfileCharge ()
-					+ textProfileCount
-						* chatSchemeCharges.getChargeChatInfo ());
-
-			chatUser.setImageProfileCharge (
-				chatUser.getImageProfileCharge ()
-					+ imageProfileCount
-						* chatSchemeCharges.getChargeChatPic ()
-						/ chatSchemeCharges.getChargeChatPicDiv ());
-
-			chatUser.setVideoProfileCharge (
-				chatUser.getVideoProfileCharge ()
-					+ videoProfileCount
-						* chatSchemeCharges.getChargeChatVideo ()
-						/ chatSchemeCharges.getChargeChatVideoDiv ());
-		}
-
-		// work out the total
-
-		int amount = 0;
-
-		if (! free) {
-
-			amount +=
-				chatSchemeCharges.getChargeChatSend ()
-					* (userMessageCount + monitorMessageCount);
-
-			amount +=
-				chatSchemeCharges.getChargeChatInfo ()
-					* textProfileCount;
-
-			amount +=
-				chatSchemeCharges.getChargeChatPic ()
-					* imageProfileCount
-					/ chatSchemeCharges.getChargeChatPicDiv ();
-
-			amount +=
-				chatSchemeCharges.getChargeChatVideo ()
-					* videoProfileCount
-					/ chatSchemeCharges.getChargeChatVideoDiv ();
-		}
-
-		// update the chat user
-
-		chatUserSpendBasic (
-			chatUser,
-			amount);
 
 	}
 
@@ -446,34 +458,41 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull LocalDate date) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateChatUserSpend");
+		try (
 
-		ChatUserSpendRec chatUserSpend =
-			chatUserSpendHelper.findByDate (
-				chatUser,
-				date);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateChatUserSpend");
 
-		if (chatUserSpend == null) {
+		) {
 
-			chatUserSpend =
-				chatUserSpendHelper.insert (
-					taskLogger,
-					chatUserSpendHelper.createInstance ()
+			ChatUserSpendRec chatUserSpend =
+				chatUserSpendHelper.findByDate (
+					chatUser,
+					date);
 
-				.setChatUser (
-					chatUser)
+			if (chatUserSpend == null) {
 
-				.setDate (
-					date)
+				chatUserSpend =
+					chatUserSpendHelper.insert (
+						taskLogger,
+						chatUserSpendHelper.createInstance ()
 
-			);
+					.setChatUser (
+						chatUser)
+
+					.setDate (
+						date)
+
+				);
+
+			}
+
+			return chatUserSpend;
 
 		}
 
-		return chatUserSpend;
 	}
 
 	@Override
@@ -484,89 +503,97 @@ class ChatCreditLogicImplementation
 			@NonNull Boolean userActed,
 			@NonNull Optional <Long> threadId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userSpendCreditCheck");
+		try (
 
-		taskLogger.debugFormat (
-			"userSpendCheck (%s, %s, %s)",
-			integerToDecimalString (
-				chatUser.getId ()),
-			booleanToYesNo (
-				userActed),
-			threadId.isPresent ()
-				? threadId.get ().toString ()
-				: "null");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userSpendCreditCheck");
 
-		// if user acted then clear block and send pending bill
-
-		if (userActed) {
-
-			chatUser
-
-				.setBlockAll (
-					false);
-
-			userBill (
-				taskLogger,
-				chatUser,
-				new BillCheckOptions ()
-					.retry (true));
-
-		}
-
-		// check their credit
-
-		ChatCreditCheckResult creditCheckResult =
-			userCreditCheck (
-				taskLogger,
-				chatUser);
-
-		// if credit ok, clear credit hint
-
-		if (creditCheckResult.passed ()) {
-
-			chatUser
-
-				.setLastCreditHint (
-					null);
-
-		}
-
-		// if credit bad, and acted, send credit hint
-
-		if (
-			creditCheckResult.failed ()
-			&& userActed
-			&& chatUser.getFirstJoin () != null
 		) {
 
-			userCreditHint (
-				taskLogger,
-				chatUser,
-				threadId);
+			taskLogger.debugFormat (
+				"userSpendCheck (%s, %s, %s)",
+				integerToDecimalString (
+					chatUser.getId ()),
+				booleanToYesNo (
+					userActed),
+				threadId.isPresent ()
+					? threadId.get ().toString ()
+					: "null");
+
+			// if user acted then clear block and send pending bill
+
+			if (userActed) {
+
+				chatUser
+
+					.setBlockAll (
+						false);
+
+				userBill (
+					taskLogger,
+					chatUser,
+					new BillCheckOptions ()
+						.retry (true));
+
+			}
+
+			// check their credit
+
+			ChatCreditCheckResult creditCheckResult =
+				userCreditCheck (
+					taskLogger,
+					chatUser);
+
+			// if credit ok, clear credit hint
+
+			if (creditCheckResult.passed ()) {
+
+				chatUser
+
+					.setLastCreditHint (
+						null);
+
+			}
+
+			// if credit bad, and acted, send credit hint
+
+			if (
+				creditCheckResult.failed ()
+				&& userActed
+				&& chatUser.getFirstJoin () != null
+			) {
+
+				userCreditHint (
+					taskLogger,
+					chatUser,
+					threadId);
+
+			}
+
+			// if credit bad, log them off and cancel ad
+
+			if (creditCheckResult.failed ()) {
+
+				chatUserLogic.logoff (
+					taskLogger,
+					chatUser,
+					isNull (
+						threadId));
+
+				chatUser
+
+					.setNextAd (
+						null);
+
+			}
+
+			// return
+
+			return creditCheckResult;
 
 		}
-
-		// if credit bad, log them off and cancel ad
-
-		if (creditCheckResult.failed ()) {
-
-			chatUserLogic.logoff (
-				chatUser,
-				threadId == null);
-
-			chatUser
-
-				.setNextAd (
-					null);
-
-		}
-
-		// return
-
-		return creditCheckResult;
 
 	}
 
@@ -576,57 +603,63 @@ class ChatCreditLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userCreditCheck");
+		try (
 
-		taskLogger.debugFormat (
-			"userCreditOk (%s)",
-			integerToDecimalString (
-				chatUser.getId ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userCreditCheck");
 
-		// monitors always pass
+		) {
 
-		if (chatUser.getType () == ChatUserType.monitor)
-			return ChatCreditCheckResult.monitor;
+			taskLogger.debugFormat (
+				"userCreditOk (%s)",
+				integerToDecimalString (
+					chatUser.getId ()));
 
-		// deleted users always fail
+			// monitors always pass
 
-		if (chatUser.getNumber () == null)
-			return ChatCreditCheckResult.failedNoNumber;
+			if (chatUser.getType () == ChatUserType.monitor)
+				return ChatCreditCheckResult.monitor;
 
-		// blocked users fail unless the caller disables this check
+			// deleted users always fail
 
-		if (chatUser.getBlockAll ())
-			return ChatCreditCheckResult.failedBlocked;
+			if (chatUser.getNumber () == null)
+				return ChatCreditCheckResult.failedNoNumber;
 
-		// barred users always fail
+			// blocked users fail unless the caller disables this check
 
-		if (chatUser.getBarred ())
-			return ChatCreditCheckResult.failedBarred;
+			if (chatUser.getBlockAll ())
+				return ChatCreditCheckResult.failedBlocked;
 
-		// further checks based on credit mode
+			// barred users always fail
 
-		switch (chatUser.getCreditMode ()) {
+			if (chatUser.getBarred ())
+				return ChatCreditCheckResult.failedBarred;
 
-		case billedMessages:
-			return userCreditCheckStrict (
-				chatUser);
+			// further checks based on credit mode
 
-		case prePay:
-			return userCreditCheckPrepay (
-				chatUser);
+			switch (chatUser.getCreditMode ()) {
 
-		case barred:
-			return ChatCreditCheckResult.failedBarred;
+			case billedMessages:
+				return userCreditCheckStrict (
+					chatUser);
 
-		case free:
-			return ChatCreditCheckResult.passedFree;
+			case prePay:
+				return userCreditCheckPrepay (
+					chatUser);
+
+			case barred:
+				return ChatCreditCheckResult.failedBarred;
+
+			case free:
+				return ChatCreditCheckResult.passedFree;
+
+			}
+
+			throw new RuntimeException ();
 
 		}
-
-		throw new RuntimeException ();
 
 	}
 
@@ -726,188 +759,194 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull BillCheckOptions options) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userBillCheck");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
-
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
-
-		// check user has number
-
-		if (chatUser.getNumber () == null) {
-
-			return optionalOf (
-				stringFormat (
-					"Unable to bill chat user %s with no number",
-					objectManager.objectPathMini (
-						chatUser)));
-
-		}
-
-		// check number is successful
-
-		if (
-
-			! chatNumberReportLogic.isNumberReportSuccessful (
-				taskLogger,
-				chatUser.getNumber ())
-
-			&& ! options.includeFailed ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userBillCheck");
 
 		) {
 
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s ",
-					integerToDecimalString (
-						chatUser.getId ()),
-					"due to repeated billed message failure"));
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		}
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		// check number has not had too many permanent failures
+			// check user has number
 
-		if (
-			chatNumberReportLogic
-				.isNumberReportPastPermanentDeliveryConstraint (
+			if (chatUser.getNumber () == null) {
+
+				return optionalOf (
+					stringFormat (
+						"Unable to bill chat user %s with no number",
+						objectManager.objectPathMini (
+							chatUser)));
+
+			}
+
+			// check number is successful
+
+			if (
+
+				! chatNumberReportLogic.isNumberReportSuccessful (
 					taskLogger,
 					chatUser.getNumber ())
-		) {
 
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s because permanent failure",
-					integerToDecimalString (
-						chatUser.getId ())));
+				&& ! options.includeFailed ()
+
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"due to repeated billed message failure"));
+
+			}
+
+			// check number has not had too many permanent failures
+
+			if (
+				chatNumberReportLogic
+					.isNumberReportPastPermanentDeliveryConstraint (
+						taskLogger,
+						chatUser.getNumber ())
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s because permanent failure",
+						integerToDecimalString (
+							chatUser.getId ())));
+
+			}
+
+			// check block all
+
+			if (
+
+				chatUser.getBlockAll ()
+
+				&& ! (
+					chatUser.getChat ().getBillBlockedUsers ()
+					|| options.includeBlocked ()
+				)
+
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s because block all",
+						integerToDecimalString (
+							chatUser.getId ())));
+
+			}
+
+			// check they are on strict billing
+
+			if (
+				enumNotEqualSafe (
+					chatUser.getCreditMode (),
+					ChatUserCreditMode.billedMessages)
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"as their credit mode is %s",
+						chatUser.getCreditMode ().toString ()));
+
+			}
+
+			// check they are still below 0
+
+			if (chatUser.getCredit () >= 0) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s as their credit is %s",
+						integerToDecimalString (
+							chatUser.getId ()),
+						currencyLogic.formatText (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getCredit ())));
+
+			}
+
+			// check we aren't retrying revoked credit if we aren't supposed to
+
+			boolean revoked =
+				chatUser.getCredit () + chatUser.getCreditRevoked () >= 0;
+
+			if (revoked && ! options.retry ()) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"as credit is revoked and retry is disabled"));
+
+			}
+
+			// apply daily bill limit
+
+			if (userBillLimitApplies (chatUser)) {
+
+				return optionalOf (
+					stringFormat (
+						"Ignoring credit request for %s due to daily ",
+						objectManager.objectPathMini (
+							chatUser),
+						"limit"));
+
+			}
+
+			// work out start of day
+
+			DateTimeZone timeZone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
+
+			Instant startOfToday =
+				transaction.now ()
+					.toDateTime (timeZone)
+					.withTimeAtStartOfDay ()
+					.toInstant ();
+
+			// check user hasnt been sent a bill today that wasn't successful
+
+			if (
+
+				isNotNull (
+					chatUser.getLastBillSent ())
+
+				&& laterThan (
+					chatUser.getLastBillSent (),
+					startOfToday)
+
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Rejecting bill for user %s because last sent %s",
+						integerToDecimalString (
+							chatUser.getId ()),
+						timeFormatter.timestampSecondStringIso (
+							chatUser.getLastBillSent ())));
+
+			}
+
+			// return success
+
+			return optionalAbsent ();
 
 		}
-
-		// check block all
-
-		if (
-
-			chatUser.getBlockAll ()
-
-			&& ! (
-				chatUser.getChat ().getBillBlockedUsers ()
-				|| options.includeBlocked ()
-			)
-
-		) {
-
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s because block all",
-					integerToDecimalString (
-						chatUser.getId ())));
-
-		}
-
-		// check they are on strict billing
-
-		if (
-			enumNotEqualSafe (
-				chatUser.getCreditMode (),
-				ChatUserCreditMode.billedMessages)
-		) {
-
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s ",
-					integerToDecimalString (
-						chatUser.getId ()),
-					"as their credit mode is %s",
-					chatUser.getCreditMode ().toString ()));
-
-		}
-
-		// check they are still below 0
-
-		if (chatUser.getCredit () >= 0) {
-
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s as their credit is %s",
-					integerToDecimalString (
-						chatUser.getId ()),
-					currencyLogic.formatText (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getCredit ())));
-
-		}
-
-		// check we aren't retrying revoked credit if we aren't supposed to
-
-		boolean revoked =
-			chatUser.getCredit () + chatUser.getCreditRevoked () >= 0;
-
-		if (revoked && ! options.retry ()) {
-
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s ",
-					integerToDecimalString (
-						chatUser.getId ()),
-					"as credit is revoked and retry is disabled"));
-
-		}
-
-		// apply daily bill limit
-
-		if (userBillLimitApplies (chatUser)) {
-
-			return optionalOf (
-				stringFormat (
-					"Ignoring credit request for %s due to daily ",
-					objectManager.objectPathMini (
-						chatUser),
-					"limit"));
-
-		}
-
-		// work out start of day
-
-		DateTimeZone timeZone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
-
-		Instant startOfToday =
-			transaction.now ()
-				.toDateTime (timeZone)
-				.withTimeAtStartOfDay ()
-				.toInstant ();
-
-		// check user hasnt been sent a bill today that wasn't successful
-
-		if (
-
-			isNotNull (
-				chatUser.getLastBillSent ())
-
-			&& laterThan (
-				chatUser.getLastBillSent (),
-				startOfToday)
-
-		) {
-
-			return optionalOf (
-				stringFormat (
-					"Rejecting bill for user %s because last sent %s",
-					integerToDecimalString (
-						chatUser.getId ()),
-					timeFormatter.timestampSecondStringIso (
-						chatUser.getLastBillSent ())));
-
-		}
-
-		// return success
-
-		return optionalAbsent ();
 
 	}
 
@@ -918,32 +957,38 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull BillCheckOptions options) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userBill");
+		try (
 
-		Optional <String> reasonOptional =
-			userBillCheck (
-				taskLogger,
-				chatUser,
-				options);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userBill");
 
-		if (
-			optionalIsPresent (
-				reasonOptional)
 		) {
 
-			taskLogger.debugFormat (
-				"%s",
-				reasonOptional.get ());
+			Optional <String> reasonOptional =
+				userBillCheck (
+					taskLogger,
+					chatUser,
+					options);
 
-		} else {
+			if (
+				optionalIsPresent (
+					reasonOptional)
+			) {
 
-			userBillReal (
-				taskLogger,
-				chatUser,
-				true);
+				taskLogger.debugFormat (
+					"%s",
+					reasonOptional.get ());
+
+			} else {
+
+				userBillReal (
+					taskLogger,
+					chatUser,
+					true);
+
+			}
 
 		}
 
@@ -956,227 +1001,233 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			boolean updateRevoked) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userBillReal");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userBillReal");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		RouteRec route =
-			chatScheme.getRbBillRoute ();
+			ChatRec chat =
+				chatUser.getChat ();
 
-		taskLogger.debugFormat (
-			"Doing credit for user %s",
-			integerToDecimalString (
-				chatUser.getId ()));
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		// sanity check on the route
+			RouteRec route =
+				chatScheme.getRbBillRoute ();
 
-		if (! route.getDeliveryReports ()) {
+			taskLogger.debugFormat (
+				"Doing credit for user %s",
+				integerToDecimalString (
+					chatUser.getId ()));
 
-			throw new RuntimeException (
-				stringFormat (
-					"Can't use route %s as billed for chat scheme %s because ",
-					integerToDecimalString (
-						route.getId ()),
-					integerToDecimalString (
-						chatScheme.getId ()),
-					"delivery reports are disabled"));
+			// sanity check on the route
 
-		}
+			if (! route.getDeliveryReports ()) {
 
-		if (route.getExpirySecs () == null) {
+				throw new RuntimeException (
+					stringFormat (
+						"Can't use route %s as billed for chat scheme %s because ",
+						integerToDecimalString (
+							route.getId ()),
+						integerToDecimalString (
+							chatScheme.getId ()),
+						"delivery reports are disabled"));
 
-			throw new RuntimeException (
-				stringFormat (
-					"Can't use route %s as billed for chat scheme %s because ",
-					integerToDecimalString (
-						route.getId ()),
-					integerToDecimalString (
-						chatScheme.getId ()),
-					"no expiry time is configured"));
+			}
 
-		}
+			if (route.getExpirySecs () == null) {
 
-		// update user credit
+				throw new RuntimeException (
+					stringFormat (
+						"Can't use route %s as billed for chat scheme %s because ",
+						integerToDecimalString (
+							route.getId ()),
+						integerToDecimalString (
+							chatScheme.getId ()),
+						"no expiry time is configured"));
 
-		chatUser
+			}
 
-			.setCredit (
-				chatUser.getCredit () + route.getOutCharge ());
+			// update user credit
 
-		if (route.getDeliveryReports ()) {
+			chatUser
 
-			if (chatUser.getCreditMode () == ChatUserCreditMode.billedMessages) {
+				.setCredit (
+					chatUser.getCredit () + route.getOutCharge ());
 
-				chatUser
+			if (route.getDeliveryReports ()) {
 
-					.setCreditPendingStrict (
-						+ chatUser.getCreditPendingStrict ()
-						+ route.getOutCharge ());
+				if (chatUser.getCreditMode () == ChatUserCreditMode.billedMessages) {
+
+					chatUser
+
+						.setCreditPendingStrict (
+							+ chatUser.getCreditPendingStrict ()
+							+ route.getOutCharge ());
+
+				} else {
+
+					chatUser
+
+						.setCreditPending (
+							+ chatUser.getCreditPending ()
+							+ route.getOutCharge ());
+
+				}
 
 			} else {
 
 				chatUser
 
-					.setCreditPending (
-						+ chatUser.getCreditPending ()
+					.setCreditSent (
+						+ chatUser.getCreditSent ()
 						+ route.getOutCharge ());
 
 			}
 
-		} else {
+			// update revoked if appropriate
 
-			chatUser
-
-				.setCreditSent (
-					+ chatUser.getCreditSent ()
-					+ route.getOutCharge ());
-
-		}
-
-		// update revoked if appropriate
-
-		boolean revoked =
-			updateRevoked && (
-				+ chatUser.getCredit ()
-				- route.getOutCharge ()
-				+ chatUser.getCreditRevoked ()
-			) >= 0;
-
-		if (revoked) {
-
-			chatUser
-
-				.setCreditRevoked (
+			boolean revoked =
+				updateRevoked && (
+					+ chatUser.getCredit ()
+					- route.getOutCharge ()
 					+ chatUser.getCreditRevoked ()
-					- route.getOutCharge ())
+				) >= 0;
 
-				.setCreditRetried (
-					+ chatUser.getCreditRetried ()
-					+ route.getOutCharge ());
-
-			if (chatUser.getCreditRevoked () < 0) {
+			if (revoked) {
 
 				chatUser
 
-					.setCreditRetried (
-						+ chatUser.getCreditRetried ()
-						+ chatUser.getCreditRevoked ())
-
 					.setCreditRevoked (
 						+ chatUser.getCreditRevoked ()
-						- chatUser.getCreditRevoked ());
+						- route.getOutCharge ())
+
+					.setCreditRetried (
+						+ chatUser.getCreditRetried ()
+						+ route.getOutCharge ());
+
+				if (chatUser.getCreditRevoked () < 0) {
+
+					chatUser
+
+						.setCreditRetried (
+							+ chatUser.getCreditRetried ()
+							+ chatUser.getCreditRevoked ())
+
+						.setCreditRevoked (
+							+ chatUser.getCreditRevoked ()
+							- chatUser.getCreditRevoked ());
+
+				}
 
 			}
 
+			// get delivery notice type
+
+			Optional<String> deliveryTypeCode =
+				route.getDeliveryReports ()
+					? Optional.of (
+						chatUser.getCreditMode () == ChatUserCreditMode.billedMessages
+							? "chat_bill_strict"
+							: "chat_bill")
+					: Optional.<String>absent ();
+
+			// lookup the template
+
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
+					chatUser,
+					"system",
+					"billed_message");
+
+			// substitute the params
+
+			String originalText =
+				chatHelpTemplate.getText ();
+
+			Map<String,String> allParams =
+				chatSendLogic.addDefaultParams (
+					chatUser,
+					Collections.<String,String>emptyMap ());
+
+			String finalText =
+				MapStringSubstituter.substitute (
+					originalText,
+					allParams);
+
+			TextRec text =
+				textHelper.findOrCreate (
+					taskLogger,
+					finalText);
+
+			// and send it
+
+			ServiceRec billService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"bill");
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			messageSender.get ()
+
+				.number (
+					chatUser.getNumber ())
+
+				.messageText (
+					text)
+
+				.numFrom (
+					chatScheme.getRbNumber ())
+
+				.route (
+					route)
+
+				.service (
+					billService)
+
+				.affiliate (
+					affiliate)
+
+				.deliveryTypeCode (
+					deliveryTypeCode)
+
+				.ref (
+					chatUser.getId ())
+
+				.send (
+					taskLogger);
+
+			// Bill message has been sent, now tidy up for 30 pound limit
+
+			chatUser
+
+				.setCreditDailyAmount (
+					+ chatUser.getCreditDailyAmount ()
+					+ route.getOutCharge ());
+
+			chatUser
+
+				.setLastBillSent (
+					transaction.now ());
+
+			taskLogger.noticeFormat (
+				"Billed message sent to chat user %s %s",
+				integerToDecimalString (
+					chatUser.getId ()),
+				userCreditDebug (
+					chatUser));
+
 		}
-
-		// get delivery notice type
-
-		Optional<String> deliveryTypeCode =
-			route.getDeliveryReports ()
-				? Optional.of (
-					chatUser.getCreditMode () == ChatUserCreditMode.billedMessages
-						? "chat_bill_strict"
-						: "chat_bill")
-				: Optional.<String>absent ();
-
-		// lookup the template
-
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				"system",
-				"billed_message");
-
-		// substitute the params
-
-		String originalText =
-			chatHelpTemplate.getText ();
-
-		Map<String,String> allParams =
-			chatSendLogic.addDefaultParams (
-				chatUser,
-				Collections.<String,String>emptyMap ());
-
-		String finalText =
-			MapStringSubstituter.substitute (
-				originalText,
-				allParams);
-
-		TextRec text =
-			textHelper.findOrCreate (
-				taskLogger,
-				finalText);
-
-		// and send it
-
-		ServiceRec billService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"bill");
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		messageSender.get ()
-
-			.number (
-				chatUser.getNumber ())
-
-			.messageText (
-				text)
-
-			.numFrom (
-				chatScheme.getRbNumber ())
-
-			.route (
-				route)
-
-			.service (
-				billService)
-
-			.affiliate (
-				affiliate)
-
-			.deliveryTypeCode (
-				deliveryTypeCode)
-
-			.ref (
-				chatUser.getId ())
-
-			.send (
-				taskLogger);
-
-		// Bill message has been sent, now tidy up for 30 pound limit
-
-		chatUser
-
-			.setCreditDailyAmount (
-				+ chatUser.getCreditDailyAmount ()
-				+ route.getOutCharge ());
-
-		chatUser
-
-			.setLastBillSent (
-				transaction.now ());
-
-		taskLogger.noticeFormat (
-			"Billed message sent to chat user %s %s",
-			integerToDecimalString (
-				chatUser.getId ()),
-			userCreditDebug (
-				chatUser));
 
 	}
 
@@ -1213,7 +1264,7 @@ class ChatCreditLogicImplementation
 	boolean userBillLimitApplies (
 			ChatUserRec chatUser) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		ChatSchemeRec chatScheme =
@@ -1294,139 +1345,145 @@ class ChatCreditLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userCreditHint");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
-
-		if (chatUser.getBarred ())
-			return;
-
-		if (chatUser.getBlockAll ())
-			return;
-
-		if (
-
-			isNull (
-				chatUser.getLastCreditHint ())
-
-			|| earlierThan (
-				chatUser.getLastCreditHint (),
-				transaction.now ().minus (
-					1000 * 60 * 60 * 24))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userCreditHint");
 
 		) {
 
-			// send message as appropriate
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			Optional <ChatNetworkRec> chatNetworkOptional =
-				chatNetworkHelper.forUser (
-					chatUser);
-
-			if (! chatNetworkOptional.isPresent ()) {
-
-				taskLogger.debugFormat (
-					"Not sending credit hint to %s ",
-					integerToDecimalString (
-						chatUser.getId ()),
-					"because no network settings found");
-
+			if (chatUser.getBarred ())
 				return;
 
-			}
-
-			ChatNetworkRec chatNetwork =
-				chatNetworkOptional.get ();
+			if (chatUser.getBlockAll ())
+				return;
 
 			if (
-				enumEqualSafe (
-					chatUser.getCreditMode (),
-					ChatUserCreditMode.prePay)
+
+				isNull (
+					chatUser.getLastCreditHint ())
+
+				|| earlierThan (
+					chatUser.getLastCreditHint (),
+					transaction.now ().minus (
+						1000 * 60 * 60 * 24))
+
 			) {
 
-				if (! chatNetwork.getAllowPrePay ()) {
+				// send message as appropriate
 
-					chatSendLogic.sendSystemRbFree (
-						taskLogger,
-						chatUser,
-						threadId,
-						"credit_hint_network",
-						TemplateMissing.error,
-						emptyMap ());
+				Optional <ChatNetworkRec> chatNetworkOptional =
+					chatNetworkHelper.forUser (
+						chatUser);
 
-				} else {
+				if (! chatNetworkOptional.isPresent ()) {
 
-					chatSendLogic.sendSystemRbFree (
-						taskLogger,
-						chatUser,
-						threadId,
-						"credit_hint_prepay",
-						TemplateMissing.error,
-						emptyMap ());
+					taskLogger.debugFormat (
+						"Not sending credit hint to %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"because no network settings found");
+
+					return;
 
 				}
 
-			} else if (
-				enumEqualSafe (
-					chatUser.getCreditMode (),
-					ChatUserCreditMode.billedMessages)
-			) {
+				ChatNetworkRec chatNetwork =
+					chatNetworkOptional.get ();
 
-				if (! chatNetwork.getAllowReverseBill ()) {
-
-					chatSendLogic.sendSystemRbFree (
-						taskLogger,
-						chatUser,
-						threadId,
-						"credit_hint_network",
-						TemplateMissing.error,
-						emptyMap ());
-
-				} else if (
-					userBillLimitApplies (
-						chatUser)
+				if (
+					enumEqualSafe (
+						chatUser.getCreditMode (),
+						ChatUserCreditMode.prePay)
 				) {
 
-					chatSendLogic.sendSystemRbFree (
-						taskLogger,
-						chatUser,
-						threadId,
-						"credit_hint_daily",
-						TemplateMissing.error,
-						ImmutableMap.<String, String> builder ()
+					if (! chatNetwork.getAllowPrePay ()) {
 
-							.put (
-								"limit",
-								Long.toString (
-									userBillLimitAmount (chatUser) / 100))
+						chatSendLogic.sendSystemRbFree (
+							taskLogger,
+							chatUser,
+							threadId,
+							"credit_hint_network",
+							TemplateMissing.error,
+							emptyMap ());
 
-							.build ());
+					} else {
+
+						chatSendLogic.sendSystemRbFree (
+							taskLogger,
+							chatUser,
+							threadId,
+							"credit_hint_prepay",
+							TemplateMissing.error,
+							emptyMap ());
+
+					}
+
+				} else if (
+					enumEqualSafe (
+						chatUser.getCreditMode (),
+						ChatUserCreditMode.billedMessages)
+				) {
+
+					if (! chatNetwork.getAllowReverseBill ()) {
+
+						chatSendLogic.sendSystemRbFree (
+							taskLogger,
+							chatUser,
+							threadId,
+							"credit_hint_network",
+							TemplateMissing.error,
+							emptyMap ());
+
+					} else if (
+						userBillLimitApplies (
+							chatUser)
+					) {
+
+						chatSendLogic.sendSystemRbFree (
+							taskLogger,
+							chatUser,
+							threadId,
+							"credit_hint_daily",
+							TemplateMissing.error,
+							ImmutableMap.<String, String> builder ()
+
+								.put (
+									"limit",
+									Long.toString (
+										userBillLimitAmount (chatUser) / 100))
+
+								.build ());
+
+					} else {
+
+						chatSendLogic.sendSystemRbFree (
+							taskLogger,
+							chatUser,
+							threadId,
+							"credit_hint",
+							TemplateMissing.error,
+							emptyMap ());
+
+					}
 
 				} else {
 
-					chatSendLogic.sendSystemRbFree (
-						taskLogger,
-						chatUser,
-						threadId,
-						"credit_hint",
-						TemplateMissing.error,
-						emptyMap ());
+					throw new RuntimeException ();
 
 				}
 
-			} else {
+				chatUser
 
-				throw new RuntimeException ();
+					.setLastCreditHint (
+						transaction.now ());
 
 			}
-
-			chatUser
-
-				.setLastCreditHint (
-					transaction.now ());
 
 		}
 
@@ -1453,52 +1510,58 @@ class ChatCreditLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"creditLimitUpdate");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"creditLimitUpdate");
 
-		// work out the minimum we are aiming for
+		) {
 
-		long targetLimit =
-			sum (
-				+ chatUser.getCreditSuccess (),
-				- (chatUser.getCreditSuccess () % 1000) + 1000);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// if it's already above that do nothing
+			// work out the minimum we are aiming for
 
-		if (chatUser.getCreditLimit () >= targetLimit)
-			return;
+			long targetLimit =
+				sum (
+					+ chatUser.getCreditSuccess (),
+					- (chatUser.getCreditSuccess () % 1000) + 1000);
 
-		// log it
+			// if it's already above that do nothing
 
-		chatUserCreditLimitLogHelper.insert (
-			taskLogger,
-			chatUserCreditLimitLogHelper.createInstance ()
+			if (chatUser.getCreditLimit () >= targetLimit)
+				return;
 
-			.setChatUser (
-				chatUser)
+			// log it
 
-			.setTimestamp (
-				transaction.now ())
+			chatUserCreditLimitLogHelper.insert (
+				taskLogger,
+				chatUserCreditLimitLogHelper.createInstance ()
 
-			.setOldCreditLimit (
-				chatUser.getCreditLimit ())
+				.setChatUser (
+					chatUser)
 
-			.setNewCreditLimit (
-				targetLimit)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setOldCreditLimit (
+					chatUser.getCreditLimit ())
 
-		// update the user's credit limit
+				.setNewCreditLimit (
+					targetLimit)
 
-		chatUser
+			);
 
-			.setCreditLimit (
-				targetLimit);
+			// update the user's credit limit
+
+			chatUser
+
+				.setCreditLimit (
+					targetLimit);
+
+		}
 
 	}
 

@@ -133,66 +133,72 @@ class ManualResponderStatusLine
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserPrivChecker privChecker) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getUpdateScript");
+		try (
 
-		JsonObject updateData =
-			new JsonObject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getUpdateScript");
 
-		if (
-			! featureChecker.checkFeatureAccess (
-				taskLogger,
-				privChecker,
-				"queue_items_status_line")
 		) {
+
+			JsonObject updateData =
+				new JsonObject ();
+
+			if (
+				! featureChecker.checkFeatureAccess (
+					taskLogger,
+					privChecker,
+					"queue_items_status_line")
+			) {
+
+				updateData.addProperty (
+					"numToday",
+					0);
+
+				updateData.addProperty (
+					"numThisHour",
+					0);
+
+				return futureValue (
+					updateData);
+
+			}
+
+			// find or create per-operator caches
+
+			PerOperatorCaches caches =
+				cacheGet (
+					cachesByUserId,
+					privChecker.userIdRequired ());
+
+			if (caches == null) {
+
+				caches =
+					new PerOperatorCaches ();
+
+				cachesByUserId.put (
+					privChecker.userIdRequired (),
+					caches);
+
+			}
+
+			// return update script
 
 			updateData.addProperty (
 				"numToday",
-				0);
+				caches.numTodayCache.get (
+					taskLogger));
 
 			updateData.addProperty (
 				"numThisHour",
-				0);
+				caches.numThisHourCache.get (
+					taskLogger));
 
 			return futureValue (
 				updateData);
 
 		}
-
-		// find or create per-operator caches
-
-		PerOperatorCaches caches =
-			cacheGet (
-				cachesByUserId,
-				privChecker.userIdRequired ());
-
-		if (caches == null) {
-
-			caches =
-				new PerOperatorCaches ();
-
-			cachesByUserId.put (
-				privChecker.userIdRequired (),
-				caches);
-
-		}
-
-		// return update script
-
-		updateData.addProperty (
-			"numToday",
-			caches.numTodayCache.get (
-				taskLogger));
-
-		updateData.addProperty (
-			"numThisHour",
-			caches.numThisHourCache.get (
-				taskLogger));
-
-		return futureValue (
-			updateData);
 
 	}
 

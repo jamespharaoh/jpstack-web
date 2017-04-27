@@ -5,15 +5,15 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 public
-class TransactionView
+class BorrowedTransaction
 	implements Transaction {
 
 	private
-	Transaction realTransaction;
+	OwnedTransaction realTransaction;
 
 	public
-	TransactionView (
-			@NonNull Transaction realTransaction) {
+	BorrowedTransaction (
+			@NonNull OwnedTransaction realTransaction) {
 
 		this.realTransaction =
 			realTransaction;
@@ -29,12 +29,6 @@ class TransactionView
 	@Override
 	public
 	void commit () {
-		throw new IllegalAccessError ();
-	}
-
-	@Override
-	public
-	void close () {
 		throw new IllegalAccessError ();
 	}
 

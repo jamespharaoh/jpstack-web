@@ -12,6 +12,7 @@ import static wbs.utils.etc.ResultUtils.getError;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
 
@@ -67,97 +68,102 @@ class TextualRangeFormFieldInterfaceMapping <
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"genericToInterface");
+		try (
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToInterface");
+
 		) {
 
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
+
+				return successResultAbsent ();
+
+			}
+
+			// get minimum
+
+			Either <Optional <String>, String> leftResult =
+				itemMapping.genericToInterface (
+					taskLogger,
+					container,
+					hints,
+					optionalOf (
+						genericValue.get ().getMinimum ()));
+
+			if (
+				isError (
+					leftResult)
+			) {
+
+				return errorResult (
+					getError (
+						leftResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						leftResult))
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// get maximum
+
+			Either <Optional <String>, String> rightResult =
+				itemMapping.genericToInterface (
+					taskLogger,
+					container,
+					hints,
+					Optional.of (
+						genericValue.get ().getMaximum ()));
+
+			if (
+				isError (
+					rightResult)
+			) {
+
+				return errorResult (
+					getError (
+						rightResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						rightResult))
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// return
+
 			return successResult (
-				optionalAbsent ());
-
-		}
-
-		// get minimum
-
-		Either <Optional <String>, String> leftResult =
-			itemMapping.genericToInterface (
-				taskLogger,
-				container,
-				hints,
 				optionalOf (
-					genericValue.get ().getMinimum ()));
-
-		if (
-			isError (
-				leftResult)
-		) {
-
-			return errorResult (
-				getError (
-					leftResult));
+					stringFormat (
+						"%s to %s",
+						optionalGetRequired (
+							resultValueRequired (
+								leftResult)),
+						optionalGetRequired (
+							resultValueRequired (
+								rightResult)))));
 
 		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					leftResult))
-		) {
-
-			return successResult (
-				Optional.absent ());
-
-		}
-
-		// get maximum
-
-		Either <Optional <String>, String> rightResult =
-			itemMapping.genericToInterface (
-				taskLogger,
-				container,
-				hints,
-				Optional.of (
-					genericValue.get ().getMaximum ()));
-
-		if (
-			isError (
-				rightResult)
-		) {
-
-			return errorResult (
-				getError (
-					rightResult));
-
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					rightResult))
-		) {
-
-			return successResult (
-				Optional.absent ());
-
-		}
-
-		// return
-
-		return successResult (
-			optionalOf (
-				stringFormat (
-					"%s to %s",
-					optionalGetRequired (
-						resultValueRequired (
-							leftResult)),
-					optionalGetRequired (
-						resultValueRequired (
-							rightResult)))));
 
 	}
 

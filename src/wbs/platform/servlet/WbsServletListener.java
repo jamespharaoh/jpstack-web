@@ -70,85 +70,91 @@ class WbsServletListener
 	void contextInitialized (
 			@NonNull ServletContextEvent event) {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"contextInitialized");
+		try (
 
-		// setup components
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"contextInitialized");
 
-		taskLogger.noticeFormat (
-			"Initialising components");
+		) {
 
-		SDNotify.sendStatus (
-			"Initialising components");
+			// setup components
 
-		servletContext =
-			event.getServletContext ();
+			taskLogger.noticeFormat (
+				"Initialising components");
 
-		String primaryProjectName =
-			servletContext.getInitParameter (
-				"primaryProjectName");
+			SDNotify.sendStatus (
+				"Initialising components");
 
-		String primaryProjectPackageName =
-			servletContext.getInitParameter (
-				"primaryProjectPackageName");
+			servletContext =
+				event.getServletContext ();
 
-		String beanDefinitionOutputPath =
-			servletContext.getInitParameter (
-				"beanDefinitionOutputPath");
-
-		List <String> layerNames =
-			stringSplitComma (
+			String primaryProjectName =
 				servletContext.getInitParameter (
-					"layerNames"));
+					"primaryProjectName");
 
-		componentManager =
-			new ComponentManagerBuilder ()
+			String primaryProjectPackageName =
+				servletContext.getInitParameter (
+					"primaryProjectPackageName");
 
-			.primaryProjectName (
-				primaryProjectName)
+			String beanDefinitionOutputPath =
+				servletContext.getInitParameter (
+					"beanDefinitionOutputPath");
 
-			.primaryProjectPackageName (
-				primaryProjectPackageName)
+			List <String> layerNames =
+				stringSplitComma (
+					servletContext.getInitParameter (
+						"layerNames"));
 
-			.layerNames (
-				layerNames)
+			componentManager =
+				new ComponentManagerBuilder ()
 
-			.configNames (
-				Collections.emptyList ())
+				.primaryProjectName (
+					primaryProjectName)
 
-			.outputPath (
-				beanDefinitionOutputPath)
+				.primaryProjectPackageName (
+					primaryProjectPackageName)
 
-			.addSingletonComponent (
-				"servletContext",
-				event.getServletContext ())
+				.layerNames (
+					layerNames)
 
-			.build (
-				taskLogger);
+				.configNames (
+					Collections.emptyList ())
 
-		servletContext.setAttribute (
-			"wbs-application-context",
-			componentManager);
+				.outputPath (
+					beanDefinitionOutputPath)
 
-		randomLogic =
-			componentManager.getComponentRequired (
-				taskLogger,
-				"randomLogic",
-				RandomLogic.class);
+				.addSingletonComponent (
+					"servletContext",
+					event.getServletContext ())
 
-		// systemd integration
+				.build (
+					taskLogger);
 
-		SDNotify.sendNotify ();
+			servletContext.setAttribute (
+				"wbs-application-context",
+				componentManager);
 
-		watchdogThread =
-			new Thread (
-				this::watchdogThread);
+			randomLogic =
+				componentManager.getComponentRequired (
+					taskLogger,
+					"randomLogic",
+					RandomLogic.class);
 
-		watchdogThread.start ();
+			// systemd integration
 
-		SDNotify.sendStatus (
-			"Running");
+			SDNotify.sendNotify ();
+
+			watchdogThread =
+				new Thread (
+					this::watchdogThread);
+
+			watchdogThread.start ();
+
+			SDNotify.sendStatus (
+				"Running");
+
+		}
 
 	}
 
@@ -157,49 +163,55 @@ class WbsServletListener
 	void contextDestroyed (
 			@NonNull ServletContextEvent event) {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"contextDestroyed");
+		try (
 
-		// update systemd status
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"contextDestroyed");
 
-		SDNotify.sendStatus (
-			"Shutting down");
-
-		// clean up components
-
-		if (
-			isNotNull (
-				componentManager)
 		) {
 
-			taskLogger.noticeFormat (
-				"Closing component manager");
+			// update systemd status
 
-			componentManager.close ();
+			SDNotify.sendStatus (
+				"Shutting down");
 
-		}
+			// clean up components
 
-		// systemd integration
+			if (
+				isNotNull (
+					componentManager)
+			) {
 
-		if (
-			isNotNull (
-				watchdogThread)
-		) {
+				taskLogger.noticeFormat (
+					"Closing component manager");
 
-			taskLogger.noticeFormat (
-				"Stopping systemd watchdog");
+				componentManager.close ();
 
-			watchdogThread.interrupt ();
+			}
 
-			try {
+			// systemd integration
 
-				watchdogThread.join ();
+			if (
+				isNotNull (
+					watchdogThread)
+			) {
 
-			} catch (InterruptedException interruptedException) {
+				taskLogger.noticeFormat (
+					"Stopping systemd watchdog");
 
-				throw new RuntimeException (
-					interruptedException);
+				watchdogThread.interrupt ();
+
+				try {
+
+					watchdogThread.join ();
+
+				} catch (InterruptedException interruptedException) {
+
+					throw new RuntimeException (
+						interruptedException);
+
+				}
 
 			}
 
@@ -212,61 +224,13 @@ class WbsServletListener
 	void requestDestroyed (
 			@NonNull ServletRequestEvent event) {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"requestDestroyed");
+		try (
 
-		for (
-			String requestBeanName
-				: componentManager.requestComponentNames ()
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"requestDestroyed");
+
 		) {
-
-			ThreadLocalProxyComponentFactory.Control control =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						taskLogger,
-						requestBeanName,
-						Object.class));
-
-			control.threadLocalProxyReset ();
-
-		}
-
-		RequestContextImplementation
-			.servletRequestThreadLocal
-			.remove ();
-
-	}
-
-	@Override
-	public
-	void requestInitialized (
-			@NonNull ServletRequestEvent event) {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"requestInitialized");
-
-		boolean setServletContext = false;
-		boolean setServletRequest = false;
-
-		List <String> setRequestBeanNames =
-			new ArrayList<> ();
-
-		boolean success = false;
-
-		try {
-
-			RequestContextImplementation.servletContextThreadLocal.set (
-				servletContext);
-
-			setServletContext = true;
-
-			RequestContextImplementation.servletRequestThreadLocal.set (
-				(HttpServletRequest)
-				event.getServletRequest ());
-
-			setServletRequest = true;
 
 			for (
 				String requestBeanName
@@ -280,34 +244,55 @@ class WbsServletListener
 							requestBeanName,
 							Object.class));
 
-				String targetBeanName =
-					stringFormat (
-						"%sTarget",
-						requestBeanName);
-
-				Object targetBean =
-					componentManager.getComponentRequired (
-						taskLogger,
-						targetBeanName,
-						Object.class);
-
-				control.threadLocalProxySet (
-					targetBean);
-
-				setRequestBeanNames.add (
-					requestBeanName);
+				control.threadLocalProxyReset ();
 
 			}
 
-			success = true;
+			RequestContextImplementation
+				.servletRequestThreadLocal
+				.remove ();
 
-		} finally {
+		}
 
-			if (! success) {
+	}
+
+	@Override
+	public
+	void requestInitialized (
+			@NonNull ServletRequestEvent event) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"requestInitialized");
+
+		) {
+
+			boolean setServletContext = false;
+			boolean setServletRequest = false;
+
+			List <String> setRequestBeanNames =
+				new ArrayList<> ();
+
+			boolean success = false;
+
+			try {
+
+				RequestContextImplementation.servletContextThreadLocal.set (
+					servletContext);
+
+				setServletContext = true;
+
+				RequestContextImplementation.servletRequestThreadLocal.set (
+					(HttpServletRequest)
+					event.getServletRequest ());
+
+				setServletRequest = true;
 
 				for (
 					String requestBeanName
-						: setRequestBeanNames
+						: componentManager.requestComponentNames ()
 				) {
 
 					ThreadLocalProxyComponentFactory.Control control =
@@ -317,23 +302,62 @@ class WbsServletListener
 								requestBeanName,
 								Object.class));
 
-					control.threadLocalProxyReset ();
+					String targetBeanName =
+						stringFormat (
+							"%sTarget",
+							requestBeanName);
+
+					Object targetBean =
+						componentManager.getComponentRequired (
+							taskLogger,
+							targetBeanName,
+							Object.class);
+
+					control.threadLocalProxySet (
+						targetBean);
+
+					setRequestBeanNames.add (
+						requestBeanName);
 
 				}
 
-				if (setServletRequest) {
+				success = true;
 
-					RequestContextImplementation
-						.servletRequestThreadLocal
-						.remove ();
+			} finally {
 
-				}
+				if (! success) {
 
-				if (setServletContext) {
+					for (
+						String requestBeanName
+							: setRequestBeanNames
+					) {
 
-					RequestContextImplementation
-						.servletContextThreadLocal
-						.remove ();
+						ThreadLocalProxyComponentFactory.Control control =
+							genericCastUnchecked (
+								componentManager.getComponentRequired (
+									taskLogger,
+									requestBeanName,
+									Object.class));
+
+						control.threadLocalProxyReset ();
+
+					}
+
+					if (setServletRequest) {
+
+						RequestContextImplementation
+							.servletRequestThreadLocal
+							.remove ();
+
+					}
+
+					if (setServletContext) {
+
+						RequestContextImplementation
+							.servletContextThreadLocal
+							.remove ();
+
+					}
 
 				}
 
@@ -382,43 +406,49 @@ class WbsServletListener
 	private
 	void shutdown () {
 
-		// send sigterm
+		try (
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"shutdown ()");
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"shutdown ()");
 
-		taskLogger.noticeFormat (
-			"Automatic restart");
+		) {
 
-		String processName =
-			ManagementFactory.getRuntimeMXBean ().getName ();
+			// send sigterm
 
-		List <String> processNameParts =
-			stringSplitSimple (
-				"@",
-				processName);
+			taskLogger.noticeFormat (
+				"Automatic restart");
 
-		Long processId =
-			parseIntegerRequired (
-				listFirstElementRequired (
-					processNameParts));
+			String processName =
+				ManagementFactory.getRuntimeMXBean ().getName ();
 
-		try {
+			List <String> processNameParts =
+				stringSplitSimple (
+					"@",
+					processName);
 
-			Runtime.getRuntime ().exec (
-				stringFormat (
-					"kill -SIGTERM %s",
-					integerToDecimalString (
-						processId)));
+			Long processId =
+				parseIntegerRequired (
+					listFirstElementRequired (
+						processNameParts));
 
-		} catch (IOException ioException) {
+			try {
 
-			taskLogger.noticeFormatException (
-				ioException,
-				"Failed to kill -SIGTERM, calling System.exit (1)");
+				Runtime.getRuntime ().exec (
+					stringFormat (
+						"kill -SIGTERM %s",
+						integerToDecimalString (
+							processId)));
 
-			System.exit (1);
+			} catch (IOException ioException) {
+
+				taskLogger.noticeFormatException (
+					ioException,
+					"Failed to kill -SIGTERM, calling System.exit (1)");
+
+				System.exit (1);
+
+			}
 
 		}
 

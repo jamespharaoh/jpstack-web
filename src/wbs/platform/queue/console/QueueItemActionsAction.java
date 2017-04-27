@@ -4,8 +4,6 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -14,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -72,19 +70,16 @@ class QueueItemActionsAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// begin transaction
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"QueueItemActionsAction.goReal ()",
@@ -123,6 +118,7 @@ class QueueItemActionsAction
 			) {
 
 				return unclaimQueueItem (
+					taskLogger,
 					transaction);
 
 			} else if (
@@ -147,89 +143,108 @@ class QueueItemActionsAction
 
 	private
 	Responder unclaimQueueItem (
-			@NonNull Transaction transaction) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull OwnedTransaction transaction) {
 
-		if (
+		try (
 
-			enumNotEqualSafe (
-				queueItem.getState (),
-				QueueItemState.claimed)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"unclaimQueueItem");
 
 		) {
 
-			requestContext.addError (
-				"Queue item is not claimed");
+			if (
+
+				enumNotEqualSafe (
+					queueItem.getState (),
+					QueueItemState.claimed)
+
+			) {
+
+				requestContext.addError (
+					"Queue item is not claimed");
+
+				return null;
+
+			}
+
+			queueConsoleLogic.unclaimQueueItem (
+				taskLogger,
+				queueItem,
+				user);
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Queue item returned to queue");
 
 			return null;
 
 		}
-
-		queueConsoleLogic.unclaimQueueItem (
-			queueItem,
-			user);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Queue item returned to queue");
-
-		return null;
 
 	}
 
 	private
 	Responder reclaimQueueItem (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reclaimQueueItem");
+		try (
 
-		if (
-
-			enumNotEqualSafe (
-				queueItem.getState (),
-				QueueItemState.claimed)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reclaimQueueItem");
 
 		) {
 
-			requestContext.addWarning (
-				"Queue item is not claimed");
+			if (
 
-			return null;
+				enumNotEqualSafe (
+					queueItem.getState (),
+					QueueItemState.claimed)
 
-		}
+			) {
 
-		if (
+				requestContext.addWarning (
+					"Queue item is not claimed");
 
-			referenceEqualWithClass (
-				UserRec.class,
+				return null;
+
+			}
+
+			if (
+
+				referenceEqualWithClass (
+					UserRec.class,
+					queueItem.getQueueItemClaim ().getUser (),
+					user)
+
+			) {
+
+				requestContext.addWarning (
+					"Queue item is already claimed by you");
+
+				return null;
+
+			}
+
+			queueConsoleLogic.reclaimQueueItem (
+				taskLogger,
+				queueItem,
 				queueItem.getQueueItemClaim ().getUser (),
-				user)
+				user);
 
-		) {
+			transaction.commit ();
 
-			requestContext.addWarning (
-				"Queue item is already claimed by you");
+			requestContext.addNotice (
+				"Queue item reclaimed by you");
 
 			return null;
 
 		}
-
-		queueConsoleLogic.reclaimQueueItem (
-			taskLogger,
-			queueItem,
-			queueItem.getQueueItemClaim ().getUser (),
-			user);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Queue item reclaimed by you");
-
-		return null;
 
 	}
 

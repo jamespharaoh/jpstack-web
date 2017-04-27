@@ -43,6 +43,7 @@ interface ChatUserLogic {
 			ChatUserRec chatUser);
 
 	void logoff (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			Boolean automatic);
 
@@ -50,6 +51,7 @@ interface ChatUserLogic {
 			ChatUserRec chatUser);
 
 	void scheduleAd (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser);
 
 	boolean compatible (
@@ -69,16 +71,16 @@ interface ChatUserLogic {
 			Collection <ChatUserRec> thoseUsers,
 			Long numToFind);
 
-	List<UserDistance> getUserDistances (
+	List <UserDistance> getUserDistances (
 			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers);
+			Collection <ChatUserRec> otherUsers);
 
 	@Accessors (fluent = true)
 	@Data
 	@EqualsAndHashCode
 	public static
 	class UserDistance
-		implements Comparable<UserDistance> {
+		implements Comparable <UserDistance> {
 
 		ChatUserRec user;
 		double miles;
@@ -105,6 +107,7 @@ interface ChatUserLogic {
 	}
 
 	void adultVerify (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser);
 
 	ChatUserRec createChatMonitor (
@@ -112,6 +115,7 @@ interface ChatUserLogic {
 			ChatRec chat);
 
 	void creditModeChange (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			ChatUserCreditMode newMode);
 

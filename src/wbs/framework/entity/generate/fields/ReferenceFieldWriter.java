@@ -59,63 +59,69 @@ class ReferenceFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		if (
-			isNull (
-				fieldTypePluginModel)
 		) {
 
-			throw new RuntimeException (
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
+
+			if (
+				isNull (
+					fieldTypePluginModel)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field type %s ",
+						spec.typeName (),
+						"does not exist while building reference field %s.%s",
+						context.modelMeta ().name (),
+						ifNull (
+							spec.name (),
+							spec.typeName ())));
+
+			}
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			String fullFieldTypeName =
 				stringFormat (
-					"Field type %s ",
-					spec.typeName (),
-					"does not exist while building reference field %s.%s",
-					context.modelMeta ().name (),
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
+
+			// write field
+
+			new JavaPropertyWriter ()
+
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
+
+				.typeName (
+					fullFieldTypeName)
+
+				.propertyName (
 					ifNull (
 						spec.name (),
-						spec.typeName ())));
+						spec.typeName ()))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
 
 		}
-
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
-
-		// write field
-
-		new JavaPropertyWriter ()
-
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
-
-			.typeName (
-				fullFieldTypeName)
-
-			.propertyName (
-				ifNull (
-					spec.name (),
-					spec.typeName ()))
-
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
 
 	}
 

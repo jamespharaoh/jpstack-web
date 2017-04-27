@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -56,14 +56,14 @@ class PrivHooks
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"setup ()",
@@ -115,42 +115,48 @@ class PrivHooks
 			return;
 		}
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSingletons");
+		try (
 
-		ObjectTypeRec parentType =
-			objectTypeDao.findById (
-				parentHelper.objectTypeId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSingletons");
 
-		for (
-			Long privTypeId
-				: privTypeIdsByParentTypeId.get (
-					parentHelper.objectTypeId ())
 		) {
 
-			PrivTypeRec privType =
-				privTypeDao.findRequired (
-					privTypeId);
+			ObjectTypeRec parentType =
+				objectTypeDao.findById (
+					parentHelper.objectTypeId ());
 
-			privHelper.insert (
-				taskLogger,
-				privHelper.createInstance ()
+			for (
+				Long privTypeId
+					: privTypeIdsByParentTypeId.get (
+						parentHelper.objectTypeId ())
+			) {
 
-				.setPrivType (
-					privType)
+				PrivTypeRec privType =
+					privTypeDao.findRequired (
+						privTypeId);
 
-				.setCode (
-					privType.getCode ())
+				privHelper.insert (
+					taskLogger,
+					privHelper.createInstance ()
 
-				.setParentType (
-					parentType)
+					.setPrivType (
+						privType)
 
-				.setParentId (
-					parent.getId ())
+					.setCode (
+						privType.getCode ())
 
-			);
+					.setParentType (
+						parentType)
+
+					.setParentId (
+						parent.getId ())
+
+				);
+
+			}
 
 		}
 

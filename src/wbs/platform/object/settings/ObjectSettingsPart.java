@@ -117,36 +117,42 @@ class ObjectSettingsPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		updateResultSet =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"objectSettingsUpdateResultSet"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		object =
-			objectLookup.lookupObject (
-				requestContext.consoleContextStuffRequired ());
+		) {
 
-		canEdit = (
+			updateResultSet =
+				optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"objectSettingsUpdateResultSet"));
 
-			editPrivKey != null
+			object =
+				objectLookup.lookupObject (
+					requestContext.consoleContextStuffRequired ());
 
-			&& requestContext.canContext (
-				editPrivKey)
+			canEdit = (
 
-		);
+				editPrivKey != null
 
-		if (formFieldsProvider != null) {
+				&& requestContext.canContext (
+					editPrivKey)
 
-			prepareParent ();
+			);
 
-			prepareFieldSet (
-				taskLogger);
+			if (formFieldsProvider != null) {
+
+				prepareParent ();
+
+				prepareFieldSet (
+					taskLogger);
+
+			}
 
 		}
 
@@ -212,84 +218,90 @@ class ObjectSettingsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (canEdit) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-			String enctype =
-				"application/x-www-form-urlencoded";
+		) {
 
-			try {
+			if (canEdit) {
 
-				if (formFieldSet.fileUpload ()) {
+				String enctype =
+					"application/x-www-form-urlencoded";
+
+				try {
+
+					if (formFieldSet.fileUpload ()) {
+
+						enctype =
+							"multipart/form-data";
+
+					}
+
+				} catch (Exception exception) {
 
 					enctype =
-						"multipart/form-data";
+						"application/x-www-form-urlencoded";
 
 				}
 
-			} catch (Exception exception) {
-
-				enctype =
-					"application/x-www-form-urlencoded";
+				htmlFormOpenPostActionEncoding (
+					requestContext.resolveLocalUrl (
+						localName),
+					enctype);
 
 			}
 
-			htmlFormOpenPostActionEncoding (
-				requestContext.resolveLocalUrl (
-					localName),
-				enctype);
+			htmlTableOpenDetails ();
 
-		}
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFieldSet,
+				updateResultSet,
+				object,
+				ImmutableMap.of (),
+				FormType.update,
+				"settings");
 
-		htmlTableOpenDetails ();
+			htmlTableClose ();
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFieldSet,
-			updateResultSet,
-			object,
-			ImmutableMap.of (),
-			FormType.update,
-			"settings");
+			if (canEdit) {
 
-		htmlTableClose ();
-
-		if (canEdit) {
-
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"save changes\"",
-				">");
-
-			htmlParagraphClose ();
-
-			htmlFormClose ();
-
-			if (removeLocalName != null) {
-
-				htmlHeadingTwoWrite (
-					"Remove");
-
-				htmlFormOpenPostAction (
-					requestContext.resolveLocalUrl (
-						removeLocalName));
+				htmlParagraphOpen ();
 
 				formatWriter.writeLineFormat (
 					"<input",
 					" type=\"submit\"",
-					" value=\"remove\"",
+					" value=\"save changes\"",
 					">");
 
+				htmlParagraphClose ();
+
 				htmlFormClose ();
+
+				if (removeLocalName != null) {
+
+					htmlHeadingTwoWrite (
+						"Remove");
+
+					htmlFormOpenPostAction (
+						requestContext.resolveLocalUrl (
+							removeLocalName));
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" value=\"remove\"",
+						">");
+
+					htmlFormClose ();
+
+				}
 
 			}
 

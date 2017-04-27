@@ -12,8 +12,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
@@ -203,41 +203,47 @@ class BroadcastSendHelper
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendStart");
+		try (
 
-		// sanity check
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendStart");
 
-		if (
-			broadcast.getState ()
-				!= BroadcastState.scheduled
 		) {
-			throw new IllegalStateException ();
+
+			// sanity check
+
+			if (
+				broadcast.getState ()
+					!= BroadcastState.scheduled
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// update broadcast
+
+			broadcast
+
+				.setState (
+					BroadcastState.sending);
+
+			broadcastConfig
+
+				.setNumScheduled (
+					broadcastConfig.getNumScheduled () - 1)
+
+				.setNumSending (
+					broadcastConfig.getNumSending () + 1);
+
+			// create event
+
+			eventLogic.createEvent (
+				taskLogger,
+				"broadcast_send_begun",
+				broadcast);
+
 		}
-
-		// update broadcast
-
-		broadcast
-
-			.setState (
-				BroadcastState.sending);
-
-		broadcastConfig
-
-			.setNumScheduled (
-				broadcastConfig.getNumScheduled () - 1)
-
-			.setNumSending (
-				broadcastConfig.getNumSending () + 1);
-
-		// create event
-
-		eventLogic.createEvent (
-			taskLogger,
-			"broadcast_send_begun",
-			broadcast);
 
 	}
 
@@ -314,77 +320,83 @@ class BroadcastSendHelper
 			@NonNull BroadcastRec broadcast,
 			@NonNull BroadcastNumberRec broadcastNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendItem");
+		try (
 
-		// sanity check
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendItem");
 
-		if (
-			broadcastNumber.getState ()
-				!= BroadcastNumberState.accepted
 		) {
-			throw new IllegalStateException ();
+
+			// sanity check
+
+			if (
+				broadcastNumber.getState ()
+					!= BroadcastNumberState.accepted
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// send the message
+
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					broadcastConfig,
+					"default");
+
+			BatchRec broadcastBatch =
+				batchHelper.findByCodeRequired (
+					broadcast,
+					"broadcast");
+
+			MessageRec message =
+				smsMessageSenderProvider.get ()
+
+				.batch (
+					broadcastBatch)
+
+				.messageString (
+					taskLogger,
+					broadcast.getMessageText ())
+
+				.number (
+					broadcastNumber.getNumber ())
+
+				.numFrom (
+					broadcast.getMessageOriginator ())
+
+				.routerResolve (
+					broadcastConfig.getRouter ())
+
+				.service (
+					defaultService)
+
+				.user (
+					broadcast.getSentUser ())
+
+				.send (
+					taskLogger);
+
+			// mark the number as sent
+
+			broadcastNumber
+
+				.setState (
+					BroadcastNumberState.sent)
+
+				.setMessage (
+					message);
+
+			broadcast
+
+				.setNumAccepted (
+					broadcast.getNumAccepted () - 1)
+
+				.setNumSent (
+					broadcast.getNumSent () + 1);
+
 		}
-
-		// send the message
-
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				broadcastConfig,
-				"default");
-
-		BatchRec broadcastBatch =
-			batchHelper.findByCodeRequired (
-				broadcast,
-				"broadcast");
-
-		MessageRec message =
-			smsMessageSenderProvider.get ()
-
-			.batch (
-				broadcastBatch)
-
-			.messageString (
-				taskLogger,
-				broadcast.getMessageText ())
-
-			.number (
-				broadcastNumber.getNumber ())
-
-			.numFrom (
-				broadcast.getMessageOriginator ())
-
-			.routerResolve (
-				broadcastConfig.getRouter ())
-
-			.service (
-				defaultService)
-
-			.user (
-				broadcast.getSentUser ())
-
-			.send (
-				taskLogger);
-
-		// mark the number as sent
-
-		broadcastNumber
-
-			.setState (
-				BroadcastNumberState.sent)
-
-			.setMessage (
-				message);
-
-		broadcast
-
-			.setNumAccepted (
-				broadcast.getNumAccepted () - 1)
-
-			.setNumSent (
-				broadcast.getNumSent () + 1);
 
 	}
 
@@ -395,44 +407,50 @@ class BroadcastSendHelper
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendComplete");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendComplete");
 
-		// sanity check
+		) {
 
-		if (broadcast.getNumAccepted () != 0) {
-			throw new IllegalStateException ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			// sanity check
+
+			if (broadcast.getNumAccepted () != 0) {
+				throw new IllegalStateException ();
+			}
+
+			// update broadcast
+
+			broadcast
+
+				.setState (
+					BroadcastState.sent)
+
+				.setSentTime (
+					transaction.now ());
+
+			broadcastConfig
+
+				.setNumSending (
+					broadcastConfig.getNumSending () - 1)
+
+				.setNumSent (
+					broadcastConfig.getNumSent () + 1);
+
+			// create event
+
+			eventLogic.createEvent (
+				taskLogger,
+				"broadcast_send_completed",
+				broadcast);
+
 		}
-
-		// update broadcast
-
-		broadcast
-
-			.setState (
-				BroadcastState.sent)
-
-			.setSentTime (
-				transaction.now ());
-
-		broadcastConfig
-
-			.setNumSending (
-				broadcastConfig.getNumSending () - 1)
-
-			.setNumSent (
-				broadcastConfig.getNumSent () + 1);
-
-		// create event
-
-		eventLogic.createEvent (
-			taskLogger,
-			"broadcast_send_completed",
-			broadcast);
 
 	}
 

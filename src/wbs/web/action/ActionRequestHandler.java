@@ -2,19 +2,18 @@ package wbs.web.action;
 
 import static wbs.utils.etc.Misc.isNull;
 
-import java.io.IOException;
-
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.handler.RequestHandler;
@@ -30,6 +29,9 @@ class ActionRequestHandler
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -56,27 +58,35 @@ class ActionRequestHandler
 	@Override
 	public
 	void handle (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		Action action =
-			actionProvider.get ();
+		try (
 
-		Responder responder =
-			action.handle (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
+		) {
+
+			Action action =
+				actionProvider.get ();
+
+			Responder responder =
+				action.handle (
+					parentTaskLogger);
+
+			if (
+				isNull (
+					responder)
+			) {
+				throw new NullPointerException ();
+			}
+
+			responder.execute (
 				parentTaskLogger);
 
-		if (
-			isNull (
-				responder)
-		) {
-			throw new NullPointerException ();
 		}
-
-		responder.execute (
-			parentTaskLogger);
 
 	}
 

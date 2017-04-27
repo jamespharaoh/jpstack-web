@@ -65,76 +65,82 @@ class ConsoleAsyncConnection
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String messageString) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleMessage");
+		try (
 
-		lastMessage =
-			Instant.now ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleMessage");
 
-		try {
+		) {
 
-			JsonObject messageJson =
-				jsonObjectParse (
-					messageString);
+			lastMessage =
+				Instant.now ();
 
-			String sessionId =
-				jsonObjectGetString (
-					messageJson,
-					"sessionId");
+			try {
 
-			Long userId =
-				jsonObjectGetInteger (
-					messageJson,
-					"userId");
+				JsonObject messageJson =
+					jsonObjectParse (
+						messageString);
 
-			String endpointPath =
-				jsonObjectGetString (
-					messageJson,
-					"endpoint");
+				String sessionId =
+					jsonObjectGetString (
+						messageJson,
+						"sessionId");
 
-			JsonObject payload =
-				jsonObjectGetObject (
-					messageJson,
-					"payload");
+				Long userId =
+					jsonObjectGetInteger (
+						messageJson,
+						"userId");
 
-			if (
-				! userSessionVerifyLogic.userSessionVerify (
+				String endpointPath =
+					jsonObjectGetString (
+						messageJson,
+						"endpoint");
+
+				JsonObject payload =
+					jsonObjectGetObject (
+						messageJson,
+						"payload");
+
+				if (
+					! userSessionVerifyLogic.userSessionVerify (
+						taskLogger,
+						sessionId,
+						userId,
+						false)
+				) {
+
+					taskLogger.warningFormat (
+						"Async message ignored due to authentication failure");
+
+					return;
+
+				}
+
+				ConsoleAsyncEndpoint asyncEndpoint =
+					consoleAsyncManager.asyncEndpointForPathRequired (
+						endpointPath);
+
+				ConnectionHandleImplementation connectionHandle =
+					new ConnectionHandleImplementation ()
+
+					.endpointPath (
+						endpointPath);
+
+				asyncEndpoint.message (
 					taskLogger,
-					sessionId,
+					connectionHandle,
 					userId,
-					false)
-			) {
+					payload);
 
-				taskLogger.warningFormat (
-					"Async message ignored due to authentication failure");
+			} catch (Exception exception) {
 
-				return;
+				taskLogger.errorFormatException (
+					exception,
+					"Error handling async message");
 
 			}
-
-			ConsoleAsyncEndpoint asyncEndpoint =
-				consoleAsyncManager.asyncEndpointForPathRequired (
-					endpointPath);
-
-			ConnectionHandleImplementation connectionHandle =
-				new ConnectionHandleImplementation ()
-
-				.endpointPath (
-					endpointPath);
-
-			asyncEndpoint.message (
-				taskLogger,
-				connectionHandle,
-				userId,
-				payload);
-
-		} catch (Exception exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error handling async message");
 
 		}
 
@@ -145,13 +151,18 @@ class ConsoleAsyncConnection
 	void handleConnectionClosed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleConnectionClosed");
+		try (
 
-		connected = false;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleConnectionClosed");
+
+		) {
+
+			connected = false;
+
+		}
 
 	}
 
@@ -203,29 +214,35 @@ class ConsoleAsyncConnection
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull JsonObject payload) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"send");
+			try (
 
-			JsonObject message =
-				new JsonObject ();
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"send");
 
-			message.addProperty (
-				"endpoint",
-				endpointPath);
+			) {
 
-			message.add (
-				"payload",
-				payload);
+				JsonObject message =
+					new JsonObject ();
 
-			String messageJson =
-				jsonEncode (
-					message);
+				message.addProperty (
+					"endpoint",
+					endpointPath);
 
-			connectionProvider.sendMessage (
-				taskLogger,
-				messageJson);
+				message.add (
+					"payload",
+					payload);
+
+				String messageJson =
+					jsonEncode (
+						message);
+
+				connectionProvider.sendMessage (
+					taskLogger,
+					messageJson);
+
+			}
 
 		}
 

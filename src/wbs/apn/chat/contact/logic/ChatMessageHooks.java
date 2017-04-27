@@ -44,74 +44,80 @@ class ChatMessageHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"beforeInsert");
+		try (
 
-		ChatUserRec fromChatUser =
-			chatMessage.getFromUser ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"beforeInsert");
 
-		ChatUserRec toChatUser =
-			chatMessage.getToUser ();
-
-		ChatRec chat =
-			fromChatUser.getChat ();
-
-		// sanity check
-
-		if (
-			referenceNotEqualWithClass (
-				ChatRec.class,
-				fromChatUser.getChat (),
-				toChatUser.getChat ())
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"From user's chat %s does not match to user's %s",
-					integerToDecimalString (
-						fromChatUser.getChat ().getId ()),
-					integerToDecimalString (
-						toChatUser.getChat ().getId ())));
+			ChatUserRec fromChatUser =
+				chatMessage.getFromUser ();
+
+			ChatUserRec toChatUser =
+				chatMessage.getToUser ();
+
+			ChatRec chat =
+				fromChatUser.getChat ();
+
+			// sanity check
+
+			if (
+				referenceNotEqualWithClass (
+					ChatRec.class,
+					fromChatUser.getChat (),
+					toChatUser.getChat ())
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"From user's chat %s does not match to user's %s",
+						integerToDecimalString (
+							fromChatUser.getChat ().getId ()),
+						integerToDecimalString (
+							toChatUser.getChat ().getId ())));
+
+			}
+
+			// find or create chat contact
+
+			ChatContactRec chatContact =
+				chatContactHelper.findOrCreate (
+					taskLogger,
+					chatMessage.getFromUser (),
+					chatMessage.getToUser ());
+
+			// update message
+
+			chatMessage
+
+				.setIndex (
+					chatContact.getNumChatMessages ())
+
+				.setChatContact (
+					chatContact)
+
+				.setChat (
+					chat);
+
+			// update chat contact
+
+			chatContact
+
+				.setNumChatMessages (
+					chatContact.getNumChatMessages () + 1)
+
+				.setFirstMessageTime (
+					ifNull (
+						chatContact.getFirstMessageTime (),
+						chatMessage.getTimestamp ()))
+
+				.setLastMessageTime (
+					chatMessage.getTimestamp ());
 
 		}
-
-		// find or create chat contact
-
-		ChatContactRec chatContact =
-			chatContactHelper.findOrCreate (
-				taskLogger,
-				chatMessage.getFromUser (),
-				chatMessage.getToUser ());
-
-		// update message
-
-		chatMessage
-
-			.setIndex (
-				chatContact.getNumChatMessages ())
-
-			.setChatContact (
-				chatContact)
-
-			.setChat (
-				chat);
-
-		// update chat contact
-
-		chatContact
-
-			.setNumChatMessages (
-				chatContact.getNumChatMessages () + 1)
-
-			.setFirstMessageTime (
-				ifNull (
-					chatContact.getFirstMessageTime (),
-					chatMessage.getTimestamp ()))
-
-			.setLastMessageTime (
-				chatMessage.getTimestamp ());
 
 	}
 

@@ -67,21 +67,18 @@ class WbsServlet
 	}
 
 	protected
-	void doGet ()
-		throws
-			ServletException,
-			IOException {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"doGet",
-				parseBooleanYesNoRequired (
-					optionalOr (
-						requestContext.cookie (
-							"wbs-debug"),
-						"no")));
+	void doGet () {
 
 		try (
+
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"doGet",
+					parseBooleanYesNoRequired (
+						optionalOr (
+							requestContext.cookie (
+								"wbs-debug"),
+							"no")));
 
 			ActiveTask activeTask =
 				startTask (
@@ -125,70 +122,70 @@ class WbsServlet
 	}
 
 	protected
-	void doPost ()
-		throws
-			ServletException,
-			IOException {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"doPost",
-				parseBooleanYesNoRequired (
-					optionalOr (
-						requestContext.cookie (
-							"wbs-debug"),
-						"no")));
+	void doPost () {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"doPost");
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"doPost",
+					parseBooleanYesNoRequired (
+						optionalOr (
+							requestContext.cookie (
+								"wbs-debug"),
+							"no")));
 
 		) {
 
-			WebFile file =
-				processPath (
-					taskLogger);
+			try (
 
-			if (file != null) {
+				ActiveTask activeTask =
+					startTask (
+						"doPost");
 
-				file.doPost (
-					taskLogger);
+			) {
 
-			} else {
+				WebFile file =
+					processPath (
+						taskLogger);
 
-				handleNotFound (
-					taskLogger);
+				if (file != null) {
+
+					file.doPost (
+						taskLogger);
+
+				} else {
+
+					handleNotFound (
+						taskLogger);
+
+				}
+
+			} catch (Throwable exception) {
+
+				handleException (
+					taskLogger,
+					exception);
 
 			}
-
-		} catch (Throwable exception) {
-
-			handleException (
-				taskLogger,
-				exception);
 
 		}
 
 	}
 
 	protected
-	void doOptions ()
-		throws
-			ServletException,
-			IOException {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"doOptions",
-				parseBooleanYesNoRequired (
-					optionalOr (
-						requestContext.cookie (
-							"wbs-debug"),
-						"no")));
+	void doOptions () {
 
 		try (
+
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"doOptions",
+					parseBooleanYesNoRequired (
+						optionalOr (
+							requestContext.cookie (
+								"wbs-debug"),
+							"no")));
 
 			ActiveTask activeTask =
 				startTask (
@@ -277,55 +274,48 @@ class WbsServlet
 	protected
 	void handleException (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Throwable exception)
-		throws
-			ServletException,
-			IOException {
+			@NonNull Throwable exception) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleException");
+		try (
 
-		if (exception instanceof ServletException) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleException");
 
-			throw (ServletException)
-				exception;
+		) {
 
-		} else if (exception instanceof IOException) {
+			if (exception instanceof HttpMethodNotAllowedException) {
 
-			throw (IOException)
-				exception;
+				handleMethodNotAllowed (
+					taskLogger);
 
-		} else if (exception instanceof HttpMethodNotAllowedException) {
+			} else if (exception instanceof HttpForbiddenException) {
 
-			handleMethodNotAllowed (
-				taskLogger);
+				handleForbidden (
+					taskLogger,
+					requestContext);
 
-		} else if (exception instanceof HttpForbiddenException) {
+			} else if (exception instanceof ExternalRedirectException) {
 
-			handleForbidden (
-				taskLogger,
-				requestContext);
+				ExternalRedirectException redirectException =
+					(ExternalRedirectException)
+					exception;
 
-		} else if (exception instanceof ExternalRedirectException) {
+				requestContext.sendRedirect (
+					redirectException.getLocation ());
 
-			ExternalRedirectException redirectException =
-				(ExternalRedirectException)
-				exception;
+			} else if (exception instanceof RuntimeException) {
 
-			requestContext.sendRedirect (
-				redirectException.getLocation ());
+				throw (RuntimeException)
+					exception;
 
-		} else if (exception instanceof RuntimeException) {
+			} else {
 
-			throw (RuntimeException)
-				exception;
+				throw new RuntimeException (
+					exception);
 
-		} else {
-
-			throw new RuntimeException (
-				exception);
+			}
 
 		}
 
@@ -333,69 +323,78 @@ class WbsServlet
 
 	protected
 	void handleNotFound (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleNotFound");
+		try (
 
-		taskLogger.warningFormat (
-			"RCX not found %s",
-			requestContext.requestUri ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleNotFound");
 
-		requestContext.sendError (
-			fromJavaInteger (
-				HttpServletResponse.SC_NOT_FOUND),
-			requestContext.requestUri ());
+		) {
+
+			taskLogger.warningFormat (
+				"RCX not found %s",
+				requestContext.requestUri ());
+
+			requestContext.sendError (
+				fromJavaInteger (
+					HttpServletResponse.SC_NOT_FOUND),
+				requestContext.requestUri ());
+
+		}
 
 	}
 
 	protected
 	void handleMethodNotAllowed (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleMethodNotAllowed");
+		try (
 
-		taskLogger.warningFormat (
-			"method not allowed %s",
-			requestContext.requestUri ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleMethodNotAllowed");
 
-		requestContext.sendError (
-			fromJavaInteger (
-				HttpServletResponse.SC_METHOD_NOT_ALLOWED));
+		) {
+
+			taskLogger.warningFormat (
+				"method not allowed %s",
+				requestContext.requestUri ());
+
+			requestContext.sendError (
+				fromJavaInteger (
+					HttpServletResponse.SC_METHOD_NOT_ALLOWED));
+
+		}
 
 	}
 
 	protected
 	void handleForbidden (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RequestContext requestContext)
-		throws
-			ServletException,
-			IOException {
+			@NonNull RequestContext requestContext) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleForbidden");
+		try (
 
-		taskLogger.warningFormat (
-			"RCX forbidden %s",
-			requestContext.requestUri ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleForbidden");
 
-		requestContext.sendError (
-			fromJavaInteger (
-				HttpServletResponse.SC_FORBIDDEN));
+		) {
+
+			taskLogger.warningFormat (
+				"RCX forbidden %s",
+				requestContext.requestUri ());
+
+			requestContext.sendError (
+				fromJavaInteger (
+					HttpServletResponse.SC_FORBIDDEN));
+
+		}
 
 	}
 
@@ -404,32 +403,38 @@ class WbsServlet
 	void init ()
 		throws ServletException {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"init");
+		try (
 
-		ServletContext servletContext =
-			getServletContext ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"init");
 
-		componentManager =
-			(ComponentManager)
-			servletContext.getAttribute (
-				"wbs-application-context");
+		) {
 
-		if (componentManager == null) {
+			ServletContext servletContext =
+				getServletContext ();
 
-			throw new ServletException (
-				"Application context not found");
+			componentManager =
+				(ComponentManager)
+				servletContext.getAttribute (
+					"wbs-application-context");
+
+			if (componentManager == null) {
+
+				throw new ServletException (
+					"Application context not found");
+
+			}
+
+			requestContext =
+				componentManager.getComponentRequired (
+					taskLogger,
+					"requestContext",
+					RequestContext.class);
+
+			taskLogger.makeException ();
 
 		}
-
-		requestContext =
-			componentManager.getComponentRequired (
-				taskLogger,
-				"requestContext",
-				RequestContext.class);
-
-		taskLogger.makeException ();
 
 	}
 

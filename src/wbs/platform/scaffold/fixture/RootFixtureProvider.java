@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -36,28 +36,34 @@ class RootFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		rootHelper.insert (
-			taskLogger,
-			rootHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setId (
-				0l)
+		) {
 
-			.setCode (
-				"root")
+			rootHelper.insert (
+				taskLogger,
+				rootHelper.createInstance ()
 
-			.setFixturesSeed (
-				randomLogic.generateLowercase (
-					20))
+				.setId (
+					0l)
 
-		);
+				.setCode (
+					"root")
+
+				.setFixturesSeed (
+					randomLogic.generateLowercase (
+						20))
+
+			);
+
+		}
 
 	}
 

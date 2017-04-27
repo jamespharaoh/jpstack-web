@@ -38,7 +38,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -194,22 +194,14 @@ class ChatBroadcastSendAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		boolean verify =
-			requestContext.formIsPresent (
-				"verify");
-
-		boolean send =
-			requestContext.formIsPresent (
-				"send");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatBroadcastSendAction.goReal ()",
@@ -218,6 +210,14 @@ class ChatBroadcastSendAction
 		) {
 
 			// load form
+
+			boolean verify =
+				requestContext.formIsPresent (
+					"verify");
+
+			boolean send =
+				requestContext.formIsPresent (
+					"send");
 
 			FormFieldSet <?> searchFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
@@ -863,10 +863,6 @@ class ChatBroadcastSendAction
 
 			return responder (
 				"chatBroadcastSendResponder");
-
-		} catch (RuntimeException exception) {
-
-			throw exception;
 
 		}
 

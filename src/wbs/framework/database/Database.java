@@ -7,7 +7,7 @@ import wbs.framework.logging.TaskLogger;
 public
 interface Database {
 
-	Transaction beginTransaction (
+	OwnedTransaction beginTransaction (
 			TaskLogger parentTaskLogger,
 			String summary,
 			Object owner,
@@ -17,7 +17,7 @@ interface Database {
 			boolean makeCurrent);
 
 	default
-	Transaction beginReadWrite (
+	OwnedTransaction beginReadWrite (
 			TaskLogger parentTaskLogger,
 			String summary,
 			Object owner) {
@@ -34,7 +34,7 @@ interface Database {
 	}
 
 	default
-	Transaction beginReadOnly (
+	OwnedTransaction beginReadOnly (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String summary,
 			@NonNull Object owner) {
@@ -51,7 +51,7 @@ interface Database {
 	}
 
 	default
-	Transaction beginReadOnlyJoin (
+	OwnedTransaction beginReadOnlyJoin (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String summary,
 			@NonNull Object owner) {
@@ -67,7 +67,7 @@ interface Database {
 
 	}
 
-	Transaction currentTransaction ();
+	BorrowedTransaction currentTransaction ();
 
 	void flush ();
 	void clear ();

@@ -28,7 +28,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -114,128 +114,128 @@ class ChatUserImageUploadAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		fields =
-			chatUserImageConsoleModule.formFieldSetRequired (
-				"uploadForm",
-				ChatUserImageUploadForm.class);
-
-		chatUserImageType =
-			toEnum (
-				ChatUserImageType.class,
-				(String)
-				requestContext.stuff (
-					"chatUserImageType"));
-
-		uploadForm =
-			new ChatUserImageUploadForm ();
-
-		formFieldLogic.update (
-			taskLogger,
-			requestContext,
-			fields,
-			uploadForm,
-			ImmutableMap.of (),
-			"upload");
-
-		String resultType;
-		String extension;
-
-		byte[] resampledData;
-
-		switch (chatUserImageType) {
-
-		case video:
-
-			// resample the video
-
-			resampledData =
-				mediaLogic.videoConvertRequired (
-					taskLogger,
-					"3gpp",
-					uploadForm.upload ().data ());
-
-			// set others
-
-			resultType =
-				"video/3gpp";
-
-			extension =
-				"3gp";
-
-			break;
-
-		case image:
-
-			// read the image
-
-			Optional <BufferedImage> imageOptional =
-				mediaLogic.readImage (
-					taskLogger,
-					uploadForm.upload ().data (),
-					"image/jpeg");
-
-			if (
-				optionalIsNotPresent (
-					imageOptional)
-			) {
-
-				requestContext.addError (
-					stringFormat (
-						"Error reading image (content type was %s)",
-						ifNull (
-							uploadForm.upload ().contentType (),
-							"not specified")));
-
-				return null;
-
-			}
-
-			BufferedImage image =
-				imageOptional.get ();
-
-			// resample image
-
-			image =
-				mediaLogic.resampleImageToFit (
-					image,
-					320l,
-					240l);
-
-			resampledData =
-				mediaLogic.writeImage (
-					image,
-					"image/jpeg");
-
-			// set others
-
-			resultType =
-				"image/jpeg";
-
-			extension =
-				"jpg";
-
-			break;
-
-		default:
-
-			throw new RuntimeException ();
-
-		}
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserImageUploadAction.goReal ()",
 					this);
 
 		) {
+
+			fields =
+				chatUserImageConsoleModule.formFieldSetRequired (
+					"uploadForm",
+					ChatUserImageUploadForm.class);
+
+			chatUserImageType =
+				toEnum (
+					ChatUserImageType.class,
+					(String)
+					requestContext.stuff (
+						"chatUserImageType"));
+
+			uploadForm =
+				new ChatUserImageUploadForm ();
+
+			formFieldLogic.update (
+				taskLogger,
+				requestContext,
+				fields,
+				uploadForm,
+				ImmutableMap.of (),
+				"upload");
+
+			String resultType;
+			String extension;
+
+			byte[] resampledData;
+
+			switch (chatUserImageType) {
+
+			case video:
+
+				// resample the video
+
+				resampledData =
+					mediaLogic.videoConvertRequired (
+						taskLogger,
+						"3gpp",
+						uploadForm.upload ().data ());
+
+				// set others
+
+				resultType =
+					"video/3gpp";
+
+				extension =
+					"3gp";
+
+				break;
+
+			case image:
+
+				// read the image
+
+				Optional <BufferedImage> imageOptional =
+					mediaLogic.readImage (
+						taskLogger,
+						uploadForm.upload ().data (),
+						"image/jpeg");
+
+				if (
+					optionalIsNotPresent (
+						imageOptional)
+				) {
+
+					requestContext.addError (
+						stringFormat (
+							"Error reading image (content type was %s)",
+							ifNull (
+								uploadForm.upload ().contentType (),
+								"not specified")));
+
+					return null;
+
+				}
+
+				BufferedImage image =
+					imageOptional.get ();
+
+				// resample image
+
+				image =
+					mediaLogic.resampleImageToFit (
+						image,
+						320l,
+						240l);
+
+				resampledData =
+					mediaLogic.writeImage (
+						image,
+						"image/jpeg");
+
+				// set others
+
+				resultType =
+					"image/jpeg";
+
+				extension =
+					"jpg";
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 			ChatUserRec chatUser =
 				chatUserHelper.findFromContextRequired ();

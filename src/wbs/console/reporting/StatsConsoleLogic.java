@@ -46,75 +46,81 @@ class StatsConsoleLogic {
 			@NonNull StatsResolver resolver,
 			@NonNull StatsFormatter formatter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeGroup");
+		try (
 
-		// aggregate stats via resolver
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeGroup");
 
-		Set <Object> groups =
-			resolver.getGroups (
-				dataSetsByName,
-				grouper);
-
-		ResolvedStats resolved =
-			resolver.resolve (
-				dataSetsByName,
-				period,
-				groups);
-
-		List <Object> sortedGroups =
-			grouper.sortGroups (
-				groups);
-
-		// output
-
-		for (
-			Object group
-				: sortedGroups
 		) {
 
-			htmlTableRowOpen ();
+			// aggregate stats via resolver
 
-			grouper.writeTdForGroup (
-				taskLogger,
-				formatWriter,
-				group);
+			Set <Object> groups =
+				resolver.getGroups (
+					dataSetsByName,
+					grouper);
+
+			ResolvedStats resolved =
+				resolver.resolve (
+					dataSetsByName,
+					period,
+					groups);
+
+			List <Object> sortedGroups =
+				grouper.sortGroups (
+					groups);
+
+			// output
 
 			for (
-				int step = 0;
-				step < period.size ();
-				step ++
+				Object group
+					: sortedGroups
 			) {
 
-				Object combinedValue =
-					resolved.steps ().get (
-						new ImmutablePair<Object,Instant> (
-							group,
-							period.step (step)));
+				htmlTableRowOpen ();
 
-				formatter.format (
+				grouper.writeTdForGroup (
+					taskLogger,
 					formatWriter,
-					group,
-					period,
-					step,
-					optionalFromNullable (
-						combinedValue));
-
-			}
-
-			Object totalValue =
-				resolved.totals ().get (
 					group);
 
-			formatter.formatTotal (
-				formatWriter,
-				group,
-				Optional.fromNullable (
-					totalValue));
+				for (
+					int step = 0;
+					step < period.size ();
+					step ++
+				) {
 
-			htmlTableRowClose ();
+					Object combinedValue =
+						resolved.steps ().get (
+							new ImmutablePair<Object,Instant> (
+								group,
+								period.step (step)));
+
+					formatter.format (
+						formatWriter,
+						group,
+						period,
+						step,
+						optionalFromNullable (
+							combinedValue));
+
+				}
+
+				Object totalValue =
+					resolved.totals ().get (
+						group);
+
+				formatter.formatTotal (
+					formatWriter,
+					group,
+					Optional.fromNullable (
+						totalValue));
+
+				htmlTableRowClose ();
+
+			}
 
 		}
 

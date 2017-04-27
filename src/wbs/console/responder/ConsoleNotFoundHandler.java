@@ -4,10 +4,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.IOException;
-
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
@@ -81,81 +78,84 @@ class ConsoleNotFoundHandler
 	@Override
 	public
 	void handleNotFound (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleNotFound");
+		try (
 
-		// log it the old fashioned way
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleNotFound");
 
-		taskLogger.errorFormat (
-			"Path not found: %s",
-			requestContext.requestUri ());
-
-		// make an exception log of this calamity
-
-		try {
-
-			String path =
-				stringFormat (
-					"%s%s",
-					requestContext.servletPath (),
-					optionalOrEmptyString (
-						requestContext.pathInfo ()));
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"console",
-				path,
-				"Not found",
-				"The specified path was not found",
-				consoleUserHelper.loggedInUserId (),
-				GenericExceptionResolution.ignoreWithUserWarning);
-
-		} catch (RuntimeException exception) {
-
-			taskLogger.fatalFormatException (
-				exception,
-				"Error creating not found log: %s",
-				 exception.getMessage ());
-
-		}
-
-		// show the not found page
-
-		Optional <TabContext> tabContextOptional =
-			requestContext.tabContext ();
-
-		if (
-			optionalIsPresent (
-				tabContextOptional)
 		) {
 
-			tabbedPageProvider.get ()
+			// log it the old fashioned way
 
-				.tab (
-					notFoundTab)
+			taskLogger.errorFormat (
+				"Path not found: %s",
+				requestContext.requestUri ());
 
-				.title (
-					"Page not found")
+			// make an exception log of this calamity
 
-				.pagePart (
-					notFoundPartProvider.get ())
+			try {
 
-				.execute (
-					taskLogger);
+				String path =
+					stringFormat (
+						"%s%s",
+						requestContext.servletPath (),
+						optionalOrEmptyString (
+							requestContext.pathInfo ()));
 
-		} else {
+				exceptionLogger.logSimple (
+					taskLogger,
+					"console",
+					path,
+					"Not found",
+					"The specified path was not found",
+					consoleUserHelper.loggedInUserId (),
+					GenericExceptionResolution.ignoreWithUserWarning);
 
-			notFoundPageProvider.get ()
+			} catch (RuntimeException exception) {
 
-				.execute (
-					taskLogger);
+				taskLogger.fatalFormatException (
+					exception,
+					"Error creating not found log: %s",
+					 exception.getMessage ());
+
+			}
+
+			// show the not found page
+
+			Optional <TabContext> tabContextOptional =
+				requestContext.tabContext ();
+
+			if (
+				optionalIsPresent (
+					tabContextOptional)
+			) {
+
+				tabbedPageProvider.get ()
+
+					.tab (
+						notFoundTab)
+
+					.title (
+						"Page not found")
+
+					.pagePart (
+						notFoundPartProvider.get ())
+
+					.execute (
+						taskLogger);
+
+			} else {
+
+				notFoundPageProvider.get ()
+
+					.execute (
+						taskLogger);
+
+			}
 
 		}
 

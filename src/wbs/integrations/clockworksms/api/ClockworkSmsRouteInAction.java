@@ -28,7 +28,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
@@ -110,107 +110,113 @@ class ClockworkSmsRouteInAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processRequest");
+		try (
 
-		// convert request to string
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequest");
 
-		byte[] requestBytes =
-			requestContext.requestBodyRaw ();
+		) {
 
-		String requestString;
+			// convert request to string
 
-		try {
+			byte[] requestBytes =
+				requestContext.requestBodyRaw ();
 
-			requestString =
-				utf8ToStringSafe (
-					requestBytes);
+			String requestString;
 
-		} catch (IllegalArgumentException exception) {
+			try {
 
-			debugWriter.writeLineFormat (
-				"=== DECODE ERROR ===");
+				requestString =
+					utf8ToStringSafe (
+						requestBytes);
 
-			debugWriter.writeNewline ();
-
-			debugWriter.writeLineFormat (
-				"Error decoding unicode data: %s",
-				exception.getMessage ());
-
-			debugWriter.writeNewline ();
-
-			debugWriter.writeLineFormat (
-				"=== RAW REQUEST DATA ===");
-
-			debugWriter.writeNewline ();
-
-			for (
-				int position = 0;
-				position < requestBytes.length;
-				position += 32
-			) {
-
-				byte[] requestBytesChunk =
-					Arrays.copyOfRange (
-						requestBytes,
-						position,
-						min (
-							position + 32,
-							requestBytes.length));
+			} catch (IllegalArgumentException exception) {
 
 				debugWriter.writeLineFormat (
-					"%s %s",
-					String.format (
-						"%06x",
-						position),
-					bytesToHex (
-						requestBytesChunk));
+					"=== DECODE ERROR ===");
+
+				debugWriter.writeNewline ();
+
+				debugWriter.writeLineFormat (
+					"Error decoding unicode data: %s",
+					exception.getMessage ());
+
+				debugWriter.writeNewline ();
+
+				debugWriter.writeLineFormat (
+					"=== RAW REQUEST DATA ===");
+
+				debugWriter.writeNewline ();
+
+				for (
+					int position = 0;
+					position < requestBytes.length;
+					position += 32
+				) {
+
+					byte[] requestBytesChunk =
+						Arrays.copyOfRange (
+							requestBytes,
+							position,
+							min (
+								position + 32,
+								requestBytes.length));
+
+					debugWriter.writeLineFormat (
+						"%s %s",
+						String.format (
+							"%06x",
+							position),
+						bytesToHex (
+							requestBytesChunk));
+
+				}
+
+				debugWriter.writeLineFormat ();
+
+				throw exception;
 
 			}
 
-			debugWriter.writeLineFormat ();
+			debugWriter.writeLineFormat (
+				"=== REQUEST DATA ===");
 
-			throw exception;
+			debugWriter.writeNewline ();
+
+			debugWriter.writeString (
+				requestString);
+
+			debugWriter.writeNewline ();
+
+			debugWriter.writeNewline ();
+
+			// decode request
+
+			DataFromXml dataFromXml =
+				new DataFromXmlBuilder ()
+
+				.taskLogger (
+					taskLogger)
+
+				.registerBuilderClasses (
+					ClockworkSmsRouteInRequest.class)
+
+				.build ();
+
+			taskLogger.makeException ();
+
+			request =
+				(ClockworkSmsRouteInRequest)
+				dataFromXml.readInputStream (
+					taskLogger,
+					new ByteArrayInputStream (
+						requestBytes),
+					"clockwork-sms-route-in.xml",
+					emptyList ());
 
 		}
-
-		debugWriter.writeLineFormat (
-			"=== REQUEST DATA ===");
-
-		debugWriter.writeNewline ();
-
-		debugWriter.writeString (
-			requestString);
-
-		debugWriter.writeNewline ();
-
-		debugWriter.writeNewline ();
-
-		// decode request
-
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
-
-			.taskLogger (
-				taskLogger)
-
-			.registerBuilderClasses (
-				ClockworkSmsRouteInRequest.class)
-
-			.build ();
-
-		taskLogger.makeException ();
-
-		request =
-			(ClockworkSmsRouteInRequest)
-			dataFromXml.readInputStream (
-				taskLogger,
-				new ByteArrayInputStream (
-					requestBytes),
-				"clockwork-sms-route-in.xml",
-				emptyList ());
 
 	}
 
@@ -219,16 +225,14 @@ class ClockworkSmsRouteInAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ClockworkSmsRouteInAction.handle ()",
@@ -352,14 +356,14 @@ class ClockworkSmsRouteInAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",

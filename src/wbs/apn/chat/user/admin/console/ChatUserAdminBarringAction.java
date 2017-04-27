@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -76,129 +76,136 @@ class ChatUserAdminBarringAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		if (
-			! requestContext.canContext (
-				"chat.userAdmin")
-		) {
-
-			requestContext.addError (
-				"Access denied");
-
-			return null;
-
-		}
-
-		// get params
-
-		Boolean barOn =
-			requestContext.parameterOn (
-				"bar_on");
-
-		Boolean barOff =
-			requestContext.parameterOn (
-				"bar_off");
-
-		String reason =
-			stringTrim (
-				requestContext.parameterRequired (
-					"reason"));
-
-		// check params
-
-		if (
-
-			(! barOn && ! barOff)
-
-			|| stringIsEmpty (
-				reason)
-
-		) {
-
-			requestContext.addError (
-				"Please fill in the form properly");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminBarringAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			// lookup database stuff
+			if (
+				! requestContext.canContext (
+					"chat.userAdmin")
+			) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				requestContext.addError (
+					"Access denied");
 
-			// do the work
-
-			String eventType = null;
-			String notice = null;
-
-			if (barOn) {
-
-				chatUserLogic.logoff (
-					chatUser,
-					true);
-
-				chatUser
-
-					.setBarred (
-						true);
-
-				eventType =
-					"chat_user_barred";
-
-				notice =
-					"Chat user barred";
-
-			} else if (barOff) {
-
-				chatUser
-
-					.setBarred (
-						false);
-
-				eventType =
-					"chat_user_unbarred";
-
-				notice =
-					"Chat user unbarred";
-
-			} else {
-
-				throw shouldNeverHappen ();
+				return null;
 
 			}
 
-			// create an event
+			// get params
 
-			eventLogic.createEvent (
-				taskLogger,
-				eventType,
-				userConsoleLogic.userRequired (),
-				chatUser,
-				reason);
+			Boolean barOn =
+				requestContext.parameterOn (
+					"bar_on");
 
-			transaction.commit ();
+			Boolean barOff =
+				requestContext.parameterOn (
+					"bar_off");
 
-			// return
+			String reason =
+				stringTrim (
+					requestContext.parameterRequired (
+						"reason"));
 
-			requestContext.addNotice (
-				notice);
+			// check params
 
-			return null;
+			if (
+
+				(! barOn && ! barOff)
+
+				|| stringIsEmpty (
+					reason)
+
+			) {
+
+				requestContext.addError (
+					"Please fill in the form properly");
+
+				return null;
+
+			}
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatUserAdminBarringAction.goReal ()",
+						this);
+
+			) {
+
+				// lookup database stuff
+
+				ChatUserRec chatUser =
+					chatUserHelper.findFromContextRequired ();
+
+				// do the work
+
+				String eventType = null;
+				String notice = null;
+
+				if (barOn) {
+
+					chatUserLogic.logoff (
+						taskLogger,
+						chatUser,
+						true);
+
+					chatUser
+
+						.setBarred (
+							true);
+
+					eventType =
+						"chat_user_barred";
+
+					notice =
+						"Chat user barred";
+
+				} else if (barOff) {
+
+					chatUser
+
+						.setBarred (
+							false);
+
+					eventType =
+						"chat_user_unbarred";
+
+					notice =
+						"Chat user unbarred";
+
+				} else {
+
+					throw shouldNeverHappen ();
+
+				}
+
+				// create an event
+
+				eventLogic.createEvent (
+					taskLogger,
+					eventType,
+					userConsoleLogic.userRequired (),
+					chatUser,
+					reason);
+
+				transaction.commit ();
+
+				// return
+
+				requestContext.addNotice (
+					notice);
+
+				return null;
+
+			}
 
 		}
 

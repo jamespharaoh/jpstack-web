@@ -178,15 +178,22 @@ class ChatSupervisorConversationPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderDetails (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderHistory ();
+		) {
+
+			renderDetails (
+				taskLogger);
+
+			renderHistory (
+				taskLogger);
+
+		}
 
 	}
 
@@ -194,230 +201,248 @@ class ChatSupervisorConversationPart
 	void renderDetails (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderDetails");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderDetails");
 
-		// party
+		) {
 
-		htmlTableHeaderRowHtml (
-			"Party",
-			"<strong>monitor</strong>",
-			"<strong>user</strong>");
+			htmlTableOpenDetails ();
 
-		htmlTableRowOpen ();
+			// party
 
-		htmlTableHeaderCellWrite (
-			"User number");
+			htmlTableHeaderRowHtml (
+				"Party",
+				"<strong>monitor</strong>",
+				"<strong>user</strong>");
 
-		objectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			monitorChatUser,
-			chat);
+			htmlTableRowOpen ();
 
-		objectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			userChatUser,
-			chat);
+			htmlTableHeaderCellWrite (
+				"User number");
 
-		htmlTableRowClose ();
-
-		// name
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"Name");
-
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				monitorChatUser.getName ()));
-
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				userChatUser.getName ()));
-
-		htmlTableRowClose ();
-
-		// info
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"Info");
-
-		htmlTableCellWrite (
-			ifNotNullThenElseEmDash (
-				monitorChatUser.getInfoText (),
-				() -> monitorChatUser.getInfoText ().getText ()));
-
-		htmlTableCellWrite (
-			ifNotNullThenElseEmDash (
-				userChatUser.getInfoText (),
-				() -> userChatUser.getInfoText ().getText ()));
-
-		htmlTableRowClose ();
-
-		// pic
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"Pic");
-
-		htmlTableCellWriteHtml (
-			ifNotEmptyThenElse (
-				monitorChatUser.getChatUserImageList (),
-
-			() -> mediaConsoleLogic.writeMediaThumb100 (
+			objectManager.writeTdForObjectMiniLink (
 				taskLogger,
-				formatWriter,
-				monitorChatUser.getChatUserImageList ().get (0)
-					.getMedia ()),
+				monitorChatUser,
+				chat);
 
-			() -> formatWriter.writeFormat (
-				"—")
-
-		));
-
-		htmlTableCellWriteHtml (
-			ifNotEmptyThenElse (
-				userChatUser.getChatUserImageList (),
-
-			() -> mediaConsoleLogic.writeMediaThumb100 (
+			objectManager.writeTdForObjectMiniLink (
 				taskLogger,
-				formatWriter,
-				userChatUser.getChatUserImageList ().get (0).getMedia ()),
+				userChatUser,
+				chat);
 
-			() -> formatWriter.writeFormat (
-				"—")
+			htmlTableRowClose ();
 
-		));
+			// name
 
-		htmlTableRowClose ();
+			htmlTableRowOpen ();
 
-		// location
+			htmlTableHeaderCellWrite (
+				"Name");
 
-		htmlTableRowOpen ();
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					monitorChatUser.getName ()));
 
-		htmlTableHeaderCellWrite (
-			"Location");
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					userChatUser.getName ()));
 
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				monitorChatUser.getLocationPlace ()));
+			htmlTableRowClose ();
 
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				userChatUser.getLocationPlace ()));
+			// info
 
-		htmlTableRowClose ();
+			htmlTableRowOpen ();
 
-		// close table
+			htmlTableHeaderCellWrite (
+				"Info");
 
-		htmlTableClose ();
+			htmlTableCellWrite (
+				ifNotNullThenElseEmDash (
+					monitorChatUser.getInfoText (),
+					() -> monitorChatUser.getInfoText ().getText ()));
+
+			htmlTableCellWrite (
+				ifNotNullThenElseEmDash (
+					userChatUser.getInfoText (),
+					() -> userChatUser.getInfoText ().getText ()));
+
+			htmlTableRowClose ();
+
+			// pic
+
+			htmlTableRowOpen ();
+
+			htmlTableHeaderCellWrite (
+				"Pic");
+
+			htmlTableCellWriteHtml (
+				ifNotEmptyThenElse (
+					monitorChatUser.getChatUserImageList (),
+
+				() -> mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
+					formatWriter,
+					monitorChatUser.getChatUserImageList ().get (0)
+						.getMedia ()),
+
+				() -> formatWriter.writeFormat (
+					"—")
+
+			));
+
+			htmlTableCellWriteHtml (
+				ifNotEmptyThenElse (
+					userChatUser.getChatUserImageList (),
+
+				() -> mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
+					formatWriter,
+					userChatUser.getChatUserImageList ().get (0).getMedia ()),
+
+				() -> formatWriter.writeFormat (
+					"—")
+
+			));
+
+			htmlTableRowClose ();
+
+			// location
+
+			htmlTableRowOpen ();
+
+			htmlTableHeaderCellWrite (
+				"Location");
+
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					monitorChatUser.getLocationPlace ()));
+
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					userChatUser.getLocationPlace ()));
+
+			htmlTableRowClose ();
+
+			// close table
+
+			htmlTableClose ();
+
+		}
 
 	}
 
 	private
-	void renderHistory () {
+	void renderHistory (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlHeadingTwoWrite (
-			"History");
+		try (
 
-		// open table
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHistory");
 
-		htmlTableOpenList ();
-
-		// header row
-
-		htmlTableHeaderRowWrite (
-			"Time",
-			"Message",
-			"Monitor");
-
-		DateTimeZone timezone =
-			chatMiscLogic.timezone (
-				chat);
-
-		LocalDate previousDate = null;
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			LocalDate nextDate =
-				chatMessage.getTimestamp ()
+			htmlHeadingTwoWrite (
+				"History");
 
-				.toDateTime (
-					timezone)
+			// open table
 
-				.toLocalDate ();
+			htmlTableOpenList ();
 
-			if (
+			// header row
 
-				isNull (
-					previousDate)
+			htmlTableHeaderRowWrite (
+				"Time",
+				"Message",
+				"Monitor");
 
-				|| localDateNotEqual (
-					nextDate,
-					previousDate)
+			DateTimeZone timezone =
+				chatMiscLogic.timezone (
+					chat);
 
+			LocalDate previousDate = null;
+
+			for (
+				ChatMessageRec chatMessage
+					: chatMessages
 			) {
 
-				htmlTableRowSeparatorWrite ();
+				LocalDate nextDate =
+					chatMessage.getTimestamp ()
+
+					.toDateTime (
+						timezone)
+
+					.toLocalDate ();
+
+				if (
+
+					isNull (
+						previousDate)
+
+					|| localDateNotEqual (
+						nextDate,
+						previousDate)
+
+				) {
+
+					htmlTableRowSeparatorWrite ();
+
+					formatWriter.writeLineFormat (
+						"<tr style=\"font-weight: bold\">");
+
+					formatWriter.increaseIndent ();
+
+					formatWriter.writeLineFormat (
+						"<td colspan=\"3\">%h</td>",
+						timeFormatter.dateStringLong (
+							chatTimezone,
+							chatMessage.getTimestamp ()));
+
+					htmlTableRowClose ();
+
+					previousDate =
+						nextDate;
+
+				}
 
 				formatWriter.writeLineFormat (
-					"<tr style=\"font-weight: bold\">");
+					"<tr class=\"%h\">",
+					chatMessage.getFromUser () == userChatUser
+						? "message-in"
+						: "message-out");
 
 				formatWriter.increaseIndent ();
 
-				formatWriter.writeLineFormat (
-					"<td colspan=\"3\">%h</td>",
-					timeFormatter.dateStringLong (
+				htmlTableCellWrite (
+					timeFormatter.timeString (
 						chatTimezone,
 						chatMessage.getTimestamp ()));
 
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatMessage.getEditedText (),
+						() -> spacify (
+							chatMessage.getEditedText ().getText ())));
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatMessage.getSender (),
+						() -> chatMessage.getSender ().getUsername ()));
+
 				htmlTableRowClose ();
 
-				previousDate =
-					nextDate;
-
 			}
-
-			formatWriter.writeLineFormat (
-				"<tr class=\"%h\">",
-				chatMessage.getFromUser () == userChatUser
-					? "message-in"
-					: "message-out");
-
-			formatWriter.increaseIndent ();
-
-			htmlTableCellWrite (
-				timeFormatter.timeString (
-					chatTimezone,
-					chatMessage.getTimestamp ()));
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatMessage.getEditedText (),
-					() -> spacify (
-						chatMessage.getEditedText ().getText ())));
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatMessage.getSender (),
-					() -> chatMessage.getSender ().getUsername ()));
 
 			htmlTableRowClose ();
 
 		}
-
-		htmlTableRowClose ();
 
 	}
 

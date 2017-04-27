@@ -5,8 +5,9 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -91,18 +92,24 @@ class TicketFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItems (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createTicketManager (
-			taskLogger);
+		) {
+
+			createMenuItems (
+				taskLogger);
+
+			createTicketManager (
+				taskLogger);
+
+		}
 
 	}
 
@@ -110,43 +117,49 @@ class TicketFixtureProvider
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuHelper.insert (
-			taskLogger,
-			menuHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"ticket_manager")
+			menuHelper.insert (
+				taskLogger,
+				menuHelper.createInstance ()
 
-			.setName (
-				"Ticket Manager Chat")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setDescription (
-				"Ticket manager description")
+				.setCode (
+					"ticket_manager")
 
-			.setLabel (
-				"Ticket Manager")
+				.setName (
+					"Ticket Manager Chat")
 
-			.setTargetPath (
-				"/ticketManagers")
+				.setDescription (
+					"Ticket manager description")
 
-			.setLabel (
-				"Ticket Manager")
+				.setLabel (
+					"Ticket Manager")
 
-			.setTargetFrame (
-				"main")
+				.setTargetPath (
+					"/ticketManagers")
 
-		);
+				.setLabel (
+					"Ticket Manager")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 
@@ -154,470 +167,476 @@ class TicketFixtureProvider
 	void createTicketManager (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createTicketManager");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTicketManager");
 
-		TicketManagerRec ticketManager =
-			ticketManagerHelper.insert (
-				taskLogger,
-				ticketManagerHelper.createInstance ()
-
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
-
-			.setCode (
-				"ticket_manager")
-
-			.setName (
-				"My ticket manager")
-
-			.setDescription (
-				"Ticket manager description")
-
-		);
-
-		database.flush ();
-
-		TicketStateRec submittedState =
-			ticketStateHelper.insert (
-				taskLogger,
-				ticketStateHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"submitted")
-
-			.setName (
-				"Submitted")
-
-			.setDescription (
-				"Submitted")
-
-			.setShowInQueue (
-				true)
-
-			.setMinimum (
-				0l)
-
-			.setMaximum (
-				0l)
-
-			.setPreferredQueueTime (
-				15l)
-
-		);
-
-		// accepted state
-
-		ticketStateHelper.insert (
-			taskLogger,
-			ticketStateHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"accepted")
-
-			.setName (
-				"Accepted")
-
-			.setDescription (
-				"Accepted")
-
-			.setShowInQueue (
-				true)
-
-			.setMinimum (
-				60l)
-
-			.setMaximum (
-				120l)
-
-			.setPreferredQueueTime (
-				15l)
-
-		);
-
-		// pending state
-
-		ticketStateHelper.insert (
-			taskLogger,
-			ticketStateHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"pending")
-
-			.setName (
-				"Pending")
-
-			.setDescription (
-				"Pending")
-
-			.setShowInQueue (
-				true)
-
-			.setMinimum (
-				300l)
-
-			.setMaximum (
-				600l)
-
-			.setPreferredQueueTime (
-				15l)
-
-		);
-
-		// solved state
-
-		ticketStateHelper.insert (
-			taskLogger,
-			ticketStateHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"solved")
-
-			.setName (
-				"Solved")
-
-			.setDescription (
-				"Solved")
-
-			.setShowInQueue (
-				true)
-
-			.setMinimum (
-				60l)
-
-			.setMaximum (
-				120l)
-
-			.setPreferredQueueTime (
-				15l)
-
-		);
-
-		// closed state
-
-		ticketStateHelper.insert (
-			taskLogger,
-			ticketStateHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"closed")
-
-			.setName (
-				"Closed")
-
-			.setDescription (
-				"Closed")
-
-			.setShowInQueue (
-				true)
-
-			.setMinimum (
-				0l)
-
-			.setMaximum (
-				0l)
-
-			.setPreferredQueueTime (
-				15l)
-
-		);
-
-		database.flush ();
-
-		TicketRec ticket =
-			ticketHelper.insert (
-				taskLogger,
-				ticketHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				randomLogic.generateNumericNoZero (8))
-
-			.setTicketState (
-				submittedState)
-
-			.setTimestamp (
-				transaction.now ())
-
-		);
-
-		TicketFieldTypeRec booleanType =
-			ticketFieldTypeHelper.insert (
-				taskLogger,
-				ticketFieldTypeHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"read")
-
-			.setName (
-				"Read")
-
-			.setDescription (
-				"Read")
-
-			.setDataType (
-				TicketFieldDataType.bool)
-
-			.setRequired (
-				true)
-
-			.setVisible (
-				true)
-
-		);
-
-		TicketFieldTypeRec numberType =
-			ticketFieldTypeHelper.insert (
-				taskLogger,
-				ticketFieldTypeHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"number")
-
-			.setName (
-				"Number")
-
-			.setDescription (
-				"Number")
-
-			.setDataType (
-				TicketFieldDataType.number)
-
-			.setRequired (
-				true)
-
-			.setVisible (
-				true)
-
-		);
-
-		TicketFieldTypeRec stringType =
-			ticketFieldTypeHelper.insert (
-				taskLogger,
-				ticketFieldTypeHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"text")
-
-			.setName (
-				"Text")
-
-			.setDescription (
-				"Text")
-
-			.setDataType (
-				TicketFieldDataType.string)
-
-			.setRequired (
-				true)
-
-			.setVisible (
-				true)
-
-		);
-
-		TicketFieldTypeRec chatUserType =
-			ticketFieldTypeHelper.insert (
-				taskLogger,
-				ticketFieldTypeHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager)
-
-			.setCode (
-				"chat_user")
-
-			.setName (
-				"Chat user")
-
-			.setDescription (
-				"Chat user")
-
-			.setDataType (
-				TicketFieldDataType.object)
-
-			.setObjectType (
-				objectTypeHelper.findByCodeRequired (
-					GlobalId.root,
-					"chat_user"))
-
-			.setRequired (
-				true)
-
-			.setVisible (
-				true)
-
-		);
-
-		ticketFieldValueHelper.insert (
-			taskLogger,
-			ticketFieldValueHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setTicketFieldType (
-				numberType)
-
-			.setIntegerValue (
-				10l)
-
-		);
-
-		ticketFieldValueHelper.insert (
-			taskLogger,
-			ticketFieldValueHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setTicketFieldType (
-				stringType)
-
-			.setStringValue (
-				"Value")
-
-		);
-
-		ticketFieldValueHelper.insert (
-			taskLogger,
-			ticketFieldValueHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setTicketFieldType (
-				booleanType)
-
-			.setBooleanValue (
-				true)
-
-		);
-
-		ticketFieldValueHelper.insert (
-			taskLogger,
-			ticketFieldValueHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setTicketFieldType (
-				chatUserType)
-
-			.setIntegerValue (
-				1l)
-
-		);
-
-		ticketNoteHelper.insert (
-			taskLogger,
-			ticketNoteHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setIndex (
-				ticket.getNumNotes ())
-
-			.setNoteText (
-				"Ticket note 1 text")
-
-		);
-
-		ticket
-			.setNumNotes (
-				ticket.getNumNotes () + 1);
-
-		ticketNoteHelper.insert (
-			taskLogger,
-			ticketNoteHelper.createInstance ()
-
-			.setTicket (
-				ticket)
-
-			.setIndex (
-				ticket.getNumNotes ())
-
-			.setNoteText (
-				"Ticket note 2 text")
-
-		);
-
-		ticket
-
-			.setNumNotes (
-				ticket.getNumNotes () + 1);
-
-		// ticket template
-
-		/*
-		for (
-			TicketStateState state
-				: TicketStateState.values ()
 		) {
 
-		TicketTemplateRec template =
-			ticketTemplateHelper.insert (
-				new TicketTemplateRec ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			TicketManagerRec ticketManager =
+				ticketManagerHelper.insert (
+					taskLogger,
+					ticketManagerHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					"ticket_manager")
+
+				.setName (
+					"My ticket manager")
+
+				.setDescription (
+					"Ticket manager description")
+
+			);
+
+			database.flush ();
+
+			TicketStateRec submittedState =
+				ticketStateHelper.insert (
+					taskLogger,
+					ticketStateHelper.createInstance ()
 
 				.setTicketManager (
 					ticketManager)
 
 				.setCode (
-					stringFormat (
-						"template_%s",
-						state.toString()))
+					"submitted")
 
 				.setName (
-					stringFormat (
-						"Template %s",
-						state.toString ()))
+					"Submitted")
 
-				.setTicketState (
-					ticketStateHelper.findByCode (
-						ticketManager,
-						state.toString ()))
+				.setDescription (
+					"Submitted")
+
+				.setShowInQueue (
+					true)
+
+				.setMinimum (
+					0l)
+
+				.setMaximum (
+					0l)
+
+				.setPreferredQueueTime (
+					15l)
 
 			);
 
-			ticketManager.getTicketTemplates ().add (
-				template);
+			// accepted state
+
+			ticketStateHelper.insert (
+				taskLogger,
+				ticketStateHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"accepted")
+
+				.setName (
+					"Accepted")
+
+				.setDescription (
+					"Accepted")
+
+				.setShowInQueue (
+					true)
+
+				.setMinimum (
+					60l)
+
+				.setMaximum (
+					120l)
+
+				.setPreferredQueueTime (
+					15l)
+
+			);
+
+			// pending state
+
+			ticketStateHelper.insert (
+				taskLogger,
+				ticketStateHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"pending")
+
+				.setName (
+					"Pending")
+
+				.setDescription (
+					"Pending")
+
+				.setShowInQueue (
+					true)
+
+				.setMinimum (
+					300l)
+
+				.setMaximum (
+					600l)
+
+				.setPreferredQueueTime (
+					15l)
+
+			);
+
+			// solved state
+
+			ticketStateHelper.insert (
+				taskLogger,
+				ticketStateHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"solved")
+
+				.setName (
+					"Solved")
+
+				.setDescription (
+					"Solved")
+
+				.setShowInQueue (
+					true)
+
+				.setMinimum (
+					60l)
+
+				.setMaximum (
+					120l)
+
+				.setPreferredQueueTime (
+					15l)
+
+			);
+
+			// closed state
+
+			ticketStateHelper.insert (
+				taskLogger,
+				ticketStateHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"closed")
+
+				.setName (
+					"Closed")
+
+				.setDescription (
+					"Closed")
+
+				.setShowInQueue (
+					true)
+
+				.setMinimum (
+					0l)
+
+				.setMaximum (
+					0l)
+
+				.setPreferredQueueTime (
+					15l)
+
+			);
+
+			database.flush ();
+
+			TicketRec ticket =
+				ticketHelper.insert (
+					taskLogger,
+					ticketHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					randomLogic.generateNumericNoZero (8))
+
+				.setTicketState (
+					submittedState)
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
+
+			TicketFieldTypeRec booleanType =
+				ticketFieldTypeHelper.insert (
+					taskLogger,
+					ticketFieldTypeHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"read")
+
+				.setName (
+					"Read")
+
+				.setDescription (
+					"Read")
+
+				.setDataType (
+					TicketFieldDataType.bool)
+
+				.setRequired (
+					true)
+
+				.setVisible (
+					true)
+
+			);
+
+			TicketFieldTypeRec numberType =
+				ticketFieldTypeHelper.insert (
+					taskLogger,
+					ticketFieldTypeHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"number")
+
+				.setName (
+					"Number")
+
+				.setDescription (
+					"Number")
+
+				.setDataType (
+					TicketFieldDataType.number)
+
+				.setRequired (
+					true)
+
+				.setVisible (
+					true)
+
+			);
+
+			TicketFieldTypeRec stringType =
+				ticketFieldTypeHelper.insert (
+					taskLogger,
+					ticketFieldTypeHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"text")
+
+				.setName (
+					"Text")
+
+				.setDescription (
+					"Text")
+
+				.setDataType (
+					TicketFieldDataType.string)
+
+				.setRequired (
+					true)
+
+				.setVisible (
+					true)
+
+			);
+
+			TicketFieldTypeRec chatUserType =
+				ticketFieldTypeHelper.insert (
+					taskLogger,
+					ticketFieldTypeHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager)
+
+				.setCode (
+					"chat_user")
+
+				.setName (
+					"Chat user")
+
+				.setDescription (
+					"Chat user")
+
+				.setDataType (
+					TicketFieldDataType.object)
+
+				.setObjectType (
+					objectTypeHelper.findByCodeRequired (
+						GlobalId.root,
+						"chat_user"))
+
+				.setRequired (
+					true)
+
+				.setVisible (
+					true)
+
+			);
+
+			ticketFieldValueHelper.insert (
+				taskLogger,
+				ticketFieldValueHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setTicketFieldType (
+					numberType)
+
+				.setIntegerValue (
+					10l)
+
+			);
+
+			ticketFieldValueHelper.insert (
+				taskLogger,
+				ticketFieldValueHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setTicketFieldType (
+					stringType)
+
+				.setStringValue (
+					"Value")
+
+			);
+
+			ticketFieldValueHelper.insert (
+				taskLogger,
+				ticketFieldValueHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setTicketFieldType (
+					booleanType)
+
+				.setBooleanValue (
+					true)
+
+			);
+
+			ticketFieldValueHelper.insert (
+				taskLogger,
+				ticketFieldValueHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setTicketFieldType (
+					chatUserType)
+
+				.setIntegerValue (
+					1l)
+
+			);
+
+			ticketNoteHelper.insert (
+				taskLogger,
+				ticketNoteHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setIndex (
+					ticket.getNumNotes ())
+
+				.setNoteText (
+					"Ticket note 1 text")
+
+			);
+
+			ticket
+				.setNumNotes (
+					ticket.getNumNotes () + 1);
+
+			ticketNoteHelper.insert (
+				taskLogger,
+				ticketNoteHelper.createInstance ()
+
+				.setTicket (
+					ticket)
+
+				.setIndex (
+					ticket.getNumNotes ())
+
+				.setNoteText (
+					"Ticket note 2 text")
+
+			);
+
+			ticket
+
+				.setNumNotes (
+					ticket.getNumNotes () + 1);
+
+			// ticket template
+
+			/*
+			for (
+				TicketStateState state
+					: TicketStateState.values ()
+			) {
+
+			TicketTemplateRec template =
+				ticketTemplateHelper.insert (
+					new TicketTemplateRec ()
+
+					.setTicketManager (
+						ticketManager)
+
+					.setCode (
+						stringFormat (
+							"template_%s",
+							state.toString()))
+
+					.setName (
+						stringFormat (
+							"Template %s",
+							state.toString ()))
+
+					.setTicketState (
+						ticketStateHelper.findByCode (
+							ticketManager,
+							state.toString ()))
+
+				);
+
+				ticketManager.getTicketTemplates ().add (
+					template);
+
+			}
+			*/
 
 		}
-		*/
 
 	}
 

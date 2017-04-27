@@ -28,8 +28,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
@@ -162,157 +162,163 @@ class ChatInfoLogicImplementation
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserInfo");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserInfo");
 
-		ChatRec chat =
-			thisUser.getChat ();
-
-		// update chat user with last info stats and charge
-
-		chatCreditLogic.userSpend (
-			taskLogger,
-			thisUser,
-			0,
-			0,
-			1,
-			0,
-			0);
-
-		thisUser
-
-			.setLastInfo (
-				transaction.now ());
-
-		// update contact record with last info stats
-
-		ChatContactRec contact =
-			chatContactHelper.findOrCreate (
-				taskLogger,
-				otherUser,
-				thisUser);
-
-		contact
-
-			.setLastInfoTime (
-				transaction.now ());
-
-		// work out distance
-
-		long miles =
-			roundToIntegerRequired (
-				locatorLogic.distanceMiles (
-					thisUser.getLocationLongLat (),
-					otherUser.getLocationLongLat ()));
-
-		// construct message parts
-
-		String userId =
-			otherUser.getName () == null
-				? otherUser.getCode ()
-				: otherUser.getName () + " " + otherUser.getCode ();
-
-		String distanceText =
-			 "" + miles + (miles == 1 ? " mile" : " miles");
-
-		MessageSplitter.Templates templates =
-			chatTemplateLogic.splitter (
-				chat,
-				otherUser.getType () == ChatUserType.monitor
-					? "info_monitor"
-					: "info_user",
-				ImmutableMap.<String,String>builder ()
-
-					.put (
-						"user",
-						userId)
-
-					.put (
-						"distance",
-						distanceText)
-
-					.build ());
-
-		List<String> stringParts;
-
-		try {
-
-			stringParts =
-				MessageSplitter.split (
-					otherUser.getInfoText ().getText (),
-					templates);
-
-		} catch (IllegalArgumentException exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error splitting message");
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"unknown",
-				"chatLogic.sendUserInfo (...)",
-				"MessageSplitter.split (...) threw IllegalArgumentException",
-
-				stringFormat (
-					"Error probably caused by illegal characters in user's ",
-					"info. Ignoring error.\n",
-					"\n",
-					"thisUser.id = " + thisUser.getId () + "\n",
-					"otherUser.id = " + otherUser.getId () + "\n",
-					"\n",
-					"%s",
-					exceptionLogic.throwableDump (
-						taskLogger,
-						exception)),
-
-				Optional.absent (),
-				GenericExceptionResolution.ignoreWithNoWarning);
-
-			return;
-
-		}
-
-		// send the message
-
-		String serviceCode =
-			asDating
-				? "date_text"
-				: "online_text";
-
-		List<TextRec> textParts =
-			new ArrayList<TextRec> ();
-
-		for (
-			String part
-				: stringParts
 		) {
 
-			textParts.add (
-				textHelper.findOrCreate (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ChatRec chat =
+				thisUser.getChat ();
+
+			// update chat user with last info stats and charge
+
+			chatCreditLogic.userSpend (
+				taskLogger,
+				thisUser,
+				0,
+				0,
+				1,
+				0,
+				0);
+
+			thisUser
+
+				.setLastInfo (
+					transaction.now ());
+
+			// update contact record with last info stats
+
+			ChatContactRec contact =
+				chatContactHelper.findOrCreate (
 					taskLogger,
-					part));
+					otherUser,
+					thisUser);
+
+			contact
+
+				.setLastInfoTime (
+					transaction.now ());
+
+			// work out distance
+
+			long miles =
+				roundToIntegerRequired (
+					locatorLogic.distanceMiles (
+						thisUser.getLocationLongLat (),
+						otherUser.getLocationLongLat ()));
+
+			// construct message parts
+
+			String userId =
+				otherUser.getName () == null
+					? otherUser.getCode ()
+					: otherUser.getName () + " " + otherUser.getCode ();
+
+			String distanceText =
+				 "" + miles + (miles == 1 ? " mile" : " miles");
+
+			MessageSplitter.Templates templates =
+				chatTemplateLogic.splitter (
+					chat,
+					otherUser.getType () == ChatUserType.monitor
+						? "info_monitor"
+						: "info_user",
+					ImmutableMap.<String,String>builder ()
+
+						.put (
+							"user",
+							userId)
+
+						.put (
+							"distance",
+							distanceText)
+
+						.build ());
+
+			List <String> stringParts;
+
+			try {
+
+				stringParts =
+					MessageSplitter.split (
+						otherUser.getInfoText ().getText (),
+						templates);
+
+			} catch (IllegalArgumentException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error splitting message");
+
+				exceptionLogger.logSimple (
+					taskLogger,
+					"unknown",
+					"chatLogic.sendUserInfo (...)",
+					"MessageSplitter.split (...) threw IllegalArgumentException",
+
+					stringFormat (
+						"Error probably caused by illegal characters in user's ",
+						"info. Ignoring error.\n",
+						"\n",
+						"thisUser.id = " + thisUser.getId () + "\n",
+						"otherUser.id = " + otherUser.getId () + "\n",
+						"\n",
+						"%s",
+						exceptionLogic.throwableDump (
+							taskLogger,
+							exception)),
+
+					Optional.absent (),
+					GenericExceptionResolution.ignoreWithNoWarning);
+
+				return;
+
+			}
+
+			// send the message
+
+			String serviceCode =
+				asDating
+					? "date_text"
+					: "online_text";
+
+			List<TextRec> textParts =
+				new ArrayList<TextRec> ();
+
+			for (
+				String part
+					: stringParts
+			) {
+
+				textParts.add (
+					textHelper.findOrCreate (
+						taskLogger,
+						part));
+
+			}
+
+			chatSendLogic.sendMessageMagic (
+				taskLogger,
+				thisUser,
+				threadIdOptional,
+				textParts,
+				commandHelper.findByCodeRequired (
+					chat,
+					"chat"),
+				serviceHelper.findByCodeRequired (
+					chat,
+					serviceCode),
+				otherUser.getId (),
+				optionalAbsent ());
 
 		}
-
-		chatSendLogic.sendMessageMagic (
-			taskLogger,
-			thisUser,
-			threadIdOptional,
-			textParts,
-			commandHelper.findByCodeRequired (
-				chat,
-				"chat"),
-			serviceHelper.findByCodeRequired (
-				chat,
-				serviceCode),
-			otherUser.getId (),
-			optionalAbsent ());
 
 	}
 
@@ -324,46 +330,52 @@ class ChatInfoLogicImplementation
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserInfos");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserInfos");
 
-		// ignore deleted users
-
-		if (thisUser.getNumber () == null)
-			return 0;
-
-		Instant cutoffTime =
-			transaction.now ()
-				.toDateTime ()
-				.minusWeeks (1)
-				.toInstant ();
-
-		Collection <ChatUserRec> otherUsers =
-			getNearbyOnlineUsersForInfo (
-				thisUser,
-				cutoffTime,
-				numToSend);
-
-		for (
-			ChatUserRec otherUser
-				: otherUsers
 		) {
 
-			sendUserInfo (
-				taskLogger,
-				thisUser,
-				otherUser,
-				threadIdOptional,
-				false);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			// ignore deleted users
+
+			if (thisUser.getNumber () == null)
+				return 0;
+
+			Instant cutoffTime =
+				transaction.now ()
+					.toDateTime ()
+					.minusWeeks (1)
+					.toInstant ();
+
+			Collection <ChatUserRec> otherUsers =
+				getNearbyOnlineUsersForInfo (
+					thisUser,
+					cutoffTime,
+					numToSend);
+
+			for (
+				ChatUserRec otherUser
+					: otherUsers
+			) {
+
+				sendUserInfo (
+					taskLogger,
+					thisUser,
+					otherUser,
+					threadIdOptional,
+					false);
+
+			}
+
+			return otherUsers.size ();
 
 		}
-
-		return otherUsers.size ();
 
 	}
 
@@ -374,59 +386,66 @@ class ChatInfoLogicImplementation
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec otherUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserBlurb");
+		try (
 
-		ChatRec chat =
-			thisUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserBlurb");
 
-		ChatSchemeRec chatScheme =
-			thisUser.getChatScheme ();
+		) {
 
-		// allocate a magic number
+			ChatRec chat =
+				thisUser.getChat ();
 
-		MagicNumberRec magicNumber =
-			magicNumberLogic.allocateMagicNumber (
-				taskLogger,
-				chatScheme.getMagicNumberSet (),
-				thisUser.getNumber (),
-				commandHelper.findByCodeRequired (
-					chat,
-					"chat"),
-				otherUser.getId ());
+			ChatSchemeRec chatScheme =
+				thisUser.getChatScheme ();
 
-		StringBuilder message =
-			new StringBuilder ();
+			// allocate a magic number
 
-		message.append (
-			stringFormat (
-				"Text me on: 0%s\n",
-				magicNumber.getNumber ().substring (2)));
+			MagicNumberRec magicNumber =
+				magicNumberLogic.allocateMagicNumber (
+					taskLogger,
+					chatScheme.getMagicNumberSet (),
+					thisUser.getNumber (),
+					commandHelper.findByCodeRequired (
+						chat,
+						"chat"),
+					otherUser.getId ());
 
-		if (otherUser.getName () != null)
+			StringBuilder message =
+				new StringBuilder ();
 
 			message.append (
 				stringFormat (
-					"Name: %s\n",
-					otherUser.getName ()));
+					"Text me on: 0%s\n",
+					magicNumber.getNumber ().substring (2)));
 
-		message.append (
-			stringFormat (
-				"User: %s\n",
-				otherUser.getCode ()));
+			if (otherUser.getName () != null)
 
-		if (otherUser.getInfoText () != null) {
+				message.append (
+					stringFormat (
+						"Name: %s\n",
+						otherUser.getName ()));
 
 			message.append (
 				stringFormat (
-					"Info: %s\n",
-					otherUser.getInfoText ().getText ()));
+					"User: %s\n",
+					otherUser.getCode ()));
+
+			if (otherUser.getInfoText () != null) {
+
+				message.append (
+					stringFormat (
+						"Info: %s\n",
+						otherUser.getInfoText ().getText ()));
+
+			}
+
+			return message.toString ();
 
 		}
 
-		return message.toString ();
 	}
 
 	@Override
@@ -436,22 +455,28 @@ class ChatInfoLogicImplementation
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec otherUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserBlurbMedia");
+		try (
 
-		String message =
-			chatUserBlurb (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserBlurbMedia");
+
+		) {
+
+			String message =
+				chatUserBlurb (
+					taskLogger,
+					thisUser,
+					otherUser);
+
+			return mediaLogic.createTextMedia (
 				taskLogger,
-				thisUser,
-				otherUser);
+				message,
+				"text/plain",
+				otherUser.getCode () + ".txt");
 
-		return mediaLogic.createTextMedia (
-			taskLogger,
-			message,
-			"text/plain",
-			otherUser.getCode () + ".txt");
+		}
 
 	}
 
@@ -463,151 +488,157 @@ class ChatInfoLogicImplementation
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserPicsViaLink");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserPicsViaLink");
 
-		ChatRec chat =
-			thisUser.getChat ();
+		) {
 
-		ChatSchemeRec chatScheme =
-			thisUser.getChatScheme ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// create info site
+			ChatRec chat =
+				thisUser.getChat ();
 
-		ChatInfoSiteRec chatInfoSite =
-			chatInfoSiteHelper.insert (
+			ChatSchemeRec chatScheme =
+				thisUser.getChatScheme ();
+
+			// create info site
+
+			ChatInfoSiteRec chatInfoSite =
+				chatInfoSiteHelper.insert (
+					taskLogger,
+					chatInfoSiteHelper.createInstance ()
+
+				.setChatUser (
+					thisUser)
+
+				.setCreateTime (
+					transaction.now ())
+
+				.setNumViews (
+					0l)
+
+				.setNumExpired (
+					0l)
+
+				.setExpireTime (
+					Instant.now ().plus (
+						Duration.standardHours (48)))
+
+				.setToken (
+					randomLogic.generateLowercase (10))
+
+				.setOtherChatUsers (
+					ImmutableList.copyOf (
+						otherUsers))
+
+			);
+
+			// update user charge and stats
+
+			chatCreditLogic.userSpend (
 				taskLogger,
-				chatInfoSiteHelper.createInstance ()
+				thisUser,
+				0,
+				0,
+				0,
+				otherUsers.size (),
+				0);
 
-			.setChatUser (
-				thisUser)
+			thisUser
 
-			.setCreateTime (
-				transaction.now ())
+				.setLastPic (
+					transaction.now ());
 
-			.setNumViews (
-				0l)
+			// flush to generate id
 
-			.setNumExpired (
-				0l)
+			database.flush ();
 
-			.setExpireTime (
-				Instant.now ().plus (
-					Duration.standardHours (48)))
+			// send the wap link
 
-			.setToken (
-				randomLogic.generateLowercase (10))
+			/*
+			wapPushUtils.wapPushSend (
+				null,
+				thisUser.getNumber (),
+				chatScheme.getRbNumber (),
+				"Click for user pics",
+				sf ("http://hades.apnuk.com/api/chat/infoSite/%s/%s",
+					infoSite.getId (),
+					infoSite.getToken ()),
+				chatScheme.getWapRouter ().getRoute (),
+				serviceLogic.findOrCreateService (
+					chat,
+					"info_site",
+					"info_site"),
+				null,
+				getAffiliate (thisUser),
+				null,
+				null,
+				true,
+				null,
+				null,
+				null);
+			*/
 
-			.setOtherChatUsers (
-				ImmutableList.copyOf (
-					otherUsers))
+			ChatHelpTemplateRec linkTemplate =
+				chatHelpTemplateHelper.findByTypeAndCode (
+					chat,
+					"system",
+					"info_site_link");
 
-		);
+			String link =
+				stringFormat (
+					"http://txtit.com/is/%s/%s",
+					integerToDecimalString (
+						chatInfoSite.getId ()),
+					chatInfoSite.getToken ());
 
-		// update user charge and stats
+			String messageText =
+				linkTemplate.getText ()
+					.replace ("{link}", link);
 
-		chatCreditLogic.userSpend (
-			taskLogger,
-			thisUser,
-			0,
-			0,
-			0,
-			otherUsers.size (),
-			0);
+			ServiceRec infoSiteService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"info_site");
 
-		thisUser
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					thisUser);
 
-			.setLastPic (
-				transaction.now ());
+			messageSender.get ()
 
-		// flush to generate id
+				.threadId (
+					optionalOrNull (
+						threadIdOptional))
 
-		database.flush ();
+				.number (
+					thisUser.getNumber ())
 
-		// send the wap link
+				.messageString (
+					taskLogger,
+					messageText)
 
-		/*
-		wapPushUtils.wapPushSend (
-			null,
-			thisUser.getNumber (),
-			chatScheme.getRbNumber (),
-			"Click for user pics",
-			sf ("http://hades.apnuk.com/api/chat/infoSite/%s/%s",
-				infoSite.getId (),
-				infoSite.getToken ()),
-			chatScheme.getWapRouter ().getRoute (),
-			serviceLogic.findOrCreateService (
-				chat,
-				"info_site",
-				"info_site"),
-			null,
-			getAffiliate (thisUser),
-			null,
-			null,
-			true,
-			null,
-			null,
-			null);
-		*/
+				.numFrom (
+					chatScheme.getRbNumber ())
 
-		ChatHelpTemplateRec linkTemplate =
-			chatHelpTemplateHelper.findByTypeAndCode (
-				chat,
-				"system",
-				"info_site_link");
+				.routerResolve (
+					chatScheme.getRbFreeRouter ())
 
-		String link =
-			stringFormat (
-				"http://txtit.com/is/%s/%s",
-				integerToDecimalString (
-					chatInfoSite.getId ()),
-				chatInfoSite.getToken ());
+				.service (
+					infoSiteService)
 
-		String messageText =
-			linkTemplate.getText ()
-				.replace ("{link}", link);
+				.affiliate (
+					affiliate)
 
-		ServiceRec infoSiteService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"info_site");
+				.send (
+					taskLogger);
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				thisUser);
-
-		messageSender.get ()
-
-			.threadId (
-				optionalOrNull (
-					threadIdOptional))
-
-			.number (
-				thisUser.getNumber ())
-
-			.messageString (
-				taskLogger,
-				messageText)
-
-			.numFrom (
-				chatScheme.getRbNumber ())
-
-			.routerResolve (
-				chatScheme.getRbFreeRouter ())
-
-			.service (
-				infoSiteService)
-
-			.affiliate (
-				affiliate)
-
-			.send (
-				taskLogger);
+		}
 
 	}
 
@@ -619,133 +650,139 @@ class ChatInfoLogicImplementation
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserPicsViaMms");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserPicsViaMms");
 
-		ChatRec chat =
-			thisUser.getChat ();
-
-		ChatSchemeRec chatScheme =
-			thisUser.getChatScheme ();
-
-		List<MediaRec> medias =
-			new ArrayList<MediaRec> ();
-
-		int i = 0;
-
-		for (
-			ChatUserRec otherUser
-				: otherUsers
 		) {
 
-			// add their image to the list
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			if (otherUser.getMainChatUserImage () != null) {
+			ChatRec chat =
+				thisUser.getChat ();
+
+			ChatSchemeRec chatScheme =
+				thisUser.getChatScheme ();
+
+			List<MediaRec> medias =
+				new ArrayList<MediaRec> ();
+
+			int i = 0;
+
+			for (
+				ChatUserRec otherUser
+					: otherUsers
+			) {
+
+				// add their image to the list
+
+				if (otherUser.getMainChatUserImage () != null) {
+
+					medias.add (
+						otherUser.getMainChatUserImage ().getMedia ());
+
+				}
+
+				// add their blurb
 
 				medias.add (
-					otherUser.getMainChatUserImage ().getMedia ());
+					chatUserBlurbMedia (
+						taskLogger,
+						thisUser,
+						otherUser));
+
+				i ++;
 
 			}
 
-			// add their blurb
+			// update chat user with last pic stats and charge
 
-			medias.add (
-				chatUserBlurbMedia (
-					taskLogger,
+			chatCreditLogic.userSpend (
+				taskLogger,
+				thisUser,
+				0,
+				0,
+				0,
+				i,
+				0);
+
+			thisUser
+
+				.setLastPic (
+					transaction.now ());
+
+			// now add a help message on the end
+
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
 					thisUser,
-					otherUser));
+					"system",
+					"photos_help_text");
 
-			i ++;
+			MediaRec helpTextMedia =
+				mediaLogic.createTextMedia (
+					taskLogger,
+					chatHelpTemplate.getText (),
+					"text/plain",
+					"help.text");
+
+			medias.add (helpTextMedia);
+
+			// and send the message
+
+			String serviceCode =
+				asDating
+					? "date_image"
+					: "online_image";
+
+			ServiceRec service =
+				serviceHelper.findByCodeRequired (
+					chat,
+					serviceCode);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (thisUser);
+
+			messageSender.get ()
+
+				.threadId (
+					optionalOrNull (
+						threadIdOptional))
+
+				.number (
+					thisUser.getNumber ())
+
+				.messageString (
+					taskLogger,
+					"")
+
+				.numFrom (
+					chatScheme.getMmsNumber ())
+
+				.route (
+					chatScheme.getMmsRoute ())
+
+				.service (
+					service)
+
+				.affiliate (
+					affiliate)
+
+				.subjectString (
+					taskLogger,
+					"User profiles")
+
+				.medias (
+					medias)
+
+				.send (
+					taskLogger);
 
 		}
-
-		// update chat user with last pic stats and charge
-
-		chatCreditLogic.userSpend (
-			taskLogger,
-			thisUser,
-			0,
-			0,
-			0,
-			i,
-			0);
-
-		thisUser
-
-			.setLastPic (
-				transaction.now ());
-
-		// now add a help message on the end
-
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				thisUser,
-				"system",
-				"photos_help_text");
-
-		MediaRec helpTextMedia =
-			mediaLogic.createTextMedia (
-				taskLogger,
-				chatHelpTemplate.getText (),
-				"text/plain",
-				"help.text");
-
-		medias.add (helpTextMedia);
-
-		// and send the message
-
-		String serviceCode =
-			asDating
-				? "date_image"
-				: "online_image";
-
-		ServiceRec service =
-			serviceHelper.findByCodeRequired (
-				chat,
-				serviceCode);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (thisUser);
-
-		messageSender.get ()
-
-			.threadId (
-				optionalOrNull (
-					threadIdOptional))
-
-			.number (
-				thisUser.getNumber ())
-
-			.messageString (
-				taskLogger,
-				"")
-
-			.numFrom (
-				chatScheme.getMmsNumber ())
-
-			.route (
-				chatScheme.getMmsRoute ())
-
-			.service (
-				service)
-
-			.affiliate (
-				affiliate)
-
-			.subjectString (
-				taskLogger,
-				"User profiles")
-
-			.medias (
-				medias)
-
-			.send (
-				taskLogger);
 
 	}
 
@@ -758,61 +795,67 @@ class ChatInfoLogicImplementation
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserPics");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserPics");
 
-		switch (thisUser.getImageMode ()) {
-
-		case link:
-
-			sendUserPicsViaLink (
-				taskLogger,
-				thisUser,
-				otherUsers,
-				threadIdOptional,
-				asDating);
-
-			break;
-
-		case mms:
-
-			sendUserPicsViaMms (
-				taskLogger,
-				thisUser,
-				otherUsers,
-				threadIdOptional,
-				asDating);
-
-			break;
-
-		default:
-
-			throw new RuntimeException ("Error 10842342");
-
-		}
-
-		// update contact record with last pic stats
-
-		for (
-			ChatUserRec otherUser
-				: otherUsers
 		) {
 
-			ChatContactRec contact =
-				chatContactHelper.findOrCreate (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			switch (thisUser.getImageMode ()) {
+
+			case link:
+
+				sendUserPicsViaLink (
 					taskLogger,
-					otherUser,
-					thisUser);
+					thisUser,
+					otherUsers,
+					threadIdOptional,
+					asDating);
 
-			contact
+				break;
 
-				.setLastPicTime (
-					transaction.now ());
+			case mms:
+
+				sendUserPicsViaMms (
+					taskLogger,
+					thisUser,
+					otherUsers,
+					threadIdOptional,
+					asDating);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ("Error 10842342");
+
+			}
+
+			// update contact record with last pic stats
+
+			for (
+				ChatUserRec otherUser
+					: otherUsers
+			) {
+
+				ChatContactRec contact =
+					chatContactHelper.findOrCreate (
+						taskLogger,
+						otherUser,
+						thisUser);
+
+				contact
+
+					.setLastPicTime (
+						transaction.now ());
+
+			}
 
 		}
 
@@ -827,144 +870,150 @@ class ChatInfoLogicImplementation
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserVideos");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserVideos");
 
-		ChatSchemeRec chatScheme =
-			thisUser.getChatScheme ();
-
-		List <MediaRec> medias =
-			new ArrayList<> ();
-
-		int index = 0;
-
-		for (
-			ChatUserRec otherUser
-				: otherUsers
 		) {
 
-			// add their video to the list
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			if (otherUser.getMainChatUserVideo () != null) {
+			ChatSchemeRec chatScheme =
+				thisUser.getChatScheme ();
+
+			List <MediaRec> medias =
+				new ArrayList<> ();
+
+			int index = 0;
+
+			for (
+				ChatUserRec otherUser
+					: otherUsers
+			) {
+
+				// add their video to the list
+
+				if (otherUser.getMainChatUserVideo () != null) {
+
+					medias.add (
+						otherUser.getMainChatUserVideo ().getMedia ());
+
+				}
+
+				// add their blurb
 
 				medias.add (
-					otherUser.getMainChatUserVideo ().getMedia ());
+					chatUserBlurbMedia (
+						taskLogger,
+						thisUser,
+						otherUser));
+
+				// update contact record with last videostats
+
+				ChatContactRec contact =
+					chatContactHelper.findOrCreate (
+						taskLogger,
+						otherUser,
+						thisUser);
+
+				contact
+
+					.setLastVideoTime (
+						transaction.now ());
+
+				index ++;
 
 			}
 
-			// add their blurb
+			// update chat user with last video stats and charge
 
-			medias.add (
-				chatUserBlurbMedia (
-					taskLogger,
-					thisUser,
-					otherUser));
+			chatCreditLogic.userSpend (
+				taskLogger,
+				thisUser,
+				0,
+				0,
+				0,
+				0,
+				index);
 
-			// update contact record with last videostats
+			thisUser
 
-			ChatContactRec contact =
-				chatContactHelper.findOrCreate (
-					taskLogger,
-					otherUser,
-					thisUser);
-
-			contact
-
-				.setLastVideoTime (
+				.setLastPic (
 					transaction.now ());
 
-			index ++;
+			// now add a help message on the end
+
+			ChatHelpTemplateRec template =
+				chatTemplateLogic.findChatHelpTemplate (
+					thisUser,
+					"system",
+					"videos_help_text");
+
+			MediaRec helpTextMedia =
+				mediaLogic.createTextMedia (
+					taskLogger,
+					template.getText (),
+					"text/plain",
+					"help.text");
+
+			medias.add (
+				helpTextMedia);
+
+			// and send the message
+
+			String serviceCode =
+				asDating
+					? "date_video"
+					: "online_video";
+
+			ServiceRec service =
+				serviceHelper.findByCodeRequired (
+					thisUser.getChat (),
+					serviceCode);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (thisUser);
+
+			messageSender.get ()
+
+				.threadId (
+					optionalOrNull (
+						threadIdOptional))
+
+				.number (
+					thisUser.getNumber ())
+
+				.messageString (
+					taskLogger,
+					"")
+
+				.numFrom (
+					chatScheme.getMmsNumber ())
+
+				.route (
+					chatScheme.getMmsRoute ())
+
+				.service (
+					service)
+
+				.affiliate (
+					affiliate)
+
+				.subjectString (
+					taskLogger,
+					"User videos")
+
+				.medias (
+					medias)
+
+				.send (
+					taskLogger);
 
 		}
-
-		// update chat user with last video stats and charge
-
-		chatCreditLogic.userSpend (
-			taskLogger,
-			thisUser,
-			0,
-			0,
-			0,
-			0,
-			index);
-
-		thisUser
-
-			.setLastPic (
-				transaction.now ());
-
-		// now add a help message on the end
-
-		ChatHelpTemplateRec template =
-			chatTemplateLogic.findChatHelpTemplate (
-				thisUser,
-				"system",
-				"videos_help_text");
-
-		MediaRec helpTextMedia =
-			mediaLogic.createTextMedia (
-				taskLogger,
-				template.getText (),
-				"text/plain",
-				"help.text");
-
-		medias.add (
-			helpTextMedia);
-
-		// and send the message
-
-		String serviceCode =
-			asDating
-				? "date_video"
-				: "online_video";
-
-		ServiceRec service =
-			serviceHelper.findByCodeRequired (
-				thisUser.getChat (),
-				serviceCode);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (thisUser);
-
-		messageSender.get ()
-
-			.threadId (
-				optionalOrNull (
-					threadIdOptional))
-
-			.number (
-				thisUser.getNumber ())
-
-			.messageString (
-				taskLogger,
-				"")
-
-			.numFrom (
-				chatScheme.getMmsNumber ())
-
-			.route (
-				chatScheme.getMmsRoute ())
-
-			.service (
-				service)
-
-			.affiliate (
-				affiliate)
-
-			.subjectString (
-				taskLogger,
-				"User videos")
-
-			.medias (
-				medias)
-
-			.send (
-				taskLogger);
 
 	}
 
@@ -977,42 +1026,48 @@ class ChatInfoLogicImplementation
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendRequestedUserPicandOtherUserPics");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendRequestedUserPicandOtherUserPics");
 
-		Instant cutoffTime =
-			transaction.now ()
-				.toDateTime ()
-				.minusDays (1)
-				.toInstant ();
+		) {
 
-		Collection <ChatUserRec> otherUsers =
-			getNearbyOnlineUsersForPic (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			Instant cutoffTime =
+				transaction.now ()
+					.toDateTime ()
+					.minusDays (1)
+					.toInstant ();
+
+			Collection <ChatUserRec> otherUsers =
+				getNearbyOnlineUsersForPic (
+					thisUser,
+					cutoffTime,
+					numToSend);
+
+			ArrayList <ChatUserRec> list =
+				new ArrayList<> (
+					otherUsers);
+
+			list.add (0, requestedUser);
+
+			otherUsers = list;
+
+			sendUserPics (
+				taskLogger,
 				thisUser,
-				cutoffTime,
-				numToSend);
+				otherUsers,
+				threadIdOptional,
+				false);
 
-		ArrayList <ChatUserRec> list =
-			new ArrayList<> (
-				otherUsers);
+			return otherUsers.size ();
 
-		list.add (0, requestedUser);
-
-		otherUsers = list;
-
-		sendUserPics (
-			taskLogger,
-			thisUser,
-			otherUsers,
-			threadIdOptional,
-			false);
-
-		return otherUsers.size ();
+		}
 
 	}
 
@@ -1024,37 +1079,43 @@ class ChatInfoLogicImplementation
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserPics");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserPics");
 
-		Instant cutoffTime =
-			transaction.now ()
-				.toDateTime ()
-				.minusDays (1)
-				.toInstant ();
+		) {
 
-		Collection<ChatUserRec> otherUsers =
-			getNearbyOnlineUsersForPic (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			Instant cutoffTime =
+				transaction.now ()
+					.toDateTime ()
+					.minusDays (1)
+					.toInstant ();
+
+			Collection <ChatUserRec> otherUsers =
+				getNearbyOnlineUsersForPic (
+					thisUser,
+					cutoffTime,
+					numToSend);
+
+			if (otherUsers.size () == 0)
+				return 0;
+
+			sendUserPics (
+				taskLogger,
 				thisUser,
-				cutoffTime,
-				numToSend);
+				otherUsers,
+				threadIdOptional,
+				false);
 
-		if (otherUsers.size () == 0)
-			return 0;
+			return otherUsers.size ();
 
-		sendUserPics (
-			taskLogger,
-			thisUser,
-			otherUsers,
-			threadIdOptional,
-			false);
-
-		return otherUsers.size ();
+		}
 
 	}
 
@@ -1066,37 +1127,43 @@ class ChatInfoLogicImplementation
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendUserVideos");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendUserVideos");
 
-		Instant cutoffTime =
-			transaction.now ()
-				.toDateTime ()
-				.minusDays (1)
-				.toInstant ();
+		) {
 
-		Collection<ChatUserRec> otherUsers =
-			getNearbyOnlineUsersForVideo (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			Instant cutoffTime =
+				transaction.now ()
+					.toDateTime ()
+					.minusDays (1)
+					.toInstant ();
+
+			Collection<ChatUserRec> otherUsers =
+				getNearbyOnlineUsersForVideo (
+					thisUser,
+					cutoffTime,
+					numToSend);
+
+			if (otherUsers.size () == 0)
+				return 0;
+
+			sendUserVideos (
+				taskLogger,
 				thisUser,
-				cutoffTime,
-				numToSend);
+				otherUsers,
+				threadId,
+				false);
 
-		if (otherUsers.size () == 0)
-			return 0;
+			return otherUsers.size ();
 
-		sendUserVideos (
-			taskLogger,
-			thisUser,
-			otherUsers,
-			threadId,
-			false);
-
-		return otherUsers.size ();
+		}
 
 	}
 
@@ -1526,71 +1593,77 @@ class ChatInfoLogicImplementation
 			@NonNull String info,
 			@NonNull Optional <Long> threadId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserSetInfo");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserSetInfo");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		TextRec newInfoText =
-			textHelper.findOrCreate (
-				taskLogger,
-				info);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// create the chat user info
+			ChatRec chat =
+				chatUser.getChat ();
 
-		ChatUserInfoRec chatUserInfoRec =
-			chatUserInfoHelper.insert (
-				taskLogger,
-				chatUserInfoHelper.createInstance ()
-
-			.setChatUser (
-				chatUser)
-
-			.setCreationTime (
-				transaction.now ())
-
-			.setOriginalText (
-				newInfoText)
-
-			.setStatus (
-				ChatUserInfoStatus.moderatorPending)
-
-			.setThreadId (
-				optionalOrNull (
-					threadId))
-
-		);
-
-		chatUser
-
-			.setNewChatUserInfo (
-				chatUserInfoRec);
-
-		// create a queue item if necessary
-
-		if (chatUser.getQueueItem () == null) {
-
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
+			TextRec newInfoText =
+				textHelper.findOrCreate (
 					taskLogger,
-					chat,
-					"user",
-					chatUser,
-					chatUser,
-					chatUserLogic.getPrettyName (
-						chatUser),
-					"Info to approve");
+					info);
+
+			// create the chat user info
+
+			ChatUserInfoRec chatUserInfoRec =
+				chatUserInfoHelper.insert (
+					taskLogger,
+					chatUserInfoHelper.createInstance ()
+
+				.setChatUser (
+					chatUser)
+
+				.setCreationTime (
+					transaction.now ())
+
+				.setOriginalText (
+					newInfoText)
+
+				.setStatus (
+					ChatUserInfoStatus.moderatorPending)
+
+				.setThreadId (
+					optionalOrNull (
+						threadId))
+
+			);
 
 			chatUser
 
-				.setQueueItem (
-					queueItem);
+				.setNewChatUserInfo (
+					chatUserInfoRec);
+
+			// create a queue item if necessary
+
+			if (chatUser.getQueueItem () == null) {
+
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						taskLogger,
+						chat,
+						"user",
+						chatUser,
+						chatUser,
+						chatUserLogic.getPrettyName (
+							chatUser),
+						"Info to approve");
+
+				chatUser
+
+					.setQueueItem (
+						queueItem);
+
+			}
 
 		}
 
@@ -1602,40 +1675,46 @@ class ChatInfoLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendNameHint");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendNameHint");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// send the message
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chatSendLogic.sendSystemMagic (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			"name_hint",
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic"),
-			IdObject.objectId (
+			ChatRec chat =
+				chatUser.getChat ();
+
+			// send the message
+
+			chatSendLogic.sendSystemMagic (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				"name_hint",
 				commandHelper.findByCodeRequired (
 					chat,
-					"name")),
-			TemplateMissing.error,
-			emptyMap ());
+					"magic"),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"name")),
+				TemplateMissing.error,
+				emptyMap ());
 
-		// and update the chat user
+			// and update the chat user
 
-		chatUser
+			chatUser
 
-			.setLastNameHint (
-				transaction.now ());
+				.setLastNameHint (
+					transaction.now ());
+
+		}
 
 	}
 
@@ -1645,35 +1724,41 @@ class ChatInfoLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendPicHint");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendPicHint");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// send the message
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chatSendLogic.sendSystemMmsFree (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			"photo_hint",
-			commandHelper.findByCodeRequired (
-				chat,
-				"set_photo"),
-			TemplateMissing.error);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		// and update the chat user
+			// send the message
 
-		chatUser
+			chatSendLogic.sendSystemMmsFree (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				"photo_hint",
+				commandHelper.findByCodeRequired (
+					chat,
+					"set_photo"),
+				TemplateMissing.error);
 
-			.setLastPicHint (
-				transaction.now ());
+			// and update the chat user
+
+			chatUser
+
+				.setLastPicHint (
+					transaction.now ());
+
+		}
 
 	}
 
@@ -1683,35 +1768,41 @@ class ChatInfoLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendPicHint2");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendPicHint2");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// send the message
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chatSendLogic.sendSystemMmsFree (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			"photo_hint_2",
-			commandHelper.findByCodeRequired (
-				chat,
-				"set_photo"),
-			TemplateMissing.error);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		// and update the chat user
+			// send the message
 
-		chatUser
+			chatSendLogic.sendSystemMmsFree (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				"photo_hint_2",
+				commandHelper.findByCodeRequired (
+					chat,
+					"set_photo"),
+				TemplateMissing.error);
 
-			.setLastPicHint (
-				transaction.now ());
+			// and update the chat user
+
+			chatUser
+
+				.setLastPicHint (
+					transaction.now ());
+
+		}
 
 	}
 

@@ -1,5 +1,7 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -42,48 +44,54 @@ class ChatUserInitiationLogConsoleHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"applySearchFilter");
+		try (
 
-		ChatUserInitiationLogSearch search =
-			(ChatUserInitiationLogSearch)
-			searchObject;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"applySearchFilter");
 
-		search
-
-			.filter (
-				true);
-
-		// chats
-
-		ImmutableList.Builder<Long> chatsBuilder =
-			ImmutableList.builder ();
-
-		for (
-			ChatRec chat
-				: chatHelper.findAll ()
 		) {
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					chat,
-					"supervisor")
+			ChatUserInitiationLogSearch search =
+				genericCastUnchecked (
+					searchObject);
+
+			search
+
+				.filter (
+					true);
+
+			// chats
+
+			ImmutableList.Builder<Long> chatsBuilder =
+				ImmutableList.builder ();
+
+			for (
+				ChatRec chat
+					: chatHelper.findAll ()
 			) {
-				continue;
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						chat,
+						"supervisor")
+				) {
+					continue;
+				}
+
+				chatsBuilder.add (
+					chat.getId ());
+
 			}
 
-			chatsBuilder.add (
-				chat.getId ());
+			search
+
+				.filterChatIds (
+					chatsBuilder.build ());
 
 		}
-
-		search
-
-			.filterChatIds (
-				chatsBuilder.build ());
 
 	}
 

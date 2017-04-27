@@ -58,67 +58,73 @@ class ChatInfoSiteApiModule
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		infoSiteFile =
-			apiFile.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-			.getActionName (
-				taskLogger,
-				"chatInfoSiteViewAction")
+		) {
 
-			.postActionName (
-				taskLogger,
-				"chatInfoSiteRespondAction");
+			infoSiteFile =
+				apiFile.get ()
 
-		infoSiteImageFile =
-			apiFile.get ()
-				.getResponderName ("chatInfoSiteImageResponder");
+				.getActionName (
+					taskLogger,
+					"chatInfoSiteViewAction")
 
-		infoSiteEntry =
-			new RegexpPathHandler.Entry (
-				"/([0-9]+)" +
-				"/([a-z]+)" +
-				"(?:" +
+				.postActionName (
+					taskLogger,
+					"chatInfoSiteRespondAction");
+
+			infoSiteImageFile =
+				apiFile.get ()
+					.getResponderName ("chatInfoSiteImageResponder");
+
+			infoSiteEntry =
+				new RegexpPathHandler.Entry (
 					"/([0-9]+)" +
-					"/(full|normal)" +
-				")?"
-			) {
+					"/([a-z]+)" +
+					"(?:" +
+						"/([0-9]+)" +
+						"/(full|normal)" +
+					")?"
+				) {
 
-			@Override
-			protected
-			WebFile handle (
-					Matcher matcher) {
+				@Override
+				protected
+				WebFile handle (
+						Matcher matcher) {
 
-				requestContext.request (
-					"chatInfoSiteId",
-					parseIntegerRequired (
-						matcher.group (1)));
+					requestContext.request (
+						"chatInfoSiteId",
+						parseIntegerRequired (
+							matcher.group (1)));
 
-				requestContext.request (
-					"chatInfoSiteToken",
-					matcher.group (2));
+					requestContext.request (
+						"chatInfoSiteToken",
+						matcher.group (2));
 
-				if (matcher.group (3) == null)
-					return infoSiteFile;
+					if (matcher.group (3) == null)
+						return infoSiteFile;
 
-				requestContext.request (
-					"chatInfoSiteIndex",
-					parseIntegerRequired (
-						matcher.group (3)));
+					requestContext.request (
+						"chatInfoSiteIndex",
+						parseIntegerRequired (
+							matcher.group (3)));
 
-				requestContext.request (
-					"chatInfoSiteMode",
-					matcher.group (4));
+					requestContext.request (
+						"chatInfoSiteMode",
+						matcher.group (4));
 
-				return infoSiteImageFile;
+					return infoSiteImageFile;
 
-			}
+				}
 
-		};
+			};
+
+		}
 
 	}
 

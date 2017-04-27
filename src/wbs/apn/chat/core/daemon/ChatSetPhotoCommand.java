@@ -123,157 +123,163 @@ class ChatSetPhotoCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat;
-		ChatSchemeRec chatScheme;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		Object parent =
-			objectManager.getParentRequired (
-				command);
-
-		if (parent instanceof ChatRec) {
-
-			chat = (ChatRec) parent;
-			chatScheme = null;
-
-		} else if (parent instanceof ChatSchemeRec) {
-
-			chatScheme = (ChatSchemeRec) parent;
-			chat = chatScheme.getChat ();
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
-
-		MessageRec message =
-			inbox.getMessage ();
-
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// set chat scheme
-
-		if (chatScheme != null) {
-
-			chatUserLogic.setScheme (
-				chatUser,
-				chatScheme);
-
-		}
-
-		// try set photo
-
-		Optional <ChatUserImageRec> chatUserImageOptional =
-			chatUserLogic.setPhotoFromMessage (
-				taskLogger,
-				chatUser,
-				message,
-				false);
-
-		if (
-			optionalIsPresent (
-				chatUserImageOptional)
 		) {
 
-			// send confirmation
+			ChatRec chat;
+			ChatSchemeRec chatScheme;
 
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalAbsent (),
-				"photo_confirm",
-				commandHelper.findByCodeRequired (
+			Object parent =
+				objectManager.getParentRequired (
+					command);
+
+			if (parent instanceof ChatRec) {
+
+				chat = (ChatRec) parent;
+				chatScheme = null;
+
+			} else if (parent instanceof ChatSchemeRec) {
+
+				chatScheme = (ChatSchemeRec) parent;
+				chat = chatScheme.getChat ();
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
 					chat,
-					"magic"),
-				IdObject.objectId (
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// set chat scheme
+
+			if (chatScheme != null) {
+
+				chatUserLogic.setScheme (
+					chatUser,
+					chatScheme);
+
+			}
+
+			// try set photo
+
+			Optional <ChatUserImageRec> chatUserImageOptional =
+				chatUserLogic.setPhotoFromMessage (
+					taskLogger,
+					chatUser,
+					message,
+					false);
+
+			if (
+				optionalIsPresent (
+					chatUserImageOptional)
+			) {
+
+				// send confirmation
+
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalAbsent (),
+					"photo_confirm",
 					commandHelper.findByCodeRequired (
 						chat,
-						"help")),
-				TemplateMissing.error,
-				emptyMap ());
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					TemplateMissing.error,
+					emptyMap ());
 
-			// auto join
+				// auto join
 
-			chatMiscLogic.userAutoJoin (
+				chatMiscLogic.userAutoJoin (
+					taskLogger,
+					chatUser,
+					message,
+					true);
+
+			// try set video
+
+			} else if (
+				chatUserLogic.setVideo (
+					taskLogger,
+					chatUser,
+					message,
+					false)
+			) {
+
+				// send confirmation
+
+				chatSendLogic.sendSystemRbFree (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"video_set_pending",
+					TemplateMissing.error,
+					emptyMap ());
+
+				// auto join
+
+				chatMiscLogic.userAutoJoin (
+					taskLogger,
+					chatUser,
+					message,
+					true);
+
+			} else {
+
+				// send error
+
+				chatSendLogic.sendSystemMmsFree (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"photo_error",
+					commandHelper.findByCodeRequired (
+						chat,
+						"set_photo"),
+					TemplateMissing.error);
+
+			}
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
 				taskLogger,
-				chatUser,
-				message,
-				true);
-
-		// try set video
-
-		} else if (
-			chatUserLogic.setVideo (
-				taskLogger,
-				chatUser,
-				message,
-				false)
-		) {
-
-			// send confirmation
-
-			chatSendLogic.sendSystemRbFree (
-				taskLogger,
-				chatUser,
+				inbox,
 				optionalOf (
-					message.getThreadId ()),
-				"video_set_pending",
-				TemplateMissing.error,
-				emptyMap ());
-
-			// auto join
-
-			chatMiscLogic.userAutoJoin (
-				taskLogger,
-				chatUser,
-				message,
-				true);
-
-		} else {
-
-			// send error
-
-			chatSendLogic.sendSystemMmsFree (
-				taskLogger,
-				chatUser,
+					defaultService),
 				optionalOf (
-					message.getThreadId ()),
-				"photo_error",
-				commandHelper.findByCodeRequired (
-					chat,
-					"set_photo"),
-				TemplateMissing.error);
+					affiliate),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

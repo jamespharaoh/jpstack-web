@@ -130,175 +130,181 @@ class ChatUserImageListPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				stringFormat (
-					"/chatUser.%s.list",
-					type.name ())));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"I",
-			"S",
-			"Preview",
-			"Timestamp",
-			"Moderator",
-			"Classification",
-			"Controls");
-
-		if (chatUserImages.isEmpty ()) {
-
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				"No photos/videos to show",
-				htmlColumnSpanAttribute (7l));
-
-			htmlTableRowClose ();
-
-		}
-
-		int index = 0;
-
-		for (
-			ChatUserImageRec chatUserImage
-				: chatUserImages
 		) {
 
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				ifNotNullThenElse (
-					chatUserImage.getIndex (),
-
-				() -> integerToDecimalString (
-					chatUserImage.getIndex () + 1),
-
-				() -> "—"
-
-			));
-
-			htmlTableCellWrite (
-				ifThenElse (
-					optionalValueEqualWithClass (
-						ChatUserImageRec.class,
-						optionalFromNullable (
-							chatUserLogic.getMainChatUserImageByType (
-								chatUser,
-								type)),
-						chatUserImage),
-					() -> "Y",
-					() -> ""));
-
-			htmlTableCellOpen (
-				htmlAttribute (
-					"style",
-					"text-align: center"));
-
-			htmlLinkWriteHtml (
+			htmlFormOpenPostAction (
 				requestContext.resolveLocalUrl (
 					stringFormat (
-						"/chatUser.%u.view",
-						enumName (
-							type),
-						"?chatUserImageId=%u",
-						integerToDecimalString (
-							chatUserImage.getId ()))),
-				() -> ifNotNullThenElse (
-					chatUserImage.getMedia (),
-					() -> mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
-						chatUserImage.getMedia ()),
-					() -> formatWriter.writeLineFormat (
-						"(none)")));
+						"/chatUser.%s.list",
+						type.name ())));
 
-			htmlTableCellClose ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithoutTimezoneString (
-					chatUserImage.getTimestamp ()));
+			htmlTableHeaderRowWrite (
+				"I",
+				"S",
+				"Preview",
+				"Timestamp",
+				"Moderator",
+				"Classification",
+				"Controls");
 
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					chatUserImage.getModerator (),
-					userConsoleLogic.sliceRequired ()));
+			if (chatUserImages.isEmpty ()) {
 
-			htmlTableCellWrite (
-				chatUserImage.getClassification ());
+				htmlTableRowOpen ();
 
-			htmlTableCellOpen ();
+				htmlTableCellWrite (
+					"No photos/videos to show",
+					htmlColumnSpanAttribute (7l));
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"remove_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"X\"",
-				">");
+				htmlTableRowClose ();
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"rotate_ccw_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"&#x21b6;\"",
-				">");
+			}
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"rotate_cw_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"&#x21b7;\"",
-				">");
+			int index = 0;
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"move_up_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"&#x2191;\"",
-				">");
+			for (
+				ChatUserImageRec chatUserImage
+					: chatUserImages
+			) {
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"move_down_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"&#x2193;\"",
-				">");
+				htmlTableRowOpen ();
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"select_%h\"",
-				integerToDecimalString (
-					index),
-				" value=\"S\"",
-				">");
+				htmlTableCellWrite (
+					ifNotNullThenElse (
+						chatUserImage.getIndex (),
 
-			htmlTableCellClose ();
+					() -> integerToDecimalString (
+						chatUserImage.getIndex () + 1),
 
-			htmlTableRowClose ();
+					() -> "—"
 
-			index ++;
+				));
+
+				htmlTableCellWrite (
+					ifThenElse (
+						optionalValueEqualWithClass (
+							ChatUserImageRec.class,
+							optionalFromNullable (
+								chatUserLogic.getMainChatUserImageByType (
+									chatUser,
+									type)),
+							chatUserImage),
+						() -> "Y",
+						() -> ""));
+
+				htmlTableCellOpen (
+					htmlAttribute (
+						"style",
+						"text-align: center"));
+
+				htmlLinkWriteHtml (
+					requestContext.resolveLocalUrl (
+						stringFormat (
+							"/chatUser.%u.view",
+							enumName (
+								type),
+							"?chatUserImageId=%u",
+							integerToDecimalString (
+								chatUserImage.getId ()))),
+					() -> ifNotNullThenElse (
+						chatUserImage.getMedia (),
+						() -> mediaConsoleLogic.writeMediaThumb100 (
+							taskLogger,
+							chatUserImage.getMedia ()),
+						() -> formatWriter.writeLineFormat (
+							"(none)")));
+
+				htmlTableCellClose ();
+
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithoutTimezoneString (
+						chatUserImage.getTimestamp ()));
+
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						chatUserImage.getModerator (),
+						userConsoleLogic.sliceRequired ()));
+
+				htmlTableCellWrite (
+					chatUserImage.getClassification ());
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"remove_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"X\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"rotate_ccw_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"&#x21b6;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"rotate_cw_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"&#x21b7;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"move_up_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"&#x2191;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"move_down_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"&#x2193;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"select_%h\"",
+					integerToDecimalString (
+						index),
+					" value=\"S\"",
+					">");
+
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
+
+				index ++;
+
+			}
+
+			htmlTableClose ();
+
+			htmlFormClose ();
 
 		}
-
-		htmlTableClose ();
-
-		htmlFormClose ();
 
 	}
 

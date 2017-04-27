@@ -62,66 +62,72 @@ class SimpleConsoleContextMetaBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// extension point
+		) {
 
-		metaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+			setDefaults ();
 
-			.name (
-				contextTypeName)
+			// extension point
 
-			.contextTypeNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+			metaModule.addExtensionPoint (
+				rootExtensionPointProvider.get ()
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+				.name (
+					contextTypeName)
 
-			.parentContextNames (
-				ImmutableList.<String>of (
-					contextTypeName)));
+				.contextTypeNames (
+					ImmutableList.<String>of (
+						contextTypeName))
 
-		// context hints
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						contextTypeName))
 
-		metaModule.addContextHint (
-			new ConsoleContextHint ()
+				.parentContextNames (
+					ImmutableList.<String>of (
+						contextTypeName)));
 
-			.linkName (
-				contextTypeName)
+			// context hints
 
-			.singular (
-				true)
+			metaModule.addContextHint (
+				new ConsoleContextHint ()
 
-			.plural (
-				false)
+				.linkName (
+					contextTypeName)
 
-		);
+				.singular (
+					true)
 
-		// descend
+				.plural (
+					false)
 
-		ConsoleContextMetaBuilderContainer nextContainer =
-			new ConsoleContextMetaBuilderContainer ()
+			);
 
-			.structuralName (
-				contextTypeName)
+			// descend
 
-			.extensionPointName (
-				contextTypeName);
+			ConsoleContextMetaBuilderContainer nextContainer =
+				new ConsoleContextMetaBuilderContainer ()
 
-		builder.descend (
-			taskLogger,
-			nextContainer,
-			spec.children (),
-			metaModule,
-			MissingBuilderBehaviour.ignore);
+				.structuralName (
+					contextTypeName)
+
+				.extensionPointName (
+					contextTypeName);
+
+			builder.descend (
+				taskLogger,
+				nextContainer,
+				spec.children (),
+				metaModule,
+				MissingBuilderBehaviour.ignore);
+
+		}
 
 	}
 

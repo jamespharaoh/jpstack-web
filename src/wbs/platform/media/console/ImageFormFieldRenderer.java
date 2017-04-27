@@ -102,46 +102,52 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormInput");
+		try (
 
-		if (interfaceValue.isPresent ()) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormInput");
 
-			renderHtmlComplex (
-				taskLogger,
-				htmlWriter,
-				container,
-				hints,
-				interfaceValue);
-
-			htmlWriter.writeFormat (
-				"<br>\n");
-
-		}
-
-		htmlWriter.writeFormat (
-			"<input",
-			" type=\"file\"",
-			" name=\"%h.%h\"",
-			formName,
-			name (),
-			"><br>\n");
-
-		if (
-			interfaceValue.isPresent ()
-			&& nullable ()
 		) {
+
+			if (interfaceValue.isPresent ()) {
+
+				renderHtmlComplex (
+					taskLogger,
+					htmlWriter,
+					container,
+					hints,
+					interfaceValue);
+
+				htmlWriter.writeFormat (
+					"<br>\n");
+
+			}
 
 			htmlWriter.writeFormat (
 				"<input",
-				" type=\"submit\"",
-				" name=\"%h.%h:remove\"",
+				" type=\"file\"",
+				" name=\"%h.%h\"",
 				formName,
 				name (),
-				" value=\"remove image\"",
-				">\n");
+				"><br>\n");
+
+			if (
+				interfaceValue.isPresent ()
+				&& nullable ()
+			) {
+
+				htmlWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"%h.%h:remove\"",
+					formName,
+					name (),
+					" value=\"remove image\"",
+					">\n");
+
+			}
 
 		}
 
@@ -150,20 +156,32 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
-			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull Optional <MediaRec> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"#%j.%j\").replaceWith (",
-			formName,
-			name);
+		try (
 
-		javascriptWriter.writeLineFormat (
-			"\t$(\"#%j.%j\").clone (true));",
-			formName,
-			name);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j.%j\").replaceWith (",
+				formName,
+				name);
+
+			javascriptWriter.writeLineFormat (
+				"\t$(\"#%j.%j\").clone (true));",
+				formName,
+				name);
+
+		}
 
 	}
 
@@ -208,44 +226,50 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"formValue");
+		try (
 
-		if (
-			submission.hasParameter (
-				stringFormat (
-					"%s.%s:remove",
-					formName,
-					name ()))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"formValue");
+
 		) {
-			return null;
-		}
 
-		FileItem fileItem =
-			submission.fileItem (
-				stringFormat (
-					"%s.%s",
-					formName,
-					name ()));
+			if (
+				submission.hasParameter (
+					stringFormat (
+						"%s.%s:remove",
+						formName,
+						name ()))
+			) {
+				return null;
+			}
 
-		try {
+			FileItem fileItem =
+				submission.fileItem (
+					stringFormat (
+						"%s.%s",
+						formName,
+						name ()));
 
-			byte[] data =
-				IOUtils.toByteArray (
-					fileItem.getInputStream ());
+			try {
 
-			return mediaLogic.createMediaFromImageRequired (
-				taskLogger,
-				data,
-				"image/jpeg",
-				fileItem.getName ());
+				byte[] data =
+					IOUtils.toByteArray (
+						fileItem.getInputStream ());
 
-		} catch (IOException exception) {
+				return mediaLogic.createMediaFromImageRequired (
+					taskLogger,
+					data,
+					"image/jpeg",
+					fileItem.getName ());
 
-			throw new RuntimeIoException (
-				exception);
+			} catch (IOException exception) {
+
+				throw new RuntimeIoException (
+					exception);
+
+			}
 
 		}
 
@@ -258,17 +282,23 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"formToInterface");
+		try (
 
-		return successResult (
-			Optional.fromNullable (
-				formValue (
-					taskLogger,
-					submission,
-					formName)));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"formToInterface");
+
+		) {
+
+			return successResult (
+				Optional.fromNullable (
+					formValue (
+						taskLogger,
+						submission,
+						formName)));
+
+		}
 
 	}
 
@@ -282,25 +312,31 @@ class ImageFormFieldRenderer <Container>
 			@NonNull Optional<MediaRec> interfaceValue,
 			boolean link) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlSimple");
+		try (
 
-		if (! interfaceValue.isPresent ()) {
-			return;
-		}
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlSimple");
 
-		mediaConsoleLogic.writeMediaThumb32 (
-			taskLogger,
-			htmlWriter,
-			interfaceValue.get ());
+		) {
 
-		if (showFilename) {
+			if (! interfaceValue.isPresent ()) {
+				return;
+			}
 
-			htmlWriter.writeLineFormat (
-				"%h",
-				interfaceValue.get ().getFilename ());
+			mediaConsoleLogic.writeMediaThumb32 (
+				taskLogger,
+				htmlWriter,
+				interfaceValue.get ());
+
+			if (showFilename) {
+
+				htmlWriter.writeLineFormat (
+					"%h",
+					interfaceValue.get ().getFilename ());
+
+			}
 
 		}
 
@@ -315,30 +351,36 @@ class ImageFormFieldRenderer <Container>
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlComplex");
+		try (
 
-		if (! interfaceValue.isPresent ()) {
-			return;
-		}
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlComplex");
 
-		mediaConsoleLogic.writeMediaThumb100 (
-			taskLogger,
-			htmlWriter,
-			interfaceValue.get ());
+		) {
 
-		if (showFilename) {
+			if (! interfaceValue.isPresent ()) {
+				return;
+			}
 
-			htmlWriter.writeLineFormat (
-				"<br>");
+			mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
+				htmlWriter,
+				interfaceValue.get ());
 
-			htmlWriter.writeLineFormat (
-				"%h (%h bytes)",
-				interfaceValue.get ().getFilename (),
-				integerToDecimalString (
-					interfaceValue.get ().getContent ().getData ().length));
+			if (showFilename) {
+
+				htmlWriter.writeLineFormat (
+					"<br>");
+
+				htmlWriter.writeLineFormat (
+					"%h (%h bytes)",
+					interfaceValue.get ().getFilename (),
+					integerToDecimalString (
+						interfaceValue.get ().getContent ().getData ().length));
+
+			}
 
 		}
 

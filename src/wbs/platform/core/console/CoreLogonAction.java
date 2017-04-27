@@ -26,7 +26,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -85,82 +85,78 @@ class CoreLogonAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		@NonNull
-		String slice =
-			requestContext.parameterRequired (
-				"slice");
-
-		@NonNull
-		String username =
-			requestContext.parameterRequired (
-				"username");
-
-		@NonNull
-		String password =
-			requestContext.parameterRequired (
-				"password");
-
-		// extract slice from username if present
-
-		if (
-			optionalIsPresent (
-				requestContext.header (
-					"x-wbs-slice"))
-		) {
-
-			List <String> usernameParts =
-				stringSplitFullStop (
-					username);
-
-			if (
-				collectionHasTwoElements (
-					usernameParts)
-			) {
-
-				slice =
-					listFirstElementRequired (
-						usernameParts);
-
-				username =
-					listSecondElementRequired (
-						usernameParts);
-
-			}
-
-		}
-
-		// check we got the right params
-
-		if (
-			stringInSafe (
-				"",
-				slice,
-				username,
-				password)
-		) {
-			return null;
-		}
-
-		// attempt login
-
-		Optional <Long> userIdOptional;
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"CoreLogonAction.goReal ()",
 					this);
 
 		) {
+
+			// get params
+
+			@NonNull
+			String slice =
+				requestContext.parameterRequired (
+					"slice");
+
+			@NonNull
+			String username =
+				requestContext.parameterRequired (
+					"username");
+
+			@NonNull
+			String password =
+				requestContext.parameterRequired (
+					"password");
+
+			// extract slice from username if present
+
+			if (
+				optionalIsPresent (
+					requestContext.header (
+						"x-wbs-slice"))
+			) {
+
+				List <String> usernameParts =
+					stringSplitFullStop (
+						username);
+
+				if (
+					collectionHasTwoElements (
+						usernameParts)
+				) {
+
+					slice =
+						listFirstElementRequired (
+							usernameParts);
+
+					username =
+						listSecondElementRequired (
+							usernameParts);
+
+				}
+
+			}
+
+			// check we got the right params
+
+			if (
+				stringInSafe (
+					"",
+					slice,
+					username,
+					password)
+			) {
+				return null;
+			}
 
 			// attempt logon
 
@@ -178,6 +174,8 @@ class CoreLogonAction
 						"User-Agent"),
 					requestContext.cookie (
 						"txt2_console"));
+
+			Optional <Long> userIdOptional;
 
 			if (
 				optionalIsPresent (
@@ -210,45 +208,45 @@ class CoreLogonAction
 
 			transaction.commit ();
 
-		}
+			// if it failed show the logon page again
 
-		// if it failed show the logon page again
+			if (
+				optionalIsNotPresent (
+					userIdOptional)
+			) {
 
-		if (
-			optionalIsNotPresent (
-				userIdOptional)
-		) {
+				requestContext.addWarningFormat (
+					"Sorry, the details you entered did not match. Please try ",
+					"again, or contact an appropriate person for help.");
 
-			requestContext.addWarningFormat (
-				"Sorry, the details you entered did not match. Please try ",
-				"again, or contact an appropriate person for help.");
+				taskLogger.warningFormat (
+					"Failed logon attempt for %s.%s",
+					slice,
+					username);
 
-			taskLogger.warningFormat (
-				"Failed logon attempt for %s.%s",
+				return null;
+
+			}
+
+			Long userId =
+				optionalGetRequired (
+					userIdOptional);
+
+			// save the userid
+
+			taskLogger.noticeFormat (
+				"Successful logon for %s.%s (%s)",
 				slice,
-				username);
+				username,
+				integerToDecimalString (
+					userId));
 
-			return null;
+			// and redirect to the console proper
+
+			return responder (
+				"coreRedirectResponder");
 
 		}
-
-		Long userId =
-			optionalGetRequired (
-				userIdOptional);
-
-		// save the userid
-
-		taskLogger.noticeFormat (
-			"Successful logon for %s.%s (%s)",
-			slice,
-			username,
-			integerToDecimalString (
-				userId));
-
-		// and redirect to the console proper
-
-		return responder (
-			"coreRedirectResponder");
 
 	}
 

@@ -47,30 +47,36 @@ class ParentIdFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeClass (
-				Long.class)
+			new JavaPropertyWriter ()
 
-			.propertyName (
-				"parentId")
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.typeClass (
+					Long.class)
+
+				.propertyName (
+					"parentId")
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -93,223 +93,253 @@ class ClockworkSmsFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenus (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createConfig (
-			taskLogger,
-			transaction);
+		) {
 
-		createRoutes (
-			taskLogger,
-			transaction);
+			createMenus (
+				taskLogger,
+				transaction);
+
+			createConfig (
+				taskLogger,
+				transaction);
+
+			createRoutes (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenus (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenus");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenus");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"integration"))
+		) {
 
-			.setCode (
-				"clockwork_sms")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Clockwork SMS")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"integration"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"clockwork_sms")
 
-			.setLabel (
-				"Clockwork SMS")
+				.setName (
+					"Clockwork SMS")
 
-			.setTargetPath (
-				"/clockworkSms")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Clockwork SMS")
 
-		);
+				.setTargetPath (
+					"/clockworkSms")
 
-		transaction.flush ();
+				.setTargetFrame (
+					"main")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createConfig (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createConfig");
+		try (
 
-		ClockworkSmsConfigRec config =
-			clockworkSmsConfigHelper.insert (
-				taskLogger,
-				clockworkSmsConfigHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createConfig");
 
-			.setCode (
-				"default")
-
-			.setName (
-				"Default")
-
-			.setDescription (
-				"Default")
-
-		);
-
-		for (
-			DefaultDeliveryStatus defaultDeliveryStatus
-				: defaultDeliveryStatuses
 		) {
 
-			clockworkSmsDeliveryStatusHelper.insert (
-				taskLogger,
-				clockworkSmsDeliveryStatusHelper.createInstance ()
-
-				.setClockworkSmsConfig (
-					config)
+			ClockworkSmsConfigRec config =
+				clockworkSmsConfigHelper.insert (
+					taskLogger,
+					clockworkSmsConfigHelper.createInstance ()
 
 				.setCode (
-					lowercase (
-						defaultDeliveryStatus.status ()))
+					"default")
+
+				.setName (
+					"Default")
 
 				.setDescription (
-					defaultDeliveryStatus.status ())
-
-				.setTheirDescription (
-					defaultDeliveryStatus.theirDescription ())
-
-				.setTheirCommonCauses (
-					defaultDeliveryStatus.theirCommonCauses ())
-
-				.setMessageStatus (
-					defaultDeliveryStatus.ourStatus ())
+					"Default")
 
 			);
 
+			for (
+				DefaultDeliveryStatus defaultDeliveryStatus
+					: defaultDeliveryStatuses
+			) {
+
+				clockworkSmsDeliveryStatusHelper.insert (
+					taskLogger,
+					clockworkSmsDeliveryStatusHelper.createInstance ()
+
+					.setClockworkSmsConfig (
+						config)
+
+					.setCode (
+						lowercase (
+							defaultDeliveryStatus.status ()))
+
+					.setDescription (
+						defaultDeliveryStatus.status ())
+
+					.setTheirDescription (
+						defaultDeliveryStatus.theirDescription ())
+
+					.setTheirCommonCauses (
+						defaultDeliveryStatus.theirCommonCauses ())
+
+					.setMessageStatus (
+						defaultDeliveryStatus.ourStatus ())
+
+				);
+
+			}
+
+			for (
+				DefaultDeliveryStatusDetailCode defaultDeliveryStatusDetailCode
+					: defaultDeliveryStatusDetailCodes
+			) {
+
+				clockworkSmsDeliveryStatusDetailCodeHelper.insert (
+					taskLogger,
+					clockworkSmsDeliveryStatusDetailCodeHelper.createInstance ()
+
+					.setClockworkSmsConfig (
+						config)
+
+					.setCode (
+						Long.toString (
+							defaultDeliveryStatusDetailCode.errorNumber ()))
+
+					.setDescription (
+						Long.toString (
+							defaultDeliveryStatusDetailCode.errorNumber ()))
+
+					.setTheirDescription (
+						defaultDeliveryStatusDetailCode.theirDescription ())
+
+					.setPermanent (
+						defaultDeliveryStatusDetailCode.permanent ())
+
+				);
+
+			}
+
+			transaction.flush ();
+
 		}
-
-		for (
-			DefaultDeliveryStatusDetailCode defaultDeliveryStatusDetailCode
-				: defaultDeliveryStatusDetailCodes
-		) {
-
-			clockworkSmsDeliveryStatusDetailCodeHelper.insert (
-				taskLogger,
-				clockworkSmsDeliveryStatusDetailCodeHelper.createInstance ()
-
-				.setClockworkSmsConfig (
-					config)
-
-				.setCode (
-					Long.toString (
-						defaultDeliveryStatusDetailCode.errorNumber ()))
-
-				.setDescription (
-					Long.toString (
-						defaultDeliveryStatusDetailCode.errorNumber ()))
-
-				.setTheirDescription (
-					defaultDeliveryStatusDetailCode.theirDescription ())
-
-				.setPermanent (
-					defaultDeliveryStatusDetailCode.permanent ())
-
-			);
-
-		}
-
-		transaction.flush ();
 
 	}
 
 	private
 	void createRoutes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createRoutes");
+		try (
 
-		testAccounts.forEach (
-			"clockwork-sms-route",
-			testAccount ->
-				createRoute (
-					taskLogger,
-					transaction,
-					testAccount));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRoutes");
 
-		transaction.flush ();
+		) {
+
+			testAccounts.forEach (
+				"clockwork-sms-route",
+				testAccount ->
+					createRoute (
+						taskLogger,
+						transaction,
+						testAccount));
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createRoute (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createRoute");
+		try (
 
-		switch (
-			params.get (
-				"direction")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRoute");
+
 		) {
 
-		case "in":
+			switch (
+				params.get (
+					"direction")
+			) {
 
-			createInboundRoute (
-				taskLogger,
-				params);
+			case "in":
 
-			break;
+				createInboundRoute (
+					taskLogger,
+					params);
 
-		case "out":
+				break;
 
-			createOutboundRoute (
-				taskLogger,
-				params);
+			case "out":
 
-			break;
+				createOutboundRoute (
+					taskLogger,
+					params);
 
-		default:
+				break;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Clockwork SMS route has invalid direction %s",
-					params.get ("direction")));
+			default:
+
+				throw new RuntimeException (
+					stringFormat (
+						"Clockwork SMS route has invalid direction %s",
+						params.get ("direction")));
+
+			}
 
 		}
 
@@ -320,49 +350,55 @@ class ClockworkSmsFixtureProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createInboundRoute");
+		try (
 
-		RouteRec smsRoute =
-			smsRouteHelper.insert (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createInboundRoute");
+
+		) {
+
+			RouteRec smsRoute =
+				smsRouteHelper.insert (
+					taskLogger,
+					smsRouteHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					simplifyToCodeRequired (
+						params.get ("name")))
+
+				.setName (
+					params.get ("name"))
+
+				.setDescription (
+					params.get ("description"))
+
+				.setCanReceive (
+					true)
+
+			);
+
+			clockworkSmsRouteInHelper.insert (
 				taskLogger,
-				smsRouteHelper.createInstance ()
+				clockworkSmsRouteInHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setRoute (
+					smsRoute)
 
-			.setCode (
-				simplifyToCodeRequired (
-					params.get ("name")))
+				.setClockworkSmsConfig (
+					clockworkSmsConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-			.setName (
-				params.get ("name"))
+			);
 
-			.setDescription (
-				params.get ("description"))
-
-			.setCanReceive (
-				true)
-
-		);
-
-		clockworkSmsRouteInHelper.insert (
-			taskLogger,
-			clockworkSmsRouteInHelper.createInstance ()
-
-			.setRoute (
-				smsRoute)
-
-			.setClockworkSmsConfig (
-				clockworkSmsConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
-
-		);
+		}
 
 	}
 
@@ -371,71 +407,77 @@ class ClockworkSmsFixtureProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createOutboundRoute");
+		try (
 
-		RouteRec smsRoute =
-			smsRouteHelper.insert (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createOutboundRoute");
+
+		) {
+
+			RouteRec smsRoute =
+				smsRouteHelper.insert (
+					taskLogger,
+					smsRouteHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					simplifyToCodeRequired (
+						params.get ("name")))
+
+				.setName (
+					params.get ("name"))
+
+				.setDescription (
+					params.get ("description"))
+
+				.setCanSend (
+					true)
+
+				.setDeliveryReports (
+					true)
+
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"clockwork_sms"))
+
+			);
+
+			clockworkSmsRouteOutHelper.insert (
 				taskLogger,
-				smsRouteHelper.createInstance ()
+				clockworkSmsRouteOutHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setRoute (
+					smsRoute)
 
-			.setCode (
-				simplifyToCodeRequired (
-					params.get ("name")))
+				.setClockworkSmsConfig (
+					clockworkSmsConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-			.setName (
-				params.get ("name"))
+				.setUrl (
+					params.get ("url"))
 
-			.setDescription (
-				params.get ("description"))
+				.setKey (
+					params.get ("key"))
 
-			.setCanSend (
-				true)
+				.setMaxParts (
+					parseIntegerRequired (
+						params.get ("max-parts")))
 
-			.setDeliveryReports (
-				true)
+				.setSimulateMultipart (
+					parseBooleanYesNoRequired (
+						params.get ("simulate-multipart")))
 
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"clockwork_sms"))
+			);
 
-		);
-
-		clockworkSmsRouteOutHelper.insert (
-			taskLogger,
-			clockworkSmsRouteOutHelper.createInstance ()
-
-			.setRoute (
-				smsRoute)
-
-			.setClockworkSmsConfig (
-				clockworkSmsConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
-
-			.setUrl (
-				params.get ("url"))
-
-			.setKey (
-				params.get ("key"))
-
-			.setMaxParts (
-				parseIntegerRequired (
-					params.get ("max-parts")))
-
-			.setSimulateMultipart (
-				parseBooleanYesNoRequired (
-					params.get ("simulate-multipart")))
-
-		);
+		}
 
 	}
 

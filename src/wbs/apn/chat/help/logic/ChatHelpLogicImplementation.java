@@ -73,103 +73,109 @@ class ChatHelpLogicImplementation
 			@NonNull Optional <Long> originalThreadId,
 			@NonNull Optional <ChatHelpLogRec> replyTo) {
 
-		Optional <Long> threadId =
-			originalThreadId;
+		try (
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendHelpMessage");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendHelpMessage");
 
-		ChatRec chat =
-			chatUser.getChat ();
-
-		CommandRec magicCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic");
-
-		CommandRec helpCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"help");
-
-		ServiceRec helpService  =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"help");
-
-		// load templates
-
-		ChatHelpTemplateRec singleTemplate =
-			chatHelpTemplateHelper.findByTypeAndCode (
-				chat,
-				"system",
-				"help_single");
-
-		ChatHelpTemplateRec multipleTemplate =
-			chatHelpTemplateHelper.findByTypeAndCode (
-				chat,
-				"system",
-				"help_multiple");
-
-		// split message
-
-		MessageSplitter.Templates messageSplitterTemplates =
-			new MessageSplitter.Templates (
-				singleTemplate.getText (),
-				multipleTemplate.getText (),
-				multipleTemplate.getText (),
-				multipleTemplate.getText ());
-
-		List <String> splitTexts =
-			MessageSplitter.split (
-				text,
-				messageSplitterTemplates);
-
-		for (
-			String splitText
-				: splitTexts
 		) {
 
-			// send message
+			Optional <Long> threadId =
+				originalThreadId;
 
-			MessageRec message =
-				chatSendLogic.sendMessageMagic (
-					taskLogger,
-					chatUser,
-					threadId,
-					textHelper.findOrCreate (
-						taskLogger,
-						splitText),
-					magicCommand,
-					helpService,
-					helpCommand.getId ());
+			ChatRec chat =
+				chatUser.getChat ();
 
-			if (
-				optionalIsNotPresent (
-					threadId)
+			CommandRec magicCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic");
+
+			CommandRec helpCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"help");
+
+			ServiceRec helpService  =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"help");
+
+			// load templates
+
+			ChatHelpTemplateRec singleTemplate =
+				chatHelpTemplateHelper.findByTypeAndCode (
+					chat,
+					"system",
+					"help_single");
+
+			ChatHelpTemplateRec multipleTemplate =
+				chatHelpTemplateHelper.findByTypeAndCode (
+					chat,
+					"system",
+					"help_multiple");
+
+			// split message
+
+			MessageSplitter.Templates messageSplitterTemplates =
+				new MessageSplitter.Templates (
+					singleTemplate.getText (),
+					multipleTemplate.getText (),
+					multipleTemplate.getText (),
+					multipleTemplate.getText ());
+
+			List <String> splitTexts =
+				MessageSplitter.split (
+					text,
+					messageSplitterTemplates);
+
+			for (
+				String splitText
+					: splitTexts
 			) {
 
-				threadId =
-					Optional.of (
-						message.getId ());
+				// send message
+
+				MessageRec message =
+					chatSendLogic.sendMessageMagic (
+						taskLogger,
+						chatUser,
+						threadId,
+						textHelper.findOrCreate (
+							taskLogger,
+							splitText),
+						magicCommand,
+						helpService,
+						helpCommand.getId ());
+
+				if (
+					optionalIsNotPresent (
+						threadId)
+				) {
+
+					threadId =
+						Optional.of (
+							message.getId ());
+
+				}
+
+				// save reply
+
+				chatHelpLogLogic.createChatHelpLogOut (
+					taskLogger,
+					chatUser,
+					replyTo,
+					optionalOf (
+						user),
+					message,
+					optionalAbsent (),
+					splitText,
+					optionalOf (
+						helpCommand));
 
 			}
-
-			// save reply
-
-			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
-				chatUser,
-				replyTo,
-				optionalOf (
-					user),
-				message,
-				optionalAbsent (),
-				splitText,
-				optionalOf (
-					helpCommand));
 
 		}
 

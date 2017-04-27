@@ -172,78 +172,84 @@ class ComponentManagerBuilder {
 	void loadPlugins (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"loadPlugins");
+		try (
 
-		String buildPath =
-			"/wbs-build.xml";
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"loadPlugins");
 
-		DataFromXml buildDataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				BuildSpec.class,
-				BuildPluginSpec.class)
-
-			.build ();
-
-		BuildSpec build =
-			(BuildSpec)
-			buildDataFromXml.readClasspath (
-				taskLogger,
-				buildPath);
-
-		ImmutableList.Builder <PluginSpec> pluginsBuilder =
-			ImmutableList.builder ();
-
-		DataFromXml pluginDataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				PluginApiModuleSpec.class,
-				PluginComponentSpec.class,
-				PluginComponentTypeSpec.class,
-				PluginConsoleModuleSpec.class,
-				PluginCustomTypeSpec.class,
-				PluginEnumTypeSpec.class,
-				PluginFixtureSpec.class,
-				PluginLayerSpec.class,
-				PluginModelSpec.class,
-				PluginModelsSpec.class,
-				PluginDependencySpec.class,
-				PluginSpec.class)
-
-			.build ();
-
-		for (
-			BuildPluginSpec buildPlugin
-				: build.plugins ()
 		) {
 
-			String pluginPath =
-				stringFormat (
-					"/%s",
-					buildPlugin.packageName ().replace (".", "/"),
-					"/%s-plugin.xml",
-					buildPlugin.name ());
+			String buildPath =
+				"/wbs-build.xml";
 
-			PluginSpec plugin =
-				(PluginSpec)
-				pluginDataFromXml.readClasspath (
+			DataFromXml buildDataFromXml =
+				new DataFromXmlBuilder ()
+
+				.registerBuilderClasses (
+					BuildSpec.class,
+					BuildPluginSpec.class)
+
+				.build ();
+
+			BuildSpec build =
+				(BuildSpec)
+				buildDataFromXml.readClasspath (
 					taskLogger,
-					pluginPath,
-					ImmutableList.of (
-						build));
+					buildPath);
 
-			pluginsBuilder.add (
-				plugin);
+			ImmutableList.Builder <PluginSpec> pluginsBuilder =
+				ImmutableList.builder ();
+
+			DataFromXml pluginDataFromXml =
+				new DataFromXmlBuilder ()
+
+				.registerBuilderClasses (
+					PluginApiModuleSpec.class,
+					PluginComponentSpec.class,
+					PluginComponentTypeSpec.class,
+					PluginConsoleModuleSpec.class,
+					PluginCustomTypeSpec.class,
+					PluginEnumTypeSpec.class,
+					PluginFixtureSpec.class,
+					PluginLayerSpec.class,
+					PluginModelSpec.class,
+					PluginModelsSpec.class,
+					PluginDependencySpec.class,
+					PluginSpec.class)
+
+				.build ();
+
+			for (
+				BuildPluginSpec buildPlugin
+					: build.plugins ()
+			) {
+
+				String pluginPath =
+					stringFormat (
+						"/%s",
+						buildPlugin.packageName ().replace (".", "/"),
+						"/%s-plugin.xml",
+						buildPlugin.name ());
+
+				PluginSpec plugin =
+					(PluginSpec)
+					pluginDataFromXml.readClasspath (
+						taskLogger,
+						pluginPath,
+						ImmutableList.of (
+							build));
+
+				pluginsBuilder.add (
+					plugin);
+
+			}
+
+			plugins =
+				pluginsBuilder.build ();
 
 		}
-
-		plugins =
-			pluginsBuilder.build ();
 
 	}
 
@@ -264,38 +270,44 @@ class ComponentManagerBuilder {
 	private
 	void registerComponents () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"registerComponents");
+		try (
 
-		createComponentRegistry ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"registerComponents");
 
-		registerLayerComponents (
-			taskLogger);
-
-		registerConfigComponents (
-			taskLogger);
-
-		registerSingletonComponents (
-			taskLogger);
-
-		if (taskLogger.errors ()) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
-					integerToDecimalString (
-						taskLogger.errorCount ())));
-
-		}
-
-		for (
-			ComponentDefinition componentDefinition
-				: componentDefinitionsToRegister
 		) {
 
-			componentRegistry.registerDefinition (
-				componentDefinition);
+			createComponentRegistry ();
+
+			registerLayerComponents (
+				taskLogger);
+
+			registerConfigComponents (
+				taskLogger);
+
+			registerSingletonComponents (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Aborting due to %s errors",
+						integerToDecimalString (
+							taskLogger.errorCount ())));
+
+			}
+
+			for (
+				ComponentDefinition componentDefinition
+					: componentDefinitionsToRegister
+			) {
+
+				componentRegistry.registerDefinition (
+					componentDefinition);
+
+			}
 
 		}
 
@@ -305,49 +317,55 @@ class ComponentManagerBuilder {
 	void registerLayerComponents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerLayerComponents");
+		try (
 
-		for (
-			String layerName
-				: layerNames
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerLayerComponents");
+
 		) {
 
-			taskLogger.noticeFormat (
-				"Loading components for layer %s",
-				layerName);
-
 			for (
-				PluginSpec plugin
-					: plugins
+				String layerName
+					: layerNames
 			) {
 
-				PluginLayerSpec layer =
-					plugin.layersByName ().get (
-						layerName);
+				taskLogger.noticeFormat (
+					"Loading components for layer %s",
+					layerName);
 
-				if (layer != null) {
+				for (
+					PluginSpec plugin
+						: plugins
+				) {
 
-					registerLayerComponents (
-						taskLogger,
-						plugin,
-						layer);
+					PluginLayerSpec layer =
+						plugin.layersByName ().get (
+							layerName);
+
+					if (layer != null) {
+
+						registerLayerComponents (
+							taskLogger,
+							plugin,
+							layer);
+
+					}
 
 				}
 
-			}
+				for (
+					PluginSpec plugin
+						: plugins
+				) {
 
-			for (
-				PluginSpec plugin
-					: plugins
-			) {
+					registerLayerAutomaticComponents (
+						taskLogger,
+						plugin,
+						layerName);
 
-				registerLayerAutomaticComponents (
-					taskLogger,
-					plugin,
-					layerName);
+				}
 
 			}
 
@@ -625,61 +643,67 @@ class ComponentManagerBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginSpec plugin) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerFixtureLayerComponents");
+		try (
 
-		for (
-			PluginFixtureSpec fixture
-				: plugin.fixtures ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerFixtureLayerComponents");
+
 		) {
 
-			String fixtureProviderComponentName =
-				stringFormat (
-					"%sFixtureProvider",
-					fixture.name ());
+			for (
+				PluginFixtureSpec fixture
+					: plugin.fixtures ()
+			) {
 
-			String fixtureProviderClassName =
-				stringFormat (
-					"%s.fixture.%sFixtureProvider",
-					plugin.packageName (),
-					capitalise (
-						fixture.name ()));
+				String fixtureProviderComponentName =
+					stringFormat (
+						"%sFixtureProvider",
+						fixture.name ());
 
-			Class<?> fixtureProviderClass;
+				String fixtureProviderClassName =
+					stringFormat (
+						"%s.fixture.%sFixtureProvider",
+						plugin.packageName (),
+						capitalise (
+							fixture.name ()));
 
-			try {
+				Class<?> fixtureProviderClass;
 
-				fixtureProviderClass =
-					Class.forName (
-						fixtureProviderClassName);
+				try {
 
-			} catch (ClassNotFoundException exception) {
+					fixtureProviderClass =
+						Class.forName (
+							fixtureProviderClassName);
 
-				taskLogger.errorFormat (
-					"Can't find fixture provider of type %s ",
-					fixtureProviderClassName,
-					"for fixture %s ",
-					fixture.name (),
-					"from %s",
-					plugin.name ());
+				} catch (ClassNotFoundException exception) {
 
-				continue;
+					taskLogger.errorFormat (
+						"Can't find fixture provider of type %s ",
+						fixtureProviderClassName,
+						"for fixture %s ",
+						fixture.name (),
+						"from %s",
+						plugin.name ());
+
+					continue;
+
+				}
+
+				componentRegistry.registerDefinition (
+					new ComponentDefinition ()
+
+					.name (
+						fixtureProviderComponentName)
+
+					.componentClass (
+						fixtureProviderClass)
+
+					.scope (
+						"prototype"));
 
 			}
-
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					fixtureProviderComponentName)
-
-				.componentClass (
-					fixtureProviderClass)
-
-				.scope (
-					"prototype"));
 
 		}
 
@@ -756,285 +780,291 @@ class ComponentManagerBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginComponentSpec componentSpec) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerLayerComponent");
+		try (
 
-		taskLogger.debugFormat (
-			"Loading %s from %s",
-			componentSpec.className (),
-			componentSpec.plugin ().name ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerLayerComponent");
 
-		String componentClassName =
-			stringFormat (
-				"%s.%s",
-				componentSpec.plugin ().packageName (),
-				componentSpec.className ());
-
-		Class <?> componentClass;
-
-		try {
-
-			componentClass =
-				Class.forName (
-					componentClassName);
-
-		} catch (ClassNotFoundException exception) {
-
-			taskLogger.errorFormat (
-				"No such class %s in %s.%s.%s",
-				componentClassName,
-				componentSpec.plugin ().name (),
-				componentSpec.layer ().name (),
-				componentSpec.className ());
-
-			return;
-
-		}
-
-		String componentName = null;
-
-		SingletonComponent singletonComponent =
-			componentClass.getAnnotation (
-				SingletonComponent.class);
-
-		if (singletonComponent != null) {
-
-			componentName =
-				singletonComponent.value ();
-
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					componentName)
-
-				.componentClass (
-					componentClass)
-
-				.scope (
-					"singleton")
-
-			);
-
-		}
-
-		PrototypeComponent prototypeComponent =
-			componentClass.getAnnotation (
-				PrototypeComponent.class);
-
-		if (prototypeComponent != null) {
-
-			componentName =
-				prototypeComponent.value ();
-
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					componentName)
-
-				.componentClass (
-					componentClass)
-
-				.scope (
-					"prototype")
-
-			);
-
-		}
-
-		ProxiedRequestComponent proxiedRequestComponent =
-			componentClass.getAnnotation (
-				ProxiedRequestComponent.class);
-
-		if (proxiedRequestComponent != null) {
-
-			componentName =
-				proxiedRequestComponent.value ();
-
-			String targetComponentName =
-				stringFormat (
-					"%sTarget",
-					componentName);
-
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					targetComponentName)
-
-				.componentClass (
-					componentClass)
-
-				.scope (
-					"prototype")
-
-				.hide (
-					true)
-
-			);
-
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					componentName)
-
-				.componentClass (
-					proxiedRequestComponent.proxyInterface ())
-
-				.factoryClass (
-					ThreadLocalProxyComponentFactory.class)
-
-				.scope (
-					"singleton")
-
-				.addValueProperty (
-					"componentName",
-					componentName)
-
-				.addValueProperty (
-					"componentClass",
-					proxiedRequestComponent.proxyInterface ())
-
-			);
-
-			componentRegistry.addRequestComponentName (
-				componentName);
-
-		}
-
-		if (componentName == null) {
-
-			taskLogger.errorFormat (
-				"Could not find component annotation on %s",
-				componentClass.getName ());
-
-			return;
-
-		}
-
-		for (
-			Method method
-				: componentClass.getDeclaredMethods ()
 		) {
 
-			Named namedAnnotation =
-				method.getAnnotation (
-					Named.class);
+			taskLogger.debugFormat (
+				"Loading %s from %s",
+				componentSpec.className (),
+				componentSpec.plugin ().name ());
 
-			SingletonComponent singletonComponentAnnotation =
-				method.getAnnotation (
+			String componentClassName =
+				stringFormat (
+					"%s.%s",
+					componentSpec.plugin ().packageName (),
+					componentSpec.className ());
+
+			Class <?> componentClass;
+
+			try {
+
+				componentClass =
+					Class.forName (
+						componentClassName);
+
+			} catch (ClassNotFoundException exception) {
+
+				taskLogger.errorFormat (
+					"No such class %s in %s.%s.%s",
+					componentClassName,
+					componentSpec.plugin ().name (),
+					componentSpec.layer ().name (),
+					componentSpec.className ());
+
+				return;
+
+			}
+
+			String componentName = null;
+
+			SingletonComponent singletonComponent =
+				componentClass.getAnnotation (
 					SingletonComponent.class);
 
-			if (
-				isNotNull (
-					singletonComponentAnnotation)
-			) {
+			if (singletonComponent != null) {
 
-				if (
-					stringNotEqualSafe (
-						method.getName (),
-						singletonComponentAnnotation.value ())
-				) {
-
-					taskLogger.warningFormat (
-						"Factory method name '%s' ",
-						method.getName (),
-						"does not match component name '%s'",
-						singletonComponentAnnotation.value ());
-
-				}
+				componentName =
+					singletonComponent.value ();
 
 				componentRegistry.registerDefinition (
 					new ComponentDefinition ()
 
 					.name (
-						singletonComponentAnnotation.value ())
+						componentName)
 
 					.componentClass (
-						method.getReturnType ())
+						componentClass)
 
 					.scope (
 						"singleton")
-
-					.factoryClass (
-						MethodComponentFactory.class)
-
-					.addReferenceProperty (
-						"factoryComponent",
-						componentName)
-
-					.addValueProperty (
-						"factoryMethodName",
-						method.getName ())
-
-					.addValueProperty (
-						"initialized",
-						false)
-
-					.hide (
-						isNotNull (
-							namedAnnotation))
 
 				);
 
 			}
 
-			PrototypeComponent prototypeComponentAnnotation =
-				method.getAnnotation (
+			PrototypeComponent prototypeComponent =
+				componentClass.getAnnotation (
 					PrototypeComponent.class);
 
-			if (prototypeComponentAnnotation != null) {
+			if (prototypeComponent != null) {
 
-				if (
-					stringNotEqualSafe (
-						method.getName (),
-						prototypeComponentAnnotation.value ())
-				) {
-
-					taskLogger.warningFormat (
-						"Factory method name '%s' ",
-						method.getName (),
-						"does not match component name '%s' ",
-						prototypeComponentAnnotation.value ());
-
-				}
+				componentName =
+					prototypeComponent.value ();
 
 				componentRegistry.registerDefinition (
 					new ComponentDefinition ()
 
 					.name (
-						prototypeComponentAnnotation.value ())
+						componentName)
 
 					.componentClass (
-						method.getReturnType ())
+						componentClass)
 
 					.scope (
 						"prototype")
 
-					.factoryClass (
-						MethodComponentFactory.class)
+				);
 
-					.addReferenceProperty (
-						"factoryComponent",
+			}
+
+			ProxiedRequestComponent proxiedRequestComponent =
+				componentClass.getAnnotation (
+					ProxiedRequestComponent.class);
+
+			if (proxiedRequestComponent != null) {
+
+				componentName =
+					proxiedRequestComponent.value ();
+
+				String targetComponentName =
+					stringFormat (
+						"%sTarget",
+						componentName);
+
+				componentRegistry.registerDefinition (
+					new ComponentDefinition ()
+
+					.name (
+						targetComponentName)
+
+					.componentClass (
+						componentClass)
+
+					.scope (
+						"prototype")
+
+					.hide (
+						true)
+
+				);
+
+				componentRegistry.registerDefinition (
+					new ComponentDefinition ()
+
+					.name (
+						componentName)
+
+					.componentClass (
+						proxiedRequestComponent.proxyInterface ())
+
+					.factoryClass (
+						ThreadLocalProxyComponentFactory.class)
+
+					.scope (
+						"singleton")
+
+					.addValueProperty (
+						"componentName",
 						componentName)
 
 					.addValueProperty (
-						"factoryMethodName",
-						method.getName ())
-
-					.addValueProperty (
-						"initialized",
-						false)
-
-					.hide (
-						isNotNull (
-							namedAnnotation))
+						"componentClass",
+						proxiedRequestComponent.proxyInterface ())
 
 				);
+
+				componentRegistry.addRequestComponentName (
+					componentName);
+
+			}
+
+			if (componentName == null) {
+
+				taskLogger.errorFormat (
+					"Could not find component annotation on %s",
+					componentClass.getName ());
+
+				return;
+
+			}
+
+			for (
+				Method method
+					: componentClass.getDeclaredMethods ()
+			) {
+
+				Named namedAnnotation =
+					method.getAnnotation (
+						Named.class);
+
+				SingletonComponent singletonComponentAnnotation =
+					method.getAnnotation (
+						SingletonComponent.class);
+
+				if (
+					isNotNull (
+						singletonComponentAnnotation)
+				) {
+
+					if (
+						stringNotEqualSafe (
+							method.getName (),
+							singletonComponentAnnotation.value ())
+					) {
+
+						taskLogger.warningFormat (
+							"Factory method name '%s' ",
+							method.getName (),
+							"does not match component name '%s'",
+							singletonComponentAnnotation.value ());
+
+					}
+
+					componentRegistry.registerDefinition (
+						new ComponentDefinition ()
+
+						.name (
+							singletonComponentAnnotation.value ())
+
+						.componentClass (
+							method.getReturnType ())
+
+						.scope (
+							"singleton")
+
+						.factoryClass (
+							MethodComponentFactory.class)
+
+						.addReferenceProperty (
+							"factoryComponent",
+							componentName)
+
+						.addValueProperty (
+							"factoryMethodName",
+							method.getName ())
+
+						.addValueProperty (
+							"initialized",
+							false)
+
+						.hide (
+							isNotNull (
+								namedAnnotation))
+
+					);
+
+				}
+
+				PrototypeComponent prototypeComponentAnnotation =
+					method.getAnnotation (
+						PrototypeComponent.class);
+
+				if (prototypeComponentAnnotation != null) {
+
+					if (
+						stringNotEqualSafe (
+							method.getName (),
+							prototypeComponentAnnotation.value ())
+					) {
+
+						taskLogger.warningFormat (
+							"Factory method name '%s' ",
+							method.getName (),
+							"does not match component name '%s' ",
+							prototypeComponentAnnotation.value ());
+
+					}
+
+					componentRegistry.registerDefinition (
+						new ComponentDefinition ()
+
+						.name (
+							prototypeComponentAnnotation.value ())
+
+						.componentClass (
+							method.getReturnType ())
+
+						.scope (
+							"prototype")
+
+						.factoryClass (
+							MethodComponentFactory.class)
+
+						.addReferenceProperty (
+							"factoryComponent",
+							componentName)
+
+						.addValueProperty (
+							"factoryMethodName",
+							method.getName ())
+
+						.addValueProperty (
+							"initialized",
+							false)
+
+						.hide (
+							isNotNull (
+								namedAnnotation))
+
+					);
+
+				}
 
 			}
 
@@ -1043,384 +1073,450 @@ class ComponentManagerBuilder {
 	}
 
 	void registerObjectHooks (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginModelSpec model) {
 
-		String objectHooksComponentName =
-			stringFormat (
-				"%sHooks",
-				model.name ());
+		try (
 
-		String objectHooksClassName =
-			stringFormat (
-				"%s.logic.%sHooks",
-				model.plugin ().packageName (),
-				capitalise (model.name ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerObjectHooks");
 
-		Class <?> objectHooksClass;
+		) {
 
-		try {
+			String objectHooksComponentName =
+				stringFormat (
+					"%sHooks",
+					model.name ());
 
-			objectHooksClass =
-				Class.forName (
-					objectHooksClassName);
+			String objectHooksClassName =
+				stringFormat (
+					"%s.logic.%sHooks",
+					model.plugin ().packageName (),
+					capitalise (model.name ()));
 
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
+			Class <?> objectHooksClass;
 
-				.name (
-					objectHooksComponentName)
+			try {
 
-				.componentClass (
-					objectHooksClass)
+				objectHooksClass =
+					Class.forName (
+						objectHooksClassName);
 
-				.scope (
-					"singleton")
+				componentRegistry.registerDefinition (
+					new ComponentDefinition ()
 
-			);
+					.name (
+						objectHooksComponentName)
 
-		} catch (ClassNotFoundException exception) {
+					.componentClass (
+						objectHooksClass)
 
-			componentRegistry.registerDefinition (
-				new ComponentDefinition ()
+					.scope (
+						"singleton")
 
-				.name (
-					objectHooksComponentName)
+				);
 
-				.componentClass (
-					ObjectHooks.DefaultImplementation.class)
+			} catch (ClassNotFoundException exception) {
 
-				.scope (
-					"singleton")
+				componentRegistry.registerDefinition (
+					new ComponentDefinition ()
 
-			);
+					.name (
+						objectHooksComponentName)
+
+					.componentClass (
+						ObjectHooks.DefaultImplementation.class)
+
+					.scope (
+						"singleton")
+
+				);
+
+			}
 
 		}
 
 	}
 
 	void registerObjectHelper (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginModelSpec model) {
 
-		String objectHelperComponentName =
-			stringFormat (
-				"%sObjectHelper",
-				model.name ());
+		try (
 
-		String objectHelperImplementationClassName =
-			stringFormat (
-				"%s.logic.%sObjectHelperImplementation",
-				model.plugin ().packageName (),
-				capitalise (
-					model.name ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerObjectHelper");
 
-		Class <?> objectHelperImplementationClass =
-			classForNameRequired (
-				objectHelperImplementationClassName);
+		) {
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+			String objectHelperComponentName =
+				stringFormat (
+					"%sObjectHelper",
+					model.name ());
 
-			.name (
-				objectHelperComponentName)
+			String objectHelperImplementationClassName =
+				stringFormat (
+					"%s.logic.%sObjectHelperImplementation",
+					model.plugin ().packageName (),
+					capitalise (
+						model.name ()));
 
-			.componentClass (
-				objectHelperImplementationClass)
+			Class <?> objectHelperImplementationClass =
+				classForNameRequired (
+					objectHelperImplementationClassName);
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				new ComponentDefinition ()
 
-		);
+				.name (
+					objectHelperComponentName)
+
+				.componentClass (
+					objectHelperImplementationClass)
+
+				.scope (
+					"singleton")
+
+			);
+
+		}
 
 	}
 
 	void registerObjectHelperMethodsImplementation (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginModelSpec model) {
 
-		String objectHelperMethodsImplementationComponentName =
-			stringFormat (
-				"%sObjectHelperMethodsImplementation",
-				model.name ());
+		try (
 
-		String objectHelperMethodsImplementationClassName =
-			stringFormat (
-				"%s.logic.%sObjectHelperMethodsImplementation",
-				model.plugin ().packageName (),
-				capitalise (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerObjectHelperMethodsImplementation");
+
+		) {
+
+			String objectHelperMethodsImplementationComponentName =
+				stringFormat (
+					"%sObjectHelperMethodsImplementation",
+					model.name ());
+
+			String objectHelperMethodsImplementationClassName =
+				stringFormat (
+					"%s.logic.%sObjectHelperMethodsImplementation",
+					model.plugin ().packageName (),
+					capitalise (
+						model.name ()));
+
+			Class <?> objectHelperMethodsImplementationClass;
+
+			try {
+
+				objectHelperMethodsImplementationClass =
+					Class.forName (
+						objectHelperMethodsImplementationClassName);
+
+			} catch (ClassNotFoundException exception) {
+
+				/*
+				log.warn (sf (
+					"No object helper implementation for %s.%s.%s",
+					model.project ().packageName (),
+					model.plugin ().packageName (),
 					model.name ()));
+				*/
 
-		Class <?> objectHelperMethodsImplementationClass;
+				return;
 
-		try {
+			}
 
-			objectHelperMethodsImplementationClass =
-				Class.forName (
-					objectHelperMethodsImplementationClassName);
+			componentRegistry.registerDefinition (
+				new ComponentDefinition ()
 
-		} catch (ClassNotFoundException exception) {
+				.name (
+					objectHelperMethodsImplementationComponentName)
 
-			/*
-			log.warn (sf (
-				"No object helper implementation for %s.%s.%s",
-				model.project ().packageName (),
-				model.plugin ().packageName (),
-				model.name ()));
-			*/
+				.componentClass (
+					objectHelperMethodsImplementationClass)
+
+				.scope (
+					"singleton")
+
+			);
 
 			return;
 
 		}
-
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
-
-			.name (
-				objectHelperMethodsImplementationComponentName)
-
-			.componentClass (
-				objectHelperMethodsImplementationClass)
-
-			.scope (
-				"singleton")
-
-		);
-
-		return;
 
 	}
 
 	void registerDaoHibernate (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginModelSpec pluginModelSpec) {
 
-		String daoComponentName =
-			stringFormat (
-				"%sDao",
-				pluginModelSpec.name ());
+		try (
 
-		String daoClassName =
-			stringFormat (
-				"%s.model.%sDao",
-				pluginModelSpec.plugin ().packageName (),
-				capitalise (
-					pluginModelSpec.name ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerDaoHibernate");
 
-		boolean gotDaoClass;
+		) {
 
-		try {
+			String daoComponentName =
+				stringFormat (
+					"%sDao",
+					pluginModelSpec.name ());
 
-			Class.forName (
-				daoClassName);
+			String daoClassName =
+				stringFormat (
+					"%s.model.%sDao",
+					pluginModelSpec.plugin ().packageName (),
+					capitalise (
+						pluginModelSpec.name ()));
 
-			gotDaoClass = true;
+			boolean gotDaoClass;
 
-		} catch (ClassNotFoundException exception) {
+			try {
 
-			gotDaoClass = false;
-
-		}
-
-		String daoHibernateClassName =
-			stringFormat (
-				"%s.hibernate.%sDaoHibernate",
-				pluginModelSpec.plugin ().packageName (),
-				capitalise (
-					pluginModelSpec.name ()));
-
-		Class<?> daoHibernateClass = null;
-		boolean gotDaoHibernateClass;
-
-		try {
-
-			daoHibernateClass =
 				Class.forName (
-					daoHibernateClassName);
+					daoClassName);
 
-			gotDaoHibernateClass = true;
+				gotDaoClass = true;
 
-		} catch (ClassNotFoundException exception) {
+			} catch (ClassNotFoundException exception) {
 
-			gotDaoHibernateClass = false;
+				gotDaoClass = false;
 
-		}
+			}
 
-		if (
-			! gotDaoClass
-			&& ! gotDaoHibernateClass
-		) {
+			String daoHibernateClassName =
+				stringFormat (
+					"%s.hibernate.%sDaoHibernate",
+					pluginModelSpec.plugin ().packageName (),
+					capitalise (
+						pluginModelSpec.name ()));
+
+			Class<?> daoHibernateClass = null;
+			boolean gotDaoHibernateClass;
+
+			try {
+
+				daoHibernateClass =
+					Class.forName (
+						daoHibernateClassName);
+
+				gotDaoHibernateClass = true;
+
+			} catch (ClassNotFoundException exception) {
+
+				gotDaoHibernateClass = false;
+
+			}
+
+			if (
+				! gotDaoClass
+				&& ! gotDaoHibernateClass
+			) {
+				return;
+			}
+
+			if (
+				! gotDaoClass
+				|| ! gotDaoHibernateClass
+			) {
+
+				taskLogger.errorFormat (
+					"DAO methods or implementation missing for %s in %s",
+					pluginModelSpec.name (),
+					pluginModelSpec.plugin ().name ());
+
+				return;
+
+			}
+
+			componentRegistry.registerDefinition (
+				new ComponentDefinition ()
+
+				.name (
+					daoComponentName)
+
+				.componentClass (
+					daoHibernateClass)
+
+				.scope (
+					"singleton")
+
+			);
+
 			return;
-		}
-
-		if (
-			! gotDaoClass
-			|| ! gotDaoHibernateClass
-		) {
-
-			taskLog.errorFormat (
-				"DAO methods or implementation missing for %s in %s",
-				pluginModelSpec.name (),
-				pluginModelSpec.plugin ().name ());
-
-			return;
 
 		}
-
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
-
-			.name (
-				daoComponentName)
-
-			.componentClass (
-				daoHibernateClass)
-
-			.scope (
-				"singleton")
-
-		);
-
-		return;
 
 	}
 
 	void registerConsoleHelper (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginModelSpec model) {
 
-		String consoleHelperComponentName =
-			stringFormat (
-				"%sConsoleHelper",
-				model.name ());
+		try (
 
-		// console helper
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleHelper");
 
-		String consoleHelperClassName =
-			stringFormat (
-				"%s.console.%sConsoleHelper",
-				model.plugin ().packageName (),
-				capitalise (
-					model.name ()));
-
-		Optional <Class <?>> consoleHelperClassOptional =
-			classForName (
-				consoleHelperClassName);
-
-		if (
-			optionalIsNotPresent (
-				consoleHelperClassOptional)
 		) {
 
-			taskLog.errorFormat (
-				"No such class %s",
-				consoleHelperClassName);
+			String consoleHelperComponentName =
+				stringFormat (
+					"%sConsoleHelper",
+					model.name ());
 
-			return;
+			// console helper
+
+			String consoleHelperClassName =
+				stringFormat (
+					"%s.console.%sConsoleHelper",
+					model.plugin ().packageName (),
+					capitalise (
+						model.name ()));
+
+			Optional <Class <?>> consoleHelperClassOptional =
+				classForName (
+					consoleHelperClassName);
+
+			if (
+				optionalIsNotPresent (
+					consoleHelperClassOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"No such class %s",
+					consoleHelperClassName);
+
+				return;
+
+			}
+
+			// console helper implemenation
+
+			String consoleHelperImplementationClassName =
+				stringFormat (
+					"%s.console.%sConsoleHelperImplementation",
+					model.plugin ().packageName (),
+					capitalise (
+						model.name ()));
+
+			Optional <Class <?>> consoleHelperImplementationClassOptional =
+				classForName (
+					consoleHelperImplementationClassName);
+
+			if (
+				optionalIsNotPresent (
+					consoleHelperImplementationClassOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"No such class %s",
+					consoleHelperImplementationClassName);
+
+				return;
+
+			}
+
+			Class <?> consoleHelperImplementationClass =
+				consoleHelperImplementationClassOptional.get ();
+
+			// component definition
+
+			componentRegistry.registerDefinition (
+				new ComponentDefinition ()
+
+				.name (
+					consoleHelperComponentName)
+
+				.componentClass (
+					consoleHelperImplementationClass)
+
+				.scope (
+					"singleton")
+
+			);
 
 		}
-
-		// console helper implemenation
-
-		String consoleHelperImplementationClassName =
-			stringFormat (
-				"%s.console.%sConsoleHelperImplementation",
-				model.plugin ().packageName (),
-				capitalise (
-					model.name ()));
-
-		Optional <Class <?>> consoleHelperImplementationClassOptional =
-			classForName (
-				consoleHelperImplementationClassName);
-
-		if (
-			optionalIsNotPresent (
-				consoleHelperImplementationClassOptional)
-		) {
-
-			taskLog.errorFormat (
-				"No such class %s",
-				consoleHelperImplementationClassName);
-
-			return;
-
-		}
-
-		Class <?> consoleHelperImplementationClass =
-			consoleHelperImplementationClassOptional.get ();
-
-		// component definition
-
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
-
-			.name (
-				consoleHelperComponentName)
-
-			.componentClass (
-				consoleHelperImplementationClass)
-
-			.scope (
-				"singleton")
-
-		);
 
 	}
 
 	void registerEnumConsoleHelper (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginEnumTypeSpec enumType) {
 
-		String enumClassName =
-			stringFormat (
-				"%s.model.%s",
-				enumType.plugin ().packageName (),
-				capitalise (
-					enumType.name ()));
+		try (
 
-		Class <?> enumClass;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerEnumConsoleHelper");
 
-		try {
+		) {
 
-			enumClass =
-				Class.forName (
+			String enumClassName =
+				stringFormat (
+					"%s.model.%s",
+					enumType.plugin ().packageName (),
+					capitalise (
+						enumType.name ()));
+
+			Class <?> enumClass;
+
+			try {
+
+				enumClass =
+					Class.forName (
+						enumClassName);
+
+			} catch (ClassNotFoundException exception) {
+
+				taskLogger.errorFormat (
+					"No such class %s",
 					enumClassName);
 
-		} catch (ClassNotFoundException exception) {
+				return;
 
-			taskLog.errorFormat (
-				"No such class %s",
-				enumClassName);
+			}
 
-			return;
+			String enumConsoleHelperComponentName =
+				stringFormat (
+					"%sConsoleHelper",
+					enumType.name ());
+
+			componentRegistry.registerDefinition (
+				new ComponentDefinition ()
+
+				.name (
+					enumConsoleHelperComponentName)
+
+				.componentClass (
+					EnumConsoleHelper.class)
+
+				.factoryClass (
+					EnumConsoleHelperFactory.class)
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"enumClass",
+					enumClass)
+
+			);
 
 		}
-
-		String enumConsoleHelperComponentName =
-			stringFormat (
-				"%sConsoleHelper",
-				enumType.name ());
-
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
-
-			.name (
-				enumConsoleHelperComponentName)
-
-			.componentClass (
-				EnumConsoleHelper.class)
-
-			.factoryClass (
-				EnumConsoleHelperFactory.class)
-
-			.scope (
-				"singleton")
-
-			.addValueProperty (
-				"enumClass",
-				enumClass)
-
-		);
 
 	}
 
@@ -1502,28 +1598,34 @@ class ComponentManagerBuilder {
 	void registerConfigComponents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerConfigComponents");
+		try (
 
-		for (
-			String configName
-				: configNames
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConfigComponents");
+
 		) {
 
-			taskLogger.noticeFormat (
-				"Loading configuration %s",
-				configName);
+			for (
+				String configName
+					: configNames
+			) {
 
-			String configPath =
-				stringFormat (
-					"conf/%s-config-components.xml",
+				taskLogger.noticeFormat (
+					"Loading configuration %s",
 					configName);
 
-			componentRegistry.registerXmlFilename (
-				taskLogger,
-				configPath);
+				String configPath =
+					stringFormat (
+						"conf/%s-config-components.xml",
+						configName);
+
+				componentRegistry.registerXmlFilename (
+					taskLogger,
+					configPath);
+
+			}
 
 		}
 

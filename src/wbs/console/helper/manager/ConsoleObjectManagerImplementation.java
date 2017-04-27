@@ -162,56 +162,62 @@ class ConsoleObjectManagerImplementation
 			@NonNull Boolean link,
 			@NonNull Long colspan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeTdForObject");
+		try (
 
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelperRequired (
-				object);
-
-		String path =
-			objectManager.objectPathMini (
-				object,
-				assumedRootOptional);
-
-		if (
-
-			link
-
-			&& canView (
-				taskLogger,
-				object)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeTdForObject");
 
 		) {
 
-			new HtmlTableCellWriter ()
+			ConsoleHelper <?> objectHelper =
+				findConsoleHelperRequired (
+					object);
 
-				.href (
-					requestContext.resolveLocalUrl (
-						objectHelper.getDefaultLocalPathGeneric (
-							taskLogger,
-							object)))
+			String path =
+				objectManager.objectPathMini (
+					object,
+					assumedRootOptional);
 
-				.target (
-					"main")
+			if (
 
-				.columnSpan (
-					colspan)
+				link
 
-				.write (
-					formatWriter);
+				&& canView (
+					taskLogger,
+					object)
 
-			formatWriter.writeFormat (
-				"%h</td>",
-				path);
+			) {
 
-		} else {
+				new HtmlTableCellWriter ()
 
-			formatWriter.writeLineFormat (
-				"<td>%h</td>",
-				path);
+					.href (
+						requestContext.resolveLocalUrl (
+							objectHelper.getDefaultLocalPathGeneric (
+								taskLogger,
+								object)))
+
+					.target (
+						"main")
+
+					.columnSpan (
+						colspan)
+
+					.write (
+						formatWriter);
+
+				formatWriter.writeFormat (
+					"%h</td>",
+					path);
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"<td>%h</td>",
+					path);
+
+			}
 
 		}
 
@@ -226,37 +232,43 @@ class ConsoleObjectManagerImplementation
 			@NonNull Optional <Record <?>> assumedRootOptional,
 			@NonNull Boolean mini) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeHtmlForObject");
+		try (
 
-		if (taskLogger.debugEnabled ()) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeHtmlForObject");
 
-			taskLogger.debugFormat (
-				"%s.htmlForObject (%s, %s, %s)",
-				getClass ().getName (),
-				objectManager.objectPath (
-					object),
-				optionalMapRequiredOrDefault (
-					objectManager::objectPath,
-					assumedRootOptional,
-					"—"),
-				Boolean.toString (
-					mini));
+		) {
+
+			if (taskLogger.debugEnabled ()) {
+
+				taskLogger.debugFormat (
+					"%s.htmlForObject (%s, %s, %s)",
+					getClass ().getName (),
+					objectManager.objectPath (
+						object),
+					optionalMapRequiredOrDefault (
+						objectManager::objectPath,
+						assumedRootOptional,
+						"—"),
+					Boolean.toString (
+						mini));
+
+			}
+
+			ConsoleHelper <?> objectHelper =
+				findConsoleHelperRequired (
+					object);
+
+			objectHelper.writeHtmlGeneric (
+				taskLogger,
+				formatWriter,
+				object,
+				assumedRootOptional,
+				mini);
 
 		}
-
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelperRequired (
-				object);
-
-		objectHelper.writeHtmlGeneric (
-			taskLogger,
-			formatWriter,
-			object,
-			assumedRootOptional,
-			mini);
 
 	}
 
@@ -269,47 +281,53 @@ class ConsoleObjectManagerImplementation
 			Record <?> assumedRoot,
 			boolean mini) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"objectToSimpleHtml");
+		try (
 
-		if (
-			object instanceof Integer
-			|| object instanceof Long
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"objectToSimpleHtml");
+
 		) {
 
-			formatWriter.writeFormat (
-				"%s",
-				object.toString ());
+			if (
+				object instanceof Integer
+				|| object instanceof Long
+			) {
 
-		} else if (object instanceof Record) {
+				formatWriter.writeFormat (
+					"%s",
+					object.toString ());
 
-			Record <?> dataObject =
-				(Record <?>) object;
+			} else if (object instanceof Record) {
 
-			writeHtmlForObject (
-				taskLogger,
-				formatWriter,
-				dataObject,
-				optionalFromNullable (
-					assumedRoot),
-				mini);
+				Record <?> dataObject =
+					(Record <?>) object;
 
-		} else if (
-			isNull (
-				object)
-		) {
+				writeHtmlForObject (
+					taskLogger,
+					formatWriter,
+					dataObject,
+					optionalFromNullable (
+						assumedRoot),
+					mini);
 
-			taskLogger.warningFormat (
-				"Null object is deprecated");
+			} else if (
+				isNull (
+					object)
+			) {
 
-			formatWriter.writeFormat (
-				"NULL");
+				taskLogger.warningFormat (
+					"Null object is deprecated");
 
-		} else {
+				formatWriter.writeFormat (
+					"NULL");
 
-			throw new IllegalArgumentException ();
+			} else {
+
+				throw new IllegalArgumentException ();
+
+			}
 
 		}
 
@@ -321,20 +339,26 @@ class ConsoleObjectManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"canView (%s)",
-				object.toString ());
+		try (
 
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelperRequired (
-				object);
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"canView (%s)",
+					object.toString ());
 
-		return objectHelper.canView (
-			taskLogger,
-			genericCastUnchecked (
-				object));
+		) {
+
+			ConsoleHelper <?> objectHelper =
+				findConsoleHelperRequired (
+					object);
+
+			return objectHelper.canView (
+				taskLogger,
+				genericCastUnchecked (
+					object));
+
+		}
 
 	}
 
@@ -371,19 +395,25 @@ class ConsoleObjectManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"contextLink");
+		try (
 
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelperRequired (
-				object);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"contextLink");
 
-		return requestContext.resolveContextUrl (
-			objectHelper.getDefaultContextPathGeneric (
-				taskLogger,
-				object));
+		) {
+
+			ConsoleHelper <?> objectHelper =
+				findConsoleHelperRequired (
+					object);
+
+			return requestContext.resolveContextUrl (
+				objectHelper.getDefaultContextPathGeneric (
+					taskLogger,
+					object));
+
+		}
 
 	}
 
@@ -393,19 +423,25 @@ class ConsoleObjectManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"localLink");
+		try (
 
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelperRequired (
-				object);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"localLink");
 
-		return requestContext.resolveLocalUrl (
-			objectHelper.getDefaultLocalPathGeneric (
-				taskLogger,
-				object));
+		) {
+
+			ConsoleHelper <?> objectHelper =
+				findConsoleHelperRequired (
+					object);
+
+			return requestContext.resolveLocalUrl (
+				objectHelper.getDefaultLocalPathGeneric (
+					taskLogger,
+					object));
+
+		}
 
 	}
 

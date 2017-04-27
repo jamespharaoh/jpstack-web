@@ -23,8 +23,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -152,369 +152,375 @@ class ChatPromoCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ChatPromoRec chatPromo =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
-
-		ChatRec chat =
-			chatPromo.getChat ();
-
-		MessageRec inboundMessage =
-			inbox.getMessage ();
-
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				inboundMessage);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		CommandRec magicCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic");
-
-		CommandRec helpCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"help");
-
-		ServiceRec promoService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"promo");
-
-		// send barred users to help
-
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					inboundMessage.getThreadId ()));
-
-		if (creditCheckResult.failed ()) {
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				inboundMessage,
-				inboundMessage.getText ().getText (),
-				optionalOf (
-					command),
-				true);
-
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					promoService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// log inbound message
-
-		ChatHelpLogRec inboundHelpLog =
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				inboundMessage,
-				inboundMessage.getText ().getText (),
-				optionalOf (
-					command),
-				false);
-
-		// check promo has started
-
-		if (
-			earlierThan (
-				transaction.now (),
-				chatPromo.getStartTime ())
 		) {
 
-			MessageRec outboundMessage =
-				chatSendLogic.sendMessageMagic (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ChatPromoRec chatPromo =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
+
+			ChatRec chat =
+				chatPromo.getChat ();
+
+			MessageRec inboundMessage =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					inboundMessage);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			CommandRec magicCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic");
+
+			CommandRec helpCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"help");
+
+			ServiceRec promoService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"promo");
+
+			// send barred users to help
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					taskLogger,
 					chatUser,
+					true,
 					optionalOf (
-						inboundMessage.getThreadId ()),
-					chatPromo.getPromoNotStartedText (),
-					magicCommand,
-					promoService,
-					helpCommand.getId ());
+						inboundMessage.getThreadId ()));
 
-			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					inboundHelpLog),
-				optionalAbsent (),
-				outboundMessage,
-				optionalAbsent (),
-				outboundMessage.getText ().getText (),
-				optionalOf (
-					helpCommand));
+			if (creditCheckResult.failed ()) {
 
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					promoService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// check promo has not ended
-
-		if (
-			laterThan (
-				transaction.now (),
-				chatPromo.getEndTime ())
-		) {
-
-			MessageRec outboundMessage =
-				chatSendLogic.sendMessageMagic (
+				chatHelpLogLogic.createChatHelpLogIn (
 					taskLogger,
 					chatUser,
+					inboundMessage,
+					inboundMessage.getText ().getText (),
 					optionalOf (
-						inboundMessage.getThreadId ()),
-					chatPromo.getPromoEndedText (),
-					magicCommand,
-					promoService,
-					helpCommand.getId ());
+						command),
+					true);
 
-			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					inboundHelpLog),
-				optionalAbsent (),
-				outboundMessage,
-				optionalAbsent (),
-				outboundMessage.getText ().getText (),
-				optionalOf (
-					helpCommand));
-
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					promoService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// check promo has not been claimed already
-
-		ChatPromoUserRec existingChatPromoUser =
-			chatPromo.getChatPromoUsers ().get (
-				chatUser.getId ());
-
-		if (
-			isNotNull (
-				existingChatPromoUser)
-		) {
-
-			MessageRec outboundMessage =
-				chatSendLogic.sendMessageMagic (
+				return smsInboxLogic.inboxProcessed (
 					taskLogger,
-					chatUser,
+					inbox,
 					optionalOf (
-						inboundMessage.getThreadId ()),
-					chatPromo.getAlreadyClaimedText (),
-					magicCommand,
-					promoService,
-					helpCommand.getId ());
-
-			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					inboundHelpLog),
-				optionalAbsent (),
-				outboundMessage,
-				optionalAbsent (),
-				outboundMessage.getText ().getText (),
-				optionalOf (
-					helpCommand));
-
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					promoService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// claim promo
-
-		chatPromoUserHelper.insert (
-			taskLogger,
-			chatPromoUserHelper.createInstance ()
-
-			.setChatPromo (
-				chatPromo)
-
-			.setChatUser (
-				chatUser)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setMessage (
-				inboundMessage)
-
-		);
-
-		chatPromo
-
-			.setNumUsers (
-				+ chatPromo.getNumUsers ()
-				+ 1);
-
-		chatUser
-
-			.setCredit (
-				+ chatUser.getCredit ()
-				+ chatPromo.getAmount ())
-
-			.setCreditAdded (
-				+ chatUser.getCreditAdded ()
-				+ chatPromo.getAmount ());
-
-		MessageRec outboundMessage =
-			chatSendLogic.sendMessageMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					inboundMessage.getThreadId ()),
-				chatPromo.getSuccessText (),
-				magicCommand,
-				promoService,
-				helpCommand.getId ());
-
-		chatHelpLogLogic.createChatHelpLogOut (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				inboundHelpLog),
-			optionalAbsent (),
-			outboundMessage,
-			optionalAbsent (),
-			outboundMessage.getText ().getText (),
-			optionalOf (
-				helpCommand));
-
-		// new users jump to join process
-
-		if (
-			isNull (
-				chatUser.getFirstJoin ())
-		) {
-
-			return chatJoinerProvider.get ()
-
-				.chatId (
-					chat.getId ())
-
-				.joinType (
-					(
-						chatPromo.getJoinDating ()
-						&& ! chatPromo.getJoinChat ()
-					)
-						? JoinType.dateSimple
-						: JoinType.chatSimple)
-
-				.inbox (
-					inbox)
-
-				.rest (
-					"")
-
-				.handleInbox (
-					taskLogger,
+						promoService),
+					optionalOf (
+						affiliate),
 					command);
 
-		}
+			}
 
-		// simple join for existing customers
+			// log inbound message
 
-		boolean sendMessage = true;
+			ChatHelpLogRec inboundHelpLog =
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					inboundMessage,
+					inboundMessage.getText ().getText (),
+					optionalOf (
+						command),
+					false);
 
-		if (
-			chatPromo.getJoinChat ()
-			&& ! chatUser.getOnline ()
-		) {
+			// check promo has started
 
-			chatMiscLogic.userJoin (
+			if (
+				earlierThan (
+					transaction.now (),
+					chatPromo.getStartTime ())
+			) {
+
+				MessageRec outboundMessage =
+					chatSendLogic.sendMessageMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							inboundMessage.getThreadId ()),
+						chatPromo.getPromoNotStartedText (),
+						magicCommand,
+						promoService,
+						helpCommand.getId ());
+
+				chatHelpLogLogic.createChatHelpLogOut (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						inboundHelpLog),
+					optionalAbsent (),
+					outboundMessage,
+					optionalAbsent (),
+					outboundMessage.getText ().getText (),
+					optionalOf (
+						helpCommand));
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						promoService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// check promo has not ended
+
+			if (
+				laterThan (
+					transaction.now (),
+					chatPromo.getEndTime ())
+			) {
+
+				MessageRec outboundMessage =
+					chatSendLogic.sendMessageMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							inboundMessage.getThreadId ()),
+						chatPromo.getPromoEndedText (),
+						magicCommand,
+						promoService,
+						helpCommand.getId ());
+
+				chatHelpLogLogic.createChatHelpLogOut (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						inboundHelpLog),
+					optionalAbsent (),
+					outboundMessage,
+					optionalAbsent (),
+					outboundMessage.getText ().getText (),
+					optionalOf (
+						helpCommand));
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						promoService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// check promo has not been claimed already
+
+			ChatPromoUserRec existingChatPromoUser =
+				chatPromo.getChatPromoUsers ().get (
+					chatUser.getId ());
+
+			if (
+				isNotNull (
+					existingChatPromoUser)
+			) {
+
+				MessageRec outboundMessage =
+					chatSendLogic.sendMessageMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							inboundMessage.getThreadId ()),
+						chatPromo.getAlreadyClaimedText (),
+						magicCommand,
+						promoService,
+						helpCommand.getId ());
+
+				chatHelpLogLogic.createChatHelpLogOut (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						inboundHelpLog),
+					optionalAbsent (),
+					outboundMessage,
+					optionalAbsent (),
+					outboundMessage.getText ().getText (),
+					optionalOf (
+						helpCommand));
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						promoService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// claim promo
+
+			chatPromoUserHelper.insert (
+				taskLogger,
+				chatPromoUserHelper.createInstance ()
+
+				.setChatPromo (
+					chatPromo)
+
+				.setChatUser (
+					chatUser)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setMessage (
+					inboundMessage)
+
+			);
+
+			chatPromo
+
+				.setNumUsers (
+					+ chatPromo.getNumUsers ()
+					+ 1);
+
+			chatUser
+
+				.setCredit (
+					+ chatUser.getCredit ()
+					+ chatPromo.getAmount ())
+
+				.setCreditAdded (
+					+ chatUser.getCreditAdded ()
+					+ chatPromo.getAmount ());
+
+			MessageRec outboundMessage =
+				chatSendLogic.sendMessageMagic (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						inboundMessage.getThreadId ()),
+					chatPromo.getSuccessText (),
+					magicCommand,
+					promoService,
+					helpCommand.getId ());
+
+			chatHelpLogLogic.createChatHelpLogOut (
 				taskLogger,
 				chatUser,
-				sendMessage,
-				inboundMessage.getThreadId (),
-				ChatMessageMethod.sms);
-
-			sendMessage = false;
-
-		}
-
-		if (allOf (
-
-			() -> chatPromo.getJoinDating (),
-
-			() -> enumEqualSafe (
-				chatUser.getDateMode (),
-				ChatUserDateMode.none)
-
-		)) {
-
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				optionalAbsent (),
 				optionalOf (
-					inboundMessage),
-				chatUser.getMainChatUserImage () != null
-					? ChatUserDateMode.photo
-					: ChatUserDateMode.text,
-				sendMessage);
+					inboundHelpLog),
+				optionalAbsent (),
+				outboundMessage,
+				optionalAbsent (),
+				outboundMessage.getText ().getText (),
+				optionalOf (
+					helpCommand));
 
-			sendMessage = false;
+			// new users jump to join process
+
+			if (
+				isNull (
+					chatUser.getFirstJoin ())
+			) {
+
+				return chatJoinerProvider.get ()
+
+					.chatId (
+						chat.getId ())
+
+					.joinType (
+						(
+							chatPromo.getJoinDating ()
+							&& ! chatPromo.getJoinChat ()
+						)
+							? JoinType.dateSimple
+							: JoinType.chatSimple)
+
+					.inbox (
+						inbox)
+
+					.rest (
+						"")
+
+					.handleInbox (
+						taskLogger,
+						command);
+
+			}
+
+			// simple join for existing customers
+
+			boolean sendMessage = true;
+
+			if (
+				chatPromo.getJoinChat ()
+				&& ! chatUser.getOnline ()
+			) {
+
+				chatMiscLogic.userJoin (
+					taskLogger,
+					chatUser,
+					sendMessage,
+					inboundMessage.getThreadId (),
+					ChatMessageMethod.sms);
+
+				sendMessage = false;
+
+			}
+
+			if (allOf (
+
+				() -> chatPromo.getJoinDating (),
+
+				() -> enumEqualSafe (
+					chatUser.getDateMode (),
+					ChatUserDateMode.none)
+
+			)) {
+
+				chatDateLogic.userDateStuff (
+					taskLogger,
+					chatUser,
+					optionalAbsent (),
+					optionalOf (
+						inboundMessage),
+					chatUser.getMainChatUserImage () != null
+						? ChatUserDateMode.photo
+						: ChatUserDateMode.text,
+					sendMessage);
+
+				sendMessage = false;
+
+			}
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					promoService),
+				optionalOf (
+					affiliate),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				promoService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

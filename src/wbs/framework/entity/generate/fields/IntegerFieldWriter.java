@@ -47,40 +47,46 @@ class IntegerFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		JavaPropertyWriter propertyWriter =
-			new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeClass (
-				Long.class)
+			JavaPropertyWriter propertyWriter =
+				new JavaPropertyWriter ()
 
-			.propertyName (
-				spec.name ());
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-		if (spec.defaultValue () != null) {
+				.typeClass (
+					Long.class)
 
-			propertyWriter.defaultValueFormat (
-				"%sl",
-				Long.toString (
-					spec.defaultValue ()));
+				.propertyName (
+					spec.name ());
+
+			if (spec.defaultValue () != null) {
+
+				propertyWriter.defaultValueFormat (
+					"%sl",
+					Long.toString (
+						spec.defaultValue ()));
+
+			}
+
+			propertyWriter.writeBlock (
+				taskLogger,
+				target.imports (),
+				target.formatWriter ());
 
 		}
-
-		propertyWriter.writeBlock (
-			taskLogger,
-			target.imports (),
-			target.formatWriter ());
 
 	}
 

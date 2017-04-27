@@ -94,30 +94,36 @@ class ObjectPrivsPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildResponder (
-			taskLogger);
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextTab (
-				taskLogger,
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildContextFile (
-				taskLogger,
-				resolvedExtensionPoint);
+			buildResponder (
+				taskLogger);
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTab (
+					taskLogger,
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					taskLogger,
+					resolvedExtensionPoint);
+
+			}
 
 		}
 

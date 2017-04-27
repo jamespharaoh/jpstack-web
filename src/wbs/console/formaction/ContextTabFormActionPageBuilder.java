@@ -114,35 +114,41 @@ class ContextTabFormActionPageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		initFormFields ();
-
-		initFormActionHelper (
-			taskLogger);
-
-		buildPagePartFactory ();
-		buildAction ();
-
-		buildResponder (
-			taskLogger);
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildFile (
-				resolvedExtensionPoint);
+			initFormFields ();
+
+			initFormActionHelper (
+				taskLogger);
+
+			buildPagePartFactory ();
+			buildAction ();
+
+			buildResponder (
+				taskLogger);
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
 
 		}
 
@@ -175,16 +181,22 @@ class ContextTabFormActionPageBuilder
 	void initFormActionHelper (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initFormActionHelper");
+		try (
 
-		formActionHelperProvider =
-			componentManager.getComponentProviderRequired (
-				taskLogger,
-				helperBeanName,
-				ConsoleFormActionHelper.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initFormActionHelper");
+
+		) {
+
+			formActionHelperProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					helperBeanName,
+					ConsoleFormActionHelper.class);
+
+		}
 
 	}
 

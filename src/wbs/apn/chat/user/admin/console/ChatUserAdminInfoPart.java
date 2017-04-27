@@ -111,139 +111,145 @@ class ChatUserAdminInfoPart
 	void renderHtmlBodyContent(
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (
-			requestContext.canContext (
-				"chat.userAdmin")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
 		) {
-
-			htmlFormOpenPostAction (
-				requestContext.resolveLocalUrl (
-					"/chatUser.admin.info"));
-
-			htmlTableOpenDetails ();
-
-			String charCountJavascript =
-				stringFormat (
-					"gsmCharCount (%s, %s, %s)",
-					"this",
-					"document.getElementById ('chars')",
-					"0");
-
-			htmlTableDetailsRowWriteHtml (
-				"Info",
-				stringFormat (
-					"<textarea",
-					" id=\"info\"",
-					" name=\"info\"",
-					" rows=\"3\"",
-					" cols=\"64\"",
-					" onkeyup=\"%h\"",
-					charCountJavascript,
-					" onfocus=\"%h\"",
-					charCountJavascript,
-					">%h</textarea></td>",
-					requestContext.formOrElse (
-						"info",
-						() -> ifNotNullThenElseEmDash (
-							chatUser.getInfoText (),
-							() -> chatUser.getInfoText ().getText ()))));
-
-			htmlTableDetailsRowWriteHtml (
-				"Chars",
-				"<span id=\"chars\">&nbsp;</span>");
-
-			htmlTableDetailsRowWriteHtml (
-				"Reason",
-				() -> chatConsoleLogic.writeSelectForChatUserEditReason (
-					"editReason",
-					requestContext.formOrEmptyString (
-						"editReason")));
-
-			htmlTableDetailsRowWriteHtml (
-				"Action",
-				stringFormat (
-					"<input\n",
-					" type=\"submit\"\n",
-					" value=\"save changes\"",
-					">"));
-
-			htmlTableClose ();
-
-			htmlFormClose ();
-
-		}
-
-		Set <ChatUserInfoRec> chatUserInfos =
-			chatUser.getChatUserInfos ();
-
-		if (chatUserInfos.size () == 0)
-			return;
-
-		htmlHeadingThreeWrite (
-			"History");
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Timestamp",
-			"Original",
-			"Edited",
-			"Status",
-			"Moderator");
-
-		for (
-			ChatUserInfoRec chatUserInfo
-				: chatUserInfos
-		) {
-
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					chatUserInfo.getCreationTime ()));
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUserInfo.getOriginalText (),
-					() -> chatUserInfo.getOriginalText ().getText ()));
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUserInfo.getEditedText (),
-					() -> chatUserInfo.getEditedText ().getText ()));
-
-			htmlTableCellWrite (
-				chatConsoleLogic.textForChatUserInfoStatus (
-					chatUserInfo.getStatus ()));
 
 			if (
-				isNotNull (
-					chatUserInfo.getModerator ())
+				requestContext.canContext (
+					"chat.userAdmin")
 			) {
 
-				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					chatUserInfo.getModerator ());
+				htmlFormOpenPostAction (
+					requestContext.resolveLocalUrl (
+						"/chatUser.admin.info"));
 
-			} else {
+				htmlTableOpenDetails ();
 
-				htmlTableCellWrite (
-					"—");
+				String charCountJavascript =
+					stringFormat (
+						"gsmCharCount (%s, %s, %s)",
+						"this",
+						"document.getElementById ('chars')",
+						"0");
+
+				htmlTableDetailsRowWriteHtml (
+					"Info",
+					stringFormat (
+						"<textarea",
+						" id=\"info\"",
+						" name=\"info\"",
+						" rows=\"3\"",
+						" cols=\"64\"",
+						" onkeyup=\"%h\"",
+						charCountJavascript,
+						" onfocus=\"%h\"",
+						charCountJavascript,
+						">%h</textarea></td>",
+						requestContext.formOrElse (
+							"info",
+							() -> ifNotNullThenElseEmDash (
+								chatUser.getInfoText (),
+								() -> chatUser.getInfoText ().getText ()))));
+
+				htmlTableDetailsRowWriteHtml (
+					"Chars",
+					"<span id=\"chars\">&nbsp;</span>");
+
+				htmlTableDetailsRowWriteHtml (
+					"Reason",
+					() -> chatConsoleLogic.writeSelectForChatUserEditReason (
+						"editReason",
+						requestContext.formOrEmptyString (
+							"editReason")));
+
+				htmlTableDetailsRowWriteHtml (
+					"Action",
+					stringFormat (
+						"<input\n",
+						" type=\"submit\"\n",
+						" value=\"save changes\"",
+						">"));
+
+				htmlTableClose ();
+
+				htmlFormClose ();
 
 			}
 
-			htmlTableRowClose ();
+			Set <ChatUserInfoRec> chatUserInfos =
+				chatUser.getChatUserInfos ();
+
+			if (chatUserInfos.size () == 0)
+				return;
+
+			htmlHeadingThreeWrite (
+				"History");
+
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Timestamp",
+				"Original",
+				"Edited",
+				"Status",
+				"Moderator");
+
+			for (
+				ChatUserInfoRec chatUserInfo
+					: chatUserInfos
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatUserLogic.getTimezone (
+							chatUser),
+						chatUserInfo.getCreationTime ()));
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatUserInfo.getOriginalText (),
+						() -> chatUserInfo.getOriginalText ().getText ()));
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatUserInfo.getEditedText (),
+						() -> chatUserInfo.getEditedText ().getText ()));
+
+				htmlTableCellWrite (
+					chatConsoleLogic.textForChatUserInfoStatus (
+						chatUserInfo.getStatus ()));
+
+				if (
+					isNotNull (
+						chatUserInfo.getModerator ())
+				) {
+
+					objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						chatUserInfo.getModerator ());
+
+				} else {
+
+					htmlTableCellWrite (
+						"—");
+
+				}
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

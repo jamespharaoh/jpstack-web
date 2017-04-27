@@ -1,6 +1,8 @@
 package wbs.integrations.urbanairship.logic;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -10,16 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
@@ -30,12 +32,21 @@ import org.apache.http.protocol.HttpContext;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("urbanAirshipApi")
 public
 class UrbanAirshipApi {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	@Getter @Setter
 	String baseUrl;
@@ -67,17 +78,27 @@ class UrbanAirshipApi {
 
 	public
 	void post (
-			String accountKey,
-			String typeKey,
-			String path,
-			JSONObject request) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String accountKey,
+			@NonNull String typeKey,
+			@NonNull String path,
+			@NonNull JSONObject request) {
 
-		try {
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"post");
+
+		) {
 
 			String url =
 				baseUrl + "/" + path + "/";
 
-			log.debug ("Preparing request to " + url);
+			taskLogger.debugFormat (
+				"Preparing request to %s",
+				url);
 
 			// encode json
 
@@ -153,46 +174,84 @@ class UrbanAirshipApi {
 
 				// output request for debugging
 
-				if (log.isDebugEnabled ()) {
+				if (taskLogger.debugEnabled ()) {
 
-					log.debug ("Request entity: " + json);
+					taskLogger.debugFormat (
+						"Request entity: %s",
+						json);
 
-					for (Header header : post.getAllHeaders ())
-						log.debug ("Request header " + header.getName () + ": " + header.getValue ());
+					for (
+						Header header
+							: post.getAllHeaders ()
+					) {
 
-				}
+						taskLogger.debugFormat (
+							"Request header %s: %s",
+							header.getName (),
+							header.getValue ());
 
-				HttpResponse response =
-					httpClient.execute (post);
-
-				// output response (for debugging)
-
-				if (log.isDebugEnabled ()) {
-
-					HttpEntity responseEntity =
-						response.getEntity ();
-
-					byte[] responseBytes =
-						IOUtils.toByteArray (responseEntity.getContent ());
-
-					log.debug ("Response entity " + new String (responseBytes, "utf-8"));
-
-					for (Header header : response.getAllHeaders ())
-						log.debug ("Response header " + header.getName () + ": " + header.getValue ());
+					}
 
 				}
 
-				// check status
+				try (
 
-				int status =
-					response.getStatusLine ().getStatusCode ();
+					CloseableHttpResponse response =
+						httpClient.execute (
+							post);
 
-				if (status != 200) {
+				) {
 
-					log.debug ("Urban Airship API call failed with status code " + status + ": " +
-						response.getStatusLine ().getReasonPhrase ());
+					// output response (for debugging)
 
-					throw new RuntimeException ("Urban Airship API call failed with status code " + status);
+					if (taskLogger.debugEnabled ()) {
+
+						HttpEntity responseEntity =
+							response.getEntity ();
+
+						byte[] responseBytes =
+							IOUtils.toByteArray (
+								responseEntity.getContent ());
+
+						taskLogger.debugFormat (
+							"Response entity %s",
+							utf8ToString (
+								responseBytes));
+
+						for (
+							Header header
+								: response.getAllHeaders ()
+						) {
+
+							taskLogger.debugFormat (
+								"Response header %s: %s",
+								header.getName (),
+								header.getValue ());
+
+						}
+
+					}
+
+					// check status
+
+					int status =
+						response.getStatusLine ().getStatusCode ();
+
+					if (status != 200) {
+
+						taskLogger.debugFormat (
+							"Urban Airship API call failed with status code %s: %s",
+							integerToDecimalString (
+								status),
+							response.getStatusLine ().getReasonPhrase ());
+
+						throw new RuntimeException (
+							stringFormat (
+								"Urban Airship API call failed with status code %s",
+								integerToDecimalString (
+									status)));
+
+					}
 
 				}
 
@@ -211,11 +270,19 @@ class UrbanAirshipApi {
 	@SuppressWarnings ("unchecked")
 	public
 	void push (
-			String accountKey,
-			String typeKey,
-			PushRequest request) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String accountKey,
+			@NonNull String typeKey,
+			@NonNull PushRequest request) {
 
-		try {
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"push");
+
+		) {
 
 			// prepare json
 
@@ -251,36 +318,45 @@ class UrbanAirshipApi {
 
 			// make call
 
-			post (
-				accountKey,
-				typeKey,
-				"push",
-				obj);
+			try {
 
-			for (String token : request.tokens) {
+				post (
+					taskLogger,
+					accountKey,
+					typeKey,
+					"push",
+					obj);
 
-				log.info (
-					stringFormat (
+				for (
+					String token
+						: request.tokens
+				) {
+
+					taskLogger.noticeFormat (
 						"Urban Airship push notification sent to %s",
-						token));
+						token);
 
-			}
+				}
 
-		} catch (Exception exception) {
+			} catch (Exception exception) {
 
-			for (String token : request.tokens) {
+				for (
+					String token
+						: request.tokens
+				) {
 
-				log.warn (
-					stringFormat (
+					taskLogger.warningFormatException (
+						exception,
 						"Urban Airship push notification failed to %s",
-						token),
+						token);
+
+				}
+
+				throw new RuntimeException (
+					"Unable to contact Urban airship server",
 					exception);
 
 			}
-
-			throw new RuntimeException (
-				"Unable to contact Urban airship server",
-				exception);
 
 		}
 

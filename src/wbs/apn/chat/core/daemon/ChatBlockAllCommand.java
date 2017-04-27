@@ -108,72 +108,78 @@ class ChatBlockAllCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			chatHelper.findRequired (
-				command.getParentId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				chatHelper.findRequired (
+					command.getParentId ());
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// send barred users to help
+
+			/* disabled at sam wilson's request 10 april 2013
+
+			if (! chatLogic.userSpendCheck (
+					chatUser,
+					true,
+					message.getThreadId (),
+					false)) {
+
+				chatHelpLogic.createChatHelpLogIn (
+					chatUser,
+					message,
+					receivedMessage.getRest (),
+					null,
+					true);
+
+				return null;
+			}
+			*/
+
+			// call the block all function
+
+			chatMiscLogic.blockAll (
 				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// send barred users to help
-
-		/* disabled at sam wilson's request 10 april 2013
-
-		if (! chatLogic.userSpendCheck (
 				chatUser,
-				true,
-				message.getThreadId (),
-				false)) {
+				optionalOf (
+					message));
 
-			chatHelpLogic.createChatHelpLogIn (
-				chatUser,
-				message,
-				receivedMessage.getRest (),
-				null,
-				true);
+			// process inbox
 
-			return null;
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalFromNullable (
+					affiliate),
+				command);
+
 		}
-		*/
-
-		// call the block all function
-
-		chatMiscLogic.blockAll (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				message));
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalFromNullable (
-				affiliate),
-			command);
 
 	}
 

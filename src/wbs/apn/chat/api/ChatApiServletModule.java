@@ -1,8 +1,8 @@
-
 package wbs.apn.chat.api;
 
 import static wbs.utils.collection.CollectionUtils.arrayLength;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.anyOf;
 import static wbs.utils.etc.LogicUtils.equalSafe;
@@ -12,7 +12,6 @@ import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -25,8 +24,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +37,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -48,7 +44,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import org.apache.http.HttpStatus;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -63,8 +58,9 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -101,6 +97,7 @@ import wbs.sms.locator.model.MercatorProjection;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 
+import wbs.utils.io.BorrowedOutputStream;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
@@ -140,6 +137,7 @@ import wbs.apn.chat.user.info.model.ChatUserProfileFieldRec;
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
 import wbs.web.file.WebFile;
+import wbs.web.misc.HttpStatus;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.responder.WebModule;
@@ -248,24 +246,30 @@ class ChatApiServletModule
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		registerRpcHandlerClasses (
-			taskLogger,
-			MediaRpcHandler.class,
-			MessageSendRpcHandler.class,
-			MessagePollRpcHandler.class,
-			ProfileRpcHandler.class,
-			ProfilesRpcHandler.class,
-			ImageUpdateRpcHandler.class,
-			CreditRpcHandler.class,
-			ProfileDeleteRpcHandler.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		initRpcHandlers ();
-		initActions ();
+		) {
+
+			registerRpcHandlerClasses (
+				taskLogger,
+				MediaRpcHandler.class,
+				MessageSendRpcHandler.class,
+				MessagePollRpcHandler.class,
+				ProfileRpcHandler.class,
+				ProfilesRpcHandler.class,
+				ImageUpdateRpcHandler.class,
+				CreditRpcHandler.class,
+				ProfileDeleteRpcHandler.class);
+
+			initRpcHandlers ();
+			initActions ();
+
+		}
 
 	}
 
@@ -277,130 +281,137 @@ class ChatApiServletModule
 		@Override
 		public
 		void doGet (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"mediaFile.doGet");
-
-			String format =
-				requestContext.requestStringRequired (
-					"format");
-
-			Long mediaId =
-				requestContext.requestIntegerRequired (
-					"mediaId");
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"ChatApiServletModule.MediaFile.doGet ()",
-						this);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"mediaFile.doGet");
 
 			) {
 
-				Optional <MediaRec> mediaOptional =
-					mediaHelper.find (
-						mediaId);
+				String format =
+					requestContext.requestStringRequired (
+						"format");
 
-				if (
-					optionalIsNotPresent (
-						mediaOptional)
+				Long mediaId =
+					requestContext.requestIntegerRequired (
+						"mediaId");
+
+				try (
+
+					OwnedTransaction transaction =
+						database.beginReadOnly (
+							taskLogger,
+							"ChatApiServletModule.MediaFile.doGet ()",
+							this);
+
 				) {
 
-					requestContext.status (
-						fromJavaInteger (
-							HttpStatus.SC_NOT_FOUND));
+					Optional <MediaRec> mediaOptional =
+						mediaHelper.find (
+							mediaId);
 
-					return;
-
-				}
-
-				MediaRec media =
-					mediaOptional.get ();
-
-				byte[] data =
-					media.getContent ().getData ();
-
-				String mimeType =
-					media.getMediaType ().getMimeType ();
-
-				if (allOf (
-
-					() ->isNotNull (
-						format),
-
-					() -> stringNotEqualSafe (
-						format,
-						"orig")
-
-				)) {
-
-					if (mediaLogic.isVideo (mimeType)) {
-
-						if (
-							mediaLogic.videoProfileNames ().contains (
-								format)
-						) {
-
-							data =
-								mediaLogic.videoConvertRequired (
-									taskLogger,
-									format,
-									data);
-
-						} else {
-
-							taskLogger.warningFormat (
-								"Unable to convert %s to format %s",
-								mimeType,
-								format);
-
-							requestContext.status (
-								fromJavaInteger (
-									HttpStatus.SC_NOT_FOUND));
-
-							return;
-
-						}
-
-					} else {
-
-						taskLogger.warningFormat (
-							"Unable to convert %s",
-							 mimeType);
+					if (
+						optionalIsNotPresent (
+							mediaOptional)
+					) {
 
 						requestContext.status (
-							fromJavaInteger (
-								HttpStatus.SC_NOT_FOUND));
+							HttpStatus.httpNotFound);
 
 						return;
 
 					}
 
+					MediaRec media =
+						mediaOptional.get ();
+
+					byte[] data =
+						media.getContent ().getData ();
+
+					String mimeType =
+						media.getMediaType ().getMimeType ();
+
+					if (allOf (
+
+						() ->isNotNull (
+							format),
+
+						() -> stringNotEqualSafe (
+							format,
+							"orig")
+
+					)) {
+
+						if (mediaLogic.isVideo (mimeType)) {
+
+							if (
+								mediaLogic.videoProfileNames ().contains (
+									format)
+							) {
+
+								data =
+									mediaLogic.videoConvertRequired (
+										taskLogger,
+										format,
+										data);
+
+							} else {
+
+								taskLogger.warningFormat (
+									"Unable to convert %s to format %s",
+									mimeType,
+									format);
+
+								requestContext.status (
+									HttpStatus.httpNotFound);
+
+								return;
+
+							}
+
+						} else {
+
+							taskLogger.warningFormat (
+								"Unable to convert %s",
+								 mimeType);
+
+							requestContext.status (
+								HttpStatus.httpNotFound);
+
+							return;
+
+						}
+
+					}
+
+					requestContext.setHeader (
+						"Content-Type",
+						media.getMediaType ().getMimeType ());
+
+					requestContext.setHeader (
+						"Content-Length",
+						integerToDecimalString (
+							arrayLength (
+								data)));
+
+					try (
+
+						BorrowedOutputStream out =
+							requestContext.outputStream ();
+
+					) {
+
+						writeBytes (
+							out,
+							data);
+
+					}
+
 				}
-
-				requestContext.setHeader (
-					"Content-Type",
-					media.getMediaType ().getMimeType ());
-
-				requestContext.setHeader (
-					"Content-Length",
-					integerToDecimalString (
-						arrayLength (
-							data)));
-
-				OutputStream out =
-					requestContext.outputStream ();
-
-				out.write (
-					data);
 
 			}
 
@@ -521,34 +532,40 @@ class ChatApiServletModule
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?> ... handlerClasses) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerRpcHandlerClasses");
+		try (
 
-		for (
-			Class <?> uncastHandlerClass
-				: handlerClasses
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerRpcHandlerClasses");
+
 		) {
 
-			Class <? extends RpcHandler> handlerClass =
-				uncastHandlerClass.asSubclass (
-					RpcHandler.class);
+			for (
+				Class <?> uncastHandlerClass
+					: handlerClasses
+			) {
 
-			if (handlerClass.getAnnotation (RpcExport.class) == null) {
+				Class <? extends RpcHandler> handlerClass =
+					uncastHandlerClass.asSubclass (
+						RpcHandler.class);
 
-				taskLogger.warningFormat (
-					"Unable to register %s",
-					classNameSimple (
-						handlerClass));
+				if (handlerClass.getAnnotation (RpcExport.class) == null) {
 
-				continue;
+					taskLogger.warningFormat (
+						"Unable to register %s",
+						classNameSimple (
+							handlerClass));
+
+					continue;
+
+				}
+
+				ChatApiServletModule
+					.handlerClasses
+					.add (handlerClass);
 
 			}
-
-			ChatApiServletModule
-				.handlerClasses
-				.add (handlerClass);
 
 		}
 
@@ -840,7 +857,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
@@ -906,17 +923,17 @@ class ChatApiServletModule
 		RpcResult makeResponse (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"makeResponse");
-
 			try (
 
-				Transaction transaction =
-					database.currentTransaction ();
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"makeResponse");
 
 			) {
+
+				BorrowedTransaction transaction =
+					database.currentTransaction ();
 
 				if (number != null) {
 
@@ -1464,7 +1481,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						"ChatApiServletModule.MediaRpcHandler.handle (source)",
@@ -1770,14 +1787,14 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"ProfileRpcHandler.handle");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"ChatApiServletModule.ProfileRpcHandler.handle (source)",
@@ -1887,309 +1904,315 @@ class ChatApiServletModule
 		private
 		void doUpdates (
 				@NonNull TaskLogger parentTaskLogger,
-				@NonNull Transaction transaction) {
+				@NonNull OwnedTransaction transaction) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doUpdates");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doUpdates");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
-					number);
+			) {
 
-			chatUser =
-				chatUserHelper.findOrCreate (
-					taskLogger,
-					chat,
-					numberRec);
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
 
-			if (schemeCode != null) {
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
+						taskLogger,
+						number);
 
-				ChatSchemeRec scheme =
-					chatSchemeHelper.findByCodeOrThrow (
+				chatUser =
+					chatUserHelper.findOrCreate (
+						taskLogger,
 						chat,
-						schemeCode,
-						() -> new RpcException (
-							Rpc.rpcError (
-								"chat-profile-response",
-								stAffiliateNotFound,
-								"affiliate-not-found",
-								"The affiliate specified can not be found")));
+						numberRec);
 
-				ChatAffiliateRec affiliate =
-					chatAffiliateHelper.findByCodeOrThrow (
-						scheme,
-						affiliateCode,
-						() -> new RpcException (
-							Rpc.rpcError (
-								"chat-profile-response",
-								stAffiliateNotFound,
-								"affiliate-not-found",
-								"The affiliate specified can not be found")));
+				if (schemeCode != null) {
 
-				chatUserLogic.setAffiliate (
-					taskLogger,
-					chatUser,
-					affiliate,
-					optionalAbsent ());
+					ChatSchemeRec scheme =
+						chatSchemeHelper.findByCodeOrThrow (
+							chat,
+							schemeCode,
+							() -> new RpcException (
+								Rpc.rpcError (
+									"chat-profile-response",
+									stAffiliateNotFound,
+									"affiliate-not-found",
+									"The affiliate specified can not be found")));
 
-			}
+					ChatAffiliateRec affiliate =
+						chatAffiliateHelper.findByCodeOrThrow (
+							scheme,
+							affiliateCode,
+							() -> new RpcException (
+								Rpc.rpcError (
+									"chat-profile-response",
+									stAffiliateNotFound,
+									"affiliate-not-found",
+									"The affiliate specified can not be found")));
 
-			if (name != null) {
-
-				chatMiscLogic.chatUserSetName (
-					taskLogger,
-					chatUser,
-					name,
-					null);
-
-			}
-
-			if (gender != null)
-				chatUser.setGender (gender);
-
-			if (orient != null)
-				chatUser.setOrient (orient);
-
-			if (info != null) {
-
-				chatInfoLogic.chatUserSetInfo (
-					taskLogger,
-					chatUser,
-					info,
-					null);
-
-			}
-
-			if (dob != null) {
-
-				if (chatUser.getDob () != null) {
-
-					errorCodes.add (
-						"dob-already-set");
-
-					errors.add (
-						"Date of birth cannot be changed");
-
-				}
-
-				chatUser.setDob (
-					dob);
-
-			}
-
-			if (location != null) {
-
-				if (
-					! chatUserLogic.setPlace (
+					chatUserLogic.setAffiliate (
 						taskLogger,
 						chatUser,
-						location,
-						optionalAbsent (),
-						optionalAbsent ())
-				) {
-
-					errorCodes.add (
-						"location-invalid");
-
-					errors.add (
-						"Invalid location");
+						affiliate,
+						optionalAbsent ());
 
 				}
 
-			}
+				if (name != null) {
 
-			if (
-				longitude != null
-				&& latitude != null
-			) {
+					chatMiscLogic.chatUserSetName (
+						taskLogger,
+						chatUser,
+						name,
+						null);
 
-				chatUser
+				}
 
-					.setLocationLongLat (
-						new LongLat (
-							longitude,
-							latitude))
+				if (gender != null)
+					chatUser.setGender (gender);
 
-					.setLocationBackupLongLat (
-						new LongLat (
-							longitude,
-							latitude));
+				if (orient != null)
+					chatUser.setOrient (orient);
 
-				eventLogic.createEvent (
-					taskLogger,
-					"chat_user_location_api",
-					chatUser,
-					longitude,
-					latitude);
+				if (info != null) {
 
-			} else if (
-				longitude != null
-				|| latitude != null
-			) {
+					chatInfoLogic.chatUserSetInfo (
+						taskLogger,
+						chatUser,
+						info,
+						null);
 
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-profile-response",
-						Rpc.stRequestInvalid,
-						"request-invalid",
-						"Longitude and latitude must both be specified"));
+				}
 
-			}
+				if (dob != null) {
 
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				null,
-				null,
-				dateMode,
-				dateRadius,
-				dateStartHour,
-				dateEndHour,
-				dateDailyMax,
-				false);
+					if (chatUser.getDob () != null) {
 
-			if (chargesConfirmed != null && chargesConfirmed)
-				chatUser.setChargesConfirmed (true);
+						errorCodes.add (
+							"dob-already-set");
 
-			if (image != null) {
-
-				chatUserLogic.setPhoto (
-					taskLogger,
-					chatUser,
-					image,
-					optionalAbsent (),
-					optionalAbsent (),
-					optionalAbsent (),
-					false);
-
-			}
-
-			if (email != null)
-				chatUser.setEmail (email);
-
-			if (jigsawApplicationIdentifier != null) {
-
-				chatUser
-
-					.setJigsawApplicationIdentifier (
-						jigsawApplicationIdentifier);
-
-			}
-
-			if (jigsawToken != null) {
-
-				chatUser
-
-					.setJigsawToken (
-						jigsawToken);
-
-			}
-
-			if (profileFields != null) {
-
-				for (Map.Entry<String,String> profileFieldEntry
-						: profileFields.entrySet ()) {
-
-					// lookup field
-
-					ChatProfileFieldRec field =
-						chat.getProfileFields ().get (
-							profileFieldEntry.getKey ());
-
-					if (field == null) {
-
-						throw new RpcException (
-							"chat-profile-response",
-							Rpc.stRequestInvalid,
-							"request-invalid",
-							stringFormat (
-								"Profile field name not recognised: %s",
-								profileFieldEntry.getKey ()));
+						errors.add (
+							"Date of birth cannot be changed");
 
 					}
 
-					// lookup value
+					chatUser.setDob (
+						dob);
 
-					ChatProfileFieldValueRec value =
-						field.getValues ()
-							.get (profileFieldEntry.getValue ());
+				}
+
+				if (location != null) {
 
 					if (
-
-						stringIsNotEmpty (
-							profileFieldEntry.getValue ())
-
-						&& isNull (
-							value)
-
+						! chatUserLogic.setPlace (
+							taskLogger,
+							chatUser,
+							location,
+							optionalAbsent (),
+							optionalAbsent ())
 					) {
 
-						throw new RpcException (
+						errorCodes.add (
+							"location-invalid");
+
+						errors.add (
+							"Invalid location");
+
+					}
+
+				}
+
+				if (
+					longitude != null
+					&& latitude != null
+				) {
+
+					chatUser
+
+						.setLocationLongLat (
+							new LongLat (
+								longitude,
+								latitude))
+
+						.setLocationBackupLongLat (
+							new LongLat (
+								longitude,
+								latitude));
+
+					eventLogic.createEvent (
+						taskLogger,
+						"chat_user_location_api",
+						chatUser,
+						longitude,
+						latitude);
+
+				} else if (
+					longitude != null
+					|| latitude != null
+				) {
+
+					throw new RpcException (
+						Rpc.rpcError (
 							"chat-profile-response",
 							Rpc.stRequestInvalid,
 							"request-invalid",
-							stringFormat (
-								"Profile field value not recognised: %s, for ",
-								profileFieldEntry.getValue (),
-								"field: %s",
-								profileFieldEntry.getKey ()));
+							"Longitude and latitude must both be specified"));
 
-					}
+				}
 
-					ChatUserProfileFieldRec userField =
-						chatUser.getProfileFields ()
-							.get (field.getId ());
+				chatDateLogic.userDateStuff (
+					taskLogger,
+					chatUser,
+					null,
+					null,
+					dateMode,
+					dateRadius,
+					dateStartHour,
+					dateEndHour,
+					dateDailyMax,
+					false);
 
-					if (userField == null && value != null) {
+				if (chargesConfirmed != null && chargesConfirmed)
+					chatUser.setChargesConfirmed (true);
 
-						// new field
+				if (image != null) {
 
-						userField =
-							chatUserProfileFieldHelper.insert (
-								taskLogger,
-								chatUserProfileFieldHelper.createInstance ()
+					chatUserLogic.setPhoto (
+						taskLogger,
+						chatUser,
+						image,
+						optionalAbsent (),
+						optionalAbsent (),
+						optionalAbsent (),
+						false);
 
-							.setChatUser (
-								chatUser)
+				}
 
-							.setChatProfileField (
-								field)
+				if (email != null)
+					chatUser.setEmail (email);
 
-							.setChatProfileFieldValue (
+				if (jigsawApplicationIdentifier != null) {
+
+					chatUser
+
+						.setJigsawApplicationIdentifier (
+							jigsawApplicationIdentifier);
+
+				}
+
+				if (jigsawToken != null) {
+
+					chatUser
+
+						.setJigsawToken (
+							jigsawToken);
+
+				}
+
+				if (profileFields != null) {
+
+					for (Map.Entry<String,String> profileFieldEntry
+							: profileFields.entrySet ()) {
+
+						// lookup field
+
+						ChatProfileFieldRec field =
+							chat.getProfileFields ().get (
+								profileFieldEntry.getKey ());
+
+						if (field == null) {
+
+							throw new RpcException (
+								"chat-profile-response",
+								Rpc.stRequestInvalid,
+								"request-invalid",
+								stringFormat (
+									"Profile field name not recognised: %s",
+									profileFieldEntry.getKey ()));
+
+						}
+
+						// lookup value
+
+						ChatProfileFieldValueRec value =
+							field.getValues ()
+								.get (profileFieldEntry.getValue ());
+
+						if (
+
+							stringIsNotEmpty (
+								profileFieldEntry.getValue ())
+
+							&& isNull (
 								value)
 
-						);
+						) {
 
-					} else if (
-						userField != null
-						&& value != null
-						&& userField.getChatProfileFieldValue () != value
-					) {
+							throw new RpcException (
+								"chat-profile-response",
+								Rpc.stRequestInvalid,
+								"request-invalid",
+								stringFormat (
+									"Profile field value not recognised: %s, for ",
+									profileFieldEntry.getValue (),
+									"field: %s",
+									profileFieldEntry.getKey ()));
 
-						// change field
+						}
 
-						userField.setChatProfileFieldValue (value);
+						ChatUserProfileFieldRec userField =
+							chatUser.getProfileFields ()
+								.get (field.getId ());
 
-					} else if (
-						userField != null
-						&& value == null
-					) {
+						if (userField == null && value != null) {
 
-						// remove field
+							// new field
 
-						chatUserProfileFieldHelper.remove (
-							userField);
+							userField =
+								chatUserProfileFieldHelper.insert (
+									taskLogger,
+									chatUserProfileFieldHelper.createInstance ()
+
+								.setChatUser (
+									chatUser)
+
+								.setChatProfileField (
+									field)
+
+								.setChatProfileFieldValue (
+									value)
+
+							);
+
+						} else if (
+							userField != null
+							&& value != null
+							&& userField.getChatProfileFieldValue () != value
+						) {
+
+							// change field
+
+							userField.setChatProfileFieldValue (value);
+
+						} else if (
+							userField != null
+							&& value == null
+						) {
+
+							// remove field
+
+							chatUserProfileFieldHelper.remove (
+								userField);
+
+						}
+
+						transaction.refresh (chatUser);
 
 					}
-
-					transaction.refresh (chatUser);
 
 				}
 
@@ -2197,7 +2220,8 @@ class ChatApiServletModule
 
 		}
 
-		private RpcResult makeResponse () {
+		private
+		RpcResult makeResponse () {
 
 			// enumerate update classErrors
 
@@ -2478,7 +2502,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						stringFormat (
@@ -2554,38 +2578,44 @@ class ChatApiServletModule
 		private
 		void doUpdates (
 				@NonNull TaskLogger parentTaskLogger,
-				@NonNull Transaction transaction) {
+				@NonNull OwnedTransaction transaction) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doUpdates");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doUpdates");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
+			) {
+
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
+
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
+						taskLogger,
+						number);
+
+				chatUser =
+					chatUserHelper.find (
+						chat,
+						numberRec);
+
+				if (chatUser == null)
+					return;
+
+				chatUser.setNumber (null);
+
+				taskLogger.noticeFormat (
+					"Delete chat user %s, ",
+					integerToDecimalString (
+						chatUser.getId ()),
+					"number was %s",
 					number);
 
-			chatUser =
-				chatUserHelper.find (
-					chat,
-					numberRec);
-
-			if (chatUser == null)
-				return;
-
-			chatUser.setNumber (null);
-
-			taskLogger.noticeFormat (
-				"Delete chat user %s, ",
-				integerToDecimalString (
-					chatUser.getId ()),
-				"number was %s",
-				number);
+			}
 
 		}
 
@@ -2691,14 +2721,14 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"handle");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						stringFormat (
@@ -2783,155 +2813,161 @@ class ChatApiServletModule
 		void doIt (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doIt");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doIt");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
-					number);
+			) {
 
-			ChatUserRec fromUser =
-				chatUserHelper.findOrCreate (
-					taskLogger,
-					chat,
-					numberRec);
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
 
-			ChatUserRec toUser =
-				chatUserHelper.findByCodeRequired (
-					chat,
-					toCode);
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
+						taskLogger,
+						number);
 
-			// check the user is not barred
+				ChatUserRec fromUser =
+					chatUserHelper.findOrCreate (
+						taskLogger,
+						chat,
+						numberRec);
 
-			if (fromUser.getBarred ()) {
+				ChatUserRec toUser =
+					chatUserHelper.findByCodeRequired (
+						chat,
+						toCode);
 
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stBarred,
-						"barred",
-						"This profile has been barred"));
+				// check the user is not barred
 
-			}
+				if (fromUser.getBarred ()) {
 
-			// check if the user is barred through credit
-
-			ChatCreditCheckResult creditCheckResult =
-				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
-					fromUser,
-					true,
-					optionalAbsent ());
-
-			if (creditCheckResult.failed ()) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stCredit,
-						"credit",
-						stringFormat (
-							"This profile has failed the credit check: %s",
-							creditCheckResult.details ())));
-
-			}
-
-			// check the age has been set up
-
-			if (! chatUserLogic.gotDob (fromUser)) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stDobNotConfirmed,
-						"dob-not-confirmed",
-						"This profile has no date of birth"));
-
-			}
-
-			// check the age is ok
-
-			if (! chatUserLogic.dobOk (fromUser)) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stDobTooYoung,
-						"dob-too-young",
-						"This profile has a too-young date of birth"));
-
-			}
-
-			// check the charges have been confirmed
-
-			if (fromUser.getDeliveryMethod () != ChatMessageMethod.iphone
-					&& ! fromUser.getChargesConfirmed ()) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stChargesNotConfirmed,
-						"charges-not-confirmed",
-						"This profile has not had the charges confirmed"));
-
-			}
-
-			// check the user can be found
-
-			if (toUser == null) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-send-response",
-						stRecipientNotFound,
-						"recipient-not-found",
-						"The specified recipient does not exist"));
-
-			}
-
-			// turn the images into media
-
-			List<MediaRec> medias =
-				new ArrayList<MediaRec> ();
-
-			if (attachments != null) {
-
-				for (
-					MessageSendAttachment attachment
-						: attachments
-				) {
-
-					MediaRec media =
-						mediaLogic.createMediaFromImageRequired (
-							taskLogger,
-							attachment.data,
-							attachment.type,
-							attachment.filename);
-
-					medias.add (
-						media);
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stBarred,
+							"barred",
+							"This profile has been barred"));
 
 				}
 
+				// check if the user is barred through credit
+
+				ChatCreditCheckResult creditCheckResult =
+					chatCreditLogic.userSpendCreditCheck (
+						taskLogger,
+						fromUser,
+						true,
+						optionalAbsent ());
+
+				if (creditCheckResult.failed ()) {
+
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stCredit,
+							"credit",
+							stringFormat (
+								"This profile has failed the credit check: %s",
+								creditCheckResult.details ())));
+
+				}
+
+				// check the age has been set up
+
+				if (! chatUserLogic.gotDob (fromUser)) {
+
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stDobNotConfirmed,
+							"dob-not-confirmed",
+							"This profile has no date of birth"));
+
+				}
+
+				// check the age is ok
+
+				if (! chatUserLogic.dobOk (fromUser)) {
+
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stDobTooYoung,
+							"dob-too-young",
+							"This profile has a too-young date of birth"));
+
+				}
+
+				// check the charges have been confirmed
+
+				if (fromUser.getDeliveryMethod () != ChatMessageMethod.iphone
+						&& ! fromUser.getChargesConfirmed ()) {
+
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stChargesNotConfirmed,
+							"charges-not-confirmed",
+							"This profile has not had the charges confirmed"));
+
+				}
+
+				// check the user can be found
+
+				if (toUser == null) {
+
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-send-response",
+							stRecipientNotFound,
+							"recipient-not-found",
+							"The specified recipient does not exist"));
+
+				}
+
+				// turn the images into media
+
+				List<MediaRec> medias =
+					new ArrayList<MediaRec> ();
+
+				if (attachments != null) {
+
+					for (
+						MessageSendAttachment attachment
+							: attachments
+					) {
+
+						MediaRec media =
+							mediaLogic.createMediaFromImageRequired (
+								taskLogger,
+								attachment.data,
+								attachment.type,
+								attachment.filename);
+
+						medias.add (
+							media);
+
+					}
+
+				}
+
+				// send the message
+
+				chatMessageLogic.chatMessageSendFromUser (
+					taskLogger,
+					fromUser,
+					toUser,
+					message,
+					null,
+					source,
+					medias);
+
 			}
-
-			// send the message
-
-			chatMessageLogic.chatMessageSendFromUser (
-				taskLogger,
-				fromUser,
-				toUser,
-				message,
-				null,
-				source,
-				medias);
 
 		}
 
@@ -3011,7 +3047,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						stringFormat (
@@ -3087,132 +3123,184 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				Instant now) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doIt");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doIt");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
-					number);
+			) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findOrCreate (
-					taskLogger,
-					chat,
-					numberRec);
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
 
-			// check the user is not barred
-
-			if (chatUser.getBarred ()) {
-
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-poll-response",
-						stBarred,
-						"barred",
-						"This profile has been barred"));
-
-			}
-
-			// check if the user is barred through credit
-
-			if (ignoreCredit == null || ! ignoreCredit) {
-
-				ChatCreditCheckResult creditCheckResult =
-					chatCreditLogic.userSpendCreditCheck (
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
 						taskLogger,
-						chatUser,
-						true,
-						optionalAbsent ());
+						number);
 
-				if (creditCheckResult.failed ()) {
+				ChatUserRec chatUser =
+					chatUserHelper.findOrCreate (
+						taskLogger,
+						chat,
+						numberRec);
+
+				// check the user is not barred
+
+				if (chatUser.getBarred ()) {
 
 					throw new RpcException (
 						Rpc.rpcError (
 							"chat-message-poll-response",
-							stCredit,
-							"credit",
-							stringFormat (
-								"This profile has been barred due to billing ",
-								"problems")));
+							stBarred,
+							"barred",
+							"This profile has been barred"));
 
 				}
 
-			}
+				// check if the user is barred through credit
 
-			// check and/or update the delivery method
+				if (ignoreCredit == null || ! ignoreCredit) {
 
-			ChatMessageMethod method;
+					ChatCreditCheckResult creditCheckResult =
+						chatCreditLogic.userSpendCreditCheck (
+							taskLogger,
+							chatUser,
+							true,
+							optionalAbsent ());
 
-			switch (deviceType) {
+					if (creditCheckResult.failed ()) {
 
-			case iphone:
-				method = ChatMessageMethod.iphone;
-				break;
+						throw new RpcException (
+							Rpc.rpcError (
+								"chat-message-poll-response",
+								stCredit,
+								"credit",
+								stringFormat (
+									"This profile has been barred due to billing ",
+									"problems")));
 
-			case web:
-				method = ChatMessageMethod.web;
-				break;
+					}
 
-			default:
+				}
 
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-poll-response",
-						Rpc.stRequestInvalid,
-						"request-invalid",
-						"The device type is not valid"));
+				// check and/or update the delivery method
 
-			}
+				ChatMessageMethod method;
 
-			if (login) {
+				switch (deviceType) {
 
-				chatMiscLogic.userJoin (
-					taskLogger,
-					chatUser,
-					false,
-					null,
-					method);
+				case iphone:
+					method = ChatMessageMethod.iphone;
+					break;
 
-			}
+				case web:
+					method = ChatMessageMethod.web;
+					break;
 
-			if (chatUser.getDeliveryMethod () != method) {
+				default:
 
-				throw new RpcException (
-					Rpc.rpcError (
-						"chat-message-poll-response",
-						stLoggedOut,
-						"logged-out",
-						"Not logged on via this device type"));
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-poll-response",
+							Rpc.stRequestInvalid,
+							"request-invalid",
+							"The device type is not valid"));
 
-			}
+				}
 
-			if (logout) {
+				if (login) {
 
-				chatUserLogic.logoff (
-					chatUser,
-					true);
+					chatMiscLogic.userJoin (
+						taskLogger,
+						chatUser,
+						false,
+						null,
+						method);
 
-			}
+				}
 
-			// update the last message poll
+				if (chatUser.getDeliveryMethod () != method) {
 
-			chatUser
+					throw new RpcException (
+						Rpc.rpcError (
+							"chat-message-poll-response",
+							stLoggedOut,
+							"logged-out",
+							"Not logged on via this device type"));
 
-				.setLastMessagePoll (
-					now);
+				}
 
-			// update the last poll message id
+				if (logout) {
 
-			if (gotDeliveryId != null) {
+					chatUserLogic.logoff (
+						taskLogger,
+						chatUser,
+						true);
 
-				List <ChatMessageRec> chatMessages =
+				}
+
+				// update the last message poll
+
+				chatUser
+
+					.setLastMessagePoll (
+						now);
+
+				// update the last poll message id
+
+				if (gotDeliveryId != null) {
+
+					List <ChatMessageRec> chatMessages =
+						chatMessageHelper.search (
+							taskLogger,
+							new ChatMessageSearch ()
+
+						.toUserId (
+							chatUser.getId ())
+
+						.deliveryId (
+							gotDeliveryId));
+
+					if (
+						chatMessages.isEmpty ()
+						|| chatMessages.get (0).getToUser () != chatUser
+					) {
+
+						throw new RpcException (
+							Rpc.rpcError (
+								"chat-message-poll-response",
+								stInvalidMessageId,
+								"invalid-message-id",
+								"The value for got-delivery-id not valid"));
+
+					}
+
+					if (
+						chatUser.getLastMessagePollId () == null
+						|| gotDeliveryId > chatUser.getLastMessagePollId ()
+					) {
+
+						chatUser
+
+							.setLastMessagePollId (
+								gotDeliveryId);
+
+					}
+
+				}
+
+				// retrieve all newer messages
+
+				respMessages =
+					Rpc.rpcList (
+						"messages",
+						"message",
+						RpcType.rStructure);
+
+				List<ChatMessageRec> messages =
 					chatMessageHelper.search (
 						taskLogger,
 						new ChatMessageSearch ()
@@ -3220,148 +3308,105 @@ class ChatApiServletModule
 					.toUserId (
 						chatUser.getId ())
 
-					.deliveryId (
-						gotDeliveryId));
+					.method (
+						method)
 
-				if (
-					chatMessages.isEmpty ()
-					|| chatMessages.get (0).getToUser () != chatUser
-				) {
+					.statusIn (
+						ImmutableSet.<ChatMessageStatus>of (
+							ChatMessageStatus.sent,
+							ChatMessageStatus.broadcast,
+							ChatMessageStatus.moderatorApproved,
+							ChatMessageStatus.moderatorAutoEdited,
+							ChatMessageStatus.moderatorEdited))
 
-					throw new RpcException (
-						Rpc.rpcError (
-							"chat-message-poll-response",
-							stInvalidMessageId,
-							"invalid-message-id",
-							"The value for got-delivery-id not valid"));
+					.deliveryIdGreaterThan (
+						chatUser.getLastMessagePollId ())
 
-				}
+					.orderBy (
+						ChatMessageSearch.Order.deliveryId)
 
-				if (
-					chatUser.getLastMessagePollId () == null
-					|| gotDeliveryId > chatUser.getLastMessagePollId ()
-				) {
+				);
 
-					chatUser
+				for (ChatMessageRec message : messages) {
 
-						.setLastMessagePollId (
-							gotDeliveryId);
+					if (message.getDeliveryId () == null
+							|| message.getDeliveryId () <= 0) {
 
-				}
-
-			}
-
-			// retrieve all newer messages
-
-			respMessages =
-				Rpc.rpcList (
-					"messages",
-					"message",
-					RpcType.rStructure);
-
-			List<ChatMessageRec> messages =
-				chatMessageHelper.search (
-					taskLogger,
-					new ChatMessageSearch ()
-
-				.toUserId (
-					chatUser.getId ())
-
-				.method (
-					method)
-
-				.statusIn (
-					ImmutableSet.<ChatMessageStatus>of (
-						ChatMessageStatus.sent,
-						ChatMessageStatus.broadcast,
-						ChatMessageStatus.moderatorApproved,
-						ChatMessageStatus.moderatorAutoEdited,
-						ChatMessageStatus.moderatorEdited))
-
-				.deliveryIdGreaterThan (
-					chatUser.getLastMessagePollId ())
-
-				.orderBy (
-					ChatMessageSearch.Order.deliveryId)
-
-			);
-
-			for (ChatMessageRec message : messages) {
-
-				if (message.getDeliveryId () == null
-						|| message.getDeliveryId () <= 0) {
-
-					throw new RuntimeException (
-						"Message " + message.getId ());
-
-				}
-
-				RpcStructure respMessage =
-					Rpc.rpcStruct (
-						"message",
-
-						Rpc.rpcElem (
-							"id",
-							message.getId ()),
-
-						Rpc.rpcElem (
-							"delivery-id",
-							message.getDeliveryId ()),
-
-						Rpc.rpcElem (
-							"from-type",
-							message.getFromUser ().getType ().toString ()),
-
-						Rpc.rpcElem (
-							"from-code",
-							message.getFromUser ().getCode ()),
-
-						Rpc.rpcElem (
-							"to-code",
-							message.getToUser ().getCode ()),
-
-						Rpc.rpcElem (
-							"timestamp",
-							message.getTimestamp ().getMillis ()),
-
-						Rpc.rpcElem (
-							"text",
-							message.getEditedText ().getText ()));
-
-				if (! message.getMedias ().isEmpty ()) {
-
-					RpcList attachments =
-						Rpc.rpcList (
-							"attachments",
-							"attachment",
-							RpcType.rStructure);
-
-					for (MediaRec media : message.getMedias ()) {
-
-						attachments.add (
-							Rpc.rpcStruct (
-								"attachment",
-
-								Rpc.rpcElem (
-									"type",
-									media.getMediaType ().getMimeType ()),
-
-								Rpc.rpcElem (
-									"media-id",
-									media.getId ())));
+						throw new RuntimeException (
+							"Message " + message.getId ());
 
 					}
 
-					respMessage.add (
-						attachments);
+					RpcStructure respMessage =
+						Rpc.rpcStruct (
+							"message",
+
+							Rpc.rpcElem (
+								"id",
+								message.getId ()),
+
+							Rpc.rpcElem (
+								"delivery-id",
+								message.getDeliveryId ()),
+
+							Rpc.rpcElem (
+								"from-type",
+								message.getFromUser ().getType ().toString ()),
+
+							Rpc.rpcElem (
+								"from-code",
+								message.getFromUser ().getCode ()),
+
+							Rpc.rpcElem (
+								"to-code",
+								message.getToUser ().getCode ()),
+
+							Rpc.rpcElem (
+								"timestamp",
+								message.getTimestamp ().getMillis ()),
+
+							Rpc.rpcElem (
+								"text",
+								message.getEditedText ().getText ()));
+
+					if (! message.getMedias ().isEmpty ()) {
+
+						RpcList attachments =
+							Rpc.rpcList (
+								"attachments",
+								"attachment",
+								RpcType.rStructure);
+
+						for (MediaRec media : message.getMedias ()) {
+
+							attachments.add (
+								Rpc.rpcStruct (
+									"attachment",
+
+									Rpc.rpcElem (
+										"type",
+										media.getMediaType ().getMimeType ()),
+
+									Rpc.rpcElem (
+										"media-id",
+										media.getId ())));
+
+						}
+
+						respMessage.add (
+							attachments);
+
+					}
+
+					respMessages.add (
+						respMessage);
 
 				}
 
-				respMessages.add (
-					respMessage);
-
 			}
+
 		}
+
 	}
 
 	// =============================================== image update rpc handler
@@ -3488,7 +3533,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						stringFormat (
@@ -3624,149 +3669,173 @@ class ChatApiServletModule
 		private
 		void doIt (
 				@NonNull TaskLogger parentTaskLogger,
-				@NonNull Transaction transaction) {
+				@NonNull OwnedTransaction transaction) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doIt");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doIt");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
-					number);
+			) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findOrCreate (
-					taskLogger,
-					chat,
-					numberRec);
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
 
-			List <ChatUserImageRec> images =
-				chatUserLogic.getChatUserImageListByType (
-					chatUser,
-					type);
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
+						taskLogger,
+						number);
 
-			// delete images
+				ChatUserRec chatUser =
+					chatUserHelper.findOrCreate (
+						taskLogger,
+						chat,
+						numberRec);
 
-			if (delete != null) {
-
-				// check the delete image ids are valid
-
-				Set <Long> userImageIds =
-					images.stream ()
-
-					.map (
-						ChatUserImageRec::getId)
-
-					.collect (
-						Collectors.toSet ());
-
-				Set <Long> requestImageIds =
-					new HashSet<> ();
-
-				for (
-					Long imageId
-						: delete
-				) {
-
-					if (requestImageIds.contains (imageId)) {
-
-						throw new RpcException (
-							Rpc.rpcError (
-								"chat-update-image-response",
-								Rpc.stRequestInvalid,
-								"request-invalid",
-								"The delete image ids contains a duplicate"));
-
-					}
-
-					if (! userImageIds.contains (imageId)) {
-
-						throw new RpcException (
-							Rpc.rpcError (
-								"chat-update-image-response",
-								Rpc.stRequestInvalid,
-								"request-invalid",
-								stringFormat (
-									"The delete image ids contains an invalid ",
-									"image id")));
-
-					}
-
-					requestImageIds.add (imageId);
-
-				}
-
-				// perform the deletions
-
-				long i = 0l;
-
-				for (
-					ChatUserImageRec image
-						: images
-				) {
-
-					ChatUserImageRec mainChatUserImage =
-						chatUserLogic.getMainChatUserImageByType (
-							chatUser,
-							type);
-
-					if (mainChatUserImage == image) {
-
-						chatUserLogic.setMainChatUserImageByType (
-							chatUser,
-							type,
-							Optional.<ChatUserImageRec>absent ());
-
-					}
-
-					image.setIndex (
-						requestImageIds.contains (image.getId ())
-							? null
-							: i ++);
-
-				}
-
-				transaction.refresh (chatUser);
-
-				images =
+				List <ChatUserImageRec> images =
 					chatUserLogic.getChatUserImageListByType (
 						chatUser,
 						type);
 
-			}
+				// delete images
 
-			// reorder images
-			if (reorder != null) {
+				if (delete != null) {
 
-				// check the reorder image ids are valid
+					// check the delete image ids are valid
 
-				Set <Long> userImageIds =
-					images.stream ()
+					Set <Long> userImageIds =
+						images.stream ()
 
-					.map (
-						ChatUserImageRec::getId)
+						.map (
+							ChatUserImageRec::getId)
 
-					.collect (
-						Collectors.toSet ());
+						.collect (
+							Collectors.toSet ());
 
-				Set <Long> requestImageIds =
-					new HashSet<> ();
+					Set <Long> requestImageIds =
+						new HashSet<> ();
 
-				for (
-					Long imageId
-						: reorder
-				) {
+					for (
+						Long imageId
+							: delete
+					) {
+
+						if (requestImageIds.contains (imageId)) {
+
+							throw new RpcException (
+								Rpc.rpcError (
+									"chat-update-image-response",
+									Rpc.stRequestInvalid,
+									"request-invalid",
+									"The delete image ids contains a duplicate"));
+
+						}
+
+						if (! userImageIds.contains (imageId)) {
+
+							throw new RpcException (
+								Rpc.rpcError (
+									"chat-update-image-response",
+									Rpc.stRequestInvalid,
+									"request-invalid",
+									stringFormat (
+										"The delete image ids contains an invalid ",
+										"image id")));
+
+						}
+
+						requestImageIds.add (imageId);
+
+					}
+
+					// perform the deletions
+
+					long i = 0l;
+
+					for (
+						ChatUserImageRec image
+							: images
+					) {
+
+						ChatUserImageRec mainChatUserImage =
+							chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type);
+
+						if (mainChatUserImage == image) {
+
+							chatUserLogic.setMainChatUserImageByType (
+								chatUser,
+								type,
+								Optional.<ChatUserImageRec>absent ());
+
+						}
+
+						image.setIndex (
+							requestImageIds.contains (image.getId ())
+								? null
+								: i ++);
+
+					}
+
+					transaction.refresh (chatUser);
+
+					images =
+						chatUserLogic.getChatUserImageListByType (
+							chatUser,
+							type);
+
+				}
+
+				// reorder images
+				if (reorder != null) {
+
+					// check the reorder image ids are valid
+
+					Set <Long> userImageIds =
+						images.stream ()
+
+						.map (
+							ChatUserImageRec::getId)
+
+						.collect (
+							Collectors.toSet ());
+
+					Set <Long> requestImageIds =
+						new HashSet<> ();
+
+					for (
+						Long imageId
+							: reorder
+					) {
+
+						if (
+							contains (
+								requestImageIds,
+								imageId)
+						) {
+
+							throw new RpcException (
+								Rpc.rpcError (
+									"chat-update-image-response",
+									Rpc.stRequestInvalid,
+									"request-invalid",
+									"The reorder image ids contains a duplicate"));
+
+						}
+
+						requestImageIds.add (
+							imageId);
+
+					}
 
 					if (
-						contains (
-							requestImageIds,
-							imageId)
+						equalSafe (
+							userImageIds,
+							requestImageIds)
 					) {
 
 						throw new RpcException (
@@ -3774,96 +3843,123 @@ class ChatApiServletModule
 								"chat-update-image-response",
 								Rpc.stRequestInvalid,
 								"request-invalid",
-								"The reorder image ids contains a duplicate"));
+								stringFormat (
+									"The reorder image ids do not match the ",
+									"current list")));
 
 					}
 
-					requestImageIds.add (
-						imageId);
+					// perform the reorder
+
+					for (ChatUserImageRec image : images)
+						image.setIndex (null);
+
+					transaction.flush ();
+
+					long index = 0;
+
+					for (
+						Long chatUserImageId
+							: reorder
+					) {
+
+						ChatUserImageRec image =
+							chatUserImageHelper.findRequired (
+								chatUserImageId);
+
+						image.setIndex (
+							index ++);
+
+					}
+
+					transaction.refresh (chatUser);
+
+					images =
+						chatUserLogic.getChatUserImageListByType (
+							chatUser,
+							type);
 
 				}
 
-				if (
-					equalSafe (
-						userImageIds,
-						requestImageIds)
-				) {
+				// add images
 
-					throw new RpcException (
-						Rpc.rpcError (
-							"chat-update-image-response",
-							Rpc.stRequestInvalid,
-							"request-invalid",
-							stringFormat (
-								"The reorder image ids do not match the ",
-								"current list")));
+				if (add != null) {
 
-				}
+					for (ImageUpdateAdd imageUpdateAdd : add) {
 
-				// perform the reorder
+						chatUserLogic.setImage (
+							taskLogger,
+							chatUser,
+							type,
+							imageUpdateAdd.imageData,
+							imageUpdateAdd.filename,
+							imageUpdateAdd.mimeType,
+							null,
+							true);
 
-				for (ChatUserImageRec image : images)
-					image.setIndex (null);
+					}
 
-				transaction.flush ();
+					transaction.refresh (chatUser);
 
-				long index = 0;
-
-				for (
-					Long chatUserImageId
-						: reorder
-				) {
-
-					ChatUserImageRec image =
-						chatUserImageHelper.findRequired (
-							chatUserImageId);
-
-					image.setIndex (
-						index ++);
+					images =
+						chatUserLogic.getChatUserImageListByType (
+							chatUser,
+							type);
 
 				}
 
-				transaction.refresh (chatUser);
+				// set selected image
 
-				images =
-					chatUserLogic.getChatUserImageListByType (
-						chatUser,
-						type);
+				if (selectedImageId != null) {
 
-			}
+					ChatUserImageRec selectedChatUserImage = null;
 
-			// add images
+					for (
+						ChatUserImageRec chatUserImage
+							: chatUserLogic.getChatUserImageListByType (
+								chatUser,
+								type)
+					) {
 
-			if (add != null) {
+						if (
+							integerNotEqualSafe (
+								chatUserImage.getId (),
+								selectedImageId)
+						) {
+							continue;
+						}
 
-				for (ImageUpdateAdd imageUpdateAdd : add) {
+						selectedChatUserImage =
+							chatUserImage;
 
-					chatUserLogic.setImage (
-						taskLogger,
+					}
+
+					if (selectedChatUserImage == null) {
+
+						throw new RpcException (
+							Rpc.rpcError (
+								"chat-update-image-response",
+								Rpc.stRequestInvalid,
+								"request-invalid",
+								"The new selected image id does not exist"));
+
+					}
+
+					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						imageUpdateAdd.imageData,
-						imageUpdateAdd.filename,
-						imageUpdateAdd.mimeType,
-						null,
-						true);
+						Optional.of (
+							selectedChatUserImage));
 
 				}
 
-				transaction.refresh (chatUser);
+				// retrieve all images
 
-				images =
-					chatUserLogic.getChatUserImageListByType (
-						chatUser,
-						type);
-
-			}
-
-			// set selected image
-
-			if (selectedImageId != null) {
-
-				ChatUserImageRec selectedChatUserImage = null;
+				respImages =
+					Rpc.rpcList (
+						"images",
+						"image",
+						RpcType.rStructure);
 
 				for (
 					ChatUserImageRec chatUserImage
@@ -3872,207 +3968,162 @@ class ChatApiServletModule
 							type)
 				) {
 
+					RpcStructure respImage =
+
+						Rpc.rpcStruct (
+							"image",
+
+							Rpc.rpcElem (
+								"image-id",
+								chatUserImage.getId ()),
+
+							Rpc.rpcElem (
+								"media-id",
+								chatUserImage.getMedia ().getId ()),
+
+							Rpc.rpcElem (
+								"classification",
+								chatUserImage.getClassification ()),
+
+							Rpc.rpcElem (
+								"selected",
+								referenceEqualWithClass (
+									ChatUserImageRec.class,
+									chatUserImage,
+									chatUserLogic.getMainChatUserImageByType (
+										chatUser,
+										type))),
+
+							Rpc.rpcElem (
+								"status",
+								chatUserInfoStatusMuneMap.get (
+									chatUserImage.getStatus ())),
+
+							Rpc.rpcElem (
+								"creation-time",
+								chatUserImage.getTimestamp ().getMillis ()));
+
+					if (chatUserImage.getFullMedia () != null) {
+
+						respImage.add (
+
+							Rpc.rpcElem (
+								"full-media-id",
+								chatUserImage.getFullMedia ().getId ()),
+
+							Rpc.rpcElem (
+								"full-media-filename",
+								chatUserImage.getFullMedia ().getFilename ()),
+
+							Rpc.rpcElem (
+								"full-media-mime-type",
+								chatUserImage.getFullMedia ().getMediaType ()
+									.getMimeType ()));
+
+					}
+
+					if (chatUserImage.getModerationTime () != null) {
+
+						respImage.add (
+							Rpc.rpcElem (
+								"moderation-time",
+								chatUserImage.getModerationTime ().getMillis ()));
+
+					}
+
+					respImages.add (respImage);
+				}
+
+				// retrieve all images
+
+				respOtherImages =
+					Rpc.rpcList (
+						"other-images",
+						"image",
+						RpcType.rStructure);
+
+				for (
+					ChatUserImageRec chatUserImage
+						: chatUser.getChatUserImages ()
+				) {
+
+					if (chatUserImage.getType () != type) continue;
+
 					if (
-						integerNotEqualSafe (
-							chatUserImage.getId (),
-							selectedImageId)
+						enumNotInSafe (
+							chatUserImage.getStatus (),
+							ChatUserInfoStatus.moderatorPending,
+							ChatUserInfoStatus.moderatorRejected)
 					) {
 						continue;
 					}
 
-					selectedChatUserImage =
-						chatUserImage;
+					RpcStructure respImage =
+
+						Rpc.rpcStruct (
+							"image",
+
+							Rpc.rpcElem (
+								"image-id",
+								chatUserImage.getId ()),
+
+							Rpc.rpcElem (
+								"media-id",
+								chatUserImage.getMedia ().getId ()),
+
+							Rpc.rpcElem (
+								"classification",
+								chatUserImage.getClassification ()),
+
+							Rpc.rpcElem (
+								"selected",
+								referenceEqualWithClass (
+									ChatUserImageRec.class,
+									chatUserImage,
+									chatUserLogic.getMainChatUserImageByType (
+										chatUser,
+										type))),
+
+							Rpc.rpcElem (
+								"status",
+								chatUserInfoStatusMuneMap.get (
+									chatUserImage.getStatus ())),
+
+							Rpc.rpcElem (
+								"creation-time",
+								chatUserImage.getTimestamp ().getMillis ()));
+
+					if (chatUserImage.getFullMedia () != null) {
+
+						respImage.add (
+
+							Rpc.rpcElem (
+								"full-media-id",
+								chatUserImage.getFullMedia ().getId ()),
+
+							Rpc.rpcElem (
+								"full-media-filename",
+								chatUserImage.getFullMedia ().getFilename ()),
+
+							Rpc.rpcElem (
+								"full-media-mime-type",
+								chatUserImage.getFullMedia ().getMediaType ()
+									.getMimeType ()));
+
+					}
+
+					if (chatUserImage.getModerationTime () != null) {
+
+						respImage.add (
+							Rpc.rpcElem (
+								"moderation-time",
+								chatUserImage.getModerationTime ().getMillis ()));
+
+					}
+
+					respOtherImages.add (respImage);
 
 				}
-
-				if (selectedChatUserImage == null) {
-
-					throw new RpcException (
-						Rpc.rpcError (
-							"chat-update-image-response",
-							Rpc.stRequestInvalid,
-							"request-invalid",
-							"The new selected image id does not exist"));
-
-				}
-
-				chatUserLogic.setMainChatUserImageByType (
-					chatUser,
-					type,
-					Optional.of (
-						selectedChatUserImage));
-
-			}
-
-			// retrieve all images
-
-			respImages =
-				Rpc.rpcList (
-					"images",
-					"image",
-					RpcType.rStructure);
-
-			for (
-				ChatUserImageRec chatUserImage
-					: chatUserLogic.getChatUserImageListByType (
-						chatUser,
-						type)
-			) {
-
-				RpcStructure respImage =
-
-					Rpc.rpcStruct (
-						"image",
-
-						Rpc.rpcElem (
-							"image-id",
-							chatUserImage.getId ()),
-
-						Rpc.rpcElem (
-							"media-id",
-							chatUserImage.getMedia ().getId ()),
-
-						Rpc.rpcElem (
-							"classification",
-							chatUserImage.getClassification ()),
-
-						Rpc.rpcElem (
-							"selected",
-							referenceEqualWithClass (
-								ChatUserImageRec.class,
-								chatUserImage,
-								chatUserLogic.getMainChatUserImageByType (
-									chatUser,
-									type))),
-
-						Rpc.rpcElem (
-							"status",
-							chatUserInfoStatusMuneMap.get (
-								chatUserImage.getStatus ())),
-
-						Rpc.rpcElem (
-							"creation-time",
-							chatUserImage.getTimestamp ().getMillis ()));
-
-				if (chatUserImage.getFullMedia () != null) {
-
-					respImage.add (
-
-						Rpc.rpcElem (
-							"full-media-id",
-							chatUserImage.getFullMedia ().getId ()),
-
-						Rpc.rpcElem (
-							"full-media-filename",
-							chatUserImage.getFullMedia ().getFilename ()),
-
-						Rpc.rpcElem (
-							"full-media-mime-type",
-							chatUserImage.getFullMedia ().getMediaType ()
-								.getMimeType ()));
-
-				}
-
-				if (chatUserImage.getModerationTime () != null) {
-
-					respImage.add (
-						Rpc.rpcElem (
-							"moderation-time",
-							chatUserImage.getModerationTime ().getMillis ()));
-
-				}
-
-				respImages.add (respImage);
-			}
-
-			// retrieve all images
-
-			respOtherImages =
-				Rpc.rpcList (
-					"other-images",
-					"image",
-					RpcType.rStructure);
-
-			for (
-				ChatUserImageRec chatUserImage
-					: chatUser.getChatUserImages ()
-			) {
-
-				if (chatUserImage.getType () != type) continue;
-
-				if (
-					enumNotInSafe (
-						chatUserImage.getStatus (),
-						ChatUserInfoStatus.moderatorPending,
-						ChatUserInfoStatus.moderatorRejected)
-				) {
-					continue;
-				}
-
-				RpcStructure respImage =
-
-					Rpc.rpcStruct (
-						"image",
-
-						Rpc.rpcElem (
-							"image-id",
-							chatUserImage.getId ()),
-
-						Rpc.rpcElem (
-							"media-id",
-							chatUserImage.getMedia ().getId ()),
-
-						Rpc.rpcElem (
-							"classification",
-							chatUserImage.getClassification ()),
-
-						Rpc.rpcElem (
-							"selected",
-							referenceEqualWithClass (
-								ChatUserImageRec.class,
-								chatUserImage,
-								chatUserLogic.getMainChatUserImageByType (
-									chatUser,
-									type))),
-
-						Rpc.rpcElem (
-							"status",
-							chatUserInfoStatusMuneMap.get (
-								chatUserImage.getStatus ())),
-
-						Rpc.rpcElem (
-							"creation-time",
-							chatUserImage.getTimestamp ().getMillis ()));
-
-				if (chatUserImage.getFullMedia () != null) {
-
-					respImage.add (
-
-						Rpc.rpcElem (
-							"full-media-id",
-							chatUserImage.getFullMedia ().getId ()),
-
-						Rpc.rpcElem (
-							"full-media-filename",
-							chatUserImage.getFullMedia ().getFilename ()),
-
-						Rpc.rpcElem (
-							"full-media-mime-type",
-							chatUserImage.getFullMedia ().getMediaType ()
-								.getMimeType ()));
-
-				}
-
-				if (chatUserImage.getModerationTime () != null) {
-
-					respImage.add (
-						Rpc.rpcElem (
-							"moderation-time",
-							chatUserImage.getModerationTime ().getMillis ()));
-
-				}
-
-				respOtherImages.add (respImage);
 
 			}
 
@@ -4156,7 +4207,7 @@ class ChatApiServletModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"ChatApiServletModule.CreditRpcHandler.handle (source)",
@@ -4232,136 +4283,142 @@ class ChatApiServletModule
 		private
 		void doIt (
 				@NonNull TaskLogger parentTaskLogger,
-				@NonNull Transaction transaction) {
+				@NonNull OwnedTransaction transaction) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doIt");
+			try (
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"doIt");
 
-			NumberRec numberRec =
-				numberHelper.findOrCreate (
-					taskLogger,
-					number);
+			) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findOrCreate (
-					taskLogger,
-					chat,
-					numberRec);
+				ChatRec chat =
+					chatHelper.findRequired (
+						chatId);
 
-			ChatSchemeRec chatScheme =
-				chatUser.getChatScheme ();
-
-			routeCharge =
-				chatScheme.getRbBillRoute ().getOutCharge ();
-
-			// set count from amount if not specified
-
-			if (sendCount == null && sendAmount != null) {
-
-				sendCount =
-					sendAmount / routeCharge;
-
-			}
-
-			// check send count and amount match
-
-			if (allOf (
-
-				() -> isNotNull (
-					sendCount),
-
-				() -> isNotNull (
-					sendAmount),
-
-				() -> integerNotEqualSafe (
-					sendCount * routeCharge,
-					sendAmount)
-
-			)) {
-
-				throw new RpcException (
-					"chat-credit-response",
-					stSendAmountCountMismatch,
-					"send-amount-count-mismatch",
-					stringFormat (
-						"Send count %s and send amount %s mismatch. Route ",
-						integerToDecimalString (
-							sendCount),
-						integerToDecimalString (
-							sendAmount),
-						"charge is %s.",
-						integerToDecimalString (
-							routeCharge)));
-
-			}
-
-			// send bills
-
-			if (sendCount != null) {
-
-				for (int i = 0; i < sendCount; i++) {
-
-					chatCreditLogic.userBillReal (
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
 						taskLogger,
-						chatUser,
-						true);
+						number);
+
+				ChatUserRec chatUser =
+					chatUserHelper.findOrCreate (
+						taskLogger,
+						chat,
+						numberRec);
+
+				ChatSchemeRec chatScheme =
+					chatUser.getChatScheme ();
+
+				routeCharge =
+					chatScheme.getRbBillRoute ().getOutCharge ();
+
+				// set count from amount if not specified
+
+				if (sendCount == null && sendAmount != null) {
+
+					sendCount =
+						sendAmount / routeCharge;
 
 				}
 
-			}
+				// check send count and amount match
 
-			// update credit
+				if (allOf (
 
-			if (creditAmount != null || billAmount != null) {
+					() -> isNotNull (
+						sendCount),
 
-				chatUserCreditHelper.insert (
-					taskLogger,
-					chatUserCreditHelper.createInstance ()
+					() -> isNotNull (
+						sendAmount),
 
-					.setChatUser (
-						chatUser)
+					() -> integerNotEqualSafe (
+						sendCount * routeCharge,
+						sendAmount)
 
-					.setTimestamp (
-						transaction.now ())
+				)) {
 
-					.setCreditAmount (
-						ifNull (
-							creditAmount,
-							0l))
+					throw new RpcException (
+						"chat-credit-response",
+						stSendAmountCountMismatch,
+						"send-amount-count-mismatch",
+						stringFormat (
+							"Send count %s and send amount %s mismatch. Route ",
+							integerToDecimalString (
+								sendCount),
+							integerToDecimalString (
+								sendAmount),
+							"charge is %s.",
+							integerToDecimalString (
+								routeCharge)));
 
-					.setBillAmount (
-						ifNull (
-							billAmount,
-							0l))
+				}
 
-					.setGift (
-						ifNull (
-							billAmount,
-							0l
-						) == 0)
+				// send bills
 
-					.setDetails (
-						ifNull (
-							details,
-							""))
+				if (sendCount != null) {
 
-				);
+					for (int i = 0; i < sendCount; i++) {
 
-				chatUser
+						chatCreditLogic.userBillReal (
+							taskLogger,
+							chatUser,
+							true);
 
-					.setCredit (
-						chatUser.getCredit ()
-						+ creditAmount)
+					}
 
-					.setCreditBought (
-						+ chatUser.getCreditBought ()
-						+ creditAmount);
+				}
+
+				// update credit
+
+				if (creditAmount != null || billAmount != null) {
+
+					chatUserCreditHelper.insert (
+						taskLogger,
+						chatUserCreditHelper.createInstance ()
+
+						.setChatUser (
+							chatUser)
+
+						.setTimestamp (
+							transaction.now ())
+
+						.setCreditAmount (
+							ifNull (
+								creditAmount,
+								0l))
+
+						.setBillAmount (
+							ifNull (
+								billAmount,
+								0l))
+
+						.setGift (
+							ifNull (
+								billAmount,
+								0l
+							) == 0)
+
+						.setDetails (
+							ifNull (
+								details,
+								""))
+
+					);
+
+					chatUser
+
+						.setCredit (
+							chatUser.getCredit ()
+							+ creditAmount)
+
+						.setCreditBought (
+							+ chatUser.getCreditBought ()
+							+ creditAmount);
+
+				}
 
 			}
 

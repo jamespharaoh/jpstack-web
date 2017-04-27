@@ -1,10 +1,13 @@
 package wbs.smsapps.forwarder.api;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.util.List;
 import java.util.Map;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.rpc.core.RpcChecker;
 import wbs.platform.rpc.core.RpcDefinition;
 
@@ -25,10 +28,10 @@ class ForwarderQueryExMessageChecker
 	Object check (
 			RpcDefinition rpcDefinition,
 			Object value,
-			List<String> errors) {
+			List <String> errors) {
 
-		Map<String,Object> map =
-			forwarderApiLogic.unsafeMapStringObject (
+		Map <String, Object> map =
+			genericCastUnchecked (
 				value);
 
 		if (

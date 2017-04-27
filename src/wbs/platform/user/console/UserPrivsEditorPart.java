@@ -119,89 +119,95 @@ class UserPrivsEditorPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// build the privs tree
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		List <PrivRec> privs =
-			privHelper.findAll ();
-
-		for (
-			PrivRec priv
-				: privs
 		) {
 
-			if (
-				! privChecker.canGrant (
-					taskLogger,
-					priv.getId ())
-			) {
-				continue;
-			}
+			// build the privs tree
 
-			Record <?> parentObject =
-				objectManager.getParentRequired (
-					priv);
-
-			PrivsEditorNode parentNode =
-				findNode (
-					parentObject);
-
-			parentNode.privs.put (
-				priv.getCode (),
-				priv);
-
-		}
-
-		// and fill the current priv data sets
-
-		UserRec user =
-			userHelper.findFromContextRequired ();
-
-		for (
-			UserPrivRec userPriv
-				: user.getUserPrivs ()
-		) {
-
-			if (userPriv.getCan ()) {
-
-				canPrivIds.add (
-					userPriv.getPriv ().getId ());
-
-			}
-
-			if (userPriv.getCanGrant ()) {
-
-				canGrantPrivIds.add (
-					userPriv.getPriv ().getId ());
-
-			}
-
-		}
-
-		for (
-			GroupRec group
-				: user.getGroups ()
-		) {
+			List <PrivRec> privs =
+				privHelper.findAll ();
 
 			for (
 				PrivRec priv
-					: group.getPrivs ()
+					: privs
 			) {
 
-				groupPrivIds.add (
-					priv.getId ());
+				if (
+					! privChecker.canGrant (
+						taskLogger,
+						priv.getId ())
+				) {
+					continue;
+				}
+
+				Record <?> parentObject =
+					objectManager.getParentRequired (
+						priv);
+
+				PrivsEditorNode parentNode =
+					findNode (
+						parentObject);
+
+				parentNode.privs.put (
+					priv.getCode (),
+					priv);
 
 			}
+
+			// and fill the current priv data sets
+
+			UserRec user =
+				userHelper.findFromContextRequired ();
+
+			for (
+				UserPrivRec userPriv
+					: user.getUserPrivs ()
+			) {
+
+				if (userPriv.getCan ()) {
+
+					canPrivIds.add (
+						userPriv.getPriv ().getId ());
+
+				}
+
+				if (userPriv.getCanGrant ()) {
+
+					canGrantPrivIds.add (
+						userPriv.getPriv ().getId ());
+
+				}
+
+			}
+
+			for (
+				GroupRec group
+					: user.getGroups ()
+			) {
+
+				for (
+					PrivRec priv
+						: group.getPrivs ()
+				) {
+
+					groupPrivIds.add (
+						priv.getId ());
+
+				}
+			}
+
+			// now check which tree nodes to expand initially
+
+			doExpansion (
+				rootNode);
+
 		}
-
-		// now check which tree nodes to expand initially
-
-		doExpansion (
-			rootNode);
 
 	}
 

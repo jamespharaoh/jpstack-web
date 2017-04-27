@@ -99,29 +99,35 @@ class ContextTabActionPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildFile (
-				taskLogger,
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					resolvedExtensionPoint);
+
+				buildFile (
+					taskLogger,
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -158,26 +164,32 @@ class ContextTabActionPageBuilder <
 			@NonNull ResolvedConsoleContextExtensionPoint
 				resolvedExtensionPoint) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildFile");
+		try (
 
-		consoleModule.addContextFile (
-			localFile,
-			consoleFile.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-				.getResponderName (
-					responderName)
+		) {
 
-				.postActionName (
-					taskLogger,
-					actionName)
+			consoleModule.addContextFile (
+				localFile,
+				consoleFile.get ()
 
-				.privKeys (
-					privKeys),
+					.getResponderName (
+						responderName)
 
-			resolvedExtensionPoint.contextTypeNames ());
+					.postActionName (
+						taskLogger,
+						actionName)
+
+					.privKeys (
+						privKeys),
+
+				resolvedExtensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

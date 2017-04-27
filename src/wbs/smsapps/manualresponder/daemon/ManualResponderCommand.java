@@ -31,8 +31,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -157,7 +157,7 @@ class ManualResponderCommand
 
 	// state
 
-	Transaction transaction;
+	BorrowedTransaction transaction;
 
 	ManualResponderRec manualResponder;
 	ManualResponderAffiliateRec manualResponderAffiliate;
@@ -175,195 +175,281 @@ class ManualResponderCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		transaction =
-			database.currentTransaction ();
-
-		Record <?> commandParent =
-			objectManager.getParentRequired (
-				command);
-
-		if (commandParent instanceof ManualResponderRec) {
-
-			manualResponder =
-				(ManualResponderRec)
-				commandParent;
-
-		} else if (commandParent instanceof ManualResponderAffiliateRec) {
-
-			manualResponderAffiliate =
-				(ManualResponderAffiliateRec)
-				commandParent;
-
-			manualResponder =
-				manualResponderAffiliate.getManualResponder ();
-
-		} else {
-
-			shouldNeverHappen ();
-
-		}
-
-		message =
-			inbox.getMessage ();
-
-		manualResponderNumber =
-			manualResponderNumberHelper.findOrCreate (
-				taskLogger,
-				manualResponder,
-				message.getNumber ());
-
-		defaultService =
-			serviceHelper.findByCodeRequired (
-				manualResponder,
-				"default");
-
-		// remove from number list
-
-		if (
-			isNotNull (
-				manualResponder.getUnblockNumberList ())
-		) {
-
-			numberListLogic.removeDueToMessage (
-				taskLogger,
-				manualResponder.getUnblockNumberList (),
-				message.getNumber (),
-				message,
-				defaultService);
-
-		}
-
-		// lookup sms customer
-
-		if (
-			isNotNull (
-				manualResponder.getSmsCustomerManager ())
-		) {
-
-			smsCustomer =
-				Optional.of (
-					smsCustomerHelper.findOrCreate (
-						taskLogger,
-						manualResponder.getSmsCustomerManager (),
-						message.getNumber ()));
-
-			manualResponderNumber
-
-				.setSmsCustomer (
-					smsCustomer.get ());
-
-		} else {
-
-			smsCustomer =
-				Optional.absent ();
-
-		}
-
-		// assign affiliate if appropriate
-
-		if (
-
-			isNotNull (
-				manualResponder.getSmsCustomerManager ())
-
-			&& isNotNull (
-				manualResponderAffiliate)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
 		) {
 
-			if (
-				referenceNotEqualWithClass (
-					SmsCustomerManagerRec.class,
-					manualResponder
-						.getSmsCustomerManager (),
-					manualResponderAffiliate
-						.getSmsCustomerAffiliate ()
-						.getSmsCustomerManager ())
-			) {
+			transaction =
+				database.currentTransaction ();
+
+			Record <?> commandParent =
+				objectManager.getParentRequired (
+					command);
+
+			if (commandParent instanceof ManualResponderRec) {
+
+				manualResponder =
+					(ManualResponderRec)
+					commandParent;
+
+			} else if (commandParent instanceof ManualResponderAffiliateRec) {
+
+				manualResponderAffiliate =
+					(ManualResponderAffiliateRec)
+					commandParent;
+
+				manualResponder =
+					manualResponderAffiliate.getManualResponder ();
+
+			} else {
 
 				shouldNeverHappen ();
 
 			}
 
-			smsCustomerLogic.customerAffiliateUpdate (
-				taskLogger,
-				smsCustomer.get (),
-				manualResponderAffiliate.getSmsCustomerAffiliate (),
-				message);
+			message =
+				inbox.getMessage ();
+
+			manualResponderNumber =
+				manualResponderNumberHelper.findOrCreate (
+					taskLogger,
+					manualResponder,
+					message.getNumber ());
+
+			defaultService =
+				serviceHelper.findByCodeRequired (
+					manualResponder,
+					"default");
+
+			// remove from number list
+
+			if (
+				isNotNull (
+					manualResponder.getUnblockNumberList ())
+			) {
+
+				numberListLogic.removeDueToMessage (
+					taskLogger,
+					manualResponder.getUnblockNumberList (),
+					message.getNumber (),
+					message,
+					defaultService);
+
+			}
+
+			// lookup sms customer
+
+			if (
+				isNotNull (
+					manualResponder.getSmsCustomerManager ())
+			) {
+
+				smsCustomer =
+					Optional.of (
+						smsCustomerHelper.findOrCreate (
+							taskLogger,
+							manualResponder.getSmsCustomerManager (),
+							message.getNumber ()));
+
+				manualResponderNumber
+
+					.setSmsCustomer (
+						smsCustomer.get ());
+
+			} else {
+
+				smsCustomer =
+					Optional.absent ();
+
+			}
+
+			// assign affiliate if appropriate
+
+			if (
+
+				isNotNull (
+					manualResponder.getSmsCustomerManager ())
+
+				&& isNotNull (
+					manualResponderAffiliate)
+
+			) {
+
+				if (
+					referenceNotEqualWithClass (
+						SmsCustomerManagerRec.class,
+						manualResponder
+							.getSmsCustomerManager (),
+						manualResponderAffiliate
+							.getSmsCustomerAffiliate ()
+							.getSmsCustomerManager ())
+				) {
+
+					shouldNeverHappen ();
+
+				}
+
+				smsCustomerLogic.customerAffiliateUpdate (
+					taskLogger,
+					smsCustomer.get (),
+					manualResponderAffiliate.getSmsCustomerAffiliate (),
+					message);
+
+			}
+
+			// save the request
+
+			request =
+				manualResponderRequestHelper.insert (
+					taskLogger,
+					manualResponderRequestHelper.createInstance ()
+
+				.setManualResponderNumber (
+					manualResponderNumber)
+
+				.setIndex (
+					manualResponderNumber.getNumRequests ())
+
+				.setMessage (
+					message)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setNumber (
+					message.getNumber ())
+
+				.setPending (
+					false)
+
+			);
+
+			// update number statistics
+
+			previousRequestTime =
+				manualResponderNumber.getLastRequest ();
+
+			manualResponderNumber
+
+				.setFirstRequest (
+					ifNull (
+						manualResponderNumber.getFirstRequest (),
+						transaction.now ()))
+
+				.setLastRequest (
+					transaction.now ())
+
+				.setNumRequests (
+					manualResponderNumber.getNumRequests () + 1);
+
+			// handle message as appropriate
+
+			return handleGeneral (
+				taskLogger);
 
 		}
-
-		// save the request
-
-		request =
-			manualResponderRequestHelper.insert (
-				taskLogger,
-				manualResponderRequestHelper.createInstance ()
-
-			.setManualResponderNumber (
-				manualResponderNumber)
-
-			.setIndex (
-				manualResponderNumber.getNumRequests ())
-
-			.setMessage (
-				message)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setNumber (
-				message.getNumber ())
-
-			.setPending (
-				false)
-
-		);
-
-		// update number statistics
-
-		previousRequestTime =
-			manualResponderNumber.getLastRequest ();
-
-		manualResponderNumber
-
-			.setFirstRequest (
-				ifNull (
-					manualResponderNumber.getFirstRequest (),
-					transaction.now ()))
-
-			.setLastRequest (
-				transaction.now ())
-
-			.setNumRequests (
-				manualResponderNumber.getNumRequests () + 1);
-
-		// handle message as appropriate
-
-		return handleGeneral (
-			taskLogger);
 
 	}
 
 	InboxAttemptRec handleExpectDateOfBirth (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleExpectDateOfBirth");
+		try (
 
-		// reset if date of birth already known
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleExpectDateOfBirth");
 
-		if (
-			isNotNull (
-				smsCustomer.get ().getDateOfBirth ())
 		) {
+
+			// reset if date of birth already known
+
+			if (
+				isNotNull (
+					smsCustomer.get ().getDateOfBirth ())
+			) {
+
+				manualResponderNumber
+
+					.setExpectDateOfBirth (
+						false);
+
+				return handleGeneral (
+					taskLogger);
+
+			}
+
+			// interpret date of birth
+
+			Optional<LocalDate> dateOfBirth =
+				DateFinder.find (
+					rest,
+					1915);
+
+			// error if it wasn't understood
+
+			if (
+				optionalIsNotPresent (
+					dateOfBirth)
+			) {
+
+				emailLogic.sendSystemEmail (
+					ImmutableList.of (
+						wbsConfig.email ().developerAddress ()),
+					"DOB error",
+					stringFormat (
+
+						"********** %s DOB ERROR **********\n",
+						wbsConfig.name ().toUpperCase (),
+						"\n",
+
+						"Application:  manual responder\n",
+						"Service:      %s.%s\n",
+						manualResponder.getSlice ().getCode (),
+						manualResponder.getCode (),
+						"Timestamp:    %s\n",
+						timeFormatter.timestampString (
+							timeFormatter.timezone (
+								ifNull (
+									manualResponder
+										.getSlice ()
+										.getDefaultTimezone (),
+									wbsConfig.defaultTimezone ())),
+							transaction.now ()),
+						"\n",
+
+						"Message ID:   %s\n",
+						integerToDecimalString (
+							message.getId ()),
+						"Route:        %s.%s\n",
+						message.getRoute ().getSlice ().getCode (),
+						message.getRoute ().getCode (),
+						"Number from:  %s\n",
+						message.getNumFrom (),
+						"Number to:    %s\n",
+						message.getNumTo (),
+						"Full message: %s\n",
+						message.getText ().getText (),
+						"Message rest: %s\n",
+						rest));
+
+				return handleDateOfBirthError (
+					taskLogger);
+
+			}
+
+			// store date of birth
+
+			smsCustomer.get ()
+
+				.setDateOfBirth (
+					dateOfBirth.get ());
 
 			manualResponderNumber
 
@@ -375,301 +461,257 @@ class ManualResponderCommand
 
 		}
 
-		// interpret date of birth
-
-		Optional<LocalDate> dateOfBirth =
-			DateFinder.find (
-				rest,
-				1915);
-
-		// error if it wasn't understood
-
-		if (
-			optionalIsNotPresent (
-				dateOfBirth)
-		) {
-
-			emailLogic.sendSystemEmail (
-				ImmutableList.of (
-					wbsConfig.email ().developerAddress ()),
-				"DOB error",
-				stringFormat (
-
-					"********** %s DOB ERROR **********\n",
-					wbsConfig.name ().toUpperCase (),
-					"\n",
-
-					"Application:  manual responder\n",
-					"Service:      %s.%s\n",
-					manualResponder.getSlice ().getCode (),
-					manualResponder.getCode (),
-					"Timestamp:    %s\n",
-					timeFormatter.timestampString (
-						timeFormatter.timezone (
-							ifNull (
-								manualResponder
-									.getSlice ()
-									.getDefaultTimezone (),
-								wbsConfig.defaultTimezone ())),
-						transaction.now ()),
-					"\n",
-
-					"Message ID:   %s\n",
-					integerToDecimalString (
-						message.getId ()),
-					"Route:        %s.%s\n",
-					message.getRoute ().getSlice ().getCode (),
-					message.getRoute ().getCode (),
-					"Number from:  %s\n",
-					message.getNumFrom (),
-					"Number to:    %s\n",
-					message.getNumTo (),
-					"Full message: %s\n",
-					message.getText ().getText (),
-					"Message rest: %s\n",
-					rest));
-
-			return handleDateOfBirthError (
-				taskLogger);
-
-		}
-
-		// store date of birth
-
-		smsCustomer.get ()
-
-			.setDateOfBirth (
-				dateOfBirth.get ());
-
-		manualResponderNumber
-
-			.setExpectDateOfBirth (
-				false);
-
-		return handleGeneral (
-			taskLogger);
-
 	}
 
 	InboxAttemptRec handleNeedDateOfBirth (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleNeedDateOfBirth");
+		try (
 
-		manualResponderLogic.sendTemplateAutomatically (
-			taskLogger,
-			request,
-			manualResponder.getDateOfBirthTemplate ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleNeedDateOfBirth");
 
-		manualResponderNumber
+		) {
 
-			.setExpectDateOfBirth (
-				true);
+			manualResponderLogic.sendTemplateAutomatically (
+				taskLogger,
+				request,
+				manualResponder.getDateOfBirthTemplate ());
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			manualResponderLogic.customerAffiliate (
-				manualResponderNumber),
-			command);
+			manualResponderNumber
+
+				.setExpectDateOfBirth (
+					true);
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				manualResponderLogic.customerAffiliate (
+					manualResponderNumber),
+				command);
+
+		}
 
 	}
 
 	InboxAttemptRec handleDateOfBirthError (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleDateOfBirthError");
+		try (
 
-		manualResponderLogic.sendTemplateAutomatically (
-			taskLogger,
-			request,
-			manualResponder.getDateOfBirthErrorTemplate ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleDateOfBirthError");
 
-		manualResponderNumber
+		) {
 
-			.setExpectDateOfBirth (
-				true);
+			manualResponderLogic.sendTemplateAutomatically (
+				taskLogger,
+				request,
+				manualResponder.getDateOfBirthErrorTemplate ());
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			manualResponderLogic.customerAffiliate (
-				manualResponderNumber),
-			command);
+			manualResponderNumber
+
+				.setExpectDateOfBirth (
+					true);
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				manualResponderLogic.customerAffiliate (
+					manualResponderNumber),
+				command);
+
+		}
 
 	}
 
 	InboxAttemptRec handleTooYoungError (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleTooYoungError");
+		try (
 
-		manualResponderLogic.sendTemplateAutomatically (
-			taskLogger,
-			request,
-			manualResponder.getTooYoungTemplate ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleTooYoungError");
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			manualResponderLogic.customerAffiliate (
-				manualResponderNumber),
-			command);
+		) {
+
+			manualResponderLogic.sendTemplateAutomatically (
+				taskLogger,
+				request,
+				manualResponder.getTooYoungTemplate ());
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				manualResponderLogic.customerAffiliate (
+					manualResponderNumber),
+				command);
+
+		}
 
 	}
 
 	InboxAttemptRec handleGeneral (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleGeneral");
+		try (
 
-		// if expecting date of birth
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleGeneral");
 
-		if (manualResponderNumber.getExpectDateOfBirth ()) {
-
-			return handleExpectDateOfBirth (
-				taskLogger);
-
-		}
-
-		// check age
-
-		if (
-			isNotNull (
-				manualResponder.getRequiredAge ())
 		) {
 
-			// ask for age
+			// if expecting date of birth
 
-			if (
+			if (manualResponderNumber.getExpectDateOfBirth ()) {
 
-				isNull (
-					smsCustomer.get ().getDateOfBirth ())
-
-				&& (
-
-					isNull (
-						previousRequestTime)
-
-					|| earlierThan (
-						previousRequestTime,
-						transaction.now ().minus (
-							Days.days (180).toStandardDuration ()))
-
-				)
-
-			) {
-
-				return handleNeedDateOfBirth (
+				return handleExpectDateOfBirth (
 					taskLogger);
 
 			}
 
-			// error if too young
+			// check age
 
 			if (
 				isNotNull (
-					smsCustomer.get ().getDateOfBirth ())
+					manualResponder.getRequiredAge ())
 			) {
 
-				Long age =
-					calculateAgeInYears (
-						smsCustomer.get ().getDateOfBirth (),
-						transaction.now (),
-						DateTimeZone.forID (
-							wbsConfig.defaultTimezone ()));
+				// ask for age
 
 				if (
-					lessThan (
-						age,
-						manualResponder.getRequiredAge ())
+
+					isNull (
+						smsCustomer.get ().getDateOfBirth ())
+
+					&& (
+
+						isNull (
+							previousRequestTime)
+
+						|| earlierThan (
+							previousRequestTime,
+							transaction.now ().minus (
+								Days.days (180).toStandardDuration ()))
+
+					)
+
 				) {
 
-					return handleTooYoungError (
+					return handleNeedDateOfBirth (
 						taskLogger);
+
+				}
+
+				// error if too young
+
+				if (
+					isNotNull (
+						smsCustomer.get ().getDateOfBirth ())
+				) {
+
+					Long age =
+						calculateAgeInYears (
+							smsCustomer.get ().getDateOfBirth (),
+							transaction.now (),
+							DateTimeZone.forID (
+								wbsConfig.defaultTimezone ()));
+
+					if (
+						lessThan (
+							age,
+							manualResponder.getRequiredAge ())
+					) {
+
+						return handleTooYoungError (
+							taskLogger);
+
+					}
 
 				}
 
 			}
 
-		}
+			return handleNormal (
+				taskLogger);
 
-		return handleNormal (
-			taskLogger);
+		}
 
 	}
 
 	InboxAttemptRec handleNormal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleNormal");
+		try (
 
-		// start session
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleNormal");
 
-		if (
-			optionalIsPresent (
-				smsCustomer)
 		) {
 
-			smsCustomerLogic.sessionStart (
+			// start session
+
+			if (
+				optionalIsPresent (
+					smsCustomer)
+			) {
+
+				smsCustomerLogic.sessionStart (
+					taskLogger,
+					smsCustomer.get (),
+					optionalOf (
+						message.getThreadId ()));
+
+			}
+
+			// create queue item
+
+			QueueItemRec queueItem =
+				queueLogic.createQueueItem (
+					taskLogger,
+					manualResponder,
+					"default",
+					manualResponderNumber,
+					request,
+					manualResponderNumber.getCode (),
+					message.getText ().getText ());
+
+			request
+
+				.setPending (
+					true)
+
+				.setQueueItem (
+					queueItem);
+
+			// return
+
+			return smsInboxLogic.inboxProcessed (
 				taskLogger,
-				smsCustomer.get (),
+				inbox,
 				optionalOf (
-					message.getThreadId ()));
+					defaultService),
+				manualResponderLogic.customerAffiliate (
+					manualResponderNumber),
+				command);
 
 		}
-
-		// create queue item
-
-		QueueItemRec queueItem =
-			queueLogic.createQueueItem (
-				taskLogger,
-				manualResponder,
-				"default",
-				manualResponderNumber,
-				request,
-				manualResponderNumber.getCode (),
-				message.getText ().getText ());
-
-		request
-
-			.setPending (
-				true)
-
-			.setQueueItem (
-				queueItem);
-
-		// return
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			manualResponderLogic.customerAffiliate (
-				manualResponderNumber),
-			command);
 
 	}
 

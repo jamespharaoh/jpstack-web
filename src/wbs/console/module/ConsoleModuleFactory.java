@@ -50,39 +50,45 @@ class ConsoleModuleFactory
 	Object makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"makeComponent");
+		try (
 
-		ConsoleModuleImplementation consoleModule =
-			consoleModuleProvider.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeComponent");
 
-			.name (
-				consoleSpec.name ());
+		) {
 
-		SimpleConsoleBuilderContainer container =
-			new SimpleConsoleBuilderContainerImplementation ()
+			ConsoleModuleImplementation consoleModule =
+				consoleModuleProvider.get ()
 
-			.taskLogger (
-				taskLogger)
+				.name (
+					consoleSpec.name ());
 
-			.newBeanNamePrefix (
-				hyphenToCamel (
-					consoleSpec.name ()))
+			SimpleConsoleBuilderContainer container =
+				new SimpleConsoleBuilderContainerImplementation ()
 
-			.existingBeanNamePrefix (
-				hyphenToCamel (
-					consoleSpec.name ()));
+				.taskLogger (
+					taskLogger)
 
-		consoleModuleBuilder.descend (
-			taskLogger,
-			container,
-			consoleSpec.builders (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
+				.newBeanNamePrefix (
+					hyphenToCamel (
+						consoleSpec.name ()))
 
-		return consoleModule;
+				.existingBeanNamePrefix (
+					hyphenToCamel (
+						consoleSpec.name ()));
+
+			consoleModuleBuilder.descend (
+				taskLogger,
+				container,
+				consoleSpec.builders (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
+
+			return consoleModule;
+
+		}
 
 	}
 

@@ -194,179 +194,191 @@ class ObjectSearchResultsPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// form fields
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		String resultsModeName =
-			requestContext.parameterOrDefault (
-				"mode",
-				resultsModes.keySet ().iterator ().next ());
-
-		ObjectSearchResultsMode <ResultType> resultsMode =
-			mapItemForKeyRequired (
-				resultsModes,
-				resultsModeName);
-
-		columnsFormFieldSet =
-			optionalOrNull (
-				resultsMode.columns);
-
-		rowsFormFieldSet =
-			optionalOrNull (
-				resultsMode.rows);
-
-		// current object
-
-		if (
-			classEqualSafe (
-				consoleHelper.objectClass (),
-				resultsClass)
 		) {
 
-			Optional <Long> currentObjectIdOptional =
-				requestContext.stuffInteger (
-					consoleHelper.objectName () + "Id");
+			// form fields
+
+			String resultsModeName =
+				requestContext.parameterOrDefault (
+					"mode",
+					resultsModes.keySet ().iterator ().next ());
+
+			ObjectSearchResultsMode <ResultType> resultsMode =
+				mapItemForKeyRequired (
+					resultsModes,
+					resultsModeName);
+
+			columnsFormFieldSet =
+				optionalOrNull (
+					resultsMode.columns);
+
+			rowsFormFieldSet =
+				optionalOrNull (
+					resultsMode.rows);
+
+			// current object
 
 			if (
-				optionalIsPresent (
-					currentObjectIdOptional)
+				classEqualSafe (
+					consoleHelper.objectClass (),
+					resultsClass)
 			) {
 
-				currentObject =
-					consoleHelper.findRequired (
-						optionalGetRequired (
-							currentObjectIdOptional));
+				Optional <Long> currentObjectIdOptional =
+					requestContext.stuffInteger (
+						consoleHelper.objectName () + "Id");
+
+				if (
+					optionalIsPresent (
+						currentObjectIdOptional)
+				) {
+
+					currentObject =
+						consoleHelper.findRequired (
+							optionalGetRequired (
+								currentObjectIdOptional));
+
+				}
 
 			}
 
-		}
+			// set search object
 
-		// set search object
+			Object searchObject =
+				userSessionLogic.userDataObjectRequired (
+					taskLogger,
+					userConsoleLogic.userRequired (),
+					stringFormat (
+						"object_search_%s_fields",
+						sessionKey));
 
-		Object searchObject =
-			userSessionLogic.userDataObjectRequired (
-				taskLogger,
-				userConsoleLogic.userRequired (),
-				stringFormat (
-					"object_search_%s_fields",
-					sessionKey));
+			// get search results for page
 
-		// get search results for page
+			List <Long> allObjectIds =
+				iterableMapToList (
+					NumberUtils::parseIntegerRequired,
+					stringSplitComma (
+						userSessionLogic.userDataStringRequired (
+							userConsoleLogic.userRequired (),
+							stringFormat (
+								"object_search_%s_results",
+								sessionKey))));
 
-		List <Long> allObjectIds =
-			iterableMapToList (
-				NumberUtils::parseIntegerRequired,
-				stringSplitComma (
-					userSessionLogic.userDataStringRequired (
-						userConsoleLogic.userRequired (),
-						stringFormat (
-							"object_search_%s_results",
-							sessionKey))));
+			totalObjects =
+				allObjectIds.size ();
 
-		totalObjects =
-			allObjectIds.size ();
-
-		if (
-			stringEqualSafe (
-				requestContext.parameterOrDefault (
-					"page",
-					"0"),
-				"all")
-		) {
-
-			singlePage = true;
-
-		} else {
-
-			singlePage = false;
-
-			pageNumber =
-				parseIntegerRequired (
+			if (
+				stringEqualSafe (
 					requestContext.parameterOrDefault (
 						"page",
-						"0"));
+						"0"),
+					"all")
+			) {
+
+				singlePage = true;
+
+			} else {
+
+				singlePage = false;
+
+				pageNumber =
+					parseIntegerRequired (
+						requestContext.parameterOrDefault (
+							"page",
+							"0"));
+
+			}
+
+			List <Long> pageObjectIds =
+				singlePage
+
+				? allObjectIds
+
+				: listSlice (
+					allObjectIds,
+					pageNumber * itemsPerPage,
+					Math.min (
+						(pageNumber + 1) * itemsPerPage,
+						allObjectIds.size ()));
+
+			pageCount =
+				(allObjectIds.size () - 1) / itemsPerPage + 1;
+
+			// load objects
+
+			if (
+				isNotNull (
+					resultsDaoMethodName)
+			) {
+
+				Method method =
+					methodGetRequired (
+						consoleHelper.getClass (),
+						resultsDaoMethodName,
+						ImmutableList.<Class <?>> of (
+							TaskLogger.class,
+							searchObject.getClass (),
+							List.class));
+
+				objects =
+					genericCastUnchecked (
+						methodInvoke (
+							method,
+							consoleHelper,
+							taskLogger,
+							searchObject,
+							pageObjectIds));
+
+			} else {
+
+				objects =
+					genericCastUnchecked (
+						iterableMapToList (
+							consoleHelper::find,
+							pageObjectIds));
+
+			}
+
+			// other stuff
+
+			prepareTargetContext (
+				taskLogger);
 
 		}
-
-		List <Long> pageObjectIds =
-			singlePage
-
-			? allObjectIds
-
-			: listSlice (
-				allObjectIds,
-				pageNumber * itemsPerPage,
-				Math.min (
-					(pageNumber + 1) * itemsPerPage,
-					allObjectIds.size ()));
-
-		pageCount =
-			(allObjectIds.size () - 1) / itemsPerPage + 1;
-
-		// load objects
-
-		if (
-			isNotNull (
-				resultsDaoMethodName)
-		) {
-
-			Method method =
-				methodGetRequired (
-					consoleHelper.getClass (),
-					resultsDaoMethodName,
-					ImmutableList.<Class <?>> of (
-						TaskLogger.class,
-						searchObject.getClass (),
-						List.class));
-
-			objects =
-				genericCastUnchecked (
-					methodInvoke (
-						method,
-						consoleHelper,
-						taskLogger,
-						searchObject,
-						pageObjectIds));
-
-		} else {
-
-			objects =
-				genericCastUnchecked (
-					iterableMapToList (
-						consoleHelper::find,
-						pageObjectIds));
-
-		}
-
-		// other stuff
-
-		prepareTargetContext (
-			taskLogger);
 
 	}
 
 	void prepareTargetContext (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareTargetContext");
+		try (
 
-		ConsoleContextType targetContextType =
-			consoleManager.contextType (
-				targetContextTypeName,
-				true);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareTargetContext");
 
-		targetContext =
-			consoleManager.relatedContext (
-				taskLogger,
-				requestContext.consoleContextRequired (),
-				targetContextType);
+		) {
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					targetContextTypeName,
+					true);
+
+			targetContext =
+				consoleManager.relatedContext (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					targetContextType);
+
+		}
 
 	}
 
@@ -375,28 +387,34 @@ class ObjectSearchResultsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderNewSearch (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderTotalObjects (
-			taskLogger);
+		) {
 
-		renderPageNumbers (
-			taskLogger);
+			renderNewSearch (
+				taskLogger);
 
-		renderModeTabs (
-			taskLogger);
+			renderTotalObjects (
+				taskLogger);
 
-		renderSearchResults (
-			taskLogger);
+			renderPageNumbers (
+				taskLogger);
 
-		renderPageNumbers (
-			taskLogger);
+			renderModeTabs (
+				taskLogger);
+
+			renderSearchResults (
+				taskLogger);
+
+			renderPageNumbers (
+				taskLogger);
+
+		}
 
 	}
 
@@ -547,254 +565,260 @@ class ObjectSearchResultsPart <
 	void renderSearchResults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goSearchResults");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goSearchResults");
 
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			columnsFormFieldSet);
-
-		htmlTableRowClose ();
-
-		LocalDate currentDate =
-			new LocalDate (0);
-
-		for (
-			Optional <ResultType> resultOptional
-				: objects
 		) {
 
-			if (
-				optionalIsNotPresent (
-					resultOptional)
+			htmlTableOpenList ();
+
+			htmlTableRowOpen ();
+
+			formFieldLogic.outputTableHeadings (
+				formatWriter,
+				columnsFormFieldSet);
+
+			htmlTableRowClose ();
+
+			LocalDate currentDate =
+				new LocalDate (0);
+
+			for (
+				Optional <ResultType> resultOptional
+					: objects
 			) {
-
-				htmlTableRowOpen ();
-
-				htmlTableCellWrite (
-					"(deleted)",
-					htmlColumnSpanAttribute (
-						collectionSize (
-							columnsFormFieldSet.formItems ())));
-
-				htmlTableRowClose ();
-
-				continue;
-
-			}
-
-			ResultType result =
-				resultOptional.get ();
-
-			if (
-
-				result instanceof Record
-
-				&& ! consoleHelper.canView (
-					taskLogger,
-					genericCastUnchecked (
-						result))
-
-			)  {
-
-				htmlTableRowOpen ();
-
-				htmlTableCellWrite (
-					"(restricted)",
-					htmlColumnSpanAttribute (
-						collectionSize (
-							columnsFormFieldSet.formItems ())));
-
-				htmlTableRowClose ();
-
-				continue;
-
-			}
-
-			if (
-
-				classEqualSafe (
-					consoleHelper.objectClass (),
-					resultsClass)
-
-				&& consoleHelper.event ()
-
-			) {
-
-				Instant rowTimestamp =
-					(Instant)
-					PropertyUtils.propertyGetAuto (
-						result,
-						consoleHelper.timestampFieldName ());
-
-				LocalDate rowDate =
-					rowTimestamp.toDateTime ().toLocalDate ();
 
 				if (
-					localDateNotEqual (
-						currentDate,
-						rowDate)
+					optionalIsNotPresent (
+						resultOptional)
 				) {
 
-					currentDate =
-						rowDate;
-
-					htmlTableRowSeparatorWrite ();
-
-					htmlTableRowOpen (
-						htmlStyleAttribute (
-							htmlStyleRuleEntry (
-								"font-weight",
-								"bold")));
+					htmlTableRowOpen ();
 
 					htmlTableCellWrite (
-						userConsoleLogic.dateStringLong (
-							rowTimestamp),
+						"(deleted)",
 						htmlColumnSpanAttribute (
 							collectionSize (
 								columnsFormFieldSet.formItems ())));
 
 					htmlTableRowClose ();
 
+					continue;
+
 				}
 
-			}
+				ResultType result =
+					resultOptional.get ();
 
-			if (
-				isNotNull (
-					rowsFormFieldSet)
-			) {
+				if (
 
-				htmlTableRowSeparatorWrite ();
+					result instanceof Record
 
-			}
+					&& ! consoleHelper.canView (
+						taskLogger,
+						genericCastUnchecked (
+							result))
 
-			if (result instanceof Record) {
+				)  {
 
-				htmlTableRowOpen (
+					htmlTableRowOpen ();
 
-					htmlClassAttribute (
-						presentInstances (
+					htmlTableCellWrite (
+						"(restricted)",
+						htmlColumnSpanAttribute (
+							collectionSize (
+								columnsFormFieldSet.formItems ())));
 
-						Optional.of (
-							"magic-table-row"),
+					htmlTableRowClose ();
 
-						Optional.of (
-							stringFormat (
-								"search-result-%s",
-								integerToDecimalString (
-									result.getId ()))),
+					continue;
 
-						optionalIf (
-							result == currentObject,
-							() -> "selected"),
+				}
 
-						getListClass (
-							result)
+				if (
 
-					)),
+					classEqualSafe (
+						consoleHelper.objectClass (),
+						resultsClass)
 
-					htmlDataAttribute (
-						"rows-class",
-						stringFormat (
-							"search-result-%s",
-							integerToDecimalString (
-								result.getId ()))),
+					&& consoleHelper.event ()
 
-					htmlDataAttribute (
-						"target-href",
-						objectUrl (
-							taskLogger,
-							genericCastUnchecked (
-								result)))
+				) {
 
-				);
+					Instant rowTimestamp =
+						(Instant)
+						PropertyUtils.propertyGetAuto (
+							result,
+							consoleHelper.timestampFieldName ());
 
-			} else {
+					LocalDate rowDate =
+						rowTimestamp.toDateTime ().toLocalDate ();
 
-				htmlTableRowOpen ();
+					if (
+						localDateNotEqual (
+							currentDate,
+							rowDate)
+					) {
 
-			}
+						currentDate =
+							rowDate;
 
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
-				formatWriter,
-				columnsFormFieldSet,
-				result,
-				emptyMap (),
-				false);
+						htmlTableRowSeparatorWrite ();
 
-			if (
-				isNotNull (
-					rowsFormFieldSet)
-			) {
+						htmlTableRowOpen (
+							htmlStyleAttribute (
+								htmlStyleRuleEntry (
+									"font-weight",
+									"bold")));
 
-				htmlTableRowClose ();
+						htmlTableCellWrite (
+							userConsoleLogic.dateStringLong (
+								rowTimestamp),
+							htmlColumnSpanAttribute (
+								collectionSize (
+									columnsFormFieldSet.formItems ())));
 
-				htmlTableRowOpen (
-					presentInstances (
+						htmlTableRowClose ();
 
-					optionalOf (
+					}
+
+				}
+
+				if (
+					isNotNull (
+						rowsFormFieldSet)
+				) {
+
+					htmlTableRowSeparatorWrite ();
+
+				}
+
+				if (result instanceof Record) {
+
+					htmlTableRowOpen (
+
 						htmlClassAttribute (
 							presentInstances (
 
-						Optional.of (
-							"magic-table-row"),
+							Optional.of (
+								"magic-table-row"),
 
-						Optional.of (
+							Optional.of (
+								stringFormat (
+									"search-result-%s",
+									integerToDecimalString (
+										result.getId ()))),
+
+							optionalIf (
+								result == currentObject,
+								() -> "selected"),
+
+							getListClass (
+								result)
+
+						)),
+
+						htmlDataAttribute (
+							"rows-class",
 							stringFormat (
 								"search-result-%s",
 								integerToDecimalString (
 									result.getId ()))),
 
-						optionalIf (
-							result == currentObject,
-							() -> "selected"),
-
-						getListClass (
-							result)
-
-					))),
-
-					optionalOf (
-						htmlDataAttributeFormat (
-							"rows-class",
-							"search-result-%s",
-							integerToDecimalString (
-								result.getId ()))),
-
-					optionalIf (
-						result instanceof Record,
-						() -> htmlDataAttribute (
+						htmlDataAttribute (
 							"target-href",
 							objectUrl (
 								taskLogger,
 								genericCastUnchecked (
-									result))))
+									result)))
 
-				));
+					);
 
-				formFieldLogic.outputTableRowsList (
+				} else {
+
+					htmlTableRowOpen ();
+
+				}
+
+				formFieldLogic.outputTableCellsList (
 					taskLogger,
 					formatWriter,
-					rowsFormFieldSet,
+					columnsFormFieldSet,
 					result,
-					false,
-					columnsFormFieldSet.columns ());
+					emptyMap (),
+					false);
+
+				if (
+					isNotNull (
+						rowsFormFieldSet)
+				) {
+
+					htmlTableRowClose ();
+
+					htmlTableRowOpen (
+						presentInstances (
+
+						optionalOf (
+							htmlClassAttribute (
+								presentInstances (
+
+							Optional.of (
+								"magic-table-row"),
+
+							Optional.of (
+								stringFormat (
+									"search-result-%s",
+									integerToDecimalString (
+										result.getId ()))),
+
+							optionalIf (
+								result == currentObject,
+								() -> "selected"),
+
+							getListClass (
+								result)
+
+						))),
+
+						optionalOf (
+							htmlDataAttributeFormat (
+								"rows-class",
+								"search-result-%s",
+								integerToDecimalString (
+									result.getId ()))),
+
+						optionalIf (
+							result instanceof Record,
+							() -> htmlDataAttribute (
+								"target-href",
+								objectUrl (
+									taskLogger,
+									genericCastUnchecked (
+										result))))
+
+					));
+
+					formFieldLogic.outputTableRowsList (
+						taskLogger,
+						formatWriter,
+						rowsFormFieldSet,
+						result,
+						false,
+						columnsFormFieldSet.columns ());
+
+				}
+
+				htmlTableRowClose ();
 
 			}
 
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
@@ -803,31 +827,37 @@ class ObjectSearchResultsPart <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"objectUrl");
+		try (
 
-		if (
-			optionalIsPresent (
-				targetContext)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"objectUrl");
+
 		) {
 
-			return requestContext.resolveContextUrl (
-				stringFormat (
-					"%s",
-					targetContext.get ().pathPrefix (),
-					"/%s",
-					consoleHelper.getPathIdGeneric (
+			if (
+				optionalIsPresent (
+					targetContext)
+			) {
+
+				return requestContext.resolveContextUrl (
+					stringFormat (
+						"%s",
+						targetContext.get ().pathPrefix (),
+						"/%s",
+						consoleHelper.getPathIdGeneric (
+							taskLogger,
+							object)));
+
+			} else {
+
+				return requestContext.resolveLocalUrl (
+					consoleHelper.getDefaultLocalPathGeneric (
 						taskLogger,
-						object)));
+						object));
 
-		} else {
-
-			return requestContext.resolveLocalUrl (
-				consoleHelper.getDefaultLocalPathGeneric (
-					taskLogger,
-					object));
+			}
 
 		}
 

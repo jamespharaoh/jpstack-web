@@ -49,32 +49,38 @@ class NameFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeClass (
-				String.class)
+			new JavaPropertyWriter ()
 
-			.propertyName (
-				ifNull (
-					spec.name (),
-					"name"))
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.typeClass (
+					String.class)
+
+				.propertyName (
+					ifNull (
+						spec.name (),
+						"name"))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

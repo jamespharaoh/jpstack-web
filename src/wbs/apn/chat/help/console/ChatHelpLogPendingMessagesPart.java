@@ -81,44 +81,50 @@ class ChatHelpLogPendingMessagesPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		chatHelpLog =
-			chatHelpLogHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		chatUser =
-			chatHelpLog.getChatUser ();
+		) {
 
-		chat =
-			chatUser.getChat ();
+			chatHelpLog =
+				chatHelpLogHelper.findFromContextRequired ();
 
-		ServiceRec service =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			chatUser =
+				chatHelpLog.getChatUser ();
 
-		NumberRec number =
-			chatHelpLog.getChatUser ().getNumber ();
+			chat =
+				chatUser.getChat ();
 
-		MessageSearch messageSearch =
-			new MessageSearch ()
+			ServiceRec service =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-			.serviceId (
-				service.getId ())
+			NumberRec number =
+				chatHelpLog.getChatUser ().getNumber ();
 
-			.numberId (
-				number.getId ())
+			MessageSearch messageSearch =
+				new MessageSearch ()
 
-			.orderBy (
-				MessageSearchOrder.createdTime);
+				.serviceId (
+					service.getId ())
 
-		messages =
-			messageHelper.search (
-				taskLogger,
-				messageSearch);
+				.numberId (
+					number.getId ())
+
+				.orderBy (
+					MessageSearchOrder.createdTime);
+
+			messages =
+				messageHelper.search (
+					taskLogger,
+					messageSearch);
+
+		}
 
 	}
 
@@ -127,72 +133,83 @@ class ChatHelpLogPendingMessagesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"From",
-			"To",
-			"Timestamp",
-			"Charge");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		for (
-			MessageRec message
-				: messages
 		) {
 
-			htmlTableRowSeparatorWrite ();
+			htmlTableOpenList ();
 
-			String rowClass;
+			htmlTableHeaderRowWrite (
+				"From",
+				"To",
+				"Timestamp",
+				"Charge");
 
-			if (message.getDirection () == MessageDirection.in) {
-				rowClass = "message-in";
-			} else if (message.getCharge () > 0) {
-				rowClass = "message-out-charge";
-			} else {
-				rowClass = "message-out";
+			for (
+				MessageRec message
+					: messages
+			) {
+
+				htmlTableRowSeparatorWrite ();
+
+				String rowClass;
+
+				if (message.getDirection () == MessageDirection.in) {
+					rowClass = "message-in";
+				} else if (message.getCharge () > 0) {
+					rowClass = "message-out-charge";
+				} else {
+					rowClass = "message-out";
+				}
+
+				// message attributes row
+
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						rowClass));
+
+				htmlTableCellWrite (
+					message.getNumFrom ());
+
+				htmlTableCellWrite (
+					message.getNumTo ());
+
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatUserLogic.getTimezone (
+							chatUser),
+						message.getCreatedTime ()));
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						message.getCharge ()));
+
+				htmlTableRowClose ();
+
+				// message content row
+
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						rowClass));
+
+				htmlTableCellWrite (
+					HtmlUtils.encodeNewlineToBr (
+						message.getText ().getText ()),
+					htmlColumnSpanAttribute (
+						4l));
+
+				htmlTableRowClose ();
+
 			}
 
-			// message attributes row
-
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					rowClass));
-
-			htmlTableCellWrite (
-				message.getNumFrom ());
-
-			htmlTableCellWrite (
-				message.getNumTo ());
-
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					message.getCreatedTime ()));
-
-			htmlTableCellWrite (
-				integerToDecimalString (
-					message.getCharge ()));
-
-			htmlTableRowClose ();
-
-			// message content row
-
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					rowClass));
-
-			htmlTableCellWrite (
-				HtmlUtils.encodeNewlineToBr (
-					message.getText ().getText ()),
-				htmlColumnSpanAttribute (
-					4l));
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

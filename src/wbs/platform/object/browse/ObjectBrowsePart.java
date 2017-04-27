@@ -123,17 +123,23 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		prepareCurrentObject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		prepareAllObjects ();
+		) {
 
-		prepareTargetContext (
-			taskLogger);
+			prepareCurrentObject ();
+
+			prepareAllObjects ();
+
+			prepareTargetContext (
+				taskLogger);
+
+		}
 
 	}
 
@@ -277,21 +283,27 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	void prepareTargetContext (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareTargetContext");
+		try (
 
-		ConsoleContextType targetContextType =
-			consoleManager.contextType (
-				targetContextTypeName,
-				true);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareTargetContext");
 
-		targetContext =
-			consoleManager.relatedContextRequired (
-				taskLogger,
-				requestContext.consoleContextRequired (),
-				targetContextType);
+		) {
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					targetContextTypeName,
+					true);
+
+			targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					targetContextType);
+
+		}
 
 	}
 
@@ -300,74 +312,80 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// table open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenList ();
-
-		// table header
-
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			formFieldSet);
-
-		htmlTableRowClose ();
-
-		// table content
-
-		for (
-			ObjectType object
-				: allObjects
 		) {
 
-			htmlTableRowOpen (
+			// table open
 
-				htmlClassAttribute (
-					presentInstances (
+			htmlTableOpenList ();
 
-					optionalOf (
-						"magic-table-row"),
+			// table header
 
-					optionalIf (
-						object == currentObject,
-						() -> "selected")
+			htmlTableRowOpen ();
 
-				)),
-
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%s",
-							consoleHelper.getPathId (
-								taskLogger,
-								object))))
-
-			);
-
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
+			formFieldLogic.outputTableHeadings (
 				formatWriter,
-				formFieldSet,
-				object,
-				emptyMap (),
-				false);
+				formFieldSet);
 
 			htmlTableRowClose ();
 
+			// table content
+
+			for (
+				ObjectType object
+					: allObjects
+			) {
+
+				htmlTableRowOpen (
+
+					htmlClassAttribute (
+						presentInstances (
+
+						optionalOf (
+							"magic-table-row"),
+
+						optionalIf (
+							object == currentObject,
+							() -> "selected")
+
+					)),
+
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveContextUrl (
+							stringFormat (
+								"%s",
+								targetContext.pathPrefix (),
+								"/%s",
+								consoleHelper.getPathId (
+									taskLogger,
+									object))))
+
+				);
+
+				formFieldLogic.outputTableCellsList (
+					taskLogger,
+					formatWriter,
+					formFieldSet,
+					object,
+					emptyMap (),
+					false);
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
+
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

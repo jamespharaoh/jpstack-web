@@ -94,206 +94,212 @@ class MessageTemplateEntryValueHooks
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDynamic");
+		try (
 
-		MessageTemplateEntryTypeRec entryType =
-			entryValue.getMessageTemplateEntryType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDynamic");
 
-		// find the ticket field type
+		) {
 
-		MessageTemplateFieldTypeRec fieldType =
-			messageTemplateFieldTypeHelper.findByCodeRequired (
-				entryType,
-				name);
+			MessageTemplateEntryTypeRec entryType =
+				entryValue.getMessageTemplateEntryType ();
 
-		/*
-		List<String> messageTemplateUsedParameters =
-			new ArrayList<String> ();
+			// find the ticket field type
 
-		String message =
-			(String) value;
+			MessageTemplateFieldTypeRec fieldType =
+				messageTemplateFieldTypeHelper.findByCodeRequired (
+					entryType,
+					name);
 
-		// length of non variable parts
+			/*
+			List<String> messageTemplateUsedParameters =
+				new ArrayList<String> ();
 
-		Integer messageLength = 0;
+			String message =
+				(String) value;
 
-		String[] parts =
-			message.split (
-				"\\{(.*?)\\}");
+			// length of non variable parts
 
-		for (int i = 0; i < parts.length; i++) {
+			Integer messageLength = 0;
 
-			// length of special chars if gsm encoding
+			String[] parts =
+				message.split (
+					"\\{(.*?)\\}");
 
-			if (
-				equal (
-					messageTemplateType.getCharset (),
-					MessageTemplateTypeCharset.gsm)
-			) {
+			for (int i = 0; i < parts.length; i++) {
 
-				if (! Gsm.isGsm (parts [i])) {
+				// length of special chars if gsm encoding
 
-					throw new RuntimeException (
-						"Message text is invalid");
+				if (
+					equal (
+						messageTemplateType.getCharset (),
+						MessageTemplateTypeCharset.gsm)
+				) {
+
+					if (! Gsm.isGsm (parts [i])) {
+
+						throw new RuntimeException (
+							"Message text is invalid");
+
+					}
+
+					messageLength +=
+						Gsm.length (parts [i]);
+
+				} else {
+
+					messageLength +=
+						parts [i].length ();
 
 				}
 
-				messageLength +=
-					Gsm.length (parts [i]);
+			}
 
-			} else {
+			// length of the parameters
 
-				messageLength +=
-					parts [i].length ();
+			Pattern regExp =
+				Pattern.compile ("\\{(.*?)\\}");
+
+			Matcher matcher =
+				regExp.matcher (message);
+
+			while (matcher.find ()) {
+
+				String parameterName =
+					matcher.group (1);
+
+				MessageTemplateParameterRec messageTemplateParameter =
+					messageTemplateParameterHelper.get ().findByCode (
+						messageTemplateType,
+						parameterName);
+
+				if (messageTemplateParameter == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"The parameter %s does not exist!",
+							parameterName));
+
+				}
+
+				if (messageTemplateParameter.getLength () != null) {
+
+					messageLength +=
+						messageTemplateParameter.getLength ();
+
+				}
+
+				messageTemplateUsedParameters.add (
+					messageTemplateParameter.getName ());
 
 			}
 
-		}
+			// check if the rest of parameters which are not present were
+			// required
 
-		// length of the parameters
-
-		Pattern regExp =
-			Pattern.compile ("\\{(.*?)\\}");
-
-		Matcher matcher =
-			regExp.matcher (message);
-
-		while (matcher.find ()) {
-
-			String parameterName =
-				matcher.group (1);
-
-			MessageTemplateParameterRec messageTemplateParameter =
-				messageTemplateParameterHelper.get ().findByCode (
-					messageTemplateType,
-					parameterName);
-
-			if (messageTemplateParameter == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"The parameter %s does not exist!",
-						parameterName));
-
-			}
-
-			if (messageTemplateParameter.getLength () != null) {
-
-				messageLength +=
-					messageTemplateParameter.getLength ();
-
-			}
-
-			messageTemplateUsedParameters.add (
-				messageTemplateParameter.getName ());
-
-		}
-
-		// check if the rest of parameters which are not present were
-		// required
-
-		for (
-			MessageTemplateParameterRec messageTemplateParameter
-				: messageTemplateType.getMessageTemplateParameters ()
-		) {
-
-			if (
-				doesNotContain (
-					messageTemplateUsedParameters,
-					messageTemplateParameter.getName ())
-				&& messageTemplateParameter.getRequired ()
+			for (
+				MessageTemplateParameterRec messageTemplateParameter
+					: messageTemplateType.getMessageTemplateParameters ()
 			) {
 
-				throw new RuntimeException (
-					stringFormat (
-						"Parameter %s required but not present",
-						messageTemplateParameter.getName ()));
+				if (
+					doesNotContain (
+						messageTemplateUsedParameters,
+						messageTemplateParameter.getName ())
+					&& messageTemplateParameter.getRequired ()
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Parameter %s required but not present",
+							messageTemplateParameter.getName ()));
+
+				}
 
 			}
 
-		}
+			// check if the length is correct
 
-		// check if the length is correct
+			if (
+				messageLength < messageTemplateType.getMinLength () ||
+				messageLength > messageTemplateType.getMaxLength ())
+			{
 
-		if (
-			messageLength < messageTemplateType.getMinLength () ||
-			messageLength > messageTemplateType.getMaxLength ())
-		{
+				throw new RuntimeException (
+					"The message length is out of its template type bounds!");
 
-			throw new RuntimeException (
-				"The message length is out of its template type bounds!");
+			}
+			*/
 
-		}
-		*/
+			// find or create value
 
-		// find or create value
+			MessageTemplateFieldValueRec fieldValue =
+				entryValue.getFields ().get (
+					fieldType.getId ());
 
-		MessageTemplateFieldValueRec fieldValue =
-			entryValue.getFields ().get (
-				fieldType.getId ());
+			if (
 
-		if (
+				isNull (
+					fieldValue)
 
-			isNull (
-				fieldValue)
+				&& optionalIsPresent (
+					valueOptional)
 
-			&& optionalIsPresent (
-				valueOptional)
+			) {
 
-		) {
+				fieldValue =
+					messageTemplateFieldValueHelper.insert (
+						taskLogger,
+						messageTemplateFieldValueHelper.createInstance ()
 
-			fieldValue =
-				messageTemplateFieldValueHelper.insert (
-					taskLogger,
-					messageTemplateFieldValueHelper.createInstance ()
+					.setMessageTemplateEntryValue (
+						entryValue)
 
-				.setMessageTemplateEntryValue (
-					entryValue)
+					.setMessageTemplateFieldType (
+						fieldType)
 
-				.setMessageTemplateFieldType (
-					fieldType)
+					.setStringValue (
+						(String)
+						optionalGetRequired (
+							valueOptional))
 
-				.setStringValue (
-					(String)
-					optionalGetRequired (
-						valueOptional))
+				);
 
-			);
+				entryValue.getFields ().put (
+					fieldType.getId (),
+					fieldValue);
 
-			entryValue.getFields ().put (
-				fieldType.getId (),
-				fieldValue);
+			} else if (
+				optionalIsPresent (
+					valueOptional)
+			) {
 
-		} else if (
-			optionalIsPresent (
-				valueOptional)
-		) {
+				fieldValue
 
-			fieldValue
+					.setStringValue (
+						(String)
+						optionalGetRequired (
+							valueOptional));
 
-				.setStringValue (
-					(String)
-					optionalGetRequired (
-						valueOptional));
+			} else if (
 
-		} else if (
+				isNotNull (
+					fieldValue)
 
-			isNotNull (
-				fieldValue)
+				&& optionalIsNotPresent (
+					valueOptional)
 
-			&& optionalIsNotPresent (
-				valueOptional)
+			) {
 
-		) {
+				messageTemplateFieldValueHelper.remove (
+					fieldValue);
 
-			messageTemplateFieldValueHelper.remove (
-				fieldValue);
+				entryValue.getFields ().remove (
+					fieldType.getId ());
 
-			entryValue.getFields ().remove (
-				fieldType.getId ());
+			}
 
 		}
 

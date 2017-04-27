@@ -18,7 +18,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -30,6 +32,11 @@ import fj.data.Either;
 public
 class YesNoFormFieldRenderer <Container>
 	implements FormFieldRenderer <Container, Boolean> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -163,19 +170,31 @@ class YesNoFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Boolean> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"%j\").val (\"%j\");",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name),
-			booleanToYesNoNone (
-				interfaceValue));
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"%j\").val (\"%j\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
+				booleanToYesNoNone (
+					interfaceValue));
+
+		}
 
 	}
 

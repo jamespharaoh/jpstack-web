@@ -37,8 +37,8 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
@@ -184,36 +184,42 @@ class ChatMessageLogicImplementation
 			@NonNull ChatUserRec toUser,
 			@NonNull TextRec originalText) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageIsRecentDupe");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageIsRecentDupe");
 
-		Instant oneHourAgo =
-			transaction.now ()
-				.minus (Duration.standardHours (1));
+		) {
 
-		List<ChatMessageRec> dupes =
-			chatMessageHelper.search (
-				taskLogger,
-				new ChatMessageSearch ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.fromUserId (
-				fromUser.getId ())
+			Instant oneHourAgo =
+				transaction.now ()
+					.minus (Duration.standardHours (1));
 
-			.toUserId (
-				toUser.getId ())
+			List <ChatMessageRec> dupes =
+				chatMessageHelper.search (
+					taskLogger,
+					new ChatMessageSearch ()
 
-			.timestampAfter (
-				oneHourAgo)
+				.fromUserId (
+					fromUser.getId ())
 
-			.originalTextId (
-				originalText.getId ()));
+				.toUserId (
+					toUser.getId ())
 
-		return dupes.size () > 0;
+				.timestampAfter (
+					oneHourAgo)
+
+				.originalTextId (
+					originalText.getId ()));
+
+			return dupes.size () > 0;
+
+		}
 
 	}
 
@@ -228,321 +234,328 @@ class ChatMessageLogicImplementation
 			@NonNull ChatMessageMethod source,
 			@NonNull List <MediaRec> medias) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageSendFromUser");
+		try (
 
-		taskLogger.debugFormat (
-			"chatMessageSendFromUser (%s)",
-			joinWithCommaAndSpace (
-				objectManager.objectPathMini (
-					fromUser),
-				objectManager.objectPathMini (
-					toUser),
-				stringFormat (
-					"\"%s\"",
-					text.length () > 20
-						? text.substring (0, 20)
-						: text),
-				threadId.isPresent ()
-					? threadId.get ().toString ()
-					: "null",
-				source.toString (),
-				integerToDecimalString (
-					collectionSize (
-						medias))));
-
-		Transaction transaction =
-			database.currentTransaction ();
-
-		ChatRec chat =
-			fromUser.getChat ();
-
-		// ignore messages from barred users
-
-		ChatCreditCheckResult fromCreditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				fromUser,
-				true,
-				threadId);
-
-		if (fromCreditCheckResult.failed ()) {
-
-			String errorMessage =
-				stringFormat (
-					"Ignoring message from barred user %s (%s)",
-					fromUser.getCode (),
-					fromCreditCheckResult.details ());
-
-			taskLogger.noticeFormat (
-				"%s",
-				errorMessage);
-
-			return errorMessage;
-
-		}
-
-		TextRec originalText =
-			textHelper.findOrCreate (
-				taskLogger,
-				text);
-
-		// ignored duplicated messages
-
-		if (allOf (
-
-			() -> enumNotEqualSafe (
-				source,
-				ChatMessageMethod.iphone),
-
-			() -> chatMessageIsRecentDupe (
-				taskLogger,
-				fromUser,
-				toUser,
-				originalText)
-
-		)) {
-
-			String errorMessage =
-				stringFormat (
-					"Ignoring duplicated message from %s to %s, threadId = %s",
-					fromUser.getCode (),
-					toUser.getCode (),
-					threadId.isPresent ()
-						? threadId.get ().toString ()
-						: "null");
-
-			taskLogger.noticeFormat (
-				"%s",
-				errorMessage);
-
-			return errorMessage;
-
-		}
-
-		String logMessage =
-			stringFormat (
-				"Sending user message from %s to %s: %s",
-				fromUser.getCode (),
-				toUser.getCode (),
-				text);
-
-		taskLogger.noticeFormat (
-			"%s",
-			logMessage);
-
-		// check if the message should be blocked
-
-		ChatBlockRec chatBlock =
-			chatBlockHelper.find (
-				toUser,
-				fromUser);
-
-		ChatCreditCheckResult toCreditCheckResult =
-			chatCreditLogic.userCreditCheck (
-				taskLogger,
-				toUser);
-
-		boolean blocked =
-			chatBlock != null
-			|| toCreditCheckResult.failed ();
-
-		// update chat user stats
-
-		fromUser
-
-			.setLastSend (
-				transaction.now ())
-
-			.setLastAction (
-				transaction.now ());
-
-		// reschedule the next ad
-
-		chatUserLogic.scheduleAd (
-			fromUser);
-
-		// clear an alarm if appropriate
-
-		ChatUserAlarmRec alarm =
-			chatUserAlarmHelper.find (
-				fromUser,
-				toUser);
-
-		if (
-
-			alarm != null
-
-			&& earlierThan (
-				alarm.getResetTime (),
-				transaction.now ())
-
-			&& not (
-				alarm.getSticky ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageSendFromUser");
 
 		) {
 
-			chatUserAlarmHelper.remove (
-				alarm);
+			taskLogger.debugFormat (
+				"chatMessageSendFromUser (%s)",
+				joinWithCommaAndSpace (
+					objectManager.objectPathMini (
+						fromUser),
+					objectManager.objectPathMini (
+						toUser),
+					stringFormat (
+						"\"%s\"",
+						text.length () > 20
+							? text.substring (0, 20)
+							: text),
+					threadId.isPresent ()
+						? threadId.get ().toString ()
+						: "null",
+					source.toString (),
+					integerToDecimalString (
+						collectionSize (
+							medias))));
 
-			chatUserInitiationLogHelper.insert (
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ChatRec chat =
+				fromUser.getChat ();
+
+			// ignore messages from barred users
+
+			ChatCreditCheckResult fromCreditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					fromUser,
+					true,
+					threadId);
+
+			if (fromCreditCheckResult.failed ()) {
+
+				String errorMessage =
+					stringFormat (
+						"Ignoring message from barred user %s (%s)",
+						fromUser.getCode (),
+						fromCreditCheckResult.details ());
+
+				taskLogger.noticeFormat (
+					"%s",
+					errorMessage);
+
+				return errorMessage;
+
+			}
+
+			TextRec originalText =
+				textHelper.findOrCreate (
+					taskLogger,
+					text);
+
+			// ignored duplicated messages
+
+			if (allOf (
+
+				() -> enumNotEqualSafe (
+					source,
+					ChatMessageMethod.iphone),
+
+				() -> chatMessageIsRecentDupe (
+					taskLogger,
+					fromUser,
+					toUser,
+					originalText)
+
+			)) {
+
+				String errorMessage =
+					stringFormat (
+						"Ignoring duplicated message from %s to %s, threadId = %s",
+						fromUser.getCode (),
+						toUser.getCode (),
+						threadId.isPresent ()
+							? threadId.get ().toString ()
+							: "null");
+
+				taskLogger.noticeFormat (
+					"%s",
+					errorMessage);
+
+				return errorMessage;
+
+			}
+
+			String logMessage =
+				stringFormat (
+					"Sending user message from %s to %s: %s",
+					fromUser.getCode (),
+					toUser.getCode (),
+					text);
+
+			taskLogger.noticeFormat (
+				"%s",
+				logMessage);
+
+			// check if the message should be blocked
+
+			ChatBlockRec chatBlock =
+				chatBlockHelper.find (
+					toUser,
+					fromUser);
+
+			ChatCreditCheckResult toCreditCheckResult =
+				chatCreditLogic.userCreditCheck (
+					taskLogger,
+					toUser);
+
+			boolean blocked =
+				chatBlock != null
+				|| toCreditCheckResult.failed ();
+
+			// update chat user stats
+
+			fromUser
+
+				.setLastSend (
+					transaction.now ())
+
+				.setLastAction (
+					transaction.now ());
+
+			// reschedule the next ad
+
+			chatUserLogic.scheduleAd (
 				taskLogger,
-				chatUserInitiationLogHelper.createInstance ()
+				fromUser);
 
-				.setChatUser (
+			// clear an alarm if appropriate
+
+			ChatUserAlarmRec alarm =
+				chatUserAlarmHelper.find (
+					fromUser,
+					toUser);
+
+			if (
+
+				alarm != null
+
+				&& earlierThan (
+					alarm.getResetTime (),
+					transaction.now ())
+
+				&& not (
+					alarm.getSticky ())
+
+			) {
+
+				chatUserAlarmHelper.remove (
+					alarm);
+
+				chatUserInitiationLogHelper.insert (
+					taskLogger,
+					chatUserInitiationLogHelper.createInstance ()
+
+					.setChatUser (
+						fromUser)
+
+					.setMonitorChatUser (
+						toUser)
+
+					.setReason (
+						ChatUserInitiationReason.alarmCancel)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setAlarmTime (
+						alarm.getAlarmTime ()));
+
+			}
+
+			// reschedule next outbound
+
+			fromUser
+
+				.setNextQuietOutbound (
+					transaction.now ().plus (
+						Duration.standardSeconds (
+							fromUser.getChat ().getTimeQuietOutbound ())));
+
+			// unschedule any join outbound
+
+			fromUser
+				.setNextJoinOutbound (null);
+
+			// cancel previous signup message if there is one
+
+			if (fromUser.getFirstJoin () == null) {
+
+				ChatMessageRec oldMessage =
+					chatMessageHelper.findSignup (
+						fromUser);
+
+				if (oldMessage != null) {
+
+					taskLogger.noticeFormat (
+						"Cancelling previously queued message %s",
+						integerToDecimalString (
+							oldMessage.getId ()));
+
+					oldMessage
+
+						.setStatus (
+							ChatMessageStatus.signupReplaced);
+
+				}
+
+			}
+
+			// create the chat message
+
+			ChatMessageRec chatMessage =
+				chatMessageHelper.insert (
+					taskLogger,
+					chatMessageHelper.createInstance ()
+
+				.setChat (
+					fromUser.getChat ())
+
+				.setFromUser (
 					fromUser)
 
-				.setMonitorChatUser (
+				.setToUser (
 					toUser)
-
-				.setReason (
-					ChatUserInitiationReason.alarmCancel)
 
 				.setTimestamp (
 					transaction.now ())
 
-				.setAlarmTime (
-					alarm.getAlarmTime ()));
+				.setThreadId (
+					threadId.orNull ())
 
-		}
+				.setOriginalText (
+					originalText)
 
-		// reschedule next outbound
+				.setStatus (
+					blocked
+						? ChatMessageStatus.blocked
+						: fromUser.getFirstJoin () == null
+							? ChatMessageStatus.signup
+							: ChatMessageStatus.sent)
 
-		fromUser
+				.setSource (
+					source)
 
-			.setNextQuietOutbound (
-				transaction.now ().plus (
-					Duration.standardSeconds (
-						fromUser.getChat ().getTimeQuietOutbound ())));
+				.setMedias (
+					medias)
 
-		// unschedule any join outbound
+			);
 
-		fromUser
-			.setNextJoinOutbound (null);
+			// check if we should actually send the message
 
-		// cancel previous signup message if there is one
+			if (chatMessage.getStatus () == ChatMessageStatus.sent) {
 
-		if (fromUser.getFirstJoin () == null) {
-
-			ChatMessageRec oldMessage =
-				chatMessageHelper.findSignup (
-					fromUser);
-
-			if (oldMessage != null) {
-
-				taskLogger.noticeFormat (
-					"Cancelling previously queued message %s",
-					integerToDecimalString (
-						oldMessage.getId ()));
-
-				oldMessage
-
-					.setStatus (
-						ChatMessageStatus.signupReplaced);
+				chatMessageSendFromUserPartTwo (
+					taskLogger,
+					chatMessage);
 
 			}
 
-		}
+			// if necessary, send a join hint
 
-		// create the chat message
+			if (
 
-		ChatMessageRec chatMessage =
-			chatMessageHelper.insert (
-				taskLogger,
-				chatMessageHelper.createInstance ()
+				fromUser.getFirstJoin () != null
 
-			.setChat (
-				fromUser.getChat ())
+				&& ! fromUser.getOnline ()
 
-			.setFromUser (
-				fromUser)
+				&& (
 
-			.setToUser (
-				toUser)
+					fromUser.getLastJoinHint () == null
 
-			.setTimestamp (
-				transaction.now ())
+					|| fromUser.getLastJoinHint ()
+						.plus (
+							Duration.standardHours (12))
+						.isBefore (
+							transaction.now ())
 
-			.setThreadId (
-				threadId.orNull ())
+				)
 
-			.setOriginalText (
-				originalText)
+				&& source == ChatMessageMethod.sms
 
-			.setStatus (
-				blocked
-					? ChatMessageStatus.blocked
-					: fromUser.getFirstJoin () == null
-						? ChatMessageStatus.signup
-						: ChatMessageStatus.sent)
+			) {
 
-			.setSource (
-				source)
-
-			.setMedias (
-				medias)
-
-		);
-
-		// check if we should actually send the message
-
-		if (chatMessage.getStatus () == ChatMessageStatus.sent) {
-
-			chatMessageSendFromUserPartTwo (
-				taskLogger,
-				chatMessage);
-
-		}
-
-		// if necessary, send a join hint
-
-		if (
-
-			fromUser.getFirstJoin () != null
-
-			&& ! fromUser.getOnline ()
-
-			&& (
-
-				fromUser.getLastJoinHint () == null
-
-				|| fromUser.getLastJoinHint ()
-					.plus (
-						Duration.standardHours (12))
-					.isBefore (
-						transaction.now ())
-
-			)
-
-			&& source == ChatMessageMethod.sms
-
-		) {
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				fromUser,
-				threadId,
-				"logon_hint",
-				commandHelper.findByCodeRequired (
-					chat,
-					"magic"),
-				IdObject.objectId (
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					fromUser,
+					threadId,
+					"logon_hint",
 					commandHelper.findByCodeRequired (
 						chat,
-						"help")),
-				TemplateMissing.error,
-				emptyMap ());
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					TemplateMissing.error,
+					emptyMap ());
 
-			fromUser
+				fromUser
 
-				.setLastJoinHint (
-					transaction.now ());
+					.setLastJoinHint (
+						transaction.now ());
+
+			}
+
+			return null;
 
 		}
-
-		return null;
 
 	}
 
@@ -552,208 +565,214 @@ class ChatMessageLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageSendFromUserPartTwo");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageSendFromUserPartTwo");
 
-		ChatUserRec fromUser =
-			chatMessage.getFromUser ();
+		) {
 
-		ChatUserRec toUser =
-			chatMessage.getToUser ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatRec chat =
-			chatMessage.getChat ();
+			ChatUserRec fromUser =
+				chatMessage.getFromUser ();
 
-		ChatContactRec chatUserContact =
-			chatContactHelper.findOrCreate (
-				taskLogger,
-				fromUser,
-				toUser);
+			ChatUserRec toUser =
+				chatMessage.getToUser ();
 
-		// update stats
+			ChatRec chat =
+				chatMessage.getChat ();
 
-		if (toUser.getType () == ChatUserType.user) {
-
-			chatCreditLogic.userSpend (
-				taskLogger,
-				fromUser,
-				1,
-				0,
-				0,
-				0,
-				0);
-
-		} else {
-
-			chatCreditLogic.userSpend (
-				taskLogger,
-				fromUser,
-				0,
-				1,
-				0,
-				0,
-				0);
-
-		}
-
-		toUser
-
-			.setLastReceive (
-				transaction.now ());
-
-		// subtract credit etc
-
-		chatCreditLogic.userReceiveSpend (
-			taskLogger,
-			toUser,
-			1l);
-
-		// work out adult state of users
-
-		boolean fromUserAdult =
-
-			fromUser.getAdultVerified ()
-
-			|| enumInSafe (
-				chatMessage.getSource (),
-				ChatMessageMethod.iphone,
-				ChatMessageMethod.web,
-				ChatMessageMethod.api);
-
-		boolean toUserAdult =
-
-			toUser.getAdultVerified ()
-
-			|| enumEqualSafe (
-				toUser.getType (),
-				ChatUserType.monitor)
-
-			|| enumInSafe (
-				toUser.getDeliveryMethod (),
-				ChatMessageMethod.iphone,
-				ChatMessageMethod.web);
-
-		// if they are both adult
-
-		if (fromUserAdult && toUserAdult) {
-
-			// just send it
-
-			chatMessage.setEditedText (
-				chatMessage.getOriginalText ());
-
-			chatMessageDeliver (
-				taskLogger,
-				chatMessage);
-
-			chatUserContact
-
-				.setLastDeliveredMessageTime (
-					transaction.now ());
-
-		// if either are not adult
-
-		} else {
-
-			// check for approval
-
-			ApprovalResult approvalResult =
-				checkForApproval (
-					chatMessage.getChat (),
-					chatMessage.getOriginalText ().getText ());
-
-			chatMessage.setEditedText (
-				textHelper.findOrCreate (
-					taskLogger,
-					approvalResult.message));
-
-			switch (approvalResult.status) {
-
-			// is clean
-			case clean:
-
-				chatMessage
-
-					.setStatus (
-						ChatMessageStatus.sent);
-
-				chatMessageDeliver (
-					taskLogger,
-					chatMessage);
-
-				chatUserContact
-
-					.setLastDeliveredMessageTime (
-						transaction.now ());
-
-				break;
-
-			// requires automatic editing
-			case auto:
-
-				chatMessage
-
-					.setStatus (
-						ChatMessageStatus.autoEdited);
-
-				chatMessageDeliver (
-					taskLogger,
-					chatMessage);
-
-				chatUserContact
-
-					.setLastDeliveredMessageTime (
-						transaction.now ());
-
-				chatUserRejectionCountInc (
+			ChatContactRec chatUserContact =
+				chatContactHelper.findOrCreate (
 					taskLogger,
 					fromUser,
-					smsMessageHelper.findRequired (
-						chatMessage.getThreadId ()));
+					toUser);
 
-				chatUserRejectionCountInc (
+			// update stats
+
+			if (toUser.getType () == ChatUserType.user) {
+
+				chatCreditLogic.userSpend (
 					taskLogger,
-					toUser,
-					smsMessageHelper.findRequired (
-						chatMessage.getThreadId ()));
+					fromUser,
+					1,
+					0,
+					0,
+					0,
+					0);
 
-				break;
+			} else {
 
-			// requires manual approval
+				chatCreditLogic.userSpend (
+					taskLogger,
+					fromUser,
+					0,
+					1,
+					0,
+					0,
+					0);
 
-			case manual:
+			}
 
-				chatMessage
+			toUser
 
-					.setStatus (
-						ChatMessageStatus.moderatorPending);
+				.setLastReceive (
+					transaction.now ());
 
-				QueueItemRec queueItem =
-					queueLogic.createQueueItem (
-						taskLogger,
-						chat,
-						"message",
-						chatUserContact,
-						chatMessage,
-						chatUserLogic.getPrettyName (
-							fromUser),
+			// subtract credit etc
+
+			chatCreditLogic.userReceiveSpend (
+				taskLogger,
+				toUser,
+				1l);
+
+			// work out adult state of users
+
+			boolean fromUserAdult =
+
+				fromUser.getAdultVerified ()
+
+				|| enumInSafe (
+					chatMessage.getSource (),
+					ChatMessageMethod.iphone,
+					ChatMessageMethod.web,
+					ChatMessageMethod.api);
+
+			boolean toUserAdult =
+
+				toUser.getAdultVerified ()
+
+				|| enumEqualSafe (
+					toUser.getType (),
+					ChatUserType.monitor)
+
+				|| enumInSafe (
+					toUser.getDeliveryMethod (),
+					ChatMessageMethod.iphone,
+					ChatMessageMethod.web);
+
+			// if they are both adult
+
+			if (fromUserAdult && toUserAdult) {
+
+				// just send it
+
+				chatMessage.setEditedText (
+					chatMessage.getOriginalText ());
+
+				chatMessageDeliver (
+					taskLogger,
+					chatMessage);
+
+				chatUserContact
+
+					.setLastDeliveredMessageTime (
+						transaction.now ());
+
+			// if either are not adult
+
+			} else {
+
+				// check for approval
+
+				ApprovalResult approvalResult =
+					checkForApproval (
+						chatMessage.getChat (),
 						chatMessage.getOriginalText ().getText ());
 
-				chatMessage
+				chatMessage.setEditedText (
+					textHelper.findOrCreate (
+						taskLogger,
+						approvalResult.message));
 
-					.setQueueItem (
-						queueItem);
+				switch (approvalResult.status) {
 
-				break;
+				// is clean
+				case clean:
 
-			default:
+					chatMessage
 
-				throw new RuntimeException ();
+						.setStatus (
+							ChatMessageStatus.sent);
+
+					chatMessageDeliver (
+						taskLogger,
+						chatMessage);
+
+					chatUserContact
+
+						.setLastDeliveredMessageTime (
+							transaction.now ());
+
+					break;
+
+				// requires automatic editing
+				case auto:
+
+					chatMessage
+
+						.setStatus (
+							ChatMessageStatus.autoEdited);
+
+					chatMessageDeliver (
+						taskLogger,
+						chatMessage);
+
+					chatUserContact
+
+						.setLastDeliveredMessageTime (
+							transaction.now ());
+
+					chatUserRejectionCountInc (
+						taskLogger,
+						fromUser,
+						smsMessageHelper.findRequired (
+							chatMessage.getThreadId ()));
+
+					chatUserRejectionCountInc (
+						taskLogger,
+						toUser,
+						smsMessageHelper.findRequired (
+							chatMessage.getThreadId ()));
+
+					break;
+
+				// requires manual approval
+
+				case manual:
+
+					chatMessage
+
+						.setStatus (
+							ChatMessageStatus.moderatorPending);
+
+					QueueItemRec queueItem =
+						queueLogic.createQueueItem (
+							taskLogger,
+							chat,
+							"message",
+							chatUserContact,
+							chatMessage,
+							chatUserLogic.getPrettyName (
+								fromUser),
+							chatMessage.getOriginalText ().getText ());
+
+					chatMessage
+
+						.setQueueItem (
+							queueItem);
+
+					break;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
 
 			}
 
@@ -767,37 +786,43 @@ class ChatMessageLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageDeliver");
+		try (
 
-		switch (chatMessage.getToUser ().getType ()) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageDeliver");
 
-		case user:
+		) {
 
-			chatMessageDeliverToUser (
-				taskLogger,
-				chatMessage);
+			switch (chatMessage.getToUser ().getType ()) {
 
-			break;
+			case user:
 
-		case monitor:
-
-			ChatMonitorInboxRec inbox =
-				findOrCreateChatMonitorInbox (
+				chatMessageDeliverToUser (
 					taskLogger,
-					chatMessage.getToUser (),
-					chatMessage.getFromUser (),
-					false);
+					chatMessage);
 
-			inbox.setInbound (true);
+				break;
 
-			break;
+			case monitor:
 
-		default:
+				ChatMonitorInboxRec inbox =
+					findOrCreateChatMonitorInbox (
+						taskLogger,
+						chatMessage.getToUser (),
+						chatMessage.getFromUser (),
+						false);
 
-			throw new RuntimeException ();
+				inbox.setInbound (true);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
@@ -922,75 +947,82 @@ class ChatMessageLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageDeliverToUser");
+		try (
 
-		ChatUserRec toUser =
-			chatMessage.getToUser ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageDeliverToUser");
 
-		String text =
-			chatMessagePrependWarning (
-				chatMessage);
+		) {
 
-		// set the delivery method
+			ChatUserRec toUser =
+				chatMessage.getToUser ();
 
-		chatMessage.setMethod (
-			chatMessage.getToUser ().getDeliveryMethod ());
+			String text =
+				chatMessagePrependWarning (
+					chatMessage);
 
-		// set the delivery id
+			// set the delivery method
 
-		if (toUser.getLastDeliveryId () == null)
-			toUser.setLastDeliveryId (0l);
+			chatMessage.setMethod (
+				chatMessage.getToUser ().getDeliveryMethod ());
 
-		toUser
+			// set the delivery id
 
-			.setLastDeliveryId (
-				toUser.getLastDeliveryId () + 1);
+			if (toUser.getLastDeliveryId () == null)
+				toUser.setLastDeliveryId (0l);
 
-		chatMessage
+			toUser
 
-			.setDeliveryId (
-				toUser.getLastDeliveryId ());
+				.setLastDeliveryId (
+					toUser.getLastDeliveryId () + 1);
 
-		// delegate as appropriate
+			chatMessage
 
-		switch (toUser.getDeliveryMethod ()) {
+				.setDeliveryId (
+					toUser.getLastDeliveryId ());
 
-		case sms:
+			// delegate as appropriate
 
-			return chatMessageDeliverViaSms (
-				taskLogger,
-				chatMessage,
-				text);
+			switch (toUser.getDeliveryMethod ()) {
 
-		case iphone:
+			case sms:
 
-			if (toUser.getJigsawToken () != null) {
-
-				return chatMessageDeliverViaJigsaw (
+				return chatMessageDeliverViaSms (
 					taskLogger,
 					chatMessage,
 					text);
 
+			case iphone:
+
+				if (toUser.getJigsawToken () != null) {
+
+					return chatMessageDeliverViaJigsaw (
+						taskLogger,
+						chatMessage,
+						text);
+
+				}
+
+				return true;
+
+			case web:
+
+				return true;
+
+			default:
+
+				throw new RuntimeException (
+					stringFormat (
+						"No delivery method for user %s",
+						integerToDecimalString (
+							toUser.getId ())));
+
 			}
 
-			return true;
-
-		case web:
-
-			return true;
-
-		default:
-
-			throw new RuntimeException (
-				stringFormat (
-					"No delivery method for user %s",
-					integerToDecimalString (
-						toUser.getId ())));
-
 		}
+
 	}
 
 	@Override
@@ -1000,230 +1032,239 @@ class ChatMessageLogicImplementation
 			@NonNull ChatMessageRec chatMessage,
 			@NonNull String text) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageDeliverViaJigsaw");
+		try (
 
-		ChatUserRec fromUser =
-			chatMessage.getFromUser ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageDeliverViaJigsaw");
 
-		ChatUserRec toUser =
-			chatMessage.getToUser ();
+		) {
 
-		ChatRec chat =
-			toUser.getChat ();
+			ChatUserRec fromUser =
+				chatMessage.getFromUser ();
 
-		// count pending allMessages
+			ChatUserRec toUser =
+				chatMessage.getToUser ();
 
-		List <ChatMessageRec> messages =
-			chatMessageHelper.search (
-				taskLogger,
-				new ChatMessageSearch ()
+			ChatRec chat =
+				toUser.getChat ();
 
-			.toUserId (
-				toUser.getId ())
+			// count pending allMessages
 
-			.method (
-				ChatMessageMethod.iphone)
-
-			.statusIn (
-				ImmutableSet.of (
-					ChatMessageStatus.sent,
-					ChatMessageStatus.moderatorApproved,
-					ChatMessageStatus.moderatorAutoEdited,
-					ChatMessageStatus.moderatorEdited))
-
-			.deliveryIdGreaterThan (
-				toUser.getLastMessagePollId ())
-
-			.orderBy (
-				ChatMessageSearch.Order.deliveryId)
-
-		);
-
-		@SuppressWarnings ("unused")
-		JigsawApi.PushRequest jigsawRequest =
-			new JigsawApi.PushRequest ()
-
-			.applicationIdentifier (
-				chat.getJigsawApplicationIdentifier ())
-
-			.addToken (
-				toUser.getJigsawToken ())
-
-			.messageBody (
-				stringFormat (
-					"New message from %s",
-					ifNull (
-						fromUser.getName (),
-						fromUser.getCode ())))
-
-			.messageSound (
-				"default")
-
-			.addMessageCustomProperty (
-				"fromUserCode",
-				fromUser.getCode ())
-
-			.addMessageCustomProperty (
-				"timestamp",
-				isoDate (
-					chatMessage.getTimestamp ()))
-
-			.messageBadge (
-				messages.size ())
-
-			.messageSound (
-				"default");
-
-		boolean success = true;
-
-		long jigsawStart = System.nanoTime ();
-
-		try {
-
-			//jigsawApi.pushServer (
-				//jigsawRequest);
-
-		} catch (Exception exception) {
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"unknown",
-				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
-
-				"JigsawApi.pushServer threw exception",
-				"Chat message id: " + chatMessage.getId () + "\n" +
-				"\n" +
-				exceptionLogic.throwableDump (
+			List <ChatMessageRec> messages =
+				chatMessageHelper.search (
 					taskLogger,
-					exception),
+					new ChatMessageSearch ()
 
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithNoWarning);
+				.toUserId (
+					toUser.getId ())
 
-			success = false;
+				.method (
+					ChatMessageMethod.iphone)
 
-		}
+				.statusIn (
+					ImmutableSet.of (
+						ChatMessageStatus.sent,
+						ChatMessageStatus.moderatorApproved,
+						ChatMessageStatus.moderatorAutoEdited,
+						ChatMessageStatus.moderatorEdited))
 
-		long jigsawEnd =
-			System.nanoTime ();
+				.deliveryIdGreaterThan (
+					toUser.getLastMessagePollId ())
 
-		taskLogger.noticeFormat (
-			"Call to jigsaw took %sns",
-			integerToDecimalString (
-				jigsawEnd - jigsawStart));
+				.orderBy (
+					ChatMessageSearch.Order.deliveryId)
 
-		UrbanAirshipApi.PushRequest urbanApiRequest =
-			new UrbanAirshipApi.PushRequest ();
+			);
 
-		urbanApiRequest.tokens.add (
-			toUser.getJigsawToken ());
+			@SuppressWarnings ("unused")
+			JigsawApi.PushRequest jigsawRequest =
+				new JigsawApi.PushRequest ()
 
-		urbanApiRequest.apsAlert =
-			"New message from " + ifNull (
-				fromUser.getName (),
+				.applicationIdentifier (
+					chat.getJigsawApplicationIdentifier ())
+
+				.addToken (
+					toUser.getJigsawToken ())
+
+				.messageBody (
+					stringFormat (
+						"New message from %s",
+						ifNull (
+							fromUser.getName (),
+							fromUser.getCode ())))
+
+				.messageSound (
+					"default")
+
+				.addMessageCustomProperty (
+					"fromUserCode",
+					fromUser.getCode ())
+
+				.addMessageCustomProperty (
+					"timestamp",
+					isoDate (
+						chatMessage.getTimestamp ()))
+
+				.messageBadge (
+					messages.size ())
+
+				.messageSound (
+					"default");
+
+			boolean success = true;
+
+			long jigsawStart = System.nanoTime ();
+
+			try {
+
+				//jigsawApi.pushServer (
+					//jigsawRequest);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logSimple (
+					taskLogger,
+					"unknown",
+					"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
+
+					"JigsawApi.pushServer threw exception",
+					"Chat message id: " + chatMessage.getId () + "\n" +
+					"\n" +
+					exceptionLogic.throwableDump (
+						taskLogger,
+						exception),
+
+					optionalAbsent (),
+					GenericExceptionResolution.ignoreWithNoWarning);
+
+				success = false;
+
+			}
+
+			long jigsawEnd =
+				System.nanoTime ();
+
+			taskLogger.noticeFormat (
+				"Call to jigsaw took %sns",
+				integerToDecimalString (
+					jigsawEnd - jigsawStart));
+
+			UrbanAirshipApi.PushRequest urbanApiRequest =
+				new UrbanAirshipApi.PushRequest ();
+
+			urbanApiRequest.tokens.add (
+				toUser.getJigsawToken ());
+
+			urbanApiRequest.apsAlert =
+				"New message from " + ifNull (
+					fromUser.getName (),
+					fromUser.getCode ());
+
+			urbanApiRequest.apsSound =
+				"default";
+
+			urbanApiRequest.apsBadge =
+				messages.size ();
+
+			urbanApiRequest.customProperties.put (
+				"fromUserCode",
 				fromUser.getCode ());
 
-		urbanApiRequest.apsSound =
-			"default";
+			urbanApiRequest.customProperties.put (
+				"timestamp",
+				isoDate (
+					chatMessage.getTimestamp ()));
 
-		urbanApiRequest.apsBadge =
-			messages.size ();
+			long urbanStart =
+				System.nanoTime ();
 
-		urbanApiRequest.customProperties.put (
-			"fromUserCode",
-			fromUser.getCode ());
+			try {
 
-		urbanApiRequest.customProperties.put (
-			"timestamp",
-			isoDate (
-				chatMessage.getTimestamp ()));
+				String accountKey =
+					toUser.getChatAffiliate ().getId ().toString ();
 
-		long urbanStart =
-			System.nanoTime ();
-
-		try {
-
-			String accountKey =
-				toUser.getChatAffiliate ().getId ().toString ();
-
-			urbanAirshipApi.push (
-				accountKey,
-				"prod",
-				urbanApiRequest);
-
-		} catch (Exception exception) {
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"unknown",
-				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
-
-				"JigsawApi.pushServer threw exception",
-				"Chat message id: " + chatMessage.getId () + "\n" +
-				"\n" +
-				exceptionLogic.throwableDump (
+				urbanAirshipApi.push (
 					taskLogger,
-					exception),
+					accountKey,
+					"prod",
+					urbanApiRequest);
 
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithNoWarning);
+			} catch (Exception exception) {
 
-			success = false;
+				exceptionLogger.logSimple (
+					taskLogger,
+					"unknown",
+					"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
+
+					"JigsawApi.pushServer threw exception",
+					"Chat message id: " + chatMessage.getId () + "\n" +
+					"\n" +
+					exceptionLogic.throwableDump (
+						taskLogger,
+						exception),
+
+					optionalAbsent (),
+					GenericExceptionResolution.ignoreWithNoWarning);
+
+				success = false;
+
+			}
+
+			long urbanEnd =
+				System.nanoTime ();
+
+			taskLogger.noticeFormat (
+				"Call to urban airship (prod) took %sns",
+				integerToDecimalString (
+					urbanEnd - urbanStart));
+
+			urbanStart = System.nanoTime ();
+
+			try {
+
+				String accountKey =
+					toUser.getChatAffiliate ().getId ().toString ();
+
+				urbanAirshipApi.push (
+					taskLogger,
+					accountKey,
+					"dev",
+					urbanApiRequest);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logSimple (
+					taskLogger,
+					"unknown",
+					"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
+
+					"JigsawApi.pushServer threw exception",
+					"Chat message id: " + chatMessage.getId () + "\n" +
+					"\n" +
+					exceptionLogic.throwableDump (
+						taskLogger,
+						exception),
+
+					optionalAbsent (),
+					GenericExceptionResolution.ignoreWithNoWarning);
+
+				success = false;
+
+			}
+
+			urbanEnd =
+				System.nanoTime ();
+
+			taskLogger.noticeFormat (
+				"Call to urban airship (dev) took %sns",
+				integerToDecimalString (
+					urbanEnd - urbanStart));
+
+			return success;
 
 		}
-
-		long urbanEnd =
-			System.nanoTime ();
-
-		taskLogger.noticeFormat (
-			"Call to urban airship (prod) took %sns",
-			integerToDecimalString (
-				urbanEnd - urbanStart));
-
-		urbanStart = System.nanoTime ();
-		try {
-
-			String accountKey =
-				toUser.getChatAffiliate ().getId ().toString ();
-
-			urbanAirshipApi.push (
-				accountKey,
-				"dev",
-				urbanApiRequest);
-
-		} catch (Exception exception) {
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"unknown",
-				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
-
-				"JigsawApi.pushServer threw exception",
-				"Chat message id: " + chatMessage.getId () + "\n" +
-				"\n" +
-				exceptionLogic.throwableDump (
-					taskLogger,
-					exception),
-
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithNoWarning);
-
-			success = false;
-
-		}
-
-		urbanEnd =
-			System.nanoTime ();
-
-		taskLogger.noticeFormat (
-			"Call to urban airship (dev) took %sns",
-			integerToDecimalString (
-				urbanEnd - urbanStart));
-
-		return success;
 
 	}
 
@@ -1235,120 +1276,126 @@ class ChatMessageLogicImplementation
 			@NonNull ChatUserRec userChatUser,
 			boolean alarm) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateChatMonitorInbox");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateChatMonitorInbox");
 
-		ChatRec chat =
-			userChatUser.getChat ();
-
-		// lookup chat monitor inbox
-
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.find (
-				monitorChatUser,
-				userChatUser);
-
-		if (chatMonitorInbox != null)
-			return chatMonitorInbox;
-
-		// there wasn't one, create one
-
-		chatMonitorInbox =
-			chatMonitorInboxHelper.insert (
-				taskLogger,
-				chatMonitorInboxHelper.createInstance ()
-
-			.setMonitorChatUser (
-				monitorChatUser)
-
-			.setUserChatUser (
-				userChatUser)
-
-			.setTimestamp (
-				transaction.now ())
-
-		);
-
-		// find chat user contact
-
-		ChatContactRec chatUserContact =
-			chatContactHelper.findOrCreate (
-				taskLogger,
-				userChatUser,
-				monitorChatUser);
-
-		// check which queue to use
-
-		Gender monitorGender =
-			monitorChatUser.getGender ();
-
-		Gender userGender =
-			userChatUser.getGender ();
-
-		String queueCode;
-
-		if (
-			monitorGender == null
-			|| userGender == null
 		) {
 
-			queueCode =
-				"chat_unknown";
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		} else {
+			ChatRec chat =
+				userChatUser.getChat ();
 
-			String sexuality =
-				monitorGender == userGender
-					? "gay"
-					: "straight";
+			// lookup chat monitor inbox
 
-			String gender =
-				monitorGender.toString ();
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMonitorInboxHelper.find (
+					monitorChatUser,
+					userChatUser);
 
-			queueCode =
-				stringFormat (
-					"chat_%s_%s",
-					sexuality,
-					gender);
+			if (chatMonitorInbox != null)
+				return chatMonitorInbox;
+
+			// there wasn't one, create one
+
+			chatMonitorInbox =
+				chatMonitorInboxHelper.insert (
+					taskLogger,
+					chatMonitorInboxHelper.createInstance ()
+
+				.setMonitorChatUser (
+					monitorChatUser)
+
+				.setUserChatUser (
+					userChatUser)
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
+
+			// find chat user contact
+
+			ChatContactRec chatUserContact =
+				chatContactHelper.findOrCreate (
+					taskLogger,
+					userChatUser,
+					monitorChatUser);
+
+			// check which queue to use
+
+			Gender monitorGender =
+				monitorChatUser.getGender ();
+
+			Gender userGender =
+				userChatUser.getGender ();
+
+			String queueCode;
+
+			if (
+				monitorGender == null
+				|| userGender == null
+			) {
+
+				queueCode =
+					"chat_unknown";
+
+			} else {
+
+				String sexuality =
+					monitorGender == userGender
+						? "gay"
+						: "straight";
+
+				String gender =
+					monitorGender.toString ();
+
+				queueCode =
+					stringFormat (
+						"chat_%s_%s",
+						sexuality,
+						gender);
+
+			}
+
+			if (alarm) {
+
+				queueCode +=
+					"_alarm";
+
+			}
+
+			QueueRec queue =
+				queueLogic.findQueue (
+					chat,
+					queueCode);
+
+			// and create the queue item
+
+			QueueItemRec queueItem =
+				queueLogic.createQueueItem (
+					taskLogger,
+					queue,
+					chatUserContact,
+					chatMonitorInbox,
+					userChatUser.getCode (),
+					"");
+
+			chatMonitorInbox
+
+				.setQueueItem (
+					queueItem);
+
+			// and return
+
+			return chatMonitorInbox;
 
 		}
-
-		if (alarm) {
-
-			queueCode +=
-				"_alarm";
-
-		}
-
-		QueueRec queue =
-			queueLogic.findQueue (
-				chat,
-				queueCode);
-
-		// and create the queue item
-
-		QueueItemRec queueItem =
-			queueLogic.createQueueItem (
-				taskLogger,
-				queue,
-				chatUserContact,
-				chatMonitorInbox,
-				userChatUser.getCode (),
-				"");
-
-		chatMonitorInbox
-
-			.setQueueItem (
-				queueItem);
-
-		// and return
-
-		return chatMonitorInbox;
 
 	}
 
@@ -1359,120 +1406,126 @@ class ChatMessageLogicImplementation
 			@NonNull ChatMessageRec chatMessage,
 			@NonNull String text) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatMessageDeliverViaSms");
+		try (
 
-		ChatUserRec fromUser =
-			chatMessage.getFromUser ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatMessageDeliverViaSms");
 
-		ChatUserRec toUser =
-			chatMessage.getToUser ();
-
-		ChatRec chat =
-			toUser.getChat ();
-
-		List <String> stringParts;
-
-		try {
-
-			stringParts =
-				MessageSplitter.split (
-					text,
-					messageFromTemplates (
-						fromUser));
-
-		} catch (IllegalArgumentException exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"MessageSplitter.split threw exception");
-
-			exceptionLogger.logSimple (
-				taskLogger,
-				"unknown",
-				"ChatReceivedHandler.sendUserMessage (...)",
-				"MessageSplitter.split (...) threw IllegalArgumentException",
-
-				stringFormat (
-
-					"Error probably caused by illegal characters in message. ",
-					" Ignoring error.\n",
-
-					"\n",
-
-					"fromUser.id = %s\n",
-					integerToDecimalString (
-						fromUser.getId ()),
-
-					"toUser.id = %s\n",
-					integerToDecimalString (
-						toUser.getId ()),
-
-					"text = '%s'\n",
-					text,
-
-					"\n",
-
-					"%s",
-					exceptionLogic.throwableDump (
-						taskLogger,
-						exception)),
-
-				Optional.absent (),
-				GenericExceptionResolution.ignoreWithNoWarning);
-
-			return false;
-
-		}
-
-		// and send the message(s)
-
-		String serviceCode =
-			chatMessage.getFromUser ().getType ().toString ();
-
-		List<TextRec> textParts =
-			new ArrayList<TextRec> ();
-
-		for (
-			String part
-				: stringParts
 		) {
 
-			textParts.add (
-				textHelper.findOrCreate (
+			ChatUserRec fromUser =
+				chatMessage.getFromUser ();
+
+			ChatUserRec toUser =
+				chatMessage.getToUser ();
+
+			ChatRec chat =
+				toUser.getChat ();
+
+			List <String> stringParts;
+
+			try {
+
+				stringParts =
+					MessageSplitter.split (
+						text,
+						messageFromTemplates (
+							fromUser));
+
+			} catch (IllegalArgumentException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"MessageSplitter.split threw exception");
+
+				exceptionLogger.logSimple (
 					taskLogger,
-					part));
+					"unknown",
+					"ChatReceivedHandler.sendUserMessage (...)",
+					"MessageSplitter.split (...) threw IllegalArgumentException",
+
+					stringFormat (
+
+						"Error probably caused by illegal characters in message. ",
+						" Ignoring error.\n",
+
+						"\n",
+
+						"fromUser.id = %s\n",
+						integerToDecimalString (
+							fromUser.getId ()),
+
+						"toUser.id = %s\n",
+						integerToDecimalString (
+							toUser.getId ()),
+
+						"text = '%s'\n",
+						text,
+
+						"\n",
+
+						"%s",
+						exceptionLogic.throwableDump (
+							taskLogger,
+							exception)),
+
+					Optional.absent (),
+					GenericExceptionResolution.ignoreWithNoWarning);
+
+				return false;
+
+			}
+
+			// and send the message(s)
+
+			String serviceCode =
+				chatMessage.getFromUser ().getType ().toString ();
+
+			List<TextRec> textParts =
+				new ArrayList<TextRec> ();
+
+			for (
+				String part
+					: stringParts
+			) {
+
+				textParts.add (
+					textHelper.findOrCreate (
+						taskLogger,
+						part));
+
+			}
+
+			Long threadId =
+				chatSendLogic.sendMessageMagic (
+					taskLogger,
+					toUser,
+					optionalFromNullable (
+						chatMessage.getThreadId ()),
+					textParts,
+					commandHelper.findByCodeRequired (
+						chat,
+						"chat"),
+					serviceHelper.findByCodeRequired (
+						chat,
+						serviceCode),
+					fromUser.getId (),
+					optionalFromNullable (
+						chatMessage.getSender ()));
+
+			chatMessage
+
+				.setThreadId (
+					threadId)
+
+				.setMethod (
+					ChatMessageMethod.sms);
+
+			return true;
 
 		}
-
-		Long threadId =
-			chatSendLogic.sendMessageMagic (
-				taskLogger,
-				toUser,
-				optionalFromNullable (
-					chatMessage.getThreadId ()),
-				textParts,
-				commandHelper.findByCodeRequired (
-					chat,
-					"chat"),
-				serviceHelper.findByCodeRequired (
-					chat,
-					serviceCode),
-				fromUser.getId (),
-				optionalFromNullable (
-					chatMessage.getSender ()));
-
-		chatMessage
-
-			.setThreadId (
-				threadId)
-
-			.setMethod (
-				ChatMessageMethod.sms);
-
-		return true;
 
 	}
 
@@ -1528,54 +1581,60 @@ class ChatMessageLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserRejectionCountInc");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserRejectionCountInc");
 
-		// ignore iphones
+		) {
 
-		if (chatUser.getDeliveryMethod () == ChatMessageMethod.iphone)
-			return;
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		// increment their rejection count
+			// ignore iphones
 
-		chatUser.setRejectionCount (
-			chatUser.getRejectionCount () + 1);
+			if (chatUser.getDeliveryMethod () == ChatMessageMethod.iphone)
+				return;
 
-		// ignore monitors
+			// increment their rejection count
 
-		if (chatUser.getType () == ChatUserType.monitor)
-			return;
+			chatUser.setRejectionCount (
+				chatUser.getRejectionCount () + 1);
 
-		// ignore already verified users
+			// ignore monitors
 
-		if (chatUser.getAdultVerified ())
-			return;
+			if (chatUser.getType () == ChatUserType.monitor)
+				return;
 
-		// ignore them except the first and every fifth thereafter
+			// ignore already verified users
 
-		if (chatUser.getRejectionCount () % 5 != 1)
-			return;
+			if (chatUser.getAdultVerified ())
+				return;
 
-		// send the hint explaining how to adult verify
+			// ignore them except the first and every fifth thereafter
 
-		chatSendLogic.sendSystem (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				message.getThreadId ()),
-			"adult_hint_in",
-			chatScheme.getRbFreeRouter (),
-			chatScheme.getAdultAdsScheme ().getRbNumber (),
-			Collections.emptySet (),
-			optionalAbsent (),
-			"system",
-			TemplateMissing.error,
-			emptyMap ());
+			if (chatUser.getRejectionCount () % 5 != 1)
+				return;
+
+			// send the hint explaining how to adult verify
+
+			chatSendLogic.sendSystem (
+				taskLogger,
+				chatUser,
+				optionalOf (
+					message.getThreadId ()),
+				"adult_hint_in",
+				chatScheme.getRbFreeRouter (),
+				chatScheme.getAdultAdsScheme ().getRbNumber (),
+				Collections.emptySet (),
+				optionalAbsent (),
+				"system",
+				TemplateMissing.error,
+				emptyMap ());
+
+		}
 
 	}
 

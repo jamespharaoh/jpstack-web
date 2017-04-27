@@ -51,75 +51,81 @@ class ManualResponderRequestConsoleHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"applySearchFilter");
+		try (
 
-		ManualResponderRequestSearch search =
-			(ManualResponderRequestSearch)
-			searchObject;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"applySearchFilter");
 
-		search
-
-			.filter (
-				true);
-
-		// manual responders
-
-		ImmutableList.Builder <Long> manualRespondersBuilder =
-			ImmutableList.builder ();
-
-		for (
-			ManualResponderRec manualResponder
-				: manualResponderHelper.findAll ()
 		) {
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					manualResponder,
-					"supervisor")
+			ManualResponderRequestSearch search =
+				(ManualResponderRequestSearch)
+				searchObject;
+
+			search
+
+				.filter (
+					true);
+
+			// manual responders
+
+			ImmutableList.Builder <Long> manualRespondersBuilder =
+				ImmutableList.builder ();
+
+			for (
+				ManualResponderRec manualResponder
+					: manualResponderHelper.findAll ()
 			) {
-				continue;
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						manualResponder,
+						"supervisor")
+				) {
+					continue;
+				}
+
+				manualRespondersBuilder.add (
+					manualResponder.getId ());
+
 			}
 
-			manualRespondersBuilder.add (
-				manualResponder.getId ());
+			// users
 
-		}
+			ImmutableList.Builder <Long> usersBuilder =
+				ImmutableList.builder ();
 
-		// users
-
-		ImmutableList.Builder <Long> usersBuilder =
-			ImmutableList.builder ();
-
-		for (
-			UserRec user
-				: userHelper.findAll ()
-		) {
-
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					user,
-					"supervisor")
+			for (
+				UserRec user
+					: userHelper.findAll ()
 			) {
-				continue;
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						user,
+						"supervisor")
+				) {
+					continue;
+				}
+
+				usersBuilder.add (
+					user.getId ());
+
 			}
 
-			usersBuilder.add (
-				user.getId ());
+			search
+
+				.filterManualResponderIds (
+					manualRespondersBuilder.build ())
+
+				.filterProcessedByUserIds (
+					usersBuilder.build ());
 
 		}
-
-		search
-
-			.filterManualResponderIds (
-				manualRespondersBuilder.build ())
-
-			.filterProcessedByUserIds (
-				usersBuilder.build ());
 
 	}
 

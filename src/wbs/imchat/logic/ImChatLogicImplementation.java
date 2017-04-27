@@ -14,8 +14,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -70,126 +70,150 @@ class ImChatLogicImplementation
 	@Override
 	public
 	void conversationEnd (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatConversationRec conversation) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		ImChatCustomerRec customer =
-			conversation.getImChatCustomer ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"conversationEnd");
 
-		// check preconditions
-
-		if (
-			referenceNotEqualWithClass (
-				ImChatConversationRec.class,
-				customer.getCurrentConversation (),
-				conversation)
 		) {
 
-			throw new IllegalStateException ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ImChatCustomerRec customer =
+				conversation.getImChatCustomer ();
+
+			// check preconditions
+
+			if (
+				referenceNotEqualWithClass (
+					ImChatConversationRec.class,
+					customer.getCurrentConversation (),
+					conversation)
+			) {
+
+				throw new IllegalStateException ();
+
+			}
+
+			// update conversation
+
+			conversation
+
+				.setEndTime (
+					transaction.now ());
+
+			// update customer
+
+			customer
+
+				.setCurrentConversation (
+					null);
 
 		}
-
-		// update conversation
-
-		conversation
-
-			.setEndTime (
-				transaction.now ());
-
-		// update customer
-
-		customer
-
-			.setCurrentConversation (
-				null);
 
 	}
 
 	@Override
 	public
 	void conversationEmailSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatConversationRec conversation) {
-
-		ImChatProfileRec profile =
-			conversation.getImChatProfile ();
-
-		ImChatCustomerRec customer =
-			conversation.getImChatCustomer ();
-
-		ImChatRec imChat =
-			customer.getImChat ();
-
-		// construct email content
 
 		try (
 
-			StringFormatWriter formatWriter =
-				new StringFormatWriter ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"conversationEmailSend");
 
 		) {
 
-			formatWriter.writeFormat (
-				"Thanks for using the psychic chat service. For your future ",
-				"reference, we have included a transcript of your recent ",
-				"conversation with %s.\n",
-				profile.getPublicName ());
+			ImChatProfileRec profile =
+				conversation.getImChatProfile ();
 
-			formatWriter.writeFormat (
-				"\n");
+			ImChatCustomerRec customer =
+				conversation.getImChatCustomer ();
 
-			for (
-				ImChatMessageRec message
-					: conversation.getMessages ()
+			ImChatRec imChat =
+				customer.getImChat ();
+
+			// construct email content
+
+			try (
+
+				StringFormatWriter formatWriter =
+					new StringFormatWriter ();
+
 			) {
 
 				formatWriter.writeFormat (
-					"%s %s:\n",
-					timeFormatter.timeString (
-						timeFormatter.timezone (
-							ifNull (
-								imChat.getSlice ().getDefaultTimezone (),
-								wbsConfig.defaultTimezone ())),
-						message.getTimestamp ()),
-					message.getSenderUser () != null
-						? profile.getPublicName ()
-						: "Me");
-
-				formatWriter.writeFormat (
-					"%s\n",
-					message.getMessageText ());
-
-				if (
-					isNotNull (
-						message.getPrice ())
-				) {
-
-					formatWriter.writeFormat (
-						"(you were charged %s for this message)\n",
-						currencyLogic.formatText (
-							imChat.getCreditCurrency (),
-							message.getPrice ()));
-
-				}
+					"Thanks for using the psychic chat service. For your future ",
+					"reference, we have included a transcript of your recent ",
+					"conversation with %s.\n",
+					profile.getPublicName ());
 
 				formatWriter.writeFormat (
 					"\n");
 
+				for (
+					ImChatMessageRec message
+						: conversation.getMessages ()
+				) {
+
+					formatWriter.writeFormat (
+						"%s %s:\n",
+						timeFormatter.timeString (
+							timeFormatter.timezone (
+								ifNull (
+									imChat.getSlice ().getDefaultTimezone (),
+									wbsConfig.defaultTimezone ())),
+							message.getTimestamp ()),
+						message.getSenderUser () != null
+							? profile.getPublicName ()
+							: "Me");
+
+					formatWriter.writeFormat (
+						"%s\n",
+						message.getMessageText ());
+
+					if (
+						isNotNull (
+							message.getPrice ())
+					) {
+
+						formatWriter.writeFormat (
+							"(you were charged %s for this message)\n",
+							currencyLogic.formatText (
+								imChat.getCreditCurrency (),
+								message.getPrice ()));
+
+					}
+
+					formatWriter.writeFormat (
+						"\n");
+
+				}
+
+				// send email
+
+				emailLogic.sendEmail (
+					imChat.getEmailFromName (),
+					imChat.getEmailFromAddress (),
+					imChat.getEmailReplyToAddress (),
+					ImmutableList.<String>of (
+						customer.getEmail ()),
+					stringFormat (
+						"Your recent conversation with %s",
+						profile.getPublicName ()),
+					formatWriter.toString ());
+
 			}
-
-			// send email
-
-			emailLogic.sendEmail (
-				imChat.getEmailFromName (),
-				imChat.getEmailFromAddress (),
-				imChat.getEmailReplyToAddress (),
-				ImmutableList.<String>of (
-					customer.getEmail ()),
-				stringFormat (
-					"Your recent conversation with %s",
-					profile.getPublicName ()),
-				formatWriter.toString ());
 
 		}
 
@@ -202,60 +226,66 @@ class ImChatLogicImplementation
 			@NonNull ImChatCustomerRec customer,
 			@NonNull Optional <UserRec> consoleUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"customerPasswordGenerate");
+		try (
 
-		ImChatRec imChat =
-			customer.getImChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"customerPasswordGenerate");
 
-		// generate new password
-
-		String newPassword =
-			randomLogic.generateLowercase (12);
-
-		// update customer password
-
-		customer
-
-			.setPassword (
-				newPassword);
-
-		// send new password via mail
-
-		emailLogic.sendEmail (
-			imChat.getEmailFromName (),
-			imChat.getEmailFromAddress (),
-			imChat.getEmailReplyToAddress (),
-			ImmutableList.of (
-				customer.getEmail ()),
-			imChat.getEmailSubjectForgotPassword (),
-			stringFormat (
-				"Please log on with your new password:\n",
-				"\n",
-				"%s\n",
-				newPassword));
-
-		// create log
-
-		if (
-			isNotNull (
-				consoleUser)
 		) {
 
-			eventLogic.createEvent (
-				taskLogger,
-				"im_chat_customer_generated_password_from_console",
-				consoleUser.get (),
-				customer);
+			ImChatRec imChat =
+				customer.getImChat ();
 
-		} else {
+			// generate new password
 
-			eventLogic.createEvent (
-				taskLogger,
-				"im_chat_customer_forgotten_password",
-				customer);
+			String newPassword =
+				randomLogic.generateLowercase (12);
+
+			// update customer password
+
+			customer
+
+				.setPassword (
+					newPassword);
+
+			// send new password via mail
+
+			emailLogic.sendEmail (
+				imChat.getEmailFromName (),
+				imChat.getEmailFromAddress (),
+				imChat.getEmailReplyToAddress (),
+				ImmutableList.of (
+					customer.getEmail ()),
+				imChat.getEmailSubjectForgotPassword (),
+				stringFormat (
+					"Please log on with your new password:\n",
+					"\n",
+					"%s\n",
+					newPassword));
+
+			// create log
+
+			if (
+				isNotNull (
+					consoleUser)
+			) {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"im_chat_customer_generated_password_from_console",
+					consoleUser.get (),
+					customer);
+
+			} else {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"im_chat_customer_forgotten_password",
+					customer);
+
+			}
 
 		}
 

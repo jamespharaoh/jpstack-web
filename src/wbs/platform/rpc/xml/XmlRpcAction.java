@@ -42,6 +42,8 @@ import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 
+import wbs.utils.io.RuntimeIoException;
+
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -158,8 +160,7 @@ class XmlRpcAction
 	@Override
 	public
 	Responder go (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		RpcResult ret =
 			realGo (
@@ -174,15 +175,16 @@ class XmlRpcAction
 	public
 	XmlRpcSource parse (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull InputStream in)
-		throws IOException {
+			@NonNull InputStream in) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"parse");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"parse");
+
+		) {
 
 			Builder parser =
 				new Builder ();
@@ -206,6 +208,11 @@ class XmlRpcAction
 			}
 
 			return source;
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		} catch (ValidityException exception) {
 
@@ -231,12 +238,14 @@ class XmlRpcAction
 	RpcResult realGo (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"realGo");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"realGo");
+
+		) {
 
 			XmlRpcSource source =
 				parse (

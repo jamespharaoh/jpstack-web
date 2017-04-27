@@ -134,15 +134,21 @@ class ConsoleModuleImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String name) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"beanResponder");
+		try (
 
-		return componentManager.getComponentProviderRequired (
-			taskLogger,
-			name,
-			Responder.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"beanResponder");
+
+		) {
+
+			return componentManager.getComponentProviderRequired (
+				taskLogger,
+				name,
+				Responder.class);
+
+		}
 
 	}
 
@@ -155,64 +161,70 @@ class ConsoleModuleImplementation
 			@NonNull ConsoleContextTab tab,
 			@NonNull List <String> contextTypes) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"addContextTab");
+		try (
 
-		if (tab.name ().isEmpty ())
-			throw new RuntimeException ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addContextTab");
 
-		if (
-			contains (
-				tabNames,
-				tab.name ())
 		) {
 
-			taskLogger.errorFormat (
-				"Duplicated tab name '%s' ",
-				tab.name (),
-				"in console module '%s'",
-				name ());
+			if (tab.name ().isEmpty ())
+				throw new RuntimeException ();
 
-				return;
+			if (
+				contains (
+					tabNames,
+					tab.name ())
+			) {
 
-		}
+				taskLogger.errorFormat (
+					"Duplicated tab name '%s' ",
+					tab.name (),
+					"in console module '%s'",
+					name ());
 
-		tabs.add (
-			tab);
-
-		tabNames.add (
-			tab.name ());
-
-		for (
-			String contextTypeName
-				: contextTypes
-		) {
-
-			List<ContextTabPlacement> tabPlacements =
-				tabPlacementsByContextType.get (
-					contextTypeName);
-
-			if (tabPlacements == null) {
-
-				tabPlacements =
-					new ArrayList<ContextTabPlacement> ();
-
-				tabPlacementsByContextType.put (
-					contextTypeName,
-					tabPlacements);
+					return;
 
 			}
 
-			tabPlacements.add (
-				new ContextTabPlacement ()
+			tabs.add (
+				tab);
 
-				.tabLocation (
-					tabLocation)
+			tabNames.add (
+				tab.name ());
 
-				.tabName (
-					tab.name ()));
+			for (
+				String contextTypeName
+					: contextTypes
+			) {
+
+				List<ContextTabPlacement> tabPlacements =
+					tabPlacementsByContextType.get (
+						contextTypeName);
+
+				if (tabPlacements == null) {
+
+					tabPlacements =
+						new ArrayList<ContextTabPlacement> ();
+
+					tabPlacementsByContextType.put (
+						contextTypeName,
+						tabPlacements);
+
+				}
+
+				tabPlacements.add (
+					new ContextTabPlacement ()
+
+					.tabLocation (
+						tabLocation)
+
+					.tabName (
+						tab.name ()));
+
+			}
 
 		}
 

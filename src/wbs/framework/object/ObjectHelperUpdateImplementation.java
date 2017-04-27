@@ -59,49 +59,55 @@ class ObjectHelperUpdateImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"insert");
+		try (
 
-		if (
-			! objectModel.objectClass ().isInstance (
-				objectUncast)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"insert");
+
 		) {
 
-			throw new ClassCastException (
-				stringFormat (
-					"Can't insert %s as %s",
-					objectUncast.getClass ().getSimpleName (),
-					objectModel.objectClass ().getSimpleName ()));
+			if (
+				! objectModel.objectClass ().isInstance (
+					objectUncast)
+			) {
 
-		}
+				throw new ClassCastException (
+					stringFormat (
+						"Can't insert %s as %s",
+						objectUncast.getClass ().getSimpleName (),
+						objectModel.objectClass ().getSimpleName ()));
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			objectUncast;
+			}
 
-		objectDatabaseHelper.insert (
-			taskLogger,
-			object);
+			@SuppressWarnings ("unchecked")
+			RecordType object =
+				(RecordType)
+				objectUncast;
 
-		UnsavedRecordDetector.instance.removeRecord (
-			object);
-
-		for (
-			ObjectHelper<?> childObjectHelper
-				: objectManager.objectHelpers ()
-		) {
-
-			childObjectHelper.createSingletons (
+			objectDatabaseHelper.insert (
 				taskLogger,
-				objectHelper,
 				object);
 
-		}
+			UnsavedRecordDetector.instance.removeRecord (
+				object);
 
-		return objectUncast;
+			for (
+				ObjectHelper<?> childObjectHelper
+					: objectManager.objectHelpers ()
+			) {
+
+				childObjectHelper.createSingletons (
+					taskLogger,
+					objectHelper,
+					object);
+
+			}
+
+			return objectUncast;
+
+		}
 
 	}
 
@@ -111,48 +117,54 @@ class ObjectHelperUpdateImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"insertSpecial");
+		try (
 
-		if (
-			! objectModel.objectClass ().isInstance (
-				objectUncast)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"insertSpecial");
+
 		) {
 
-			throw new ClassCastException (
-				stringFormat (
-					"Can't insert %s as %s",
-					objectUncast.getClass ().getSimpleName (),
-					objectModel.objectClass ().getSimpleName ()));
+			if (
+				! objectModel.objectClass ().isInstance (
+					objectUncast)
+			) {
 
-		}
+				throw new ClassCastException (
+					stringFormat (
+						"Can't insert %s as %s",
+						objectUncast.getClass ().getSimpleName (),
+						objectModel.objectClass ().getSimpleName ()));
 
-		RecordType object =
-			genericCastUnchecked (
-				objectUncast);
+			}
 
-		objectDatabaseHelper.insertSpecial (
-			taskLogger,
-			object);
+			RecordType object =
+				genericCastUnchecked (
+					objectUncast);
 
-		UnsavedRecordDetector.instance.removeRecord (
-			object);
-
-		for (
-			ObjectHelper<?> childObjectHelper
-				: objectManager.objectHelpers ()
-		) {
-
-			childObjectHelper.createSingletons (
+			objectDatabaseHelper.insertSpecial (
 				taskLogger,
-				objectHelper,
 				object);
 
-		}
+			UnsavedRecordDetector.instance.removeRecord (
+				object);
 
-		return objectUncast;
+			for (
+				ObjectHelper<?> childObjectHelper
+					: objectManager.objectHelpers ()
+			) {
+
+				childObjectHelper.createSingletons (
+					taskLogger,
+					objectHelper,
+					object);
+
+			}
+
+			return objectUncast;
+
+		}
 
 	}
 
@@ -162,44 +174,50 @@ class ObjectHelperUpdateImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"update");
+		try (
 
-		if (
-			! objectModel.objectClass ().isInstance (
-				objectUncast)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"update");
+
 		) {
 
-			throw new ClassCastException (
-				stringFormat (
-					"Can't update %s as %s",
-					objectUncast.getClass ().getSimpleName (),
-					objectModel.objectClass ().getSimpleName ()));
+			if (
+				! objectModel.objectClass ().isInstance (
+					objectUncast)
+			) {
 
-		}
+				throw new ClassCastException (
+					stringFormat (
+						"Can't update %s as %s",
+						objectUncast.getClass ().getSimpleName (),
+						objectModel.objectClass ().getSimpleName ()));
 
-		RecordType object =
-			genericCastUnchecked (
-				objectUncast);
+			}
 
-		objectDatabaseHelper.update (
-			object);
+			RecordType object =
+				genericCastUnchecked (
+					objectUncast);
 
-		for (
-			ObjectHelper<?> childObjectHelper
-				: objectManager.objectHelpers ()
-		) {
-
-			childObjectHelper.createSingletons (
-				taskLogger,
-				objectHelper,
+			objectDatabaseHelper.update (
 				object);
 
-		}
+			for (
+				ObjectHelper<?> childObjectHelper
+					: objectManager.objectHelpers ()
+			) {
 
-		return objectUncast;
+				childObjectHelper.createSingletons (
+					taskLogger,
+					objectHelper,
+					object);
+
+			}
+
+			return objectUncast;
+
+		}
 
 	}
 

@@ -100,16 +100,22 @@ class QueueSupervisorItemsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderParameterTable (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderContentTable (
-			taskLogger);
+		) {
+
+			renderParameterTable (
+				taskLogger);
+
+			renderContentTable (
+				taskLogger);
+
+		}
 
 	}
 
@@ -117,27 +123,33 @@ class QueueSupervisorItemsPart
 	void renderParameterTable (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderParameterTable");
+		try (
 
-		// open table
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderParameterTable");
 
-		htmlTableOpenDetails ();
+		) {
 
-		// write user table row
+			// open table
 
-		htmlTableDetailsRowWriteRaw (
-			"User",
-			() ->
-				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					user));
+			htmlTableOpenDetails ();
 
-		// close table
+			// write user table row
 
-		htmlTableClose ();
+			htmlTableDetailsRowWriteRaw (
+				"User",
+				() ->
+					objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						user));
+
+			// close table
+
+			htmlTableClose ();
+
+		}
 
 	}
 
@@ -145,77 +157,83 @@ class QueueSupervisorItemsPart
 	void renderContentTable (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderContentTable");
+		try (
 
-		// open table
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderContentTable");
 
-		htmlTableOpenList ();
-
-		// write table header
-
-		htmlTableHeaderRowWrite (
-			"Object",
-			"Queue",
-			"Item",
-			"Created",
-			"Pending",
-			"Processed");
-
-		// write table contents
-
-		for (
-			QueueItemRec queueItem
-				: queueItems
 		) {
 
-			QueueRec queue =
-				ifNotNullThenElse (
-					queueItem.getQueueSubject (),
-					() -> queueItem.getQueueSubject ().getQueue (),
-					() -> queueItem.getQueue ());
+			// open table
 
-			Record <?> parent =
-				objectManager.getParentRequired (
+			htmlTableOpenList ();
+
+			// write table header
+
+			htmlTableHeaderRowWrite (
+				"Object",
+				"Queue",
+				"Item",
+				"Created",
+				"Pending",
+				"Processed");
+
+			// write table contents
+
+			for (
+				QueueItemRec queueItem
+					: queueItems
+			) {
+
+				QueueRec queue =
+					ifNotNullThenElse (
+						queueItem.getQueueSubject (),
+						() -> queueItem.getQueueSubject ().getQueue (),
+						() -> queueItem.getQueue ());
+
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
+
+				// open table row
+
+				htmlTableRowOpen ();
+
+				objectManager.writeTdForObjectLink (
+					taskLogger,
+					parent);
+
+				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					queue,
+					parent);
+
+				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					queueItem,
 					queue);
 
-			// open table row
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithTimezoneString (
+						queueItem.getCreatedTime ()));
 
-			htmlTableRowOpen ();
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithTimezoneString (
+						queueItem.getPendingTime ()));
 
-			objectManager.writeTdForObjectLink (
-				taskLogger,
-				parent);
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithTimezoneString (
+						queueItem.getProcessedTime ()));
 
-			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				queue,
-				parent);
+				htmlTableRowClose ();
 
-			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				queueItem,
-				queue);
+			}
 
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithTimezoneString (
-					queueItem.getCreatedTime ()));
-
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithTimezoneString (
-					queueItem.getPendingTime ()));
-
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithTimezoneString (
-					queueItem.getProcessedTime ()));
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

@@ -37,44 +37,50 @@ class DaemonRunner {
 			@NonNull List <String> arguments)
 		throws InterruptedException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runDaemon");
+		try (
 
-		taskLogger.noticeFormat (
-			"Daemon started");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runDaemon");
 
-		SDNotify.sendNotify ();
+		) {
 
-		try {
+			taskLogger.noticeFormat (
+				"Daemon started");
 
-			Instant restartTime =
-				Instant.now ().plus (
-					restartFrequency.getMillis ()
-					- restartFrequencyDeviation.getMillis ()
-					+ randomLogic.randomInteger (
-						restartFrequencyDeviation.getMillis () * 2));
+			SDNotify.sendNotify ();
 
-			while (
-				earlierThan (
-					Instant.now (),
-					restartTime)
-			) {
+			try {
 
-				Thread.sleep (1000);
+				Instant restartTime =
+					Instant.now ().plus (
+						restartFrequency.getMillis ()
+						- restartFrequencyDeviation.getMillis ()
+						+ randomLogic.randomInteger (
+							restartFrequencyDeviation.getMillis () * 2));
 
-				SDNotify.sendWatchdog ();
+				while (
+					earlierThan (
+						Instant.now (),
+						restartTime)
+				) {
+
+					Thread.sleep (1000);
+
+					SDNotify.sendWatchdog ();
+
+				}
+
+				taskLogger.noticeFormat (
+					"Automatic periodic restart");
+
+			} finally {
+
+				taskLogger.noticeFormat (
+					"Daemon shutting down");
 
 			}
-
-			taskLogger.noticeFormat (
-				"Automatic periodic restart");
-
-		} finally {
-
-			taskLogger.noticeFormat (
-				"Daemon shutting down");
 
 		}
 

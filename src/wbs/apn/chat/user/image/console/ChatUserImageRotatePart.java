@@ -64,167 +64,173 @@ class ChatUserImageRotatePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (chatUser.getChatUserImageList ().isEmpty ()) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
+		) {
+
+			if (chatUser.getChatUserImageList ().isEmpty ()) {
+
+				formatWriter.writeLineFormat (
+					"<p>No photo to rotate</p>");
+
+				return;
+
+			}
+
+			htmlFormOpenPost ();
 
 			formatWriter.writeLineFormat (
-				"<p>No photo to rotate</p>");
+				"<input",
+				" type=\"hidden\"",
+				" name=\"chatUserImageId\"",
+				" value=\"%h\"",
+				integerToDecimalString (
+					chatUser.getChatUserImageList ().get (0).getId ()),
+				">");
 
-			return;
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"",
+				"Image",
+				"Rotation");
+
+			// no rotation
+
+			htmlTableRowOpen ();
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"radio\"",
+				" name=\"rotate\"",
+				" value=\"0\"",
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
+
+			mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
+				chatUser.getChatUserImageList ().get (0).getMedia ());
+
+			htmlTableCellClose ();
+
+			formatWriter.writeLineFormat (
+				"<td>Original image</td>");
+
+			htmlTableRowClose ();
+
+			// rotate 90 degrees clockwise
+
+			htmlTableRowOpen ();
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"radio\"",
+				" name=\"rotate\"",
+				" value=\"90\"",
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
+
+			mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
+				chatUser.getChatUserImageList ().get (0).getMedia (),
+				"90");
+
+			htmlTableCellClose ();
+
+			formatWriter.writeLineFormat (
+				"<td>90 degrees clockwise</td>");
+
+
+			htmlTableRowClose ();
+
+			// rotate 180 degrees
+
+			htmlTableRowOpen ();
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"radio\"",
+				" name=\"rotate\"",
+				" value=\"180\"",
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
+
+			mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
+				chatUser.getChatUserImageList ().get (0).getMedia (),
+				"180");
+
+			htmlTableCellClose ();
+
+			formatWriter.writeLineFormat (
+				"<td>180 degrees</td>");
+
+			htmlTableRowClose ();
+
+			// rotate 90 degrees counter-clockwise
+
+			htmlTableRowOpen ();
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"radio\"",
+				" name=\"rotate\"",
+				" value=\"270\"",
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
+
+			mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
+				chatUser.getChatUserImageList ().get (0).getMedia (),
+				"270");
+
+			htmlTableCellClose ();
+
+			formatWriter.writeLineFormat (
+				"<td>90 degrees counter-clockwise</td>");
+
+			htmlTableRowClose ();
+
+			// end form
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"rotate image\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 		}
-
-		htmlFormOpenPost ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"chatUserImageId\"",
-			" value=\"%h\"",
-			integerToDecimalString (
-				chatUser.getChatUserImageList ().get (0).getId ()),
-			">");
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Image",
-			"Rotation");
-
-		// no rotation
-
-		htmlTableRowOpen ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"radio\"",
-			" name=\"rotate\"",
-			" value=\"0\"",
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		mediaConsoleLogic.writeMediaThumb100 (
-			taskLogger,
-			chatUser.getChatUserImageList ().get (0).getMedia ());
-
-		htmlTableCellClose ();
-
-		formatWriter.writeLineFormat (
-			"<td>Original image</td>");
-
-		htmlTableRowClose ();
-
-		// rotate 90 degrees clockwise
-
-		htmlTableRowOpen ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"radio\"",
-			" name=\"rotate\"",
-			" value=\"90\"",
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		mediaConsoleLogic.writeMediaThumb100 (
-			taskLogger,
-			chatUser.getChatUserImageList ().get (0).getMedia (),
-			"90");
-
-		htmlTableCellClose ();
-
-		formatWriter.writeLineFormat (
-			"<td>90 degrees clockwise</td>");
-
-
-		htmlTableRowClose ();
-
-		// rotate 180 degrees
-
-		htmlTableRowOpen ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"radio\"",
-			" name=\"rotate\"",
-			" value=\"180\"",
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		mediaConsoleLogic.writeMediaThumb100 (
-			taskLogger,
-			chatUser.getChatUserImageList ().get (0).getMedia (),
-			"180");
-
-		htmlTableCellClose ();
-
-		formatWriter.writeLineFormat (
-			"<td>180 degrees</td>");
-
-		htmlTableRowClose ();
-
-		// rotate 90 degrees counter-clockwise
-
-		htmlTableRowOpen ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"radio\"",
-			" name=\"rotate\"",
-			" value=\"270\"",
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		mediaConsoleLogic.writeMediaThumb100 (
-			taskLogger,
-			chatUser.getChatUserImageList ().get (0).getMedia (),
-			"270");
-
-		htmlTableCellClose ();
-
-		formatWriter.writeLineFormat (
-			"<td>90 degrees counter-clockwise</td>");
-
-		htmlTableRowClose ();
-
-		// end form
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"rotate image\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
 
 	}
 

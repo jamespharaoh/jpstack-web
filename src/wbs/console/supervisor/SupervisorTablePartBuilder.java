@@ -70,27 +70,33 @@ class SupervisorTablePartBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		PagePartFactory pagePartFactory =
-			nextTaskLogger ->
-				supervisorTablePartProvider.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.supervisorTablePartBuilder (
-				SupervisorTablePartBuilder.this);
+		) {
 
-		supervisorConfigBuilder.pagePartFactories ().add (
-			pagePartFactory);
+			PagePartFactory pagePartFactory =
+				nextTaskLogger ->
+					supervisorTablePartProvider.get ()
 
-		builder.descend (
-			taskLogger,
-			spec,
-			spec.builders (),
-			this,
-			MissingBuilderBehaviour.ignore);
+				.supervisorTablePartBuilder (
+					SupervisorTablePartBuilder.this);
+
+			supervisorConfigBuilder.pagePartFactories ().add (
+				pagePartFactory);
+
+			builder.descend (
+				taskLogger,
+				spec,
+				spec.builders (),
+				this,
+				MissingBuilderBehaviour.ignore);
+
+		}
 
 	}
 

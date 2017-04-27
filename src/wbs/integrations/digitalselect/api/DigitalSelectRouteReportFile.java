@@ -4,7 +4,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -15,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -65,56 +64,53 @@ class DigitalSelectRouteReportFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doPost");
-
-		Long routeId =
-			requestContext.requestIntegerRequired (
-				"routeId");
-
-		String msgidParam =
-			requestContext.parameterRequired (
-				"msgid");
-
-		String statParam =
-			requestContext.parameterRequired (
-				"stat");
-
-		// debugging
-
-		requestContext.debugDump (
-			taskLogger);
-
-		// sanity checks
-
-		if (! messageStatusCodes.containsKey (statParam)) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Unrecognised result: %s",
-					statParam));
-
-		}
-
-		MessageStatus newMessageStatus =
-			messageStatusCodes.get (statParam);
-
-		// start transaction
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doPost");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"DigitalSelectRouteReportFile.doPost ()",
 					this);
 
 		) {
+
+			Long routeId =
+				requestContext.requestIntegerRequired (
+					"routeId");
+
+			String msgidParam =
+				requestContext.parameterRequired (
+					"msgid");
+
+			String statParam =
+				requestContext.parameterRequired (
+					"stat");
+
+			// debugging
+
+			requestContext.debugDump (
+				taskLogger);
+
+			// sanity checks
+
+			if (! messageStatusCodes.containsKey (statParam)) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unrecognised result: %s",
+						statParam));
+
+			}
+
+			MessageStatus newMessageStatus =
+				messageStatusCodes.get (statParam);
 
 			DigitalSelectRouteOutRec digitalSelectRouteOut =
 				digitalSelectRouteOutHelper.findRequired (

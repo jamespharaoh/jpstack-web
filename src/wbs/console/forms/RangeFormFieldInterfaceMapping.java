@@ -62,96 +62,102 @@ class RangeFormFieldInterfaceMapping <
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"genericToInterface");
+		try (
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToInterface");
+
 		) {
 
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// get minimum
+
+			Either <Optional <Interface>, String> leftResult =
+				itemMapping.genericToInterface (
+					taskLogger,
+					container,
+					hints,
+					Optional.of (
+						genericValue.get ().getMinimum ()));
+
+			if (
+				isError (
+					leftResult)
+			) {
+
+				return errorResult (
+					getError (
+						leftResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						leftResult))
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// get maximum
+
+			Either <Optional <Interface>, String> rightResult =
+				itemMapping.genericToInterface (
+					taskLogger,
+					container,
+					hints,
+					optionalOf (
+						genericValue.get ().getMaximum ()));
+
+			if (
+				isError (
+					rightResult)
+			) {
+
+				return errorResult (
+					getError (
+						rightResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						rightResult))
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// return
+
 			return successResult (
-				optionalAbsent ());
-
-		}
-
-		// get minimum
-
-		Either <Optional <Interface>, String> leftResult =
-			itemMapping.genericToInterface (
-				taskLogger,
-				container,
-				hints,
 				Optional.of (
-					genericValue.get ().getMinimum ()));
-
-		if (
-			isError (
-				leftResult)
-		) {
-
-			return errorResult (
-				getError (
-					leftResult));
+					Range.between (
+						optionalGetRequired (
+							resultValueRequired (
+								leftResult)),
+						optionalGetRequired (
+							resultValueRequired (
+								rightResult)))));
 
 		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					leftResult))
-		) {
-
-			return successResult (
-				optionalAbsent ());
-
-		}
-
-		// get maximum
-
-		Either <Optional <Interface>, String> rightResult =
-			itemMapping.genericToInterface (
-				taskLogger,
-				container,
-				hints,
-				optionalOf (
-					genericValue.get ().getMaximum ()));
-
-		if (
-			isError (
-				rightResult)
-		) {
-
-			return errorResult (
-				getError (
-					rightResult));
-
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					rightResult))
-		) {
-
-			return successResult (
-				Optional.absent ());
-
-		}
-
-		// return
-
-		return successResult (
-			Optional.of (
-				Range.between (
-					optionalGetRequired (
-						resultValueRequired (
-							leftResult)),
-					optionalGetRequired (
-						resultValueRequired (
-							rightResult)))));
 
 	}
 

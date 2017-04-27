@@ -81,17 +81,23 @@ class CoreTitledResponder
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		super.setup (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		pagePart.setup (
-			taskLogger,
-			emptyMap ());
+		) {
+
+			super.setup (
+				taskLogger);
+
+			pagePart.setup (
+				taskLogger,
+				emptyMap ());
+
+		}
 
 	}
 
@@ -100,47 +106,53 @@ class CoreTitledResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		if (pagePart != null) {
+		) {
 
-			try {
+			super.prepare (
+				taskLogger);
 
-				pagePart.prepare (
-					taskLogger);
+			if (pagePart != null) {
 
-			} catch (RuntimeException exception) {
+				try {
 
-				// record the exception
+					pagePart.prepare (
+						taskLogger);
 
-				String path =
-					stringFormat (
-						"%s%s",
-						requestContext.servletPath (),
-						optionalOrEmptyString (
-							requestContext.pathInfo ()));
+				} catch (RuntimeException exception) {
 
-				exceptionLogger.logThrowable (
-					taskLogger,
-					"console",
-					path,
-					exception,
-					userConsoleLogic.userId (),
-					GenericExceptionResolution.ignoreWithUserWarning);
+					// record the exception
 
-				// and remember we had a problem
+					String path =
+						stringFormat (
+							"%s%s",
+							requestContext.servletPath (),
+							optionalOrEmptyString (
+								requestContext.pathInfo ()));
 
-				pagePartThrew =
-					exception;
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"console",
+						path,
+						exception,
+						userConsoleLogic.userId (),
+						GenericExceptionResolution.ignoreWithUserWarning);
 
-				requestContext.addError (
-					"Internal error");
+					// and remember we had a problem
+
+					pagePartThrew =
+						exception;
+
+					requestContext.addError (
+						"Internal error");
+
+				}
 
 			}
 
@@ -153,24 +165,30 @@ class CoreTitledResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		formatWriter.writeLineFormat (
-			"<link",
-			" rel=\"stylesheet\"",
-			" href=\"%h\"",
-			requestContext.resolveApplicationUrl (
-				"/style/basic.css"),
-			">");
+		) {
 
-		pagePart.renderHtmlHeadContent (
-			taskLogger);
+			super.renderHtmlHeadContents (
+				taskLogger);
+
+			formatWriter.writeLineFormat (
+				"<link",
+				" rel=\"stylesheet\"",
+				" href=\"%h\"",
+				requestContext.resolveApplicationUrl (
+					"/style/basic.css"),
+				">");
+
+			pagePart.renderHtmlHeadContent (
+				taskLogger);
+
+		}
 
 	}
 
@@ -183,42 +201,48 @@ class CoreTitledResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		htmlHeadingOneWrite (
-			title);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		requestContext.flushNotices (
-			formatWriter);
+		) {
 
-		if (pagePartThrew != null) {
+			htmlHeadingOneWrite (
+				title);
 
-			htmlParagraphWriteFormat (
-				"Unable to show page contents.");
+			requestContext.flushNotices (
+				formatWriter);
 
-			if (
-				privChecker.canRecursive (
-					taskLogger,
-					GlobalId.root,
-					"debug")
-			) {
+			if (pagePartThrew != null) {
 
-				htmlParagraphWriteHtml (
-					stringFormat (
-						"<pre>%h</pre>",
-						exceptionLogic.throwableDump (
-							taskLogger,
-							pagePartThrew)));
+				htmlParagraphWriteFormat (
+					"Unable to show page contents.");
+
+				if (
+					privChecker.canRecursive (
+						taskLogger,
+						GlobalId.root,
+						"debug")
+				) {
+
+					htmlParagraphWriteHtml (
+						stringFormat (
+							"<pre>%h</pre>",
+							exceptionLogic.throwableDump (
+								taskLogger,
+								pagePartThrew)));
+
+				}
+
+			} else if (pagePart != null) {
+
+				pagePart.renderHtmlBodyContent (
+					taskLogger);
 
 			}
-
-		} else if (pagePart != null) {
-
-			pagePart.renderHtmlBodyContent (
-				taskLogger);
 
 		}
 

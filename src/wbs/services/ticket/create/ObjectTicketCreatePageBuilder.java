@@ -143,30 +143,36 @@ class ObjectTicketCreatePageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				container.taskLogger (),
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					container.taskLogger (),
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -174,21 +180,27 @@ class ObjectTicketCreatePageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildTab");
+		try (
 
-		consoleModule.addContextTab (
-			taskLogger,
-			container.tabLocation (),
-			contextTabProvider.get ()
-				.name (tabName)
-				.defaultLabel (tabLabel)
-				.localFile (localFile),
-			hideTab
-				? Collections.<String>emptyList ()
-				: resolvedExtensionPoint.contextTypeNames ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
+
+		) {
+
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
+				contextTabProvider.get ()
+					.name (tabName)
+					.defaultLabel (tabLabel)
+					.localFile (localFile),
+				hideTab
+					? Collections.<String>emptyList ()
+					: resolvedExtensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -310,91 +322,97 @@ class ObjectTicketCreatePageBuilder
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		name =
-			spec.name ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		typeCode =
-			spec.typeCode ();
+		) {
 
-		tabName =
-			ifNull (
-				spec.tabName (),
-				stringFormat (
-					"%s.create",
-					container.pathPrefix ()));
+			name =
+				spec.name ();
 
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%sCreateResponder",
-					container.newBeanNamePrefix ()));
+			typeCode =
+				spec.typeCode ();
 
-		targetContextTypeName =
-			"Ticket";
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.create",
+						container.pathPrefix ()));
 
-		targetResponderName =
-			"TicketSettingsResponder";
+			responderName =
+				ifNull (
+					spec.responderName (),
+					stringFormat (
+						"%sCreateResponder",
+						container.newBeanNamePrefix ()));
 
-		createPrivDelegate =
-			spec.createPrivDelegate ();
+			targetContextTypeName =
+				"Ticket";
 
-		createPrivCode =
-			"ticket.create";
+			targetResponderName =
+				"TicketSettingsResponder";
 
-		tabLabel =
-			"Create ticket";
+			createPrivDelegate =
+				spec.createPrivDelegate ();
 
-		localFile =
-			ifNull (
-				spec.localFile (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			createPrivCode =
+				"ticket.create";
 
-		hideTab =
-			spec.hideTab ();
+			tabLabel =
+				"Create ticket";
 
-		consoleHelper =
-				container.consoleHelper ();
+			localFile =
+				ifNull (
+					spec.localFile (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		tabName =
-			ifNull (
-				spec.tabName (),
-				stringFormat (
-					"%s.create",
-					container.pathPrefix ()));
+			hideTab =
+				spec.hideTab ();
+
+			consoleHelper =
+					container.consoleHelper ();
+
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.create",
+						container.pathPrefix ()));
 
 
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%sCreateResponder",
-					container.newBeanNamePrefix ()));
+			responderName =
+				ifNull (
+					spec.responderName (),
+					stringFormat (
+						"%sCreateResponder",
+						container.newBeanNamePrefix ()));
 
-		ticketManagerPath =
-			spec.ticketManager ();
+			ticketManagerPath =
+				spec.ticketManager ();
 
-		if (spec.fieldsProviderName () != null) {
+			if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						taskLogger,
-						spec.fieldsProviderName (),
-						FieldsProvider.class));
+				fieldsProvider =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							spec.fieldsProviderName (),
+							FieldsProvider.class));
+
+			}
+
+			ticketFields =
+				spec.ticketFields;
 
 		}
-
-		ticketFields =
-			spec.ticketFields;
 
 	}
 

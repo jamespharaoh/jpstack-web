@@ -60,24 +60,30 @@ class ChainedFormFieldNativeMapping<Container,Generic,Temporary,Native>
 			@NonNull Container container,
 			@NonNull Optional <Generic> genericValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"genericToNative");
+		try (
 
-		Optional <Temporary> temporaryValue =
-			previousMapping.genericToNative (
-				taskLogger,
-				container,
-				genericValue);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToNative");
 
-		Optional <Native> nativeValue =
-			nextMapping.genericToNative (
-				taskLogger,
-				container,
-				temporaryValue);
+		) {
 
-		return nativeValue;
+			Optional <Temporary> temporaryValue =
+				previousMapping.genericToNative (
+					taskLogger,
+					container,
+					genericValue);
+
+			Optional <Native> nativeValue =
+				nextMapping.genericToNative (
+					taskLogger,
+					container,
+					temporaryValue);
+
+			return nativeValue;
+
+		}
 
 	}
 

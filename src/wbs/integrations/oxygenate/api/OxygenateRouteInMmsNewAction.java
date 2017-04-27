@@ -37,7 +37,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.TaskLogger;
@@ -117,95 +117,101 @@ class OxygenateRouteInMmsNewAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processRequest");
+		try (
 
-		// read request
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequest");
 
-		byte[] requestBytes =
-			requestContext.requestBodyRaw ();
-
-		String requestString =
-			utf8ToString (
-				requestBytes);
-
-		debugWriter.writeLineFormat (
-			"===== REQUEST BODY =====");
-
-		debugWriter.writeNewline ();
-
-		debugWriter.writeString (
-			stringTrim (
-				requestString));
-
-		debugWriter.writeNewline ();
-		debugWriter.writeNewline ();
-
-		// decode request
-
-		try {
-
-			request =
-				genericCastUnchecked (
-					requestFromXml.readInputStream (
-						taskLogger,
-						new ByteArrayInputStream (
-							requestBytes),
-						"oxygen8-route-in-mms-new.xml"));
-
-		} catch (LoggedErrorsException loggedErrorsException) {
-
-			throw new HttpUnprocessableEntityException (
-				"Unable to interpret MMS request",
-				emptyList ());
-
-		}
-
-		// simple verification
-
-		if (
-			stringNotEqualSafe (
-				request.type (),
-				"MMS")
 		) {
 
-			taskLogger.errorFormat (
-				"Invalid value for type attribute: %s",
-				request.type ());
+			// read request
 
-		}
+			byte[] requestBytes =
+				requestContext.requestBodyRaw ();
 
-		for (
-			OxygenateRouteInMmsNewRequest.Attachment attachment
-				: request.attachments ()
-		) {
+			String requestString =
+				utf8ToString (
+					requestBytes);
 
-			if (
-				stringNotInSafe (
-					attachment.encoding (),
-					"base64",
-					"text")
-			) {
+			debugWriter.writeLineFormat (
+				"===== REQUEST BODY =====");
 
-				taskLogger.errorFormat (
-					"Invalid value for 'Encoding' attribute: %s",
-					attachment.encoding ());
+			debugWriter.writeNewline ();
+
+			debugWriter.writeString (
+				stringTrim (
+					requestString));
+
+			debugWriter.writeNewline ();
+			debugWriter.writeNewline ();
+
+			// decode request
+
+			try {
+
+				request =
+					genericCastUnchecked (
+						requestFromXml.readInputStream (
+							taskLogger,
+							new ByteArrayInputStream (
+								requestBytes),
+							"oxygen8-route-in-mms-new.xml"));
+
+			} catch (LoggedErrorsException loggedErrorsException) {
+
+				throw new HttpUnprocessableEntityException (
+					"Unable to interpret MMS request",
+					emptyList ());
 
 			}
 
+			// simple verification
+
+			if (
+				stringNotEqualSafe (
+					request.type (),
+					"MMS")
+			) {
+
+				taskLogger.errorFormat (
+					"Invalid value for type attribute: %s",
+					request.type ());
+
+			}
+
+			for (
+				OxygenateRouteInMmsNewRequest.Attachment attachment
+					: request.attachments ()
+			) {
+
+				if (
+					stringNotInSafe (
+						attachment.encoding (),
+						"base64",
+						"text")
+				) {
+
+					taskLogger.errorFormat (
+						"Invalid value for 'Encoding' attribute: %s",
+						attachment.encoding ());
+
+				}
+
+			}
+
+			// check for errors
+
+			taskLogger.makeException (
+				() -> new HttpUnprocessableEntityException (
+					stringFormat (
+						"Unable to process request due to %s errors",
+						integerToDecimalString (
+							taskLogger.errorCount ())),
+					emptyList ()));
+
 		}
-
-		// check for errors
-
-		taskLogger.makeException (
-			() -> new HttpUnprocessableEntityException (
-				stringFormat (
-					"Unable to process request due to %s errors",
-					integerToDecimalString (
-						taskLogger.errorCount ())),
-				emptyList ()));
 
 	}
 
@@ -214,16 +220,14 @@ class OxygenateRouteInMmsNewAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (
@@ -330,9 +334,9 @@ class OxygenateRouteInMmsNewAction
 
 			transaction.commit ();
 
-		}
+			success = true;
 
-		success = true;
+		}
 
 	}
 
@@ -365,14 +369,14 @@ class OxygenateRouteInMmsNewAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",
@@ -417,44 +421,50 @@ class OxygenateRouteInMmsNewAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OxygenateRouteInMmsNewRequest.Attachment attachment) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processAttachment");
+		try (
 
-		if (
-			stringEqualSafe (
-				attachment.encoding (),
-				"text")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processAttachment");
+
 		) {
 
-			return mediaLogic.createTextMedia (
-				taskLogger,
-				attachment.content (),
-				attachment.contentType (),
-				attachment.fileName ());
+			if (
+				stringEqualSafe (
+					attachment.encoding (),
+					"text")
+			) {
 
-		} else if (
-			stringEqualSafe (
-				attachment.encoding (),
-				"base64")
-		) {
+				return mediaLogic.createTextMedia (
+					taskLogger,
+					attachment.content (),
+					attachment.contentType (),
+					attachment.fileName ());
 
-			byte[] attachmentContent =
-				bytesFromBase64 (
-					attachment.content ());
+			} else if (
+				stringEqualSafe (
+					attachment.encoding (),
+					"base64")
+			) {
 
-			return mediaLogic.createMediaRequired (
-				taskLogger,
-				attachmentContent,
-				attachment.contentType (),
-				attachment.fileName (),
-				optionalOf (
-					"utf8"));
+				byte[] attachmentContent =
+					bytesFromBase64 (
+						attachment.content ());
 
-		} else {
+				return mediaLogic.createMediaRequired (
+					taskLogger,
+					attachmentContent,
+					attachment.contentType (),
+					attachment.fileName (),
+					optionalOf (
+						"utf8"));
 
-			throw shouldNeverHappen ();
+			} else {
+
+				throw shouldNeverHappen ();
+
+			}
 
 		}
 

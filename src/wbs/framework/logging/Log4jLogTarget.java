@@ -16,12 +16,24 @@ import lombok.NonNull;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+
+@PrototypeComponent ("log4jLogTarget")
 public
 class Log4jLogTarget
 	implements LogTarget {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// state
+
 	private final
 	Logger logger;
+
 	// data
 
 	public final static
@@ -66,6 +78,7 @@ class Log4jLogTarget
 	@Override
 	public
 	void writeToLog (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull LogSeverity severity,
 			@NonNull String message,
 			@NonNull Optional <Throwable> exception) {

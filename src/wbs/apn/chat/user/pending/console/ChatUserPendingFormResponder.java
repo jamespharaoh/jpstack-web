@@ -203,15 +203,21 @@ class ChatUserPendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		renderScriptBlock ();
+		) {
+
+			super.renderHtmlHeadContents (
+				taskLogger);
+
+			renderScriptBlock ();
+
+		}
 
 	}
 
@@ -257,474 +263,480 @@ class ChatUserPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		htmlHeadingOneWrite (
-			"Chat user—approve info");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		requestContext.flushNotices (
-			formatWriter);
+		) {
 
-		// form open
+			htmlHeadingOneWrite (
+				"Chat user—approve info");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrlFormat (
-				"/chatUser.pending",
-				"/%u",
-				integerToDecimalString (
-					chatUser.getId ()),
-				"/chatUser.pending.form"));
+			requestContext.flushNotices (
+				formatWriter);
 
-		if (mode == PendingMode.none) {
+			// form open
 
-			htmlParagraphWrite (
-				"No info to approve");
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrlFormat (
+					"/chatUser.pending",
+					"/%u",
+					integerToDecimalString (
+						chatUser.getId ()),
+					"/chatUser.pending.form"));
 
-			if (
-				privChecker.canRecursive (
-					taskLogger,
-					GlobalId.root,
-					"manage")
-			) {
+			if (mode == PendingMode.none) {
 
-				htmlParagraphOpen ();
+				htmlParagraphWrite (
+					"No info to approve");
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"chatUserDismiss\"",
-					" value=\"dismiss queue item\"",
-					">");
+				if (
+					privChecker.canRecursive (
+						taskLogger,
+						GlobalId.root,
+						"manage")
+				) {
 
-				htmlParagraphClose ();
+					htmlParagraphOpen ();
 
-			}
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" name=\"chatUserDismiss\"",
+						" value=\"dismiss queue item\"",
+						">");
 
-		} else {
+					htmlParagraphClose ();
 
-			htmlTableOpenDetails ();
+				}
 
-			htmlTableDetailsRowWrite (
-				"User",
-				stringFormat (
-					"%s/%s",
-					chatUser.getChat ().getCode (),
-					chatUser.getCode ()));
+			} else {
 
-			htmlTableDetailsRowWriteHtml (
-				"Options",
-				() -> {
+				htmlTableOpenDetails ();
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" type=\"button\"",
-					" value=\"approve\"",
-					" onclick=\"showPhoto ()\"",
-					">");
-
-				formatWriter.writeLineFormat (
-					"<input",
-					" type=\"button\"",
-					" value=\"reject\"",
-					" onclick=\"showReject ()\"",
-					">");
-
-			});
-
-			switch (mode) {
-
-			case name:
+				htmlTableDetailsRowWrite (
+					"User",
+					stringFormat (
+						"%s/%s",
+						chatUser.getChat ().getCode (),
+						chatUser.getCode ()));
 
 				htmlTableDetailsRowWriteHtml (
-					"Name",
-					() -> formatWriter.writeLineFormat (
-						"<textarea",
-						" name=\"name\"",
-						" rows=\"4\"",
-						" cols=\"48\"",
-						">%h</textarea>",
-						chatUser
-							.getNewChatUserName ()
-							.getOriginalName ()),
-					htmlIdAttribute (
-						"photoRow"));
+					"Options",
+					() -> {
 
-				break;
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"button\"",
+						" value=\"approve\"",
+						" onclick=\"showPhoto ()\"",
+						">");
 
-			case info:
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"button\"",
+						" value=\"reject\"",
+						" onclick=\"showReject ()\"",
+						">");
 
-				htmlTableDetailsRowWriteHtml (
-					"Info",
-					() -> formatWriter.writeLineFormat (
-						"<textarea",
-						" name=\"info\"",
-						" rows=\"4\"",
-						" cols=\"48\"",
-						">%h</textarea>",
-						chatUser
-							.getNewChatUserInfo ()
-							.getOriginalText ()
-							.getText ()),
-					htmlIdAttribute (
-						"photoRow"));
+				});
 
-				break;
+				switch (mode) {
 
-			case image:
+				case name:
 
-				ChatUserImageRec image =
-					chatUserLogic.chatUserPendingImage (
-						chatUser,
-						ChatUserImageType.image);
+					htmlTableDetailsRowWriteHtml (
+						"Name",
+						() -> formatWriter.writeLineFormat (
+							"<textarea",
+							" name=\"name\"",
+							" rows=\"4\"",
+							" cols=\"48\"",
+							">%h</textarea>",
+							chatUser
+								.getNewChatUserName ()
+								.getOriginalName ()),
+						htmlIdAttribute (
+							"photoRow"));
+
+					break;
+
+				case info:
+
+					htmlTableDetailsRowWriteHtml (
+						"Info",
+						() -> formatWriter.writeLineFormat (
+							"<textarea",
+							" name=\"info\"",
+							" rows=\"4\"",
+							" cols=\"48\"",
+							">%h</textarea>",
+							chatUser
+								.getNewChatUserInfo ()
+								.getOriginalText ()
+								.getText ()),
+						htmlIdAttribute (
+							"photoRow"));
+
+					break;
+
+				case image:
+
+					ChatUserImageRec image =
+						chatUserLogic.chatUserPendingImage (
+							chatUser,
+							ChatUserImageType.image);
+
+					htmlTableRowOpen (
+						htmlIdAttribute (
+							"photoRow"));
+
+					htmlTableHeaderCellWrite (
+						"Photo");
+
+					htmlTableCellOpen ();
+
+					mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						image.getMedia ());
+
+					htmlTableCellClose ();
+
+					htmlTableRowClose ();
+
+					break;
+
+				case video:
+
+					ChatUserImageRec video =
+						chatUserLogic.chatUserPendingImage (
+							chatUser,
+							ChatUserImageType.video);
+
+					htmlTableRowOpen (
+						htmlIdAttribute (
+							"photoRow"));
+
+					htmlTableHeaderRowWrite (
+						"Video");
+
+					htmlTableCellOpen ();
+
+					mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						video.getMedia ());
+
+					htmlTableCellClose ();
+
+					htmlTableRowClose ();
+
+					break;
+
+				case audio:
+
+					htmlTableRowOpen (
+						htmlIdAttribute (
+							"photoRow"));
+
+					htmlTableHeaderRowWrite (
+						"Audio");
+
+					htmlTableCellWrite (
+						"(audio)");
+
+					htmlTableRowClose ();
+
+					break;
+
+				default:
+
+					doNothing ();
+
+				}
+
+				// media
+
+				if (
+					enumInSafe (
+						mode,
+						PendingMode.image,
+						PendingMode.video,
+						PendingMode.audio)
+				) {
+
+					ChatUserImageRec chatUserImage =
+						chatUserLogic.chatUserPendingImage (
+							chatUser,
+							chatUserLogic.imageTypeForMode (mode));
+
+					htmlTableRowOpen (
+						htmlIdAttribute (
+							"classificationRow"));
+
+					htmlTableHeaderCellWrite (
+						"Classification");
+
+					htmlTableCellOpen ();
+
+					htmlSelectOpen (
+						"classification");
+
+					htmlOptionWrite (
+						"primary",
+						requestContext.formOrEmptyString (
+							"classification"),
+						"primary");
+
+					if (
+
+						chatUserImage.getAppend ()
+
+						|| stringEqualSafe (
+							chatUser.getChat ().getCode (),
+							"adult")
+
+					) {
+
+						htmlOptionWrite (
+							"secondary",
+							requestContext.formOrEmptyString (
+								"classification"),
+							"secondary");
+
+					}
+
+					if (
+						chatUserImage.getAppend ()
+					) {
+
+						htmlOptionWrite (
+							"landscape",
+							requestContext.formOrEmptyString (
+								"classification"),
+							"landscape");
+
+					}
+
+					htmlSelectClose ();
+
+					htmlTableCellClose ();
+
+					htmlTableRowClose ();
+
+				}
+
+				// template
 
 				htmlTableRowOpen (
 					htmlIdAttribute (
-						"photoRow"));
+						"templateRow"),
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"display",
+							"none")));
 
 				htmlTableHeaderCellWrite (
-					"Photo");
-
-				htmlTableCellOpen ();
-
-				mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					image.getMedia ());
-
-				htmlTableCellClose ();
-
-				htmlTableRowClose ();
-
-				break;
-
-			case video:
-
-				ChatUserImageRec video =
-					chatUserLogic.chatUserPendingImage (
-						chatUser,
-						ChatUserImageType.video);
-
-				htmlTableRowOpen (
-					htmlIdAttribute (
-						"photoRow"));
-
-				htmlTableHeaderRowWrite (
-					"Video");
-
-				htmlTableCellOpen ();
-
-				mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					video.getMedia ());
-
-				htmlTableCellClose ();
-
-				htmlTableRowClose ();
-
-				break;
-
-			case audio:
-
-				htmlTableRowOpen (
-					htmlIdAttribute (
-						"photoRow"));
-
-				htmlTableHeaderRowWrite (
-					"Audio");
-
-				htmlTableCellWrite (
-					"(audio)");
-
-				htmlTableRowClose ();
-
-				break;
-
-			default:
-
-				doNothing ();
-
-			}
-
-			// media
-
-			if (
-				enumInSafe (
-					mode,
-					PendingMode.image,
-					PendingMode.video,
-					PendingMode.audio)
-			) {
-
-				ChatUserImageRec chatUserImage =
-					chatUserLogic.chatUserPendingImage (
-						chatUser,
-						chatUserLogic.imageTypeForMode (mode));
-
-				htmlTableRowOpen (
-					htmlIdAttribute (
-						"classificationRow"));
-
-				htmlTableHeaderCellWrite (
-					"Classification");
+					"Template");
 
 				htmlTableCellOpen ();
 
 				htmlSelectOpen (
-					"classification");
+					htmlIdAttribute (
+						"templateId"));
 
 				htmlOptionWrite (
-					"primary",
-					requestContext.formOrEmptyString (
-						"classification"),
-					"primary");
+					"");
 
-				if (
-
-					chatUserImage.getAppend ()
-
-					|| stringEqualSafe (
-						chatUser.getChat ().getCode (),
-						"adult")
-
+				for (
+					ChatHelpTemplateRec chatelpTemplate
+						: chatHelpTemplates
 				) {
 
 					htmlOptionWrite (
-						"secondary",
-						requestContext.formOrEmptyString (
-							"classification"),
-						"secondary");
-
-				}
-
-				if (
-					chatUserImage.getAppend ()
-				) {
-
-					htmlOptionWrite (
-						"landscape",
-						requestContext.formOrEmptyString (
-							"classification"),
-						"landscape");
+						integerToDecimalString (
+							chatelpTemplate.getId ()),
+						chatelpTemplate.getCode ());
 
 				}
 
 				htmlSelectClose ();
 
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"button\"",
+					" onclick=\"useTemplate ()\"",
+					" value=\"ok\"",
+					">");
+
 				htmlTableCellClose ();
 
 				htmlTableRowClose ();
 
-			}
+				// message
 
-			// template
+				htmlTableRowOpen (
+					htmlIdAttribute (
+						"messageRow"),
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"display",
+							"none")));
 
-			htmlTableRowOpen (
-				htmlIdAttribute (
-					"templateRow"),
-				htmlStyleAttribute (
-					htmlStyleRuleEntry (
-						"display",
-						"none")));
+				htmlTableHeaderCellWrite (
+					"Message");
 
-			htmlTableHeaderCellWrite (
-				"Template");
-
-			htmlTableCellOpen ();
-
-			htmlSelectOpen (
-				htmlIdAttribute (
-					"templateId"));
-
-			htmlOptionWrite (
-				"");
-
-			for (
-				ChatHelpTemplateRec chatelpTemplate
-					: chatHelpTemplates
-			) {
-
-				htmlOptionWrite (
-					integerToDecimalString (
-						chatelpTemplate.getId ()),
-					chatelpTemplate.getCode ());
-
-			}
-
-			htmlSelectClose ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" onclick=\"useTemplate ()\"",
-				" value=\"ok\"",
-				">");
-
-			htmlTableCellClose ();
-
-			htmlTableRowClose ();
-
-			// message
-
-			htmlTableRowOpen (
-				htmlIdAttribute (
-					"messageRow"),
-				htmlStyleAttribute (
-					htmlStyleRuleEntry (
-						"display",
-						"none")));
-
-			htmlTableHeaderCellWrite (
-				"Message");
-
-			htmlTableCellOpen ();
-
-			formatWriter.writeLineFormat (
-				"<textarea",
-				" id=\"message\"",
-				" name=\"message\"",
-				" rows=\"4\"",
-				" cols=\"48\"",
-				"></textarea>");
-
-			htmlTableCellClose ();
-
-			htmlTableRowClose ();
-
-			// actions
-
-			htmlTableRowOpen ();
-
-			htmlTableHeaderCellWrite (
-				"Actions");
-
-			htmlTableCellOpen ();
-
-			switch (mode) {
-
-			case name:
+				htmlTableCellOpen ();
 
 				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"approveButton\"",
-					" type=\"submit\"",
-					" name=\"chatUserNameApprove\"",
-					" value=\"approve name\"",
-					">");
+					"<textarea",
+					" id=\"message\"",
+					" name=\"message\"",
+					" rows=\"4\"",
+					" cols=\"48\"",
+					"></textarea>");
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"rejectButton\"",
-					" style=\"display: none\"",
-					" type=\"submit\"",
-					" name=\"chatUserNameReject\"",
-					" value=\"reject name and send warning\"",
-					">");
+				htmlTableCellClose ();
 
-				break;
+				htmlTableRowClose ();
 
-			case info:
+				// actions
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"approveButton\"",
-					" type=\"submit\"",
-					" name=\"chatUserInfoApprove\"",
-					" value=\"approve info\"",
-					">");
+				htmlTableRowOpen ();
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"rejectButton\"",
-					" style=\"display: none\"",
-					" type=\"submit\"",
-					" name=\"chatUserInfoReject\"",
-					" value=\"reject info and send warning\"",
-					">");
+				htmlTableHeaderCellWrite (
+					"Actions");
 
-				break;
+				htmlTableCellOpen ();
 
-			case image:
+				switch (mode) {
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"approveButton\"",
-					" type=\"submit\"",
-					" name=\"chatUserImageApprove\"",
-					" value=\"approve photo\"",
-					">");
+				case name:
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"rejectButton\"",
-					" style=\"display: none\"",
-					" type=\"submit\"",
-					" name=\"chatUserImageReject\"",
-					" value=\"reject photo and send warning\"",
-					">");
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"approveButton\"",
+						" type=\"submit\"",
+						" name=\"chatUserNameApprove\"",
+						" value=\"approve name\"",
+						">");
 
-				break;
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"rejectButton\"",
+						" style=\"display: none\"",
+						" type=\"submit\"",
+						" name=\"chatUserNameReject\"",
+						" value=\"reject name and send warning\"",
+						">");
 
-			case video:
+					break;
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"approveButton\"",
-					" type=\"submit\"",
-					" name=\"chatUserVideoApprove\"",
-					" value=\"approve video\"",
-					">");
+				case info:
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"rejectButton\"",
-					" style=\"display: none\"",
-					" type=\"submit\"",
-					" name=\"chatUserVideoReject\"",
-					" value=\"reject video and send warning\"",
-					">");
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"approveButton\"",
+						" type=\"submit\"",
+						" name=\"chatUserInfoApprove\"",
+						" value=\"approve info\"",
+						">");
 
-				break;
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"rejectButton\"",
+						" style=\"display: none\"",
+						" type=\"submit\"",
+						" name=\"chatUserInfoReject\"",
+						" value=\"reject info and send warning\"",
+						">");
 
-			case audio:
+					break;
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"approveButton\"",
-					" type=\"submit\"",
-					" name=\"chatUserAudioApprove\"",
-					" value=\"approve audio\"",
-					">");
+				case image:
 
-				formatWriter.writeLineFormat (
-					"<input",
-					" id=\"rejectButton\"",
-					" style=\"display: none\"",
-					" type=\"submit\"",
-					" name=\"chatUserAudioReject\"",
-					" value=\"reject audio and send warning\"",
-					">");
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"approveButton\"",
+						" type=\"submit\"",
+						" name=\"chatUserImageApprove\"",
+						" value=\"approve photo\"",
+						">");
 
-				break;
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"rejectButton\"",
+						" style=\"display: none\"",
+						" type=\"submit\"",
+						" name=\"chatUserImageReject\"",
+						" value=\"reject photo and send warning\"",
+						">");
 
-			default:
+					break;
 
-				// do nothing
+				case video:
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"approveButton\"",
+						" type=\"submit\"",
+						" name=\"chatUserVideoApprove\"",
+						" value=\"approve video\"",
+						">");
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"rejectButton\"",
+						" style=\"display: none\"",
+						" type=\"submit\"",
+						" name=\"chatUserVideoReject\"",
+						" value=\"reject video and send warning\"",
+						">");
+
+					break;
+
+				case audio:
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"approveButton\"",
+						" type=\"submit\"",
+						" name=\"chatUserAudioApprove\"",
+						" value=\"approve audio\"",
+						">");
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"rejectButton\"",
+						" style=\"display: none\"",
+						" type=\"submit\"",
+						" name=\"chatUserAudioReject\"",
+						" value=\"reject audio and send warning\"",
+						">");
+
+					break;
+
+				default:
+
+					// do nothing
+
+				}
+
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
+
+				htmlTableClose ();
 
 			}
 
-			htmlTableCellClose ();
+			// form close
 
-			htmlTableRowClose ();
-
-			htmlTableClose ();
+			htmlFormClose ();
 
 		}
-
-		// form close
-
-		htmlFormClose ();
 
 	}
 

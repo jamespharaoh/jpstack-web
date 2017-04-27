@@ -107,43 +107,49 @@ class QueueListActivePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		List <QueueInfo> queueInfosTemp =
-			queueSubjectSorterProvider.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-			.queueCache (
-				dummyQueueCache)
-
-			.loggedInUser (
-				userConsoleLogic.userRequired ())
-
-			.sort (
-				taskLogger)
-
-			.availableQueues ();
-
-		queueInfos =
-			new ArrayList <> ();
-
-		for (
-			QueueInfo queueInfo
-				: queueInfosTemp
 		) {
 
-			if (
-				! objectManager.canView (
-					taskLogger,
-					queueInfo.queue ())
-			) {
-				continue;
-			}
+			List <QueueInfo> queueInfosTemp =
+				queueSubjectSorterProvider.get ()
 
-			queueInfos.add (
-				queueInfo);
+				.queueCache (
+					dummyQueueCache)
+
+				.loggedInUser (
+					userConsoleLogic.userRequired ())
+
+				.sort (
+					taskLogger)
+
+				.availableQueues ();
+
+			queueInfos =
+				new ArrayList <> ();
+
+			for (
+				QueueInfo queueInfo
+					: queueInfosTemp
+			) {
+
+				if (
+					! objectManager.canView (
+						taskLogger,
+						queueInfo.queue ())
+				) {
+					continue;
+				}
+
+				queueInfos.add (
+					queueInfo);
+
+			}
 
 		}
 
@@ -154,149 +160,155 @@ class QueueListActivePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		ConsoleContextType queueContextType =
-			consoleManager.contextType (
-				"queue:object",
-				true);
-
-		ConsoleContext queueContext =
-			consoleManager.relatedContextRequired (
-				taskLogger,
-				requestContext.consoleContextRequired (),
-				queueContextType);
-
-		htmlTableHeaderRowWrite (
-			"Object",
-			"Queue",
-			"Available",
-			null,
-			"Claimed",
-			null,
-			"Preferred",
-			null,
-			"Waiting",
-			null,
-			"Total",
-			null);
-
-		for (
-			QueueInfo queueInfo
-				: queueInfos
 		) {
 
-			QueueRec queue =
-				queueInfo.queue ();
+			htmlTableOpenList ();
 
-			// table row open
+			ConsoleContextType queueContextType =
+				consoleManager.contextType (
+					"queue:object",
+					true);
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"magic-table-row"),
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveContextUrlFormat (
-						"%s",
-						queueContext.pathPrefix (),
-						"/%u",
-						integerToDecimalString (
-							queue.getId ()))));
+			ConsoleContext queueContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					queueContextType);
 
-			// details
+			htmlTableHeaderRowWrite (
+				"Object",
+				"Queue",
+				"Available",
+				null,
+				"Claimed",
+				null,
+				"Preferred",
+				null,
+				"Waiting",
+				null,
+				"Total",
+				null);
 
-			htmlTableCellWrite (
-				objectManager.objectPath (
-					objectManager.getParentRequired (
-						queue)));
+			for (
+				QueueInfo queueInfo
+					: queueInfos
+			) {
 
-			htmlTableCellWrite (
-				queue.getCode ());
+				QueueRec queue =
+					queueInfo.queue ();
 
-			// available
+				// table row open
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.availableItems ()));
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"magic-table-row"),
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveContextUrlFormat (
+							"%s",
+							queueContext.pathPrefix (),
+							"/%u",
+							integerToDecimalString (
+								queue.getId ()))));
 
-			htmlTableCellWrite (
-				ifThenElseEmDash (
-					moreThanZero (
-						queueInfo.availableItems ()),
-					() -> timeFormatter.prettyDuration (
-						queueInfo.oldestAvailable (),
-						transaction.now ())));
+				// details
 
-			// claimed
+				htmlTableCellWrite (
+					objectManager.objectPath (
+						objectManager.getParentRequired (
+							queue)));
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.claimedItems ()));
+				htmlTableCellWrite (
+					queue.getCode ());
 
-			htmlTableCellWrite (
-				ifThenElseEmDash (
-					moreThanZero (
-						queueInfo.claimedItems ()),
-					() -> timeFormatter.prettyDuration (
-						queueInfo.oldestClaimed (),
-						transaction.now ())));
+				// available
 
-			// preferred
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.availableItems ()));
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.totalUnavailableItems ()));
+				htmlTableCellWrite (
+					ifThenElseEmDash (
+						moreThanZero (
+							queueInfo.availableItems ()),
+						() -> timeFormatter.prettyDuration (
+							queueInfo.oldestAvailable (),
+							transaction.now ())));
 
-			htmlTableCellWrite (
-				ifThenElseEmDash (
-					moreThanZero (
-						queueInfo.totalUnavailableItems ()),
-					() -> timeFormatter.prettyDuration (
-						queueInfo.oldestUnavailable (),
-						transaction.now ())));
+				// claimed
 
-			// waiting
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.claimedItems ()));
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.waitingItems ()));
+				htmlTableCellWrite (
+					ifThenElseEmDash (
+						moreThanZero (
+							queueInfo.claimedItems ()),
+						() -> timeFormatter.prettyDuration (
+							queueInfo.oldestClaimed (),
+							transaction.now ())));
 
-			htmlTableCellWrite (
-				ifThenElseEmDash (
-					moreThanZero (
-						queueInfo.waitingItems ()),
-					() -> timeFormatter.prettyDuration (
-						queueInfo.oldestWaiting (),
-						transaction.now ())));
+				// preferred
 
-			// total
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.totalUnavailableItems ()));
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.totalItems ()));
+				htmlTableCellWrite (
+					ifThenElseEmDash (
+						moreThanZero (
+							queueInfo.totalUnavailableItems ()),
+						() -> timeFormatter.prettyDuration (
+							queueInfo.oldestUnavailable (),
+							transaction.now ())));
 
-			htmlTableCellWrite (
-				ifThenElseEmDash (
-					moreThanZero (
-						queueInfo.totalItems ()),
-					() -> timeFormatter.prettyDuration (
-						queueInfo.oldest (),
-						transaction.now ())));
+				// waiting
 
-			// table row close
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.waitingItems ()));
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					ifThenElseEmDash (
+						moreThanZero (
+							queueInfo.waitingItems ()),
+						() -> timeFormatter.prettyDuration (
+							queueInfo.oldestWaiting (),
+							transaction.now ())));
+
+				// total
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.totalItems ()));
+
+				htmlTableCellWrite (
+					ifThenElseEmDash (
+						moreThanZero (
+							queueInfo.totalItems ()),
+						() -> timeFormatter.prettyDuration (
+							queueInfo.oldest (),
+							transaction.now ())));
+
+				// table row close
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

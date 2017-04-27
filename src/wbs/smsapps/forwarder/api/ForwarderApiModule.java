@@ -4,8 +4,10 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -40,7 +42,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -145,17 +147,25 @@ class ForwarderApiModule
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		initRpcHandlers ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		initActions ();
+		) {
 
-		initFiles (
-			taskLogger);
+			initRpcHandlers (
+				taskLogger);
+
+			initActions (
+				taskLogger);
+
+			initFiles (
+				taskLogger);
+
+		}
 
 	}
 
@@ -163,111 +173,117 @@ class ForwarderApiModule
 	void initFiles (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initFiles");
+		try (
 
-		files =
-			ImmutableMap.<String, WebFile> builder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initFiles");
 
-			.put (
-				"/forwarder/control",
-				apiFile.get ()
+		) {
 
-				.getActionName (
-					taskLogger,
-					"forwarderInAction")
+			files =
+				ImmutableMap.<String, WebFile> builder ()
 
-				.postActionName (
-					taskLogger,
-					"forwarderInAction")
+				.put (
+					"/forwarder/control",
+					apiFile.get ()
 
-			)
+					.getActionName (
+						taskLogger,
+						"forwarderInAction")
 
-			.put (
-				"/forwarder/in",
-				apiFile.get ()
+					.postActionName (
+						taskLogger,
+						"forwarderInAction")
 
-				.getActionName (
-					taskLogger,
-					"forwarderInAction")
+				)
 
-				.postActionName (
-					taskLogger,
-					"forwarderInAction")
+				.put (
+					"/forwarder/in",
+					apiFile.get ()
 
-			)
+					.getActionName (
+						taskLogger,
+						"forwarderInAction")
 
-			.put (
-				"/forwarder/out",
-				apiFile.get ()
+					.postActionName (
+						taskLogger,
+						"forwarderInAction")
 
-				.getActionName (
-					taskLogger,
-					"forwarderOutAction")
+				)
 
-				.postActionName (
-					taskLogger,
-					"forwarderOutAction")
+				.put (
+					"/forwarder/out",
+					apiFile.get ()
 
-			)
+					.getActionName (
+						taskLogger,
+						"forwarderOutAction")
 
-			// ---------- php
+					.postActionName (
+						taskLogger,
+						"forwarderOutAction")
 
-			.put (
-				"/forwarder/php/send",
-				apiFile.get ()
-					.postApiAction (sendPhpAction))
+				)
 
-			.put (
-				"/forwarder/php/sendEx",
-				apiFile.get ()
-					.postApiAction (sendExPhpAction))
+				// ---------- php
 
-			.put (
-				"/forwarder/php/queryEx",
-				apiFile.get ()
-					.postApiAction (queryExPhpAction))
+				.put (
+					"/forwarder/php/send",
+					apiFile.get ()
+						.postApiAction (sendPhpAction))
 
-			.put (
-				"/forwarder/php/peekEx",
-				apiFile.get ()
-					.postApiAction (peekExPhpAction))
+				.put (
+					"/forwarder/php/sendEx",
+					apiFile.get ()
+						.postApiAction (sendExPhpAction))
 
-			.put (
-				"/forwarder/php/unqueueEx",
-				apiFile.get ()
-					.postApiAction (unqueueExPhpAction))
+				.put (
+					"/forwarder/php/queryEx",
+					apiFile.get ()
+						.postApiAction (queryExPhpAction))
 
-			// ---------- xml
+				.put (
+					"/forwarder/php/peekEx",
+					apiFile.get ()
+						.postApiAction (peekExPhpAction))
 
-			.put (
-				"/forwarder/xml/send",
-				apiFile.get ()
-					.postApiAction (sendXmlAction))
+				.put (
+					"/forwarder/php/unqueueEx",
+					apiFile.get ()
+						.postApiAction (unqueueExPhpAction))
 
-			.put (
-				"/forwarder/xml/sendEx",
-				apiFile.get ()
-					.postApiAction (sendExXmlAction))
+				// ---------- xml
 
-			.put (
-				"/forwarder/xml/queryEx",
-				apiFile.get ()
-					.postApiAction (queryExXmlAction))
+				.put (
+					"/forwarder/xml/send",
+					apiFile.get ()
+						.postApiAction (sendXmlAction))
 
-			.put (
-				"/forwarder/xml/peekEx",
-				apiFile.get ()
-					.postApiAction (peekExXmlAction))
+				.put (
+					"/forwarder/xml/sendEx",
+					apiFile.get ()
+						.postApiAction (sendExXmlAction))
 
-			.put (
-				"/forwarder/xml/unqueueEx",
-				apiFile.get ()
-					.postApiAction (unqueueExXmlAction))
+				.put (
+					"/forwarder/xml/queryEx",
+					apiFile.get ()
+						.postApiAction (queryExXmlAction))
 
-			.build ();
+				.put (
+					"/forwarder/xml/peekEx",
+					apiFile.get ()
+						.postApiAction (peekExXmlAction))
+
+				.put (
+					"/forwarder/xml/unqueueEx",
+					apiFile.get ()
+						.postApiAction (unqueueExXmlAction))
+
+				.build ();
+
+		}
 
 	}
 
@@ -280,27 +296,39 @@ class ForwarderApiModule
 		peekExRpcHandler;
 
 	private
-	void initRpcHandlers () {
+	void initRpcHandlers (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		sendRpcHandler =
-			new RpcHandlerFactory (
-				SendRpcHandler.class,
-				this);
+		try (
 
-		sendExRpcHandler =
-			new RpcHandlerFactory (
-				SendExRpcHandler.class,
-				this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initRpcHandlers");
 
-		queryExRpcHandler =
-			new RpcHandlerFactory (
-				QueryExRpcHandler.class,
-				this);
+		) {
 
-		peekExRpcHandler =
-			new RpcHandlerFactory (
-				PeekExRpcHandler.class,
-				this);
+			sendRpcHandler =
+				new RpcHandlerFactory (
+					SendRpcHandler.class,
+					this);
+
+			sendExRpcHandler =
+				new RpcHandlerFactory (
+					SendExRpcHandler.class,
+					this);
+
+			queryExRpcHandler =
+				new RpcHandlerFactory (
+					QueryExRpcHandler.class,
+					this);
+
+			peekExRpcHandler =
+				new RpcHandlerFactory (
+					PeekExRpcHandler.class,
+					this);
+
+		}
 
 	}
 
@@ -321,51 +349,63 @@ class ForwarderApiModule
 		unqueueExXmlAction;
 
 	private
-	void initActions () {
+	void initActions (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// php
+		try (
 
-		sendPhpAction =
-			phpRpcAction.get ().rpcHandler (
-				sendRpcHandler);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initActions");
 
-		sendExPhpAction =
-			phpRpcAction.get ().rpcHandler (
-				sendExRpcHandler);
+		) {
 
-		queryExPhpAction =
-			phpRpcAction.get ().rpcHandler (
-				queryExRpcHandler);
+			// php
 
-		peekExPhpAction =
-			phpRpcAction.get ().rpcHandler (
-				peekExRpcHandler);
+			sendPhpAction =
+				phpRpcAction.get ().rpcHandler (
+					sendRpcHandler);
 
-		unqueueExPhpAction =
-			phpRpcAction.get ().rpcHandlerName (
-				"forwarderUnqueueExRpcHandler");
+			sendExPhpAction =
+				phpRpcAction.get ().rpcHandler (
+					sendExRpcHandler);
 
-		// xml
+			queryExPhpAction =
+				phpRpcAction.get ().rpcHandler (
+					queryExRpcHandler);
 
-		sendXmlAction =
-			xmlRpcAction.get ().rpcHandler (
-				sendRpcHandler);
+			peekExPhpAction =
+				phpRpcAction.get ().rpcHandler (
+					peekExRpcHandler);
 
-		sendExXmlAction =
-			xmlRpcAction.get ().rpcHandler (
-				sendExRpcHandler);
+			unqueueExPhpAction =
+				phpRpcAction.get ().rpcHandlerName (
+					"forwarderUnqueueExRpcHandler");
 
-		queryExXmlAction =
-			xmlRpcAction.get ().rpcHandler (
-				queryExRpcHandler);
+			// xml
 
-		peekExXmlAction =
-			xmlRpcAction.get ().rpcHandler (
-				peekExRpcHandler);
+			sendXmlAction =
+				xmlRpcAction.get ().rpcHandler (
+					sendRpcHandler);
 
-		unqueueExXmlAction =
-			xmlRpcAction.get ().rpcHandlerName (
-				"forwarderUnqueueExRpcHandler");
+			sendExXmlAction =
+				xmlRpcAction.get ().rpcHandler (
+					sendExRpcHandler);
+
+			queryExXmlAction =
+				xmlRpcAction.get ().rpcHandler (
+					queryExRpcHandler);
+
+			peekExXmlAction =
+				xmlRpcAction.get ().rpcHandler (
+					peekExRpcHandler);
+
+			unqueueExXmlAction =
+				xmlRpcAction.get ().rpcHandlerName (
+					"forwarderUnqueueExRpcHandler");
+
+		}
 
 	}
 
@@ -460,7 +500,7 @@ class ForwarderApiModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"ForwarderApiModule.SendRpcHandler.handle (source)",
@@ -535,8 +575,8 @@ class ForwarderApiModule
 		void getParams (
 				RpcSource source) {
 
-			Map<String,Object> params =
-				forwarderApiLogic.unsafeMapStringObject (
+			Map <String, Object> params =
+				genericCastUnchecked (
 					source.obtain (
 						sendRequestDef,
 						errors,
@@ -593,14 +633,20 @@ class ForwarderApiModule
 		boolean checkTemplate (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"checkTemplate");
+			try (
 
-			return forwarderLogic.sendTemplateCheck (
-				taskLogger,
-				sendTemplate);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"checkTemplate");
+
+			) {
+
+				return forwarderLogic.sendTemplateCheck (
+					taskLogger,
+					sendTemplate);
+
+			}
 
 		}
 
@@ -608,14 +654,20 @@ class ForwarderApiModule
 		void sendTemplate (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"sendTemplate");
+			try (
 
-			forwarderLogic.sendTemplateSend (
-				taskLogger,
-				sendTemplate);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"sendTemplate");
+
+			) {
+
+				forwarderLogic.sendTemplateSend (
+					taskLogger,
+					sendTemplate);
+
+			}
 
 		}
 
@@ -865,7 +917,7 @@ class ForwarderApiModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"ForwarderApiModule.SendExRpcHandler.handle (source)",
@@ -932,79 +984,93 @@ class ForwarderApiModule
 				@NonNull List <Map <String, Object>> mpList)
 			throws ReportableException {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getMedias");
+			try (
 
-			Collection <MediaRec> medias =
-				new ArrayList<> ();
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"getMedias");
 
-			try {
+			) {
 
-				for (
-					Map <String, Object> mp
-						: mpList
-				) {
+				Collection <MediaRec> medias =
+					new ArrayList<> ();
 
-					String url = (String) mp.get("url");
+				try {
 
-					if (url == null)
-						throw new ReportableException ("Media url is null");
+					for (
+						Map <String, Object> mp
+							: mpList
+					) {
 
-					// process
+						String url = (String) mp.get("url");
 
-					String filename =
-						stringFormat (
-							"%s.jpeg",
-							integerToDecimalString (
-								url.hashCode ()));
+						if (url == null) {
 
-					medias.add (
-						mediaLogic.createMediaFromImageRequired (
-							taskLogger,
-							getImageContent (url),
-							"image/jpeg",
-							filename));
+							throw new ReportableException (
+								"Media url is null");
 
-					String message =
-						(String)
-						mp.get ("message");
+						}
 
-					if (message != null) {
+						// process
 
-						// TODO wtf is this?
-
-						char pound =
-							'\u00A3';
-
-						message =
-							message.replaceAll (
-								"&pound;",
-								"" + pound);
-
-						String txtFilename =
+						String filename =
 							stringFormat (
-								"%s.txt",
+								"%s.jpeg",
 								integerToDecimalString (
-									message.hashCode ()));
+									url.hashCode ()));
 
 						medias.add (
-							mediaLogic.createTextMedia (
+							mediaLogic.createMediaFromImageRequired (
 								taskLogger,
-								message,
-								"text/plain",
-								txtFilename));
+								getImageContent (url),
+								"image/jpeg",
+								filename));
+
+						String message =
+							(String)
+							mp.get ("message");
+
+						if (message != null) {
+
+							// TODO wtf is this?
+
+							char pound =
+								'\u00A3';
+
+							message =
+								message.replaceAll (
+									"&pound;",
+									"" + pound);
+
+							String txtFilename =
+								stringFormat (
+									"%s.txt",
+									integerToDecimalString (
+										message.hashCode ()));
+
+							medias.add (
+								mediaLogic.createTextMedia (
+									taskLogger,
+									message,
+									"text/plain",
+									txtFilename));
+
+						}
 
 					}
 
+				} catch (Exception e) {
+
+					throw new ReportableException (
+						e.getMessage ());
+
 				}
 
-			} catch (Exception e) {
-				throw new ReportableException(e.getMessage());
+				return medias;
+
 			}
 
-			return medias;
 		}
 
 		private
@@ -1023,24 +1089,46 @@ class ForwarderApiModule
 				yc.setReadTimeout (
 					30 * 1000);
 
-				InputStream inputStream =
-					yc.getInputStream ();
+				try (
 
-				BufferedInputStream bufferedInputStream =
-					new BufferedInputStream (inputStream);
+					InputStream inputStream =
+						yc.getInputStream ();
 
-				ByteArrayOutputStream byteArrayOutputStream =
-					new ByteArrayOutputStream();
+					BufferedInputStream bufferedInputStream =
+						new BufferedInputStream (inputStream);
 
-				byte[] buf = new byte[8192];
-				int numread;
-				while ((numread = bufferedInputStream.read(buf)) > 0) {
-					byteArrayOutputStream.write(buf, 0, numread);
+					ByteArrayOutputStream byteArrayOutputStream =
+						new ByteArrayOutputStream ();
+
+				) {
+
+					byte[] byteBuffer =
+						new byte [8192];
+
+					int numread;
+
+					while (
+						moreThanZero (
+							numread =
+								bufferedInputStream.read (
+									byteBuffer))
+					) {
+
+						byteArrayOutputStream.write (
+							byteBuffer,
+							0,
+							numread);
+
+					}
+
+					return byteArrayOutputStream.toByteArray ();
+
 				}
-				bufferedInputStream.close();
-				return byteArrayOutputStream.toByteArray();
+
 			} catch (Exception e) {
+
 				throw new ReportableException(e.getMessage());
+
 			}
 
 		}
@@ -1053,193 +1141,209 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getParams");
+			try (
 
-			Map <String, Object> params =
-				forwarderApiLogic.unsafeMapStringObject (
-					source.obtain (
-						sendExRequestDef,
-						errors,
-						true));
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"getParams");
 
-			allowPartial =
-				(Boolean)
-				params.get ("allow-partial");
+			) {
 
-			List<Map<String,Object>> messageChainPartList =
-				forwarderApiLogic.unsafeListMapStringObject (
-					params.get ("message-chains"));
+				Map <String, Object> params =
+					genericCastUnchecked (
+						source.obtain (
+							sendExRequestDef,
+							errors,
+							true));
 
-			if (messageChainPartList != null)
+				allowPartial =
+					(Boolean)
+					params.get (
+						"allow-partial");
 
-				for (
-					Map<String,Object> messageChainPart
-						: messageChainPartList
-				) {
-
-					SendExMessageChain sendExMessageChain =
-						new SendExMessageChain ();
-
-					messageChains.add (sendExMessageChain);
-
-					sendExMessageChain.replyToServerId =
-						(Long)
+				List <Map <String, Object>> messageChainPartList =
+					genericCastUnchecked (
 						params.get (
-							"reply-to-server-id");
+							"message-chains"));
 
-					List<Map<String,Object>> mpList =
-						forwarderApiLogic.unsafeListMapStringObject (
-							messageChainPart.get (
-								"unqueueExMessages"));
+				if (messageChainPartList != null) {
 
-					if (mpList != null)
+					for (
+						Map <String, Object> messageChainPart
+							: messageChainPartList
+					) {
 
-						for (Map<String,Object> mp
-								: mpList) {
+						SendExMessageChain sendExMessageChain =
+							new SendExMessageChain ();
 
-							SendExMessage sendExMessage =
-								new SendExMessage ();
+						messageChains.add (
+							sendExMessageChain);
 
-							sendExMessageChain.messages.add (
-								sendExMessage);
+						sendExMessageChain.replyToServerId =
+							genericCastUnchecked (
+								params.get (
+									"reply-to-server-id"));
 
-							sendExMessage.type =
-								(MessageTypeEnum)
-								mp.get ("type");
+						List <Map <String, Object>> mpList =
+							genericCastUnchecked (
+								messageChainPart.get (
+									"unqueueExMessages"));
 
-							sendExMessage.numTo =
-								(String)
-								mp.get ("num-to");
+						if (mpList != null) {
 
-							sendExMessage.numFrom =
-								(String)
-								mp.get ("num-from");
+							for (
+								Map <String, Object> mp
+									: mpList
+							) {
 
-							sendExMessage.message =
-								(String)
-								mp.get ("message");
+								SendExMessage sendExMessage =
+									new SendExMessage ();
 
-							char pound = '\u00A3';
+								sendExMessageChain.messages.add (
+									sendExMessage);
 
-							sendExMessage.message =
-								sendExMessage.message.replaceAll (
-									"&pound;", "" + pound);
+								sendExMessage.type =
+									(MessageTypeEnum)
+									mp.get ("type");
 
-							sendExMessage.url =
-								(String)
-								mp.get ("url");
+								sendExMessage.numTo =
+									(String)
+									mp.get ("num-to");
 
-							sendExMessage.clientId =
-								(String)
-								mp.get ("client-id");
+								sendExMessage.numFrom =
+									(String)
+									mp.get ("num-from");
 
-							sendExMessage.route =
-								(String)
-								mp.get ("route");
+								sendExMessage.message =
+									(String)
+									mp.get ("message");
 
-							sendExMessage.service =
-								(String)
-								mp.get ("service");
+								char pound = '\u00A3';
 
-							sendExMessage.pri =
-								(Long)
-								mp.get ("pri");
+								sendExMessage.message =
+									sendExMessage.message.replaceAll (
+										"&pound;", "" + pound);
 
-							sendExMessage.retryDays =
-								(Long)
-								mp.get ("retry-days");
+								sendExMessage.url =
+									(String)
+									mp.get ("url");
 
-							@SuppressWarnings ("unchecked")
-							Set<String> tagsTemp =
-								(Set<String>)
-								mp.get ("tags");
+								sendExMessage.clientId =
+									(String)
+									mp.get ("client-id");
 
-							sendExMessage.tags = tagsTemp;
+								sendExMessage.route =
+									(String)
+									mp.get ("route");
 
-							if (sendExMessage.type == MessageTypeEnum.mms) {
+								sendExMessage.service =
+									(String)
+									mp.get ("service");
 
-								try {
+								sendExMessage.pri =
+									(Long)
+									mp.get ("pri");
 
-									List<Map<String,Object>> mediaList =
-										forwarderApiLogic
-											.unsafeListMapStringObject (
+								sendExMessage.retryDays =
+									(Long)
+									mp.get ("retry-days");
+
+								Set <String> tagsTemp =
+									genericCastUnchecked (
+										mp.get ("tags"));
+
+								sendExMessage.tags = tagsTemp;
+
+								if (sendExMessage.type == MessageTypeEnum.mms) {
+
+									try {
+
+										List <Map <String, Object>> mediaList =
+											genericCastUnchecked (
 												mp.get ("medias"));
 
-									if (mediaList == null) {
+										if (mediaList == null) {
+
+											errors.add (
+												stringFormat (
+													"Must provide media list for ",
+													"mms type."));
+
+											break;
+
+										}
+
+										sendExMessage.medias =
+											getMedias (
+												taskLogger,
+												mediaList);
+
+										sendExMessage.subject =
+											sendExMessage.message;
+
+									} catch (ReportableException e) {
 
 										errors.add (
-											stringFormat (
-												"Must provide media list for ",
-												"mms type."));
-
-										break;
+											"Error: " + e.getMessage ());
 
 									}
 
-									sendExMessage.medias =
-										getMedias (
-											taskLogger,
-											mediaList);
+								}
 
-									sendExMessage.subject =
-										sendExMessage.message;
+								switch (sendExMessage.type) {
 
-								} catch (ReportableException e) {
+								case mms:
 
-									errors.add (
-										"Error: " + e.getMessage ());
+									if (sendExMessage.url != null) {
+
+										errors.add (
+											stringFormat (
+												"Parameter should not be set when ",
+												"message type is mms: url"));
+
+									}
+
+									break;
+
+								case sms:
+
+									if (sendExMessage.url != null) {
+
+										errors.add (
+											stringFormat (
+												"Parameter should not be set when ",
+												"message type is sms: url"));
+
+									}
+
+									break;
+
+								case wapPush:
+
+									if (sendExMessage.url == null) {
+
+										errors.add (
+											stringFormat (
+												"Parameter must be set when ",
+												"message type is wap push: url"));
+
+									}
+
+									break;
 
 								}
 
 							}
 
-							switch (sendExMessage.type) {
-
-							case mms:
-
-								if (sendExMessage.url != null) {
-
-									errors.add (
-										stringFormat (
-											"Parameter should not be set when ",
-											"message type is mms: url"));
-
-								}
-
-								break;
-
-							case sms:
-
-								if (sendExMessage.url != null) {
-
-									errors.add (
-										stringFormat (
-											"Parameter should not be set when ",
-											"message type is sms: url"));
-
-								}
-
-								break;
-
-							case wapPush:
-
-								if (sendExMessage.url == null) {
-
-									errors.add (
-										stringFormat (
-											"Parameter must be set when ",
-											"message type is wap push: url"));
-
-								}
-
-								break;
-
-							}
 						}
+
+					}
+
 				}
+
+			}
+
 		}
 
 		/**
@@ -1297,49 +1401,56 @@ class ForwarderApiModule
 		void checkTemplate (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"checkTemplate");
+			try (
 
-			for (
-				int index = 0;
-				index < messageChains.size ();
-				index ++
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"checkTemplate");
+
 			) {
 
-				SendExMessageChain sendExMessageChain =
-					messageChains.get (index);
-
-				// call sendTemplateCheck
-
-				if (
-					forwarderLogic.sendTemplateCheck (
-						taskLogger,
-						sendExMessageChain.sendTemplate)
+				for (
+					int index = 0;
+					index < messageChains.size ();
+					index ++
 				) {
 
-					someSuccess = true;
+					SendExMessageChain sendExMessageChain =
+						messageChains.get (index);
 
-					sendExMessageChain.ok = true;
+					// call sendTemplateCheck
 
-				} else {
+					if (
+						forwarderLogic.sendTemplateCheck (
+							taskLogger,
+							sendExMessageChain.sendTemplate)
+					) {
 
-					someFailed = true;
+						someSuccess = true;
 
-					if (firstError == null) {
+						sendExMessageChain.ok = true;
 
-						firstError =
-							sendExMessageChain.sendTemplate.sendError;
+					} else {
+
+						someFailed = true;
+
+						if (firstError == null) {
+
+							firstError =
+								sendExMessageChain.sendTemplate.sendError;
+
+						}
 
 					}
 
 				}
 
-			}
+				if (someFailed && ! allowPartial) {
+					cancel = true;
+				}
 
-			if (someFailed && ! allowPartial)
-				cancel = true;
+			}
 
 		}
 
@@ -1347,22 +1458,28 @@ class ForwarderApiModule
 		void sendTemplate (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"sendTemplate");
+			try (
 
-			for (
-				SendExMessageChain sendExMessasgeChain
-					: messageChains
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"sendTemplate");
+
 			) {
 
-				if (! sendExMessasgeChain.ok)
-					continue;
+				for (
+					SendExMessageChain sendExMessasgeChain
+						: messageChains
+				) {
 
-				forwarderLogic.sendTemplateSend (
-					taskLogger,
-					sendExMessasgeChain.sendTemplate);
+					if (! sendExMessasgeChain.ok)
+						continue;
+
+					forwarderLogic.sendTemplateSend (
+						taskLogger,
+						sendExMessasgeChain.sendTemplate);
+
+				}
 
 			}
 
@@ -1819,7 +1936,7 @@ class ForwarderApiModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"ForwarderApiModule.QueryExRpcHandler.handle (source)",
@@ -1867,20 +1984,21 @@ class ForwarderApiModule
 		void getParams (
 				RpcSource source) {
 
-			Map<String,Object> params =
-				forwarderApiLogic.unsafeMapStringObject (
+			Map <String, Object> params =
+				genericCastUnchecked (
 					source.obtain (
 						forwarderQueryExRequestDef,
 						errors,
 						true));
 
-			List<Map<String,Object>> mpList =
-				forwarderApiLogic.unsafeListMapStringObject (
+			List <Map <String, Object>> mpList =
+				genericCastUnchecked (
 					params.get (
 						"unqueueExMessages"));
 
-			if (mpList == null)
+			if (mpList == null) {
 				return;
+			}
 
 			for (
 				Map<String,Object> mp
@@ -2187,7 +2305,7 @@ class ForwarderApiModule
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						"ForwarderApiModule.PeekExRpcHandler.handle (source)",
@@ -2232,7 +2350,7 @@ class ForwarderApiModule
 				RpcSource source) {
 
 			Map <String, Object> params =
-				forwarderApiLogic.unsafeMapStringObject (
+				genericCastUnchecked (
 					source.obtain (
 						forwarderPeekExRequestDef,
 						errors,
@@ -2264,179 +2382,185 @@ class ForwarderApiModule
 		RpcResult makeSuccess (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"makeSuccess");
+			try (
 
-			RpcList messagesPart =
-				Rpc.rpcList (
-					"unqueueExMessages",
-					"message",
-					RpcType.rStructure);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"makeSuccess");
 
-			RpcList reportsPart =
-				Rpc.rpcList (
-					"reports",
-					"report",
-					RpcType.rStructure);
+			) {
 
-			RpcList advancedReportsPart =
-				Rpc.rpcList (
-					"advancedreports",
-					"advancedreport",
-					RpcType.rStructure);
+				RpcList messagesPart =
+					Rpc.rpcList (
+						"unqueueExMessages",
+						"message",
+						RpcType.rStructure);
 
-			// get a list of pending unqueueExMessages
+				RpcList reportsPart =
+					Rpc.rpcList (
+						"reports",
+						"report",
+						RpcType.rStructure);
 
-			if (getMessages) {
+				RpcList advancedReportsPart =
+					Rpc.rpcList (
+						"advancedreports",
+						"advancedreport",
+						RpcType.rStructure);
 
-				List <ForwarderMessageInRec> pendingMessageList =
-					forwarderMessageInHelper.findPendingLimit (
-						forwarder,
-						maxResults);
+				// get a list of pending unqueueExMessages
 
-				for (ForwarderMessageInRec forwarderMessageIn
-						: pendingMessageList) {
+				if (getMessages) {
 
-					RpcStructure message;
+					List <ForwarderMessageInRec> pendingMessageList =
+						forwarderMessageInHelper.findPendingLimit (
+							forwarder,
+							maxResults);
 
-					messagesPart.add (message =
+					for (ForwarderMessageInRec forwarderMessageIn
+							: pendingMessageList) {
 
-						Rpc.rpcStruct (
-							"message",
+						RpcStructure message;
 
-							Rpc.rpcElem (
-								"server-id",
-								forwarderMessageIn
-									.getId ()),
+						messagesPart.add (message =
 
-							Rpc.rpcElem (
-								"num-from",
-								forwarderMessageIn
-									.getMessage ()
-									.getNumFrom ()),
-
-							Rpc.rpcElem (
-								"num-to",
-								forwarderMessageIn
-									.getMessage ()
-									.getNumTo ()),
-
-							Rpc.rpcElem (
+							Rpc.rpcStruct (
 								"message",
-								forwarderMessageIn
-									.getMessage ()
-									.getText ()
-									.getText ())));
 
-					if (forwarderMessageIn
-							.getMessage ()
-							.getNetwork ()
-							.getId () != 0) {
+								Rpc.rpcElem (
+									"server-id",
+									forwarderMessageIn
+										.getId ()),
 
-						message.add (
-							Rpc.rpcElem (
-								"network-id",
-								forwarderMessageIn
-									.getMessage ()
-									.getNetwork ()
-									.getId ()));
+								Rpc.rpcElem (
+									"num-from",
+									forwarderMessageIn
+										.getMessage ()
+										.getNumFrom ()),
+
+								Rpc.rpcElem (
+									"num-to",
+									forwarderMessageIn
+										.getMessage ()
+										.getNumTo ()),
+
+								Rpc.rpcElem (
+									"message",
+									forwarderMessageIn
+										.getMessage ()
+										.getText ()
+										.getText ())));
+
+						if (forwarderMessageIn
+								.getMessage ()
+								.getNetwork ()
+								.getId () != 0) {
+
+							message.add (
+								Rpc.rpcElem (
+									"network-id",
+									forwarderMessageIn
+										.getMessage ()
+										.getNetwork ()
+										.getId ()));
+
+						}
 
 					}
 
 				}
 
-			}
+				// get a list of pending reports
 
-			// get a list of pending reports
+				if (getReports) {
 
-			if (getReports) {
+					List <ForwarderMessageOutRec> pendingReportList =
+						forwarderMessageOutHelper.findPendingLimit (
+							forwarder,
+							maxResults);
 
-				List <ForwarderMessageOutRec> pendingReportList =
-					forwarderMessageOutHelper.findPendingLimit (
-						forwarder,
-						maxResults);
+					// create the return data list
 
-				// create the return data list
+					for (
+						ForwarderMessageOutRec forwarderMessageOut
+							: pendingReportList
+					) {
 
-				for (
-					ForwarderMessageOutRec forwarderMessageOut
-						: pendingReportList
-				) {
+						taskLogger.debugFormat (
+							"fmo.id = %s",
+							integerToDecimalString (
+								forwarderMessageOut.getId ()));
 
-					taskLogger.debugFormat (
-						"fmo.id = %s",
-						integerToDecimalString (
-							forwarderMessageOut.getId ()));
+						ForwarderMessageOutReportRec forwarderMessageOutReport =
+							forwarderMessageOut.getReports ().get (
+								toJavaIntegerRequired (
+									forwarderMessageOut.getReportIndexPending ()));
 
-					ForwarderMessageOutReportRec forwarderMessageOutReport =
-						forwarderMessageOut.getReports ().get (
-							toJavaIntegerRequired (
-								forwarderMessageOut.getReportIndexPending ()));
+						ForwarderMessageStatus forwarderMessageStatus =
+							statusMap.get (
+								forwarderMessageOutReport.getNewMessageStatus ());
 
-					ForwarderMessageStatus forwarderMessageStatus =
-						statusMap.get (
-							forwarderMessageOutReport.getNewMessageStatus ());
+						RpcStructure struct =
+							Rpc.rpcStruct (
+								"report",
 
-					RpcStructure struct =
-						Rpc.rpcStruct (
-							"report",
+								Rpc.rpcElem (
+									"server-id",
+									forwarderMessageOut.getId ()),
 
-							Rpc.rpcElem (
-								"server-id",
-								forwarderMessageOut.getId ()),
+								Rpc.rpcElem (
+									"client-id",
+									forwarderMessageOut.getOtherId ()),
 
-							Rpc.rpcElem (
-								"client-id",
-								forwarderMessageOut.getOtherId ()),
+								Rpc.rpcElem (
+									"report-id",
+									forwarderMessageOutReport.getId ()),
 
-							Rpc.rpcElem (
-								"report-id",
-								forwarderMessageOutReport.getId ()),
+								Rpc.rpcElem (
+									"message-status",
+									forwarderMessageStatus.status),
 
-							Rpc.rpcElem (
-								"message-status",
-								forwarderMessageStatus.status),
+								Rpc.rpcElem (
+									"message-status-code",
+									forwarderMessageStatus.statusCode));
 
-							Rpc.rpcElem (
-								"message-status-code",
-								forwarderMessageStatus.statusCode));
+						if (advancedReporting != null && advancedReporting) {
 
-					if (advancedReporting != null && advancedReporting) {
+							struct.add (
+								Rpc.rpcElem (
+									"advanced-message-status",
+									forwarderMessageOutReport.getNewMessageStatus ()
+										.getOrdinal ()));
 
-						struct.add (
-							Rpc.rpcElem (
-								"advanced-message-status",
-								forwarderMessageOutReport.getNewMessageStatus ()
-									.getOrdinal ()));
+						}
+
+						reportsPart.add (struct);
 
 					}
 
-					reportsPart.add (struct);
-
 				}
 
-			}
+				// and return it in a map
 
-			// and return it in a map
+				if (advancedReporting != null && advancedReporting) {
 
-			if (advancedReporting != null && advancedReporting) {
+					return Rpc.rpcSuccess (
+						"forwarder-peek-ex-response",
+						"Success",
+						messagesPart,
+						reportsPart,
+						advancedReportsPart);
 
-				return Rpc.rpcSuccess (
-					"forwarder-peek-ex-response",
-					"Success",
-					messagesPart,
-					reportsPart,
-					advancedReportsPart);
+				} else {
 
-			} else {
+					return Rpc.rpcSuccess (
+						"forwarder-peek-ex-response",
+						"Success",
+						messagesPart,
+						reportsPart);
 
-				return Rpc.rpcSuccess (
-					"forwarder-peek-ex-response",
-					"Success",
-					messagesPart,
-					reportsPart);
+				}
 
 			}
 

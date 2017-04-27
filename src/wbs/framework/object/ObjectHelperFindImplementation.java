@@ -106,32 +106,38 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"search");
+		try (
 
-		List <Long> objectIds =
-			searchIds (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"search");
 
-		ImmutableList.Builder <RecordType> objectsBuilder =
-			ImmutableList.builder ();
-
-		for (
-			Long objectId
-				: objectIds
 		) {
 
-			objectsBuilder.add (
-				optionalOrNull (
-					objectHelper.find (
-						objectId)));
+			List <Long> objectIds =
+				searchIds (
+					taskLogger,
+					search);
+
+			ImmutableList.Builder <RecordType> objectsBuilder =
+				ImmutableList.builder ();
+
+			for (
+				Long objectId
+					: objectIds
+			) {
+
+				objectsBuilder.add (
+					optionalOrNull (
+						objectHelper.find (
+							objectId)));
+
+			}
+
+			return objectsBuilder.build ();
 
 		}
-
-		return objectsBuilder.build ();
 
 	}
 
@@ -141,66 +147,72 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchIds");
+		try (
 
-		Class <?> searchClass;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchIds");
 
-		if (search instanceof Map) {
+		) {
 
-			searchClass =
-				Map.class;
+			Class <?> searchClass;
 
-		} else {
+			if (search instanceof Map) {
 
-			searchClass =
-				search.getClass ();
-
-		}
-
-		Method searchIdsMethod =
-			methodGetRequired (
-				objectModel.daoImplementation ().getClass (),
-				"searchIds",
-				ImmutableList.of (
-					TaskLogger.class,
-					searchClass));
-
-		try {
-
-			List <Long> objectIds =
-				genericCastUnchecked (
-					searchIdsMethod.invoke (
-						objectModel.daoImplementation (),
-						taskLogger,
-						search));
-
-			return objectIds;
-
-		} catch (InvocationTargetException exception) {
-
-			Throwable targetException =
-				exception.getTargetException ();
-
-			if (targetException instanceof RuntimeException) {
-
-				throw
-					(RuntimeException)
-					targetException;
+				searchClass =
+					Map.class;
 
 			} else {
+
+				searchClass =
+					search.getClass ();
+
+			}
+
+			Method searchIdsMethod =
+				methodGetRequired (
+					objectModel.daoImplementation ().getClass (),
+					"searchIds",
+					ImmutableList.of (
+						TaskLogger.class,
+						searchClass));
+
+			try {
+
+				List <Long> objectIds =
+					genericCastUnchecked (
+						searchIdsMethod.invoke (
+							objectModel.daoImplementation (),
+							taskLogger,
+							search));
+
+				return objectIds;
+
+			} catch (InvocationTargetException exception) {
+
+				Throwable targetException =
+					exception.getTargetException ();
+
+				if (targetException instanceof RuntimeException) {
+
+					throw
+						(RuntimeException)
+						targetException;
+
+				} else {
+
+					throw new RuntimeException (
+						exception);
+
+				}
+
+			} catch (IllegalAccessException exception) {
 
 				throw new RuntimeException (
 					exception);
 
 			}
-
-		} catch (IllegalAccessException exception) {
-
-			throw new RuntimeException (
-				exception);
 
 		}
 

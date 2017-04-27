@@ -9,8 +9,8 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -59,70 +59,77 @@ class ChatHelpLogLogicImplementation
 			@NonNull Optional <CommandRec> command,
 			@NonNull Boolean queue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatHelpLogIn");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatHelpLogIn");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// create the request first
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatHelpLogRec chatHelpLog =
-			chatHelpLogHelper.insert (
-				taskLogger,
-				chatHelpLogHelper.createInstance ()
+			ChatRec chat =
+				chatUser.getChat ();
 
-			.setChatUser (
-				chatUser)
+			// create the request first
 
-			.setTimestamp (
-				transaction.now ())
-
-			.setMessage (
-				message)
-
-			.setText (
-				text)
-
-			.setCommand (
-				optionalOrNull (
-					command))
-
-			.setOurNumber (
-				message.getNumTo ())
-
-			.setDirection (
-				MessageDirection.in)
-
-		);
-
-		// now create the queue item
-
-		if (queue) {
-
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
+			ChatHelpLogRec chatHelpLog =
+				chatHelpLogHelper.insert (
 					taskLogger,
-					chat,
-					"help",
-					chatUser,
-					chatHelpLog,
-					chatUser.getCode (),
-					text);
+					chatHelpLogHelper.createInstance ()
 
-			chatHelpLog
+				.setChatUser (
+					chatUser)
 
-				.setQueueItem (
-					queueItem);
+				.setTimestamp (
+					transaction.now ())
+
+				.setMessage (
+					message)
+
+				.setText (
+					text)
+
+				.setCommand (
+					optionalOrNull (
+						command))
+
+				.setOurNumber (
+					message.getNumTo ())
+
+				.setDirection (
+					MessageDirection.in)
+
+			);
+
+			// now create the queue item
+
+			if (queue) {
+
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						taskLogger,
+						chat,
+						"help",
+						chatUser,
+						chatHelpLog,
+						chatUser.getCode (),
+						text);
+
+				chatHelpLog
+
+					.setQueueItem (
+						queueItem);
+
+			}
+
+			return chatHelpLog;
 
 		}
 
-		return chatHelpLog;
 	}
 
 	@Override
@@ -137,49 +144,55 @@ class ChatHelpLogLogicImplementation
 			@NonNull String text,
 			@NonNull Optional <CommandRec> command) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatHelpLogOut");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatHelpLogOut");
 
-		return chatHelpLogHelper.insert (
-			taskLogger,
-			chatHelpLogHelper.createInstance ()
+		) {
 
-			.setChatUser (
-				chatUser)
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.setTimestamp (
-				transaction.now ())
+			return chatHelpLogHelper.insert (
+				taskLogger,
+				chatHelpLogHelper.createInstance ()
 
-			.setReplyTo (
-				replyTo.orNull ())
+				.setChatUser (
+					chatUser)
 
-			.setUser (
-				user.orNull ())
+				.setTimestamp (
+					transaction.now ())
 
-			.setMessage (
-				message)
+				.setReplyTo (
+					replyTo.orNull ())
 
-			.setChatMessage (
-				chatMessage.orNull ())
+				.setUser (
+					user.orNull ())
 
-			.setText (
-				text)
+				.setMessage (
+					message)
 
-			.setCommand (
-				command.orNull ())
+				.setChatMessage (
+					chatMessage.orNull ())
 
-			.setOurNumber (
-				message.getNumFrom ())
+				.setText (
+					text)
 
-			.setDirection (
-				MessageDirection.out)
+				.setCommand (
+					command.orNull ())
 
-		);
+				.setOurNumber (
+					message.getNumFrom ())
+
+				.setDirection (
+					MessageDirection.out)
+
+			);
+
+		}
 
 	}
 

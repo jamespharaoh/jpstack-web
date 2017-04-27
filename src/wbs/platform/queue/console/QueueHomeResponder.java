@@ -192,87 +192,93 @@ class QueueHomeResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		myClaimedItems =
-			queueItemClaimHelper.findClaimed (
-				userConsoleLogic.userRequired ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		// load queue list
-
-		List <QueueInfo> queueInfosTemp =
-			queueSubjectSorterProvider.get ()
-
-			.queueCache (
-				dummyQueueCache)
-
-			.loggedInUser (
-				userConsoleLogic.userRequired ())
-
-			.effectiveUser (
-				userConsoleLogic.userRequired ())
-
-			.sort (
-				taskLogger)
-
-			.availableQueues ();
-
-		queueInfos =
-			new ArrayList<> ();
-
-		for (
-			QueueInfo queueInfo
-				: queueInfosTemp
 		) {
 
-			if (queueInfo.availableItems () == 0)
-				continue;
+			myClaimedItems =
+				queueItemClaimHelper.findClaimed (
+					userConsoleLogic.userRequired ());
 
-			queueInfos.add (queueInfo);
+			// load queue list
+
+			List <QueueInfo> queueInfosTemp =
+				queueSubjectSorterProvider.get ()
+
+				.queueCache (
+					dummyQueueCache)
+
+				.loggedInUser (
+					userConsoleLogic.userRequired ())
+
+				.effectiveUser (
+					userConsoleLogic.userRequired ())
+
+				.sort (
+					taskLogger)
+
+				.availableQueues ();
+
+			queueInfos =
+				new ArrayList<> ();
+
+			for (
+				QueueInfo queueInfo
+					: queueInfosTemp
+			) {
+
+				if (queueInfo.availableItems () == 0)
+					continue;
+
+				queueInfos.add (queueInfo);
+
+			}
+
+			// unclaimed items
+
+			queues =
+				ImmutableSet.<QueueRec> builder ()
+
+				.addAll (
+					queueInfos.stream ()
+
+					.filter (
+						queueInfo ->
+							moreThanZero (
+								queueInfo.availableItems ()))
+
+					.map (
+						queueInfo ->
+							queueInfo.queue ())
+
+					.iterator ()
+
+				)
+
+				.addAll (
+					myClaimedItems.stream ()
+
+					.map (
+						QueueItemClaimRec::getQueueItem)
+
+					.map (
+						QueueItemRec::getQueueSubject)
+
+					.map (
+						QueueSubjectRec::getQueue)
+
+					.iterator ()
+
+				)
+
+				.build ();
 
 		}
-
-		// unclaimed items
-
-		queues =
-			ImmutableSet.<QueueRec> builder ()
-
-			.addAll (
-				queueInfos.stream ()
-
-				.filter (
-					queueInfo ->
-						moreThanZero (
-							queueInfo.availableItems ()))
-
-				.map (
-					queueInfo ->
-						queueInfo.queue ())
-
-				.iterator ()
-
-			)
-
-			.addAll (
-				myClaimedItems.stream ()
-
-				.map (
-					QueueItemClaimRec::getQueueItem)
-
-				.map (
-					QueueItemRec::getQueueSubject)
-
-				.map (
-					QueueSubjectRec::getQueue)
-
-				.iterator ()
-
-			)
-
-			.build ();
 
 	}
 
@@ -281,18 +287,24 @@ class QueueHomeResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		htmlScriptBlockWrite (
-			"top.show_inbox (true)");
+		) {
 
-		renderStyles ();
+			super.renderHtmlHeadContents (
+				taskLogger);
+
+			htmlScriptBlockWrite (
+				"top.show_inbox (true)");
+
+			renderStyles ();
+
+		}
 
 	}
 
@@ -367,31 +379,37 @@ class QueueHomeResponder
 	void goQueues (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goQueues");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Queues");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goQueues");
 
-		// nothing to claim
+		) {
 
-		if (queueInfos.isEmpty ()) {
+			htmlHeadingTwoWrite (
+				"Queues");
 
-			htmlParagraphWrite (
-				"Nothing to claim");
+			// nothing to claim
 
-			return;
+			if (queueInfos.isEmpty ()) {
+
+				htmlParagraphWrite (
+					"Nothing to claim");
+
+				return;
+
+			}
+
+			// render queue stuff
+
+			renderOptions ();
+
+			renderQueueItems (
+				taskLogger);
 
 		}
-
-		// render queue stuff
-
-		renderOptions ();
-
-		renderQueueItems (
-			taskLogger);
 
 	}
 
@@ -484,208 +502,214 @@ class QueueHomeResponder
 	void renderQueueItems (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderQueueItems");
+		try (
 
-		// table open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderQueueItems");
 
-		htmlTableOpen (
-			htmlClassAttribute (
-				"list",
-				"queueItemTable"));
-
-		htmlTableHeaderRowWrite (
-			"Claim",
-			"Type",
-			"Object",
-			"Queue",
-			"Num",
-			"Pri",
-			"Oldest");
-
-		if (queueOptionsEnabled) {
-
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"loadingRow"));
-
-			htmlTableCellWrite (
-				"loading...",
-				htmlColumnSpanAttribute (6l));
-
-			htmlTableRowClose ();
-
-		}
-
-		for (
-			QueueInfo queueInfo
-				: queueInfos
 		) {
 
-			if (queueInfo.availableItems () == 0)
-				continue;
+			// table open
 
-			QueueRec queue =
-				queueInfo.queue ();
-
-			Record <?> parent =
-				objectManager.getParentRequired (
-					queue);
-
-			Optional <SliceRec> slice =
-				objectManager.getAncestor (
-					SliceRec.class,
-					queue);
-
-			String parentTypeCode =
-				objectManager.getObjectTypeCode (
-					parent);
-
-			String parentCode =
-				objectManager.getCode (
-					parent);
-
-			// table row open
-
-			htmlTableRowOpen (
-
+			htmlTableOpen (
 				htmlClassAttribute (
-					joinWithSpace (
-						"queueItemRow",
-						stringFormat (
-							"queue-%h",
-							integerToDecimalString (
-								queue.getId ())))),
+					"list",
+					"queueItemTable"));
 
-				htmlStyleAttribute (
-					presentInstances (
-						optionalIf (
-							queueOptionsEnabled,
-							() -> htmlStyleRuleEntry (
-								"display",
-								"none")))),
+			htmlTableHeaderRowWrite (
+				"Claim",
+				"Type",
+				"Object",
+				"Queue",
+				"Num",
+				"Pri",
+				"Oldest");
 
-				htmlDataAttribute (
-					"parent-object-type-code",
-					parentTypeCode),
+			if (queueOptionsEnabled) {
 
-				htmlDataAttribute (
-					"parent-object-code",
-					parentCode),
-
-				htmlDataAttribute (
-					"queue-type-code",
-					queue.getQueueType ().getCode ()),
-
-				htmlDataAttribute (
-					"queue-code",
-					queue.getCode ()),
-
-				htmlDataAttribute (
-					"slice-code",
-					ifNotNullThenElse (
-						slice,
-						() -> slice.get ().getCode (),
-						() -> "")),
-
-				htmlDataAttribute (
-					"oldest-timestamp",
-					queueInfo.oldestAvailable ().toString ())
-
-			);
-
-			// claim cell
-
-			htmlTableCellOpen ();
-
-			htmlFormOpenPostAction (
-				requestContext.resolveApplicationUrl (
-					"/queues/queue.claim"));
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"queue_id\"",
-				" value=\"%h\"",
-				integerToDecimalString (
-					queue.getId ()),
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"claim\"",
-				">");
-
-			htmlFormClose ();
-
-			htmlTableCellClose ();
-
-			// type code
-
-			htmlTableCellWrite (
-				parentTypeCode);
-
-			// object path
-
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					parent,
-					userConsoleLogic.sliceRequired ()));
-
-			// queue code
-
-			htmlTableCellWrite (
-				queue.getCode ());
-
-			// available items
-
-			htmlTableCellWrite (
-				integerToDecimalString (
-					queueInfo.availableItems ()));
-
-			// priority
-
-			if (
-				privChecker.canRecursive (
-					taskLogger,
-					objectManager.getParentRequired (
-						queueInfo.queue ()),
-					"supervisor")
-			) {
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"loadingRow"));
 
 				htmlTableCellWrite (
-					integerToDecimalString (
-						queueInfo.highestPriorityAvailable ()));
+					"loading...",
+					htmlColumnSpanAttribute (6l));
 
-			} else {
-
-				htmlTableCellWrite (
-					"");
+				htmlTableRowClose ();
 
 			}
 
-			// oldest
+			for (
+				QueueInfo queueInfo
+					: queueInfos
+			) {
 
-			htmlTableCellWriteHtml (
-				htmlEncodeNonBreakingWhitespace (
-					userConsoleLogic.prettyDuration (
-						queueInfo.oldestAvailable (),
-						transaction.now ())),
-				htmlClassAttribute (
-					"queueItemOldest"));
+				if (queueInfo.availableItems () == 0)
+					continue;
 
-			// table row close
+				QueueRec queue =
+					queueInfo.queue ();
 
-			htmlTableRowClose ();
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
+
+				Optional <SliceRec> slice =
+					objectManager.getAncestor (
+						SliceRec.class,
+						queue);
+
+				String parentTypeCode =
+					objectManager.getObjectTypeCode (
+						parent);
+
+				String parentCode =
+					objectManager.getCode (
+						parent);
+
+				// table row open
+
+				htmlTableRowOpen (
+
+					htmlClassAttribute (
+						joinWithSpace (
+							"queueItemRow",
+							stringFormat (
+								"queue-%h",
+								integerToDecimalString (
+									queue.getId ())))),
+
+					htmlStyleAttribute (
+						presentInstances (
+							optionalIf (
+								queueOptionsEnabled,
+								() -> htmlStyleRuleEntry (
+									"display",
+									"none")))),
+
+					htmlDataAttribute (
+						"parent-object-type-code",
+						parentTypeCode),
+
+					htmlDataAttribute (
+						"parent-object-code",
+						parentCode),
+
+					htmlDataAttribute (
+						"queue-type-code",
+						queue.getQueueType ().getCode ()),
+
+					htmlDataAttribute (
+						"queue-code",
+						queue.getCode ()),
+
+					htmlDataAttribute (
+						"slice-code",
+						ifNotNullThenElse (
+							slice,
+							() -> slice.get ().getCode (),
+							() -> "")),
+
+					htmlDataAttribute (
+						"oldest-timestamp",
+						queueInfo.oldestAvailable ().toString ())
+
+				);
+
+				// claim cell
+
+				htmlTableCellOpen ();
+
+				htmlFormOpenPostAction (
+					requestContext.resolveApplicationUrl (
+						"/queues/queue.claim"));
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"queue_id\"",
+					" value=\"%h\"",
+					integerToDecimalString (
+						queue.getId ()),
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"claim\"",
+					">");
+
+				htmlFormClose ();
+
+				htmlTableCellClose ();
+
+				// type code
+
+				htmlTableCellWrite (
+					parentTypeCode);
+
+				// object path
+
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						parent,
+						userConsoleLogic.sliceRequired ()));
+
+				// queue code
+
+				htmlTableCellWrite (
+					queue.getCode ());
+
+				// available items
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						queueInfo.availableItems ()));
+
+				// priority
+
+				if (
+					privChecker.canRecursive (
+						taskLogger,
+						objectManager.getParentRequired (
+							queueInfo.queue ()),
+						"supervisor")
+				) {
+
+					htmlTableCellWrite (
+						integerToDecimalString (
+							queueInfo.highestPriorityAvailable ()));
+
+				} else {
+
+					htmlTableCellWrite (
+						"");
+
+				}
+
+				// oldest
+
+				htmlTableCellWriteHtml (
+					htmlEncodeNonBreakingWhitespace (
+						userConsoleLogic.prettyDuration (
+							queueInfo.oldestAvailable (),
+							transaction.now ())),
+					htmlClassAttribute (
+						"queueItemOldest"));
+
+				// table row close
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 
@@ -808,20 +832,26 @@ class QueueHomeResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		renderLinks ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		requestContext.flushNotices (
-			formatWriter);
+		) {
 
-		goQueues (
-			taskLogger);
+			renderLinks ();
 
-		goMyItems ();
+			requestContext.flushNotices (
+				formatWriter);
+
+			goQueues (
+				taskLogger);
+
+			goMyItems ();
+
+		}
 
 	}
 

@@ -58,40 +58,46 @@ class ComponentRunner {
 			@NonNull TaskLogger parentTaskLogger)
 		throws Exception {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"run");
-
-		runnerClass =
-			Class.forName (
-				runnerName);
-
 		try (
 
-			ComponentManager componentManager =
-				initComponentManager (
-					taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"run");
 
 		) {
 
-			taskLogger.makeException ();
+			runnerClass =
+				Class.forName (
+					runnerName);
 
-			Thread shutdownHookThread =
-				new Thread (
-					componentManager::close);
+			try (
 
-			Runtime.getRuntime ().addShutdownHook (
-				shutdownHookThread);
+				ComponentManager componentManager =
+					initComponentManager (
+						taskLogger);
 
-			invokeTarget (
-				taskLogger,
-				componentManager);
+			) {
 
-			taskLogger.makeException ();
+				taskLogger.makeException ();
 
-			Runtime.getRuntime ().removeShutdownHook (
-				shutdownHookThread);
+				Thread shutdownHookThread =
+					new Thread (
+						componentManager::close);
+
+				Runtime.getRuntime ().addShutdownHook (
+					shutdownHookThread);
+
+				invokeTarget (
+					taskLogger,
+					componentManager);
+
+				taskLogger.makeException ();
+
+				Runtime.getRuntime ().removeShutdownHook (
+					shutdownHookThread);
+
+			}
 
 		}
 
@@ -101,43 +107,49 @@ class ComponentRunner {
 			@NonNull TaskLogger parentTaskLogger)
 		throws Exception {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initComponentManager");
+		try (
 
-		return new ComponentManagerBuilder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initComponentManager");
 
-			.primaryProjectName (
-				primaryProjectName)
+		) {
 
-			.primaryProjectPackageName (
-				primaryProjectPackageName)
+			return new ComponentManagerBuilder ()
 
-			.layerNames (
-				layerNames)
+				.primaryProjectName (
+					primaryProjectName)
 
-			.configNames (
-				configNames)
+				.primaryProjectPackageName (
+					primaryProjectPackageName)
 
-			.registerComponentDefinition (
-				new ComponentDefinition ()
+				.layerNames (
+					layerNames)
 
-				.componentClass (
-					runnerClass)
+				.configNames (
+					configNames)
 
-				.name (
-					uncapitalise (
-						runnerClass.getSimpleName ()))
+				.registerComponentDefinition (
+					new ComponentDefinition ()
 
-				.scope (
-					"singleton"))
+					.componentClass (
+						runnerClass)
 
-			//.outputPath (
-			//	"work/runner/components")
+					.name (
+						uncapitalise (
+							runnerClass.getSimpleName ()))
 
-			.build (
-				taskLogger);
+					.scope (
+						"singleton"))
+
+				//.outputPath (
+				//	"work/runner/components")
+
+				.build (
+					taskLogger);
+
+		}
 
 	}
 
@@ -147,30 +159,36 @@ class ComponentRunner {
 			@NonNull ComponentManager componentManager)
 		throws Exception {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"invokeTarget");
+		try (
 
-		// find runnable and run it
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"invokeTarget");
 
-		Object runner =
-			componentManager.getComponentRequired (
+		) {
+
+			// find runnable and run it
+
+			Object runner =
+				componentManager.getComponentRequired (
+					taskLogger,
+					uncapitalise (
+						runnerClass.getSimpleName ()),
+					runnerClass);
+
+			Method runMethod =
+				runnerClass.getMethod (
+					methodName,
+					TaskLogger.class,
+					List.class);
+
+			runMethod.invoke (
+				runner,
 				taskLogger,
-				uncapitalise (
-					runnerClass.getSimpleName ()),
-				runnerClass);
+				(Object) runnerArgs);
 
-		Method runMethod =
-			runnerClass.getMethod (
-				methodName,
-				TaskLogger.class,
-				List.class);
-
-		runMethod.invoke (
-			runner,
-			taskLogger,
-			(Object) runnerArgs);
+		}
 
 	}
 
@@ -178,74 +196,80 @@ class ComponentRunner {
 	void main (
 			@NonNull String[] argumentsArray) {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"main");
+		try (
 
-		List <String> arguments =
-			Arrays.asList (
-				argumentsArray);
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"main");
 
-		if (arguments.size () < 5) {
+		) {
 
-			taskLogger.errorFormat (
-				"Expects five or more parameters: %s",
-				joinWithCommaAndSpace (
-					"primary project name",
-					"primary project package name",
-					"layer names (comma separated)",
-					"config names (comma separated)",
-					"runner class name",
-					"runner method name",
-					"runner arguments..."));
+			List <String> arguments =
+				Arrays.asList (
+					argumentsArray);
 
-			System.exit (1);
+			if (arguments.size () < 5) {
 
-		}
+				taskLogger.errorFormat (
+					"Expects five or more parameters: %s",
+					joinWithCommaAndSpace (
+						"primary project name",
+						"primary project package name",
+						"layer names (comma separated)",
+						"config names (comma separated)",
+						"runner class name",
+						"runner method name",
+						"runner arguments..."));
 
-		try {
+				System.exit (1);
 
-			new ComponentRunner ()
+			}
 
-				.primaryProjectName (
-					arguments.get (0))
+			try {
 
-				.primaryProjectPackageName (
-					arguments.get (1))
+				new ComponentRunner ()
 
-				.layerNames (
-					stringSplitComma (
-						arguments.get (2)))
+					.primaryProjectName (
+						arguments.get (0))
 
-				.configNames (
-					stringSplitComma (
-						arguments.get (3)))
+					.primaryProjectPackageName (
+						arguments.get (1))
 
-				.runnerName (
-					arguments.get (4))
+					.layerNames (
+						stringSplitComma (
+							arguments.get (2)))
 
-				.methodName (
-					arguments.get (5))
+					.configNames (
+						stringSplitComma (
+							arguments.get (3)))
 
-				.runnerArgs (
-					arguments.subList (6, arguments.size ()))
+					.runnerName (
+						arguments.get (4))
 
-				.run (
-					taskLogger);
+					.methodName (
+						arguments.get (5))
 
-		} catch (LoggedErrorsException loggedErrorsException) {
+					.runnerArgs (
+						arguments.subList (6, arguments.size ()))
 
-			doNothing ();
+					.run (
+						taskLogger);
 
-			System.exit (1);
+			} catch (LoggedErrorsException loggedErrorsException) {
 
-		} catch (Exception exception) {
+				doNothing ();
 
-			taskLogger.errorFormatException (
-				exception,
-				"Failed to run component");
+				System.exit (1);
 
-			System.exit (1);
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Failed to run component");
+
+				System.exit (1);
+
+			}
 
 		}
 

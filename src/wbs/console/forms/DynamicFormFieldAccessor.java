@@ -103,44 +103,50 @@ class DynamicFormFieldAccessor <
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValueOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"write");
+		try (
 
-		// sanity check native type
-
-		if (
-
-			nativeValueOptional.isPresent ()
-
-			&& ! nativeClass.isInstance (
-				nativeValueOptional.get ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"write");
 
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Field %s is %s, not %s",
-					name,
-					nativeClass.getSimpleName (),
-					objectClassNameSimple (
-						nativeValueOptional.get ())));
+			// sanity check native type
+
+			if (
+
+				nativeValueOptional.isPresent ()
+
+				&& ! nativeClass.isInstance (
+					nativeValueOptional.get ())
+
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field %s is %s, not %s",
+						name,
+						nativeClass.getSimpleName (),
+						objectClassNameSimple (
+							nativeValueOptional.get ())));
+
+			}
+
+			// set property
+
+			ConsoleHelper <?> consoleHelper =
+				consoleObjectManager.findConsoleHelperRequired (
+					container);
+
+			consoleHelper.setDynamic (
+				taskLogger,
+				genericCastUnchecked (
+					container),
+				name,
+				nativeValueOptional);
 
 		}
-
-		// set property
-
-		ConsoleHelper <?> consoleHelper =
-			consoleObjectManager.findConsoleHelperRequired (
-				container);
-
-		consoleHelper.setDynamic (
-			taskLogger,
-			genericCastUnchecked (
-				container),
-			name,
-			nativeValueOptional);
 
 	}
 

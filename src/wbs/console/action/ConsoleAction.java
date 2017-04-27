@@ -5,7 +5,6 @@ import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
 
 import lombok.NonNull;
@@ -75,8 +74,7 @@ class ConsoleAction
 
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return null;
 
@@ -87,40 +85,46 @@ class ConsoleAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-			Responder responder =
-				goWithRetry (
-					taskLogger);
+		) {
 
-			if (responder != null)
-				return responder;
+			try {
 
-			Responder backupResponder =
-				backupResponder (
-					taskLogger);
+				Responder responder =
+					goWithRetry (
+						taskLogger);
 
-			if (backupResponder == null) {
+				if (responder != null)
+					return responder;
 
-				throw new RuntimeException (
-					stringFormat (
-						"%s.backupResponder () returned null",
-						getClass ().getSimpleName ()));
+				Responder backupResponder =
+					backupResponder (
+						taskLogger);
+
+				if (backupResponder == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"%s.backupResponder () returned null",
+							getClass ().getSimpleName ()));
+
+				}
+
+				return backupResponder;
+
+			} catch (Exception exception) {
+
+				return handleException (
+					taskLogger,
+					exception);
 
 			}
-
-			return backupResponder;
-
-		} catch (Exception exception) {
-
-			return handleException (
-				taskLogger,
-				exception);
 
 		}
 
@@ -128,59 +132,64 @@ class ConsoleAction
 
 	private
 	Responder goWithRetry (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goWithRetry");
+		try (
 
-		int triesRemaining =
-			maxTries;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goWithRetry");
 
-		while (triesRemaining > 1) {
+		) {
 
-			Exception caught;
+			int triesRemaining =
+				maxTries;
 
-			// all but last try with catch
+			while (triesRemaining > 1) {
 
-			try {
+				Exception caught;
 
-				return goReal (
-					taskLogger);
+				// all but last try with catch
 
-			} catch (ConstraintViolationException exception) {
+				try {
 
-				caught =
-					exception;
+					return goReal (
+						taskLogger);
 
-			} catch (LockAcquisitionException exception) {
+				} catch (ConstraintViolationException exception) {
 
-				caught =
-					exception;
+					caught =
+						exception;
+
+				} catch (LockAcquisitionException exception) {
+
+					caught =
+						exception;
+
+				}
+
+				// caught an exception, log it and try again
+
+				triesRemaining --;
+
+				taskLogger.warningFormat (
+					"%s: caught %s, retrying, %s remaining",
+					classNameSimple (
+						getClass ()),
+					classNameSimple (
+						caught.getClass ()),
+					integerToDecimalString (
+						triesRemaining));
 
 			}
 
-			// caught an exception, log it and try again
+			// last try without catch
 
-			triesRemaining --;
-
-			taskLogger.warningFormat (
-				"%s: caught %s, retrying, %s remaining",
-				classNameSimple (
-					getClass ()),
-				classNameSimple (
-					caught.getClass ()),
-				integerToDecimalString (
-					triesRemaining));
+			return goReal (
+				taskLogger);
 
 		}
-
-		// last try without catch
-
-		return goReal (
-			taskLogger);
 
 	}
 
@@ -188,70 +197,76 @@ class ConsoleAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleException");
+		try (
 
-		// if we have no backup page just die
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleException");
 
-		Responder backupResponder = null;
+		) {
 
-		try {
+			// if we have no backup page just die
 
-			backupResponder =
-				backupResponder (
-					taskLogger);
+			Responder backupResponder = null;
 
-		} catch (Exception exceptionFromBackupResponder) {
+			try {
+
+				backupResponder =
+					backupResponder (
+						taskLogger);
+
+			} catch (Exception exceptionFromBackupResponder) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"console",
+					requestContext.requestPath (),
+					exceptionFromBackupResponder,
+					consoleUserHelper.loggedInUserId (),
+					GenericExceptionResolution.ignoreWithUserWarning);
+
+			}
+
+			if (backupResponder == null) {
+
+				if (throwable instanceof RuntimeException) {
+
+					throw (RuntimeException)
+						throwable;
+
+				}
+
+				throw new RuntimeException (
+					throwable);
+
+			}
+
+			// record the exception
+
+			taskLogger.errorFormatException (
+				throwable,
+				"generated exception: %s",
+				requestContext.requestPath ());
 
 			exceptionLogger.logThrowable (
 				taskLogger,
 				"console",
 				requestContext.requestPath (),
-				exceptionFromBackupResponder,
+				throwable,
 				consoleUserHelper.loggedInUserId (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
-		}
+			// give the user an error message
 
-		if (backupResponder == null) {
+			requestContext.addError (
+				"Internal error");
 
-			if (throwable instanceof RuntimeException) {
+			// and go to backup page!
 
-				throw (RuntimeException)
-					throwable;
-
-			}
-
-			throw new RuntimeException (
-				throwable);
+			return backupResponder;
 
 		}
-
-		// record the exception
-
-		taskLogger.errorFormatException (
-			throwable,
-			"generated exception: %s",
-			requestContext.requestPath ());
-
-		exceptionLogger.logThrowable (
-			taskLogger,
-			"console",
-			requestContext.requestPath (),
-			throwable,
-			consoleUserHelper.loggedInUserId (),
-			GenericExceptionResolution.ignoreWithUserWarning);
-
-		// give the user an error message
-
-		requestContext.addError (
-			"Internal error");
-
-		// and go to backup page!
-
-		return backupResponder;
 
 	}
 

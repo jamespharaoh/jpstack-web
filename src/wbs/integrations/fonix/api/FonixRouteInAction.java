@@ -22,7 +22,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -121,16 +121,14 @@ class FonixRouteInAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (
@@ -246,9 +244,9 @@ class FonixRouteInAction
 
 			transaction.commit ();
 
-		}
+			success = true;
 
-		success = true;
+		}
 
 	}
 
@@ -271,14 +269,14 @@ class FonixRouteInAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",

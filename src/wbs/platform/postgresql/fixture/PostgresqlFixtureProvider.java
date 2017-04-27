@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -36,42 +36,48 @@ class PostgresqlFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"internal"))
+		) {
 
-			.setCode (
-				"postgresql")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"PostgreSQL")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"internal"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"postgresql")
 
-			.setLabel (
-				"PostgreSQL")
+				.setName (
+					"PostgreSQL")
 
-			.setTargetPath (
-				"/postgresql")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"PostgreSQL")
 
-		);
+				.setTargetPath (
+					"/postgresql")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 

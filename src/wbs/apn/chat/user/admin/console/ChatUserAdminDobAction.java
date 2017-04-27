@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -72,80 +72,86 @@ class ChatUserAdminDobAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		String dobString =
-			nullIfEmptyString (
-				requestContext.parameterRequired (
-					"dob"));
-
-		if (dobString == null) {
-
-			requestContext.addError (
-				"Please enter a date of birth");
-
-			return null;
-
-		}
-
-		LocalDate dobLocalDate;
-
-		try {
-
-			dobLocalDate =
-				LocalDate.parse (dobString);
-
-		} catch (Exception exception) {
-
-			requestContext.addError (
-				"Invalid date");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminDobAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			// lookup database stuff
+			// get params
 
-			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+			String dobString =
+				nullIfEmptyString (
+					requestContext.parameterRequired (
+						"dob"));
 
-			// update chat user
+			if (dobString == null) {
 
-			chatUser
+				requestContext.addError (
+					"Please enter a date of birth");
 
-				.setDob (
-					dobLocalDate);
+				return null;
 
-			// create event
+			}
 
-			eventLogic.createEvent (
-				taskLogger,
-				"chat_user_dob",
-				userConsoleLogic.userRequired (),
-				chatUser,
-				dobString);
+			LocalDate dobLocalDate;
 
-			transaction.commit ();
+			try {
 
-			requestContext.addNotice (
-				"Chat user date of birth updated");
+				dobLocalDate =
+					LocalDate.parse (dobString);
 
-			return null;
+			} catch (Exception exception) {
+
+				requestContext.addError (
+					"Invalid date");
+
+				return null;
+
+			}
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatUserAdminDobAction.goReal ()",
+						this);
+
+			) {
+
+				// lookup database stuff
+
+				ChatUserRec chatUser =
+					chatUserHelper.findFromContextRequired ();
+
+				// update chat user
+
+				chatUser
+
+					.setDob (
+						dobLocalDate);
+
+				// create event
+
+				eventLogic.createEvent (
+					taskLogger,
+					"chat_user_dob",
+					userConsoleLogic.userRequired (),
+					chatUser,
+					dobString);
+
+				transaction.commit ();
+
+				requestContext.addNotice (
+					"Chat user date of birth updated");
+
+				return null;
+
+			}
 
 		}
 

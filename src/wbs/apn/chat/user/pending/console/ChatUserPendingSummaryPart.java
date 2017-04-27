@@ -74,193 +74,199 @@ class ChatUserPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"",
-			"Old",
-			"New");
+		) {
 
-		htmlTableDetailsRowWriteRaw (
-			"User",
-			() -> consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatUser,
-				2l));
+			htmlTableOpenDetails ();
 
-		// name
+			htmlTableHeaderRowWrite (
+				"",
+				"Old",
+				"New");
 
-		htmlTableDetailsRowWriteRaw (
-			"Name",
-			() -> htmlTableCellWrite (
-				ifNullThenEmDash (
-					chatUser.getName ()),
-				htmlColumnSpanAttribute (2l)));
+			htmlTableDetailsRowWriteRaw (
+				"User",
+				() -> consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatUser,
+					2l));
 
-		// info
+			// name
 
-		htmlTableDetailsRowWriteRaw (
-			"Info",
-			() -> ifNotNullThenElse (
-				chatUser.getNewChatUserInfo (),
+			htmlTableDetailsRowWriteRaw (
+				"Name",
+				() -> htmlTableCellWrite (
+					ifNullThenEmDash (
+						chatUser.getName ()),
+					htmlColumnSpanAttribute (2l)));
 
-			() -> {
+			// info
 
-				htmlTableCellWrite (
-					ifNotNullThenElseEmDash (
-						chatUser.getInfoText (),
-						() -> chatUser.getInfoText ().getText ()));
+			htmlTableDetailsRowWriteRaw (
+				"Info",
+				() -> ifNotNullThenElse (
+					chatUser.getNewChatUserInfo (),
 
-				htmlTableCellWrite (
-					chatUser.getNewChatUserInfo ().getOriginalText ()
-						.getText ());
+				() -> {
 
-			},
+					htmlTableCellWrite (
+						ifNotNullThenElseEmDash (
+							chatUser.getInfoText (),
+							() -> chatUser.getInfoText ().getText ()));
 
-			() -> htmlTableCellWrite (
-				chatUser.getInfoText ().getText (),
-				htmlColumnSpanAttribute (2l))
+					htmlTableCellWrite (
+						chatUser.getNewChatUserInfo ().getOriginalText ()
+							.getText ());
 
-		));
+				},
 
-		// photo
+				() -> htmlTableCellWrite (
+					chatUser.getInfoText ().getText (),
+					htmlColumnSpanAttribute (2l))
 
-		ChatUserImageRec newImage =
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.image);
+			));
 
-		Runnable existingImageHtml = () ->
-			ifNotEmptyThenElse (
-				chatUser.getChatUserImageList (),
+			// photo
 
-			() -> mediaConsoleLogic.writeMediaContent (
-				taskLogger,
-				formatWriter,
-				chatUser.getChatUserImageList ().get (0).getMedia ()),
+			ChatUserImageRec newImage =
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.image);
 
-			() -> formatWriter.writeFormat (
-				"—")
+			Runnable existingImageHtml = () ->
+				ifNotEmptyThenElse (
+					chatUser.getChatUserImageList (),
 
-		);
+				() -> mediaConsoleLogic.writeMediaContent (
+					taskLogger,
+					formatWriter,
+					chatUser.getChatUserImageList ().get (0).getMedia ()),
 
-		htmlTableDetailsRowWriteRaw (
-			"Photo",
-			() -> ifNotNullThenElse (
-				newImage,
+				() -> formatWriter.writeFormat (
+					"—")
 
-			() -> {
+			);
 
-				htmlTableCellWrite (
-					existingImageHtml);
+			htmlTableDetailsRowWriteRaw (
+				"Photo",
+				() -> ifNotNullThenElse (
+					newImage,
 
-				htmlTableCellWriteHtml (
-					() -> mediaConsoleLogic.writeMediaContent (
-						taskLogger,
-						formatWriter,
-						newImage.getMedia ()));
-			},
+				() -> {
 
-			() -> htmlTableCellWriteHtml (
-				existingImageHtml,
-				htmlColumnSpanAttribute (2l))
+					htmlTableCellWrite (
+						existingImageHtml);
 
-		));
+					htmlTableCellWriteHtml (
+						() -> mediaConsoleLogic.writeMediaContent (
+							taskLogger,
+							formatWriter,
+							newImage.getMedia ()));
+				},
 
-		// video
+				() -> htmlTableCellWriteHtml (
+					existingImageHtml,
+					htmlColumnSpanAttribute (2l))
 
-		ChatUserImageRec newVideo =
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.video);
+			));
 
-		Runnable existingVideoHtml = () ->
-			ifNotEmptyThenElse (
-				chatUser.getChatUserVideoList (),
+			// video
 
-			() -> mediaConsoleLogic.writeMediaContent (
-				taskLogger,
-				chatUser.getChatUserImageList ().get (0).getMedia ()),
+			ChatUserImageRec newVideo =
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.video);
 
-			() -> formatWriter.writeFormat (
-				"—")
+			Runnable existingVideoHtml = () ->
+				ifNotEmptyThenElse (
+					chatUser.getChatUserVideoList (),
 
-		);
+				() -> mediaConsoleLogic.writeMediaContent (
+					taskLogger,
+					chatUser.getChatUserImageList ().get (0).getMedia ()),
 
-		htmlTableDetailsRowWriteRaw (
-			"Video",
-			() -> ifNotNullThenElse (
-				newVideo,
+				() -> formatWriter.writeFormat (
+					"—")
 
-			() -> {
+			);
 
-				htmlTableCellWrite (
-					existingVideoHtml);
+			htmlTableDetailsRowWriteRaw (
+				"Video",
+				() -> ifNotNullThenElse (
+					newVideo,
 
-				htmlTableCellWriteHtml (
-					() -> mediaConsoleLogic.writeMediaContent (
-						taskLogger,
-						newVideo.getMedia ()));
+				() -> {
 
-			},
+					htmlTableCellWrite (
+						existingVideoHtml);
 
-			() -> htmlTableCellWriteHtml (
-				existingVideoHtml,
-				htmlColumnSpanAttribute (2l))
+					htmlTableCellWriteHtml (
+						() -> mediaConsoleLogic.writeMediaContent (
+							taskLogger,
+							newVideo.getMedia ()));
 
-		));
+				},
 
-		// audio
+				() -> htmlTableCellWriteHtml (
+					existingVideoHtml,
+					htmlColumnSpanAttribute (2l))
 
-		ChatUserImageRec newAudio =
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.audio);
+			));
 
-		Runnable existingAudioHtml = () ->
-			ifNotEmptyThenElse (
-				chatUser.getChatUserAudioList (),
+			// audio
 
-			() -> mediaConsoleLogic.writeMediaContent (
-				taskLogger,
-				chatUser.getChatUserAudioList ().get (0).getMedia ()),
+			ChatUserImageRec newAudio =
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.audio);
 
-			() -> formatWriter.writeFormat (
-				"—")
+			Runnable existingAudioHtml = () ->
+				ifNotEmptyThenElse (
+					chatUser.getChatUserAudioList (),
 
-		);
+				() -> mediaConsoleLogic.writeMediaContent (
+					taskLogger,
+					chatUser.getChatUserAudioList ().get (0).getMedia ()),
 
-		htmlTableDetailsRowWriteRaw (
-			"Audio",
-			() -> ifNotNullThenElse (
-				newAudio,
+				() -> formatWriter.writeFormat (
+					"—")
 
-			() -> {
+			);
 
-				htmlTableCellWrite (
-					existingAudioHtml);
+			htmlTableDetailsRowWriteRaw (
+				"Audio",
+				() -> ifNotNullThenElse (
+					newAudio,
 
-				htmlTableCellWriteHtml (
-					() -> mediaConsoleLogic.writeMediaContent (
-						taskLogger,
-						newAudio.getMedia ()));
+				() -> {
 
-			},
+					htmlTableCellWrite (
+						existingAudioHtml);
 
-			() -> htmlTableCellWriteHtml (
-				existingAudioHtml,
-				htmlColumnSpanAttribute (2l))
+					htmlTableCellWriteHtml (
+						() -> mediaConsoleLogic.writeMediaContent (
+							taskLogger,
+							newAudio.getMedia ()));
 
-		));
+				},
 
-		// close table
+				() -> htmlTableCellWriteHtml (
+					existingAudioHtml,
+					htmlColumnSpanAttribute (2l))
 
-		htmlTableClose ();
+			));
+
+			// close table
+
+			htmlTableClose ();
+
+		}
 
 	}
 

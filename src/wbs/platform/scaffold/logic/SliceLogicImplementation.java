@@ -27,8 +27,9 @@ import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.BackgroundProcess;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -141,63 +142,69 @@ class SliceLogicImplementation
 	public synchronized
 	void runOnce () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"runOnce ()");
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"SliceLogicImplementation.runNow ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"runOnce ()");
 
 		) {
 
-			// iterate slices
+			try (
 
-			for (
-				Long sliceId
-					: nextUpdateTimestampBySlice.keySet ()
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"SliceLogicImplementation.runNow ()",
+						this);
+
 			) {
 
-				SliceRec slice =
-					sliceHelper.findRequired (
-						sliceId);
+				// iterate slices
 
-				// perform update
+				for (
+					Long sliceId
+						: nextUpdateTimestampBySlice.keySet ()
+				) {
 
-				slice
+					SliceRec slice =
+						sliceHelper.findRequired (
+							sliceId);
 
-					.setCurrentQueueInactivityTime (
-						ifNull (
-							slice.getCurrentQueueInactivityTime (),
-							orNull (
-								nextTimestampBySlice.get (
-									sliceId))))
+					// perform update
 
-					.setCurrentQueueInactivityUpdateTime (
-						optionalGetRequired (
-							nextUpdateTimestampBySlice.get (
-								sliceId)));
+					slice
+
+						.setCurrentQueueInactivityTime (
+							ifNull (
+								slice.getCurrentQueueInactivityTime (),
+								orNull (
+									nextTimestampBySlice.get (
+										sliceId))))
+
+						.setCurrentQueueInactivityUpdateTime (
+							optionalGetRequired (
+								nextUpdateTimestampBySlice.get (
+									sliceId)));
+
+				}
+
+				nextTimestampBySlice.clear ();
+				nextUpdateTimestampBySlice.clear ();
+
+				transaction.commit ();
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"unknown",
+					"sliceLogic",
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
 
 			}
-
-			nextTimestampBySlice.clear ();
-			nextUpdateTimestampBySlice.clear ();
-
-			transaction.commit ();
-
-		} catch (Exception exception) {
-
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"unknown",
-				"sliceLogic",
-				exception,
-				optionalAbsent (),
-				GenericExceptionResolution.tryAgainLater);
 
 		}
 
@@ -206,10 +213,11 @@ class SliceLogicImplementation
 	@Override
 	public synchronized
 	void updateSliceInactivityTimestamp (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SliceRec slice,
-			@NonNull Optional<Instant> timestamp) {
+			@NonNull Optional <Instant> timestamp) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		Optional<Instant> nextUpdateTimestamp =

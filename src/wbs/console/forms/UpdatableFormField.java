@@ -17,6 +17,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.etc.ResultUtils.getError;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
@@ -162,79 +163,85 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canView");
+		try (
 
-		// check feature
-
-		if (
-
-			isNotNull (
-				featureCode)
-
-			&& ! featureChecker.checkFeatureAccess (
-				taskLogger,
-				privChecker,
-				featureCode)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canView");
 
 		) {
-			return false;
-		}
 
-		// check view priv
+			// check feature
 
-		if (
-			isNull (
-				viewPriv)
-		) {
-			return true;
-		}
+			if (
 
-		List <String> privParts =
-			stringSplitColon (
-				viewPriv);
+				isNotNull (
+					featureCode)
 
-		if (
-			collectionHasOneElement (
-				privParts)
-		) {
+				&& ! featureChecker.checkFeatureAccess (
+					taskLogger,
+					privChecker,
+					featureCode)
 
-			String privCode =
-				privParts.get (0);
+			) {
+				return false;
+			}
 
-			return privChecker.canRecursive (
-				taskLogger,
-				(Record<?>) container,
-				privCode);
+			// check view priv
 
-		} else if (
-			collectionHasTwoElements (
-				privParts)
-		) {
+			if (
+				isNull (
+					viewPriv)
+			) {
+				return true;
+			}
 
-			String delegatePath =
-				privParts.get (0);
+			List <String> privParts =
+				stringSplitColon (
+					viewPriv);
 
-			String privCode =
-				privParts.get (1);
+			if (
+				collectionHasOneElement (
+					privParts)
+			) {
 
-			Record <?> delegate =
-				(Record <?>)
-				objectManager.dereferenceObsolete (
-					container,
-					delegatePath,
-					hints);
+				String privCode =
+					privParts.get (0);
 
-			return privChecker.canRecursive (
-				taskLogger,
-				delegate,
-				privCode);
+				return privChecker.canRecursive (
+					taskLogger,
+					(Record<?>) container,
+					privCode);
 
-		} else {
+			} else if (
+				collectionHasTwoElements (
+					privParts)
+			) {
 
-			throw new RuntimeException ();
+				String delegatePath =
+					privParts.get (0);
+
+				String privCode =
+					privParts.get (1);
+
+				Record <?> delegate =
+					genericCastUnchecked (
+						objectManager.dereference (
+							container,
+							delegatePath,
+							hints));
+
+				return privChecker.canRecursive (
+					taskLogger,
+					delegate,
+					privCode);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
@@ -253,26 +260,32 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefault");
+		try (
 
-		if (
-			isNotNull (
-				defaultValueSupplier)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefault");
+
 		) {
 
-			Optional <Native> nativeValue =
-				nativeMapping.genericToNative (
+			if (
+				isNotNull (
+					defaultValueSupplier)
+			) {
+
+				Optional <Native> nativeValue =
+					nativeMapping.genericToNative (
+						taskLogger,
+						container,
+						defaultValueSupplier.get ());
+
+				accessor.write (
 					taskLogger,
 					container,
-					defaultValueSupplier.get ());
+					nativeValue);
 
-			accessor.write (
-				taskLogger,
-				container,
-				nativeValue);
+			}
 
 		}
 
@@ -288,264 +301,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderTableCellList");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
-
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
-						taskLogger,
-						container,
-						hints,
-						genericValue)));
-
-		renderer.renderHtmlTableCellList (
-			taskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			link,
-			columnSpan);
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter htmlWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderTableCellProperties");
-
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
-
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
-						taskLogger,
-						container,
-						hints,
-						genericValue)));
-
-		renderer.renderHtmlTableCellProperties (
-			taskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			true,
-			1l);
-
-	}
-
-	@Override
-	public
-	void renderFormTemporarilyHidden (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter htmlWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints,
-			@NonNull FormType formType,
-			@NonNull String formName) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormTemporarilyHidden");
-
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
-
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
-						taskLogger,
-						container,
-						hints,
-						genericValue)));
-
-		renderer.renderFormTemporarilyHidden (
-			submission,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			formType,
-			formName);
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter formatWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <String> error,
-			@NonNull FormType formType,
-			@NonNull String formName) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormRow");
-
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
-
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
-						taskLogger,
-						container,
-						hints,
-						genericValue)));
-
-		htmlTableRowOpen (
-			formatWriter);
-
-		htmlTableHeaderCellWrite (
-			formatWriter,
-			label ());
-
-		htmlTableCellOpen (
-			formatWriter,
-			htmlStyleAttribute (
-				htmlStyleRuleEntry (
-					"text-align",
-					renderer.propertiesAlign ().name ())));
-
-		renderer.renderFormInput (
-			taskLogger,
-			submission,
-			formatWriter,
-			container,
-			hints,
-			interfaceValue,
-			formType,
-			formName);
-
-		if (
-			optionalIsPresent (
-				error)
-		) {
-
-			formatWriter.writeLineFormat (
-				"<br>");
-
-			formatWriter.writeLineFormat (
-				"%h",
-				error.get ());
-
-		}
-
-		htmlTableCellClose (
-			formatWriter);
-
-		htmlTableRowClose (
-			formatWriter);
-
-	}
-
-	@Override
-	public
-	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter javascriptWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints,
-			@NonNull FormType formType,
-			@NonNull String formName) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormReset");
-
-		if (
-
-			enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-
-			&& isNotNull (
-				defaultValueSupplier)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderTableCellList");
 
 		) {
-
-			Optional <Interface> interfaceValue =
-				requiredValue (
-					eitherGetLeft (
-						interfaceMapping.genericToInterface (
-							taskLogger,
-							container,
-							hints,
-							defaultValueSupplier.get ())));
-
-			renderer.renderFormReset (
-				javascriptWriter,
-				container,
-				interfaceValue,
-				formName);
-
-		} else {
 
 			Optional <Native> nativeValue =
 				requiredValue (
@@ -568,12 +331,294 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 							hints,
 							genericValue)));
 
-
-			renderer.renderFormReset (
-				javascriptWriter,
+			renderer.renderHtmlTableCellList (
+				taskLogger,
+				htmlWriter,
 				container,
+				hints,
 				interfaceValue,
+				link,
+				columnSpan);
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderTableCellProperties");
+
+		) {
+
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			renderer.renderHtmlTableCellProperties (
+				taskLogger,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				true,
+				1l);
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderFormTemporarilyHidden (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormFieldSubmission submission,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull FormType formType,
+			@NonNull String formName) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormTemporarilyHidden");
+
+		) {
+
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			renderer.renderFormTemporarilyHidden (
+				submission,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				formType,
 				formName);
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderFormRow (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormFieldSubmission submission,
+			@NonNull FormatWriter formatWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> error,
+			@NonNull FormType formType,
+			@NonNull String formName) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormRow");
+
+		) {
+
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			htmlTableRowOpen (
+				formatWriter);
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				label ());
+
+			htmlTableCellOpen (
+				formatWriter,
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"text-align",
+						renderer.propertiesAlign ().name ())));
+
+			renderer.renderFormInput (
+				taskLogger,
+				submission,
+				formatWriter,
+				container,
+				hints,
+				interfaceValue,
+				formType,
+				formName);
+
+			if (
+				optionalIsPresent (
+					error)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<br>");
+
+				formatWriter.writeLineFormat (
+					"%h",
+					error.get ());
+
+			}
+
+			htmlTableCellClose (
+				formatWriter);
+
+			htmlTableRowClose (
+				formatWriter);
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull FormType formType,
+			@NonNull String formName) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			if (
+
+				enumInSafe (
+					formType,
+					FormType.create,
+					FormType.perform,
+					FormType.search)
+
+				&& isNotNull (
+					defaultValueSupplier)
+
+			) {
+
+				Optional <Interface> interfaceValue =
+					requiredValue (
+						eitherGetLeft (
+							interfaceMapping.genericToInterface (
+								taskLogger,
+								container,
+								hints,
+								defaultValueSupplier.get ())));
+
+				renderer.renderFormReset (
+					taskLogger,
+					javascriptWriter,
+					container,
+					interfaceValue,
+					formName);
+
+			} else {
+
+				Optional <Native> nativeValue =
+					requiredValue (
+						accessor.read (
+							taskLogger,
+							container));
+
+				Optional <Generic> genericValue =
+					requiredValue (
+						nativeMapping.nativeToGeneric (
+							container,
+							nativeValue));
+
+				Optional <Interface> interfaceValue =
+					requiredValue (
+						eitherGetLeft (
+							interfaceMapping.genericToInterface (
+								taskLogger,
+								container,
+								hints,
+								genericValue)));
+
+
+				renderer.renderFormReset (
+					taskLogger,
+					javascriptWriter,
+					container,
+					interfaceValue,
+					formName);
+
+			}
 
 		}
 
@@ -587,36 +632,42 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderCsvRow");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderCsvRow");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+		) {
 
-		String csvValue =
-			optionalOr (
-				eitherGetLeft (
-					csvMapping.genericToInterface (
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
-						container,
-						hints,
-						genericValue)),
-				"");
+						container));
 
-		out.writeFormat (
-			"\"%s\"",
-			csvValue.replace ("\"", "\"\""));
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			String csvValue =
+				optionalOr (
+					eitherGetLeft (
+						csvMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)),
+					"");
+
+			out.writeFormat (
+				"\"%s\"",
+				csvValue.replace ("\"", "\"\""));
+
+		}
 
 	}
 
@@ -629,97 +680,45 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"update");
+		try (
 
-		// do nothing if no value present in form
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"update");
 
-		if (
-			! renderer.formValuePresent (
-				submission,
-				formName)
 		) {
 
-			return new UpdateResult <Generic, Native> ()
-
-				.updated (
-					false)
-
-				.error (
-					optionalAbsent ());
-
-		}
-
-		// get interface value from form
-
-		Either <Optional <Interface>, String> newInterfaceValue =
-			requiredValue (
-				renderer.formToInterface (
-					taskLogger,
-					submission,
-					formName));
-
-		if (
-			isError (
-				newInterfaceValue)
-		) {
-
-			return new UpdateResult <Generic, Native> ()
-
-				.updated (
-					false)
-
-				.error (
-					optionalOf (
-						getError (
-							newInterfaceValue)));
-
-		}
-
-		// convert to generic
-
-		Either <Optional <Generic>, String> interfaceToGenericResult =
-			interfaceMapping.interfaceToGeneric (
-				container,
-				hints,
-				resultValueRequired (
-					newInterfaceValue));
-
-		if (
-			isRight (
-				interfaceToGenericResult)
-		) {
-
-			return new UpdateResult <Generic, Native> ()
-
-				.updated (
-					false)
-
-				.error (
-					optionalOfFormat (
-						interfaceToGenericResult.right ().value ()));
-
-		}
-
-		Optional <Generic> newGenericValue =
-			interfaceToGenericResult.left ().value ();
-
-		// perform value validation
-
-		for (
-			FormFieldValueValidator <Generic> valueValidator
-				: valueValidators
-		) {
-
-			Optional <String> valueError =
-				valueValidator.validate (
-					newGenericValue);
+			// do nothing if no value present in form
 
 			if (
-				optionalIsPresent (
-					valueError)
+				! renderer.formValuePresent (
+					submission,
+					formName)
+			) {
+
+				return new UpdateResult <Generic, Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						optionalAbsent ());
+
+			}
+
+			// get interface value from form
+
+			Either <Optional <Interface>, String> newInterfaceValue =
+				requiredValue (
+					renderer.formToInterface (
+						taskLogger,
+						submission,
+						formName));
+
+			if (
+				isError (
+					newInterfaceValue)
 			) {
 
 				return new UpdateResult <Generic, Native> ()
@@ -729,101 +728,159 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 					.error (
 						optionalOf (
-							valueError.get ()));
+							getError (
+								newInterfaceValue)));
 
 			}
 
-		}
+			// convert to generic
 
-		// convert to native
+			Either <Optional <Generic>, String> interfaceToGenericResult =
+				interfaceMapping.interfaceToGeneric (
+					container,
+					hints,
+					resultValueRequired (
+						newInterfaceValue));
 
-		Optional <Native> newNativeValue =
-			requiredValue (
-				nativeMapping.genericToNative (
+			if (
+				isRight (
+					interfaceToGenericResult)
+			) {
+
+				return new UpdateResult <Generic, Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						optionalOfFormat (
+							interfaceToGenericResult.right ().value ()));
+
+			}
+
+			Optional <Generic> newGenericValue =
+				interfaceToGenericResult.left ().value ();
+
+			// perform value validation
+
+			for (
+				FormFieldValueValidator <Generic> valueValidator
+					: valueValidators
+			) {
+
+				Optional <String> valueError =
+					valueValidator.validate (
+						newGenericValue);
+
+				if (
+					optionalIsPresent (
+						valueError)
+				) {
+
+					return new UpdateResult <Generic, Native> ()
+
+						.updated (
+							false)
+
+						.error (
+							optionalOf (
+								valueError.get ()));
+
+				}
+
+			}
+
+			// convert to native
+
+			Optional <Native> newNativeValue =
+				requiredValue (
+					nativeMapping.genericToNative (
+						taskLogger,
+						container,
+						newGenericValue));
+
+			// check new value
+
+			Optional <String> constraintError =
+				constraintValidator.validate (
 					taskLogger,
 					container,
-					newGenericValue));
+					newNativeValue);
 
-		// check new value
+			if (
+				optionalIsPresent (
+					constraintError)
+			) {
 
-		Optional <String> constraintError =
-			constraintValidator.validate (
+				return new UpdateResult <Generic, Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						constraintError);
+
+			}
+
+			// get the current value, if it is the same, do nothing
+
+			Optional <Native> oldNativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> oldGenericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						oldNativeValue));
+
+			if (
+				optionalEqualOrNotPresentWithClass (
+					Object.class,
+					oldGenericValue,
+					newGenericValue)
+			) {
+
+				return new UpdateResult <Generic, Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						optionalAbsent ());
+
+			}
+
+			// set the new value
+
+			accessor.write (
 				taskLogger,
 				container,
 				newNativeValue);
 
-		if (
-			optionalIsPresent (
-				constraintError)
-		) {
-
 			return new UpdateResult <Generic, Native> ()
 
 				.updated (
-					false)
+					true)
 
-				.error (
-					constraintError);
+				.oldGenericValue (
+					oldGenericValue)
 
-		}
+				.newGenericValue (
+					newGenericValue)
 
-		// get the current value, if it is the same, do nothing
+				.oldNativeValue (
+					oldNativeValue)
 
-		Optional <Native> oldNativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
-
-		Optional <Generic> oldGenericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					oldNativeValue));
-
-		if (
-			optionalEqualOrNotPresentWithClass (
-				Object.class,
-				oldGenericValue,
-				newGenericValue)
-		) {
-
-			return new UpdateResult <Generic, Native> ()
-
-				.updated (
-					false)
+				.newNativeValue (
+					newNativeValue)
 
 				.error (
 					optionalAbsent ());
 
 		}
-
-		// set the new value
-
-		accessor.write (
-			taskLogger,
-			container,
-			newNativeValue);
-
-		return new UpdateResult <Generic, Native> ()
-
-			.updated (
-				true)
-
-			.oldGenericValue (
-				oldGenericValue)
-
-			.newGenericValue (
-				newGenericValue)
-
-			.oldNativeValue (
-				oldNativeValue)
-
-			.newNativeValue (
-				newNativeValue)
-
-			.error (
-				optionalAbsent ());
 
 	}
 

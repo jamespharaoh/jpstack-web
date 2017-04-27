@@ -1,5 +1,7 @@
 package wbs.framework.servlet;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -9,6 +11,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import lombok.NonNull;
 
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.DefaultLogContext;
@@ -52,31 +56,38 @@ class BeanFilterProxy
 	@Override
 	public
 	void init (
-			FilterConfig filterConfig)
+			@NonNull FilterConfig filterConfig)
 		throws ServletException {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"init");
+		try (
 
-		ServletContext servletContext =
-			filterConfig.getServletContext ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"init");
 
-		ComponentManager componentManager =
-			(ComponentManager)
-			servletContext.getAttribute (
-				"wbs-application-context");
+		) {
 
-		target =
-			componentManager.getComponentRequired (
-				taskLogger,
-				filterConfig.getFilterName (),
-				Filter.class);
+			ServletContext servletContext =
+				filterConfig.getServletContext ();
 
-		taskLogger.makeException ();
+			@SuppressWarnings ("resource")
+			ComponentManager componentManager =
+				genericCastUnchecked (
+					servletContext.getAttribute (
+						"wbs-application-context"));
 
-		target.init (
-			filterConfig);
+			target =
+				componentManager.getComponentRequired (
+					taskLogger,
+					filterConfig.getFilterName (),
+					Filter.class);
+
+			taskLogger.makeException ();
+
+			target.init (
+				filterConfig);
+
+		}
 
 	}
 

@@ -6,6 +6,7 @@ import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
 @SingletonComponent ("modelMetaLoader")
@@ -70,16 +73,22 @@ class ModelMetaLoader {
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		createDataFromXml (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		loadSpecs (
-			taskLogger);
+		) {
+
+			createDataFromXml (
+				taskLogger);
+
+			loadSpecs (
+				taskLogger);
+
+		}
 
 	}
 
@@ -89,34 +98,39 @@ class ModelMetaLoader {
 	void createDataFromXml (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createDataFromXml");
+		try (
 
-		DataFromXmlBuilder dataFromXmlBuilder =
-			new DataFromXmlBuilder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createDataFromXml");
 
-		for (
-			Map.Entry <Class <?>, Provider <Object>> modelMetaDataEntry
-				: modelMetaDataProviders.entrySet ()
 		) {
 
-			Class <?> modelMetaDataClass =
-				modelMetaDataEntry.getKey ();
+			DataFromXmlBuilder dataFromXmlBuilder =
+				new DataFromXmlBuilder ();
 
-			Provider <?> modelMetaDataProvider =
-				modelMetaDataEntry.getValue ();
+			for (
+				Map.Entry <Class <?>, Provider <Object>> modelMetaDataEntry
+					: modelMetaDataProviders.entrySet ()
+			) {
 
-			dataFromXmlBuilder.registerBuilder (
-				modelMetaDataClass,
-				modelMetaDataProvider);
+				Class <?> modelMetaDataClass =
+					modelMetaDataEntry.getKey ();
+
+				Provider <?> modelMetaDataProvider =
+					modelMetaDataEntry.getValue ();
+
+				dataFromXmlBuilder.registerBuilder (
+					modelMetaDataClass,
+					modelMetaDataProvider);
+
+			}
+
+			dataFromXml =
+				dataFromXmlBuilder.build ();
 
 		}
-
-		dataFromXml =
-			dataFromXmlBuilder.build ();
 
 	}
 
@@ -124,60 +138,66 @@ class ModelMetaLoader {
 	void loadSpecs (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"loadSpecs");
+		try (
 
-		ImmutableMap.Builder <String, ModelMetaSpec> modelBuilder =
-			ImmutableMap.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"loadSpecs");
 
-		ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
-			ImmutableMap.builder ();
+		) {
 
-		pluginManager.plugins ().forEach (
-			pluginSpec -> {
+			ImmutableMap.Builder <String, ModelMetaSpec> modelBuilder =
+				ImmutableMap.builder ();
 
-			if (
-				isNull (
-					pluginSpec.models ())
-			) {
-				return;
+			ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
+				ImmutableMap.builder ();
+
+			pluginManager.plugins ().forEach (
+				pluginSpec -> {
+
+				if (
+					isNull (
+						pluginSpec.models ())
+				) {
+					return;
+				}
+
+				pluginSpec.models ().models ().forEach (
+					pluginModelSpec ->
+						loadModelMeta (
+							taskLogger,
+							modelBuilder,
+							pluginSpec,
+							pluginModelSpec.name ()));
+
+				pluginSpec.models ().componentTypes ().forEach (
+					pluginComponentTypeSpec ->
+						loadModelMeta (
+							taskLogger,
+							componentBuilder,
+							pluginSpec,
+							pluginComponentTypeSpec.name ()));
+
+			});
+
+			if (taskLogger.errors ()) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Aborting due to %s errors",
+						integerToDecimalString (
+							taskLogger.errorCount ())));
+
 			}
 
-			pluginSpec.models ().models ().forEach (
-				pluginModelSpec ->
-					loadModelMeta (
-						taskLogger,
-						modelBuilder,
-						pluginSpec,
-						pluginModelSpec.name ()));
+			modelMetas =
+				modelBuilder.build ();
 
-			pluginSpec.models ().componentTypes ().forEach (
-				pluginComponentTypeSpec ->
-					loadModelMeta (
-						taskLogger,
-						componentBuilder,
-						pluginSpec,
-						pluginComponentTypeSpec.name ()));
-
-		});
-
-		if (taskLogger.errors ()) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
-					integerToDecimalString (
-						taskLogger.errorCount ())));
+			componentMetas =
+				componentBuilder.build ();
 
 		}
-
-		modelMetas =
-			modelBuilder.build ();
-
-		componentMetas =
-			componentBuilder.build ();
 
 	}
 
@@ -188,79 +208,96 @@ class ModelMetaLoader {
 			@NonNull PluginSpec plugin,
 			@NonNull String modelName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"loadModelMeta");
+		try (
 
-		String resourceName =
-			stringFormat (
-				"/%s/model/%s-model.xml",
-				plugin.packageName ().replace ('.', '/'),
-				camelToHyphen (
-					modelName));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"loadModelMeta");
 
-		InputStream inputStream =
-			getClass ().getResourceAsStream (
-				resourceName);
-
-		if (inputStream == null) {
-
-			taskLogger.errorFormat (
-				"Model meta not found for %s.%s: %s",
-				plugin.name (),
-				modelName,
-				resourceName);
-
-			return;
-
-		}
-
-		ModelMetaSpec spec;
-
-		try {
-
-			spec =
-				(ModelMetaSpec)
-				dataFromXml.readInputStream (
-					taskLogger,
-					inputStream,
-					resourceName,
-					ImmutableList.<Object> of (
-						plugin));
-
-		} catch (Exception exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error reading model meta for %s.%s: %s",
-				plugin.name (),
-				modelName,
-				resourceName);
-
-			return;
-
-		}
-
-		if (
-			stringNotEqualSafe (
-				spec.name (),
-				modelName)
 		) {
 
-			taskLogger.errorFormat (
-				"Model meta name %s should be %s in %s",
-				spec.name (),
-				modelName,
-				resourceName);
+			String resourceName =
+				stringFormat (
+					"/%s/model/%s-model.xml",
+					plugin.packageName ().replace ('.', '/'),
+					camelToHyphen (
+						modelName));
 
-			return;
+			try (
+
+				InputStream inputStream =
+					getClass ().getResourceAsStream (
+						resourceName);
+
+			) {
+
+				if (inputStream == null) {
+
+					taskLogger.errorFormat (
+						"Model meta not found for %s.%s: %s",
+						plugin.name (),
+						modelName,
+						resourceName);
+
+					return;
+
+				}
+
+				ModelMetaSpec spec;
+
+				try {
+
+					spec =
+						(ModelMetaSpec)
+						dataFromXml.readInputStream (
+							taskLogger,
+							inputStream,
+							resourceName,
+							ImmutableList.<Object> of (
+								plugin));
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
+						"Error reading model meta for %s.%s: %s",
+						plugin.name (),
+						modelName,
+						resourceName);
+
+					return;
+
+				}
+
+				if (
+					stringNotEqualSafe (
+						spec.name (),
+						modelName)
+				) {
+
+					taskLogger.errorFormat (
+						"Model meta name %s should be %s in %s",
+						spec.name (),
+						modelName,
+						resourceName);
+
+					return;
+
+				}
+
+				builder.put (
+					modelName,
+					spec);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
-
-		builder.put (
-			modelName,
-			spec);
 
 	}
 

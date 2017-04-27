@@ -75,81 +75,87 @@ class BroadcastHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BroadcastRec broadcast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"afterInsert");
+		try (
 
-		BroadcastConfigRec broadcastConfig =
-			broadcast.getBroadcastConfig ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"afterInsert");
 
-		// update parent counts
+		) {
 
-		broadcastConfig.setNumTotal (
-			broadcastConfig.getNumTotal () + 1);
+			BroadcastConfigRec broadcastConfig =
+				broadcast.getBroadcastConfig ();
 
-		broadcastConfig.setNumUnsent (
-			broadcastConfig.getNumUnsent () + 1);
+			// update parent counts
 
-		// create batch
+			broadcastConfig.setNumTotal (
+				broadcastConfig.getNumTotal () + 1);
 
-		BatchSubjectRec batchSubject =
-			batchLogic.batchSubject (
+			broadcastConfig.setNumUnsent (
+				broadcastConfig.getNumUnsent () + 1);
+
+			// create batch
+
+			BatchSubjectRec batchSubject =
+				batchLogic.batchSubject (
+					taskLogger,
+					broadcastConfig,
+					"broadcast");
+
+			ObjectTypeRec broadcastObjectType =
+				objectTypeDao.findByCode (
+					"broadcast");
+
+			if (broadcastObjectType == null)
+				throw new NullPointerException ();
+
+			batchHelper.insert (
 				taskLogger,
-				broadcastConfig,
-				"broadcast");
+				batchHelper.createInstance ()
 
-		ObjectTypeRec broadcastObjectType =
-			objectTypeDao.findByCode (
-				"broadcast");
+				.setParentType (
+					broadcastObjectType)
 
-		if (broadcastObjectType == null)
-			throw new NullPointerException ();
+				.setParentId (
+					broadcast.getId ())
 
-		batchHelper.insert (
-			taskLogger,
-			batchHelper.createInstance ()
+				.setCode (
+					"broadcast")
 
-			.setParentType (
-				broadcastObjectType)
+				.setSubject (
+					batchSubject)
 
-			.setParentId (
-				broadcast.getId ())
+			);
 
-			.setCode (
-				"broadcast")
+			// add default numbers
 
-			.setSubject (
-				batchSubject)
+			if (broadcastConfig.getDefaultNumbers () != null) {
 
-		);
+				List <String> numbers;
 
-		// add default numbers
+				try {
 
-		if (broadcastConfig.getDefaultNumbers () != null) {
+					numbers =
+						numberFormatLogicProvider.parseLines (
+							broadcastConfig.getNumberFormat (),
+							broadcastConfig.getDefaultNumbers ());
 
-			List <String> numbers;
+				} catch (WbsNumberFormatException exception) {
 
-			try {
+					throw new RuntimeException (
+						"Number format error parsing default numbers",
+						exception);
 
-				numbers =
-					numberFormatLogicProvider.parseLines (
-						broadcastConfig.getNumberFormat (),
-						broadcastConfig.getDefaultNumbers ());
+				}
 
-			} catch (WbsNumberFormatException exception) {
-
-				throw new RuntimeException (
-					"Number format error parsing default numbers",
-					exception);
+				broadcastLogicProvider.addNumbers (
+					taskLogger,
+					broadcast,
+					numbers,
+					null);
 
 			}
-
-			broadcastLogicProvider.addNumbers (
-				taskLogger,
-				broadcast,
-				numbers,
-				null);
 
 		}
 

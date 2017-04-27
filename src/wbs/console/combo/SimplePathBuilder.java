@@ -60,35 +60,47 @@ class SimplePathBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildPath (
-			taskLogger);
+		) {
+
+			setDefaults ();
+
+			buildPath (
+				taskLogger);
+
+		}
 
 	}
 
 	void buildPath (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildPath");
+		try (
 
-		PathHandler pathHandler =
-			componentManager.getComponentRequired (
-				taskLogger,
-				pathHandlerName,
-				PathHandler.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildPath");
 
-		consoleModule.addPath (
-			path,
-			pathHandler);
+		) {
+
+			PathHandler pathHandler =
+				componentManager.getComponentRequired (
+					taskLogger,
+					pathHandlerName,
+					PathHandler.class);
+
+			consoleModule.addPath (
+				path,
+				pathHandler);
+
+		}
 
 	}
 

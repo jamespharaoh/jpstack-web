@@ -120,237 +120,255 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormInput");
+		try (
 
-		// lookup root
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormInput");
 
-		Optional <Record <?>> root;
-
-		if (
-			isNotNull (
-				rootFieldName)
 		) {
 
-			root =
-				genericCastUnchecked (
-					objectManager.dereference (
-						container,
-						rootFieldName,
-						hints));
+			// lookup root
+
+			Optional <Record <?>> root;
 
 			if (
-				optionalIsNotPresent (
-					root)
+				isNotNull (
+					rootFieldName)
 			) {
 
-				throw new RuntimeException (
-					stringFormat (
-						"Failed to look up root for %s: %s",
-						name (),
-						rootFieldName));
+				root =
+					genericCastUnchecked (
+						objectManager.dereference (
+							container,
+							rootFieldName,
+							hints));
+
+				if (
+					optionalIsNotPresent (
+						root)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Failed to look up root for %s: %s",
+							name (),
+							rootFieldName));
+
+				}
+
+			} else {
+
+				root =
+					optionalAbsent ();
 
 			}
 
-		} else {
+			// get current option
 
-			root =
-				optionalAbsent ();
-
-		}
-
-		// get current option
-
-		Optional <Interface> currentValue =
-			formValuePresent (
-					submission,
-					formName)
-				? resultValueRequired (
-					formToInterface (
-						taskLogger,
+			Optional <Interface> currentValue =
+				formValuePresent (
 						submission,
-						formName))
-				: interfaceValue;
+						formName)
+					? resultValueRequired (
+						formToInterface (
+							taskLogger,
+							submission,
+							formName))
+					: interfaceValue;
 
-		// get a list of options
+			// get a list of options
 
-		Collection <Interface> allOptions =
-			entityFinder.findAllEntities ();
+			Collection <Interface> allOptions =
+				entityFinder.findAllEntities ();
 
-		// filter visible options
+			// filter visible options
 
-		List <Interface> filteredOptions =
-			allOptions.stream ()
+			List <Interface> filteredOptions =
+				allOptions.stream ()
 
-			.filter (
-				root.isPresent ()
-					? item -> objectManager.isParent (
-						item,
-						root.get ())
-					: item -> true)
+				.filter (
+					root.isPresent ()
+						? item -> objectManager.isParent (
+							item,
+							root.get ())
+						: item -> true)
 
-			.filter (
-				item ->
+				.filter (
+					item ->
 
-				(
+					(
 
-					successOrElse (
-						entityFinder.getNotDeletedOrErrorCheckParents (
-							item),
-						error -> true)
+						successOrElse (
+							entityFinder.getNotDeletedOrErrorCheckParents (
+								item),
+							error -> true)
 
-					&& objectManager.canView (
-						taskLogger,
-						item)
+						&& objectManager.canView (
+							taskLogger,
+							item)
 
-				) || (
+					) || (
 
-					optionalIsPresent (
-						interfaceValue)
+						optionalIsPresent (
+							interfaceValue)
 
-					&& referenceEqualWithClass (
-						entityFinder.entityClass (),
-						item,
-						interfaceValue.get ())
+						&& referenceEqualWithClass (
+							entityFinder.entityClass (),
+							item,
+							interfaceValue.get ())
+
+					)
 
 				)
 
-			)
+				.collect (
+					Collectors.toList ());
 
-			.collect (
-				Collectors.toList ());
+			// sort options by path
 
-		// sort options by path
+			Map <String, Record <?>> sortedOptions =
+				new TreeMap<> ();
 
-		Map <String, Record <?>> sortedOptions =
-			new TreeMap<> ();
-
-		for (
-			Record <?> option
-				: filteredOptions
-		) {
-
-			sortedOptions.put (
-				objectManager.objectPathMiniPreload (
-					option,
-					root),
-				option);
-
-		}
-
-		formatWriter.writeLineFormat (
-			"<select",
-			" id=\"%h.%h\"",
-			formName,
-			name,
-			" name=\"%h.%h\"",
-			formName,
-			name,
-			">");
-
-		// none option
-
-		if (
-
-			nullable ()
-
-			|| optionalIsNotPresent (
-				currentValue)
-
-			|| enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-
-		) {
-
-			formatWriter.writeLineFormat (
-				"<option",
-				" value=\"none\"",
-				currentValue.isPresent ()
-					? ""
-					: " selected",
-				">&mdash;</option>");
-
-		}
-
-		// value options
-
-		for (
-			Map.Entry <String, Record <?>> optionEntry
-				: sortedOptions.entrySet ()
-		) {
-
-			String optionLabel =
-				optionEntry.getKey ();
-
-			Record <?> optionValue =
-				optionEntry.getValue ();
-
-			ObjectHelper <?> objectHelper =
-				objectManager.objectHelperForObjectRequired (
-					optionValue);
-
-			boolean selected =
-				optionalValueEqualWithClass (
-					objectHelper.objectClass (),
-					genericCastUnchecked (
-						currentValue),
-					genericCastUnchecked (
-						optionValue));
-
-			if (
-
-				! selected
-
-				&& objectHelper.getDeleted (
-					genericCastUnchecked (
-						optionValue),
-					true)
-
+			for (
+				Record <?> option
+					: filteredOptions
 			) {
-				continue;
+
+				sortedOptions.put (
+					objectManager.objectPathMiniPreload (
+						option,
+						root),
+					option);
+
 			}
 
 			formatWriter.writeLineFormat (
-				"<option",
-				" value=\"%h\"",
-				integerToDecimalString (
-					optionValue.getId ()),
-				selected
-					? " selected"
-					: "",
-				">%h</option>",
-				optionLabel);
+				"<select",
+				" id=\"%h.%h\"",
+				formName,
+				name,
+				" name=\"%h.%h\"",
+				formName,
+				name,
+				">");
+
+			// none option
+
+			if (
+
+				nullable ()
+
+				|| optionalIsNotPresent (
+					currentValue)
+
+				|| enumInSafe (
+					formType,
+					FormType.create,
+					FormType.perform,
+					FormType.search)
+
+			) {
+
+				formatWriter.writeLineFormat (
+					"<option",
+					" value=\"none\"",
+					currentValue.isPresent ()
+						? ""
+						: " selected",
+					">&mdash;</option>");
+
+			}
+
+			// value options
+
+			for (
+				Map.Entry <String, Record <?>> optionEntry
+					: sortedOptions.entrySet ()
+			) {
+
+				String optionLabel =
+					optionEntry.getKey ();
+
+				Record <?> optionValue =
+					optionEntry.getValue ();
+
+				ObjectHelper <?> objectHelper =
+					objectManager.objectHelperForObjectRequired (
+						optionValue);
+
+				boolean selected =
+					optionalValueEqualWithClass (
+						objectHelper.objectClass (),
+						genericCastUnchecked (
+							currentValue),
+						genericCastUnchecked (
+							optionValue));
+
+				if (
+
+					! selected
+
+					&& objectHelper.getDeleted (
+						genericCastUnchecked (
+							optionValue),
+						true)
+
+				) {
+					continue;
+				}
+
+				formatWriter.writeLineFormat (
+					"<option",
+					" value=\"%h\"",
+					integerToDecimalString (
+						optionValue.getId ()),
+					selected
+						? " selected"
+						: "",
+					">%h</option>",
+					optionLabel);
+
+			}
+
+			formatWriter.writeLineFormat (
+				"</select>");
 
 		}
-
-		formatWriter.writeLineFormat (
-			"</select>");
 
 	}
 
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"%j\").val (\"%h\");",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name),
-			interfaceValue.isPresent ()
-				? integerToDecimalString (
-					interfaceValue.get ().getId ())
-				: "none");
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"%j\").val (\"%h\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
+				interfaceValue.isPresent ()
+					? integerToDecimalString (
+						interfaceValue.get ().getId ())
+					: "none");
+
+		}
 
 	}
 
@@ -430,9 +448,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		if (rootFieldName != null) {
 
 			root =
-				optionalOf (
-					(Record <?>)
-					objectManager.dereferenceObsolete (
+				genericCastUnchecked (
+					objectManager.dereferenceRequired (
 						container,
 						rootFieldName));
 
@@ -478,69 +495,75 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlTableCellList");
+		try (
 
-		// work out root
-
-		Optional <Record <?>> rootOptional;
-
-		if (
-
-			optionalIsPresent (
-				interfaceValue)
-
-			&& isNotNull (
-				rootFieldName)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlTableCellList");
 
 		) {
 
-			rootOptional =
-				optionalOf (
-					(Record <?>)
-					objectManager.dereferenceObsolete (
-						container,
-						rootFieldName));
+			// work out root
 
-		} else {
+			Optional <Record <?>> rootOptional;
 
-			rootOptional =
-				optionalAbsent ();
+			if (
 
-		}
+				optionalIsPresent (
+					interfaceValue)
 
-		// render table cell
+				&& isNotNull (
+					rootFieldName)
 
-		if (
-			optionalIsPresent (
-				interfaceValue)
-		) {
+			) {
 
-			objectManager.writeTdForObject (
-				taskLogger,
-				formatWriter,
-				interfaceValue.orNull (),
-				rootOptional,
-				mini,
-				link,
-				columnSpan);
+				rootOptional =
+					optionalOf (
+						(Record <?>)
+						objectManager.dereferenceObsolete (
+							container,
+							rootFieldName));
 
-		} else if (
-			moreThanOne (
-				columnSpan)
-		) {
+			} else {
 
-			formatWriter.writeLineFormat (
-				"<td colspan=\"%h\">—</td>",
-				integerToDecimalString (
-					columnSpan));
+				rootOptional =
+					optionalAbsent ();
 
-		} else {
+			}
 
-			formatWriter.writeLineFormat (
-				"<td>—</td>");
+			// render table cell
+
+			if (
+				optionalIsPresent (
+					interfaceValue)
+			) {
+
+				objectManager.writeTdForObject (
+					taskLogger,
+					formatWriter,
+					interfaceValue.orNull (),
+					rootOptional,
+					mini,
+					link,
+					columnSpan);
+
+			} else if (
+				moreThanOne (
+					columnSpan)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<td colspan=\"%h\">—</td>",
+					integerToDecimalString (
+						columnSpan));
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"<td>—</td>");
+
+			}
 
 		}
 
@@ -557,69 +580,75 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlTableCellProperties");
+		try (
 
-		// work out root
-
-		Optional <Record <?>> rootOptional;
-
-		if (
-
-			optionalIsPresent (
-				interfaceValue)
-
-			&& isNotNull (
-				rootFieldName)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlTableCellProperties");
 
 		) {
 
-			rootOptional =
-				optionalOf (
-					(Record <?>)
-					objectManager.dereferenceObsolete (
-						container,
-						rootFieldName));
+			// work out root
 
-		} else {
+			Optional <Record <?>> rootOptional;
 
-			rootOptional =
-				optionalAbsent ();
+			if (
 
-		}
+				optionalIsPresent (
+					interfaceValue)
 
-		// render table cell
+				&& isNotNull (
+					rootFieldName)
 
-		if (
-			optionalIsPresent (
-				interfaceValue)
-		) {
+			) {
 
-			objectManager.writeTdForObject (
-				taskLogger,
-				formatWriter,
-				interfaceValue.orNull (),
-				rootOptional,
-				mini,
-				link,
-				columnSpan);
+				rootOptional =
+					optionalOf (
+						(Record <?>)
+						objectManager.dereferenceObsolete (
+							container,
+							rootFieldName));
 
-		} else if (
-			moreThanOne (
-				columnSpan)
-		) {
+			} else {
 
-			formatWriter.writeLineFormat (
-				"<td colspan=\"%h\">—</td>",
-				integerToDecimalString (
-					columnSpan));
+				rootOptional =
+					optionalAbsent ();
 
-		} else {
+			}
 
-			formatWriter.writeLineFormat (
-				"<td>—</td>");
+			// render table cell
+
+			if (
+				optionalIsPresent (
+					interfaceValue)
+			) {
+
+				objectManager.writeTdForObject (
+					taskLogger,
+					formatWriter,
+					interfaceValue.orNull (),
+					rootOptional,
+					mini,
+					link,
+					columnSpan);
+
+			} else if (
+				moreThanOne (
+					columnSpan)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<td colspan=\"%h\">—</td>",
+					integerToDecimalString (
+						columnSpan));
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"<td>—</td>");
+
+			}
 
 		}
 

@@ -48,7 +48,7 @@ class SimpleExceptionLogger
 
 	@Override
 	public
-	Record<?> logThrowable (
+	Record <?> logThrowable (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
@@ -56,20 +56,26 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logThrowable");
+		try (
 
-		parentTaskLogger.errorFormatException (
-			throwable,
-			"%s: %s",
-			source,
-			exceptionLogic.throwableSummary (
-				taskLogger,
-				throwable));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logThrowable");
 
-		return null;
+		) {
+
+			parentTaskLogger.errorFormatException (
+				throwable,
+				"%s: %s",
+				source,
+				exceptionLogic.throwableSummary (
+					taskLogger,
+					throwable));
+
+			return null;
+
+		}
 
 	}
 
@@ -84,20 +90,26 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logThrowableWithSummary");
+		try (
 
-		parentTaskLogger.errorFormatException (
-			throwable,
-			"%s: %s",
-			source,
-			exceptionLogic.throwableSummary (
-				taskLogger,
-				throwable));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logThrowableWithSummary");
 
-		return null;
+		) {
+
+			parentTaskLogger.errorFormatException (
+				throwable,
+				"%s: %s",
+				source,
+				exceptionLogic.throwableSummary (
+					taskLogger,
+					throwable));
+
+			return null;
+
+		}
 
 	}
 

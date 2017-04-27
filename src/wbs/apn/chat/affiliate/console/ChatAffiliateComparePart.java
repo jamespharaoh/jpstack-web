@@ -83,157 +83,163 @@ class ChatAffiliateComparePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// check units
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		timePeriodString =
-			requestContext.parameterOrDefault (
-				"timePeriod",
-				"7 days");
-
-		Optional <Duration> timePeriodDurationOptional =
-			durationFormatter.stringToDuration (
-				timePeriodString);
-
-		if (
-			optionalIsNotPresent (
-				timePeriodDurationOptional)
 		) {
 
-			requestContext.addError (
-				"Invalid time period");
+			// check units
 
-			return;
+			timePeriodString =
+				requestContext.parameterOrDefault (
+					"timePeriod",
+					"7 days");
 
-		}
+			Optional <Duration> timePeriodDurationOptional =
+				durationFormatter.stringToDuration (
+					timePeriodString);
 
-		Duration timePeriodDuration =
-			optionalGetRequired (
-				timePeriodDurationOptional);
-
-		// get objects
-
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
-
-		// work out first join time
-
-		DateTimeZone timeZone =
-			DateTimeZone.forID (
-				chat.getTimezone ());
-
-		Instant firstJoinAfter =
-			DateTime.now (
-				timeZone)
-
-			.minus (
-				timePeriodDuration)
-
-			.toInstant ();
-
-		// get all relevant users
-
-		List <Long> newUserIds =
-			chatUserHelper.searchIds (
-				taskLogger,
-				new ChatUserSearch ()
-
-			.chatId (
-				chat.getId ())
-
-			.firstJoin (
-				TextualInterval.after (
-					DateTimeZone.UTC,
-					firstJoinAfter))
-
-		);
-
-		// count them grouping by affiliate
-
-		Map <Long, ChatAffiliateWithNewUserCount> map =
-			new HashMap<> ();
-
-		for (
-			Long chatUserId
-				: newUserIds
-		) {
-
-			ChatUserRec chatUser =
-				chatUserHelper.findRequired (
-					chatUserId);
-
-			Long chatAffiliateId =
-				chatUser.getChatAffiliate () != null
-					? chatUser.getChatAffiliate ().getId ()
-					: null;
-
-			ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount =
-				map.get (
-					chatAffiliateId);
-
-			if (chatAffiliateWithNewUserCount == null) {
-
-				map.put (
-					chatAffiliateId,
-					chatAffiliateWithNewUserCount =
-						new ChatAffiliateWithNewUserCount ()
-
-							.chatAffiliate (
-								chatUser.getChatAffiliate ())
-
-				);
-
-			}
-
-			chatAffiliateWithNewUserCount.newUsers ++;
-
-		}
-
-		// now select and sort the ones we are allowed to see
-
-		chatAffiliateWithNewUserCounts =
-			new ArrayList<> ();
-
-		if (
-			privChecker.canRecursive (
-				taskLogger,
-				chat,
-				"stats")
-		) {
-
-			chatAffiliateWithNewUserCounts.addAll (
-				map.values ());
-
-			for (
-				ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount
-					: map.values ()
+			if (
+				optionalIsNotPresent (
+					timePeriodDurationOptional)
 			) {
 
-				ChatAffiliateRec chatAffiliate =
-					chatAffiliateWithNewUserCount.chatAffiliate;
+				requestContext.addError (
+					"Invalid time period");
 
-				if (
-					! privChecker.canRecursive (
-						taskLogger,
-						chatAffiliate,
-						"stats")
-				) {
-					continue;
-				}
-
-				chatAffiliateWithNewUserCounts.add (
-					chatAffiliateWithNewUserCount);
+				return;
 
 			}
 
-		}
+			Duration timePeriodDuration =
+				optionalGetRequired (
+					timePeriodDurationOptional);
 
-		Collections.sort (
-			chatAffiliateWithNewUserCounts);
+			// get objects
+
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
+
+			// work out first join time
+
+			DateTimeZone timeZone =
+				DateTimeZone.forID (
+					chat.getTimezone ());
+
+			Instant firstJoinAfter =
+				DateTime.now (
+					timeZone)
+
+				.minus (
+					timePeriodDuration)
+
+				.toInstant ();
+
+			// get all relevant users
+
+			List <Long> newUserIds =
+				chatUserHelper.searchIds (
+					taskLogger,
+					new ChatUserSearch ()
+
+				.chatId (
+					chat.getId ())
+
+				.firstJoin (
+					TextualInterval.after (
+						DateTimeZone.UTC,
+						firstJoinAfter))
+
+			);
+
+			// count them grouping by affiliate
+
+			Map <Long, ChatAffiliateWithNewUserCount> map =
+				new HashMap<> ();
+
+			for (
+				Long chatUserId
+					: newUserIds
+			) {
+
+				ChatUserRec chatUser =
+					chatUserHelper.findRequired (
+						chatUserId);
+
+				Long chatAffiliateId =
+					chatUser.getChatAffiliate () != null
+						? chatUser.getChatAffiliate ().getId ()
+						: null;
+
+				ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount =
+					map.get (
+						chatAffiliateId);
+
+				if (chatAffiliateWithNewUserCount == null) {
+
+					map.put (
+						chatAffiliateId,
+						chatAffiliateWithNewUserCount =
+							new ChatAffiliateWithNewUserCount ()
+
+								.chatAffiliate (
+									chatUser.getChatAffiliate ())
+
+					);
+
+				}
+
+				chatAffiliateWithNewUserCount.newUsers ++;
+
+			}
+
+			// now select and sort the ones we are allowed to see
+
+			chatAffiliateWithNewUserCounts =
+				new ArrayList<> ();
+
+			if (
+				privChecker.canRecursive (
+					taskLogger,
+					chat,
+					"stats")
+			) {
+
+				chatAffiliateWithNewUserCounts.addAll (
+					map.values ());
+
+				for (
+					ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount
+						: map.values ()
+				) {
+
+					ChatAffiliateRec chatAffiliate =
+						chatAffiliateWithNewUserCount.chatAffiliate;
+
+					if (
+						! privChecker.canRecursive (
+							taskLogger,
+							chatAffiliate,
+							"stats")
+					) {
+						continue;
+					}
+
+					chatAffiliateWithNewUserCounts.add (
+						chatAffiliateWithNewUserCount);
+
+				}
+
+			}
+
+			Collections.sort (
+				chatAffiliateWithNewUserCounts);
+
+		}
 
 	}
 

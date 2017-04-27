@@ -15,8 +15,8 @@ import org.joda.time.LocalDate;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.logging.LogContext;
@@ -67,39 +67,45 @@ class EventLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createEvent");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createEvent");
 
-		// lookup type
+		) {
 
-		EventTypeRec eventType =
-			eventTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				typeCode);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// create event
+			// lookup type
 
-		EventRec event =
-			eventHelper.insert (
-				taskLogger,
-				eventHelper.createInstance ()
+			EventTypeRec eventType =
+				eventTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					typeCode);
 
-			.setEventType (
-				eventType)
+			// create event
 
-			.setTimestamp (
-				transaction.now ())
+			EventRec event =
+				eventHelper.insert (
+					taskLogger,
+					eventHelper.createInstance ()
 
-		);
+				.setEventType (
+					eventType)
 
-		// return
+				.setTimestamp (
+					transaction.now ())
 
-		return event;
+			);
+
+			// return
+
+			return event;
+
+		}
 
 	}
 
@@ -108,51 +114,57 @@ class EventLogicImplementation
 	EventRec createEvent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
-			@NonNull Object... linkObjects) {
+			@NonNull Object ... linkObjects) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createEvent");
+		try (
 
-		// create event
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createEvent");
 
-		EventRec event =
-			createEvent (
-				taskLogger,
-				typeCode);
-
-		// create event links
-
-		int index = 0;
-
-		for (
-			Object linkObject
-				: linkObjects
 		) {
 
-			EventLinkRec eventLink =
-				createEventLink (
+			// create event
+
+			EventRec event =
+				createEvent (
 					taskLogger,
-					event,
-					linkObject,
-					fromJavaInteger (
-						index));
+					typeCode);
 
-			eventLinkHelper.insert (
-				taskLogger,
-				eventLink);
+			// create event links
 
-			event.getEventLinks ().add (
-				eventLink);
+			int index = 0;
 
-			index ++;
+			for (
+				Object linkObject
+					: linkObjects
+			) {
+
+				EventLinkRec eventLink =
+					createEventLink (
+						taskLogger,
+						event,
+						linkObject,
+						fromJavaInteger (
+							index));
+
+				eventLinkHelper.insert (
+					taskLogger,
+					eventLink);
+
+				event.getEventLinks ().add (
+					eventLink);
+
+				index ++;
+
+			}
+
+			// return
+
+			return event;
 
 		}
-
-		// return
-
-		return event;
 
 	}
 
@@ -163,143 +175,149 @@ class EventLogicImplementation
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createEventLink");
+		try (
 
-		Object linkObject =
-			normaliseLinkObject (
-				taskLogger,
-				originalLinkObject,
-				index);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createEventLink");
 
-		// handle permanent records as object ids
+		) {
 
-		if (linkObject instanceof PermanentRecord <?>) {
+			Object linkObject =
+				normaliseLinkObject (
+					taskLogger,
+					originalLinkObject,
+					index);
 
-			PermanentRecord <?> dataObject =
-				(PermanentRecord <?>) linkObject;
+			// handle permanent records as object ids
 
-			if (dataObject.getId () == null)
-				throw new IllegalArgumentException ();
+			if (linkObject instanceof PermanentRecord <?>) {
 
-			return eventLinkHelper.createInstance ()
+				PermanentRecord <?> dataObject =
+					(PermanentRecord <?>) linkObject;
 
-				.setEvent (
-					event)
+				if (dataObject.getId () == null)
+					throw new IllegalArgumentException ();
 
-				.setIndex (
-					index)
+				return eventLinkHelper.createInstance ()
 
-				.setTypeId (
-					objectManager.getObjectTypeId (
-						dataObject))
+					.setEvent (
+						event)
 
-				.setRefId (
-					dataObject.getId ());
+					.setIndex (
+						index)
+
+					.setTypeId (
+						objectManager.getObjectTypeId (
+							dataObject))
+
+					.setRefId (
+						dataObject.getId ());
+
+			}
+
+			// store longs directly
+
+			if (linkObject instanceof Long) {
+
+				return eventLinkHelper.createInstance ()
+
+					.setEvent (
+						event)
+
+					.setIndex (
+						index)
+
+					.setTypeId (
+						EventLogic.integerEventLinkType)
+
+					.setRefId (
+						(Long) linkObject);
+
+			}
+
+			// store booleans directly
+
+			if (linkObject instanceof Boolean) {
+
+				return eventLinkHelper.createInstance ()
+
+					.setEvent (
+						event)
+
+					.setIndex (
+						index)
+
+					.setTypeId (
+						EventLogic.booleanEventLinkType)
+
+					.setRefId (
+						(Boolean) linkObject
+							? 1L
+							: 0L);
+
+			}
+
+			// store instants directly
+
+			if (linkObject instanceof Instant) {
+
+				Instant instant =
+					(Instant)
+					linkObject;
+
+				return eventLinkHelper.createInstance ()
+
+					.setEvent (
+						event)
+
+					.setIndex (
+						index)
+
+					.setTypeId (
+						EventLogic.instantEventLinkType)
+
+					.setRefId (
+						instant.getMillis ());
+
+			}
+
+			// store durations directly
+
+			if (linkObject instanceof Duration) {
+
+				Duration duration =
+					genericCastUnchecked (
+						linkObject);
+
+				return eventLinkHelper.createInstance ()
+
+					.setEvent (
+						event)
+
+					.setIndex (
+						index)
+
+					.setTypeId (
+						EventLogic.durationEventLinkType)
+
+					.setRefId (
+						duration.getMillis ());
+
+			}
+
+			// error otherwise
+
+			throw new RuntimeException (
+				stringFormat (
+					"Unlinkable type %s passed as link parameter %s",
+					classNameSimple (
+						linkObject.getClass ()),
+					integerToDecimalString (
+						index)));
 
 		}
-
-		// store longs directly
-
-		if (linkObject instanceof Long) {
-
-			return eventLinkHelper.createInstance ()
-
-				.setEvent (
-					event)
-
-				.setIndex (
-					index)
-
-				.setTypeId (
-					EventLogic.integerEventLinkType)
-
-				.setRefId (
-					(Long) linkObject);
-
-		}
-
-		// store booleans directly
-
-		if (linkObject instanceof Boolean) {
-
-			return eventLinkHelper.createInstance ()
-
-				.setEvent (
-					event)
-
-				.setIndex (
-					index)
-
-				.setTypeId (
-					EventLogic.booleanEventLinkType)
-
-				.setRefId (
-					(Boolean) linkObject
-						? 1L
-						: 0L);
-
-		}
-
-		// store instants directly
-
-		if (linkObject instanceof Instant) {
-
-			Instant instant =
-				(Instant)
-				linkObject;
-
-			return eventLinkHelper.createInstance ()
-
-				.setEvent (
-					event)
-
-				.setIndex (
-					index)
-
-				.setTypeId (
-					EventLogic.instantEventLinkType)
-
-				.setRefId (
-					instant.getMillis ());
-
-		}
-
-		// store durations directly
-
-		if (linkObject instanceof Duration) {
-
-			Duration duration =
-				genericCastUnchecked (
-					linkObject);
-
-			return eventLinkHelper.createInstance ()
-
-				.setEvent (
-					event)
-
-				.setIndex (
-					index)
-
-				.setTypeId (
-					EventLogic.durationEventLinkType)
-
-				.setRefId (
-					duration.getMillis ());
-
-		}
-
-		// error otherwise
-
-		throw new RuntimeException (
-			stringFormat (
-				"Unlinkable type %s passed as link parameter %s",
-				classNameSimple (
-					linkObject.getClass ()),
-				integerToDecimalString (
-					index)));
 
 	}
 
@@ -308,53 +326,59 @@ class EventLogicImplementation
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"normaliseLinkObject");
+		try (
 
-		Object currentLinkObject =
-			originalLinkObject;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"normaliseLinkObject");
 
-		// convert to string, continue processing
-
-		if (
-			currentLinkObject instanceof Float
-			|| currentLinkObject instanceof Double
-			|| currentLinkObject instanceof Enum <?>
-			|| currentLinkObject instanceof LocalDate
 		) {
 
-			currentLinkObject =
-				currentLinkObject.toString ();
+			Object currentLinkObject =
+				originalLinkObject;
 
-		}
+			// convert to string, continue processing
 
-		// convert to long, continue processing
+			if (
+				currentLinkObject instanceof Float
+				|| currentLinkObject instanceof Double
+				|| currentLinkObject instanceof Enum <?>
+				|| currentLinkObject instanceof LocalDate
+			) {
 
-		if (currentLinkObject instanceof Integer) {
+				currentLinkObject =
+					currentLinkObject.toString ();
 
-			currentLinkObject =
-				fromJavaInteger (
-					(Integer)
+			}
+
+			// convert to long, continue processing
+
+			if (currentLinkObject instanceof Integer) {
+
+				currentLinkObject =
+					fromJavaInteger (
+						(Integer)
+						currentLinkObject);
+
+			}
+
+			// handle strings as text objects
+
+			if (currentLinkObject instanceof String) {
+
+				return textHelper.findOrCreate (
+					taskLogger,
+					(String)
 					currentLinkObject);
 
-		}
+			}
 
-		// handle strings as text objects
+			// return object unchanged
 
-		if (currentLinkObject instanceof String) {
-
-			return textHelper.findOrCreate (
-				taskLogger,
-				(String)
-				currentLinkObject);
+			return currentLinkObject;
 
 		}
-
-		// return object unchanged
-
-		return currentLinkObject;
 
 	}
 

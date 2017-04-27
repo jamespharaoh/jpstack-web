@@ -77,58 +77,64 @@ class ChatGraphsJoinersImageResponder
 			@NonNull Instant minTime,
 			@NonNull Instant maxTime) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareData");
+		try (
 
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareData");
 
-		List <Long> chatUserIds =
-			chatUserHelper.searchIds (
-				taskLogger,
-				new ChatUserSearch ()
-
-			.chatId (
-				chat.getId ())
-
-			.firstJoin (
-				TextualInterval.forInterval (
-					DateTimeZone.UTC,
-					new Interval (
-						minTime,
-						maxTime)))
-
-			.chatAffiliateId (
-				optionalOrNull (
-					requestContext.stuffInteger (
-						"chatAffiliateId")))
-
-		);
-
-		timezone =
-			chatMiscLogic.timezone (
-				chat);
-
-		for (
-			Long chatUserId
-				: chatUserIds
 		) {
 
-			ChatUserRec chatUser =
-				chatUserHelper.findRequired (
-					chatUserId);
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
 
-			int index =
-				+ chatUser.getFirstJoin ()
-					.toDateTime (timezone)
-					.getDayOfMonth ()
-				- 1;
+			List <Long> chatUserIds =
+				chatUserHelper.searchIds (
+					taskLogger,
+					new ChatUserSearch ()
 
-			values.set (
-				index,
-				values.get (index) + 1);
+				.chatId (
+					chat.getId ())
+
+				.firstJoin (
+					TextualInterval.forInterval (
+						DateTimeZone.UTC,
+						new Interval (
+							minTime,
+							maxTime)))
+
+				.chatAffiliateId (
+					optionalOrNull (
+						requestContext.stuffInteger (
+							"chatAffiliateId")))
+
+			);
+
+			timezone =
+				chatMiscLogic.timezone (
+					chat);
+
+			for (
+				Long chatUserId
+					: chatUserIds
+			) {
+
+				ChatUserRec chatUser =
+					chatUserHelper.findRequired (
+						chatUserId);
+
+				int index =
+					+ chatUser.getFirstJoin ()
+						.toDateTime (timezone)
+						.getDayOfMonth ()
+					- 1;
+
+				values.set (
+					index,
+					values.get (index) + 1);
+
+			}
 
 		}
 

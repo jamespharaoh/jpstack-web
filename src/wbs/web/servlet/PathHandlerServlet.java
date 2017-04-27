@@ -4,8 +4,6 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
-import java.io.IOException;
-
 import javax.inject.Named;
 import javax.servlet.ServletException;
 
@@ -58,30 +56,35 @@ class PathHandlerServlet
 	@Override
 	protected
 	WebFile processPath (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processPath");
+		try (
 
-		// get the full path (servlet path & path info)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processPath");
 
-		String path =
-			joinWithoutSeparator (
-				requestContext.servletPath (),
-				ifThenElse (
-					optionalIsPresent (
-						requestContext.pathInfo ()),
-					() -> requestContext.pathInfo ().get (),
-					() -> ""));
+		) {
 
-		// and call the relevant pathhandler
+			// get the full path (servlet path & path info)
 
-		return pathHandler.processPath (
-			taskLogger,
-			path);
+			String path =
+				joinWithoutSeparator (
+					requestContext.servletPath (),
+					ifThenElse (
+						optionalIsPresent (
+							requestContext.pathInfo ()),
+						() -> requestContext.pathInfo ().get (),
+						() -> ""));
+
+			// and call the relevant pathhandler
+
+			return pathHandler.processPath (
+				taskLogger,
+				path);
+
+		}
 
 	}
 
@@ -89,39 +92,42 @@ class PathHandlerServlet
 	protected
 	void handleException (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Throwable exception)
-		throws
-			ServletException,
-			IOException {
+			@NonNull Throwable exception) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleException");
+		try (
 
-		if (exception instanceof ExternalRedirectException) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleException");
 
-			ExternalRedirectException redirectException =
-				(ExternalRedirectException) exception;
+		) {
 
-			requestContext.sendRedirect (
-				redirectException.getLocation ());
+			if (exception instanceof ExternalRedirectException) {
 
-		} else if (exception instanceof HttpNotFoundException) {
+				ExternalRedirectException redirectException =
+					(ExternalRedirectException) exception;
 
-			throw (HttpNotFoundException) exception;
+				requestContext.sendRedirect (
+					redirectException.getLocation ());
 
-		} else if (exceptionHandler != null) {
+			} else if (exception instanceof HttpNotFoundException) {
 
-			exceptionHandler.handleException (
-				taskLogger,
-				exception);
+				throw (HttpNotFoundException) exception;
 
-		} else {
+			} else if (exceptionHandler != null) {
 
-			super.handleException (
-				taskLogger,
-				exception);
+				exceptionHandler.handleException (
+					taskLogger,
+					exception);
+
+			} else {
+
+				super.handleException (
+					taskLogger,
+					exception);
+
+			}
 
 		}
 
@@ -130,20 +136,28 @@ class PathHandlerServlet
 	@Override
 	protected
 	void handleNotFound (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (notFoundHandler != null) {
+		try (
 
-			notFoundHandler.handleNotFound (
-				parentTaskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleNotFound");
 
-		} else {
+		) {
 
-			super.handleNotFound (
-				parentTaskLogger);
+			if (notFoundHandler != null) {
+
+				notFoundHandler.handleNotFound (
+					parentTaskLogger);
+
+			} else {
+
+				super.handleNotFound (
+					parentTaskLogger);
+
+			}
 
 		}
 

@@ -119,53 +119,88 @@ class ChatCheckCreditCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			MessageRec message =
+				inbox.getMessage ();
 
-		// send barred users to help
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// send barred users to help
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
+
+			if (creditCheckResult.failed ()) {
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					null,
+					true);
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// otherwise send their credit
+
+			String creditString =
+				currencyLogic.formatText (
+					chat.getCurrency (),
+					chatUser.getCredit ());
+
+			chatSendLogic.sendSystemRbFree (
 				taskLogger,
 				chatUser,
-				true,
 				optionalOf (
-					message.getThreadId ()));
+					message.getThreadId ()),
+				"check_credit",
+				TemplateMissing.error,
+				ImmutableMap.of (
+					"credit",
+					creditString));
 
-		if (creditCheckResult.failed ()) {
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
+			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
 				taskLogger,
@@ -177,35 +212,6 @@ class ChatCheckCreditCommand
 				command);
 
 		}
-
-		// otherwise send their credit
-
-		String creditString =
-			currencyLogic.formatText (
-				chat.getCurrency (),
-				chatUser.getCredit ());
-
-		chatSendLogic.sendSystemRbFree (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				message.getThreadId ()),
-			"check_credit",
-			TemplateMissing.error,
-			ImmutableMap.of (
-				"credit",
-				creditString));
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

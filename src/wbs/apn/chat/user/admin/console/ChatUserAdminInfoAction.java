@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -93,152 +93,158 @@ class ChatUserAdminInfoAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// check privs
-
-		if (! requestContext.canContext (
-				"chat.userAdmin")) {
-
-			requestContext.addError (
-				"Access denied");
-
-			return null;
-
-		}
-
-		// get params
-
-		ChatUserEditReason editReason =
-			toEnum (
-				ChatUserEditReason.class,
-				requestContext.parameterRequired (
-					"editReason"));
-
-		if (editReason == null) {
-
-			requestContext.addError (
-				"Please select a valid reason");
-
-			return null;
-
-		}
-
-		String newInfo =
-			requestContext.parameterOrEmptyString (
-				"info");
-
-		// transaction...
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminInfoAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			// load database objects
+			// check privs
 
-			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+			if (! requestContext.canContext (
+					"chat.userAdmin")) {
 
-			ChatRec chat =
-				chatUser.getChat ();
+				requestContext.addError (
+					"Access denied");
 
-			TextRec newInfoText =
-				newInfo != null
-					? textHelper.findOrCreate (
-						taskLogger,
-						newInfo)
-					: null;
-
-			TextRec oldInfoText =
-				chatUser.getInfoText ();
-
-			if (newInfoText != oldInfoText) {
-
-				ChatUserInfoRec chatUserInfo =
-					chatUserInfoHelper.insert (
-						taskLogger,
-						chatUserInfoHelper.createInstance ()
-
-					.setChatUser (
-						chatUser)
-
-					.setCreationTime (
-						transaction.now ())
-
-					.setOriginalText (
-						oldInfoText)
-
-					.setEditedText (
-						newInfoText)
-
-					.setStatus (
-						ChatUserInfoStatus.console)
-
-					.setModerator (
-						userConsoleLogic.userRequired ())
-
-					.setEditReason (
-						editReason)
-
-				);
-
-				chatUser
-
-					.setInfoText (
-						newInfoText);
-
-				chatUser.getChatUserInfos ().add (
-					chatUserInfo);
-
-				if (newInfoText == null) {
-
-					// TODO use a template
-
-					TextRec messageText =
-						textHelper.findOrCreateFormat (
-							taskLogger,
-							"Please reply with a message we can send out to ",
-							"people to introduce you. Say where you are, ",
-							"describe yourself and say what you are looking ",
-							"for.");
-
-					chatSendLogic.sendMessageMagic (
-						taskLogger,
-						chatUser,
-						null,
-						messageText,
-						commandHelper.findByCodeRequired (
-							chat,
-							"magic"),
-						serviceHelper.findByCodeRequired (
-							chat,
-							"system"),
-						objectId (
-							commandHelper.findByCodeRequired (
-								chat,
-								"join_info")));
-
-				}
+				return null;
 
 			}
 
-			transaction.commit ();
+			// get params
 
-			requestContext.addNotice (
-				"User's info updated");
+			ChatUserEditReason editReason =
+				toEnum (
+					ChatUserEditReason.class,
+					requestContext.parameterRequired (
+						"editReason"));
 
-			requestContext.setEmptyFormData ();
+			if (editReason == null) {
 
-			return null;
+				requestContext.addError (
+					"Please select a valid reason");
+
+				return null;
+
+			}
+
+			String newInfo =
+				requestContext.parameterOrEmptyString (
+					"info");
+
+			// transaction...
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatUserAdminInfoAction.goReal ()",
+						this);
+
+			) {
+
+				// load database objects
+
+				ChatUserRec chatUser =
+					chatUserHelper.findFromContextRequired ();
+
+				ChatRec chat =
+					chatUser.getChat ();
+
+				TextRec newInfoText =
+					newInfo != null
+						? textHelper.findOrCreate (
+							taskLogger,
+							newInfo)
+						: null;
+
+				TextRec oldInfoText =
+					chatUser.getInfoText ();
+
+				if (newInfoText != oldInfoText) {
+
+					ChatUserInfoRec chatUserInfo =
+						chatUserInfoHelper.insert (
+							taskLogger,
+							chatUserInfoHelper.createInstance ()
+
+						.setChatUser (
+							chatUser)
+
+						.setCreationTime (
+							transaction.now ())
+
+						.setOriginalText (
+							oldInfoText)
+
+						.setEditedText (
+							newInfoText)
+
+						.setStatus (
+							ChatUserInfoStatus.console)
+
+						.setModerator (
+							userConsoleLogic.userRequired ())
+
+						.setEditReason (
+							editReason)
+
+					);
+
+					chatUser
+
+						.setInfoText (
+							newInfoText);
+
+					chatUser.getChatUserInfos ().add (
+						chatUserInfo);
+
+					if (newInfoText == null) {
+
+						// TODO use a template
+
+						TextRec messageText =
+							textHelper.findOrCreateFormat (
+								taskLogger,
+								"Please reply with a message we can send out to ",
+								"people to introduce you. Say where you are, ",
+								"describe yourself and say what you are looking ",
+								"for.");
+
+						chatSendLogic.sendMessageMagic (
+							taskLogger,
+							chatUser,
+							null,
+							messageText,
+							commandHelper.findByCodeRequired (
+								chat,
+								"magic"),
+							serviceHelper.findByCodeRequired (
+								chat,
+								"system"),
+							objectId (
+								commandHelper.findByCodeRequired (
+									chat,
+									"join_info")));
+
+					}
+
+				}
+
+				transaction.commit ();
+
+				requestContext.addNotice (
+					"User's info updated");
+
+				requestContext.setEmptyFormData ();
+
+				return null;
+
+			}
 
 		}
 

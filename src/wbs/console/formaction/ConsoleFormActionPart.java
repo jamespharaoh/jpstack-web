@@ -111,77 +111,83 @@ class ConsoleFormActionPart <FormState, History>
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// write heading
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlHeadingTwoWrite (
-			heading);
-
-		// write help
-
-		if (
-			isNotNull (
-				helpText)
 		) {
 
-			htmlParagraphWrite (
-				helpText);
-
-		}
-
-		// write preamble
-
-		formActionHelper.writePreamble (
-			taskLogger,
-			formatWriter,
-			isNotNull (
-				submitLabel));
-
-		// write form
-
-		if (
-			isNotNull (
-				submitLabel)
-		) {
-
-			formFieldLogic.outputFormTable (
-				taskLogger,
-				requestContext,
-				formatWriter,
-				formFields,
-				updateResultSet,
-				formState,
-				formHints,
-				"post",
-				requestContext.resolveLocalUrl (
-					localFile),
-				submitLabel,
-				FormType.perform,
-				name);
-
-		}
-
-		// write history
-
-		if (
-			isNotNull (
-				historyFields)
-		) {
+			// write heading
 
 			htmlHeadingTwoWrite (
-				historyHeading);
+				heading);
 
-			formFieldLogic.outputListTable (
+			// write help
+
+			if (
+				isNotNull (
+					helpText)
+			) {
+
+				htmlParagraphWrite (
+					helpText);
+
+			}
+
+			// write preamble
+
+			formActionHelper.writePreamble (
 				taskLogger,
 				formatWriter,
-				historyFields,
-				history,
-				formHints,
-				true);
+				isNotNull (
+					submitLabel));
+
+			// write form
+
+			if (
+				isNotNull (
+					submitLabel)
+			) {
+
+				formFieldLogic.outputFormTable (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					formFields,
+					updateResultSet,
+					formState,
+					formHints,
+					"post",
+					requestContext.resolveLocalUrl (
+						localFile),
+					submitLabel,
+					FormType.perform,
+					name);
+
+			}
+
+			// write history
+
+			if (
+				isNotNull (
+					historyFields)
+			) {
+
+				htmlHeadingTwoWrite (
+					historyHeading);
+
+				formFieldLogic.outputListTable (
+					taskLogger,
+					formatWriter,
+					historyFields,
+					history,
+					formHints,
+					true);
+
+			}
 
 		}
 

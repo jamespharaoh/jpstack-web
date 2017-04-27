@@ -30,7 +30,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -144,36 +144,42 @@ class ManualResponderRequestPendingFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
+		try (
 
-		Long manualResponderRequestId =
-			requestContext.stuffIntegerRequired (
-				"manualResponderRequestId");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
-		String templateIdStr =
-			requestContext.parameterRequired (
-				"template-id");
+		) {
 
-		boolean ignore =
-			stringEqualSafe (
-				templateIdStr,
-				"ignore");
+			Long manualResponderRequestId =
+				requestContext.stuffIntegerRequired (
+					"manualResponderRequestId");
 
-		if (ignore) {
+			String templateIdStr =
+				requestContext.parameterRequired (
+					"template-id");
 
-			return goIgnore (
-				taskLogger,
-				manualResponderRequestId);
+			boolean ignore =
+				stringEqualSafe (
+					templateIdStr,
+					"ignore");
 
-		} else {
+			if (ignore) {
 
-			return goSend (
-				taskLogger,
-				manualResponderRequestId,
-				templateIdStr);
+				return goIgnore (
+					taskLogger,
+					manualResponderRequestId);
+
+			} else {
+
+				return goSend (
+					taskLogger,
+					manualResponderRequestId,
+					templateIdStr);
+
+			}
 
 		}
 
@@ -192,7 +198,7 @@ class ManualResponderRequestPendingFormAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (
@@ -214,6 +220,7 @@ class ManualResponderRequestPendingFormAction
 			// remove queue item
 
 			queueLogic.processQueueItem (
+				taskLogger,
 				manualResponderRequest.getQueueItem (),
 				userConsoleLogic.userRequired ());
 
@@ -268,7 +275,7 @@ class ManualResponderRequestPendingFormAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ManualResponderRequestPendingFormAction.goSend (...)",
@@ -614,6 +621,7 @@ class ManualResponderRequestPendingFormAction
 				// process queue item
 
 				queueLogic.processQueueItem (
+					taskLogger,
 					request.getQueueItem (),
 					userConsoleLogic.userRequired ());
 

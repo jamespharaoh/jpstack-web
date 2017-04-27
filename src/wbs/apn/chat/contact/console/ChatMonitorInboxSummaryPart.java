@@ -70,8 +70,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -208,88 +208,99 @@ class ChatMonitorInboxSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		now =
-			transaction.now ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		monitorInbox =
-			chatMonitorInboxHelper.findFromContextRequired ();
+		) {
 
-		monitorChatUser =
-			monitorInbox.getMonitorChatUser ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		userChatUser =
-			monitorInbox.getUserChatUser ();
+			now =
+				transaction.now ();
 
-		ChatSchemeRec chatScheme =
-			userChatUser.getChatScheme ();
+			monitorInbox =
+				chatMonitorInboxHelper.findFromContextRequired ();
 
-		chatTimezone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
+			monitorChatUser =
+				monitorInbox.getMonitorChatUser ();
 
-		chat =
-			userChatUser.getChat ();
+			userChatUser =
+				monitorInbox.getUserChatUser ();
 
-		chatMessageHistory =
-			Lists.newArrayList (
-				Iterables.concat (
+			ChatSchemeRec chatScheme =
+				userChatUser.getChatScheme ();
 
-			chatMessageHelper.findLimit (
-				userChatUser,
-				monitorChatUser,
-				50l),
+			chatTimezone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
 
-			chatMessageHelper.findLimit (
-				monitorChatUser,
-				userChatUser,
-				50l)
+			chat =
+				userChatUser.getChat ();
 
-		)).stream ()
+			chatMessageHistory =
+				Lists.newArrayList (
+					Iterables.concat (
 
-			.filter (
-				chatMessage ->
-					enumNotInSafe (
-						chatMessage.getStatus (),
-						ChatMessageStatus.moderatorPending,
-						ChatMessageStatus.moderatorRejected))
+				chatMessageHelper.findLimit (
+					userChatUser,
+					monitorChatUser,
+					50l),
 
-			.sorted (
-				ChatMessageComparator.descending)
+				chatMessageHelper.findLimit (
+					monitorChatUser,
+					userChatUser,
+					50l)
 
-			.limit (
-				50l)
+			)).stream ()
 
-			.collect (
-				Collectors.toList ());
+				.filter (
+					chatMessage ->
+						enumNotInSafe (
+							chatMessage.getStatus (),
+							ChatMessageStatus.moderatorPending,
+							ChatMessageStatus.moderatorRejected))
 
-		alarm =
-			chatUserAlarmHelper.find (
-				userChatUser,
-				monitorChatUser);
+				.sorted (
+					ChatMessageComparator.descending)
 
-		// find notes
+				.limit (
+					50l)
 
-		notes =
-			chatContactNoteHelper.find (
-				userChatUser,
-				monitorChatUser);
+				.collect (
+					Collectors.toList ());
 
-		chatNoteNames =
-			chatNoteNameHelper.findNotDeleted (
-				chat);
+			alarm =
+				chatUserAlarmHelper.find (
+					userChatUser,
+					monitorChatUser);
 
-		userNamedNotes =
-			getNamedNotes (
-				userChatUser,
-				monitorChatUser);
+			// find notes
 
-		monitorNamedNotes =
-			getNamedNotes (
-				monitorChatUser,
-				userChatUser);
+			notes =
+				chatContactNoteHelper.find (
+					userChatUser,
+					monitorChatUser);
+
+			chatNoteNames =
+				chatNoteNameHelper.findNotDeleted (
+					chat);
+
+			userNamedNotes =
+				getNamedNotes (
+					userChatUser,
+					monitorChatUser);
+
+			monitorNamedNotes =
+				getNamedNotes (
+					monitorChatUser,
+					userChatUser);
+
+		}
 
 	}
 
@@ -368,54 +379,63 @@ class ChatMonitorInboxSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		// general details
+		) {
 
-		goParty ();
-		goPrefs ();
+			htmlTableOpenDetails ();
 
-		goCode (
-			taskLogger);
+			// general details
 
-		goName ();
-		goInfo ();
+			goParty ();
+			goPrefs ();
 
-		goPic (
-			taskLogger);
+			goCode (
+				taskLogger);
 
-		goLocation ();
-		goDob ();
-		goScheme ();
+			goName (
+				taskLogger);
 
-		// notes
+			goInfo (
+				taskLogger);
 
-		goSep ();
-		goNotesHeader ();
+			goPic (
+				taskLogger);
 
-		goSep ();
-		goNamedNotes ();
+			goLocation ();
+			goDob ();
+			goScheme ();
 
-		goSep ();
-		goGeneralNotes ();
+			// notes
 
-		goSep ();
-		goAddNote ();
+			goSep ();
+			goNotesHeader ();
 
-		goSep ();
-		goAlarms ();
+			goSep ();
+			goNamedNotes ();
 
-		htmlTableClose ();
+			goSep ();
+			goGeneralNotes ();
 
-		goAdultVerified ();
-		goNoAlarmWarning ();
+			goSep ();
+			goAddNote ();
 
-		goHistory ();
+			goSep ();
+			goAlarms ();
+
+			htmlTableClose ();
+
+			goAdultVerified ();
+			goNoAlarmWarning ();
+
+			goHistory ();
+
+		}
 
 	}
 
@@ -527,67 +547,97 @@ class ChatMonitorInboxSummaryPart
 	void goCode (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goCode");
+		try (
 
-		htmlTableRowOpen ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goCode");
 
-		htmlTableHeaderCellWrite (
-			"User number");
+		) {
 
-		objectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			monitorChatUser,
-			chat);
+			htmlTableRowOpen ();
 
-		objectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			userChatUser,
-			chat);
+			htmlTableHeaderCellWrite (
+				"User number");
 
-		htmlTableRowClose ();
+			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
+				monitorChatUser,
+				chat);
 
-	}
+			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
+				userChatUser,
+				chat);
 
-	void goName () {
+			htmlTableRowClose ();
 
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"Name");
-
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				monitorChatUser.getName ()));
-
-		htmlTableCellWrite (
-			ifNullThenEmDash (
-				userChatUser.getName ()));
-
-		htmlTableRowClose ();
+		}
 
 	}
 
-	void goInfo () {
+	void goName (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlTableRowOpen ();
+		try (
 
-		htmlTableHeaderCellWrite (
-			"Info");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goName");
 
-		htmlTableCellWrite (
-			ifNotNullThenElseEmDash (
-				monitorChatUser.getInfoText (),
-				() -> monitorChatUser.getInfoText ().getText ()));
+		) {
 
-		htmlTableCellWrite (
-			ifNotNullThenElseEmDash (
-				userChatUser.getInfoText (),
-				() -> userChatUser.getInfoText ().getText ()));
+			htmlTableRowOpen ();
 
-		htmlTableRowClose ();
+			htmlTableHeaderCellWrite (
+				"Name");
+
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					monitorChatUser.getName ()));
+
+			htmlTableCellWrite (
+				ifNullThenEmDash (
+					userChatUser.getName ()));
+
+			htmlTableRowClose ();
+
+		}
+
+	}
+
+	void goInfo (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goInfo");
+
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableHeaderCellWrite (
+				"Info");
+
+			htmlTableCellWrite (
+				ifNotNullThenElseEmDash (
+					monitorChatUser.getInfoText (),
+					() -> monitorChatUser.getInfoText ().getText ()));
+
+			htmlTableCellWrite (
+				ifNotNullThenElseEmDash (
+					userChatUser.getInfoText (),
+					() -> userChatUser.getInfoText ().getText ()));
+
+			htmlTableRowClose ();
+
+		}
 
 	}
 
@@ -595,48 +645,54 @@ class ChatMonitorInboxSummaryPart
 	void goPic (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goPic");
+		try (
 
-		htmlTableRowOpen ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goPic");
 
-		htmlTableHeaderCellWrite (
-			"Pic");
+		) {
 
-		htmlTableCellWriteHtml (
-			ifNotEmptyThenElse (
-				monitorChatUser.getChatUserImageList (),
+			htmlTableRowOpen ();
 
-			() ->
-				mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					formatWriter,
-					monitorChatUser.getChatUserImageList ().get (0)
-						.getMedia ()),
+			htmlTableHeaderCellWrite (
+				"Pic");
 
-			() -> formatWriter.writeFormat (
-				"—")
+			htmlTableCellWriteHtml (
+				ifNotEmptyThenElse (
+					monitorChatUser.getChatUserImageList (),
 
-		));
+				() ->
+					mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						formatWriter,
+						monitorChatUser.getChatUserImageList ().get (0)
+							.getMedia ()),
 
-		htmlTableCellWriteHtml (
-			ifNotEmptyThenElse (
-				userChatUser.getChatUserImageList (),
+				() -> formatWriter.writeFormat (
+					"—")
 
-			() ->
-				mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					formatWriter,
-					userChatUser.getChatUserImageList ().get (0).getMedia ()),
+			));
 
-			() -> formatWriter.writeFormat (
-				"—")
+			htmlTableCellWriteHtml (
+				ifNotEmptyThenElse (
+					userChatUser.getChatUserImageList (),
 
-		));
+				() ->
+					mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						formatWriter,
+						userChatUser.getChatUserImageList ().get (0).getMedia ()),
 
-		htmlTableRowClose ();
+				() -> formatWriter.writeFormat (
+					"—")
+
+			));
+
+			htmlTableRowClose ();
+
+		}
 
 	}
 

@@ -17,8 +17,8 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -69,37 +69,43 @@ class ChatDateLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserDateJoinHint");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserDateJoinHint");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// send the message
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chatSendLogic.sendSystemMagic (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			"date_hint_photo",
-			commandHelper.findByCodeRequired (
-				chat,
-				"date_join_photo"),
-			0l,
-			TemplateMissing.error,
-			emptyMap ());
+			ChatRec chat =
+				chatUser.getChat ();
 
-		// and update the chat user
+			// send the message
 
-		chatUser
+			chatSendLogic.sendSystemMagic (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				"date_hint_photo",
+				commandHelper.findByCodeRequired (
+					chat,
+					"date_join_photo"),
+				0l,
+				TemplateMissing.error,
+				emptyMap ());
 
-			.setLastDateHint (
-				transaction.now ());
+			// and update the chat user
+
+			chatUser
+
+				.setLastDateHint (
+					transaction.now ());
+
+		}
 
 	}
 
@@ -109,40 +115,46 @@ class ChatDateLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserDateUpgradeHint");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserDateUpgradeHint");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// send the message
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chatSendLogic.sendSystemMagic (
-			taskLogger,
-			chatUser,
-			Optional.absent (),
-			"date_hint_upgrade",
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic"),
-			IdObject.objectId (
+			ChatRec chat =
+				chatUser.getChat ();
+
+			// send the message
+
+			chatSendLogic.sendSystemMagic (
+				taskLogger,
+				chatUser,
+				Optional.absent (),
+				"date_hint_upgrade",
 				commandHelper.findByCodeRequired (
 					chat,
-					"date_join_photo")),
-			TemplateMissing.error,
-			Collections.emptyMap ());
+					"magic"),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"date_join_photo")),
+				TemplateMissing.error,
+				Collections.emptyMap ());
 
-		// and update the chat user
+			// and update the chat user
 
-		chatUser
+			chatUser
 
-			.setLastDateHint (
-				transaction.now ());
+				.setLastDateHint (
+					transaction.now ());
+
+		}
 
 	}
 
@@ -160,220 +172,226 @@ class ChatDateLogicImplementation
 			Long dailyMax,
 			boolean sendMessage) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userDateStuff");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
-
-		ChatRec chat =
-			chatUser.getChat ();
-
-		if (
-			(radius != null
-				&& radius < 1)
-			|| (startHour != null
-				&& (startHour < 0 || startHour > 23))
-			|| (radius != null
-				&& (endHour < 0 || endHour > 23))
-		) {
-
-			throw new IllegalArgumentException (
-				"Illegal radius, start hour or end hour");
-
-		}
-
-		if (
-
-			optionalIsPresent (
-				user)
-
-			&& optionalIsPresent (
-				message)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userDateStuff");
 
 		) {
 
-			throw new IllegalArgumentException (
-				"Cannot specify both user and message.");
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		}
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (
-			(dateMode == null
-				|| chatUser.getDateMode () == dateMode)
-			&& (radius == null
-				|| chatUser.getDateRadius () == radius)
-			&& (startHour == null
-				|| chatUser.getDateStartHour () == startHour)
-			&& (endHour == null
-				|| chatUser.getDateEndHour () == endHour)
-			&& (dailyMax == null
-				|| chatUser.getDateDailyMax () == dailyMax)
-		) {
+			if (
+				(radius != null
+					&& radius < 1)
+				|| (startHour != null
+					&& (startHour < 0 || startHour > 23))
+				|| (radius != null
+					&& (endHour < 0 || endHour > 23))
+			) {
 
-			return;
-
-		}
-
-		chatUserHelper.lock (
-			chatUser);
-
-		if (dateMode != null) {
-
-			chatUser.setDateMode (
-				dateMode);
-
-		}
-
-		if (radius != null) {
-
-			chatUser.setDateRadius (
-				radius);
-
-		}
-
-		if (startHour != null) {
-
-			chatUser.setDateStartHour (
-				startHour);
-
-		}
-
-		if (endHour != null) {
-
-			chatUser.setDateEndHour (
-				endHour);
-
-		}
-
-		if (dailyMax != null) {
-
-			chatUser.setDateDailyMax (
-				dailyMax);
-
-		}
-
-		if (
-			dateMode != null
-			&& dateMode != ChatUserDateMode.none
-		) {
-
-			chatUser.setBlockAll (false);
-
-		}
-
-		chatUserDateLogHelper.insert (
-			taskLogger,
-			chatUserDateLogHelper.createInstance ()
-
-			.setChatUser (
-				chatUser)
-
-			.setUser (
-				optionalOrNull (
-					user))
-
-			.setMessage (
-				optionalOrNull (
-					message))
-
-			.setDateMode (
-				dateMode)
-
-			.setRadius (
-				chatUser.getDateRadius ())
-
-			.setStartHour (
-				chatUser.getDateStartHour ())
-
-			.setEndHour (
-				chatUser.getDateEndHour ())
-
-			.setDailyMax (
-				chatUser.getDateDailyMax ())
-
-			.setTimestamp (
-				transaction.now ())
-
-		);
-
-		if (sendMessage) {
-
-			String code;
-
-			switch (chatUser.getDateMode ()) {
-
-			case none:
-
-				code = "date_confirm_stop";
-
-				break;
-
-			case photo:
-
-				code = "date_confirm_photo";
-
-				break;
-
-			case text:
-
-				code = "date_confirm_text";
-
-				break;
-
-			default:
-
-				throw new RuntimeException ();
+				throw new IllegalArgumentException (
+					"Illegal radius, start hour or end hour");
 
 			}
 
-			chatSendLogic.sendSystemMagic (
+			if (
+
+				optionalIsPresent (
+					user)
+
+				&& optionalIsPresent (
+					message)
+
+			) {
+
+				throw new IllegalArgumentException (
+					"Cannot specify both user and message.");
+
+			}
+
+			if (
+				(dateMode == null
+					|| chatUser.getDateMode () == dateMode)
+				&& (radius == null
+					|| chatUser.getDateRadius () == radius)
+				&& (startHour == null
+					|| chatUser.getDateStartHour () == startHour)
+				&& (endHour == null
+					|| chatUser.getDateEndHour () == endHour)
+				&& (dailyMax == null
+					|| chatUser.getDateDailyMax () == dailyMax)
+			) {
+
+				return;
+
+			}
+
+			chatUserHelper.lock (
+				chatUser);
+
+			if (dateMode != null) {
+
+				chatUser.setDateMode (
+					dateMode);
+
+			}
+
+			if (radius != null) {
+
+				chatUser.setDateRadius (
+					radius);
+
+			}
+
+			if (startHour != null) {
+
+				chatUser.setDateStartHour (
+					startHour);
+
+			}
+
+			if (endHour != null) {
+
+				chatUser.setDateEndHour (
+					endHour);
+
+			}
+
+			if (dailyMax != null) {
+
+				chatUser.setDateDailyMax (
+					dailyMax);
+
+			}
+
+			if (
+				dateMode != null
+				&& dateMode != ChatUserDateMode.none
+			) {
+
+				chatUser.setBlockAll (false);
+
+			}
+
+			chatUserDateLogHelper.insert (
 				taskLogger,
-				chatUser,
-				optionalOf (
-					message.get ().getThreadId ()),
-				code,
-				commandHelper.findByCodeRequired (
-					chat,
-					"magic"),
-				IdObject.objectId (
+				chatUserDateLogHelper.createInstance ()
+
+				.setChatUser (
+					chatUser)
+
+				.setUser (
+					optionalOrNull (
+						user))
+
+				.setMessage (
+					optionalOrNull (
+						message))
+
+				.setDateMode (
+					dateMode)
+
+				.setRadius (
+					chatUser.getDateRadius ())
+
+				.setStartHour (
+					chatUser.getDateStartHour ())
+
+				.setEndHour (
+					chatUser.getDateEndHour ())
+
+				.setDailyMax (
+					chatUser.getDateDailyMax ())
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
+
+			if (sendMessage) {
+
+				String code;
+
+				switch (chatUser.getDateMode ()) {
+
+				case none:
+
+					code = "date_confirm_stop";
+
+					break;
+
+				case photo:
+
+					code = "date_confirm_photo";
+
+					break;
+
+				case text:
+
+					code = "date_confirm_text";
+
+					break;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
+
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.get ().getThreadId ()),
+					code,
 					commandHelper.findByCodeRequired (
 						chat,
-						"help")),
-				TemplateMissing.ignore,
-				ImmutableMap.<String, String> builder ()
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					TemplateMissing.ignore,
+					ImmutableMap.<String, String> builder ()
 
-					.put (
-						"miles",
-						chatUser.getDateRadius ().toString ())
+						.put (
+							"miles",
+							chatUser.getDateRadius ().toString ())
 
-					.put (
-						"start",
-						prettyHour (
-							chatUser.getDateStartHour ()))
+						.put (
+							"start",
+							prettyHour (
+								chatUser.getDateStartHour ()))
 
-					.put (
-						"end",
-						prettyHour (
-							chatUser.getDateEndHour ()))
+						.put (
+							"end",
+							prettyHour (
+								chatUser.getDateEndHour ()))
 
-					.build ());
+						.build ());
 
-		}
+			}
 
-		// set first join if appropriate
+			// set first join if appropriate
 
-		if (
-			chatUser.getFirstJoin () == null
-			&& chatUser.getDateMode () != ChatUserDateMode.none
-		) {
+			if (
+				chatUser.getFirstJoin () == null
+				&& chatUser.getDateMode () != ChatUserDateMode.none
+			) {
 
-			chatUser
+				chatUser
 
-				.setFirstJoin (
-					transaction.now ());
+					.setFirstJoin (
+						transaction.now ());
+
+			}
 
 		}
 

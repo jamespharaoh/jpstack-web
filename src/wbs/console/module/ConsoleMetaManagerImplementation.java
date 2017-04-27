@@ -74,138 +74,144 @@ class ConsoleMetaManagerImplementation
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		// reset output dir
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		try {
-
-			FileUtils.deleteDirectory (
-				new File (
-					"work/console/meta-module"));
-
-			FileUtils.forceMkdir (
-				new File (
-					"work/console/meta-module"));
-
-		} catch (IOException exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error deleting contents of work/console/meta-module");
-
-		}
-
-		// collect stuff
-
-		for (
-			Map.Entry<String,ConsoleMetaModule> consoleMetaModuleEntry
-				: consoleMetaModules.entrySet ()
 		) {
 
-			String consoleMetaModuleName =
-				consoleMetaModuleEntry.getKey ();
-
-			ConsoleMetaModule consoleMetaModule =
-				consoleMetaModuleEntry.getValue ();
-
-			// collect context links
-
-			for (
-				ConsoleContextLink contextLink
-					: consoleMetaModule.contextLinks ()
-			) {
-
-				List<ConsoleContextLink> contextLinksForName =
-					contextLinks.get (
-						contextLink.linkName ());
-
-				if (contextLinksForName == null) {
-
-					contextLinksForName =
-						new ArrayList<ConsoleContextLink> ();
-
-					contextLinks.put (
-						contextLink.linkName (),
-						contextLinksForName);
-
-				}
-
-				contextLinksForName.add (
-					contextLink);
-
-			}
-
-			// collect extension points
-
-			for (
-				ConsoleContextExtensionPoint extensionPoint
-					: consoleMetaModule.extensionPoints ()
-			) {
-
-				List<ConsoleContextExtensionPoint> extensionPointsForName =
-					extensionPoints.get (
-						extensionPoint.name ());
-
-				if (extensionPointsForName == null) {
-
-					extensionPointsForName =
-						new ArrayList<ConsoleContextExtensionPoint> ();
-
-					extensionPoints.put (
-						extensionPoint.name (),
-						extensionPointsForName);
-
-				}
-
-				extensionPointsForName.add (
-					extensionPoint);
-
-			}
-
-			// collect context hints
-
-			for (
-				ConsoleContextHint contextHint
-					: consoleMetaModule.contextHints ()
-			) {
-
-				if (
-					contains (
-						contextHints,
-						contextHint.linkName ())
-				) {
-					throw new RuntimeException ();
-				}
-
-				contextHints.put (
-					contextHint.linkName (),
-					contextHint);
-
-			}
-
-			// dump out data
-
-			String outputFileName =
-				stringFormat (
-					"work/console/meta-module/%s.xml",
-					camelToHyphen (
-						consoleMetaModuleName));
+			// reset output dir
 
 			try {
 
-				new DataToXml ().writeToFile (
-					outputFileName,
-					consoleMetaModule);
+				FileUtils.deleteDirectory (
+					new File (
+						"work/console/meta-module"));
 
-			} catch (Exception exception) {
+				FileUtils.forceMkdir (
+					new File (
+						"work/console/meta-module"));
 
-				taskLogger.warningFormat (
-					"Error writing %s",
-					outputFileName);
+			} catch (IOException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error deleting contents of work/console/meta-module");
+
+			}
+
+			// collect stuff
+
+			for (
+				Map.Entry<String,ConsoleMetaModule> consoleMetaModuleEntry
+					: consoleMetaModules.entrySet ()
+			) {
+
+				String consoleMetaModuleName =
+					consoleMetaModuleEntry.getKey ();
+
+				ConsoleMetaModule consoleMetaModule =
+					consoleMetaModuleEntry.getValue ();
+
+				// collect context links
+
+				for (
+					ConsoleContextLink contextLink
+						: consoleMetaModule.contextLinks ()
+				) {
+
+					List<ConsoleContextLink> contextLinksForName =
+						contextLinks.get (
+							contextLink.linkName ());
+
+					if (contextLinksForName == null) {
+
+						contextLinksForName =
+							new ArrayList<ConsoleContextLink> ();
+
+						contextLinks.put (
+							contextLink.linkName (),
+							contextLinksForName);
+
+					}
+
+					contextLinksForName.add (
+						contextLink);
+
+				}
+
+				// collect extension points
+
+				for (
+					ConsoleContextExtensionPoint extensionPoint
+						: consoleMetaModule.extensionPoints ()
+				) {
+
+					List<ConsoleContextExtensionPoint> extensionPointsForName =
+						extensionPoints.get (
+							extensionPoint.name ());
+
+					if (extensionPointsForName == null) {
+
+						extensionPointsForName =
+							new ArrayList<ConsoleContextExtensionPoint> ();
+
+						extensionPoints.put (
+							extensionPoint.name (),
+							extensionPointsForName);
+
+					}
+
+					extensionPointsForName.add (
+						extensionPoint);
+
+				}
+
+				// collect context hints
+
+				for (
+					ConsoleContextHint contextHint
+						: consoleMetaModule.contextHints ()
+				) {
+
+					if (
+						contains (
+							contextHints,
+							contextHint.linkName ())
+					) {
+						throw new RuntimeException ();
+					}
+
+					contextHints.put (
+						contextHint.linkName (),
+						contextHint);
+
+				}
+
+				// dump out data
+
+				String outputFileName =
+					stringFormat (
+						"work/console/meta-module/%s.xml",
+						camelToHyphen (
+							consoleMetaModuleName));
+
+				try {
+
+					new DataToXml ().writeToFile (
+						outputFileName,
+						consoleMetaModule);
+
+				} catch (Exception exception) {
+
+					taskLogger.warningFormat (
+						"Error writing %s",
+						outputFileName);
+
+				}
 
 			}
 

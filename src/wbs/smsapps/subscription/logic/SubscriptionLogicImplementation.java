@@ -14,8 +14,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -87,102 +87,109 @@ class SubscriptionLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendNow");
+		try (
 
-		SubscriptionSendRec subscriptionSend =
-			subscriptionSendNumber.getSubscriptionSend ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendNow");
 
-		SubscriptionRec subscription =
-			subscriptionSend.getSubscription ();
-
-		SubscriptionNumberRec subscriptionNumber =
-			subscriptionNumberHelper.find (
-				subscription,
-				subscriptionSendNumber.getNumber ());
-
-		SubscriptionSubRec subscriptionSub =
-			subscriptionSendNumber.getSubscriptionSub ();
-
-		SubscriptionListRec subscriptionList =
-			subscriptionSub.getSubscriptionList ();
-
-		SubscriptionAffiliateRec subscriptionAffiliate =
-			subscriptionSub.getSubscriptionAffiliate ();
-
-		SubscriptionSendPartRec subscriptionSendPart =
-			subscriptionSendPartHelper.find (
-				subscriptionSend,
-				subscriptionList);
-
-		// sanity check
-
-		if (
-			enumNotInSafe (
-				subscriptionSendNumber.getState (),
-				SubscriptionSendNumberState.queued,
-				SubscriptionSendNumberState.pendingBill)
 		) {
-			throw new IllegalStateException ();
+
+			SubscriptionSendRec subscriptionSend =
+				subscriptionSendNumber.getSubscriptionSend ();
+
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
+
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionNumberHelper.find (
+					subscription,
+					subscriptionSendNumber.getNumber ());
+
+			SubscriptionSubRec subscriptionSub =
+				subscriptionSendNumber.getSubscriptionSub ();
+
+			SubscriptionListRec subscriptionList =
+				subscriptionSub.getSubscriptionList ();
+
+			SubscriptionAffiliateRec subscriptionAffiliate =
+				subscriptionSub.getSubscriptionAffiliate ();
+
+			SubscriptionSendPartRec subscriptionSendPart =
+				subscriptionSendPartHelper.find (
+					subscriptionSend,
+					subscriptionList);
+
+			// sanity check
+
+			if (
+				enumNotInSafe (
+					subscriptionSendNumber.getState (),
+					SubscriptionSendNumberState.queued,
+					SubscriptionSendNumberState.pendingBill)
+			) {
+				throw new IllegalStateException ();
+			}
+
+			if (
+				subscriptionNumber.getBalance ()
+					< subscription.getDebitsPerSend ()
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// send message
+
+			MessageRec freeMessage =
+				messageSenderProvider.get ()
+
+				.number (
+					subscriptionNumber.getNumber ())
+
+				.messageText (
+					subscriptionSendPart.getText ())
+
+				.numFrom (
+					subscription.getFreeNumber ())
+
+				.routerResolve (
+					subscription.getFreeRouter ())
+
+				.service (
+					serviceHelper.findByCodeRequired (
+						subscriptionList,
+						"default"))
+
+				.batch (
+					subscriptionSend.getBatch ())
+
+				.affiliate (
+					affiliateHelper.findByCodeRequired (
+						subscriptionAffiliate,
+						"default"))
+
+				.send (
+					taskLogger);
+
+			// update state
+
+			subscriptionSendNumber
+
+				.setState (
+					SubscriptionSendNumberState.sent)
+
+				.setMessage (
+					freeMessage);
+
+			subscriptionNumber
+
+				.setBalance (
+					+ subscriptionNumber.getBalance ()
+					- subscription.getDebitsPerSend ());
+
 		}
 
-		if (
-			subscriptionNumber.getBalance ()
-				< subscription.getDebitsPerSend ()
-		) {
-			throw new IllegalStateException ();
-		}
-
-		// send message
-
-		MessageRec freeMessage =
-			messageSenderProvider.get ()
-
-			.number (
-				subscriptionNumber.getNumber ())
-
-			.messageText (
-				subscriptionSendPart.getText ())
-
-			.numFrom (
-				subscription.getFreeNumber ())
-
-			.routerResolve (
-				subscription.getFreeRouter ())
-
-			.service (
-				serviceHelper.findByCodeRequired (
-					subscriptionList,
-					"default"))
-
-			.batch (
-				subscriptionSend.getBatch ())
-
-			.affiliate (
-				affiliateHelper.findByCodeRequired (
-					subscriptionAffiliate,
-					"default"))
-
-			.send (
-				taskLogger);
-
-		// update state
-
-		subscriptionSendNumber
-
-			.setState (
-				SubscriptionSendNumberState.sent)
-
-			.setMessage (
-				freeMessage);
-
-		subscriptionNumber
-
-			.setBalance (
-				+ subscriptionNumber.getBalance ()
-				- subscription.getDebitsPerSend ());
 	}
 
 	@Override
@@ -191,158 +198,164 @@ class SubscriptionLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendLater");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendLater");
 
-		SubscriptionSendRec subscriptionSend =
-			subscriptionSendNumber.getSubscriptionSend ();
-
-		SubscriptionRec subscription =
-			subscriptionSend.getSubscription ();
-
-		SubscriptionNumberRec subscriptionNumber =
-			subscriptionNumberHelper.find (
-				subscription,
-				subscriptionSendNumber.getNumber ());
-
-		SubscriptionListRec subscriptionList =
-			subscriptionNumber.getSubscriptionList ();
-
-		SubscriptionAffiliateRec subscriptionAffiliate =
-			subscriptionNumber.getSubscriptionAffiliate ();
-
-		// sanity check
-
-		if (
-			enumNotEqualSafe (
-				subscriptionSendNumber.getState (),
-				SubscriptionSendNumberState.queued)
 		) {
-			throw new IllegalStateException ();
-		}
 
-		if (
-			subscriptionNumber.getBalance ()
-				>= subscription.getDebitsPerSend ()
-		) {
-			throw new IllegalStateException ();
-		}
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// cancel old pending message
+			SubscriptionSendRec subscriptionSend =
+				subscriptionSendNumber.getSubscriptionSend ();
 
-		SubscriptionSendNumberRec oldSubscriptionSendNumber =
-			subscriptionNumber.getPendingSubscriptionSendNumber ();
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
 
-		if (oldSubscriptionSendNumber != null) {
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionNumberHelper.find (
+					subscription,
+					subscriptionSendNumber.getNumber ());
 
-			oldSubscriptionSendNumber
+			SubscriptionListRec subscriptionList =
+				subscriptionNumber.getSubscriptionList ();
+
+			SubscriptionAffiliateRec subscriptionAffiliate =
+				subscriptionNumber.getSubscriptionAffiliate ();
+
+			// sanity check
+
+			if (
+				enumNotEqualSafe (
+					subscriptionSendNumber.getState (),
+					SubscriptionSendNumberState.queued)
+			) {
+				throw new IllegalStateException ();
+			}
+
+			if (
+				subscriptionNumber.getBalance ()
+					>= subscription.getDebitsPerSend ()
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// cancel old pending message
+
+			SubscriptionSendNumberRec oldSubscriptionSendNumber =
+				subscriptionNumber.getPendingSubscriptionSendNumber ();
+
+			if (oldSubscriptionSendNumber != null) {
+
+				oldSubscriptionSendNumber
+
+					.setState (
+						SubscriptionSendNumberState.skipped);
+
+				subscriptionNumber
+
+					.setPendingSubscriptionSendNumber (
+						null);
+
+			}
+
+			// set new pending message
+
+			subscriptionSendNumber
 
 				.setState (
-					SubscriptionSendNumberState.skipped);
+					SubscriptionSendNumberState.pendingBill);
 
 			subscriptionNumber
 
 				.setPendingSubscriptionSendNumber (
-					null);
+					subscriptionSendNumber);
 
-		}
+			// send billed message
 
-		// set new pending message
+			if (
+				subscriptionNumber.getPendingSubscriptionBill () == null
+			) {
 
-		subscriptionSendNumber
+				// send bill
 
-			.setState (
-				SubscriptionSendNumberState.pendingBill);
+				SubscriptionBillRec subscriptionBill =
+					subscriptionBillHelper.insert (
+						taskLogger,
+						subscriptionBillHelper.createInstance ()
 
-		subscriptionNumber
+					.setSubscriptionNumber (
+						subscriptionNumber)
 
-			.setPendingSubscriptionSendNumber (
-				subscriptionSendNumber);
+					.setIndex (
+						subscriptionNumber.getNumBills ())
 
-		// send billed message
+					.setCreatedTime (
+						transaction.now ())
 
-		if (
-			subscriptionNumber.getPendingSubscriptionBill () == null
-		) {
+					.setState (
+						SubscriptionBillState.pending)
 
-			// send bill
+				);
 
-			SubscriptionBillRec subscriptionBill =
-				subscriptionBillHelper.insert (
-					taskLogger,
-					subscriptionBillHelper.createInstance ()
+				MessageRec billedMessage =
+					messageSenderProvider.get ()
 
-				.setSubscriptionNumber (
-					subscriptionNumber)
+					.number (
+						subscriptionNumber.getNumber ())
 
-				.setIndex (
-					subscriptionNumber.getNumBills ())
+					.messageText (
+						subscription.getBilledMessage ())
 
-				.setCreatedTime (
-					transaction.now ())
+					.numFrom (
+						subscription.getBilledNumber ())
 
-				.setState (
-					SubscriptionBillState.pending)
+					.route (
+						subscription.getBilledRoute ())
 
-			);
+					.service (
+						serviceHelper.findByCodeRequired (
+							ifNull (
+								subscriptionList,
+								subscription),
+							"default"))
 
-			MessageRec billedMessage =
-				messageSenderProvider.get ()
+					.affiliate (
+						affiliateHelper.findByCodeRequired (
+							ifNull (
+								subscriptionAffiliate,
+								subscription),
+							"default"))
 
-				.number (
-					subscriptionNumber.getNumber ())
+					.deliveryTypeCode (
+						"subscription")
 
-				.messageText (
-					subscription.getBilledMessage ())
+					.ref (
+						subscriptionBill.getId ())
 
-				.numFrom (
-					subscription.getBilledNumber ())
+					.send (
+						taskLogger);
 
-				.route (
-					subscription.getBilledRoute ())
+				subscriptionBill
 
-				.service (
-					serviceHelper.findByCodeRequired (
-						ifNull (
-							subscriptionList,
-							subscription),
-						"default"))
+					.setMessage (
+						billedMessage);
 
-				.affiliate (
-					affiliateHelper.findByCodeRequired (
-						ifNull (
-							subscriptionAffiliate,
-							subscription),
-						"default"))
+				// update state
 
-				.deliveryTypeCode (
-					"subscription")
+				subscriptionNumber
 
-				.ref (
-					subscriptionBill.getId ())
+					.setPendingSubscriptionBill (
+						subscriptionBill)
 
-				.send (
-					taskLogger);
+					.setNumBills (
+						subscriptionNumber.getNumBills () + 1);
 
-			subscriptionBill
-
-				.setMessage (
-					billedMessage);
-
-			// update state
-
-			subscriptionNumber
-
-				.setPendingSubscriptionBill (
-					subscriptionBill)
-
-				.setNumBills (
-					subscriptionNumber.getNumBills () + 1);
+			}
 
 		}
 
@@ -356,54 +369,60 @@ class SubscriptionLogicImplementation
 			@NonNull Instant scheduleForTime,
 			@NonNull UserRec user) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"scheduleSend");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"scheduleSend");
 
-		// sanity check
-
-		if (
-			subscriptionSend.getState ()
-				!= SubscriptionSendState.notSent
 		) {
-			throw new IllegalStateException ();
+
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			// sanity check
+
+			if (
+				subscriptionSend.getState ()
+					!= SubscriptionSendState.notSent
+			) {
+				throw new IllegalStateException ();
+			}
+
+			if (
+				scheduleForTime.isBefore (
+					transaction.now ())
+			) {
+				throw new IllegalArgumentException ();
+			}
+
+			// update send
+
+			subscriptionSend
+
+				.setSentUser (
+					user)
+
+				.setScheduledTime (
+					transaction.now ())
+
+				.setScheduledForTime (
+					scheduleForTime)
+
+				.setState (
+					SubscriptionSendState.scheduled);
+
+			// create event
+
+			eventLogic.createEvent (
+				taskLogger,
+				"subscription_send_scheduled",
+				user,
+				subscriptionSend,
+				transaction.now ());
+
 		}
-
-		if (
-			scheduleForTime.isBefore (
-				transaction.now ())
-		) {
-			throw new IllegalArgumentException ();
-		}
-
-		// update send
-
-		subscriptionSend
-
-			.setSentUser (
-				user)
-
-			.setScheduledTime (
-				transaction.now ())
-
-			.setScheduledForTime (
-				scheduleForTime)
-
-			.setState (
-				SubscriptionSendState.scheduled);
-
-		// create event
-
-		eventLogic.createEvent (
-			taskLogger,
-			"subscription_send_scheduled",
-			user,
-			subscriptionSend,
-			transaction.now ());
 
 	}
 

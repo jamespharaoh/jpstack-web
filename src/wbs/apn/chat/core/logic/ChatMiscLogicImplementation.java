@@ -29,8 +29,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -268,49 +269,56 @@ class ChatMiscLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <MessageRec> message) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"blockAll");
+		try (
 
-		// log them off
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"blockAll");
 
-		chatUserLogic.logoff (
-			chatUser,
-			optionalIsNotPresent (
-				message));
+		) {
 
-		// block all allMessages and ads
+			// log them off
 
-		chatUser
+			chatUserLogic.logoff (
+				taskLogger,
+				chatUser,
+				optionalIsNotPresent (
+					message));
 
-			.setBlockAll (
-				true)
+			// block all allMessages and ads
 
-			.setNextAd (
-				null);
+			chatUser
 
-		// turn off dating
+				.setBlockAll (
+					true)
 
-		chatDateLogic.userDateStuff (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			message,
-			null,
-			false);
+				.setNextAd (
+					null);
 
-		// send message
+			// turn off dating
 
-		if (chatUser.getChatScheme () != null) {
-
-			chatSendLogic.sendSystemRbFree (
+			chatDateLogic.userDateStuff (
 				taskLogger,
 				chatUser,
 				optionalAbsent (),
-				"block_all_confirm",
-				TemplateMissing.error,
-				emptyMap ());
+				message,
+				null,
+				false);
+
+			// send message
+
+			if (chatUser.getChatScheme () != null) {
+
+				chatSendLogic.sendSystemRbFree (
+					taskLogger,
+					chatUser,
+					optionalAbsent (),
+					"block_all_confirm",
+					TemplateMissing.error,
+					emptyMap ());
+
+			}
 
 		}
 
@@ -324,52 +332,58 @@ class ChatMiscLogicImplementation
 			@NonNull MessageRec message,
 			boolean sendMessage) {
 
-		boolean currentSendMessage =
-			sendMessage;
+		try (
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userAutoJoin");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userAutoJoin");
 
-		ChatRec chat =
-			chatUser.getChat ();
-
-		// join chat
-
-		if (
-			chat.getAutoJoinChat ()
-			&& ! chatUser.getOnline ()
 		) {
 
-			userJoin (
-				taskLogger,
-				chatUser,
-				sendMessage,
-				message.getThreadId (),
-				ChatMessageMethod.sms);
+			boolean currentSendMessage =
+				sendMessage;
 
-			currentSendMessage = true;
+			ChatRec chat =
+				chatUser.getChat ();
 
-		}
+			// join chat
 
-		// join date
+			if (
+				chat.getAutoJoinChat ()
+				&& ! chatUser.getOnline ()
+			) {
 
-		if (
-			chat.getAutoJoinDate ()
-			&& chatUser.getDateMode () == ChatUserDateMode.none
-		) {
+				userJoin (
+					taskLogger,
+					chatUser,
+					sendMessage,
+					message.getThreadId (),
+					ChatMessageMethod.sms);
 
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				optionalAbsent (),
-				optionalOf (
-					message),
-				chatUser.getMainChatUserImage () != null
-					? ChatUserDateMode.photo
-					: ChatUserDateMode.text,
-				currentSendMessage);
+				currentSendMessage = true;
+
+			}
+
+			// join date
+
+			if (
+				chat.getAutoJoinDate ()
+				&& chatUser.getDateMode () == ChatUserDateMode.none
+			) {
+
+				chatDateLogic.userDateStuff (
+					taskLogger,
+					chatUser,
+					optionalAbsent (),
+					optionalOf (
+						message),
+					chatUser.getMainChatUserImage () != null
+						? ChatUserDateMode.photo
+						: ChatUserDateMode.text,
+					currentSendMessage);
+
+			}
 
 		}
 
@@ -384,216 +398,223 @@ class ChatMiscLogicImplementation
 			Long threadId,
 			ChatMessageMethod deliveryMethod) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userJoin");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userJoin");
 
-		ChatRec chat =
-			chatUser.getChat ();
-
-		// if they're already online do nothing
-
-		if (
-			chatUser.getOnline ()
-			&& chatUser.getDeliveryMethod () == deliveryMethod
 		) {
-			return;
-		}
 
-		boolean wasOnline =
-			chatUser.getOnline ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// log the user on
+			ChatRec chat =
+				chatUser.getChat ();
 
-		chatUser
+			// if they're already online do nothing
 
-			.setOnline (
-				true)
+			if (
+				chatUser.getOnline ()
+				&& chatUser.getDeliveryMethod () == deliveryMethod
+			) {
+				return;
+			}
 
-			.setBlockAll (
-				false)
+			boolean wasOnline =
+				chatUser.getOnline ();
 
-			.setLastJoin (
-				transaction.now ())
+			// log the user on
 
-			.setLastAction (
-				transaction.now ())
+			chatUser
 
-			.setFirstJoin (
-				ifNull (
-					chatUser.getFirstJoin (),
-					transaction.now ()))
+				.setOnline (
+					true)
 
-			.setNextRegisterHelp (
-				null)
+				.setBlockAll (
+					false)
 
-			.setDeliveryMethod (
-				deliveryMethod);
-
-		// schedule an ad
-
-		chatUserLogic.scheduleAd (
-			chatUser);
-
-		// create session
-
-		if (! wasOnline) {
-
-			chatUserSessionHelper.insert (
-				taskLogger,
-				chatUserSessionHelper.createInstance ()
-
-				.setChatUser (
-					chatUser)
-
-				.setStartTime (
+				.setLastJoin (
 					transaction.now ())
 
-			);
+				.setLastAction (
+					transaction.now ())
 
-		}
+				.setFirstJoin (
+					ifNull (
+						chatUser.getFirstJoin (),
+						transaction.now ()))
 
-		// send message
+				.setNextRegisterHelp (
+					null)
 
-		if (sendMessage) {
+				.setDeliveryMethod (
+					deliveryMethod);
 
-			chatSendLogic.sendSystemMagic (
+			// schedule an ad
+
+			chatUserLogic.scheduleAd (
 				taskLogger,
-				chatUser,
-				optionalFromNullable (
-					threadId),
-				"logon",
-				commandHelper.findByCodeRequired (
-					chat,
-					"magic"),
-				IdObject.objectId (
+				chatUser);
+
+			// create session
+
+			if (! wasOnline) {
+
+				chatUserSessionHelper.insert (
+					taskLogger,
+					chatUserSessionHelper.createInstance ()
+
+					.setChatUser (
+						chatUser)
+
+					.setStartTime (
+						transaction.now ())
+
+				);
+
+			}
+
+			// send message
+
+			if (sendMessage) {
+
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalFromNullable (
+						threadId),
+					"logon",
 					commandHelper.findByCodeRequired (
 						chat,
-						"help")),
-				TemplateMissing.error,
-				emptyMap ());
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					TemplateMissing.error,
+					emptyMap ());
 
-		}
+			}
 
-		// lookup location for web users
+			// lookup location for web users
 
-		if (
+			if (
 
-			deliveryMethod == ChatMessageMethod.web
+				deliveryMethod == ChatMessageMethod.web
 
-			&& (
+				&& (
 
-				chatUser.getLocationTime () == null
+					chatUser.getLocationTime () == null
 
-				|| earlierThan (
-					chatUser.getLocationTime (),
-					transaction.now ().minus (
-						Duration.standardHours (1)))
+					|| earlierThan (
+						chatUser.getLocationTime (),
+						transaction.now ().minus (
+							Duration.standardHours (1)))
 
-			)
+				)
 
-		) {
+			) {
 
-			Long chatUserId =
-				chatUser.getId ();
+				Long chatUserId =
+					chatUser.getId ();
 
-			Long locatorId =
-				chat.getLocator ().getId ();
+				Long locatorId =
+					chat.getLocator ().getId ();
 
-			locatorManager.locate (
-				taskLogger,
-				chat.getLocator ().getId (),
-				chatUser.getNumber ().getId (),
-				serviceHelper.findByCodeRequired (
-					chat,
-					"default").getId (),
-				chatUserLogic.getAffiliateId (chatUser),
-				new LocatorManager.AbstractCallback () {
+				locatorManager.locate (
+					taskLogger,
+					chat.getLocator ().getId (),
+					chatUser.getNumber ().getId (),
+					serviceHelper.findByCodeRequired (
+						chat,
+						"default").getId (),
+					chatUserLogic.getAffiliateId (chatUser),
+					new LocatorManager.AbstractCallback () {
 
-				@Override
-				public
-				void success (
-						LongLat longLat) {
+					@Override
+					public
+					void success (
+							LongLat longLat) {
 
-					try (
+						try (
 
-						Transaction transaction =
-							database.beginReadWrite (
-								taskLogger,
-								stringFormat (
-									"%s.%s.%s.%s (...)",
-									"ChatMiscLogicImplementation",
-									"userJoin",
-									"locatorCallback",
-									"success"),
-								this);
-
-					) {
-
-						ChatUserRec chatUser =
-							chatUserHelper.findRequired (
-								chatUserId);
-
-						if (longLat == null) {
-							throw new NullPointerException ();
-						}
-
-						{
-
-							if (
-								! transaction.contains (
-									chatUser)
-							) {
-
-								throw new IllegalStateException (
+							OwnedTransaction transaction =
+								database.beginReadWrite (
+									taskLogger,
 									stringFormat (
-										"Chat user %s not in transaction",
-										integerToDecimalString (
-											chatUser.getId ())));
+										"%s.%s.%s.%s (...)",
+										"ChatMiscLogicImplementation",
+										"userJoin",
+										"locatorCallback",
+										"success"),
+									this);
+
+						) {
+
+							ChatUserRec chatUser =
+								chatUserHelper.findRequired (
+									chatUserId);
+
+							if (longLat == null) {
+								throw new NullPointerException ();
+							}
+
+							{
+
+								if (
+									! transaction.contains (
+										chatUser)
+								) {
+
+									throw new IllegalStateException (
+										stringFormat (
+											"Chat user %s not in transaction",
+											integerToDecimalString (
+												chatUser.getId ())));
+
+								}
 
 							}
 
+							chatUser
+
+								.setLocationLongLat (
+									longLat)
+
+								.setLocationBackupLongLat (
+									longLat)
+
+								.setLocationTime (
+									transaction.now ());
+
+							LocatorRec locator =
+								locatorHelper.findRequired (
+									locatorId);
+
+							eventLogic.createEvent (
+								taskLogger,
+								"chat_user_location_locator",
+								chatUser,
+								longLat.longitude (),
+								longLat.latitude (),
+								locator);
+
+							transaction.commit ();
+
+							taskLogger.noticeFormat (
+								"Got location for %s: %s",
+								chatUser.getCode (),
+								longLat.toString ());
+
 						}
-
-						chatUser
-
-							.setLocationLongLat (
-								longLat)
-
-							.setLocationBackupLongLat (
-								longLat)
-
-							.setLocationTime (
-								transaction.now ());
-
-						LocatorRec locator =
-							locatorHelper.findRequired (
-								locatorId);
-
-						eventLogic.createEvent (
-							taskLogger,
-							"chat_user_location_locator",
-							chatUser,
-							longLat.longitude (),
-							longLat.latitude (),
-							locator);
-
-						transaction.commit ();
-
-						taskLogger.noticeFormat (
-							"Got location for %s: %s",
-							chatUser.getCode (),
-							longLat.toString ());
 
 					}
 
-				}
+				});
 
-			});
+			}
 
 		}
 
@@ -607,56 +628,63 @@ class ChatMiscLogicImplementation
 			Long threadId,
 			boolean automatic) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userLogoffWithMessage");
+		try (
 
-		ChatRec chat = chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userLogoffWithMessage");
 
-		// if they aren't online possibly send them a stop dating hint
+		) {
 
-		if (! chatUser.getOnline ()) {
+			ChatRec chat = chatUser.getChat ();
 
-			if (chatUser.getDateMode () != ChatUserDateMode.none) {
+			// if they aren't online possibly send them a stop dating hint
 
-				chatSendLogic.sendSystemMagic (
+			if (! chatUser.getOnline ()) {
+
+				if (chatUser.getDateMode () != ChatUserDateMode.none) {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalFromNullable (
+							threadId),
+						"date_stop_hint",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.error,
+						emptyMap ());
+
+				}
+
+				return;
+
+			}
+
+			// log the user off
+
+			chatUserLogic.logoff (
+				taskLogger,
+				chatUser,
+				automatic);
+
+			// send a message
+
+			if (chatUser.getNumber () != null) {
+
+				chatSendLogic.sendSystemRbFree (
 					taskLogger,
 					chatUser,
 					optionalFromNullable (
 						threadId),
-					"date_stop_hint",
-					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
-					0l,
+					"logoff_confirm",
 					TemplateMissing.error,
 					emptyMap ());
 
 			}
-
-			return;
-
-		}
-
-		// log the user off
-
-		chatUserLogic.logoff (
-				chatUser,
-				automatic);
-
-		// send a message
-
-		if (chatUser.getNumber () != null) {
-
-			chatSendLogic.sendSystemRbFree (
-				taskLogger,
-				chatUser,
-				optionalFromNullable (
-					threadId),
-				"logoff_confirm",
-				TemplateMissing.error,
-				emptyMap ());
 
 		}
 
@@ -672,7 +700,7 @@ class ChatMiscLogicImplementation
 
 		// fetch all appropriate monitors
 
-		List<ChatUserRec> allMonitors =
+		List <ChatUserRec> allMonitors =
 			chatUserHelper.find (
 				chat,
 				ChatUserType.monitor,
@@ -733,93 +761,99 @@ class ChatMiscLogicImplementation
 			@NonNull String name,
 			@NonNull Long threadId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chatUserSetName");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"chatUserSetName");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// create the chat user name
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ChatRec chat =
+				chatUser.getChat ();
+
+			// create the chat user name
 
 
-		ChatUserNameRec chatUserName =
-			chatUserNameHelper.insert (
-				taskLogger,
-				chatUserNameHelper.createInstance ()
+			ChatUserNameRec chatUserName =
+				chatUserNameHelper.insert (
+					taskLogger,
+					chatUserNameHelper.createInstance ()
 
-			.setChatUser (
-				chatUser)
+				.setChatUser (
+					chatUser)
 
-			.setCreationTime (
-				transaction.now ())
+				.setCreationTime (
+					transaction.now ())
 
-			.setOriginalName (
-				name)
+				.setOriginalName (
+					name)
 
-			.setEditedName (
-				name)
+				.setEditedName (
+					name)
 
-			.setStatus (
-				ChatUserInfoStatus.moderatorPending)
+				.setStatus (
+					ChatUserInfoStatus.moderatorPending)
 
-			.setThreadId (
-				threadId)
+				.setThreadId (
+					threadId)
 
-		);
+			);
 
-		chatUser.getChatUserNames ().add (
-			chatUserName);
-
-		chatUser
-
-			.setNewChatUserName (
+			chatUser.getChatUserNames ().add (
 				chatUserName);
 
-		// create the queue item
+			chatUser
 
-		if (chatUser.getQueueItem () == null) {
+				.setNewChatUserName (
+					chatUserName);
 
-			QueueItemRec qi =
-				queueLogic.createQueueItem (
+			// create the queue item
+
+			if (chatUser.getQueueItem () == null) {
+
+				QueueItemRec qi =
+					queueLogic.createQueueItem (
+						taskLogger,
+						chat,
+						"user",
+						chatUser,
+						chatUser,
+						chatUserLogic.getPrettyName (
+							chatUser),
+						"Name to approve");
+
+				chatUser.setQueueItem (qi);
+
+			}
+
+			// send reply
+
+			if (threadId != null)
+
+				chatSendLogic.sendSystemMagic (
 					taskLogger,
-					chat,
-					"user",
 					chatUser,
-					chatUser,
-					chatUserLogic.getPrettyName (
-						chatUser),
-					"Name to approve");
-
-			chatUser.setQueueItem (qi);
-
-		}
-
-		// send reply
-
-		if (threadId != null)
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					threadId),
-				"name_confirm",
-				commandHelper.findByCodeRequired (
-					chat,
-					"magic"),
-				IdObject.objectId (
+					optionalOf (
+						threadId),
+					"name_confirm",
 					commandHelper.findByCodeRequired (
 						chat,
-						"name")),
-				TemplateMissing.error,
-				ImmutableMap.<String, String> builder ()
-					.put ("newName", name)
-					.build ());
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"name")),
+					TemplateMissing.error,
+					ImmutableMap.<String, String> builder ()
+						.put ("newName", name)
+						.build ());
+
+		}
 
 	}
 

@@ -114,15 +114,22 @@ class ChatHelpLogPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderDetails (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderHistory ();
+		) {
+
+			renderDetails (
+				taskLogger);
+
+			renderHistory (
+				taskLogger);
+
+		}
 
 	}
 
@@ -130,171 +137,189 @@ class ChatHelpLogPendingSummaryPart
 	void renderDetails (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderDetails");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderDetails");
 
-		htmlTableDetailsRowWriteRaw (
-			"User",
-			() -> objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatUser,
-				chatUser.getChat ()));
+		) {
 
-		htmlTableDetailsRowWrite (
-			"Date mode",
-			chatUser.getDateMode ().name ());
+			htmlTableOpenDetails ();
 
-		htmlTableDetailsRowWrite (
-			"Online",
-			booleanToYesNo (
-				chatUser.getOnline ()));
+			htmlTableDetailsRowWriteRaw (
+				"User",
+				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatUser,
+					chatUser.getChat ()));
 
-		htmlTableDetailsRowWrite (
-			"Gender",
-			ifNotNullThenElseEmDash (
-				chatUser.getGender (),
-				() -> chatUser.getGender ().name ()));
+			htmlTableDetailsRowWrite (
+				"Date mode",
+				chatUser.getDateMode ().name ());
 
-		htmlTableDetailsRowWrite (
-			"Orientation",
-			ifNotNullThenElseEmDash (
-				chatUser.getOrient (),
-				() -> chatUser.getOrient ().name ()));
+			htmlTableDetailsRowWrite (
+				"Online",
+				booleanToYesNo (
+					chatUser.getOnline ()));
 
-		htmlTableDetailsRowWrite (
-			"Name",
-			ifNotNullThenElseEmDash (
-				chatUser.getName (),
-				() -> chatUser.getName ()));
+			htmlTableDetailsRowWrite (
+				"Gender",
+				ifNotNullThenElseEmDash (
+					chatUser.getGender (),
+					() -> chatUser.getGender ().name ()));
 
-		htmlTableDetailsRowWrite (
-			"Info",
-			ifNotNullThenElseEmDash (
-				chatUser.getInfoText (),
-				() -> chatUser.getInfoText ().getText ()));
+			htmlTableDetailsRowWrite (
+				"Orientation",
+				ifNotNullThenElseEmDash (
+					chatUser.getOrient (),
+					() -> chatUser.getOrient ().name ()));
 
-		htmlTableDetailsRowWriteHtml (
-			"Credit",
-			currencyLogic.formatHtml (
-				chatUser.getChat ().getCurrency (),
-				chatUser.getCredit ()));
+			htmlTableDetailsRowWrite (
+				"Name",
+				ifNotNullThenElseEmDash (
+					chatUser.getName (),
+					() -> chatUser.getName ()));
 
-		htmlTableDetailsRowWrite (
-			"Barred",
-			booleanToYesNo (
-				chatUser.getBarred ()));
+			htmlTableDetailsRowWrite (
+				"Info",
+				ifNotNullThenElseEmDash (
+					chatUser.getInfoText (),
+					() -> chatUser.getInfoText ().getText ()));
 
-		htmlTableDetailsRowWrite (
-			"Credit mode",
-			chatUser.getCreditMode ().name ());
+			htmlTableDetailsRowWriteHtml (
+				"Credit",
+				currencyLogic.formatHtml (
+					chatUser.getChat ().getCurrency (),
+					chatUser.getCredit ()));
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userCreditCheck (
-				taskLogger,
-				chatUser);
+			htmlTableDetailsRowWrite (
+				"Barred",
+				booleanToYesNo (
+					chatUser.getBarred ()));
 
-		htmlTableDetailsRowWrite (
-			"Credit check",
-			creditCheckResult.details ());
+			htmlTableDetailsRowWrite (
+				"Credit mode",
+				chatUser.getCreditMode ().name ());
 
-		htmlTableClose ();
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userCreditCheck (
+					taskLogger,
+					chatUser);
+
+			htmlTableDetailsRowWrite (
+				"Credit check",
+				creditCheckResult.details ());
+
+			htmlTableClose ();
+
+		}
 
 	}
 
 	private
-	void renderHistory () {
+	void renderHistory (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlHeadingTwoWrite (
-			"History");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHistory");
 
-		htmlTableHeaderRowWrite (
-			"",
-			"Time",
-			"Text",
-			"Our number",
-			"User");
-
-		LocalDate previousDate = null;
-
-		for (
-			ChatHelpLogRec chatHelpLog
-				: chatHelpLogs
 		) {
 
-			LocalDate nextDate =
-				chatHelpLog.getTimestamp ()
-					.toDateTime (timezone)
-					.toLocalDate ();
+			htmlHeadingTwoWrite (
+				"History");
 
-			if (
+			htmlTableOpenList ();
 
-				isNull (
-					previousDate)
+			htmlTableHeaderRowWrite (
+				"",
+				"Time",
+				"Text",
+				"Our number",
+				"User");
 
-				|| localDateNotEqual (
-					nextDate,
-					previousDate)
+			LocalDate previousDate = null;
 
+			for (
+				ChatHelpLogRec chatHelpLog
+					: chatHelpLogs
 			) {
 
-				previousDate =
-					nextDate;
+				LocalDate nextDate =
+					chatHelpLog.getTimestamp ()
+						.toDateTime (timezone)
+						.toLocalDate ();
 
-				htmlTableRowSeparatorWrite ();
+				if (
+
+					isNull (
+						previousDate)
+
+					|| localDateNotEqual (
+						nextDate,
+						previousDate)
+
+				) {
+
+					previousDate =
+						nextDate;
+
+					htmlTableRowSeparatorWrite ();
+
+					formatWriter.writeLineFormat (
+						"<tr style=\"font-weight: bold\">");
+
+					formatWriter.writeLineFormat (
+						"<td colspan=\"5\">%h</td>",
+						userConsoleLogic.dateStringLong (
+							chatHelpLog.getTimestamp ()));
+
+					htmlTableRowClose ();
+
+				}
+
+				String rowClass =
+					messageConsoleLogic.classForMessageDirection (
+						chatHelpLog.getDirection ());
 
 				formatWriter.writeLineFormat (
-					"<tr style=\"font-weight: bold\">");
+					"<tr class=\"%h\">",
+					rowClass);
 
 				formatWriter.writeLineFormat (
-					"<td colspan=\"5\">%h</td>",
-					userConsoleLogic.dateStringLong (
+					"<td",
+					" style=\"background: %h\"",
+					htmlColourFromObject (
+						chatHelpLog.getOurNumber ()),
+					">&nbsp;</td>");
+
+				htmlTableCellWrite (
+					userConsoleLogic.timeString (
 						chatHelpLog.getTimestamp ()));
+
+				htmlTableCellWrite (
+					chatHelpLog.getText ());
+
+				htmlTableCellWrite (
+					chatHelpLog.getOurNumber ());
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatHelpLog.getUser (),
+						() -> chatHelpLog.getUser ().getUsername ()));
 
 				htmlTableRowClose ();
 
 			}
 
-			String rowClass =
-				messageConsoleLogic.classForMessageDirection (
-					chatHelpLog.getDirection ());
-
-			formatWriter.writeLineFormat (
-				"<tr class=\"%h\">",
-				rowClass);
-
-			formatWriter.writeLineFormat (
-				"<td",
-				" style=\"background: %h\"",
-				htmlColourFromObject (
-					chatHelpLog.getOurNumber ()),
-				">&nbsp;</td>");
-
-			htmlTableCellWrite (
-				userConsoleLogic.timeString (
-					chatHelpLog.getTimestamp ()));
-
-			htmlTableCellWrite (
-				chatHelpLog.getText ());
-
-			htmlTableCellWrite (
-				chatHelpLog.getOurNumber ());
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatHelpLog.getUser (),
-					() -> chatHelpLog.getUser ().getUsername ()));
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

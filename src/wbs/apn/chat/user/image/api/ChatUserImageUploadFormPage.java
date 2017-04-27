@@ -103,25 +103,31 @@ class ChatUserImageUploadFormPage
 	void goContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goContent");
+		try (
 
-		formatWriter.writeLineFormat (
-			"<!DOCTYPE html>");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goContent");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<html>");
+		) {
 
-		goHead (
-			taskLogger);
+			formatWriter.writeLineFormat (
+				"<!DOCTYPE html>");
 
-		goBody (
-			taskLogger);
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<html>");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"</html>");
+			goHead (
+				taskLogger);
+
+			goBody (
+				taskLogger);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</html>");
+
+		}
 
 	}
 
@@ -129,15 +135,26 @@ class ChatUserImageUploadFormPage
 	void goHead (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<head>");
+		try (
 
-		formatWriter.writeLineFormat (
-			"<title>%h</title>",
-			titleText);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goHead");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"</head>");
+		) {
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<head>");
+
+			formatWriter.writeLineFormat (
+				"<title>%h</title>",
+				titleText);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</head>");
+
+		}
 
 	}
 

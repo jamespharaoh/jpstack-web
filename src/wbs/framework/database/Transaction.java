@@ -3,8 +3,7 @@ package wbs.framework.database;
 import org.joda.time.Instant;
 
 public
-interface Transaction
-	extends AutoCloseable {
+interface Transaction {
 
 	class IdGenerator {
 
@@ -22,18 +21,15 @@ interface Transaction
 
 	void commit ();
 
-	@Override
-	void close ();
-
 	Instant now ();
 
 	void flush ();
 
 	void refresh (
-			Object... objects);
+			Object ... objects);
 
 	boolean contains (
-			Object... objects);
+			Object ... objects);
 
 	void setMeta (
 			String key,
@@ -43,6 +39,6 @@ interface Transaction
 			String key);
 
 	void fetch (
-			Object... objects);
+			Object ... objects);
 
 }

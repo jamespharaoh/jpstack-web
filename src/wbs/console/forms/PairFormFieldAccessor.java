@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import com.google.common.base.Optional;
@@ -44,44 +46,50 @@ class PairFormFieldAccessor <Container, Left, Right>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"read");
+		try (
 
-		// special case for null container
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"read");
 
-		/*
-		if (container == null) {
-			return Optional.<Pair<Left,Right>>absent ();
-		}
-		*/
-
-		// get native values
-
-		Optional <Left> leftValue =
-			leftAccessor.read (
-				taskLogger,
-				container);
-
-		Optional<Right> rightValue =
-			rightAccessor.read (
-				taskLogger,
-				container);
-
-		// return as pair
-
-		if (
-			! leftValue.isPresent ()
-			&& ! rightValue.isPresent ()
 		) {
-			return Optional.<Pair<Left,Right>>absent ();
-		}
 
-		return Optional.of (
-			Pair.of (
-				leftValue.orNull (),
-				rightValue.orNull ()));
+			// special case for null container
+
+			/*
+			if (container == null) {
+				return Optional.<Pair<Left,Right>>absent ();
+			}
+			*/
+
+			// get native values
+
+			Optional <Left> leftValue =
+				leftAccessor.read (
+					taskLogger,
+					container);
+
+			Optional<Right> rightValue =
+				rightAccessor.read (
+					taskLogger,
+					container);
+
+			// return as pair
+
+			if (
+				! leftValue.isPresent ()
+				&& ! rightValue.isPresent ()
+			) {
+				return optionalAbsent ();
+			}
+
+			return optionalOf (
+				Pair.of (
+					leftValue.orNull (),
+					rightValue.orNull ()));
+
+		}
 
 	}
 
@@ -92,31 +100,37 @@ class PairFormFieldAccessor <Container, Left, Right>
 			@NonNull Container container,
 			@NonNull Optional <Pair <Left, Right>> nativeValueOptional) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"write");
+		try (
 
-		// special case for null
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"write");
 
-		Pair <Left, Right> nativeValue =
-			optionalOr (
-				nativeValueOptional,
-				Pair.of (null, null));
+		) {
 
-		// write values
+			// special case for null
 
-		leftAccessor.write (
-			taskLogger,
-			container,
-			optionalFromNullable (
-				nativeValue.getLeft ()));
+			Pair <Left, Right> nativeValue =
+				optionalOr (
+					nativeValueOptional,
+					Pair.of (null, null));
 
-		rightAccessor.write (
-			taskLogger,
-			container,
-			optionalFromNullable (
-				nativeValue.getRight ()));
+			// write values
+
+			leftAccessor.write (
+				taskLogger,
+				container,
+				optionalFromNullable (
+					nativeValue.getLeft ()));
+
+			rightAccessor.write (
+				taskLogger,
+				container,
+				optionalFromNullable (
+					nativeValue.getRight ()));
+
+		}
 
 	}
 

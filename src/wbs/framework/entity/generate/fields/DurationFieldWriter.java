@@ -56,41 +56,47 @@ class DurationFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.propertyNameFormat (
-				"%s",
-				spec.name ())
+			new JavaPropertyWriter ()
 
-			.typeClass (
-				Duration.class)
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.setterTypeClass (
-				ReadableDuration.class)
+				.propertyNameFormat (
+					"%s",
+					spec.name ())
 
-			.setterConversion (
-				methodGetStaticRequired (
-					TimeUtils.class,
-					"toDurationNullSafe",
-					ImmutableList.of (
-						ReadableDuration.class)))
+				.typeClass (
+					Duration.class)
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.setterTypeClass (
+					ReadableDuration.class)
+
+				.setterConversion (
+					methodGetStaticRequired (
+						TimeUtils.class,
+						"toDurationNullSafe",
+						ImmutableList.of (
+							ReadableDuration.class)))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

@@ -163,76 +163,32 @@ class ChatBroadcastSendPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlFormOpenPost ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlHeadingThreeWrite (
-			"Recipients");
+		) {
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			searchFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			htmlFormOpenPost ();
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			numbersFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			htmlHeadingThreeWrite (
+				"Recipients");
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			commonFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				searchFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageUserFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
-
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageMessageFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
-
-		if (! form.search ()) {
-
-			htmlTableOpenDetails ();
-
-			formFieldLogic.outputFormRows (
+			formFieldLogic.outputFormAlwaysHidden (
 				taskLogger,
 				requestContext,
 				formatWriter,
@@ -243,11 +199,149 @@ class ChatBroadcastSendPart
 				FormType.search,
 				"send");
 
-			formFieldLogic.outputFormRows (
+			formFieldLogic.outputFormAlwaysHidden (
 				taskLogger,
 				requestContext,
 				formatWriter,
 				commonFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
+
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageUserFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
+
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageMessageFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
+
+			if (! form.search ()) {
+
+				htmlTableOpenDetails ();
+
+				formFieldLogic.outputFormRows (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					numbersFields,
+					updateResults,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+				formFieldLogic.outputFormRows (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					commonFields,
+					updateResults,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+				htmlTableClose ();
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"searchOn\"",
+					" value=\"enable search\"",
+					">");
+
+				htmlParagraphClose ();
+
+				formFieldLogic.outputFormTemporarilyHidden (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					searchFields,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+			}
+
+			if (form.search ()) {
+
+				htmlTableOpenDetails ();
+
+				formFieldLogic.outputFormRows (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					searchFields,
+					updateResults,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+				formFieldLogic.outputFormRows (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					commonFields,
+					updateResults,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+				htmlTableClose ();
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"searchOff\"",
+					" value=\"disable search\"",
+					">");
+
+				formFieldLogic.outputFormTemporarilyHidden (
+					taskLogger,
+					requestContext,
+					formatWriter,
+					numbersFields,
+					form,
+					formHints,
+					FormType.search,
+					"send");
+
+			}
+
+			htmlHeadingThreeWrite (
+				"Message");
+
+			htmlTableOpenDetails ();
+
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageUserFields,
 				updateResults,
 				form,
 				formHints,
@@ -261,8 +355,8 @@ class ChatBroadcastSendPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"searchOn\"",
-				" value=\"enable search\"",
+				" name=\"verify\"",
+				" value=\"verify\"",
 				">");
 
 			htmlParagraphClose ();
@@ -271,103 +365,15 @@ class ChatBroadcastSendPart
 				taskLogger,
 				requestContext,
 				formatWriter,
-				searchFields,
+				messageMessageFields,
 				form,
 				formHints,
 				FormType.search,
 				"send");
+
+			htmlFormClose ();
 
 		}
-
-		if (form.search ()) {
-
-			htmlTableOpenDetails ();
-
-			formFieldLogic.outputFormRows (
-				taskLogger,
-				requestContext,
-				formatWriter,
-				searchFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormRows (
-				taskLogger,
-				requestContext,
-				formatWriter,
-				commonFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			htmlTableClose ();
-
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"searchOff\"",
-				" value=\"disable search\"",
-				">");
-
-			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
-				requestContext,
-				formatWriter,
-				numbersFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-		}
-
-		htmlHeadingThreeWrite (
-			"Message");
-
-		htmlTableOpenDetails ();
-
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageUserFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
-
-		htmlTableClose ();
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"verify\"",
-			" value=\"verify\"",
-			">");
-
-		htmlParagraphClose ();
-
-		formFieldLogic.outputFormTemporarilyHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageMessageFields,
-			form,
-			formHints,
-			FormType.search,
-			"send");
-
-		htmlFormClose ();
 
 	}
 

@@ -119,16 +119,22 @@ class ObjectHelperGenerator {
 	void generateHelper (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateHelper");
+		try (
 
-		init (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateHelper");
 
-		writeClass (
-			taskLogger);
+		) {
+
+			init (
+				taskLogger);
+
+			writeClass (
+				taskLogger);
+
+		}
 
 	}
 
@@ -309,88 +315,94 @@ class ObjectHelperGenerator {
 	void writeClass (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeClass");
+		try (
 
-		AtomicFileWriter formatWriter =
-			new AtomicFileWriter (
-				filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeClass");
 
-		JavaClassUnitWriter classUnitWriter =
-			javaClassUnitWriterProvider.get ()
+			AtomicFileWriter formatWriter =
+				new AtomicFileWriter (
+					filename);
 
-			.formatWriter (
-				formatWriter)
+		) {
 
-			.packageNameFormat (
-				"%s.logic",
-				packageName);
+			JavaClassUnitWriter classUnitWriter =
+				javaClassUnitWriterProvider.get ()
 
-		JavaClassWriter classWriter =
-			javaClassWriterProvider.get ()
+				.formatWriter (
+					formatWriter)
 
-			.className (
-				objectHelperImplementationName)
+				.packageNameFormat (
+					"%s.logic",
+					packageName);
 
-			.addClassAnnotation (
-				javaAnnotationWriterProvider.get ()
+			JavaClassWriter classWriter =
+				javaClassWriterProvider.get ()
 
-				.name (
-					"java.lang.SuppressWarnings")
+				.className (
+					objectHelperImplementationName)
 
-				.addAttributeFormat (
-					"value",
-					"{ \"rawtypes\", \"unchecked\" }"))
+				.addClassAnnotation (
+					javaAnnotationWriterProvider.get ()
 
-			.addClassModifier (
-				"public")
+					.name (
+						"java.lang.SuppressWarnings")
 
-			.addImplementsClass (
-				ObjectHelperImplementation.class)
+					.addAttributeFormat (
+						"value",
+						"{ \"rawtypes\", \"unchecked\" }"))
 
-			.addImplementsFormat (
-				"%s.model.%s",
-				packageName,
-				objectHelperInterfaceName)
+				.addClassModifier (
+					"public")
 
-			.addTypeParameterMapping (
-				"RecordType",
-				model.objectClass ().getSimpleName ());
+				.addImplementsClass (
+					ObjectHelperImplementation.class)
 
-		addSingletonDependencies (
-			classWriter);
+				.addImplementsFormat (
+					"%s.model.%s",
+					packageName,
+					objectHelperInterfaceName)
 
-		addState (
-			classWriter);
+				.addTypeParameterMapping (
+					"RecordType",
+					model.objectClass ().getSimpleName ());
 
-		classWriter.addBlock (
-			this::writeLifecycle);
+			addSingletonDependencies (
+				classWriter);
 
-		classWriter.addBlock (
-			this::writeImplementation);
+			addState (
+				classWriter);
 
-		addDelegations (
-			classWriter);
+			classWriter.addBlock (
+				this::writeLifecycle);
 
-		// write it out
+			classWriter.addBlock (
+				this::writeImplementation);
 
-		if (taskLogger.errors ()) {
-			return;
+			addDelegations (
+				classWriter);
+
+			// write it out
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			classUnitWriter.addBlock (
+				classWriter);
+
+			classUnitWriter.write (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			formatWriter.commit ();
+
 		}
-
-		classUnitWriter.addBlock (
-			classWriter);
-
-		classUnitWriter.write (
-			taskLogger);
-
-		if (taskLogger.errors ()) {
-			return;
-		}
-
-		formatWriter.commit ();
 
 	}
 

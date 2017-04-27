@@ -10,6 +10,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.responder.ConsoleFile;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -66,15 +67,21 @@ class SimpleFileBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildFile (
-			taskLogger);
+		) {
+
+			setDefaults ();
+
+			buildFile (
+				taskLogger);
+
+		}
 
 	}
 

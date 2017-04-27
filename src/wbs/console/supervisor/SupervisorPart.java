@@ -117,24 +117,30 @@ class SupervisorPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		prepareSupervisorConfig ();
-		prepareDate ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		if (supervisorConfig != null) {
+		) {
 
-			createStatsPeriod ();
-			createStatsConditions ();
+			prepareSupervisorConfig ();
+			prepareDate ();
 
-			createStatsDataSets (
-				taskLogger);
+			if (supervisorConfig != null) {
 
-			createPageParts (
-				taskLogger);
+				createStatsPeriod ();
+				createStatsConditions ();
+
+				createStatsDataSets (
+					taskLogger);
+
+				createPageParts (
+					taskLogger);
+
+			}
 
 		}
 
@@ -333,96 +339,108 @@ class SupervisorPart
 	void createStatsDataSets (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createStatsDataSets");
+		try (
 
-		ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
-			ImmutableMap.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createStatsDataSets");
 
-		for (
-			Object object
-				: supervisorConfig.spec ().builders ()
 		) {
 
-			if (! (object instanceof SupervisorDataSetSpec))
-				continue;
+			ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
+				ImmutableMap.builder ();
 
-			SupervisorDataSetSpec supervisorDataSetSpec =
-				(SupervisorDataSetSpec)
-				object;
+			for (
+				Object object
+					: supervisorConfig.spec ().builders ()
+			) {
 
-			StatsProvider statsProvider =
-				componentManager.getComponentRequired (
-					taskLogger,
-					supervisorDataSetSpec.providerBeanName (),
-					StatsProvider.class);
+				if (! (object instanceof SupervisorDataSetSpec))
+					continue;
 
-			StatsDataSet statsDataSet =
-				statsProvider.getStats (
-					taskLogger,
-					statsPeriod,
-					statsConditions);
+				SupervisorDataSetSpec supervisorDataSetSpec =
+					(SupervisorDataSetSpec)
+					object;
 
-			dataSetsBuilder.put (
-				supervisorDataSetSpec.name (),
-				statsDataSet);
+				StatsProvider statsProvider =
+					componentManager.getComponentRequired (
+						taskLogger,
+						supervisorDataSetSpec.providerBeanName (),
+						StatsProvider.class);
+
+				StatsDataSet statsDataSet =
+					statsProvider.getStats (
+						taskLogger,
+						statsPeriod,
+						statsConditions);
+
+				dataSetsBuilder.put (
+					supervisorDataSetSpec.name (),
+					statsDataSet);
+
+			}
+
+			statsDataSets =
+				dataSetsBuilder.build ();
 
 		}
-
-		statsDataSets =
-			dataSetsBuilder.build ();
 
 	}
 
 	void createPageParts (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createPageParts");
+		try (
 
-		Map <String, Object> partParameters =
-			ImmutableMap.<String, Object> builder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createPageParts");
 
-			.put (
-				"statsPeriod",
-				statsPeriod)
-
-			.put (
-				"statsDataSetsByName",
-				statsDataSets)
-
-			.build ();
-
-		ImmutableList.Builder <PagePart> pagePartsBuilder =
-			ImmutableList.builder ();
-
-		for (
-			PagePartFactory pagePartFactory
-				: supervisorConfig.pagePartFactories ()
 		) {
 
-			PagePart pagePart =
-				pagePartFactory.buildPagePart (
+			Map <String, Object> partParameters =
+				ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"statsPeriod",
+					statsPeriod)
+
+				.put (
+					"statsDataSetsByName",
+					statsDataSets)
+
+				.build ();
+
+			ImmutableList.Builder <PagePart> pagePartsBuilder =
+				ImmutableList.builder ();
+
+			for (
+				PagePartFactory pagePartFactory
+					: supervisorConfig.pagePartFactories ()
+			) {
+
+				PagePart pagePart =
+					pagePartFactory.buildPagePart (
+						taskLogger);
+
+				pagePart.setup (
+					taskLogger,
+					partParameters);
+
+				pagePart.prepare (
 					taskLogger);
 
-			pagePart.setup (
-				taskLogger,
-				partParameters);
+				pagePartsBuilder.add (
+					pagePart);
 
-			pagePart.prepare (
-				taskLogger);
+			}
 
-			pagePartsBuilder.add (
-				pagePart);
+			pageParts =
+				pagePartsBuilder.build ();
 
 		}
-
-		pageParts =
-			pagePartsBuilder.build ();
 
 	}
 
@@ -431,18 +449,24 @@ class SupervisorPart
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContent");
+		try (
 
-		for (
-			PagePart pagePart
-				: pageParts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContent");
+
 		) {
 
-			pagePart.renderHtmlHeadContent (
-				taskLogger);
+			for (
+				PagePart pagePart
+					: pageParts
+			) {
+
+				pagePart.renderHtmlHeadContent (
+					taskLogger);
+
+			}
 
 		}
 
@@ -453,125 +477,131 @@ class SupervisorPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		String localUrl =
-			requestContext.resolveLocalUrl (
-				stringFormat (
-					"/%s",
-					fileName ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		if (supervisorConfigNames.size () > 1) {
+		) {
 
-			htmlParagraphOpen (
-				htmlClassAttribute (
-					"links"));
-
-			for (
-				SupervisorConfig oneSupervisorConfig
-					: supervisorConfigs
-			)  {
-
-				htmlLinkWrite (
+			String localUrl =
+				requestContext.resolveLocalUrl (
 					stringFormat (
-						"%s",
-						localUrl,
-						"?config=%u",
-						oneSupervisorConfig.name (),
-						"&date=%u",
-						dateField.text),
-					oneSupervisorConfig.label (),
+						"/%s",
+						fileName ()));
+
+			if (supervisorConfigNames.size () > 1) {
+
+				htmlParagraphOpen (
 					htmlClassAttribute (
-						presentInstances (
-							optionalIf (
-								stringEqualSafe (
-									oneSupervisorConfig.name (),
-									selectedSupervisorConfigName),
-								() -> "selected"))));
+						"links"));
+
+				for (
+					SupervisorConfig oneSupervisorConfig
+						: supervisorConfigs
+				)  {
+
+					htmlLinkWrite (
+						stringFormat (
+							"%s",
+							localUrl,
+							"?config=%u",
+							oneSupervisorConfig.name (),
+							"&date=%u",
+							dateField.text),
+						oneSupervisorConfig.label (),
+						htmlClassAttribute (
+							presentInstances (
+								optionalIf (
+									stringEqualSafe (
+										oneSupervisorConfig.name (),
+										selectedSupervisorConfigName),
+									() -> "selected"))));
+
+				}
+
+				htmlParagraphClose ();
 
 			}
 
-			htmlParagraphClose ();
+			htmlFormOpenGetAction (
+				localUrl);
 
-		}
-
-		htmlFormOpenGetAction (
-			localUrl);
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"Date<br>");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"date\"",
-			" value=\"%h\"",
-			dateField.text,
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"ok\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
-
-		ObsoleteDateLinks.dailyBrowserParagraph (
-			formatWriter,
-			localUrl,
-			requestContext.formData (),
-			dateField.date);
-
-		// warning if time change
-
-		long hoursInDay =
-			new Duration (
-				startTime,
-				endTime)
-			.toStandardHours ().getHours ();
-
-		if (
-			integerNotEqualSafe (
-				hoursInDay,
-				24l)
-		) {
-
-			htmlParagraphOpen (
-				htmlClassAttribute (
-					"warning"));
+			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
-				"This day contains %h ",
-				integerToDecimalString (
-					hoursInDay),
-				"hours due to a time change from %h ",
-				consoleUserHelper.timezoneString (
-					startTime),
-				"to %h",
-				consoleUserHelper.timezoneString (
-					endTime));
+				"Date<br>");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"date\"",
+				" value=\"%h\"",
+				dateField.text,
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"ok\"",
+				">");
 
 			htmlParagraphClose ();
 
-		}
+			htmlFormClose ();
 
-		// page parts
+			ObsoleteDateLinks.dailyBrowserParagraph (
+				formatWriter,
+				localUrl,
+				requestContext.formData (),
+				dateField.date);
 
-		for (
-			PagePart pagePart
-				: pageParts
-		) {
+			// warning if time change
 
-			pagePart.renderHtmlBodyContent (
-				taskLogger);
+			long hoursInDay =
+				new Duration (
+					startTime,
+					endTime)
+				.toStandardHours ().getHours ();
+
+			if (
+				integerNotEqualSafe (
+					hoursInDay,
+					24l)
+			) {
+
+				htmlParagraphOpen (
+					htmlClassAttribute (
+						"warning"));
+
+				formatWriter.writeLineFormat (
+					"This day contains %h ",
+					integerToDecimalString (
+						hoursInDay),
+					"hours due to a time change from %h ",
+					consoleUserHelper.timezoneString (
+						startTime),
+					"to %h",
+					consoleUserHelper.timezoneString (
+						endTime));
+
+				htmlParagraphClose ();
+
+			}
+
+			// page parts
+
+			for (
+				PagePart pagePart
+					: pageParts
+			) {
+
+				pagePart.renderHtmlBodyContent (
+					taskLogger);
+
+			}
 
 		}
 

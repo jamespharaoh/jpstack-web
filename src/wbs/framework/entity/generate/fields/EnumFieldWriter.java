@@ -59,87 +59,93 @@ class EnumFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String fieldTypePackageName;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginEnumTypeSpec fieldTypePluginEnumType =
-			pluginManager.pluginEnumTypesByName ().get (
-				spec.typeName ());
+		) {
 
-		PluginCustomTypeSpec fieldTypePluginCustomType =
-			pluginManager.pluginCustomTypesByName ().get (
-				spec.typeName ());
+			String fieldTypePackageName;
 
-		if (fieldTypePluginEnumType != null) {
+			PluginEnumTypeSpec fieldTypePluginEnumType =
+				pluginManager.pluginEnumTypesByName ().get (
+					spec.typeName ());
 
-			PluginSpec fieldTypePlugin =
-				fieldTypePluginEnumType.plugin ();
+			PluginCustomTypeSpec fieldTypePluginCustomType =
+				pluginManager.pluginCustomTypesByName ().get (
+					spec.typeName ());
 
-			fieldTypePackageName =
-				fieldTypePlugin.packageName ();
+			if (fieldTypePluginEnumType != null) {
 
-		} else if (fieldTypePluginCustomType != null) {
+				PluginSpec fieldTypePlugin =
+					fieldTypePluginEnumType.plugin ();
 
-			PluginSpec fieldTypePlugin =
-				fieldTypePluginCustomType.plugin ();
+				fieldTypePackageName =
+					fieldTypePlugin.packageName ();
 
-			fieldTypePackageName =
-				fieldTypePlugin.packageName ();
+			} else if (fieldTypePluginCustomType != null) {
 
-		} else {
+				PluginSpec fieldTypePlugin =
+					fieldTypePluginCustomType.plugin ();
 
-			throw new RuntimeException (
+				fieldTypePackageName =
+					fieldTypePlugin.packageName ();
+
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"No such enum or custom type: %s",
+						spec.typeName ()));
+
+			}
+
+			String fieldName =
+				ifNull (
+					spec.name (),
+					spec.typeName ());
+
+			String fullFieldTypeName =
 				stringFormat (
-					"No such enum or custom type: %s",
-					spec.typeName ()));
+					"%s.model.%s",
+					fieldTypePackageName,
+					capitalise (
+						spec.typeName ()));
+
+			// write field
+
+			JavaPropertyWriter propertyWriter =
+				new JavaPropertyWriter ()
+
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
+
+				.typeName (
+					fullFieldTypeName)
+
+				.propertyName (
+					fieldName);
+
+			if (spec.defaultValue () != null) {
+
+				propertyWriter.defaultValueFormat (
+					"%s.%s",
+					fullFieldTypeName,
+					spec.defaultValue ());
+
+			}
+
+			propertyWriter.writeBlock (
+				taskLogger,
+				target.imports (),
+				target.formatWriter ());
 
 		}
-
-		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%s",
-				fieldTypePackageName,
-				capitalise (
-					spec.typeName ()));
-
-		// write field
-
-		JavaPropertyWriter propertyWriter =
-			new JavaPropertyWriter ()
-
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
-
-			.typeName (
-				fullFieldTypeName)
-
-			.propertyName (
-				fieldName);
-
-		if (spec.defaultValue () != null) {
-
-			propertyWriter.defaultValueFormat (
-				"%s.%s",
-				fullFieldTypeName,
-				spec.defaultValue ());
-
-		}
-
-		propertyWriter.writeBlock (
-			taskLogger,
-			target.imports (),
-			target.formatWriter ());
 
 	}
 

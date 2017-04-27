@@ -66,11 +66,17 @@ class TextResponder
 
 		}
 
-		FormatWriter formatWriter =
-			requestContext.formatWriter ();
+		try (
 
-		formatWriter.writeString (
-			text);
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
+
+		) {
+
+			formatWriter.writeString (
+				text);
+
+		}
 
 	}
 

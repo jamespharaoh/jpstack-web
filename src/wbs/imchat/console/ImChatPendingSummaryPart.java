@@ -33,7 +33,6 @@ import java.util.Set;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -144,52 +143,58 @@ class ImChatPendingSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// get field sets
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		customerFields =
-			imChatPendingConsoleModule.formFieldSetRequired (
-				"customerFields",
-				ImChatCustomerRec.class);
+		) {
 
-		profileFields =
-			imChatPendingConsoleModule.formFieldSetRequired (
-				"profileFields",
-				ImChatProfileRec.class);
+			// get field sets
 
-		messageFields =
-			imChatPendingConsoleModule.formFieldSetRequired (
-				"messageFields",
-				ImChatMessageRec.class);
+			customerFields =
+				imChatPendingConsoleModule.formFieldSetRequired (
+					"customerFields",
+					ImChatCustomerRec.class);
 
-		// load data
+			profileFields =
+				imChatPendingConsoleModule.formFieldSetRequired (
+					"profileFields",
+					ImChatProfileRec.class);
 
-		message =
-			imChatMessageHelper.findFromContextRequired ();
+			messageFields =
+				imChatPendingConsoleModule.formFieldSetRequired (
+					"messageFields",
+					ImChatMessageRec.class);
 
-		conversation =
-			message.getImChatConversation ();
+			// load data
 
-		customer =
-			conversation.getImChatCustomer ();
+			message =
+				imChatMessageHelper.findFromContextRequired ();
 
-		profile =
-			conversation.getImChatProfile ();
+			conversation =
+				message.getImChatConversation ();
 
-		imChat =
-			customer.getImChat ();
+			customer =
+				conversation.getImChatCustomer ();
 
-		// misc
+			profile =
+				conversation.getImChatProfile ();
 
-		canSupervise =
-			privChecker.canRecursive (
-				taskLogger,
-				imChat,
-				"supervisor");
+			imChat =
+				customer.getImChat ();
+
+			// misc
+
+			canSupervise =
+				privChecker.canRecursive (
+					taskLogger,
+					imChat,
+					"supervisor");
+
+		}
 
 	}
 
@@ -198,55 +203,61 @@ class ImChatPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlDivOpen (
-			htmlClassAttribute (
-				"layout-container"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpen (
-			htmlClassAttribute (
-				"layout"));
+		) {
 
-		htmlTableRowOpen ();
+			htmlDivOpen (
+				htmlClassAttribute (
+					"layout-container"));
 
-		htmlTableCellOpen (
-			htmlStyleAttribute (
-				htmlStyleRuleEntry (
-					"width",
-					"50%")));
+			htmlTableOpen (
+				htmlClassAttribute (
+					"layout"));
 
-		goCustomerSummary (
-			taskLogger);
+			htmlTableRowOpen ();
 
-		goCustomerDetails ();
+			htmlTableCellOpen (
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"width",
+						"50%")));
 
-		htmlTableCellClose ();
+			goCustomerSummary (
+				taskLogger);
 
-		htmlTableCellOpen (
-			htmlStyleAttribute (
-				htmlStyleRuleEntry (
-					"width",
-					"50%")));
+			goCustomerDetails ();
 
-		goProfileSummary (
-			taskLogger);
+			htmlTableCellClose ();
 
-		goCustomerNotes ();
+			htmlTableCellOpen (
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"width",
+						"50%")));
 
-		htmlTableCellClose ();
+			goProfileSummary (
+				taskLogger);
 
-		htmlTableRowClose ();
+			goCustomerNotes ();
 
-		htmlTableClose ();
+			htmlTableCellClose ();
 
-		htmlDivClose ();
+			htmlTableRowClose ();
 
-		goHistory (
-			taskLogger);
+			htmlTableClose ();
+
+			htmlDivClose ();
+
+			goHistory (
+				taskLogger);
+
+		}
 
 	}
 
@@ -291,40 +302,52 @@ class ImChatPendingSummaryPart
 	void goCustomerSummary (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goCustomerSummary");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Customer summary");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goCustomerSummary");
 
-		formFieldLogic.outputDetailsTable (
-			taskLogger,
-			formatWriter,
-			customerFields,
-			customer,
-			ImmutableMap.of ());
+		) {
+
+			htmlHeadingThreeWrite (
+				"Customer summary");
+
+			formFieldLogic.outputDetailsTable (
+				taskLogger,
+				formatWriter,
+				customerFields,
+				customer,
+				emptyMap ());
+
+		}
 
 	}
 
 	void goProfileSummary (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goProfileSummary");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Profile summary");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goProfileSummary");
 
-		formFieldLogic.outputDetailsTable (
-			taskLogger,
-			formatWriter,
-			profileFields,
-			profile,
-			ImmutableMap.of ());
+		) {
+
+			htmlHeadingThreeWrite (
+				"Profile summary");
+
+			formFieldLogic.outputDetailsTable (
+				taskLogger,
+				formatWriter,
+				profileFields,
+				profile,
+				emptyMap ());
+
+		}
 
 	}
 
@@ -352,63 +375,96 @@ class ImChatPendingSummaryPart
 	void goHistory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goHistory");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Conversation history");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goHistory");
 
-		// retrieve messages
-
-		List <ImChatMessageRec> messages =
-			new ArrayList<> (
-				conversation.getMessagesIn ());
-
-		List <ImChatMessageRec> historyRequests =
-			Lists.reverse (
-				messages);
-
-		// create message table
-
-		htmlTableOpenList ();
-
-		// header
-
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			messageFields);
-
-		htmlTableRowClose ();
-
-		// row
-
-		for (
-			ImChatMessageRec historyRequest
-				: historyRequests
 		) {
 
-			if (
-				isNotNull (
-					historyRequest.getPartnerImChatMessage ())
+			htmlHeadingThreeWrite (
+				"Conversation history");
+
+			// retrieve messages
+
+			List <ImChatMessageRec> messages =
+				new ArrayList<> (
+					conversation.getMessagesIn ());
+
+			List <ImChatMessageRec> historyRequests =
+				Lists.reverse (
+					messages);
+
+			// create message table
+
+			htmlTableOpenList ();
+
+			// header
+
+			htmlTableRowOpen ();
+
+			formFieldLogic.outputTableHeadings (
+				formatWriter,
+				messageFields);
+
+			htmlTableRowClose ();
+
+			// row
+
+			for (
+				ImChatMessageRec historyRequest
+					: historyRequests
 			) {
 
-				ImChatMessageRec historyReply =
-					historyRequest.getPartnerImChatMessage ();
+				if (
+					isNotNull (
+						historyRequest.getPartnerImChatMessage ())
+				) {
+
+					ImChatMessageRec historyReply =
+						historyRequest.getPartnerImChatMessage ();
+
+					htmlTableRowOpen (
+						htmlClassAttribute (
+							classForMessage (
+								historyReply)));
+
+					formFieldLogic.outputTableCellsList (
+						taskLogger,
+						formatWriter,
+						messageFields,
+						historyReply,
+						emptyMap (),
+						true);
+
+					htmlTableRowClose ();
+
+				}
 
 				htmlTableRowOpen (
 					htmlClassAttribute (
+						presentInstances (
+
+					Optional.of (
 						classForMessage (
-							historyReply)));
+							historyRequest)),
+
+					optionalIf (
+						referenceEqualWithClass (
+							ImChatMessageRec.class,
+							message,
+							historyRequest),
+						() -> "selected")
+
+				)));
 
 				formFieldLogic.outputTableCellsList (
 					taskLogger,
 					formatWriter,
 					messageFields,
-					historyReply,
+					historyRequest,
 					emptyMap (),
 					true);
 
@@ -416,36 +472,9 @@ class ImChatPendingSummaryPart
 
 			}
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					presentInstances (
-
-				Optional.of (
-					classForMessage (
-						historyRequest)),
-
-				optionalIf (
-					referenceEqualWithClass (
-						ImChatMessageRec.class,
-						message,
-						historyRequest),
-					() -> "selected")
-
-			)));
-
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
-				formatWriter,
-				messageFields,
-				historyRequest,
-				emptyMap (),
-				true);
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

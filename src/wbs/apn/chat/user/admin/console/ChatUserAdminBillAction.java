@@ -15,7 +15,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -83,32 +83,32 @@ class ChatUserAdminBillAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		if (
-			! requestContext.canContext (
-				"chat.userCredit")
-		) {
-
-			requestContext.addError (
-				"Access denied");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserAdminBillAction.goReal ()",
 					this);
 
 		) {
+
+			if (
+				! requestContext.canContext (
+					"chat.userCredit")
+			) {
+
+				requestContext.addError (
+					"Access denied");
+
+				return null;
+
+			}
 
 			ChatUserRec chatUser =
 				chatUserHelper.findFromContextRequired ();

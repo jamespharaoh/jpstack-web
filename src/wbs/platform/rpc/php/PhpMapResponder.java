@@ -4,7 +4,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -53,8 +52,7 @@ class PhpMapResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.status (
 			status);
@@ -63,11 +61,12 @@ class PhpMapResponder
 			"Content-Type",
 			"application/vnd.php.serialized; charset=utf-8");
 
-		OutputStream out =
+		@SuppressWarnings ("resource")
+		OutputStream outputStream =
 			requestContext.outputStream ();
 
 		PhpSerializer.serialize (
-			out,
+			outputStream,
 			map,
 			"utf-8");
 

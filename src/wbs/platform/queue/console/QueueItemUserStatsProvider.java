@@ -70,135 +70,141 @@ class QueueItemUserStatsProvider
 			@NonNull StatsPeriod statsPeriod,
 			@NonNull Map <String, Object> conditions) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getStats");
+		try (
 
-		if (statsPeriod.granularity () != StatsGranularity.hour)
-			throw new IllegalArgumentException ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getStats");
 
-		// setup data structures
-
-		Map <Long, long[]> numProcessedPerUser =
-			new TreeMap<> ();
-
-		Set <Object> userIdObjects =
-			new HashSet<> ();
-
-		// retrieve queue items
-
-		QueueStatsFilter queueStatsFilter =
-			queueStatsFilterProvider.get ();
-
-		queueStatsFilter.conditions (
-			conditions);
-
-		List <QueueItemRec> queueItems =
-			queueStatsFilter.filterQueueItems (
-				queueItemHelper.findByProcessedTime (
-					statsPeriod.toInterval ()));
-
-		// aggregate stats
-
-		for (
-			QueueItemRec queueItem
-				: queueItems
 		) {
 
-			QueueSubjectRec queueSubject =
-				queueItem.getQueueSubject ();
+			if (statsPeriod.granularity () != StatsGranularity.hour)
+				throw new IllegalArgumentException ();
 
-			// TODO fix data!
-			QueueRec queue =
-				queueSubject != null
-					? queueSubject.getQueue ()
-					: queueItem.getQueue ();
+			// setup data structures
 
-			Record <?> parent =
-				objectManager.getParentRequired (
-					queue);
+			Map <Long, long[]> numProcessedPerUser =
+				new TreeMap<> ();
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					parent,
-					"supervisor")
-			) {
-				continue;
-			}
+			Set <Object> userIdObjects =
+				new HashSet<> ();
 
-			int hour =
-				statsPeriod.assign (
-					queueItem.getProcessedTime ());
+			// retrieve queue items
 
+			QueueStatsFilter queueStatsFilter =
+				queueStatsFilterProvider.get ();
 
-			if (! userIdObjects.contains (
-					queueItem.getProcessedUser ().getId ())) {
+			queueStatsFilter.conditions (
+				conditions);
 
-				userIdObjects.add (
-					queueItem.getProcessedUser ().getId ());
+			List <QueueItemRec> queueItems =
+				queueStatsFilter.filterQueueItems (
+					queueItemHelper.findByProcessedTime (
+						statsPeriod.toInterval ()));
 
-				numProcessedPerUser.put (
-					queueItem.getProcessedUser ().getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
-
-			}
-
-			long[] numProcessedForUser =
-				numProcessedPerUser.get (
-					queueItem.getProcessedUser ().getId ());
-
-			numProcessedForUser [hour] ++;
-
-		}
-
-		// create return value
-
-		StatsDataSet statsDataSet =
-			new StatsDataSet ();
-
-		statsDataSet.indexValues ().put (
-			"userId",
-			userIdObjects);
-
-		for (
-			int hour = 0;
-			hour < statsPeriod.size ();
-			hour ++
-		) {
+			// aggregate stats
 
 			for (
-				Object userIdObject
-					: userIdObjects
+				QueueItemRec queueItem
+					: queueItems
 			) {
 
-				Long userId =
-					(Long)
-					userIdObject;
+				QueueSubjectRec queueSubject =
+					queueItem.getQueueSubject ();
 
-				statsDataSet.data ().add (
-					new StatsDatum ()
+				// TODO fix data!
+				QueueRec queue =
+					queueSubject != null
+						? queueSubject.getQueue ()
+						: queueItem.getQueue ();
 
-					.startTime (
-						statsPeriod.step (
-							hour))
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
 
-					.addIndex (
-						"userId",
-						userId)
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						parent,
+						"supervisor")
+				) {
+					continue;
+				}
 
-					.addValue (
-						"numProcessed",
-						numProcessedPerUser.get (userId) [hour]));
+				int hour =
+					statsPeriod.assign (
+						queueItem.getProcessedTime ());
+
+
+				if (! userIdObjects.contains (
+						queueItem.getProcessedUser ().getId ())) {
+
+					userIdObjects.add (
+						queueItem.getProcessedUser ().getId ());
+
+					numProcessedPerUser.put (
+						queueItem.getProcessedUser ().getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
+
+				}
+
+				long[] numProcessedForUser =
+					numProcessedPerUser.get (
+						queueItem.getProcessedUser ().getId ());
+
+				numProcessedForUser [hour] ++;
 
 			}
 
-		}
+			// create return value
 
-		return statsDataSet;
+			StatsDataSet statsDataSet =
+				new StatsDataSet ();
+
+			statsDataSet.indexValues ().put (
+				"userId",
+				userIdObjects);
+
+			for (
+				int hour = 0;
+				hour < statsPeriod.size ();
+				hour ++
+			) {
+
+				for (
+					Object userIdObject
+						: userIdObjects
+				) {
+
+					Long userId =
+						(Long)
+						userIdObject;
+
+					statsDataSet.data ().add (
+						new StatsDatum ()
+
+						.startTime (
+							statsPeriod.step (
+								hour))
+
+						.addIndex (
+							"userId",
+							userId)
+
+						.addValue (
+							"numProcessed",
+							numProcessedPerUser.get (userId) [hour]));
+
+				}
+
+			}
+
+			return statsDataSet;
+
+		}
 
 	}
 

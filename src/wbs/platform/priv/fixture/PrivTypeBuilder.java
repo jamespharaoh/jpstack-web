@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -74,12 +74,14 @@ class PrivTypeBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
 
 			taskLogger.noticeFormat (
 				"Create priv type %s.%s",
@@ -114,16 +116,14 @@ class PrivTypeBuilder
 	void createPrivType (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createPrivType");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createPrivType");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"PrivTypeBuilder.createPrivType ()",

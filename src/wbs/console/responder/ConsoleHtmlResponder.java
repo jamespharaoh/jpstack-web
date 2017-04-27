@@ -6,7 +6,6 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,23 +102,35 @@ class ConsoleHtmlResponder
 
 	@Override
 	protected
-	void setHtmlHeaders ()
-		throws IOException {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.setHtmlHeaders ();
+		try (
 
-		requestContext.setHeader (
-			"Content-Type",
-			"text/html; charset=utf-8");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
 
-		requestContext.setHeader (
-			"Cache-Control",
-			"no-cache");
+		) {
 
-		requestContext.setHeader (
-			"Expiry",
-			timeFormatter.httpTimestampString (
-				Instant.now ()));
+			super.setHtmlHeaders (
+				taskLogger);
+
+			requestContext.setHeader (
+				"Content-Type",
+				"text/html; charset=utf-8");
+
+			requestContext.setHeader (
+				"Cache-Control",
+				"no-cache");
+
+			requestContext.setHeader (
+				"Expiry",
+				timeFormatter.httpTimestampString (
+					Instant.now ()));
+
+		}
 
 	}
 
@@ -250,23 +261,29 @@ class ConsoleHtmlResponder
 	void renderHtmlBody (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBody");
+		try (
 
-		formatWriter.writeLineFormat (
-			"<body>");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBody");
 
-		formatWriter.increaseIndent ();
+		) {
 
-		renderHtmlBodyContents (
-			taskLogger);
+			formatWriter.writeLineFormat (
+				"<body>");
 
-		formatWriter.decreaseIndent ();
+			formatWriter.increaseIndent ();
 
-		formatWriter.writeLineFormat (
-			"</body>");
+			renderHtmlBodyContents (
+				taskLogger);
+
+			formatWriter.decreaseIndent ();
+
+			formatWriter.writeLineFormat (
+				"</body>");
+
+		}
 
 	}
 
@@ -275,27 +292,33 @@ class ConsoleHtmlResponder
 	void render (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"render");
+		try (
 
-		renderHtmlDoctype ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"render");
 
-		formatWriter.writeLineFormat (
-			"<html>");
+		) {
 
-		renderHtmlHead (
-			taskLogger);
+			renderHtmlDoctype ();
 
-		renderHtmlBody (
-			taskLogger);
+			formatWriter.writeLineFormat (
+				"<html>");
 
-		formatWriter.writeLineFormat (
-			"</html>");
+			renderHtmlHead (
+				taskLogger);
 
-		renderDebugInformation (
-			taskLogger);
+			renderHtmlBody (
+				taskLogger);
+
+			formatWriter.writeLineFormat (
+				"</html>");
+
+			renderDebugInformation (
+				taskLogger);
+
+		}
 
 	}
 
@@ -303,162 +326,168 @@ class ConsoleHtmlResponder
 	void renderDebugInformation (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderDebugInformation");
+		try (
 
-		if (
-			! privChecker.canSimple (
-				taskLogger,
-				GlobalId.root,
-				"debug")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderDebugInformation");
+
 		) {
-			return;
-		}
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<!--");
-
-		formatWriter.writeNewline ();
-
-		if (
-			optionalIsPresent (
-				requestContext.consoleContext ())
-		) {
-
-			formatWriter.writeLineFormatIncreaseIndent (
-				"Context data");
-
-			formatWriter.writeNewline ();
-
-			formatWriter.writeLineFormat (
-				"Name: %s",
-				requestContext.consoleContextRequired ().name ());
-
-			formatWriter.writeLineFormat (
-				"Type name: %s",
-				requestContext.consoleContextRequired ().typeName ());
-
-			formatWriter.writeLineFormat (
-				"Path prefix: %s",
-				requestContext.consoleContextRequired ().pathPrefix ());
-
-			formatWriter.writeLineFormat (
-				"Global: %s",
-				booleanToYesNo (
-					requestContext.consoleContextRequired ().global ()));
 
 			if (
-				isNotNull (
-					requestContext.consoleContextRequired ().parentContextName ())
+				! privChecker.canSimple (
+					taskLogger,
+					GlobalId.root,
+					"debug")
 			) {
-
-				formatWriter.writeLineFormat (
-					"Parent context name: %s",
-					requestContext.consoleContextRequired ().parentContextName ());
-
-				formatWriter.writeLineFormat (
-					"Parent context tab name: %s",
-					requestContext.consoleContextRequired ().parentContextTabName ());
-
+				return;
 			}
 
-			formatWriter.writeLineFormat ();
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<!--");
+
+			formatWriter.writeNewline ();
 
 			if (
 				optionalIsPresent (
-					requestContext.foreignContextPath ())
+					requestContext.consoleContext ())
 			) {
 
+				formatWriter.writeLineFormatIncreaseIndent (
+					"Context data");
+
+				formatWriter.writeNewline ();
+
 				formatWriter.writeLineFormat (
-					"Foreign context path: %s",
-					requestContext.foreignContextPathRequired ());
+					"Name: %s",
+					requestContext.consoleContextRequired ().name ());
+
+				formatWriter.writeLineFormat (
+					"Type name: %s",
+					requestContext.consoleContextRequired ().typeName ());
+
+				formatWriter.writeLineFormat (
+					"Path prefix: %s",
+					requestContext.consoleContextRequired ().pathPrefix ());
+
+				formatWriter.writeLineFormat (
+					"Global: %s",
+					booleanToYesNo (
+						requestContext.consoleContextRequired ().global ()));
+
+				if (
+					isNotNull (
+						requestContext.consoleContextRequired ().parentContextName ())
+				) {
+
+					formatWriter.writeLineFormat (
+						"Parent context name: %s",
+						requestContext.consoleContextRequired ().parentContextName ());
+
+					formatWriter.writeLineFormat (
+						"Parent context tab name: %s",
+						requestContext.consoleContextRequired ().parentContextTabName ());
+
+				}
+
+				formatWriter.writeLineFormat ();
+
+				if (
+					optionalIsPresent (
+						requestContext.foreignContextPath ())
+				) {
+
+					formatWriter.writeLineFormat (
+						"Foreign context path: %s",
+						requestContext.foreignContextPathRequired ());
+
+				}
+
+				if (
+					optionalIsPresent (
+						requestContext.changedContextPath ())
+				) {
+
+					formatWriter.writeLineFormat (
+						"Changed context path: %s",
+						requestContext.changedContextPathRequired ());
+
+				}
+
+				formatWriter.decreaseIndent ();
+
+				formatWriter.writeNewline ();
 
 			}
 
 			if (
 				optionalIsPresent (
-					requestContext.changedContextPath ())
+					requestContext.consoleContextStuff ())
 			) {
 
-				formatWriter.writeLineFormat (
-					"Changed context path: %s",
-					requestContext.changedContextPathRequired ());
+				formatWriter.writeLineFormatIncreaseIndent (
+					"Context attributes");
+
+				formatWriter.writeNewline ();
+
+				for (
+					Map.Entry <String, Object> attributeEntry
+						: requestContext.consoleContextStuffRequired ()
+							.attributes ()
+							.entrySet ()
+				) {
+
+					formatWriter.writeLineFormat (
+						"%s: %s",
+						attributeEntry.getKey (),
+						attributeEntry.getValue ().toString ());
+
+				}
+
+				formatWriter.decreaseIndent ();
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormatIncreaseIndent (
+					"Context privs");
+
+				formatWriter.writeNewline ();
+
+				for (
+					String priv
+						: listSorted (
+							requestContext.consoleContextStuffRequired ().privs ())
+				) {
+
+					formatWriter.writeLineFormat (
+						"%s",
+						priv);
+
+				}
+
+				formatWriter.decreaseIndent ();
+
+				formatWriter.writeNewline ();
 
 			}
-
-			formatWriter.decreaseIndent ();
-
-			formatWriter.writeNewline ();
-
-		}
-
-		if (
-			optionalIsPresent (
-				requestContext.consoleContextStuff ())
-		) {
 
 			formatWriter.writeLineFormatIncreaseIndent (
-				"Context attributes");
+				"Task log");
 
 			formatWriter.writeNewline ();
 
-			for (
-				Map.Entry <String, Object> attributeEntry
-					: requestContext.consoleContextStuffRequired ()
-						.attributes ()
-						.entrySet ()
-			) {
-
-				formatWriter.writeLineFormat (
-					"%s: %s",
-					attributeEntry.getKey (),
-					attributeEntry.getValue ().toString ());
-
-			}
+			writeTaskLog (
+				taskLogger.findRoot ());
 
 			formatWriter.decreaseIndent ();
 
 			formatWriter.writeNewline ();
 
-			formatWriter.writeLineFormatIncreaseIndent (
-				"Context privs");
-
-			formatWriter.writeNewline ();
-
-			for (
-				String priv
-					: listSorted (
-						requestContext.consoleContextStuffRequired ().privs ())
-			) {
-
-				formatWriter.writeLineFormat (
-					"%s",
-					priv);
-
-			}
-
-			formatWriter.decreaseIndent ();
-
-			formatWriter.writeNewline ();
+			formatWriter.writeLineFormatDecreaseIndent (
+				"-->");
 
 		}
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"Task log");
-
-		formatWriter.writeNewline ();
-
-		writeTaskLog (
-			taskLogger.findRoot ());
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"-->");
 
 	}
 

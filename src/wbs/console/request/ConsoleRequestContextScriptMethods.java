@@ -58,27 +58,33 @@ interface ConsoleRequestContextScriptMethods
 		State state =
 			consoleRequestContextScriptMethodsState ();
 
-		FormatWriter formatWriter =
-			requestContext ().formatWriter ();
+		try (
 
-		if (
-			collectionIsNotEmpty (
-				state.scripts)
+			FormatWriter formatWriter =
+				requestContext ().formatWriter ();
+
 		) {
 
-			htmlScriptBlockOpen (
-				formatWriter);
+			if (
+				collectionIsNotEmpty (
+					state.scripts)
+			) {
 
-			state.scripts.forEach (
-				script ->
-					formatWriter.writeLineFormat (
-						"%s",
-						script));
+				htmlScriptBlockOpen (
+					formatWriter);
 
-			htmlScriptBlockClose (
-				formatWriter);
+				state.scripts.forEach (
+					script ->
+						formatWriter.writeLineFormat (
+							"%s",
+							script));
 
-			state.scripts.clear ();
+				htmlScriptBlockClose (
+					formatWriter);
+
+				state.scripts.clear ();
+
+			}
 
 		}
 

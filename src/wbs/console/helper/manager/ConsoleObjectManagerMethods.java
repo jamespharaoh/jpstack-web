@@ -6,6 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
+import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.NoSuchElementException;
@@ -20,7 +21,6 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.StringFormatWriter;
 
 public
 interface ConsoleObjectManagerMethods {
@@ -315,17 +315,14 @@ interface ConsoleObjectManagerMethods {
 			@NonNull Optional <Record <?>> assumedRootOptional,
 			@NonNull Boolean mini) {
 
-		StringFormatWriter formatWriter =
-			new StringFormatWriter ();
-
-		writeHtmlForObject (
-			parentTaskLogger,
-			formatWriter,
-			object,
-			assumedRootOptional,
-			mini);
-
-		return formatWriter.toString ();
+		return formatWriterConsumerToString (
+			formatWriter ->
+				writeHtmlForObject (
+					parentTaskLogger,
+					formatWriter,
+					object,
+					assumedRootOptional,
+					mini));
 
 	}
 

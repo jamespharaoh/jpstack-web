@@ -127,152 +127,158 @@ class ChatPhotoCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// send barred users to help
-
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
-
-		if (creditCheckResult.failed ()) {
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				optionalAbsent (),
-				true);
-
-		} else {
-
-			String text =
-				rest.trim ();
-
-			Optional <ChatUserRec> photoUserOptional =
-				chatUserHelper.findByCode (
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
 					chat,
-					text);
+					"default");
 
-			if (text.length () == 0) {
+			MessageRec message =
+				inbox.getMessage ();
 
-				// just send any three users
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-				chatInfoLogic.sendUserPics (
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// send barred users to help
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					taskLogger,
 					chatUser,
-					3l,
+					true,
 					optionalOf (
 						message.getThreadId ()));
 
-			} else if (
+			if (creditCheckResult.failed ()) {
 
-				optionalIsNotPresent (
-					photoUserOptional)
-
-				|| ! chatUserLogic.valid (
-					photoUserOptional.get ())
-
-			) {
-
-				// send no such user error
-
-				chatSendLogic.sendSystemMagic (
+				chatHelpLogLogic.createChatHelpLogIn (
 					taskLogger,
 					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"request_photo_error",
-					commandHelper.findByCodeRequired (
-						chat,
-						"magic"),
-					IdObject.objectId (
-						commandHelper.findByCodeRequired (
-							chat,
-							"help")),
-					TemplateMissing.error,
-					emptyMap ());
-
-			} else if (
-				isNull (
-					photoUserOptional.get ().getMainChatUserImage ())
-			) {
-
-				// send no such photo error
-
-				chatSendLogic.sendSystemMagic (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"no_photo_error",
-					commandHelper.findByCodeRequired (
-						chat,
-						"magic"),
-					IdObject.objectId (
-						commandHelper.findByCodeRequired (
-							chat,
-							"help")),
-					TemplateMissing.error,
-					emptyMap ());
+					message,
+					rest,
+					optionalAbsent (),
+					true);
 
 			} else {
 
-				// send pics
+				String text =
+					rest.trim ();
 
-				chatInfoLogic.sendRequestedUserPicandOtherUserPics (
-					taskLogger,
-					chatUser,
-					photoUserOptional.get (),
-					2l,
-					optionalOf (
-						message.getThreadId ()));
+				Optional <ChatUserRec> photoUserOptional =
+					chatUserHelper.findByCode (
+						chat,
+						text);
+
+				if (text.length () == 0) {
+
+					// just send any three users
+
+					chatInfoLogic.sendUserPics (
+						taskLogger,
+						chatUser,
+						3l,
+						optionalOf (
+							message.getThreadId ()));
+
+				} else if (
+
+					optionalIsNotPresent (
+						photoUserOptional)
+
+					|| ! chatUserLogic.valid (
+						photoUserOptional.get ())
+
+				) {
+
+					// send no such user error
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"request_photo_error",
+						commandHelper.findByCodeRequired (
+							chat,
+							"magic"),
+						IdObject.objectId (
+							commandHelper.findByCodeRequired (
+								chat,
+								"help")),
+						TemplateMissing.error,
+						emptyMap ());
+
+				} else if (
+					isNull (
+						photoUserOptional.get ().getMainChatUserImage ())
+				) {
+
+					// send no such photo error
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"no_photo_error",
+						commandHelper.findByCodeRequired (
+							chat,
+							"magic"),
+						IdObject.objectId (
+							commandHelper.findByCodeRequired (
+								chat,
+								"help")),
+						TemplateMissing.error,
+						emptyMap ());
+
+				} else {
+
+					// send pics
+
+					chatInfoLogic.sendRequestedUserPicandOtherUserPics (
+						taskLogger,
+						chatUser,
+						photoUserOptional.get (),
+						2l,
+						optionalOf (
+							message.getThreadId ()));
+
+				}
 
 			}
 
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
+
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

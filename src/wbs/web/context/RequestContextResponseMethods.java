@@ -8,49 +8,18 @@ import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 
 import lombok.NonNull;
 
+import wbs.utils.io.BorrowedOutputStream;
 import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.BorrowedFormatWriter;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
 public
 interface RequestContextResponseMethods
 	extends RequestContextCoreMethods {
-
-	default
-	PrintWriter printWriter () {
-
-		State state =
-			requestContextResponseMethodsState ();
-
-		if (
-			isNull (
-				state.printWriter)
-		) {
-
-			response ().setCharacterEncoding (
-				"utf-8");
-
-			try {
-
-				state.printWriter =
-					response ().getWriter ();
-
-			} catch (IOException ioException) {
-
-				throw new RuntimeIoException (
-					ioException);
-
-			}
-
-		}
-
-		return state.printWriter;
-
-	}
 
 	default
 	FormatWriter formatWriter () {
@@ -63,13 +32,23 @@ interface RequestContextResponseMethods
 				state.formatWriter)
 		) {
 
-			state.formatWriter =
-				new WriterFormatWriter (
-					printWriter ());
+			try {
+
+				state.formatWriter =
+					new WriterFormatWriter (
+						response ().getWriter ());
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
-		return state.formatWriter;
+		return new BorrowedFormatWriter (
+			state.formatWriter);
 
 	}
 
@@ -132,18 +111,32 @@ interface RequestContextResponseMethods
 	}
 
 	default
-	OutputStream outputStream () {
+	BorrowedOutputStream outputStream () {
 
-		try {
+		State state =
+			requestContextResponseMethodsState ();
 
-			return response ().getOutputStream ();
+		if (
+			isNull (
+				state.outputStream)
+		) {
 
-		} catch (IOException ioException) {
+			try {
 
-			throw new RuntimeIoException (
-				ioException);
+				state.outputStream =
+					response ().getOutputStream ();
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
+
+		return new BorrowedOutputStream (
+			state.outputStream);
 
 	}
 
@@ -152,7 +145,7 @@ interface RequestContextResponseMethods
 
 		try {
 
-			printWriter ();
+			formatWriter ();
 
 			return true;
 
@@ -216,7 +209,7 @@ interface RequestContextResponseMethods
 
 	static
 	class State {
-		PrintWriter printWriter;
+		OutputStream outputStream;
 		FormatWriter formatWriter;
 	}
 

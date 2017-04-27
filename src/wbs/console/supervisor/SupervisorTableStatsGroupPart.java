@@ -78,19 +78,25 @@ class SupervisorTableStatsGroupPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		statsConsoleLogic.writeGroup (
-			taskLogger,
-			formatWriter,
-			statsDataSetsByName,
-			statsPeriod,
-			statsGrouper,
-			statsResolver,
-			statsFormatter);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
+		) {
+
+			statsConsoleLogic.writeGroup (
+				taskLogger,
+				formatWriter,
+				statsDataSetsByName,
+				statsPeriod,
+				statsGrouper,
+				statsResolver,
+				statsFormatter);
+
+		}
 
 	}
 

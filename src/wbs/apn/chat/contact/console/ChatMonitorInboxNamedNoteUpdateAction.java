@@ -18,7 +18,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -96,144 +96,181 @@ class ChatMonitorInboxNamedNoteUpdateAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		Matcher idMatcher =
-			idPattern.matcher (
-				requestContext.parameterRequired (
-					"id"));
-
-		if (! idMatcher.matches ()) {
-
-			throw new RuntimeException (
-				"Invalid id in post");
-
-		}
-
-		Long noteNameId =
-			Long.parseLong (
-				idMatcher.group (
-					1));
-
-		String typeString =
-			idMatcher.group (
-				2);
-
-		String newValue =
-			stringTrim (
-				requestContext.parameterRequired (
-					"value"));
-
-		// start transaction
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatMonitorInboxNamedNoteUpdateAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			ChatMonitorInboxRec monitorInbox =
-				chatMonitorInboxHelper.findFromContextRequired ();
+			// get params
 
-			ChatNoteNameRec chatNoteName =
-				chatNoteNameHelper.findRequired (
-					noteNameId);
+			Matcher idMatcher =
+				idPattern.matcher (
+					requestContext.parameterRequired (
+						"id"));
 
-			// work out which user is which
+			if (! idMatcher.matches ()) {
 
-			ChatUserRec thisChatUser;
-			ChatUserRec otherChatUser;
-
-			if (
-				stringEqualSafe (
-					typeString,
-					"user")
-			) {
-
-				thisChatUser =
-					monitorInbox.getUserChatUser ();
-
-				otherChatUser =
-					monitorInbox.getMonitorChatUser ();
-
-			} else if (
-				stringEqualSafe (
-					typeString,
-					"monitor")
-			) {
-
-				thisChatUser =
-					monitorInbox.getMonitorChatUser ();
-
-				otherChatUser =
-					monitorInbox.getUserChatUser ();
-
-			} else {
-
-				throw new RuntimeException ();
+				throw new RuntimeException (
+					"Invalid id in post");
 
 			}
 
-			// find old value
+			Long noteNameId =
+				Long.parseLong (
+					idMatcher.group (
+						1));
 
-			ChatNamedNoteRec namedNote =
-				chatNamedNoteHelper.find (
-					thisChatUser,
-					otherChatUser,
-					chatNoteName);
+			String typeString =
+				idMatcher.group (
+					2);
 
-			String oldValue =
-				namedNote != null && namedNote.getText () != null
-					? namedNote.getText ().getText ()
-					: "";
+			String newValue =
+				stringTrim (
+					requestContext.parameterRequired (
+						"value"));
 
-			if (
-				stringEqualSafe (
-					newValue,
-					oldValue)
+			// start transaction
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatMonitorInboxNamedNoteUpdateAction.goReal ()",
+						this);
+
 			) {
 
-				return textResponder.get ()
+				ChatMonitorInboxRec monitorInbox =
+					chatMonitorInboxHelper.findFromContextRequired ();
 
-					.text (
-						HtmlUtils.htmlEncode (
-							newValue));
+				ChatNoteNameRec chatNoteName =
+					chatNoteNameHelper.findRequired (
+						noteNameId);
 
-			}
+				// work out which user is which
 
-			// update note
+				ChatUserRec thisChatUser;
+				ChatUserRec otherChatUser;
 
-			TextRec newText =
-				newValue.length () > 0
-					? textHelper.findOrCreate (
-						taskLogger,
-						newValue)
-					: null;
+				if (
+					stringEqualSafe (
+						typeString,
+						"user")
+				) {
 
-			if (namedNote == null) {
+					thisChatUser =
+						monitorInbox.getUserChatUser ();
 
-				namedNote =
-					chatNamedNoteHelper.insert (
-						taskLogger,
-						chatNamedNoteHelper.createInstance ()
+					otherChatUser =
+						monitorInbox.getMonitorChatUser ();
 
-					.setChatNoteName (
-						chatNoteName)
+				} else if (
+					stringEqualSafe (
+						typeString,
+						"monitor")
+				) {
 
-					.setThisUser (
-						thisChatUser)
+					thisChatUser =
+						monitorInbox.getMonitorChatUser ();
 
-					.setOtherUser (
-						otherChatUser)
+					otherChatUser =
+						monitorInbox.getUserChatUser ();
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
+				// find old value
+
+				ChatNamedNoteRec namedNote =
+					chatNamedNoteHelper.find (
+						thisChatUser,
+						otherChatUser,
+						chatNoteName);
+
+				String oldValue =
+					namedNote != null && namedNote.getText () != null
+						? namedNote.getText ().getText ()
+						: "";
+
+				if (
+					stringEqualSafe (
+						newValue,
+						oldValue)
+				) {
+
+					return textResponder.get ()
+
+						.text (
+							HtmlUtils.htmlEncode (
+								newValue));
+
+				}
+
+				// update note
+
+				TextRec newText =
+					newValue.length () > 0
+						? textHelper.findOrCreate (
+							taskLogger,
+							newValue)
+						: null;
+
+				if (namedNote == null) {
+
+					namedNote =
+						chatNamedNoteHelper.insert (
+							taskLogger,
+							chatNamedNoteHelper.createInstance ()
+
+						.setChatNoteName (
+							chatNoteName)
+
+						.setThisUser (
+							thisChatUser)
+
+						.setOtherUser (
+							otherChatUser)
+
+						.setText (
+							newText)
+
+						.setUser (
+							userConsoleLogic.userRequired ())
+
+						.setTimestamp (
+							transaction.now ())
+
+					);
+
+				} else {
+
+					namedNote
+
+						.setText (
+							newText)
+
+						.setUser (
+							userConsoleLogic.userRequired ())
+
+						.setTimestamp (
+							transaction.now ());
+
+				}
+
+				chatNamedNoteLogHelper.insert (
+					taskLogger,
+					chatNamedNoteLogHelper.createInstance ()
+
+					.setChatNamedNote (
+						namedNote)
 
 					.setText (
 						newText)
@@ -246,46 +283,15 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 				);
 
-			} else {
+				transaction.commit ();
 
-				namedNote
+				return textResponder.get ()
 
-					.setText (
-						newText)
-
-					.setUser (
-						userConsoleLogic.userRequired ())
-
-					.setTimestamp (
-						transaction.now ());
+					.text (
+						HtmlUtils.htmlEncode (
+							newValue));
 
 			}
-
-			chatNamedNoteLogHelper.insert (
-				taskLogger,
-				chatNamedNoteLogHelper.createInstance ()
-
-				.setChatNamedNote (
-					namedNote)
-
-				.setText (
-					newText)
-
-				.setUser (
-					userConsoleLogic.userRequired ())
-
-				.setTimestamp (
-					transaction.now ())
-
-			);
-
-			transaction.commit ();
-
-			return textResponder.get ()
-
-				.text (
-					HtmlUtils.htmlEncode (
-						newValue));
 
 		}
 

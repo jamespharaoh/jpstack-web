@@ -88,31 +88,37 @@ class ChatAffiliateCreateOldPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		chatSchemes =
-			chat.getChatSchemes ().stream ()
+		) {
 
-			.filter (
-				chatScheme ->
-					privChecker.canRecursive (
-						taskLogger,
-						chatScheme,
-						"affiliate_create"))
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
 
-			.collect (
-				Collectors.toMap (
+			chatSchemes =
+				chat.getChatSchemes ().stream ()
+
+				.filter (
 					chatScheme ->
-						objectManager.objectPathMini (
+						privChecker.canRecursive (
+							taskLogger,
 							chatScheme,
-							chat),
-					ChatSchemeRec::getId));
+							"affiliate_create"))
+
+				.collect (
+					Collectors.toMap (
+						chatScheme ->
+							objectManager.objectPathMini (
+								chatScheme,
+								chat),
+						ChatSchemeRec::getId));
+
+		}
 
 	}
 

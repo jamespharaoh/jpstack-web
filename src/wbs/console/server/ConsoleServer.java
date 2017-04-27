@@ -51,59 +51,65 @@ class ConsoleServer {
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		// ensure console-server is not configured
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		taskLogger.debugFormat (
-			"Check <console-server> is configured");
-
-		if (
-			isNull (
-				wbsConfig.consoleServer ())
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"No <console-server> configuration"));
+			// ensure console-server is not configured
+
+			taskLogger.debugFormat (
+				"Check <console-server> is configured");
+
+			if (
+				isNull (
+					wbsConfig.consoleServer ())
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"No <console-server> configuration"));
+
+			}
+
+			// create http server
+
+			taskLogger.debugFormat (
+				"Create http server");
+
+			httpServer =
+				HttpServer.createSimpleServer (
+					null,
+					toJavaIntegerRequired (
+						wbsConfig.consoleServer ().listenPort ()));
+
+
+			// enable web sockets
+
+			taskLogger.debugFormat (
+				"Enable web sockets");
+
+			WebSocketAddOn webSocketAddOn =
+				new WebSocketAddOn ();
+
+			httpServer.getListeners ().forEach (
+				listener ->
+					listener.registerAddOn (
+						webSocketAddOn));
+
+			taskLogger.debugFormat (
+				"Register console web socket application");
+
+			WebSocketEngine.getEngine ().register (
+				"",
+				"/_async",
+				consoleWebSocketApplication);
 
 		}
-
-		// create http server
-
-		taskLogger.debugFormat (
-			"Create http server");
-
-		httpServer =
-			HttpServer.createSimpleServer (
-				null,
-				toJavaIntegerRequired (
-					wbsConfig.consoleServer ().listenPort ()));
-
-
-		// enable web sockets
-
-		taskLogger.debugFormat (
-			"Enable web sockets");
-
-		WebSocketAddOn webSocketAddOn =
-			new WebSocketAddOn ();
-
-		httpServer.getListeners ().forEach (
-			listener ->
-				listener.registerAddOn (
-					webSocketAddOn));
-
-		taskLogger.debugFormat (
-			"Register console web socket application");
-
-		WebSocketEngine.getEngine ().register (
-			"",
-			"/_async",
-			consoleWebSocketApplication);
 
 	}
 
@@ -112,31 +118,37 @@ class ConsoleServer {
 	void startupComplete (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"startupComplete");
+		try (
 
-		// start http server
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"startupComplete");
 
-		taskLogger.debugFormat (
-			"Start http server");
+		) {
 
-		try {
+			// start http server
 
-			httpServer.start ();
+			taskLogger.debugFormat (
+				"Start http server");
 
-		} catch (IOException ioException) {
+			try {
 
-			throw new RuntimeIoException (
-				ioException);
+				httpServer.start ();
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
+			taskLogger.noticeFormat (
+				"Started console server on port %s",
+				integerToDecimalString (
+					wbsConfig.consoleServer ().listenPort ()));
 
 		}
-
-		taskLogger.noticeFormat (
-			"Started console server on port %s",
-			integerToDecimalString (
-				wbsConfig.consoleServer ().listenPort ()));
 
 	}
 
@@ -145,49 +157,55 @@ class ConsoleServer {
 	void tearDown (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"tearDown");
+		try (
 
-		// do nothing if http server not started
-
-		taskLogger.debugFormat (
-			"Check if http server is started");
-
-		if (
-
-			isNull (
-				httpServer)
-
-			|| ! httpServer.isStarted ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"tearDown");
 
 		) {
-			return;
+
+			// do nothing if http server not started
+
+			taskLogger.debugFormat (
+				"Check if http server is started");
+
+			if (
+
+				isNull (
+					httpServer)
+
+				|| ! httpServer.isStarted ()
+
+			) {
+				return;
+			}
+
+			// shut down
+
+			taskLogger.debugFormat (
+				"Shut down http server");
+
+			try {
+
+				httpServer.shutdown ().wait ();
+
+			} catch (InterruptedException interruptedException) {
+
+				taskLogger.warningFormat (
+					"Interrupted while waiting for console server to stop");
+
+				httpServer.shutdownNow ();
+
+			}
+
+			taskLogger.noticeFormat (
+				"Stopped console server on port %s",
+				integerToDecimalString (
+					wbsConfig.consoleServer ().listenPort ()));
+
 		}
-
-		// shut down
-
-		taskLogger.debugFormat (
-			"Shut down http server");
-
-		try {
-
-			httpServer.shutdown ().wait ();
-
-		} catch (InterruptedException interruptedException) {
-
-			taskLogger.warningFormat (
-				"Interrupted while waiting for console server to stop");
-
-			httpServer.shutdownNow ();
-
-		}
-
-		taskLogger.noticeFormat (
-			"Stopped console server on port %s",
-			integerToDecimalString (
-				wbsConfig.consoleServer ().listenPort ()));
 
 	}
 

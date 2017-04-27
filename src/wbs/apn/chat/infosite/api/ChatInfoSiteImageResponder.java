@@ -5,8 +5,6 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.io.OutputStream;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -14,6 +12,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
+
+import wbs.utils.io.BorrowedOutputStream;
 
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
@@ -126,12 +126,18 @@ class ChatInfoSiteImageResponder
 	void goContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		OutputStream out =
-			requestContext.outputStream ();
+		try (
 
-		writeBytes (
-			out,
-			data);
+			BorrowedOutputStream out =
+				requestContext.outputStream ();
+
+		) {
+
+			writeBytes (
+				out,
+				data);
+
+		}
 
 	}
 

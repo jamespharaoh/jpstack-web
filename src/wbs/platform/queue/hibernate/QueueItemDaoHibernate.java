@@ -221,27 +221,33 @@ class QueueItemDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchIds");
 
-		criteria.addOrder (
-			Order.desc (
-				"_queueItem.createdTime"));
+		) {
 
-		criteria.setProjection (
-			Projections.id ());
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-		return findMany (
-			"searchIds (search)",
-			Long.class,
-			criteria);
+			criteria.addOrder (
+				Order.desc (
+					"_queueItem.createdTime"));
+
+			criteria.setProjection (
+				Projections.id ());
+
+			return findMany (
+				"searchIds (search)",
+				Long.class,
+				criteria);
+
+		}
 
 	}
 
@@ -397,69 +403,75 @@ class QueueItemDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchUserQueueReportCriteria");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchUserQueueReportCriteria");
 
-		criteria.add (
-			Restrictions.isNotNull (
-				"_queueItem.processedUser"));
+		) {
 
-		criteria.setProjection (
-			Projections.projectionList ()
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.property (
-					"_queueItem.processedUser"),
-				"user")
+			criteria.add (
+				Restrictions.isNotNull (
+					"_queueItem.processedUser"));
 
-			.add (
-				Projections.count (
-					"_queueItem.id"),
-				"messageCount")
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.min (
-					"_queueItem.createdTime"),
-				"firstMessage")
+				.add (
+					Projections.property (
+						"_queueItem.processedUser"),
+					"user")
 
-			.add (
-				Projections.max (
-					"_queueItem.createdTime"),
-				"lastMessage")
+				.add (
+					Projections.count (
+						"_queueItem.id"),
+					"messageCount")
 
-			.add (
-				Projections.sqlProjection (
-					stringFormat (
-						"avg (CASE WHEN {alias}.processed_time IS NULL THEN ",
-						"NULL ELSE EXTRACT (EPOCH FROM ({alias}.",
-						"processed_time - {alias}.created_time)) END) AS ",
-						"time_to_process"),
-					new String [] {
-						"time_to_process",
-					},
-					new Type [] {
-						LongType.INSTANCE,
-					}),
-				"timeToProcess")
+				.add (
+					Projections.min (
+						"_queueItem.createdTime"),
+					"firstMessage")
 
-			.add (
-				Projections.groupProperty (
-					"_queueItem.processedUser"))
+				.add (
+					Projections.max (
+						"_queueItem.createdTime"),
+					"lastMessage")
 
-		);
+				.add (
+					Projections.sqlProjection (
+						stringFormat (
+							"avg (CASE WHEN {alias}.processed_time IS NULL THEN ",
+							"NULL ELSE EXTRACT (EPOCH FROM ({alias}.",
+							"processed_time - {alias}.created_time)) END) AS ",
+							"time_to_process"),
+						new String [] {
+							"time_to_process",
+						},
+						new Type [] {
+							LongType.INSTANCE,
+						}),
+					"timeToProcess")
 
-		criteria.setResultTransformer (
-			Transformers.aliasToBean (
-				UserQueueReport.class));
+				.add (
+					Projections.groupProperty (
+						"_queueItem.processedUser"))
 
-		return criteria;
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					UserQueueReport.class));
+
+			return criteria;
+
+		}
 
 	}
 
@@ -469,52 +481,58 @@ class QueueItemDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchUserQueueReportIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchUserQueueReportIds");
 
-		criteria.add (
-			Restrictions.isNotNull (
-				"_queueItem.processedUser"));
+		) {
 
-		criteria.setProjection (
-			Projections.projectionList ()
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.distinct (
-					Projections.property (
-						"_queueItem.processedUser.id")))
+			criteria.add (
+				Restrictions.isNotNull (
+					"_queueItem.processedUser"));
 
-			.add (
-				Projections.groupProperty (
-					"_queueItem.processedUser"))
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.groupProperty (
-					"_processedUserSlice.code"))
+				.add (
+					Projections.distinct (
+						Projections.property (
+							"_queueItem.processedUser.id")))
 
-			.add (
-				Projections.groupProperty (
-					"_processedUser.username"))
+				.add (
+					Projections.groupProperty (
+						"_queueItem.processedUser"))
 
-		);
+				.add (
+					Projections.groupProperty (
+						"_processedUserSlice.code"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_processedUserSlice.code"));
+				.add (
+					Projections.groupProperty (
+						"_processedUser.username"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_processedUser.username"));
+			);
 
-		return findIdsOnly (
-			criteria.list ());
+			criteria.addOrder (
+				Order.asc (
+					"_processedUserSlice.code"));
+
+			criteria.addOrder (
+				Order.asc (
+					"_processedUser.username"));
+
+			return findIdsOnly (
+				criteria.list ());
+
+		}
 
 	}
 
@@ -525,26 +543,32 @@ class QueueItemDaoHibernate
 			@NonNull QueueItemSearch search,
 			@NonNull List<Long> objectIds) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchUserQueueReports");
+		try (
 
-		Criteria criteria =
-			searchUserQueueReportCriteria (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchUserQueueReports");
+
+		) {
+
+			Criteria criteria =
+				searchUserQueueReportCriteria (
+					taskLogger,
+					search);
+
+			criteria.add (
+				Restrictions.in (
+					"_processedUser.id",
+					objectIds));
+
+			return findOrdered (
 				taskLogger,
-				search);
+				UserQueueReport.class,
+				objectIds,
+				criteria.list ());
 
-		criteria.add (
-			Restrictions.in (
-				"_processedUser.id",
-				objectIds));
-
-		return findOrdered (
-			taskLogger,
-			UserQueueReport.class,
-			objectIds,
-			criteria.list ());
+		}
 
 	}
 

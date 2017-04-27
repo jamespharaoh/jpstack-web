@@ -24,7 +24,7 @@ import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -60,42 +60,48 @@ class FixturesTool {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runFixtureProviders");
+		try (
 
-		taskLogger.noticeFormat (
-			"Disabling background processes");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runFixtureProviders");
 
-		backgroundProcesses.forEach (process ->
-			process.runAutomatically (
-				false));
-
-		taskLogger.noticeFormat (
-			"About to run fixture providers");
-
-		for (
-			PluginSpec plugin
-				: pluginManager.plugins ()
 		) {
 
+			taskLogger.noticeFormat (
+				"Disabling background processes");
+
+			backgroundProcesses.forEach (process ->
+				process.runAutomatically (
+					false));
+
+			taskLogger.noticeFormat (
+				"About to run fixture providers");
+
 			for (
-				PluginFixtureSpec fixture
-					: plugin.fixtures ()
+				PluginSpec plugin
+					: pluginManager.plugins ()
 			) {
 
-				runFixtureProvider (
-					taskLogger,
-					plugin,
-					fixture);
+				for (
+					PluginFixtureSpec fixture
+						: plugin.fixtures ()
+				) {
+
+					runFixtureProvider (
+						taskLogger,
+						plugin,
+						fixture);
+
+				}
 
 			}
 
-		}
+			taskLogger.noticeFormat (
+				"All fixtures providers run successfully");
 
-		taskLogger.noticeFormat (
-			"All fixtures providers run successfully");
+		}
 
 	}
 
@@ -105,78 +111,84 @@ class FixturesTool {
 			@NonNull PluginSpec plugin,
 			@NonNull PluginFixtureSpec fixture) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runFixtureProvider");
-
-		taskLogger.noticeFormat (
-			"About to run fixture provider %s from %s",
-			fixture.name (),
-			plugin.name ());
-
-		String fixtureProviderClassName =
-			stringFormat (
-				"%s.fixture.%sFixtureProvider",
-				plugin.packageName (),
-				capitalise (
-					fixture.name ()));
-
-		Optional <Class <?>> fixtureProviderClassOptional =
-			classForName (
-				fixtureProviderClassName);
-
-		if (
-			optionalIsNotPresent (
-				fixtureProviderClassOptional)
-		) {
-
-			taskLogger.errorFormat (
-				"Can't find fixture provider of type %s for ",
-				fixtureProviderClassName,
-				"fixture %s ",
-				fixture.name (),
-				"from %s",
-				plugin.name ());
-
-			return;
-
-		}
-
-		Class <?> fixtureProviderClass =
-			optionalGetRequired (
-				fixtureProviderClassOptional);
-
-		Provider <FixtureProvider> fixtureProviderProvider =
-			fixtureProviderProvidersByClass.get (
-				fixtureProviderClass);
-
-		FixtureProvider fixtureProvider =
-			fixtureProviderProvider.get ();
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"FixturesTool.runFixtureProviders (arguments)",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runFixtureProvider");
 
 		) {
 
-			fixtureProvider.createFixtures (
-				taskLogger,
-				transaction);
-
-			transaction.commit ();
-
-		} catch (Exception exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error creating fixture %s from %s",
+			taskLogger.noticeFormat (
+				"About to run fixture provider %s from %s",
 				fixture.name (),
 				plugin.name ());
+
+			String fixtureProviderClassName =
+				stringFormat (
+					"%s.fixture.%sFixtureProvider",
+					plugin.packageName (),
+					capitalise (
+						fixture.name ()));
+
+			Optional <Class <?>> fixtureProviderClassOptional =
+				classForName (
+					fixtureProviderClassName);
+
+			if (
+				optionalIsNotPresent (
+					fixtureProviderClassOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"Can't find fixture provider of type %s for ",
+					fixtureProviderClassName,
+					"fixture %s ",
+					fixture.name (),
+					"from %s",
+					plugin.name ());
+
+				return;
+
+			}
+
+			Class <?> fixtureProviderClass =
+				optionalGetRequired (
+					fixtureProviderClassOptional);
+
+			Provider <FixtureProvider> fixtureProviderProvider =
+				fixtureProviderProvidersByClass.get (
+					fixtureProviderClass);
+
+			FixtureProvider fixtureProvider =
+				fixtureProviderProvider.get ();
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"FixturesTool.runFixtureProviders (arguments)",
+						this);
+
+			) {
+
+				fixtureProvider.createFixtures (
+					taskLogger,
+					transaction);
+
+				transaction.commit ();
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error creating fixture %s from %s",
+					fixture.name (),
+					plugin.name ());
+
+			}
 
 		}
 

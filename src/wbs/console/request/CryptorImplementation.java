@@ -39,12 +39,14 @@ class CryptorImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long input) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"encryptInteger");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"encryptInteger");
+
+		) {
 
 			byte[] clearText = new byte[] {
 				(byte) ((input & 0xff00000000000000l) >> 56),
@@ -92,12 +94,14 @@ class CryptorImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String input) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"decryptInteger");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"decryptInteger");
+
+		) {
 
 			byte[] cipherText =
 				fromHex (

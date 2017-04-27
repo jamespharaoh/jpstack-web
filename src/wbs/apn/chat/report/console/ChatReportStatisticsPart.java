@@ -85,81 +85,87 @@ class ChatReportStatisticsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		chat =
-			chatHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		List <ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
-			chatAffiliateUsersSummaryHelper.findByParent (
-				chat);
-
-		for (
-			ChatAffiliateUsersSummaryRec chatAffiliateUsersSummary
-				: chatAffiliateUsersSummaries
 		) {
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					chatAffiliateUsersSummary.getChatAffiliate (),
-					"chat_user_view")
+			chat =
+				chatHelper.findFromContextRequired ();
+
+			List <ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
+				chatAffiliateUsersSummaryHelper.findByParent (
+					chat);
+
+			for (
+				ChatAffiliateUsersSummaryRec chatAffiliateUsersSummary
+					: chatAffiliateUsersSummaries
 			) {
-				continue;
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						chatAffiliateUsersSummary.getChatAffiliate (),
+						"chat_user_view")
+				) {
+					continue;
+				}
+
+				numAffiliates ++;
+
+				numUsersGayMale +=
+					chatAffiliateUsersSummary.getNumUsersGayMale ();
+
+				numUsersGayFemale +=
+					chatAffiliateUsersSummary.getNumUsersGayFemale ();
+
+				numUsersBiMale +=
+					chatAffiliateUsersSummary.getNumUsersBiMale ();
+
+				numUsersBiFemale +=
+					chatAffiliateUsersSummary.getNumUsersBiFemale ();
+
+				numUsersStraightMale +=
+					chatAffiliateUsersSummary.getNumUsersStraightMale ();
+
+				numUsersStraightFemale +=
+					chatAffiliateUsersSummary.getNumUsersStraightFemale ();
+
+				numJoinedLastDay +=
+					chatAffiliateUsersSummary.getNumJoinedLastDay ();
+
+				numJoinedLastWeek +=
+					chatAffiliateUsersSummary.getNumJoinedLastWeek ();
+
+				numJoinedLastMonth +=
+					chatAffiliateUsersSummary.getNumJoinedLastMonth ();
+
+				numOnlineLastDay +=
+					chatAffiliateUsersSummary.getNumOnlineLastDay ();
+
+				numOnlineLastWeek +=
+					chatAffiliateUsersSummary.getNumOnlineLastWeek ();
+
+				numOnlineLastMonth +=
+					chatAffiliateUsersSummary.getNumOnlineLastMonth ();
+
 			}
 
-			numAffiliates ++;
+			users =
+				chatUsersSummaryHelper.findRequired (
+					chat.getId ());
 
-			numUsersGayMale +=
-				chatAffiliateUsersSummary.getNumUsersGayMale ();
-
-			numUsersGayFemale +=
-				chatAffiliateUsersSummary.getNumUsersGayFemale ();
-
-			numUsersBiMale +=
-				chatAffiliateUsersSummary.getNumUsersBiMale ();
-
-			numUsersBiFemale +=
-				chatAffiliateUsersSummary.getNumUsersBiFemale ();
-
-			numUsersStraightMale +=
-				chatAffiliateUsersSummary.getNumUsersStraightMale ();
-
-			numUsersStraightFemale +=
-				chatAffiliateUsersSummary.getNumUsersStraightFemale ();
-
-			numJoinedLastDay +=
-				chatAffiliateUsersSummary.getNumJoinedLastDay ();
-
-			numJoinedLastWeek +=
-				chatAffiliateUsersSummary.getNumJoinedLastWeek ();
-
-			numJoinedLastMonth +=
-				chatAffiliateUsersSummary.getNumJoinedLastMonth ();
-
-			numOnlineLastDay +=
-				chatAffiliateUsersSummary.getNumOnlineLastDay ();
-
-			numOnlineLastWeek +=
-				chatAffiliateUsersSummary.getNumOnlineLastWeek ();
-
-			numOnlineLastMonth +=
-				chatAffiliateUsersSummary.getNumOnlineLastMonth ();
+			canMonitor =
+				privChecker.canRecursive (
+					taskLogger,
+					chat,
+					"monitor");
 
 		}
-
-		users =
-			chatUsersSummaryHelper.findRequired (
-				chat.getId ());
-
-		canMonitor =
-			privChecker.canRecursive (
-				taskLogger,
-				chat,
-				"monitor");
 
 	}
 
@@ -168,26 +174,37 @@ class ChatReportStatisticsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (
+		try (
 
-			equalToZero (
-				numAffiliates)
-
-			&& ! canMonitor
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
 		) {
 
-			htmlParagraphWriteFormat (
-				"You don't have permission to view any information on this ",
-				"page.");
+			if (
 
-			return;
+				equalToZero (
+					numAffiliates)
+
+				&& ! canMonitor
+
+			) {
+
+				htmlParagraphWriteFormat (
+					"You don't have permission to view any information on this ",
+					"page.");
+
+				return;
+
+			}
+
+			writeNumberOfAffiliates ();
+			writeTotals ();
+			writeJoiners ();
 
 		}
-
-		writeNumberOfAffiliates ();
-		writeTotals ();
-		writeJoiners ();
 
 	}
 

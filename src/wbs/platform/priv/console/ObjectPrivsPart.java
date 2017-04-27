@@ -91,24 +91,30 @@ class ObjectPrivsPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		object =
-			consoleHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		privCodes =
-			iterableMapToSet (
-				PrivRec::getCode,
-				privHelper.findByParent (
-					object));
+		) {
 
-		privDatas =
-			preparePrivDatas (
-				taskLogger,
-				object);
+			object =
+				consoleHelper.findFromContextRequired ();
+
+			privCodes =
+				iterableMapToSet (
+					PrivRec::getCode,
+					privHelper.findByParent (
+						object));
+
+			privDatas =
+				preparePrivDatas (
+					taskLogger,
+					object);
+
+		}
 
 	}
 
@@ -117,61 +123,67 @@ class ObjectPrivsPart <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"preparePrivDatas");
+		try (
 
-		ImmutableList.Builder <PrivData> objectPrivDatasBuilder =
-			ImmutableList.builder ();
-
-		for (
-
-			Optional <Record <?>> currentObjectLoop =
-				optionalOf (
-					object);
-
-			optionalIsPresent (
-				currentObjectLoop);
-
-			currentObjectLoop =
-				objectManager.getParent (
-					optionalGetRequired (
-						currentObjectLoop))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"preparePrivDatas");
 
 		) {
 
-			Record <?> currentObject =
-				optionalGetRequired (
+			ImmutableList.Builder <PrivData> objectPrivDatasBuilder =
+				ImmutableList.builder ();
+
+			for (
+
+				Optional <Record <?>> currentObjectLoop =
+					optionalOf (
+						object);
+
+				optionalIsPresent (
 					currentObjectLoop);
 
-			ConsoleHelper <?> currentObjectHelper =
-				objectManager.findConsoleHelperRequired (
-					currentObject);
+				currentObjectLoop =
+					objectManager.getParent (
+						optionalGetRequired (
+							currentObjectLoop))
 
-			ObjectTypeRec currentObjectType =
-				objectTypeHelper.findRequired (
-					currentObjectHelper.objectTypeId ());
+			) {
 
-			objectPrivDatasBuilder.addAll (
-				iterableMapToList (
-					priv ->
-						preparePrivData (
-							taskLogger,
-							currentObjectType,
-							currentObject,
-							priv),
-					listSorted (
-						iterableFilter (
-							priv ->
-								privCodes.contains (
-									priv.getCode ()),
-							privHelper.findByParent (
-								currentObject)))));
+				Record <?> currentObject =
+					optionalGetRequired (
+						currentObjectLoop);
+
+				ConsoleHelper <?> currentObjectHelper =
+					objectManager.findConsoleHelperRequired (
+						currentObject);
+
+				ObjectTypeRec currentObjectType =
+					objectTypeHelper.findRequired (
+						currentObjectHelper.objectTypeId ());
+
+				objectPrivDatasBuilder.addAll (
+					iterableMapToList (
+						priv ->
+							preparePrivData (
+								taskLogger,
+								currentObjectType,
+								currentObject,
+								priv),
+						listSorted (
+							iterableFilter (
+								priv ->
+									privCodes.contains (
+										priv.getCode ()),
+								privHelper.findByParent (
+									currentObject)))));
+
+			}
+
+			return objectPrivDatasBuilder.build ();
 
 		}
-
-		return objectPrivDatasBuilder.build ();
 
 	}
 

@@ -5,7 +5,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -43,6 +42,9 @@ import wbs.platform.rpc.core.RpcHandler;
 import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.web.ReusableRpcHandler;
+
+import wbs.utils.io.BorrowedInputStream;
+import wbs.utils.io.RuntimeIoException;
 
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
@@ -117,8 +119,7 @@ class PhpRpcAction
 	@Override
 	public
 	Responder go (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		RpcResult ret =
 			realGo (
@@ -139,96 +140,106 @@ class PhpRpcAction
 
 	public
 	RpcResult realGo (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"realGo");
+		try (
 
-		// process input
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"realGo");
 
-		InputStream in =
-			requestContext.inputStream ();
+			BorrowedInputStream in =
+				requestContext.inputStream ();
 
-		PhpEntity input;
-		try {
+		) {
 
-			input =
-				PhpUnserializer.unserialize (in);
+			// process input
 
-		} catch (PhpUnserializeException e) {
+			PhpEntity input;
+			try {
 
-			e.printStackTrace (System.out);
+				input =
+					PhpUnserializer.unserialize (in);
 
-			return Rpc.rpcError (
-				"FIXME",
-				Rpc.stRequestInvalid,
-				"request-invalid",
-				"PHP serialized data not recognised");
+			} catch (PhpUnserializeException e) {
 
-		}
+				e.printStackTrace (System.out);
 
-		if (in.read () >= 0) {
+				return Rpc.rpcError (
+					"FIXME",
+					Rpc.stRequestInvalid,
+					"request-invalid",
+					"PHP serialized data not recognised");
 
-			return Rpc.rpcError (
-				"FIXME",
-				Rpc.stRequestInvalid,
-				"request-invalid",
-				"PHP serialized data too long");
+			}
 
-		}
+			if (in.read () >= 0) {
 
-		if (! input.isArray ()) {
+				return Rpc.rpcError (
+					"FIXME",
+					Rpc.stRequestInvalid,
+					"request-invalid",
+					"PHP serialized data too long");
 
-			return Rpc.rpcError (
-				"FIXME",
-				Rpc.stRequestInvalid,
-				"request-invalid",
-				"PHP serialized data should be an array");
+			}
 
-		}
+			if (! input.isArray ()) {
 
-		taskLogger.debugFormat (
-			"PHP RPC request to %s\n%s",
-			requestContext.requestUri (),
-			PhpFormatter.DEFAULT.format (
-				input));
+				return Rpc.rpcError (
+					"FIXME",
+					Rpc.stRequestInvalid,
+					"request-invalid",
+					"PHP serialized data should be an array");
 
-		// get and validate encoding
+			}
 
-		PhpEntity entity =
-			input.getAt ("encoding");
-
-		String encoding =
-			entity.isNull ()
-				? "iso-8859-1"
-				: entity.asString ("iso-8859-1");
-
-		if (! Charset.isSupported (encoding)) {
-
-			return Rpc.rpcError (
-				"FIXME",
-				Rpc.stEncodingUnsupported,
-				"encoding-unsupported",
-				"Unsupported character encoding: " + encoding);
-
-		}
-
-		// hand off to the handler
-
-		try {
-
-			return rpcHandler.handle (
-				taskLogger,
-				new PhpRpcSource (
-					encoding,
+			taskLogger.debugFormat (
+				"PHP RPC request to %s\n%s",
+				requestContext.requestUri (),
+				PhpFormatter.DEFAULT.format (
 					input));
 
-		} catch (RpcException e) {
+			// get and validate encoding
 
-			return e.getRpcResult();
+			PhpEntity entity =
+				input.getAt ("encoding");
+
+			String encoding =
+				entity.isNull ()
+					? "iso-8859-1"
+					: entity.asString ("iso-8859-1");
+
+			if (! Charset.isSupported (encoding)) {
+
+				return Rpc.rpcError (
+					"FIXME",
+					Rpc.stEncodingUnsupported,
+					"encoding-unsupported",
+					"Unsupported character encoding: " + encoding);
+
+			}
+
+			// hand off to the handler
+
+			try {
+
+				return rpcHandler.handle (
+					taskLogger,
+					new PhpRpcSource (
+						encoding,
+						input));
+
+			} catch (RpcException e) {
+
+				return e.getRpcResult();
+
+			}
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 

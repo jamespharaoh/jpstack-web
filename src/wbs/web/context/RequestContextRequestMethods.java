@@ -1,7 +1,10 @@
 package wbs.web.context;
 
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -13,6 +16,7 @@ import com.google.common.base.Optional;
 
 import org.apache.commons.io.IOUtils;
 
+import wbs.utils.io.BorrowedInputStream;
 import wbs.utils.io.RuntimeIoException;
 
 public
@@ -76,18 +80,32 @@ interface RequestContextRequestMethods
 	// request body
 
 	default
-	InputStream inputStream () {
+	BorrowedInputStream inputStream () {
 
-		try {
+		State state =
+			requestContextRequestMethodsState ();
 
-			return request ().getInputStream ();
+		if (
+			isNull (
+				state.inputStream)
+		) {
 
-		} catch (IOException ioException) {
+			try {
 
-			throw new RuntimeIoException (
-				ioException);
+				state.inputStream =
+					request ().getInputStream ();
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
+
+		return new BorrowedInputStream (
+			state.inputStream);
 
 	}
 
@@ -122,6 +140,42 @@ interface RequestContextRequestMethods
 
 		}
 
+	}
+
+	// state
+
+	final static
+	String STATE_KEY =
+		"REQUEST_CONTEXT_REQUEST_METHODS_STATE";
+
+	default
+	State requestContextRequestMethodsState () {
+
+		return optionalOrElse (
+			optionalCast (
+				State.class,
+				optionalFromNullable (
+					request ().getAttribute (
+						STATE_KEY))),
+			() -> {
+
+			State state =
+				new State ();
+
+			request ().setAttribute (
+				STATE_KEY,
+				state);
+
+			return state;
+
+		});
+
+	}
+
+	static
+	class State {
+		InputStream inputStream;
+		Reader reader;
 	}
 
 }

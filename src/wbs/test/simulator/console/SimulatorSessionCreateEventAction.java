@@ -27,7 +27,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -132,90 +132,96 @@ class SimulatorSessionCreateEventAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
-			String type =
-				requestContext.formRequired (
-					"type");
+		) {
 
-			if (
-				stringEqualSafe (
-					type,
-					"sendMessage")
-			) {
+			try {
 
-				return sendMessage (
-					taskLogger);
+				String type =
+					requestContext.formRequired (
+						"type");
+
+				if (
+					stringEqualSafe (
+						type,
+						"sendMessage")
+				) {
+
+					return sendMessage (
+						taskLogger);
+
+				}
+
+				if (
+					stringEqualSafe (
+						type,
+						"deliveryReport")
+				) {
+
+					return deliveryReport (
+						taskLogger);
+
+				}
+
+				throw new AjaxException (
+					stringFormat (
+						"Invalid event type: %s",
+						type));
+
+			} catch (AjaxException error) {
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						ImmutableMap.<Object,Object>builder ()
+
+						.put (
+							"success",
+							false)
+
+						.put (
+							"error",
+							error.message)
+
+						.build ()
+
+					);
+
+			} catch (RuntimeException exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"console",
+					requestContext.requestPath (),
+					exception,
+					optionalOf (
+						userConsoleLogic.userIdRequired ()),
+					GenericExceptionResolution.ignoreWithUserWarning);
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						ImmutableMap.<Object,Object>builder ()
+
+						.put (
+							"success",
+							false)
+
+						.put (
+							"error",
+							"internal error")
+
+						.build ()
+
+					);
 
 			}
-
-			if (
-				stringEqualSafe (
-					type,
-					"deliveryReport")
-			) {
-
-				return deliveryReport (
-					taskLogger);
-
-			}
-
-			throw new AjaxException (
-				stringFormat (
-					"Invalid event type: %s",
-					type));
-
-		} catch (AjaxException error) {
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					ImmutableMap.<Object,Object>builder ()
-
-					.put (
-						"success",
-						false)
-
-					.put (
-						"error",
-						error.message)
-
-					.build ()
-
-				);
-
-		} catch (RuntimeException exception) {
-
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"console",
-				requestContext.requestPath (),
-				exception,
-				optionalOf (
-					userConsoleLogic.userIdRequired ()),
-				GenericExceptionResolution.ignoreWithUserWarning);
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					ImmutableMap.<Object,Object>builder ()
-
-					.put (
-						"success",
-						false)
-
-					.put (
-						"error",
-						"internal error")
-
-					.build ()
-
-				);
 
 		}
 
@@ -231,7 +237,7 @@ class SimulatorSessionCreateEventAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"SimulatorSessionCreateEventAction.sendMessage ()",
@@ -413,7 +419,7 @@ class SimulatorSessionCreateEventAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"SimulatorSessionCreateEventAction.deliveryReport ()",

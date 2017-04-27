@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -90,242 +90,284 @@ class FonixFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenus (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createConfig (
-			taskLogger,
-			transaction);
+		) {
 
-		createDefaultDeliveryStatuses (
-			taskLogger,
-			transaction);
+			createMenus (
+				taskLogger,
+				transaction);
 
-		createDefaultNetworks (
-			taskLogger,
-			transaction);
+			createConfig (
+				taskLogger,
+				transaction);
 
-		createRoutes (
-			taskLogger,
-			transaction);
+			createDefaultDeliveryStatuses (
+				taskLogger,
+				transaction);
+
+			createDefaultNetworks (
+				taskLogger,
+				transaction);
+
+			createRoutes (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenus (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenus");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenus");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"integration"))
+		) {
 
-			.setCode (
-				"fonix")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Fonix")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"integration"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"fonix")
 
-			.setLabel (
-				"Fonix")
+				.setName (
+					"Fonix")
 
-			.setTargetPath (
-				"/fonix")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Fonix")
 
-		);
+				.setTargetPath (
+					"/fonix")
 
-		transaction.flush ();
+				.setTargetFrame (
+					"main")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createConfig (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createConfig");
+		try (
 
-		fonixConfigHelper.insert (
-			taskLogger,
-			fonixConfigHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createConfig");
 
-			.setCode (
-				"default")
+		) {
 
-			.setName (
-				"Default")
+			fonixConfigHelper.insert (
+				taskLogger,
+				fonixConfigHelper.createInstance ()
 
-			.setDescription (
-				"Default")
+				.setCode (
+					"default")
 
-		);
+				.setName (
+					"Default")
 
-		transaction.flush ();
+				.setDescription (
+					"Default")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createDefaultDeliveryStatuses (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createDefaultDeliveryStatuses");
+		try (
 
-		defaultDeliveryStatuses.forEach (
-			defaultDeliveryStatus ->
-				fonixDeliveryStatusHelper.insert (
-					taskLogger,
-					fonixDeliveryStatusHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createDefaultDeliveryStatuses");
 
-			.setFonixConfig (
-				fonixConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
+		) {
 
-			.setCode (
-				defaultDeliveryStatus.code ())
+			defaultDeliveryStatuses.forEach (
+				defaultDeliveryStatus ->
+					fonixDeliveryStatusHelper.insert (
+						taskLogger,
+						fonixDeliveryStatusHelper.createInstance ()
 
-			.setMessageStatus (
-				defaultDeliveryStatus.status ())
+				.setFonixConfig (
+					fonixConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-			.setDescription (
-				defaultDeliveryStatus.description ())
+				.setCode (
+					defaultDeliveryStatus.code ())
 
-			.setPermanent (
-				defaultDeliveryStatus.permanent ())
+				.setMessageStatus (
+					defaultDeliveryStatus.status ())
 
-		));
+				.setDescription (
+					defaultDeliveryStatus.description ())
 
-		transaction.flush ();
+				.setPermanent (
+					defaultDeliveryStatus.permanent ())
+
+			));
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createDefaultNetworks (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createDefaultNetworks");
+		try (
 
-		defaultNetworks.forEach (
-			defaultNetwork ->
-				fonixNetworkHelper.insert (
-					taskLogger,
-					fonixNetworkHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createDefaultNetworks");
 
-			.setFonixConfig (
-				fonixConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
+		) {
 
-			.setNetwork (
-				networkHelper.findByCodeRequired (
-					GlobalId.root,
-					defaultNetwork.ourCode ()))
+			defaultNetworks.forEach (
+				defaultNetwork ->
+					fonixNetworkHelper.insert (
+						taskLogger,
+						fonixNetworkHelper.createInstance ()
 
-			.setTheirCode (
-				defaultNetwork.theirCode ())
+				.setFonixConfig (
+					fonixConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-		));
+				.setNetwork (
+					networkHelper.findByCodeRequired (
+						GlobalId.root,
+						defaultNetwork.ourCode ()))
 
-		transaction.flush ();
+				.setTheirCode (
+					defaultNetwork.theirCode ())
+
+			));
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createRoutes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createRoutes");
+		try (
 
-		testAccounts.forEach (
-			"fonix-route",
-			testAccount ->
-				createRoute (
-					taskLogger,
-					transaction,
-					testAccount));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRoutes");
 
-		transaction.flush ();
+		) {
+
+			testAccounts.forEach (
+				"fonix-route",
+				testAccount ->
+					createRoute (
+						taskLogger,
+						transaction,
+						testAccount));
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createRoute (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createRoute");
+		try (
 
-		switch (
-			params.get (
-				"direction")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRoute");
+
 		) {
 
-		case "in":
+			switch (
+				params.get (
+					"direction")
+			) {
 
-			createInboundRoute (
-				taskLogger,
-				params);
+			case "in":
 
-			break;
+				createInboundRoute (
+					taskLogger,
+					params);
 
-		case "out":
+				break;
 
-			createOutboundRoute (
-				taskLogger,
-				params);
+			case "out":
 
-			break;
+				createOutboundRoute (
+					taskLogger,
+					params);
 
-		default:
+				break;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Fonix route has invalid direction %s",
-					params.get ("direction")));
+			default:
+
+				throw new RuntimeException (
+					stringFormat (
+						"Fonix route has invalid direction %s",
+						params.get ("direction")));
+
+			}
 
 		}
 
@@ -336,49 +378,55 @@ class FonixFixtureProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createInboundRoute");
+		try (
 
-		RouteRec smsRoute =
-			smsRouteHelper.insert (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createInboundRoute");
+
+		) {
+
+			RouteRec smsRoute =
+				smsRouteHelper.insert (
+					taskLogger,
+					smsRouteHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					simplifyToCodeRequired (
+						params.get ("name")))
+
+				.setName (
+					params.get ("name"))
+
+				.setDescription (
+					params.get ("description"))
+
+				.setCanReceive (
+					true)
+
+			);
+
+			fonixRouteInHelper.insert (
 				taskLogger,
-				smsRouteHelper.createInstance ()
+				fonixRouteInHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setRoute (
+					smsRoute)
 
-			.setCode (
-				simplifyToCodeRequired (
-					params.get ("name")))
+				.setFonixConfig (
+					fonixConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-			.setName (
-				params.get ("name"))
+			);
 
-			.setDescription (
-				params.get ("description"))
-
-			.setCanReceive (
-				true)
-
-		);
-
-		fonixRouteInHelper.insert (
-			taskLogger,
-			fonixRouteInHelper.createInstance ()
-
-			.setRoute (
-				smsRoute)
-
-			.setFonixConfig (
-				fonixConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
-
-		);
+		}
 
 	}
 
@@ -387,63 +435,69 @@ class FonixFixtureProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createOutboundRoute");
+		try (
 
-		RouteRec smsRoute =
-			smsRouteHelper.insert (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createOutboundRoute");
+
+		) {
+
+			RouteRec smsRoute =
+				smsRouteHelper.insert (
+					taskLogger,
+					smsRouteHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					simplifyToCodeRequired (
+						params.get ("name")))
+
+				.setName (
+					params.get ("name"))
+
+				.setDescription (
+					params.get ("description"))
+
+				.setCanSend (
+					true)
+
+				.setDeliveryReports (
+					true)
+
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"clockwork_sms"))
+
+			);
+
+			fonixRouteOutHelper.insert (
 				taskLogger,
-				smsRouteHelper.createInstance ()
+				fonixRouteOutHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setRoute (
+					smsRoute)
 
-			.setCode (
-				simplifyToCodeRequired (
-					params.get ("name")))
+				.setFonixConfig (
+					fonixConfigHelper.findByCodeRequired (
+						GlobalId.root,
+						"default"))
 
-			.setName (
-				params.get ("name"))
+				.setUrl (
+					params.get ("url"))
 
-			.setDescription (
-				params.get ("description"))
+				.setApiKey (
+					params.get ("api-key"))
 
-			.setCanSend (
-				true)
+			);
 
-			.setDeliveryReports (
-				true)
-
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"clockwork_sms"))
-
-		);
-
-		fonixRouteOutHelper.insert (
-			taskLogger,
-			fonixRouteOutHelper.createInstance ()
-
-			.setRoute (
-				smsRoute)
-
-			.setFonixConfig (
-				fonixConfigHelper.findByCodeRequired (
-					GlobalId.root,
-					"default"))
-
-			.setUrl (
-				params.get ("url"))
-
-			.setApiKey (
-				params.get ("api-key"))
-
-		);
+		}
 
 	}
 

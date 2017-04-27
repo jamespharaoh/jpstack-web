@@ -54,7 +54,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -200,419 +200,100 @@ class ConsoleManagerImplementation
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		dumpData (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		// find responders
+		) {
 
-		findResponders (
-			taskLogger);
+			dumpData (
+				taskLogger);
 
-		collectContextTypes (
-			taskLogger);
+			// find responders
 
-		collectContextTabs (
-			taskLogger);
+			findResponders (
+				taskLogger);
 
-		addTabsToContextTypes (
-			taskLogger);
+			collectContextTypes (
+				taskLogger);
 
-		collectContextFiles (
-			taskLogger);
+			collectContextTabs (
+				taskLogger);
 
-		collectContextTypeFiles (
-			taskLogger);
+			addTabsToContextTypes (
+				taskLogger);
 
-		resolveContextTabs (
-			taskLogger);
+			collectContextFiles (
+				taskLogger);
 
-		collectConsoleContexts (
-			taskLogger);
+			collectContextTypeFiles (
+				taskLogger);
 
-		collectContextsByParentType (
-			taskLogger);
+			resolveContextTabs (
+				taskLogger);
 
-		collectSupervisorConfigs (
-			taskLogger);
+			collectConsoleContexts (
+				taskLogger);
 
-		initPaths (
-			taskLogger);
+			collectContextsByParentType (
+				taskLogger);
 
-		taskLogger.makeException ();
+			collectSupervisorConfigs (
+				taskLogger);
+
+			initPaths (
+				taskLogger);
+
+			taskLogger.makeException ();
+
+		}
 
 	}
 
 	int collectContextTypes (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectContextTypes");
+		try (
 
-		int errors = 0;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectContextTypes");
 
-		Map <String, String> beanNamesByContextTypeName =
-			new HashMap<> ();
-
-		for (
-			Map.Entry <String, ConsoleModule> ent
-				: consoleModules.entrySet ()
 		) {
 
-			String beanName =
-				ent.getKey ();
+			int errors = 0;
 
-			ConsoleModule consoleModule =
-				ent.getValue ();
-
-			for (
-				ConsoleContextType contextType
-					: consoleModule.contextTypes ()
-			) {
-
-				if (contextTypesByName.containsKey (contextType.name ())) {
-
-					taskLogger.errorFormat (
-						"Duplicated context type %s in %s and %s",
-						contextType.name (),
-						beanName,
-						beanNamesByContextTypeName.get (
-							contextType.name ()));
-
-					errors ++;
-
-					continue;
-
-				}
-
-				beanNamesByContextTypeName.put (
-					contextType.name (),
-					beanName);
-
-				contextTypesByName.put (
-					contextType.name (),
-					contextType);
-
-				taskLogger.debugFormat (
-					"Adding context type %s from %s",
-					contextType.name (),
-					beanName);
-
-			}
-
-		}
-
-		return errors;
-
-	}
-
-	int collectContextTabs (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectContextTabs");
-
-		int errors = 0;
-
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
-		) {
-
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
+			Map <String, String> beanNamesByContextTypeName =
+				new HashMap<> ();
 
 			for (
-				ConsoleContextTab contextTab
-					: consoleModule.tabs ()
+				Map.Entry <String, ConsoleModule> ent
+					: consoleModules.entrySet ()
 			) {
 
-				if (contextTabs.containsKey (
-						contextTab.name ())) {
+				String beanName =
+					ent.getKey ();
 
-					taskLogger.errorFormat (
-						"Duplicated tab %s in %s",
-						contextTab.name (),
-						consoleModuleName);
-
-					errors ++;
-
-					continue;
-
-				}
-
-				contextTabs.put (
-					contextTab.name (),
-					contextTab);
-
-				taskLogger.debugFormat (
-					"Adding tab %s from %s",
-					contextTab.name (),
-					consoleModuleName);
-
-			}
-
-		}
-
-		return errors;
-
-	}
-
-	int addTabsToContextTypes (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"addTabsToContextTypes");
-
-		int errors = 0;
-
-		for (
-			Map.Entry<String,ConsoleModule> entry
-				: consoleModules.entrySet ()
-		) {
-
-			String consoleModuleName =
-				entry.getKey ();
-
-			ConsoleModule consoleModule =
-				entry.getValue ();
-
-			for (
-				Map.Entry<String,List<ContextTabPlacement>> tabPlacementsEntry
-					: consoleModule
-						.tabPlacementsByContextType ()
-						.entrySet ()
-			) {
-
-				String contextTypeName =
-					tabPlacementsEntry.getKey ();
-
-				List<ContextTabPlacement> tabPlacements =
-					tabPlacementsEntry.getValue ();
-
-				ConsoleContextType contextType =
-					contextTypesByName.get (
-						contextTypeName);
-
-				if (contextType == null) {
-
-					List<String> contextTabNames =
-						new ArrayList<String> ();
-
-					for (
-						ContextTabPlacement tabPlacement
-							: tabPlacements
-					) {
-
-						contextTabNames.add (
-							stringFormat (
-								"%s:%s",
-								tabPlacement.tabLocation (),
-								tabPlacement.tabName ()));
-
-					}
-
-					taskLogger.errorFormat (
-						"Unknown context type %s ",
-						contextTypeName,
-						"referenced from tabs %s ",
-						joinWithCommaAndSpace (
-							contextTabNames),
-						"in %s",
-						consoleModuleName);
-
-					errors ++;
-
-					continue;
-
-				}
+				ConsoleModule consoleModule =
+					ent.getValue ();
 
 				for (
-					ContextTabPlacement tabPlacement
-						: tabPlacements
+					ConsoleContextType contextType
+						: consoleModule.contextTypes ()
 				) {
 
-					String contextTabName =
-						tabPlacement.tabName ();
-
-					if (contextTabName.charAt (0) != '+') {
-
-						ConsoleContextTab contextTab =
-							contextTabs.get (contextTabName);
-
-						if (contextTab == null) {
-
-							taskLogger.errorFormat (
-								"Unknown tab %s referenced from %s",
-								contextTabName,
-								consoleModuleName);
-
-							errors ++;
-
-							continue;
-
-						}
-
-					}
-
-					contextType.tabPlacements ().add (
-						tabPlacement);
-
-				}
-
-			}
-
-		}
-
-		return errors;
-
-	}
-
-	int collectContextFiles (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectContextFiles");
-
-		int errors = 0;
-
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
-		) {
-
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
-
-			for (
-				Map.Entry<String,? extends WebFile> contextFileEntry
-					: consoleModule.contextFiles ().entrySet ()
-			) {
-
-				String contextFileName =
-					contextFileEntry.getKey ();
-
-				WebFile contextFile =
-					contextFileEntry.getValue ();
-
-				if (contextFiles.containsKey (
-						contextFileName)) {
-
-					taskLogger.errorFormat (
-						"Duplicated context file: %s",
-						contextFileName);
-
-					errors ++;
-
-					continue;
-
-				}
-
-				contextFiles.put (
-					contextFileName,
-					contextFile);
-
-				taskLogger.debugFormat (
-					"Adding file %s from %s",
-					contextFileName,
-					consoleModuleName);
-
-			}
-
-		}
-
-		return errors;
-
-	}
-
-	int collectContextTypeFiles (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectContextTypeFiles");
-
-		int errors = 0;
-
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
-		) {
-
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
-
-			for (
-				Map.Entry<String,? extends Collection<String>>
-				contextFilesByContextTypeEntry
-					: consoleModule
-						.contextFilesByContextType ()
-						.entrySet ()
-			) {
-
-				String contextTypeName =
-					contextFilesByContextTypeEntry.getKey ();
-
-				Collection<String> contextFileNames =
-					contextFilesByContextTypeEntry.getValue ();
-
-				ConsoleContextType contextType =
-					contextTypesByName.get (contextTypeName);
-
-				if (contextType == null) {
-
-					taskLogger.errorFormat (
-						"Unknown context type %s referenced from files in ",
-						contextTypeName,
-						"%s",
-						consoleModuleName);
-
-					errors ++;
-
-					continue;
-
-				}
-
-				Map<String,WebFile> typeContextFiles =
-					contextType.files ();
-
-				for (
-					String contextFileName
-						: contextFileNames
-				) {
-
-					WebFile contextFile =
-						contextFiles.get (contextFileName);
-
-					if (contextFile == null) {
+					if (contextTypesByName.containsKey (contextType.name ())) {
 
 						taskLogger.errorFormat (
-							"Unknown file %s references from context type ",
-							contextFileName,
-							"%s",
-							contextTypeName);
+							"Duplicated context type %s in %s and %s",
+							contextType.name (),
+							beanName,
+							beanNamesByContextTypeName.get (
+								contextType.name ()));
 
 						errors ++;
 
@@ -620,220 +301,598 @@ class ConsoleManagerImplementation
 
 					}
 
-					typeContextFiles.put (
-						contextFileName,
-						contextFile);
+					beanNamesByContextTypeName.put (
+						contextType.name (),
+						beanName);
+
+					contextTypesByName.put (
+						contextType.name (),
+						contextType);
+
+					taskLogger.debugFormat (
+						"Adding context type %s from %s",
+						contextType.name (),
+						beanName);
 
 				}
 
 			}
 
+			return errors;
+
 		}
 
-		return errors;
+	}
+
+	int collectContextTabs (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectContextTabs");
+
+		) {
+
+			int errors = 0;
+
+			for (
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
+			) {
+
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
+
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
+
+				for (
+					ConsoleContextTab contextTab
+						: consoleModule.tabs ()
+				) {
+
+					if (contextTabs.containsKey (
+							contextTab.name ())) {
+
+						taskLogger.errorFormat (
+							"Duplicated tab %s in %s",
+							contextTab.name (),
+							consoleModuleName);
+
+						errors ++;
+
+						continue;
+
+					}
+
+					contextTabs.put (
+						contextTab.name (),
+						contextTab);
+
+					taskLogger.debugFormat (
+						"Adding tab %s from %s",
+						contextTab.name (),
+						consoleModuleName);
+
+				}
+
+			}
+
+			return errors;
+
+		}
+
+	}
+
+	int addTabsToContextTypes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addTabsToContextTypes");
+
+		) {
+
+			int errors = 0;
+
+			for (
+				Map.Entry<String,ConsoleModule> entry
+					: consoleModules.entrySet ()
+			) {
+
+				String consoleModuleName =
+					entry.getKey ();
+
+				ConsoleModule consoleModule =
+					entry.getValue ();
+
+				for (
+					Map.Entry<String,List<ContextTabPlacement>> tabPlacementsEntry
+						: consoleModule
+							.tabPlacementsByContextType ()
+							.entrySet ()
+				) {
+
+					String contextTypeName =
+						tabPlacementsEntry.getKey ();
+
+					List<ContextTabPlacement> tabPlacements =
+						tabPlacementsEntry.getValue ();
+
+					ConsoleContextType contextType =
+						contextTypesByName.get (
+							contextTypeName);
+
+					if (contextType == null) {
+
+						List<String> contextTabNames =
+							new ArrayList<String> ();
+
+						for (
+							ContextTabPlacement tabPlacement
+								: tabPlacements
+						) {
+
+							contextTabNames.add (
+								stringFormat (
+									"%s:%s",
+									tabPlacement.tabLocation (),
+									tabPlacement.tabName ()));
+
+						}
+
+						taskLogger.errorFormat (
+							"Unknown context type %s ",
+							contextTypeName,
+							"referenced from tabs %s ",
+							joinWithCommaAndSpace (
+								contextTabNames),
+							"in %s",
+							consoleModuleName);
+
+						errors ++;
+
+						continue;
+
+					}
+
+					for (
+						ContextTabPlacement tabPlacement
+							: tabPlacements
+					) {
+
+						String contextTabName =
+							tabPlacement.tabName ();
+
+						if (contextTabName.charAt (0) != '+') {
+
+							ConsoleContextTab contextTab =
+								contextTabs.get (contextTabName);
+
+							if (contextTab == null) {
+
+								taskLogger.errorFormat (
+									"Unknown tab %s referenced from %s",
+									contextTabName,
+									consoleModuleName);
+
+								errors ++;
+
+								continue;
+
+							}
+
+						}
+
+						contextType.tabPlacements ().add (
+							tabPlacement);
+
+					}
+
+				}
+
+			}
+
+			return errors;
+
+		}
+
+	}
+
+	int collectContextFiles (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectContextFiles");
+
+		) {
+
+			int errors = 0;
+
+			for (
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
+			) {
+
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
+
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
+
+				for (
+					Map.Entry<String,? extends WebFile> contextFileEntry
+						: consoleModule.contextFiles ().entrySet ()
+				) {
+
+					String contextFileName =
+						contextFileEntry.getKey ();
+
+					WebFile contextFile =
+						contextFileEntry.getValue ();
+
+					if (contextFiles.containsKey (
+							contextFileName)) {
+
+						taskLogger.errorFormat (
+							"Duplicated context file: %s",
+							contextFileName);
+
+						errors ++;
+
+						continue;
+
+					}
+
+					contextFiles.put (
+						contextFileName,
+						contextFile);
+
+					taskLogger.debugFormat (
+						"Adding file %s from %s",
+						contextFileName,
+						consoleModuleName);
+
+				}
+
+			}
+
+			return errors;
+
+		}
+
+	}
+
+	int collectContextTypeFiles (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectContextTypeFiles");
+
+		) {
+
+			int errors = 0;
+
+			for (
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
+			) {
+
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
+
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
+
+				for (
+					Map.Entry<String,? extends Collection<String>>
+					contextFilesByContextTypeEntry
+						: consoleModule
+							.contextFilesByContextType ()
+							.entrySet ()
+				) {
+
+					String contextTypeName =
+						contextFilesByContextTypeEntry.getKey ();
+
+					Collection<String> contextFileNames =
+						contextFilesByContextTypeEntry.getValue ();
+
+					ConsoleContextType contextType =
+						contextTypesByName.get (contextTypeName);
+
+					if (contextType == null) {
+
+						taskLogger.errorFormat (
+							"Unknown context type %s referenced from files in ",
+							contextTypeName,
+							"%s",
+							consoleModuleName);
+
+						errors ++;
+
+						continue;
+
+					}
+
+					Map<String,WebFile> typeContextFiles =
+						contextType.files ();
+
+					for (
+						String contextFileName
+							: contextFileNames
+					) {
+
+						WebFile contextFile =
+							contextFiles.get (contextFileName);
+
+						if (contextFile == null) {
+
+							taskLogger.errorFormat (
+								"Unknown file %s references from context type ",
+								contextFileName,
+								"%s",
+								contextTypeName);
+
+							errors ++;
+
+							continue;
+
+						}
+
+						typeContextFiles.put (
+							contextFileName,
+							contextFile);
+
+					}
+
+				}
+
+			}
+
+			return errors;
+
+		}
 
 	}
 
 	int resolveContextTabs (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"resolveContextTabs");
+		try (
 
-		int errors = 0;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveContextTabs");
 
-		for (
-			ConsoleContextType contextType
-				: contextTypesByName.values ()
 		) {
 
-			try {
+			int errors = 0;
 
-				contextType.resolveTabSpecs (
-					taskLogger,
-					contextTabs);
+			for (
+				ConsoleContextType contextType
+					: contextTypesByName.values ()
+			) {
 
-			} catch (Exception exception) {
+				try {
 
-				taskLogger.errorFormatException (
-					exception,
-					"Error resolving tab specs for %s",
-					contextType.name ());
+					contextType.resolveTabSpecs (
+						taskLogger,
+						contextTabs);
 
-				errors ++;
+				} catch (Exception exception) {
 
-				taskLogger.noticeFormat (
-					"Dumping context type tab specification for %s",
-					contextType.name ());
+					taskLogger.errorFormatException (
+						exception,
+						"Error resolving tab specs for %s",
+						contextType.name ());
 
-				for (
-					ContextTabPlacement tabPlacement
-						: contextType.tabPlacements ()
-				) {
+					errors ++;
 
 					taskLogger.noticeFormat (
-						"%s => %s",
-						tabPlacement.tabLocation (),
-						tabPlacement.tabName ());
+						"Dumping context type tab specification for %s",
+						contextType.name ());
+
+					for (
+						ContextTabPlacement tabPlacement
+							: contextType.tabPlacements ()
+					) {
+
+						taskLogger.noticeFormat (
+							"%s => %s",
+							tabPlacement.tabLocation (),
+							tabPlacement.tabName ());
+
+					}
 
 				}
 
 			}
 
-		}
+			return errors;
 
-		return errors;
+		}
 
 	}
 
 	int collectConsoleContexts (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectConsoleContexts");
+		try (
 
-		int errors = 0;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectConsoleContexts");
 
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
 		) {
 
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
+			int errors = 0;
 
 			for (
-				ConsoleContext consoleContext
-					: consoleModule.contexts ()
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
 			) {
 
-				if (
-					consoleContextsByName.containsKey (
-						consoleContext.name ())
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
+
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
+
+				for (
+					ConsoleContext consoleContext
+						: consoleModule.contexts ()
 				) {
 
-					taskLogger.errorFormat (
-						"Duplicated context name: %s",
-						consoleContext.name ());
+					if (
+						consoleContextsByName.containsKey (
+							consoleContext.name ())
+					) {
 
-					errors ++;
+						taskLogger.errorFormat (
+							"Duplicated context name: %s",
+							consoleContext.name ());
 
-					continue;
+						errors ++;
 
-				}
+						continue;
 
-				consoleContextsByName.put (
-					consoleContext.name (),
-					consoleContext);
+					}
 
-				ConsoleContextType contextType =
-					contextTypesByName.get (
-						consoleContext.typeName ());
-
-				if (contextType == null) {
-
-					taskLogger.errorFormat (
-						"Unknown context type %s ",
-						consoleContext.typeName (),
-						"referenced from context %s ",
+					consoleContextsByName.put (
 						consoleContext.name (),
-						"in %s",
+						consoleContext);
+
+					ConsoleContextType contextType =
+						contextTypesByName.get (
+							consoleContext.typeName ());
+
+					if (contextType == null) {
+
+						taskLogger.errorFormat (
+							"Unknown context type %s ",
+							consoleContext.typeName (),
+							"referenced from context %s ",
+							consoleContext.name (),
+							"in %s",
+							consoleModuleName);
+
+						errors ++;
+
+						continue;
+
+					}
+
+					consoleContext
+
+						.contextType (
+							contextType)
+
+						.files (
+							contextType.files ())
+
+						.contextTabs (
+							contextType.tabs ());
+
+					taskLogger.debugFormat (
+						"Adding context %s from %s",
+						consoleContext.name (),
 						consoleModuleName);
 
-					errors ++;
-
-					continue;
-
 				}
-
-				consoleContext
-
-					.contextType (
-						contextType)
-
-					.files (
-						contextType.files ())
-
-					.contextTabs (
-						contextType.tabs ());
-
-				taskLogger.debugFormat (
-					"Adding context %s from %s",
-					consoleContext.name (),
-					consoleModuleName);
 
 			}
 
+			consoleContexts.addAll (
+				consoleContextsByName.values ());
+
+			Collections.sort (
+				consoleContexts);
+
+			return errors;
+
 		}
-
-		consoleContexts.addAll (
-			consoleContextsByName.values ());
-
-		Collections.sort (
-			consoleContexts);
-
-		return errors;
 
 	}
 
 	void collectContextsByParentType (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		for (
-			ConsoleContext context
-				: consoleContexts
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectContextsByParentType");
+
 		) {
 
-			if (context.parentContextName () != null) {
+			for (
+				ConsoleContext context
+					: consoleContexts
+			) {
 
-				Pair <String, String> key =
-					Pair.of (
-						context.parentContextName (),
-						context.typeName ());
+				if (context.parentContextName () != null) {
 
-				List<ConsoleContext> contextsForParentAndType =
-					contextsByParentAndType.get (key);
+					Pair <String, String> key =
+						Pair.of (
+							context.parentContextName (),
+							context.typeName ());
 
-				if (contextsForParentAndType == null) {
+					List<ConsoleContext> contextsForParentAndType =
+						contextsByParentAndType.get (key);
 
-					contextsForParentAndType =
-						new ArrayList<> ();
+					if (contextsForParentAndType == null) {
 
-					contextsByParentAndType.put (
-						key,
-						contextsForParentAndType);
+						contextsForParentAndType =
+							new ArrayList<> ();
+
+						contextsByParentAndType.put (
+							key,
+							contextsForParentAndType);
+
+					}
+
+					contextsForParentAndType.add (
+						context);
+
+				} else {
+
+					List <ConsoleContext> contextsForType =
+						contextsWithoutParentByType.get (
+							context.typeName ());
+
+					if (contextsForType == null) {
+
+						contextsForType =
+							new ArrayList<> ();
+
+						contextsWithoutParentByType.put (
+							context.typeName (),
+							contextsForType);
+
+					}
+
+					contextsForType.add (
+						context);
 
 				}
-
-				contextsForParentAndType.add (
-					context);
-
-			} else {
-
-				List <ConsoleContext> contextsForType =
-					contextsWithoutParentByType.get (
-						context.typeName ());
-
-				if (contextsForType == null) {
-
-					contextsForType =
-						new ArrayList<> ();
-
-					contextsWithoutParentByType.put (
-						context.typeName (),
-						contextsForType);
-
-				}
-
-				contextsForType.add (
-					context);
 
 			}
 
@@ -844,49 +903,55 @@ class ConsoleManagerImplementation
 	void collectSupervisorConfigs (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"collectSupervisorConfigs");
+		try (
 
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"collectSupervisorConfigs");
+
 		) {
 
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
-
 			for (
-				Map.Entry<String,SupervisorConfig> entry
-					: consoleModule.supervisorConfigs ().entrySet ()
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
 			) {
 
-				String supervisorConfigName =
-					entry.getKey ();
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
 
-				SupervisorConfig supervisorConfig =
-					entry.getValue ();
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
 
-				if (
-					supervisorConfigs.containsKey (
-						supervisorConfigName)
+				for (
+					Map.Entry<String,SupervisorConfig> entry
+						: consoleModule.supervisorConfigs ().entrySet ()
 				) {
 
-					taskLogger.errorFormat (
-						"Duplicated supervisor config name %s ",
+					String supervisorConfigName =
+						entry.getKey ();
+
+					SupervisorConfig supervisorConfig =
+						entry.getValue ();
+
+					if (
+						supervisorConfigs.containsKey (
+							supervisorConfigName)
+					) {
+
+						taskLogger.errorFormat (
+							"Duplicated supervisor config name %s ",
+							supervisorConfigName,
+							" in console module %s",
+							consoleModuleName);
+
+					}
+
+					supervisorConfigs.put (
 						supervisorConfigName,
-						" in console module %s",
-						consoleModuleName);
+						supervisorConfig);
 
 				}
-
-				supervisorConfigs.put (
-					supervisorConfigName,
-					supervisorConfig);
 
 			}
 
@@ -897,49 +962,55 @@ class ConsoleManagerImplementation
 	void dumpData (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"dumpData");
+		try (
 
-		// delete old data
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"dumpData");
 
-		deleteDirectory (
-			"work/console/module");
-
-		forceMkdir (
-			"work/console/module");
-
-		// iterate modules
-
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
 		) {
 
-			String consoleModuleBeanName =
-				consoleModuleEntry.getKey ();
+			// delete old data
 
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
+			deleteDirectory (
+				"work/console/module");
 
-			String outputFileName =
-				stringFormat (
-					"work/console/module/%s.xml",
-					camelToHyphen (
-						consoleModuleBeanName));
+			forceMkdir (
+				"work/console/module");
 
-			try {
+			// iterate modules
 
-				new DataToXml ().writeToFile (
-					outputFileName,
-					consoleModule);
+			for (
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
+			) {
 
-			} catch (Exception exception) {
+				String consoleModuleBeanName =
+					consoleModuleEntry.getKey ();
 
-				taskLogger.warningFormat (
-					"Error writing %s",
-					outputFileName);
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
+
+				String outputFileName =
+					stringFormat (
+						"work/console/module/%s.xml",
+						camelToHyphen (
+							consoleModuleBeanName));
+
+				try {
+
+					new DataToXml ().writeToFile (
+						outputFileName,
+						consoleModule);
+
+				} catch (Exception exception) {
+
+					taskLogger.warningFormat (
+						"Error writing %s",
+						outputFileName);
+
+				}
 
 			}
 
@@ -950,70 +1021,76 @@ class ConsoleManagerImplementation
 	void findResponders (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findResponders");
+		try (
 
-		for (
-			Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findResponders");
+
 		) {
 
-			String consoleModuleName =
-				consoleModuleEntry.getKey ();
-
-			ConsoleModule consoleModule =
-				consoleModuleEntry.getValue ();
-
-			taskLogger.debugFormat (
-				"Collecting responders from console module %s",
-				consoleModuleName);
-
 			for (
-				Map.Entry<String,Provider<Responder>> responderEntry
-					: consoleModule.responders ().entrySet ()
+				Map.Entry<String,ConsoleModule> consoleModuleEntry
+					: consoleModules.entrySet ()
 			) {
 
-				String responderName =
-					responderEntry.getKey ();
+				String consoleModuleName =
+					consoleModuleEntry.getKey ();
 
-				if (
-					responderName == null
-					|| responderName.isEmpty ()
-				) {
-
-					taskLogger.errorFormat (
-						"Empty repsponder name in %s",
-						consoleModuleName);
-
-					continue;
-
-				}
-
-				if (responders.containsKey (responderName)) {
-
-					taskLogger.errorFormat (
-						"Duplicate responder name: %s",
-						responderName);
-
-					continue;
-
-				}
-
-				Provider<Responder> responder =
-					responderEntry.getValue ();
-
-				if (responder == null)
-					throw new RuntimeException ();
+				ConsoleModule consoleModule =
+					consoleModuleEntry.getValue ();
 
 				taskLogger.debugFormat (
-					"Got reponder %s",
-					responderName);
+					"Collecting responders from console module %s",
+					consoleModuleName);
 
-				responders.put (
-					responderName,
-					responder);
+				for (
+					Map.Entry<String,Provider<Responder>> responderEntry
+						: consoleModule.responders ().entrySet ()
+				) {
+
+					String responderName =
+						responderEntry.getKey ();
+
+					if (
+						responderName == null
+						|| responderName.isEmpty ()
+					) {
+
+						taskLogger.errorFormat (
+							"Empty repsponder name in %s",
+							consoleModuleName);
+
+						continue;
+
+					}
+
+					if (responders.containsKey (responderName)) {
+
+						taskLogger.errorFormat (
+							"Duplicate responder name: %s",
+							responderName);
+
+						continue;
+
+					}
+
+					Provider<Responder> responder =
+						responderEntry.getValue ();
+
+					if (responder == null)
+						throw new RuntimeException ();
+
+					taskLogger.debugFormat (
+						"Got reponder %s",
+						responderName);
+
+					responders.put (
+						responderName,
+						responder);
+
+				}
 
 			}
 
@@ -1024,60 +1101,66 @@ class ConsoleManagerImplementation
 	void initPaths (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"paths");
+		try (
 
-		Map <String, ConsoleContext> contextsByPathPrefix =
-			new HashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-		for (
-			ConsoleContext context
-				: consoleContextsByName.values ()
 		) {
 
-			if (! context.global ())
-				continue;
+			Map <String, ConsoleContext> contextsByPathPrefix =
+				new HashMap<> ();
 
-			if (contextsByPathPrefix.containsKey (
-					context.pathPrefix ())) {
+			for (
+				ConsoleContext context
+					: consoleContextsByName.values ()
+			) {
 
-				ConsoleContext existingContext =
-					contextsByPathPrefix.get (
-						context.pathPrefix ());
+				if (! context.global ())
+					continue;
 
-				taskLogger.errorFormat (
-					"Duplicated context path %s for %s and %s",
+				if (contextsByPathPrefix.containsKey (
+						context.pathPrefix ())) {
+
+					ConsoleContext existingContext =
+						contextsByPathPrefix.get (
+							context.pathPrefix ());
+
+					taskLogger.errorFormat (
+						"Duplicated context path %s for %s and %s",
+						context.pathPrefix (),
+						context.name (),
+						existingContext.name ());
+
+				}
+
+				contextsByPathPrefix.put (
 					context.pathPrefix (),
-					context.name (),
-					existingContext.name ());
+					context);
 
 			}
 
-			contextsByPathPrefix.put (
-				context.pathPrefix (),
-				context);
+			paths =
+				ImmutableMap.copyOf (
+					contextsByPathPrefix.entrySet ().stream ()
+
+				.collect (
+					Collectors.toMap (
+
+					entry ->
+						entry.getKey (),
+
+					entry ->
+						new ContextPathHandler (
+							entry.getValue ()))
+
+				)
+
+			);
 
 		}
-
-		paths =
-			ImmutableMap.copyOf (
-				contextsByPathPrefix.entrySet ().stream ()
-
-			.collect (
-				Collectors.toMap (
-
-				entry ->
-					entry.getKey (),
-
-				entry ->
-					new ContextPathHandler (
-						entry.getValue ()))
-
-			)
-
-		);
 
 	}
 
@@ -1145,50 +1228,56 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContext context,
 			@NonNull String contextPartSuffix) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"changeContext");
-
-		requestContext.changedContextPath (
-			joinWithoutSeparator (
-				context.pathPrefix (),
-				contextPartSuffix));
-
-		PathSupply pathParts =
-			pathParts (
-				contextPartSuffix);
-
-		ConsoleContextStuff contextStuff =
-			requestContext.consoleContextStuffRequired ();
-
-		contextStuff.reset ();
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ConsoleManager.chatContext (...)",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"changeContext");
 
 		) {
 
-			context.initContext (
-				taskLogger,
-				pathParts,
-				contextStuff);
+			requestContext.changedContextPath (
+				joinWithoutSeparator (
+					context.pathPrefix (),
+					contextPartSuffix));
 
-			context.initTabContext (
-				contextStuff);
+			PathSupply pathParts =
+				pathParts (
+					contextPartSuffix);
 
-			transaction.close ();
+			ConsoleContextStuff contextStuff =
+				requestContext.consoleContextStuffRequired ();
 
-			if (pathParts.size () > 0)
-				throw new RuntimeException ();
+			contextStuff.reset ();
 
-			requestContext.consoleContext (
-				context);
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"ConsoleManager.chatContext (...)",
+						this);
+
+			) {
+
+				context.initContext (
+					taskLogger,
+					pathParts,
+					contextStuff);
+
+				context.initTabContext (
+					contextStuff);
+
+				transaction.close ();
+
+				if (pathParts.size () > 0)
+					throw new RuntimeException ();
+
+				requestContext.consoleContext (
+					context);
+
+			}
 
 		}
 
@@ -1201,21 +1290,27 @@ class ConsoleManagerImplementation
 			@NonNull String name,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runPostProcessors");
+		try (
 
-		ConsoleHelper <?> consoleHelper =
-			objectManager.findConsoleHelperRequired (
-				name);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runPostProcessors");
 
-		ConsoleHelperProvider <?> consoleHelperProvider =
-			consoleHelper.consoleHelperProvider ();
+		) {
 
-		consoleHelperProvider.postProcess (
-			taskLogger,
-			contextStuff);
+			ConsoleHelper <?> consoleHelper =
+				objectManager.findConsoleHelperRequired (
+					name);
+
+			ConsoleHelperProvider <?> consoleHelperProvider =
+				consoleHelper.consoleHelperProvider ();
+
+			consoleHelperProvider.postProcess (
+				taskLogger,
+				contextStuff);
+
+		}
 
 	}
 
@@ -1245,19 +1340,25 @@ class ConsoleManagerImplementation
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull String remainingPath) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"processPath");
+			try (
 
-			String fullPath =
-				joinWithoutSeparator (
-					consoleContext.pathPrefix (),
-					remainingPath);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"processPath");
 
-			return fileForPath (
-				taskLogger,
-				fullPath);
+			) {
+
+				String fullPath =
+					joinWithoutSeparator (
+						consoleContext.pathPrefix (),
+						remainingPath);
+
+				return fileForPath (
+					taskLogger,
+					fullPath);
+
+			}
 
 		}
 
@@ -1278,7 +1379,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ConsoleManagerImplementation.fileForPath (path)",
@@ -1747,111 +1848,117 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContext consoleContext,
 			@NonNull String localFile) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"resolveLocalFile");
+		try (
 
-		if (localFile.charAt (0) == '/') {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveLocalFile");
 
-			return joinWithoutSeparator (
-				requestContext.applicationPathPrefix (),
-				contextStuff.foreignPath (),
-				contextStuff.substitutePlaceholders (
-					localFile));
+		) {
 
-		} else if (localFile.startsWith ("type:")) {
+			if (localFile.charAt (0) == '/') {
 
-			String targetContextTypeName =
-				localFile.substring (
-					"type:".length ());
+				return joinWithoutSeparator (
+					requestContext.applicationPathPrefix (),
+					contextStuff.foreignPath (),
+					contextStuff.substitutePlaceholders (
+						localFile));
 
-			ConsoleContextType targetContextType =
-				contextType (
-					targetContextTypeName,
-					true);
+			} else if (localFile.startsWith ("type:")) {
 
-			// try and resolve target context
+				String targetContextTypeName =
+					localFile.substring (
+						"type:".length ());
 
-			Optional<ConsoleContext> targetContext =
-				Optional.<ConsoleContext>absent ();
+				ConsoleContextType targetContextType =
+					contextType (
+						targetContextTypeName,
+						true);
 
-			Optional<ConsoleContext> searchContext =
-				Optional.of (
-					consoleContext);
+				// try and resolve target context
 
-			while (
-				optionalIsPresent (
-					searchContext)
-			) {
+				Optional<ConsoleContext> targetContext =
+					Optional.<ConsoleContext>absent ();
 
-				targetContext =
-					contextWithParentOfType (
-						searchContext.get (),
-						targetContextType);
+				Optional<ConsoleContext> searchContext =
+					Optional.of (
+						consoleContext);
+
+				while (
+					optionalIsPresent (
+						searchContext)
+				) {
+
+					targetContext =
+						contextWithParentOfType (
+							searchContext.get (),
+							targetContextType);
+
+					if (
+						optionalIsPresent (
+							targetContext)
+					) {
+						break;
+					}
+
+					if (
+						isNotNull (
+							searchContext.get ().parentContextName ())
+					) {
+
+						searchContext =
+							Optional.of (
+								context (
+									searchContext.get ().parentContextName (),
+									true));
+
+					} else {
+
+						searchContext =
+							Optional.<ConsoleContext>absent ();
+
+					}
+
+				}
 
 				if (
-					optionalIsPresent (
+					optionalIsNotPresent (
 						targetContext)
 				) {
-					break;
-				}
 
-				if (
-					isNotNull (
-						searchContext.get ().parentContextName ())
-				) {
-
-					searchContext =
-						Optional.of (
-							context (
-								searchContext.get ().parentContextName (),
-								true));
-
-				} else {
-
-					searchContext =
-						Optional.<ConsoleContext>absent ();
+					throw new RuntimeException (
+						stringFormat (
+							"No context of type %s with parent %s",
+							targetContextType.name (),
+							consoleContext.name ()));
 
 				}
 
+				// create url
+
+				return joinWithoutSeparator (
+					requestContext.applicationPathPrefix (),
+					contextStuff.foreignPath (),
+					targetContext.get ().pathPrefix (),
+					consoleContext.localPathForStuff (
+						taskLogger,
+						contextStuff));
+
+			} else {
+
+				return joinWithoutSeparator (
+					requestContext.applicationPathPrefix (),
+					contextStuff.foreignPath (),
+					consoleContext.pathPrefix (),
+					consoleContext.localPathForStuff (
+						taskLogger,
+						contextStuff),
+					"/",
+					contextStuff.substitutePlaceholders (
+						localFile));
+
 			}
-
-			if (
-				optionalIsNotPresent (
-					targetContext)
-			) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"No context of type %s with parent %s",
-						targetContextType.name (),
-						consoleContext.name ()));
-
-			}
-
-			// create url
-
-			return joinWithoutSeparator (
-				requestContext.applicationPathPrefix (),
-				contextStuff.foreignPath (),
-				targetContext.get ().pathPrefix (),
-				consoleContext.localPathForStuff (
-					taskLogger,
-					contextStuff));
-
-		} else {
-
-			return joinWithoutSeparator (
-				requestContext.applicationPathPrefix (),
-				contextStuff.foreignPath (),
-				consoleContext.pathPrefix (),
-				consoleContext.localPathForStuff (
-					taskLogger,
-					contextStuff),
-				"/",
-				contextStuff.substitutePlaceholders (
-					localFile));
 
 		}
 
@@ -1865,65 +1972,71 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContextType targetContextType,
 			boolean required) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"relatedContext");
+		try (
 
-		taskLogger.debugFormat (
-			"Choosing related context");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"relatedContext");
 
-		taskLogger.debugFormat (
-			"Target context type: %s",
-			targetContextType.name ());
+		) {
 
-		// get current context
+			taskLogger.debugFormat (
+				"Choosing related context");
 
-		taskLogger.debugFormat (
-			"Source context: %s",
-			sourceContext.name ());
+			taskLogger.debugFormat (
+				"Target context type: %s",
+				targetContextType.name ());
 
-		ConsoleContext currentContext =
-			sourceContext;
+			// get current context
 
-		for (;;) {
+			taskLogger.debugFormat (
+				"Source context: %s",
+				sourceContext.name ());
 
-			// lookup target context based on parent and type
+			ConsoleContext currentContext =
+				sourceContext;
 
-			Optional <ConsoleContext> targetOptional =
-				contextWithParentOfType (
-					currentContext,
-					targetContextType,
-					false);
+			for (;;) {
 
-			if (
-				optionalIsPresent (
-					targetOptional)
-			) {
-				return targetOptional;
+				// lookup target context based on parent and type
+
+				Optional <ConsoleContext> targetOptional =
+					contextWithParentOfType (
+						currentContext,
+						targetContextType,
+						false);
+
+				if (
+					optionalIsPresent (
+						targetOptional)
+				) {
+					return targetOptional;
+				}
+
+				// get parent of current context
+
+				if (
+					isNull (
+						currentContext.parentContextName ())
+				) {
+					break;
+				}
+
+				currentContext =
+					context (
+						currentContext.parentContextName (),
+						true);
+
 			}
 
-			// get parent of current context
+			// lookup parent-less target context based on type
 
-			if (
-				isNull (
-					currentContext.parentContextName ())
-			) {
-				break;
-			}
-
-			currentContext =
-				context (
-					currentContext.parentContextName (),
-					true);
+			return contextWithoutParentOfType (
+				targetContextType,
+				required);
 
 		}
-
-		// lookup parent-less target context based on type
-
-		return contextWithoutParentOfType (
-			targetContextType,
-			required);
 
 	}
 

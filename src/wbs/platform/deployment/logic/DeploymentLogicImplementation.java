@@ -60,30 +60,36 @@ class DeploymentLogicImplementation
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		gitVersion =
-			getGitVersion ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		taskLogger.noticeFormat (
-			"Got version from git: %s",
-			gitVersion);
-
-		if (
-			stringStartsWithSimple (
-				"version-",
-				gitVersion)
 		) {
 
 			gitVersion =
-				stringFormat (
-					"v%s",
-					substringFrom (
-						gitVersion,
-						8));
+				getGitVersion ();
+
+			taskLogger.noticeFormat (
+				"Got version from git: %s",
+				gitVersion);
+
+			if (
+				stringStartsWithSimple (
+					"version-",
+					gitVersion)
+			) {
+
+				gitVersion =
+					stringFormat (
+						"v%s",
+						substringFrom (
+							gitVersion,
+							8));
+
+			}
 
 		}
 

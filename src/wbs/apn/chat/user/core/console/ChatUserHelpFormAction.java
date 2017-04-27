@@ -11,7 +11,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -67,43 +67,43 @@ class ChatUserHelpFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get parameters
-
-		String text =
-			requestContext.parameterRequired (
-				"text");
-
-		// check parameters
-
-		if (text.length() == 0) {
-			requestContext.addError("Please type a message");
-			return null;
-		}
-
-		if (!GsmUtils.gsmStringIsValid(text)) {
-			requestContext.addError("Reply contains invalid characters");
-			return null;
-		}
-
-		if (GsmUtils.gsmStringLength(text) > 149) {
-			requestContext.addError("Text is too long!");
-			return null;
-		}
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserHelpFormAction.goReal ()",
 					this);
 
 		) {
+
+			// get parameters
+
+			String text =
+				requestContext.parameterRequired (
+					"text");
+
+			// check parameters
+
+			if (text.length() == 0) {
+				requestContext.addError("Please type a message");
+				return null;
+			}
+
+			if (!GsmUtils.gsmStringIsValid(text)) {
+				requestContext.addError("Reply contains invalid characters");
+				return null;
+			}
+
+			if (GsmUtils.gsmStringLength(text) > 149) {
+				requestContext.addError("Text is too long!");
+				return null;
+			}
 
 			// get objects
 

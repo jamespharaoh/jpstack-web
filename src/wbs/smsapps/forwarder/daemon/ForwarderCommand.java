@@ -13,8 +13,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -107,65 +107,71 @@ class ForwarderCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ForwarderRec forwarder =
-			forwarderHelper.findRequired (
-				command.getParentId ());
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				forwarder,
-				"default");
+			ForwarderRec forwarder =
+				forwarderHelper.findRequired (
+					command.getParentId ());
 
-		forwarderMessageInHelper.insert (
-			taskLogger,
-			forwarderMessageInHelper.createInstance ()
+			MessageRec message =
+				inbox.getMessage ();
 
-			.setForwarder (
-				forwarder)
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					forwarder,
+					"default");
 
-			.setNumber (
-				message.getNumber ())
+			forwarderMessageInHelper.insert (
+				taskLogger,
+				forwarderMessageInHelper.createInstance ()
 
-			.setMessage (
-				message)
+				.setForwarder (
+					forwarder)
 
-			.setSendQueue (
-				forwarder.getUrl ().length () > 0)
+				.setNumber (
+					message.getNumber ())
 
-			.setRetryTime (
-				transaction.now ())
+				.setMessage (
+					message)
 
-		);
+				.setSendQueue (
+					forwarder.getUrl ().length () > 0)
 
-		messageSetLogic.sendMessageSet (
-			taskLogger,
-			messageSetHelper.findByCodeRequired (
-				forwarder,
-				"forwarder"),
-			message.getThreadId (),
-			message.getNumber (),
-			defaultService);
+				.setRetryTime (
+					transaction.now ())
 
-		// process inbox
+			);
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalAbsent (),
-			command);
+			messageSetLogic.sendMessageSet (
+				taskLogger,
+				messageSetHelper.findByCodeRequired (
+					forwarder,
+					"forwarder"),
+				message.getThreadId (),
+				message.getNumber (),
+				defaultService);
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalAbsent (),
+				command);
+
+		}
 
 	}
 

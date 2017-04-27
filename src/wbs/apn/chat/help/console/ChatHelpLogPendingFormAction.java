@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -77,102 +77,109 @@ class ChatHelpLogPendingFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		String text =
-			requestContext.parameterRequired (
-				"text");
-
-		boolean ignore =
-			optionalIsPresent (
-				requestContext.parameter (
-					"ignore"));
-
-		// check params
-
-		if (! ignore) {
-
-			if (text.length () == 0) {
-
-				requestContext.addError (
-					"Please type a message");
-
-				return null;
-
-			}
-
-			if (! GsmUtils.gsmStringIsValid (text)) {
-
-				requestContext.addError (
-					"Reply contains invalid characters");
-
-				return null;
-
-			}
-
-			/*
-			if (Gsm.length(text) > 149) {
-				requestContext.addError("Text is too long!");
-				return null;
-			}
-			*/
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatHelpLogPendingFormAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			// load objects from database
+			// get params
 
-			ChatHelpLogRec helpRequest =
-				chatHelpLogHelper.findFromContextRequired ();
+			String text =
+				requestContext.parameterRequired (
+					"text");
 
-			ChatUserRec chatUser =
-				helpRequest.getChatUser ();
+			boolean ignore =
+				optionalIsPresent (
+					requestContext.parameter (
+						"ignore"));
 
-			// send message
+			// check params
 
 			if (! ignore) {
 
-				chatHelpLogic.sendHelpMessage (
-					taskLogger,
-					userConsoleLogic.userRequired (),
-					chatUser,
-					text,
-					optionalOf (
-						helpRequest.getMessage ().getThreadId ()),
-					optionalOf (
-						helpRequest));
+				if (text.length () == 0) {
+
+					requestContext.addError (
+						"Please type a message");
+
+					return null;
+
+				}
+
+				if (! GsmUtils.gsmStringIsValid (text)) {
+
+					requestContext.addError (
+						"Reply contains invalid characters");
+
+					return null;
+
+				}
+
+				/*
+				if (Gsm.length(text) > 149) {
+					requestContext.addError("Text is too long!");
+					return null;
+				}
+				*/
 
 			}
 
-			// unqueue the request
+			try (
 
-			queueLogic.processQueueItem (
-				helpRequest.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatHelpLogPendingFormAction.goReal ()",
+						this);
 
-			transaction.commit ();
+			) {
 
-			requestContext.addNotice (
-				ignore
-					? "Request ignored"
-					: "Reply sent");
+				// load objects from database
 
-			return responder (
-				"queueHomeResponder");
+				ChatHelpLogRec helpRequest =
+					chatHelpLogHelper.findFromContextRequired ();
+
+				ChatUserRec chatUser =
+					helpRequest.getChatUser ();
+
+				// send message
+
+				if (! ignore) {
+
+					chatHelpLogic.sendHelpMessage (
+						taskLogger,
+						userConsoleLogic.userRequired (),
+						chatUser,
+						text,
+						optionalOf (
+							helpRequest.getMessage ().getThreadId ()),
+						optionalOf (
+							helpRequest));
+
+				}
+
+				// unqueue the request
+
+				queueLogic.processQueueItem (
+					taskLogger,
+					helpRequest.getQueueItem (),
+					userConsoleLogic.userRequired ());
+
+				transaction.commit ();
+
+				requestContext.addNotice (
+					ignore
+						? "Request ignored"
+						: "Reply sent");
+
+				return responder (
+					"queueHomeResponder");
+
+			}
 
 		}
 

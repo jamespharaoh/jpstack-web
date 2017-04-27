@@ -66,272 +66,278 @@ class QueueItemQueueStatsProvider
 			@NonNull StatsPeriod statsPeriod,
 			@NonNull Map <String, Object> conditions) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getStats");
+		try (
 
-		if (statsPeriod.granularity () != StatsGranularity.hour)
-			throw new IllegalArgumentException ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getStats");
 
-		// setup data structures
-
-		Map <Long, long[]> numProcessedPerQueue =
-			new TreeMap<> ();
-
-		Map <Long, long[]> numCreatedPerQueue =
-			new TreeMap<> ();
-
-		Map <Long, long[]> numPreferredPerQueue =
-			new TreeMap<> ();
-
-		Map <Long, long[]> numNotPreferredPerQueue =
-			new TreeMap<> ();
-
-		Set <Object> queueIdObjects =
-			new HashSet<> ();
-
-		// retrieve queue items
-
-		QueueStatsFilter queueStatsFilter =
-			queueStatsFilterProvider.get ();
-
-		queueStatsFilter.conditions (
-			conditions);
-
-		List <QueueItemRec> createdQueueItems =
-			queueStatsFilter.filterQueueItems (
-				queueItemHelper.findByCreatedTime (
-					statsPeriod.toInterval ()));
-
-		List <QueueItemRec> processedQueueItems =
-			queueStatsFilter.filterQueueItems (
-				queueItemHelper.findByProcessedTime (
-					statsPeriod.toInterval ()));
-
-		// aggregate created items
-
-		for (
-			QueueItemRec queueItem
-				: createdQueueItems
 		) {
 
-			QueueSubjectRec queueSubject =
-				queueItem.getQueueSubject ();
+			if (statsPeriod.granularity () != StatsGranularity.hour)
+				throw new IllegalArgumentException ();
 
-			// TODO fix data!
-			QueueRec queue =
-				queueSubject != null
-					? queueSubject.getQueue ()
-					: queueItem.getQueue ();
+			// setup data structures
 
-			Record <?> parent =
-				objectManager.getParentRequired (
-					queue);
+			Map <Long, long[]> numProcessedPerQueue =
+				new TreeMap<> ();
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					parent,
-					"supervisor")
+			Map <Long, long[]> numCreatedPerQueue =
+				new TreeMap<> ();
+
+			Map <Long, long[]> numPreferredPerQueue =
+				new TreeMap<> ();
+
+			Map <Long, long[]> numNotPreferredPerQueue =
+				new TreeMap<> ();
+
+			Set <Object> queueIdObjects =
+				new HashSet<> ();
+
+			// retrieve queue items
+
+			QueueStatsFilter queueStatsFilter =
+				queueStatsFilterProvider.get ();
+
+			queueStatsFilter.conditions (
+				conditions);
+
+			List <QueueItemRec> createdQueueItems =
+				queueStatsFilter.filterQueueItems (
+					queueItemHelper.findByCreatedTime (
+						statsPeriod.toInterval ()));
+
+			List <QueueItemRec> processedQueueItems =
+				queueStatsFilter.filterQueueItems (
+					queueItemHelper.findByProcessedTime (
+						statsPeriod.toInterval ()));
+
+			// aggregate created items
+
+			for (
+				QueueItemRec queueItem
+					: createdQueueItems
 			) {
-				continue;
+
+				QueueSubjectRec queueSubject =
+					queueItem.getQueueSubject ();
+
+				// TODO fix data!
+				QueueRec queue =
+					queueSubject != null
+						? queueSubject.getQueue ()
+						: queueItem.getQueue ();
+
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						parent,
+						"supervisor")
+				) {
+					continue;
+				}
+
+				int hour =
+					statsPeriod.assign (
+						queueItem.getCreatedTime ());
+
+				if (! queueIdObjects.contains (
+						queue.getId ())) {
+
+					queueIdObjects.add (
+						queue.getId ());
+
+					numCreatedPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
+
+					numProcessedPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
+
+					numPreferredPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
+
+					numNotPreferredPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
+
+				}
+
+				long[] numCreatedForQueue =
+					numCreatedPerQueue.get (
+						queue.getId ());
+
+				numCreatedForQueue [hour] ++;
+
 			}
 
-			int hour =
-				statsPeriod.assign (
-					queueItem.getCreatedTime ());
+			// aggregate processed items
 
-			if (! queueIdObjects.contains (
-					queue.getId ())) {
-
-				queueIdObjects.add (
-					queue.getId ());
-
-				numCreatedPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
-
-				numProcessedPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
-
-				numPreferredPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
-
-				numNotPreferredPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
-
-			}
-
-			long[] numCreatedForQueue =
-				numCreatedPerQueue.get (
-					queue.getId ());
-
-			numCreatedForQueue [hour] ++;
-
-		}
-
-		// aggregate processed items
-
-		for (
-			QueueItemRec queueItem
-				: processedQueueItems
-		) {
-
-			QueueSubjectRec queueSubject =
-				queueItem.getQueueSubject ();
-
-			// TODO fix data!
-			QueueRec queue =
-				queueSubject != null
-					? queueSubject.getQueue ()
-					: queueItem.getQueue ();
-
-			Record <?> parent =
-				objectManager.getParentRequired (
-					queue);
-
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					parent,
-					"supervisor")
+			for (
+				QueueItemRec queueItem
+					: processedQueueItems
 			) {
-				continue;
-			}
 
-			int hour =
-				statsPeriod.assign (
-					queueItem.getProcessedTime ());
+				QueueSubjectRec queueSubject =
+					queueItem.getQueueSubject ();
 
-			if (! queueIdObjects.contains (
-					queue.getId ())) {
+				// TODO fix data!
+				QueueRec queue =
+					queueSubject != null
+						? queueSubject.getQueue ()
+						: queueItem.getQueue ();
 
-				queueIdObjects.add (
-					queue.getId ());
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
 
-				numCreatedPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						parent,
+						"supervisor")
+				) {
+					continue;
+				}
 
-				numProcessedPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
+				int hour =
+					statsPeriod.assign (
+						queueItem.getProcessedTime ());
 
-				numPreferredPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
+				if (! queueIdObjects.contains (
+						queue.getId ())) {
 
-				numNotPreferredPerQueue.put (
-					queue.getId (),
-					new long [
-						toJavaIntegerRequired (
-							statsPeriod.size ())]);
+					queueIdObjects.add (
+						queue.getId ());
 
-			}
+					numCreatedPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
 
-			long[] numProcessedForQueue =
-				numProcessedPerQueue.get (
-					queue.getId ());
+					numProcessedPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
 
-			numProcessedForQueue [hour] ++;
+					numPreferredPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
 
-			if (queueItem.getProcessedByPreferredUser () != null) {
+					numNotPreferredPerQueue.put (
+						queue.getId (),
+						new long [
+							toJavaIntegerRequired (
+								statsPeriod.size ())]);
 
-				if (queueItem.getProcessedByPreferredUser ()) {
+				}
 
-					long[] numPreferredForQueue =
-						numPreferredPerQueue.get (
-							queue.getId ());
+				long[] numProcessedForQueue =
+					numProcessedPerQueue.get (
+						queue.getId ());
 
-					numPreferredForQueue [hour] ++;
+				numProcessedForQueue [hour] ++;
 
-				} else {
+				if (queueItem.getProcessedByPreferredUser () != null) {
 
-					long[] numNotPreferredForQueue =
-						numNotPreferredPerQueue.get (
-							queue.getId ());
+					if (queueItem.getProcessedByPreferredUser ()) {
 
-					numNotPreferredForQueue [hour] ++;
+						long[] numPreferredForQueue =
+							numPreferredPerQueue.get (
+								queue.getId ());
+
+						numPreferredForQueue [hour] ++;
+
+					} else {
+
+						long[] numNotPreferredForQueue =
+							numNotPreferredPerQueue.get (
+								queue.getId ());
+
+						numNotPreferredForQueue [hour] ++;
+
+					}
 
 				}
 
 			}
 
-		}
+			// create return value
 
-		// create return value
+			StatsDataSet statsDataSet =
+				new StatsDataSet ();
 
-		StatsDataSet statsDataSet =
-			new StatsDataSet ();
-
-		statsDataSet.indexValues ().put (
-			"queueId",
-			queueIdObjects);
-
-		for (
-			int hour = 0;
-			hour < statsPeriod.size ();
-			hour ++
-		) {
+			statsDataSet.indexValues ().put (
+				"queueId",
+				queueIdObjects);
 
 			for (
-				Object queueIdObject
-					: queueIdObjects
+				int hour = 0;
+				hour < statsPeriod.size ();
+				hour ++
 			) {
 
-				Long queueId =
-					(Long)
-					queueIdObject;
+				for (
+					Object queueIdObject
+						: queueIdObjects
+				) {
 
-				statsDataSet.data ().add (
-					new StatsDatum ()
+					Long queueId =
+						(Long)
+						queueIdObject;
 
-					.startTime (
-						statsPeriod.step (hour))
+					statsDataSet.data ().add (
+						new StatsDatum ()
 
-					.addIndex (
-						"queueId",
-						queueId)
+						.startTime (
+							statsPeriod.step (hour))
 
-					.addValue (
-						"numCreated",
-						numCreatedPerQueue.get (queueId) [hour])
+						.addIndex (
+							"queueId",
+							queueId)
 
-					.addValue (
-						"numProcessed",
-						numProcessedPerQueue.get (queueId) [hour])
+						.addValue (
+							"numCreated",
+							numCreatedPerQueue.get (queueId) [hour])
 
-					.addValue (
-						"numPreferred",
-						numPreferredPerQueue.get (queueId) [hour])
+						.addValue (
+							"numProcessed",
+							numProcessedPerQueue.get (queueId) [hour])
 
-					.addValue (
-						"numNotPreferred",
-						numNotPreferredPerQueue.get (queueId) [hour]));
+						.addValue (
+							"numPreferred",
+							numPreferredPerQueue.get (queueId) [hour])
+
+						.addValue (
+							"numNotPreferred",
+							numNotPreferredPerQueue.get (queueId) [hour]));
+
+				}
 
 			}
 
-		}
+			return statsDataSet;
 
-		return statsDataSet;
+		}
 
 	}
 

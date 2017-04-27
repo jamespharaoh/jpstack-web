@@ -18,7 +18,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -82,7 +82,7 @@ class ImChatMessageTemplateSetGetAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ImChatMessageTemplateSetGetAction.handle ()",

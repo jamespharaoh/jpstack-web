@@ -47,8 +47,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -218,53 +218,65 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void logoff (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean automatic) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		// log the user off
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logoff");
 
-		chatUser
+		) {
 
-			.setOnline (
-				false);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// reset delivery method to sms, except for iphone users
-
-		boolean iphone =
-			chatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
-
-		boolean token =
-			chatUser.getJigsawToken () != null;
-
-		if (! (iphone && token)) {
+			// log the user off
 
 			chatUser
 
-				.setDeliveryMethod (
-					ChatMessageMethod.sms);
+				.setOnline (
+					false);
 
-		}
+			// reset delivery method to sms, except for iphone users
 
-		// finish their session
+			boolean iphone =
+				chatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
 
-		for (
-			ChatUserSessionRec chatUserSession
-				: chatUser.getChatUserSessions ()
-		) {
+			boolean token =
+				chatUser.getJigsawToken () != null;
 
-			if (chatUserSession.getEndTime () != null)
-				continue;
+			if (! (iphone && token)) {
 
-			chatUserSession
+				chatUser
 
-				.setEndTime (
-					transaction.now ())
+					.setDeliveryMethod (
+						ChatMessageMethod.sms);
 
-				.setAutomatic (
-					automatic);
+			}
+
+			// finish their session
+
+			for (
+				ChatUserSessionRec chatUserSession
+					: chatUser.getChatUserSessions ()
+			) {
+
+				if (chatUserSession.getEndTime () != null)
+					continue;
+
+				chatUserSession
+
+					.setEndTime (
+						transaction.now ())
+
+					.setAutomatic (
+						automatic);
+
+			}
 
 		}
 
@@ -283,99 +295,76 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void scheduleAd (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"scheduleAd");
 
-		DateTimeZone timezone =
-			getTimezone (
-				chatUser);
-
-		LocalDate today =
-			transaction
-				.now ()
-				.toDateTime (timezone)
-				.toLocalDate ();
-
-		Instant midnightTonight =
-			today
-				.plusDays (1)
-				.toDateTimeAtStartOfDay ()
-				.toInstant ();
-
-		// start with their last action (or last join) date
-
-		LocalDate startDate;
-
-		if (chatUser.getLastJoin () != null) {
-
-			startDate =
-				localDate (
-					chatUser.getLastJoin (),
-					timezone);
-
-		} else {
-
-			startDate =
-				localDate (
-					chatUser.getLastAction (),
-					timezone);
-
-		}
-
-		// pick a random time of day, from 10am to 8pm
-
-		LocalTime timeOfDay =
-			new LocalTime (
-				10 + randomLogic.randomJavaInteger (10),
-				randomLogic.randomJavaInteger (60),
-				randomLogic.randomJavaInteger (60));
-
-		// try and schedule first ad
-
-		Instant firstAdTime =
-			startDate
-
-			.plusDays (
-				toJavaIntegerRequired (
-					chat.getAdTimeFirst () / 60 / 60 / 24))
-
-			.toDateTime (
-				timeOfDay,
-				timezone)
-
-			.toInstant ();
-
-		if (firstAdTime.isAfter (
-				midnightTonight)) {
-
-			chatUser
-
-				.setNextAd (
-					firstAdTime);
-
-			return;
-
-		}
-
-		// try and schedule subsequent ads
-
-		for (
-			int index = 0;
-			index < chat.getAdCount ();
-			index ++
 		) {
 
-			Instant nextAdTime =
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			ChatRec chat =
+				chatUser.getChat ();
+
+			DateTimeZone timezone =
+				getTimezone (
+					chatUser);
+
+			LocalDate today =
+				transaction
+					.now ()
+					.toDateTime (timezone)
+					.toLocalDate ();
+
+			Instant midnightTonight =
+				today
+					.plusDays (1)
+					.toDateTimeAtStartOfDay ()
+					.toInstant ();
+
+			// start with their last action (or last join) date
+
+			LocalDate startDate;
+
+			if (chatUser.getLastJoin () != null) {
+
+				startDate =
+					localDate (
+						chatUser.getLastJoin (),
+						timezone);
+
+			} else {
+
+				startDate =
+					localDate (
+						chatUser.getLastAction (),
+						timezone);
+
+			}
+
+			// pick a random time of day, from 10am to 8pm
+
+			LocalTime timeOfDay =
+				new LocalTime (
+					10 + randomLogic.randomJavaInteger (10),
+					randomLogic.randomJavaInteger (60),
+					randomLogic.randomJavaInteger (60));
+
+			// try and schedule first ad
+
+			Instant firstAdTime =
 				startDate
 
 				.plusDays (
 					toJavaIntegerRequired (
-						chat.getAdTime () / 60 / 60 / 24 * index))
+						chat.getAdTimeFirst () / 60 / 60 / 24))
 
 				.toDateTime (
 					timeOfDay,
@@ -383,26 +372,61 @@ class ChatUserLogicImplementation
 
 				.toInstant ();
 
-			if (nextAdTime.isAfter (
+			if (firstAdTime.isAfter (
 					midnightTonight)) {
 
 				chatUser
 
 					.setNextAd (
-						nextAdTime);
+						firstAdTime);
 
 				return;
 
 			}
 
+			// try and schedule subsequent ads
+
+			for (
+				int index = 0;
+				index < chat.getAdCount ();
+				index ++
+			) {
+
+				Instant nextAdTime =
+					startDate
+
+					.plusDays (
+						toJavaIntegerRequired (
+							chat.getAdTime () / 60 / 60 / 24 * index))
+
+					.toDateTime (
+						timeOfDay,
+						timezone)
+
+					.toInstant ();
+
+				if (nextAdTime.isAfter (
+						midnightTonight)) {
+
+					chatUser
+
+						.setNextAd (
+							nextAdTime);
+
+					return;
+
+				}
+
+			}
+
+			// no more ads!
+
+			chatUser
+
+				.setNextAd (
+					null);
+
 		}
-
-		// no more ads!
-
-		chatUser
-
-			.setNextAd (
-				null);
 
 	}
 
@@ -601,9 +625,10 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void adultVerify (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		ChatRec chat =
@@ -648,31 +673,37 @@ class ChatUserLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatMonitor");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createChatMonitor");
 
-		return chatUserHelper.insert (
-			taskLogger,
-			chatUserHelper.createInstance ()
+		) {
 
-			.setChat (
-				chat)
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.setCode (
-				randomLogic.generateNumericNoZero (6))
+			return chatUserHelper.insert (
+				taskLogger,
+				chatUserHelper.createInstance ()
 
-			.setCreated (
-				transaction.now ())
+				.setChat (
+					chat)
 
-			.setType (
-				ChatUserType.monitor)
+				.setCode (
+					randomLogic.generateNumericNoZero (6))
 
-		);
+				.setCreated (
+					transaction.now ())
+
+				.setType (
+					ChatUserType.monitor)
+
+			);
+
+		}
 
 	}
 
@@ -684,29 +715,41 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void creditModeChange (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserCreditMode newMode) {
 
-		if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"creditModeChange");
+
+		) {
+
+			if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
+
+				chatUser
+
+					.setCredit (
+						chatUser.getCredit ()
+						- chatUser.getCreditRevoked ());
+
+			}
 
 			chatUser
+				.setCreditMode (newMode);
 
-				.setCredit (
-					chatUser.getCredit ()
-					- chatUser.getCreditRevoked ());
+			if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
 
-		}
+				chatUser
 
-		chatUser
-			.setCreditMode (newMode);
+					.setCredit (
+						chatUser.getCredit ()
+						+ chatUser.getCreditRevoked ());
 
-		if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
-
-			chatUser
-
-				.setCredit (
-					chatUser.getCredit ()
-					+ chatUser.getCreditRevoked ());
+			}
 
 		}
 
@@ -723,71 +766,77 @@ class ChatUserLogicImplementation
 			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setImage");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setImage");
 
-		ChatRec chat =
-			chatUser.getChat ();
+		) {
 
-		// create the new chat user image
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatUserImageRec chatUserImage =
-			chatUserImageHelper.insert (
-				taskLogger,
-				chatUserImageHelper.createInstance ()
+			ChatRec chat =
+				chatUser.getChat ();
 
-			.setChatUser (
-				chatUser)
+			// create the new chat user image
 
-			.setMedia (
-				smallMedia)
-
-			.setFullMedia (
-				fullMedia)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setMessage (
-				message.orNull ())
-
-			.setStatus (
-				ChatUserInfoStatus.moderatorPending)
-
-			.setType (
-				type)
-
-			.setAppend (
-				append));
-
-		// create a queue item, if necessary
-
-		if (chatUser.getQueueItem () == null) {
-
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
+			ChatUserImageRec chatUserImage =
+				chatUserImageHelper.insert (
 					taskLogger,
-					chat,
-					"user",
-					chatUser,
-					chatUser,
-					chatUser.getNumber ().getNumber (),
-					getPrettyName (
-						chatUser));
+					chatUserImageHelper.createInstance ()
 
-			chatUser
+				.setChatUser (
+					chatUser)
 
-				.setQueueItem (
-					queueItem);
+				.setMedia (
+					smallMedia)
+
+				.setFullMedia (
+					fullMedia)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setMessage (
+					message.orNull ())
+
+				.setStatus (
+					ChatUserInfoStatus.moderatorPending)
+
+				.setType (
+					type)
+
+				.setAppend (
+					append));
+
+			// create a queue item, if necessary
+
+			if (chatUser.getQueueItem () == null) {
+
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						taskLogger,
+						chat,
+						"user",
+						chatUser,
+						chatUser,
+						chatUser.getNumber ().getNumber (),
+						getPrettyName (
+							chatUser));
+
+				chatUser
+
+					.setQueueItem (
+						queueItem);
+
+			}
+
+			return chatUserImage;
 
 		}
-
-		return chatUserImage;
 
 	}
 
@@ -800,57 +849,63 @@ class ChatUserLogicImplementation
 			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setPhoto");
+		try (
 
-		// load
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setPhoto");
 
-		byte[] fullData =
-			fullMedia.getContent ().getData ();
+		) {
 
-		String fullMimeType =
-			fullMedia.getMediaType ().getMimeType ();
+			// load
 
-		BufferedImage fullImage =
-			mediaLogic.readImageRequired (
+			byte[] fullData =
+				fullMedia.getContent ().getData ();
+
+			String fullMimeType =
+				fullMedia.getMediaType ().getMimeType ();
+
+			BufferedImage fullImage =
+				mediaLogic.readImageRequired (
+					taskLogger,
+					fullData,
+					fullMimeType);
+
+			// resample
+
+			BufferedImage smallImage =
+				mediaLogic.resampleImageToFit (
+					fullImage,
+					320l,
+					240l);
+
+			// save
+
+			byte[] smallData =
+				mediaLogic.writeJpeg (
+					smallImage,
+					0.6f);
+
+			MediaRec smallMedia =
+				mediaLogic.createMediaFromImageRequired (
+					taskLogger,
+					smallData,
+					"image/jpeg",
+					chatUser.getCode () + ".jpg");
+
+			// and delegate
+
+			return setImage (
 				taskLogger,
-				fullData,
-				fullMimeType);
+				chatUser,
+				ChatUserImageType.image,
+				smallMedia,
+				fullMedia,
+				message,
+				append);
 
-		// resample
-
-		BufferedImage smallImage =
-			mediaLogic.resampleImageToFit (
-				fullImage,
-				320l,
-				240l);
-
-		// save
-
-		byte[] smallData =
-			mediaLogic.writeJpeg (
-				smallImage,
-				0.6f);
-
-		MediaRec smallMedia =
-			mediaLogic.createMediaFromImageRequired (
-				taskLogger,
-				smallData,
-				"image/jpeg",
-				chatUser.getCode () + ".jpg");
-
-		// and delegate
-
-		return setImage (
-			taskLogger,
-			chatUser,
-			ChatUserImageType.image,
-			smallMedia,
-			fullMedia,
-			message,
-			append);
+		}
 
 	}
 
@@ -865,33 +920,39 @@ class ChatUserLogicImplementation
 			@NonNull Optional <MessageRec> message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setPhoto");
+		try (
 
-		// create media
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setPhoto");
 
-		String filename =
-			filenameOptional.or (
-				chatUser.getCode () + ".jpg");
+		) {
 
-		MediaRec fullMedia =
-			mediaLogic.createMediaFromImageRequired (
+			// create media
+
+			String filename =
+				filenameOptional.or (
+					chatUser.getCode () + ".jpg");
+
+			MediaRec fullMedia =
+				mediaLogic.createMediaFromImageRequired (
+					taskLogger,
+					data,
+					mimeType.or (
+						"image/jpeg"),
+					filename);
+
+			// and delegate
+
+			return setPhoto (
 				taskLogger,
-				data,
-				mimeType.or (
-					"image/jpeg"),
-				filename);
+				chatUser,
+				fullMedia,
+				message,
+				append);
 
-		// and delegate
-
-		return setPhoto (
-			taskLogger,
-			chatUser,
-			fullMedia,
-			message,
-			append);
+		}
 
 	}
 
@@ -903,26 +964,32 @@ class ChatUserLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setPhotoFromMessage");
+		try (
 
-		return optionalMapRequired (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setPhotoFromMessage");
 
-			findPhoto (
-				message),
+		) {
 
-			media ->
-				setPhoto (
-					taskLogger,
-					chatUser,
-					media,
-					optionalOf (
-						message),
-					append)
+			return optionalMapRequired (
 
-		);
+				findPhoto (
+					message),
+
+				media ->
+					setPhoto (
+						taskLogger,
+						chatUser,
+						media,
+						optionalOf (
+							message),
+						append)
+
+			);
+
+		}
 
 	}
 
@@ -956,34 +1023,40 @@ class ChatUserLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setVideo");
+		try (
 
-		// resample
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setVideo");
 
-		MediaRec newMedia =
-			mediaLogic.createMediaFromVideoRequired (
-				taskLogger,
-				mediaLogic.videoConvertRequired (
+		) {
+
+			// resample
+
+			MediaRec newMedia =
+				mediaLogic.createMediaFromVideoRequired (
 					taskLogger,
-					"3gpp",
-					fullMedia.getContent ().getData ()),
-				"video/3gpp",
-				chatUser.getCode () + ".3gp");
+					mediaLogic.videoConvertRequired (
+						taskLogger,
+						"3gpp",
+						fullMedia.getContent ().getData ()),
+					"video/3gpp",
+					chatUser.getCode () + ".3gp");
 
-		// and delegate
+			// and delegate
 
-		setImage (
-			taskLogger,
-			chatUser,
-			ChatUserImageType.video,
-			newMedia,
-			fullMedia,
-			optionalOf (
-				message),
-			append);
+			setImage (
+				taskLogger,
+				chatUser,
+				ChatUserImageType.video,
+				newMedia,
+				fullMedia,
+				optionalOf (
+					message),
+				append);
+
+		}
 
 	}
 
@@ -998,73 +1071,79 @@ class ChatUserLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setVideo");
+		try (
 
-		// default mime type
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setVideo");
 
-		String mimeType =
-			mimeTypeOptional.or (
-				"application/octet-stream");
+		) {
 
-		// default filename
+			// default mime type
 
-		String filename;
+			String mimeType =
+				mimeTypeOptional.or (
+					"application/octet-stream");
 
-		if (filenameOptional.isPresent ()) {
+			// default filename
 
-			filename =
-				filenameOptional.get ();
+			String filename;
 
-		} else {
+			if (filenameOptional.isPresent ()) {
 
-			MediaTypeRec mediaType =
-				mediaTypeHelper.findByCodeRequired (
-					GlobalId.root,
-					mimeType);
+				filename =
+					filenameOptional.get ();
 
-			filename =
-				stringFormat (
-					"%s.%s",
-					chatUser.getCode (),
-					mediaType.getExtension ());
+			} else {
+
+				MediaTypeRec mediaType =
+					mediaTypeHelper.findByCodeRequired (
+						GlobalId.root,
+						mimeType);
+
+				filename =
+					stringFormat (
+						"%s.%s",
+						chatUser.getCode (),
+						mediaType.getExtension ());
+
+			}
+
+			// create media
+
+			MediaRec fullMedia =
+				mediaLogic.createMediaFromVideoRequired (
+					taskLogger,
+					data,
+					mimeType,
+					filename);
+
+			// resample
+
+			MediaRec newMedia =
+				mediaLogic.createMediaFromVideoRequired (
+					taskLogger,
+					mediaLogic.videoConvertRequired (
+						taskLogger,
+						"3gpp",
+						data),
+					"video/3gpp",
+					chatUser.getCode () + ".3gp");
+
+			// and delegate
+
+			setImage (
+				taskLogger,
+				chatUser,
+				ChatUserImageType.video,
+				newMedia,
+				fullMedia,
+				optionalOf (
+					message),
+				append);
 
 		}
-
-		// create media
-
-		MediaRec fullMedia =
-			mediaLogic.createMediaFromVideoRequired (
-				taskLogger,
-				data,
-				mimeType,
-				filename);
-
-		// resample
-
-		MediaRec newMedia =
-			mediaLogic.createMediaFromVideoRequired (
-				taskLogger,
-				mediaLogic.videoConvertRequired (
-					taskLogger,
-					"3gpp",
-					data),
-				"video/3gpp",
-				chatUser.getCode () + ".3gp");
-
-		// and delegate
-
-		setImage (
-			taskLogger,
-			chatUser,
-			ChatUserImageType.video,
-			newMedia,
-			fullMedia,
-			optionalOf (
-				message),
-			append);
 
 	}
 
@@ -1077,34 +1156,40 @@ class ChatUserLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setAudio");
+		try (
 
-		// resample
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setAudio");
 
-		MediaRec newMedia =
-			mediaLogic.createMediaFromAudio (
-				taskLogger,
-				mediaLogic.videoConvertRequired (
+		) {
+
+			// resample
+
+			MediaRec newMedia =
+				mediaLogic.createMediaFromAudio (
 					taskLogger,
-					"mp3",
-					data),
-				"audio/mpeg",
-				chatUser.getCode () + ".mp3");
+					mediaLogic.videoConvertRequired (
+						taskLogger,
+						"mp3",
+						data),
+					"audio/mpeg",
+					chatUser.getCode () + ".mp3");
 
-		// and delegate
+			// and delegate
 
-		setImage (
-			taskLogger,
-			chatUser,
-			ChatUserImageType.audio,
-			newMedia,
-			null,
-			Optional.of (
-				message),
-			append);
+			setImage (
+				taskLogger,
+				chatUser,
+				ChatUserImageType.audio,
+				newMedia,
+				null,
+				Optional.of (
+					message),
+				append);
+
+		}
 
 	}
 
@@ -1117,65 +1202,71 @@ class ChatUserLogicImplementation
 			@NonNull byte[] data,
 			@NonNull String filename,
 			@NonNull String mimeType,
-			@NonNull Optional<MessageRec> message,
+			@NonNull Optional <MessageRec> message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setImage");
+		try (
 
-		switch (type) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setImage");
 
-		case image:
+		) {
 
-			setPhoto (
-				taskLogger,
-				chatUser,
-				data,
-				optionalOf (
-					filename),
-				optionalOf (
-					mimeType),
-				message,
-				append);
+			switch (type) {
 
-			break;
+			case image:
 
-		case video:
+				setPhoto (
+					taskLogger,
+					chatUser,
+					data,
+					optionalOf (
+						filename),
+					optionalOf (
+						mimeType),
+					message,
+					append);
 
-			setVideo (
-				taskLogger,
-				chatUser,
-				data,
-				optionalOf (
-					filename),
-				optionalOf (
-					mimeType),
-				null,
-				append);
+				break;
 
-			break;
+			case video:
 
-		case audio:
+				setVideo (
+					taskLogger,
+					chatUser,
+					data,
+					optionalOf (
+						filename),
+					optionalOf (
+						mimeType),
+					null,
+					append);
 
-			setAudio (
-				taskLogger,
-				chatUser,
-				data,
-				null,
-				append);
+				break;
 
-			break;
+			case audio:
 
-		default:
+				setAudio (
+					taskLogger,
+					chatUser,
+					data,
+					null,
+					append);
 
-			throw new RuntimeException (
-				stringFormat (
-					"Unknown chat user image type: %s (in ",
-					enumNameSpaces (
-						type),
-					"ChatLogicImpl.userSetImage)"));
+				break;
+
+			default:
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unknown chat user image type: %s (in ",
+						enumNameSpaces (
+							type),
+						"ChatLogicImpl.userSetImage)"));
+
+			}
 
 		}
 
@@ -1189,35 +1280,41 @@ class ChatUserLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setVideo");
+		try (
 
-		for (
-			MediaRec media
-				: message.getMedias ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setVideo");
+
 		) {
 
-			if (
-				! mediaLogic.isVideo (
-					media.getMediaType ().getMimeType ())
+			for (
+				MediaRec media
+					: message.getMedias ()
 			) {
-				continue;
+
+				if (
+					! mediaLogic.isVideo (
+						media.getMediaType ().getMimeType ())
+				) {
+					continue;
+				}
+
+				setVideo (
+					taskLogger,
+					chatUser,
+					media,
+					message,
+					append);
+
+				return true;
+
 			}
 
-			setVideo (
-				taskLogger,
-				chatUser,
-				media,
-				message,
-				append);
-
-			return true;
+			return false;
 
 		}
-
-		return false;
 
 	}
 
@@ -1230,201 +1327,207 @@ class ChatUserLogicImplementation
 			@NonNull Optional <MessageRec> message,
 			@NonNull Optional <UserRec> user) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setPlace");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setPlace");
 
-		if (
-			message.isPresent ()
-			&& user.isPresent ()
-		) {
-			throw new IllegalArgumentException ();
-		}
-
-		ChatRec chat =
-			chatUser.getChat ();
-
-		// try and find the place
-
-		Optional <GazetteerEntryRec> gazetteerEntryOptional =
-			Optional.absent ();
-
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (place)
 		) {
 
-			gazetteerEntryOptional =
-				gazetteerEntryHelper.findByCode (
-					chat.getGazetteer (),
-					match.simpleKeyword ());
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
 			if (
-				optionalIsPresent (
-					gazetteerEntryOptional)
+				message.isPresent ()
+				&& user.isPresent ()
 			) {
-				break;
+				throw new IllegalArgumentException ();
 			}
 
-		}
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (
-			optionalIsNotPresent (
-				gazetteerEntryOptional)
-		) {
+			// try and find the place
 
-			SliceRec slice =
-				chat.getSlice ().getAdminEmail () != null
-					? chat.getSlice ()
-					: sliceHelper.findByCodeRequired (
-						GlobalId.root,
-						wbsConfig.defaultSlice ());
+			Optional <GazetteerEntryRec> gazetteerEntryOptional =
+				Optional.absent ();
 
-			if (slice.getAdminEmail () != null) {
+			for (
+				KeywordFinder.Match match
+					: keywordFinder.find (place)
+			) {
 
-				try {
+				gazetteerEntryOptional =
+					gazetteerEntryHelper.findByCode (
+						chat.getGazetteer (),
+						match.simpleKeyword ());
 
-					emailLogic.sendSystemEmail (
+				if (
+					optionalIsPresent (
+						gazetteerEntryOptional)
+				) {
+					break;
+				}
 
-						ImmutableList.of (
-							slice.getAdminEmail ()),
+			}
 
-						stringFormat (
-							"Chat user %s location not recognised: %s",
+			if (
+				optionalIsNotPresent (
+					gazetteerEntryOptional)
+			) {
+
+				SliceRec slice =
+					chat.getSlice ().getAdminEmail () != null
+						? chat.getSlice ()
+						: sliceHelper.findByCodeRequired (
+							GlobalId.root,
+							wbsConfig.defaultSlice ());
+
+				if (slice.getAdminEmail () != null) {
+
+					try {
+
+						emailLogic.sendSystemEmail (
+
+							ImmutableList.of (
+								slice.getAdminEmail ()),
+
 							stringFormat (
-								"%s.%s.%s",
-								chat.getSlice ().getCode (),
-								chat.getCode (),
-								chatUser.getCode ()),
-							place),
+								"Chat user %s location not recognised: %s",
+								stringFormat (
+									"%s.%s.%s",
+									chat.getSlice ().getCode (),
+									chat.getCode (),
+									chatUser.getCode ()),
+								place),
 
-						stringFormat (
-
-							"Chat: %s\n",
 							stringFormat (
-								"%s.%s",
-								chat.getSlice ().getCode (),
-								chat.getCode ()),
 
-							"Chat user: %s\n",
-							chatUser.getCode (),
+								"Chat: %s\n",
+								stringFormat (
+									"%s.%s",
+									chat.getSlice ().getCode (),
+									chat.getCode ()),
 
-							"Message: %s\n",
-							message.isPresent ()
-								? integerToDecimalString (
-									message.get ().getId ())
-								: "(via api)",
+								"Chat user: %s\n",
+								chatUser.getCode (),
 
-							"Location: %s\n",
-							place,
+								"Message: %s\n",
+								message.isPresent ()
+									? integerToDecimalString (
+										message.get ().getId ())
+									: "(via api)",
 
-							"Timestamp: %s\n",
-							message.isPresent ()
-								? message.get ().getCreatedTime ().toString ()
-								: "(via api)"));
+								"Location: %s\n",
+								place,
 
-				} catch (Exception exception) {
+								"Timestamp: %s\n",
+								message.isPresent ()
+									? message.get ().getCreatedTime ().toString ()
+									: "(via api)"));
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"logic",
-						"ChatUserLogic.setPlace",
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.ignoreWithLoggedWarning);
+					} catch (Exception exception) {
+
+						exceptionLogger.logThrowable (
+							taskLogger,
+							"logic",
+							"ChatUserLogic.setPlace",
+							exception,
+							optionalAbsent (),
+							GenericExceptionResolution.ignoreWithLoggedWarning);
+
+					}
+
+				}
+
+				return false;
+
+			}
+
+			GazetteerEntryRec gazetteerEntry =
+				gazetteerEntryOptional.get ();
+
+			// update the user
+
+			if (gazetteerEntry.getLongLat () == null) {
+				throw new NullPointerException ();
+			}
+
+			{
+
+				if (
+					! transaction.contains (
+						chatUser)
+				) {
+
+					throw new IllegalStateException (
+						stringFormat (
+							"Chat user %s not in transaction",
+							integerToDecimalString (
+								chatUser.getId ())));
 
 				}
 
 			}
 
-			return false;
+			chatUser
 
-		}
+				.setLocationPlace (
+					gazetteerEntry.getName ())
 
-		GazetteerEntryRec gazetteerEntry =
-			gazetteerEntryOptional.get ();
+				.setLocationPlaceLongLat (
+					gazetteerEntry.getLongLat ())
 
-		// update the user
+				.setLocationLongLat (
+					gazetteerEntry.getLongLat ())
 
-		if (gazetteerEntry.getLongLat () == null) {
-			throw new NullPointerException ();
-		}
+				.setLocationBackupLongLat (
+					gazetteerEntry.getLongLat ())
 
-		{
+				.setLocationTime (
+					transaction.now ());
 
-			if (
-				! transaction.contains (
-					chatUser)
-			) {
+			// create event
 
-				throw new IllegalStateException (
-					stringFormat (
-						"Chat user %s not in transaction",
-						integerToDecimalString (
-							chatUser.getId ())));
+			if (message.isPresent ()) {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"chat_user_place_message",
+					chatUser,
+					gazetteerEntry,
+					gazetteerEntry.getLongLat ().longitude (),
+					gazetteerEntry.getLongLat ().latitude (),
+					message.get ());
+
+			} else if (user.isPresent ()) {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"chat_user_place_user",
+					chatUser,
+					gazetteerEntry,
+					gazetteerEntry.getLongLat ().longitude (),
+					gazetteerEntry.getLongLat ().latitude (),
+					user.get ());
+
+			} else {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"chat_user_place_api",
+					chatUser,
+					gazetteerEntry,
+					gazetteerEntry.getLongLat ().longitude (),
+					gazetteerEntry.getLongLat ().latitude ());
 
 			}
 
-		}
-
-		chatUser
-
-			.setLocationPlace (
-				gazetteerEntry.getName ())
-
-			.setLocationPlaceLongLat (
-				gazetteerEntry.getLongLat ())
-
-			.setLocationLongLat (
-				gazetteerEntry.getLongLat ())
-
-			.setLocationBackupLongLat (
-				gazetteerEntry.getLongLat ())
-
-			.setLocationTime (
-				transaction.now ());
-
-		// create event
-
-		if (message.isPresent ()) {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"chat_user_place_message",
-				chatUser,
-				gazetteerEntry,
-				gazetteerEntry.getLongLat ().longitude (),
-				gazetteerEntry.getLongLat ().latitude (),
-				message.get ());
-
-		} else if (user.isPresent ()) {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"chat_user_place_user",
-				chatUser,
-				gazetteerEntry,
-				gazetteerEntry.getLongLat ().longitude (),
-				gazetteerEntry.getLongLat ().latitude (),
-				user.get ());
-
-		} else {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"chat_user_place_api",
-				chatUser,
-				gazetteerEntry,
-				gazetteerEntry.getLongLat ().longitude (),
-				gazetteerEntry.getLongLat ().latitude ());
+			return true;
 
 		}
-
-		return true;
 
 	}
 
@@ -1480,7 +1583,7 @@ class ChatUserLogicImplementation
 	boolean dobOk (
 			@NonNull ChatUserRec chatUser) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		if (chatUser.getAgeChecked ())
@@ -1575,110 +1678,116 @@ class ChatUserLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatAffiliateRec chatAffiliate,
-			@NonNull Optional<MessageRec> message) {
+			@NonNull Optional <MessageRec> message) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setAffiliate");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatAffiliate.getChatScheme ();
-
-		// set category
-
-		if (
-
-			isNotNull (
-				chatAffiliate.getCategory ())
-
-			&& (
-
-				isNull (
-					chatUser.getCategory ())
-
-				|| referenceNotEqualWithClass (
-					ChatCategoryRec.class,
-					chatUser.getCategory (),
-					chatAffiliate.getCategory ())
-
-			)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setAffiliate");
 
 		) {
 
-			chatUser
+			ChatSchemeRec chatScheme =
+				chatAffiliate.getChatScheme ();
 
-				.setCategory (
-					chatAffiliate.getCategory ());
+			// set category
 
 			if (
-				optionalIsPresent (
-					message)
+
+				isNotNull (
+					chatAffiliate.getCategory ())
+
+				&& (
+
+					isNull (
+						chatUser.getCategory ())
+
+					|| referenceNotEqualWithClass (
+						ChatCategoryRec.class,
+						chatUser.getCategory (),
+						chatAffiliate.getCategory ())
+
+				)
+
 			) {
 
-				eventLogic.createEvent (
-					taskLogger,
-					"chat_user_category_message",
-					chatUser,
-					chatUser.getCategory (),
-					message.get ());
+				chatUser
 
-			} else {
+					.setCategory (
+						chatAffiliate.getCategory ());
 
-				eventLogic.createEvent (
-					taskLogger,
-					"chat_user_category_api",
-					chatUser,
-					chatUser.getCategory ());
+				if (
+					optionalIsPresent (
+						message)
+				) {
+
+					eventLogic.createEvent (
+						taskLogger,
+						"chat_user_category_message",
+						chatUser,
+						chatUser.getCategory (),
+						message.get ());
+
+				} else {
+
+					eventLogic.createEvent (
+						taskLogger,
+						"chat_user_category_api",
+						chatUser,
+						chatUser.getCategory ());
+
+				}
 
 			}
 
-		}
+			// user has no scheme or affiliate
 
-		// user has no scheme or affiliate
+			if (
+				chatUser.getChatAffiliate () == null
+				&& chatUser.getChatScheme () == null
+			) {
 
-		if (
-			chatUser.getChatAffiliate () == null
-			&& chatUser.getChatScheme () == null
-		) {
+				chatUser
 
-			chatUser
+					.setChatAffiliate (
+						chatAffiliate)
 
-				.setChatAffiliate (
-					chatAffiliate)
+					.setChatScheme (
+						chatScheme)
 
-				.setChatScheme (
-					chatScheme)
+					.setOperatorLabel (
+						chatScheme.getOperatorLabel ())
 
-				.setOperatorLabel (
-					chatScheme.getOperatorLabel ())
+					.setCredit (
+						chatUser.getCredit ()
+						+ chatScheme.getInitialCredit ());
 
-				.setCredit (
-					chatUser.getCredit ()
-					+ chatScheme.getInitialCredit ());
+				return;
+
+			}
+
+			// user is non-affiliated but on the same scheme
+
+			if (
+				chatUser.getChatAffiliate () == null
+				&& chatUser.getChatScheme () == chatScheme
+			) {
+
+				chatUser
+
+					.setChatAffiliate (
+						chatAffiliate);
+
+				return;
+			}
+
+			// do nothing
 
 			return;
 
 		}
-
-		// user is non-affiliated but on the same scheme
-
-		if (
-			chatUser.getChatAffiliate () == null
-			&& chatUser.getChatScheme () == chatScheme
-		) {
-
-			chatUser
-
-				.setChatAffiliate (
-					chatAffiliate);
-
-			return;
-		}
-
-		// do nothing
-
-		return;
 
 	}
 

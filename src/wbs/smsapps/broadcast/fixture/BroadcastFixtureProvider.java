@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -66,119 +66,137 @@ class BroadcastFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createBroadcastConfigs (
-			taskLogger,
-			transaction);
+		) {
+
+			createMenuItems (
+				taskLogger,
+				transaction);
+
+			createBroadcastConfigs (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"broadcast")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Broadcast")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"broadcast")
 
-			.setLabel (
-				"Broadcast")
+				.setName (
+					"Broadcast")
 
-			.setTargetPath (
-				"/broadcastConfigs")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Broadcast")
 
-		);
+				.setTargetPath (
+					"/broadcastConfigs")
 
-		transaction.flush ();
+				.setTargetFrame (
+					"main")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createBroadcastConfigs (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createBroadcastConfigs");
+		try (
 
-		broadcastConfigHelper.insert (
-			taskLogger,
-			broadcastConfigHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createBroadcastConfigs");
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+		) {
 
-			.setCode (
-				"test")
+			broadcastConfigHelper.insert (
+				taskLogger,
+				broadcastConfigHelper.createInstance ()
 
-			.setName (
-				"Test")
-
-			.setDescription (
-				"Test broadcast config")
-
-			.setRouter (
-				routerHelper.findByCodeRequired (
-					routeHelper.findByCodeRequired (
+				.setSlice (
+					sliceHelper.findByCodeRequired (
 						GlobalId.root,
-						"test",
-						"free"),
-					"static"))
+						"test"))
 
-			.setBlockNumberLookup (
-				numberLookupHelper.findByCodeRequired (
-					numberListHelper.findByCodeRequired (
+				.setCode (
+					"test")
+
+				.setName (
+					"Test")
+
+				.setDescription (
+					"Test broadcast config")
+
+				.setRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"free"),
+						"static"))
+
+				.setBlockNumberLookup (
+					numberLookupHelper.findByCodeRequired (
+						numberListHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"uk_blocked"),
+						"default"))
+
+				.setNumberFormat (
+					numberFormatHelper.findByCodeRequired (
 						GlobalId.root,
-						"test",
-						"uk_blocked"),
-					"default"))
+						"uk"))
 
-			.setNumberFormat (
-				numberFormatHelper.findByCodeRequired (
-					GlobalId.root,
-					"uk"))
+			);
 
-		);
+			transaction.flush ();
 
-		transaction.flush ();
+		}
 
 	}
 

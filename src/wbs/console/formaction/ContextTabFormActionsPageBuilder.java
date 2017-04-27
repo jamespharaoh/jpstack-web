@@ -115,37 +115,43 @@ class ContextTabFormActionsPageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		initFormActions (
-			taskLogger);
-
-		buildPagePartFactory (
-			taskLogger);
-
-		buildAction ();
-
-		buildResponder (
-			taskLogger);
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				taskLogger,
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildFile (
-				taskLogger,
-				resolvedExtensionPoint);
+			initFormActions (
+				taskLogger);
+
+			buildPagePartFactory (
+				taskLogger);
+
+			buildAction ();
+
+			buildResponder (
+				taskLogger);
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					taskLogger,
+					resolvedExtensionPoint);
+
+				buildFile (
+					taskLogger,
+					resolvedExtensionPoint);
+
+			}
 
 		}
 
@@ -154,13 +160,24 @@ class ContextTabFormActionsPageBuilder
 	void initFormActions (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		formActions =
-			iterableMapToList (
-				actionSpec ->
-					initFormAction (
-						parentTaskLogger,
-						actionSpec),
-				spec.actions ());
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initFormActions");
+
+		) {
+
+			formActions =
+				iterableMapToList (
+					actionSpec ->
+						initFormAction (
+							parentTaskLogger,
+							actionSpec),
+					spec.actions ());
+
+		}
 
 	}
 

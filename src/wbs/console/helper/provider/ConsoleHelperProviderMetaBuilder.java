@@ -77,49 +77,55 @@ class ConsoleHelperProviderMetaBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		ObjectHelper <RecordType> objectHelper =
-			genericCastUnchecked (
-				objectManager.objectHelperForObjectNameRequired (
-					consoleHelperProviderSpec.objectName ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		List <String> packageNameParts =
-			stringSplitFullStop (
-				objectHelper.objectClass ().getPackage ().getName ());
+		) {
 
-		String consoleHelperClassName =
-			stringFormat (
-				"%s.console.%sConsoleHelper",
-				joinWithFullStop (
-					packageNameParts.subList (
-						0,
-						packageNameParts.size () - 1)),
-				capitalise (
-					objectHelper.objectName ()));
+			ObjectHelper <RecordType> objectHelper =
+				genericCastUnchecked (
+					objectManager.objectHelperForObjectNameRequired (
+						consoleHelperProviderSpec.objectName ()));
 
-		@SuppressWarnings ("unchecked")
-		Class <ConsoleHelper <RecordType>> consoleHelperClass =
-			(Class <ConsoleHelper <RecordType>>)
-			classForNameRequired (
-				consoleHelperClassName);
+			List <String> packageNameParts =
+				stringSplitFullStop (
+					objectHelper.objectClass ().getPackage ().getName ());
 
-		genericConsoleHelperProviderProvider.get ()
+			String consoleHelperClassName =
+				stringFormat (
+					"%s.console.%sConsoleHelper",
+					joinWithFullStop (
+						packageNameParts.subList (
+							0,
+							packageNameParts.size () - 1)),
+					capitalise (
+						objectHelper.objectName ()));
 
-			.consoleHelperProviderSpec (
-				consoleHelperProviderSpec)
+			@SuppressWarnings ("unchecked")
+			Class <ConsoleHelper <RecordType>> consoleHelperClass =
+				(Class <ConsoleHelper <RecordType>>)
+				classForNameRequired (
+					consoleHelperClassName);
 
-			.objectHelper (
-				objectHelper)
+			genericConsoleHelperProviderProvider.get ()
 
-			.consoleHelperClass (
-				consoleHelperClass)
+				.consoleHelperProviderSpec (
+					consoleHelperProviderSpec)
 
-			.init (
-				taskLogger);
+				.objectHelper (
+					objectHelper)
+
+				.consoleHelperClass (
+					consoleHelperClass)
+
+				.init (
+					taskLogger);
+
+		}
 
 	}
 

@@ -84,106 +84,125 @@ class ChatUserAdminDatePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderForm ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderHistory (
-			taskLogger);
+		) {
+
+			renderForm (
+				taskLogger);
+
+			renderHistory (
+				taskLogger);
+
+		}
 
 	}
 
 	private
-	void renderForm () {
+	void renderForm (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (chatUser.getBarred ()) {
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderForm");
+
+		) {
+
+			if (chatUser.getBarred ()) {
+
+				formatWriter.writeLineFormat (
+					"<p>This user is barred</p>");
+
+				return;
+
+			}
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.date"));
+
+			htmlTableOpenDetails ();
+
+			htmlTableDetailsRowWriteHtml (
+				"Date mode",
+				() -> chatUserDateModeConsoleHelper.writeSelect (
+					"dateMode",
+					requestContext.formOrElse (
+						"dateMode",
+						() -> objectToStringNullSafe (
+							chatUser.getDateMode ()))));
+
+			htmlTableDetailsRowWriteHtml (
+				"Radius (miles)",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"radius\"",
+					" value=\"%h\"",
+					requestContext.formOrElse (
+						"radius",
+						() -> integerToDecimalString (
+							chatUser.getDateRadius ())),
+					">"));
+
+			htmlTableDetailsRowWriteHtml (
+				"Start hour",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"startHour\"",
+					" value=\"%h\"",
+					requestContext.formOrElse (
+						"startHour",
+						() -> integerToDecimalString (
+							chatUser.getDateStartHour ())),
+					">"));
+
+			htmlTableDetailsRowWriteHtml (
+				"End hour",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"endHour\"",
+					" value=\"%h\"",
+					requestContext.formOrElse (
+						"endHour",
+						() -> integerToDecimalString (
+							chatUser.getDateEndHour ())),
+					">"));
+
+			htmlTableDetailsRowWriteHtml (
+				"Max profiles per day",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"dailyMax\"",
+					" value=\"%h\"",
+					requestContext.formOrElse (
+						"dailyMax",
+						() -> integerToDecimalString (
+							chatUser.getDateDailyMax ())),
+					">"));
+
+			htmlTableClose ();
 
 			formatWriter.writeLineFormat (
-				"<p>This user is barred</p>");
+				"<p><input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				"></p>");
 
-			return;
+			htmlFormClose ();
 
 		}
-
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.date"));
-
-		htmlTableOpenDetails ();
-
-		htmlTableDetailsRowWriteHtml (
-			"Date mode",
-			() -> chatUserDateModeConsoleHelper.writeSelect (
-				"dateMode",
-				requestContext.formOrElse (
-					"dateMode",
-					() -> objectToStringNullSafe (
-						chatUser.getDateMode ()))));
-
-		htmlTableDetailsRowWriteHtml (
-			"Radius (miles)",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"radius\"",
-				" value=\"%h\"",
-				requestContext.formOrElse (
-					"radius",
-					() -> integerToDecimalString (
-						chatUser.getDateRadius ())),
-				">"));
-
-		htmlTableDetailsRowWriteHtml (
-			"Start hour",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"startHour\"",
-				" value=\"%h\"",
-				requestContext.formOrElse (
-					"startHour",
-					() -> integerToDecimalString (
-						chatUser.getDateStartHour ())),
-				">"));
-
-		htmlTableDetailsRowWriteHtml (
-			"End hour",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"endHour\"",
-				" value=\"%h\"",
-				requestContext.formOrElse (
-					"endHour",
-					() -> integerToDecimalString (
-						chatUser.getDateEndHour ())),
-				">"));
-
-		htmlTableDetailsRowWriteHtml (
-			"Max profiles per day",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"dailyMax\"",
-				" value=\"%h\"",
-				requestContext.formOrElse (
-					"dailyMax",
-					() -> integerToDecimalString (
-						chatUser.getDateDailyMax ())),
-				">"));
-
-		htmlTableClose ();
-
-		formatWriter.writeLineFormat (
-			"<p><input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			"></p>");
-
-		htmlFormClose ();
 
 	}
 
@@ -191,82 +210,88 @@ class ChatUserAdminDatePart
 	void renderHistory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHistory");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHistory");
 
-		htmlTableHeaderRowWrite (
-			"Timestamp",
-			"Source",
-			"Mode",
-			"Radius",
-			"Hours",
-			"Number");
-
-		for (
-			ChatUserDateLogRec chatUserDateLogRec
-				: chatUser.getChatUserDateLogs ()
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUserDateLogRec.getTimestamp (),
-					() -> timeFormatter.timestampTimezoneString (
-						chatUserLogic.getTimezone (
-							chatUser),
-						chatUserDateLogRec.getTimestamp ())));
+			htmlTableHeaderRowWrite (
+				"Timestamp",
+				"Source",
+				"Mode",
+				"Radius",
+				"Hours",
+				"Number");
 
-			if (
-				isNotNull (
-					chatUserDateLogRec.getUser ())
+			for (
+				ChatUserDateLogRec chatUserDateLogRec
+					: chatUser.getChatUserDateLogs ()
 			) {
 
-				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					chatUserDateLogRec.getUser ());
-
-			} else if (
-				isNotNull (
-					chatUserDateLogRec.getMessage ())
-			) {
-
-				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					chatUserDateLogRec.getMessage ());
-
-			} else {
+				htmlTableRowOpen ();
 
 				htmlTableCellWrite (
-					"API");
+					ifNotNullThenElseEmDash (
+						chatUserDateLogRec.getTimestamp (),
+						() -> timeFormatter.timestampTimezoneString (
+							chatUserLogic.getTimezone (
+								chatUser),
+							chatUserDateLogRec.getTimestamp ())));
+
+				if (
+					isNotNull (
+						chatUserDateLogRec.getUser ())
+				) {
+
+					objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						chatUserDateLogRec.getUser ());
+
+				} else if (
+					isNotNull (
+						chatUserDateLogRec.getMessage ())
+				) {
+
+					objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						chatUserDateLogRec.getMessage ());
+
+				} else {
+
+					htmlTableCellWrite (
+						"API");
+
+				}
+
+				htmlTableCellWrite (
+					chatUserDateLogRec.getDateMode ().name ());
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						chatUserDateLogRec.getRadius ()));
+
+				htmlTableCellWriteFormat (
+					"%s–%s",
+					integerToDecimalString (
+						chatUserDateLogRec.getStartHour ()),
+					integerToDecimalString (
+						chatUserDateLogRec.getEndHour ()));
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						chatUserDateLogRec.getDailyMax ()));
 
 			}
 
-			htmlTableCellWrite (
-				chatUserDateLogRec.getDateMode ().name ());
-
-			htmlTableCellWrite (
-				integerToDecimalString (
-					chatUserDateLogRec.getRadius ()));
-
-			htmlTableCellWriteFormat (
-				"%s–%s",
-				integerToDecimalString (
-					chatUserDateLogRec.getStartHour ()),
-				integerToDecimalString (
-					chatUserDateLogRec.getEndHour ()));
-
-			htmlTableCellWrite (
-				integerToDecimalString (
-					chatUserDateLogRec.getDailyMax ()));
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

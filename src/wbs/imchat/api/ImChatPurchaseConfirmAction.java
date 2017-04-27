@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -122,7 +122,7 @@ class ImChatPurchaseConfirmAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ImChatPurchaseConfirmAction.handle ()",

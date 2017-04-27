@@ -72,6 +72,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	// public implementation
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType find (
@@ -89,6 +90,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	List <RecordType> findMany (
@@ -152,6 +154,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType findByParentAndCode (
@@ -356,6 +359,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	List <RecordType> findManyByParentAndCode (
@@ -542,6 +546,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType findByParentAndIndex (
@@ -734,6 +739,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType findByParentAndTypeAndCode (
@@ -1044,6 +1050,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	List<RecordType> findAllByParent (
@@ -1263,6 +1270,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	List<RecordType> findByParentAndIndexRange (
@@ -1329,20 +1337,14 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			// execute and return
 
-			List<?> objectsUncast =
-				criteria.list ();
-
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
-
-			return objects;
+			return genericCastUnchecked (
+				criteria.list ());
 
 		}
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType insert (
@@ -1383,6 +1385,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType insertSpecial (
@@ -1453,6 +1456,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public <ObjectType extends EphemeralRecord<RecordType>>
 	ObjectType remove (
@@ -1482,6 +1486,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	List<RecordType> findAllByParentAndType (
@@ -1675,6 +1680,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
 	RecordType lock (

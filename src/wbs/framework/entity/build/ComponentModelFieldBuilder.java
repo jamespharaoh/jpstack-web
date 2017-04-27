@@ -63,116 +63,122 @@ class ComponentModelFieldBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String fieldTypeName =
-			capitalise (
-				spec.typeName ());
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				fieldTypeName);
-
-		Class<?> fieldTypeClass =
-			classForNameRequired (
-				fullFieldTypeName);
-
-		// create model field
-
-		ModelField modelField =
-			new ModelField ()
-
-			.model (
-				target.model ())
-
-			.parentField (
-				context.parentModelField ())
-
-			.name (
-				fieldName)
-
-			.label (
-				camelToSpaces (
-					fieldName))
-
-			.type (
-				ModelFieldType.component)
-
-			.parent (
-				false)
-
-			.identity (
-				false)
-
-			.valueType (
-				fieldTypeClass)
-
-			.nullable (
-				false);
-
-		// contained model field
-
-		ModelFieldBuilderContext nextContext =
-			new ModelFieldBuilderContext ()
-
-			.modelMeta (
-				context.modelMeta ())
-
-			.recordClass (
-				context.recordClass ())
-
-			.parentModelField (
-				modelField);
-
-		ModelFieldBuilderTarget nextTarget =
-			new ModelFieldBuilderTarget ()
-
-			.model (
-				target.model ())
-
-			.fields (
-				modelField.fields ())
-
-			.fieldsByName (
-				modelField.fieldsByName ());
-
-		ModelMetaSpec componentMeta =
-			modelMetaLoader.componentMetas ().get (
-				spec.typeName ());
-
-		if (
-			isNull (
-				componentMeta)
 		) {
 
-			throw new RuntimeException ();
+			String fieldName =
+				ifNull (
+					spec.name (),
+					spec.typeName ());
+
+			String fieldTypeName =
+				capitalise (
+					spec.typeName ());
+
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					fieldTypeName);
+
+			Class<?> fieldTypeClass =
+				classForNameRequired (
+					fullFieldTypeName);
+
+			// create model field
+
+			ModelField modelField =
+				new ModelField ()
+
+				.model (
+					target.model ())
+
+				.parentField (
+					context.parentModelField ())
+
+				.name (
+					fieldName)
+
+				.label (
+					camelToSpaces (
+						fieldName))
+
+				.type (
+					ModelFieldType.component)
+
+				.parent (
+					false)
+
+				.identity (
+					false)
+
+				.valueType (
+					fieldTypeClass)
+
+				.nullable (
+					false);
+
+			// contained model field
+
+			ModelFieldBuilderContext nextContext =
+				new ModelFieldBuilderContext ()
+
+				.modelMeta (
+					context.modelMeta ())
+
+				.recordClass (
+					context.recordClass ())
+
+				.parentModelField (
+					modelField);
+
+			ModelFieldBuilderTarget nextTarget =
+				new ModelFieldBuilderTarget ()
+
+				.model (
+					target.model ())
+
+				.fields (
+					modelField.fields ())
+
+				.fieldsByName (
+					modelField.fieldsByName ());
+
+			ModelMetaSpec componentMeta =
+				modelMetaLoader.componentMetas ().get (
+					spec.typeName ());
+
+			if (
+				isNull (
+					componentMeta)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			modelBuilderManager.build (
+				taskLogger,
+				nextContext,
+				componentMeta.fields (),
+				nextTarget);
+
+			// store field
+
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
 
 		}
-
-		modelBuilderManager.build (
-			taskLogger,
-			nextContext,
-			componentMeta.fields (),
-			nextTarget);
-
-		// store field
-
-		target.fields ().add (
-			modelField);
-
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
 
 	}
 

@@ -38,40 +38,46 @@ class ConsoleHelperProviderManager {
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		for (
-			Map.Entry <String, ConsoleHelperProvider <?>> entry
-				: consoleHelperProvidersByBeanName.entrySet ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
+
 		) {
 
-			ConsoleHelperProvider <?> consoleHelperProvider =
-				entry.getValue ();
-
-			// check for dupes
-
-			if (
-				consoleHelperProvidersByClass.containsKey (
-					consoleHelperProvider.objectClass ())
+			for (
+				Map.Entry <String, ConsoleHelperProvider <?>> entry
+					: consoleHelperProvidersByBeanName.entrySet ()
 			) {
 
-				taskLogger.errorFormat (
-					"Ignoring duplicate helper provider for class %s",
-					classNameFull (
-						consoleHelperProvider.objectClass ()));
+				ConsoleHelperProvider <?> consoleHelperProvider =
+					entry.getValue ();
 
-				continue;
+				// check for dupes
+
+				if (
+					consoleHelperProvidersByClass.containsKey (
+						consoleHelperProvider.objectClass ())
+				) {
+
+					taskLogger.errorFormat (
+						"Ignoring duplicate helper provider for class %s",
+						classNameFull (
+							consoleHelperProvider.objectClass ()));
+
+					continue;
+
+				}
+
+				// store in indexes
+
+				consoleHelperProvidersByClass.put (
+					consoleHelperProvider.objectClass (),
+					consoleHelperProvider);
 
 			}
-
-			// store in indexes
-
-			consoleHelperProvidersByClass.put (
-				consoleHelperProvider.objectClass (),
-				consoleHelperProvider);
 
 		}
 

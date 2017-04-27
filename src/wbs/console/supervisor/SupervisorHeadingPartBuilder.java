@@ -63,29 +63,34 @@ class SupervisorHeadingPartBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		label =
-			supervisorHeadingPartSpec.label ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		text =
-			stringFormat (
-				"<h2>%h</h2>\n",
-				label);
+		) {
 
-		PagePartFactory pagePartFactory =
-			nextTaskLogger ->
-				textPartProvider.get ()
+			label =
+				supervisorHeadingPartSpec.label ();
 
-			.text (
-				text);
+			text =
+				stringFormat (
+					"<h2>%h</h2>\n",
+					label);
 
-		supervisorConfigBuilder.pagePartFactories ().add (
-			pagePartFactory);
+			PagePartFactory pagePartFactory =
+				nextTaskLogger ->
+					textPartProvider.get ()
+
+				.text (
+					text);
+
+			supervisorConfigBuilder.pagePartFactories ().add (
+				pagePartFactory);
+
+		}
 
 	}
 

@@ -46,49 +46,55 @@ class BroadcastNumberObjectHelperMethodsImplementation
 			@NonNull BroadcastRec broadcast,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// find existing
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		BroadcastNumberRec broadcastNumber =
-			broadcastNumberHelper.find (
-				broadcast,
-				number);
+		) {
 
-		if (broadcastNumber != null)
+			// find existing
+
+			BroadcastNumberRec broadcastNumber =
+				broadcastNumberHelper.find (
+					broadcast,
+					number);
+
+			if (broadcastNumber != null)
+				return broadcastNumber;
+
+			// create new
+
+			broadcastNumber =
+				broadcastNumberHelper.insert (
+					taskLogger,
+					broadcastNumberHelper.createInstance ()
+
+				.setBroadcast (
+					broadcast)
+
+				.setNumber (
+					number)
+
+				.setState (
+					BroadcastNumberState.removed)
+
+			);
+
+			// update broadcast
+
+			broadcast
+
+				.setNumRemoved (
+					broadcast.getNumRemoved () + 1);
+
+			// return
+
 			return broadcastNumber;
 
-		// create new
-
-		broadcastNumber =
-			broadcastNumberHelper.insert (
-				taskLogger,
-				broadcastNumberHelper.createInstance ()
-
-			.setBroadcast (
-				broadcast)
-
-			.setNumber (
-				number)
-
-			.setState (
-				BroadcastNumberState.removed)
-
-		);
-
-		// update broadcast
-
-		broadcast
-
-			.setNumRemoved (
-				broadcast.getNumRemoved () + 1);
-
-		// return
-
-		return broadcastNumber;
+		}
 
 	}
 
@@ -99,78 +105,84 @@ class BroadcastNumberObjectHelperMethodsImplementation
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <NumberRec> numbers) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateMany");
+		try (
 
-		ImmutableList.Builder <BroadcastNumberRec> broadcastNumbersBuilder =
-			ImmutableList.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateMany");
 
-		// find existing
-
-		List <Optional <BroadcastNumberRec>> broadcastNumbers =
-			broadcastNumberHelper.findMany (
-				broadcast,
-				numbers);
-
-		// create new
-
-		for (
-			long index = 0;
-			index < collectionSize (numbers);
-			index ++
 		) {
 
-			Optional <BroadcastNumberRec> broadcastNumberOptional =
-				listItemAtIndexRequired (
-					broadcastNumbers,
-					index);
+			ImmutableList.Builder <BroadcastNumberRec> broadcastNumbersBuilder =
+				ImmutableList.builder ();
 
-			if (
-				optionalIsPresent (
-					broadcastNumberOptional)
+			// find existing
+
+			List <Optional <BroadcastNumberRec>> broadcastNumbers =
+				broadcastNumberHelper.findMany (
+					broadcast,
+					numbers);
+
+			// create new
+
+			for (
+				long index = 0;
+				index < collectionSize (numbers);
+				index ++
 			) {
 
-				broadcastNumbersBuilder.add (
-					optionalGetRequired (
-						broadcastNumberOptional));
-
-			} else {
-
-				NumberRec number =
+				Optional <BroadcastNumberRec> broadcastNumberOptional =
 					listItemAtIndexRequired (
-						numbers,
+						broadcastNumbers,
 						index);
 
-				broadcastNumbersBuilder.add (
-					broadcastNumberHelper.insert (
-						taskLogger,
-						broadcastNumberHelper.createInstance ()
+				if (
+					optionalIsPresent (
+						broadcastNumberOptional)
+				) {
 
-					.setBroadcast (
-						broadcast)
+					broadcastNumbersBuilder.add (
+						optionalGetRequired (
+							broadcastNumberOptional));
 
-					.setNumber (
-						number)
+				} else {
 
-					.setState (
-						BroadcastNumberState.removed)
+					NumberRec number =
+						listItemAtIndexRequired (
+							numbers,
+							index);
 
-				));
+					broadcastNumbersBuilder.add (
+						broadcastNumberHelper.insert (
+							taskLogger,
+							broadcastNumberHelper.createInstance ()
 
-				broadcast
+						.setBroadcast (
+							broadcast)
 
-					.setNumRemoved (
-						broadcast.getNumRemoved () + 1);
+						.setNumber (
+							number)
+
+						.setState (
+							BroadcastNumberState.removed)
+
+					));
+
+					broadcast
+
+						.setNumRemoved (
+							broadcast.getNumRemoved () + 1);
+
+				}
 
 			}
 
+			// return
+
+			return broadcastNumbersBuilder.build ();
+
 		}
-
-		// return
-
-		return broadcastNumbersBuilder.build ();
 
 	}
 

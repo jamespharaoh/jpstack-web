@@ -80,14 +80,20 @@ class ConsoleHelperImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getPathId");
+		try (
 
-		return consoleHelperProvider.getPathId (
-			taskLogger,
-			object.getId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getPathId");
+
+		) {
+
+			return consoleHelperProvider.getPathId (
+				taskLogger,
+				object.getId ());
+
+		}
 
 	}
 
@@ -97,14 +103,20 @@ class ConsoleHelperImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long objectId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getPathId");
+		try (
 
-		return consoleHelperProvider.getPathId (
-			taskLogger,
-			objectId);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getPathId");
+
+		) {
+
+			return consoleHelperProvider.getPathId (
+				taskLogger,
+				objectId);
+
+		}
 
 	}
 
@@ -114,14 +126,20 @@ class ConsoleHelperImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getDefaultContextPath");
+		try (
 
-		return consoleHelperProvider.getDefaultContextPath (
-			taskLogger,
-			object);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getDefaultContextPath");
+
+		) {
+
+			return consoleHelperProvider.getDefaultContextPath (
+				taskLogger,
+				object);
+
+		}
 
 	}
 
@@ -131,14 +149,20 @@ class ConsoleHelperImplementation <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getDefaultLocalPath");
+		try (
 
-		return consoleHelperProvider.localPath (
-			taskLogger,
-			object);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getDefaultLocalPath");
+
+		) {
+
+			return consoleHelperProvider.localPath (
+				taskLogger,
+				object);
+
+		}
 
 	}
 
@@ -183,38 +207,44 @@ class ConsoleHelperImplementation <
 			@NonNull Optional <Record <?>> assumedRoot,
 			@NonNull Boolean mini) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeHtml");
+		try (
 
-		Optional <String> optionalHtml =
-			consoleHooks.getHtml (
-				object,
-				mini);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeHtml");
 
-		if (optionalHtml.isPresent ()) {
+		) {
 
-			formatWriter.writeLineFormat (
-				"%s",
-				optionalHtml.get ());
-
-		} else {
-
-			String path =
-				objectManager.objectPath (
+			Optional <String> optionalHtml =
+				consoleHooks.getHtml (
 					object,
-					assumedRoot,
-					false,
 					mini);
 
-			formatWriter.writeLineFormat (
-				"<a href=\"%h\">%h</a>",
-				requestContext.resolveLocalUrl (
-					getDefaultLocalPath (
-						taskLogger,
-						object)),
-				path);
+			if (optionalHtml.isPresent ()) {
+
+				formatWriter.writeLineFormat (
+					"%s",
+					optionalHtml.get ());
+
+			} else {
+
+				String path =
+					objectManager.objectPath (
+						object,
+						assumedRoot,
+						false,
+						mini);
+
+				formatWriter.writeLineFormat (
+					"<a href=\"%h\">%h</a>",
+					requestContext.resolveLocalUrl (
+						getDefaultLocalPath (
+							taskLogger,
+							object)),
+					path);
+
+			}
 
 		}
 

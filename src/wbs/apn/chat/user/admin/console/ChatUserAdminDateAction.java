@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -74,76 +74,78 @@ class ChatUserAdminDateAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		ChatUserDateMode dateMode =
-			toEnum (
-				ChatUserDateMode.class,
-				requestContext.parameterRequired (
-					"dateMode"));
-
-		Long radius =
-			parseIntegerRequired (
-				requestContext.parameterRequired (
-					"radius"));
-
-		Long startHour =
-			parseIntegerRequired (
-				requestContext.parameterRequired (
-					"startHour"));
-
-		Long endHour =
-			parseIntegerRequired (
-				requestContext.parameterRequired (
-					"endHour"));
-
-		Long dailyMax =
-			parseIntegerRequired (
-				requestContext.parameterRequired (
-					"dailyMax"));
-
-		if (radius < 1) {
-
-			requestContext.addError (
-				"Radius must be 1 or more");
-
-			return null;
-
-		}
-
-		if (startHour < 0
-				|| startHour > 23
-				|| endHour < 0
-				|| endHour > 23) {
-
-			requestContext.addError (
-				"Start and end hours must be between 0 and 23");
-
-			return null;
-
-		}
-
-		if (dailyMax < 1) {
-
-			requestContext.addError (
-				"Daily max must be 1 or greater");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatUserAdminDateAction.goReal ()",
 					this);
 
 		) {
+
+			ChatUserDateMode dateMode =
+				toEnum (
+					ChatUserDateMode.class,
+					requestContext.parameterRequired (
+						"dateMode"));
+
+			Long radius =
+				parseIntegerRequired (
+					requestContext.parameterRequired (
+						"radius"));
+
+			Long startHour =
+				parseIntegerRequired (
+					requestContext.parameterRequired (
+						"startHour"));
+
+			Long endHour =
+				parseIntegerRequired (
+					requestContext.parameterRequired (
+						"endHour"));
+
+			Long dailyMax =
+				parseIntegerRequired (
+					requestContext.parameterRequired (
+						"dailyMax"));
+
+			if (radius < 1) {
+
+				requestContext.addError (
+					"Radius must be 1 or more");
+
+				return null;
+
+			}
+
+			if (
+				startHour < 0
+				|| startHour > 23
+				|| endHour < 0
+				|| endHour > 23
+			) {
+
+				requestContext.addError (
+					"Start and end hours must be between 0 and 23");
+
+				return null;
+
+			}
+
+			if (dailyMax < 1) {
+
+				requestContext.addError (
+					"Daily max must be 1 or greater");
+
+				return null;
+
+			}
 
 			ChatUserRec chatUser =
 				chatUserHelper.findFromContextRequired ();

@@ -9,7 +9,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -59,118 +59,124 @@ class ChatSettingsMonitorsAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		if (! requestContext.canContext ("chat.manage")) {
-
-			requestContext.addError ("Access denied");
-
-			return null;
-
-		}
-
-		long gayMale;
-		long gayFemale;
-		long biMale;
-		long biFemale;
-		long straightMale;
-		long straightFemale;
-
-		try {
-
-			gayMale =
-				requestContext.parameterIntegerRequired (
-					"gayMale");
-
-			gayFemale =
-				requestContext.parameterIntegerRequired (
-					"gayFemale");
-
-			biMale =
-				requestContext.parameterIntegerRequired (
-					"biMale");
-
-			biFemale =
-				requestContext.parameterIntegerRequired (
-					"biFemale");
-
-			straightMale =
-				requestContext.parameterIntegerRequired (
-					"straightMale");
-
-			straightFemale =
-				requestContext.parameterIntegerRequired (
-					"straightFemale");
-
-		} catch (NumberFormatException exception) {
-
-			requestContext.addError (
-				"Please enter a real number in each box.");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatSettingsMonitorsAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+			if (! requestContext.canContext ("chat.manage")) {
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.male,
-				Orient.gay,
-				gayMale);
+				requestContext.addError ("Access denied");
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.female,
-				Orient.gay,
-				gayFemale);
+				return null;
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.male,
-				Orient.bi,
-				biMale);
+			}
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.female,
-				Orient.bi,
-				biFemale);
+			long gayMale;
+			long gayFemale;
+			long biMale;
+			long biFemale;
+			long straightMale;
+			long straightFemale;
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.male,
-				Orient.straight,
-				straightMale);
+			try {
 
-			chatMiscLogic.monitorsToTarget (
-				chat,
-				Gender.female,
-				Orient.straight,
-				straightFemale);
+				gayMale =
+					requestContext.parameterIntegerRequired (
+						"gayMale");
 
-			transaction.commit ();
+				gayFemale =
+					requestContext.parameterIntegerRequired (
+						"gayFemale");
 
-			requestContext.addNotice (
-				"Chat monitors updated");
+				biMale =
+					requestContext.parameterIntegerRequired (
+						"biMale");
 
-			requestContext.setEmptyFormData ();
+				biFemale =
+					requestContext.parameterIntegerRequired (
+						"biFemale");
 
-			return null;
+				straightMale =
+					requestContext.parameterIntegerRequired (
+						"straightMale");
+
+				straightFemale =
+					requestContext.parameterIntegerRequired (
+						"straightFemale");
+
+			} catch (NumberFormatException exception) {
+
+				requestContext.addError (
+					"Please enter a real number in each box.");
+
+				return null;
+
+			}
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatSettingsMonitorsAction.goReal ()",
+						this);
+
+			) {
+
+				ChatRec chat =
+					chatHelper.findFromContextRequired ();
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.male,
+					Orient.gay,
+					gayMale);
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.female,
+					Orient.gay,
+					gayFemale);
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.male,
+					Orient.bi,
+					biMale);
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.female,
+					Orient.bi,
+					biFemale);
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.male,
+					Orient.straight,
+					straightMale);
+
+				chatMiscLogic.monitorsToTarget (
+					chat,
+					Gender.female,
+					Orient.straight,
+					straightFemale);
+
+				transaction.commit ();
+
+				requestContext.addNotice (
+					"Chat monitors updated");
+
+				requestContext.setEmptyFormData ();
+
+				return null;
+
+			}
 
 		}
 

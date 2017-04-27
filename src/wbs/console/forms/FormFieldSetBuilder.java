@@ -60,139 +60,145 @@ class FormFieldSetBuilder <Container>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		if (
-			spec.objectName () == null
-			&& spec.className () == null
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Form field set %s ",
-					spec.name (),
-					"in console module %s ",
-					spec.consoleModule ().name (),
-					"has neither object name nor class"));
+			if (
+				spec.objectName () == null
+				&& spec.className () == null
+			) {
 
-		}
+				throw new RuntimeException (
+					stringFormat (
+						"Form field set %s ",
+						spec.name (),
+						"in console module %s ",
+						spec.consoleModule ().name (),
+						"has neither object name nor class"));
 
-		if (
-			spec.objectName () != null
-			&& spec.className () != null
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Form field set %s ",
-					spec.name (),
-					"in console module %s ",
-					spec.consoleModule ().name (),
-					"has both object name and class"));
-
-		}
-
-		ConsoleHelper <?> consoleHelper;
-		Class <Container> containerClass;
-
-		if (spec.objectName () != null) {
-
-			consoleHelper =
-				objectManager.findConsoleHelperRequired (
-					spec.objectName ());
-
-			Class <Container> containerClassTemp =
-				genericCastUnchecked (
-					consoleHelper.objectClass ());
-
-			containerClass =
-				containerClassTemp;
-
-		} else {
-
-			consoleHelper = null;
-
-			@SuppressWarnings ("unchecked")
-			Class <Container> containerClassTemp =
-				(Class <Container>)
-				classForNameOrThrow (
-					spec.className (),
-					() -> new RuntimeException (
-						stringFormat (
-							"Error getting object class %s ",
-							spec.className (),
-							"for form field set %s ",
-							spec.name (),
-							"in console module %s",
-							spec.consoleModule ().name ())));
-
-			containerClass =
-				containerClassTemp;
-
-		}
-
-		FormFieldBuilderContext formFieldBuilderContext =
-			new FormFieldBuilderContextImplementation ()
-
-			.containerClass (
-				containerClass)
-
-			.consoleHelper (
-				consoleHelper);
-
-		FormFieldSet <Container> formFieldSet =
-			new FormFieldSet <Container> ()
-
-			.name (
-				joinWithFullStop (
-					spec.consoleModule ().name (),
-					spec.name ()))
-
-			.containerClass (
-				containerClass);
-
-		builder.descend (
-			taskLogger,
-			formFieldBuilderContext,
-			spec.formFieldSpecs (),
-			formFieldSet,
-			MissingBuilderBehaviour.error);
-
-		String fullName =
-			joinWithFullStop (
-				spec.consoleModule ().name (),
-				spec.name ());
-
-		for (
-			FormItem <?> formItem
-				: formFieldSet.formItems ()
-		) {
-
-			formItem.init (
-				fullName);
-
-		}
-
-		for (
-			FormField <?, ?, ?, ?> formField
-				: formFieldSet.formFields ()
-		) {
-
-			if (formField.fileUpload ()) {
-				formFieldSet.fileUpload (true);
 			}
 
+			if (
+				spec.objectName () != null
+				&& spec.className () != null
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Form field set %s ",
+						spec.name (),
+						"in console module %s ",
+						spec.consoleModule ().name (),
+						"has both object name and class"));
+
+			}
+
+			ConsoleHelper <?> consoleHelper;
+			Class <Container> containerClass;
+
+			if (spec.objectName () != null) {
+
+				consoleHelper =
+					objectManager.findConsoleHelperRequired (
+						spec.objectName ());
+
+				Class <Container> containerClassTemp =
+					genericCastUnchecked (
+						consoleHelper.objectClass ());
+
+				containerClass =
+					containerClassTemp;
+
+			} else {
+
+				consoleHelper = null;
+
+				@SuppressWarnings ("unchecked")
+				Class <Container> containerClassTemp =
+					(Class <Container>)
+					classForNameOrThrow (
+						spec.className (),
+						() -> new RuntimeException (
+							stringFormat (
+								"Error getting object class %s ",
+								spec.className (),
+								"for form field set %s ",
+								spec.name (),
+								"in console module %s",
+								spec.consoleModule ().name ())));
+
+				containerClass =
+					containerClassTemp;
+
+			}
+
+			FormFieldBuilderContext formFieldBuilderContext =
+				new FormFieldBuilderContextImplementation ()
+
+				.containerClass (
+					containerClass)
+
+				.consoleHelper (
+					consoleHelper);
+
+			FormFieldSet <Container> formFieldSet =
+				new FormFieldSet <Container> ()
+
+				.name (
+					joinWithFullStop (
+						spec.consoleModule ().name (),
+						spec.name ()))
+
+				.containerClass (
+					containerClass);
+
+			builder.descend (
+				taskLogger,
+				formFieldBuilderContext,
+				spec.formFieldSpecs (),
+				formFieldSet,
+				MissingBuilderBehaviour.error);
+
+			String fullName =
+				joinWithFullStop (
+					spec.consoleModule ().name (),
+					spec.name ());
+
+			for (
+				FormItem <?> formItem
+					: formFieldSet.formItems ()
+			) {
+
+				formItem.init (
+					fullName);
+
+			}
+
+			for (
+				FormField <?, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				if (formField.fileUpload ()) {
+					formFieldSet.fileUpload (true);
+				}
+
+			}
+
+			if (formFieldSet.fileUpload () == null)
+				formFieldSet.fileUpload (false);
+
+			consoleModule.addFormFieldSet (
+				spec.name (),
+				formFieldSet);
+
 		}
-
-		if (formFieldSet.fileUpload () == null)
-			formFieldSet.fileUpload (false);
-
-		consoleModule.addFormFieldSet (
-			spec.name (),
-			formFieldSet);
 
 	}
 

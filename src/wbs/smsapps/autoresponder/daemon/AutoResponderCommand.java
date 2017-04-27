@@ -19,8 +19,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -128,139 +128,145 @@ class AutoResponderCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		MessageRec receivedMessage =
-			inbox.getMessage ();
-
-		AutoResponderRec autoResponder =
-			autoResponderHelper.findRequired (
-				command.getParentId ());
-
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				autoResponder,
-				"default");
-
-		// create request
-
-		AutoResponderRequestRec request =
-			autoResponderRequestHelper.insert (
-				taskLogger,
-				autoResponderRequestHelper.createInstance ()
-
-			.setAutoResponder (
-				autoResponder)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setNumber (
-				receivedMessage.getNumber ())
-
-			.setReceivedMessage (
-				receivedMessage)
-
-		);
-
-		// send responses
-
-		MessageSetRec messageSet =
-			messageSetHelper.findByCodeRequired (
-				autoResponder,
-				"default");
-
-		for (
-			MessageSetMessageRec messageSetMessage
-				: messageSet.getMessages ()
 		) {
 
-			MessageRec sentMessage =
-				messageSenderProvider.get ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-				.threadId (
-					receivedMessage.getThreadId ())
+			MessageRec receivedMessage =
+				inbox.getMessage ();
 
-				.number (
+			AutoResponderRec autoResponder =
+				autoResponderHelper.findRequired (
+					command.getParentId ());
+
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					autoResponder,
+					"default");
+
+			// create request
+
+			AutoResponderRequestRec request =
+				autoResponderRequestHelper.insert (
+					taskLogger,
+					autoResponderRequestHelper.createInstance ()
+
+				.setAutoResponder (
+					autoResponder)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setNumber (
 					receivedMessage.getNumber ())
 
-				.messageString (
+				.setReceivedMessage (
+					receivedMessage)
+
+			);
+
+			// send responses
+
+			MessageSetRec messageSet =
+				messageSetHelper.findByCodeRequired (
+					autoResponder,
+					"default");
+
+			for (
+				MessageSetMessageRec messageSetMessage
+					: messageSet.getMessages ()
+			) {
+
+				MessageRec sentMessage =
+					messageSenderProvider.get ()
+
+					.threadId (
+						receivedMessage.getThreadId ())
+
+					.number (
+						receivedMessage.getNumber ())
+
+					.messageString (
+						taskLogger,
+						messageSetMessage.getMessage ())
+
+					.numFrom (
+						messageSetMessage.getNumber ())
+
+					.route (
+						messageSetMessage.getRoute ())
+
+					.service (
+						defaultService)
+
+					.sendNow (
+						! autoResponder.getSequenceResponses ()
+						|| messageSetMessage.getIndex () == 0)
+
+					.deliveryTypeCode (
+						"auto_responder")
+
+					.ref (
+						request.getId ())
+
+					.send (
+						taskLogger);
+
+				request.getSentMessages ().add (
+					sentMessage);
+
+			}
+
+			// send email
+
+			if (
+				autoResponder.getEmailAddress () != null
+				&& autoResponder.getEmailAddress ().length () > 0
+			) {
+
+				emailLogic.sendSystemEmail (
+					ImmutableList.of (
+						autoResponder.getEmailAddress ()),
+					"Auto responder " + autoResponder.getDescription (),
+					receivedMessage.getText ().getText ());
+
+			}
+
+			// add to number list
+
+			if (
+				isNotNull (
+					autoResponder.getAddToNumberList ())
+			) {
+
+				numberListLogic.addDueToMessage (
 					taskLogger,
-					messageSetMessage.getMessage ())
+					autoResponder.getAddToNumberList (),
+					receivedMessage.getNumber (),
+					receivedMessage,
+					defaultService);
 
-				.numFrom (
-					messageSetMessage.getNumber ())
+			}
 
-				.route (
-					messageSetMessage.getRoute ())
+			// process inbox
 
-				.service (
-					defaultService)
-
-				.sendNow (
-					! autoResponder.getSequenceResponses ()
-					|| messageSetMessage.getIndex () == 0)
-
-				.deliveryTypeCode (
-					"auto_responder")
-
-				.ref (
-					request.getId ())
-
-				.send (
-					taskLogger);
-
-			request.getSentMessages ().add (
-				sentMessage);
-
-		}
-
-		// send email
-
-		if (
-			autoResponder.getEmailAddress () != null
-			&& autoResponder.getEmailAddress ().length () > 0
-		) {
-
-			emailLogic.sendSystemEmail (
-				ImmutableList.of (
-					autoResponder.getEmailAddress ()),
-				"Auto responder " + autoResponder.getDescription (),
-				receivedMessage.getText ().getText ());
-
-		}
-
-		// add to number list
-
-		if (
-			isNotNull (
-				autoResponder.getAddToNumberList ())
-		) {
-
-			numberListLogic.addDueToMessage (
+			return smsInboxLogic.inboxProcessed (
 				taskLogger,
-				autoResponder.getAddToNumberList (),
-				receivedMessage.getNumber (),
-				receivedMessage,
-				defaultService);
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalAbsent (),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalAbsent (),
-			command);
 
 	}
 

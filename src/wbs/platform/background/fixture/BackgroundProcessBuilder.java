@@ -20,7 +20,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -82,31 +82,37 @@ class BackgroundProcessBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			taskLogger.noticeFormat (
-				"Create background process %s.%s",
-				hyphenToCamel (
-					spec.objectTypeCode ()),
-				simplifyToCodeRequired (
-					spec.name ()));
+		) {
 
-			createBackgroundProcess (
-				taskLogger);
+			try {
 
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Error creating background process %s.%s",
-					spec.objectTypeCode (),
+				taskLogger.noticeFormat (
+					"Create background process %s.%s",
+					hyphenToCamel (
+						spec.objectTypeCode ()),
 					simplifyToCodeRequired (
-						spec.name ())));
+						spec.name ()));
+
+				createBackgroundProcess (
+					taskLogger);
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Error creating background process %s.%s",
+						spec.objectTypeCode (),
+						simplifyToCodeRequired (
+							spec.name ())));
+
+			}
 
 		}
 
@@ -116,16 +122,14 @@ class BackgroundProcessBuilder
 	void createBackgroundProcess (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createBackgroundProcess");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createBackgroundProcess");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"BackgroundProcessBuilder.createBackgroundProcess ()",

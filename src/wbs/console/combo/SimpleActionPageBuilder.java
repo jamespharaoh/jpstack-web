@@ -69,57 +69,75 @@ class SimpleActionPageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildFile (
-			taskLogger);
+		) {
 
-		buildResponder (
-			taskLogger);
+			setDefaults ();
+
+			buildFile (
+				taskLogger);
+
+			buildResponder (
+				taskLogger);
+
+		}
 
 	}
 
 	void buildFile (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildFile");
+		try (
 
-		consoleModule.addFile (
-			path,
-			consoleFileProvider.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-			.getResponderName (
-				responderName)
+		) {
 
-			.postActionName (
-				taskLogger,
-				actionName)
+			consoleModule.addFile (
+				path,
+				consoleFileProvider.get ()
 
-		);
+				.getResponderName (
+					responderName)
+
+				.postActionName (
+					taskLogger,
+					actionName)
+
+			);
+
+		}
 
 	}
 
 	void buildResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildResponder");
+		try (
 
-		consoleModule.addResponder (
-			responderName,
-			consoleModule.beanResponder (
-				taskLogger,
-				responderBeanName));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResponder");
+
+		) {
+
+			consoleModule.addResponder (
+				responderName,
+				consoleModule.beanResponder (
+					taskLogger,
+					responderBeanName));
+
+		}
 
 	}
 

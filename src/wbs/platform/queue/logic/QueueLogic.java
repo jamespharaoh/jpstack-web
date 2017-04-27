@@ -58,9 +58,11 @@ interface QueueLogic {
 	}
 
 	void cancelQueueItem (
+			TaskLogger parentTaskLogger,
 			QueueItemRec queueItem);
 
 	void processQueueItem (
+			TaskLogger parentTaskLogger,
 			QueueItemRec queueItem,
 			UserRec user);
 

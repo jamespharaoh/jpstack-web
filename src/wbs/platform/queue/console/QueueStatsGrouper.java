@@ -57,19 +57,25 @@ class QueueStatsGrouper
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeTdForGroup");
+		try (
 
-		QueueRec queue =
-			queueHelper.findRequired (
-				(Long)
-				group);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeTdForGroup");
 
-		consoleObjectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			queue);
+		) {
+
+			QueueRec queue =
+				queueHelper.findRequired (
+					(Long)
+					group);
+
+			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
+				queue);
+
+		}
 
 	}
 

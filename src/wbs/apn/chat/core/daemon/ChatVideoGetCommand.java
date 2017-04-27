@@ -146,135 +146,60 @@ class ChatVideoGetCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		MessageRec message =
-			inbox.getMessage ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+		) {
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			MessageRec message =
+				inbox.getMessage ();
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-		// send barred users to help
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		if (creditCheckResult.failed ()) {
+			// send barred users to help
 
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
-
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					defaultService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// log request
-
-		chatHelpLogLogic.createChatHelpLogIn (
-			taskLogger,
-			chatUser,
-			message,
-			rest,
-			optionalOf (
-				command),
-			false);
-
-		String text =
-			rest.trim ();
-
-		if (text.length () == 0) {
-
-			// just send three random videos
-
-			long numSent =
-				chatInfoLogic.sendUserVideos (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					taskLogger,
 					chatUser,
-					3l,
+					true,
 					optionalOf (
 						message.getThreadId ()));
 
-			// send a message if no videos were found
+			if (creditCheckResult.failed ()) {
 
-			if (numSent == 0) {
-
-				chatSendLogic.sendSystemRbFree (
+				chatHelpLogLogic.createChatHelpLogIn (
 					taskLogger,
 					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"no_videos_error",
-					TemplateMissing.error,
-					emptyMap ());
-
-			}
-
-		} else {
-
-			// find other user and ensure they have video
-
-			Optional<ChatUserRec> otherUserOptional =
-				chatUserHelper.findByCode (
-					chat,
-					text);
-
-			if (
-
-				optionalIsNotPresent (
-					otherUserOptional)
-
-				|| otherUserOptional.get ().getChatUserVideoList ().isEmpty ()
-
-			) {
-
-				chatSendLogic.sendSystemRbFree (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"video_not_found",
-					TemplateMissing.error,
-					emptyMap ());
+					message,
+					rest,
+					null,
+					true);
 
 				return smsInboxLogic.inboxProcessed (
 					taskLogger,
@@ -287,80 +212,161 @@ class ChatVideoGetCommand
 
 			}
 
-			ChatUserRec otherUser =
-				otherUserOptional.get ();
+			// log request
 
-			// send the reply
-
-			List<MediaRec> medias =
-				new ArrayList<MediaRec> ();
-
-			medias.add (
-				otherUser.getChatUserVideoList ().get (0).getMedia ());
-
-			medias.add (
-				chatInfoLogic.chatUserBlurbMedia (
-					taskLogger,
-					chatUser,
-					otherUser));
-
-			messageSender.get ()
-
-				.threadId (
-					message.getThreadId ())
-
-				.number (
-					chatUser.getNumber ())
-
-				.messageString (
-					taskLogger,
-					"")
-
-				.numFrom (
-					chatScheme.getMmsNumber ())
-
-				.route (
-					chatScheme.getMmsRoute ())
-
-				.service (
-					defaultService)
-
-				.affiliate (
-					affiliate)
-
-				.subjectString (
-					taskLogger,
-					"User video")
-
-				.medias (
-					medias)
-
-				.send (
-					taskLogger);
-
-			// charge for one video
-
-			chatCreditLogic.userSpend (
+			chatHelpLogLogic.createChatHelpLogIn (
 				taskLogger,
 				chatUser,
-				0,
-				0,
-				0,
-				0,
-				1);
+				message,
+				rest,
+				optionalOf (
+					command),
+				false);
+
+			String text =
+				rest.trim ();
+
+			if (text.length () == 0) {
+
+				// just send three random videos
+
+				long numSent =
+					chatInfoLogic.sendUserVideos (
+						taskLogger,
+						chatUser,
+						3l,
+						optionalOf (
+							message.getThreadId ()));
+
+				// send a message if no videos were found
+
+				if (numSent == 0) {
+
+					chatSendLogic.sendSystemRbFree (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"no_videos_error",
+						TemplateMissing.error,
+						emptyMap ());
+
+				}
+
+			} else {
+
+				// find other user and ensure they have video
+
+				Optional<ChatUserRec> otherUserOptional =
+					chatUserHelper.findByCode (
+						chat,
+						text);
+
+				if (
+
+					optionalIsNotPresent (
+						otherUserOptional)
+
+					|| otherUserOptional.get ().getChatUserVideoList ().isEmpty ()
+
+				) {
+
+					chatSendLogic.sendSystemRbFree (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"video_not_found",
+						TemplateMissing.error,
+						emptyMap ());
+
+					return smsInboxLogic.inboxProcessed (
+						taskLogger,
+						inbox,
+						optionalOf (
+							defaultService),
+						optionalOf (
+							affiliate),
+						command);
+
+				}
+
+				ChatUserRec otherUser =
+					otherUserOptional.get ();
+
+				// send the reply
+
+				List<MediaRec> medias =
+					new ArrayList<MediaRec> ();
+
+				medias.add (
+					otherUser.getChatUserVideoList ().get (0).getMedia ());
+
+				medias.add (
+					chatInfoLogic.chatUserBlurbMedia (
+						taskLogger,
+						chatUser,
+						otherUser));
+
+				messageSender.get ()
+
+					.threadId (
+						message.getThreadId ())
+
+					.number (
+						chatUser.getNumber ())
+
+					.messageString (
+						taskLogger,
+						"")
+
+					.numFrom (
+						chatScheme.getMmsNumber ())
+
+					.route (
+						chatScheme.getMmsRoute ())
+
+					.service (
+						defaultService)
+
+					.affiliate (
+						affiliate)
+
+					.subjectString (
+						taskLogger,
+						"User video")
+
+					.medias (
+						medias)
+
+					.send (
+						taskLogger);
+
+				// charge for one video
+
+				chatCreditLogic.userSpend (
+					taskLogger,
+					chatUser,
+					0,
+					0,
+					0,
+					0,
+					1);
+
+			}
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

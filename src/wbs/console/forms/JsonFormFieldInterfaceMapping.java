@@ -3,19 +3,20 @@ package wbs.console.forms;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
 
-import java.io.StringWriter;
 import java.util.Map;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
+import wbs.utils.string.StringFormatWriter;
 
 import fj.data.Either;
 import wbs.web.utils.JsonToHtml;
@@ -25,6 +26,13 @@ public
 class JsonFormFieldInterfaceMapping <Container>
 	implements FormFieldInterfaceMapping <Container, String, String> {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
@@ -33,41 +41,45 @@ class JsonFormFieldInterfaceMapping <Container>
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToInterface");
+
+			StringFormatWriter formatWriter =
+				new StringFormatWriter ();
+
 		) {
 
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
+				return successResultAbsent ();
+			}
+
+			formatWriter.writeFormat (
+				"<pre>\n");
+
+			JsonToHtml jsonToHtml =
+				new JsonToHtml ()
+
+				.formatWriter (
+					formatWriter);
+
+			jsonToHtml.write (
+				genericValue.get ());
+
+			formatWriter.writeFormat (
+				"\n</pre>");
+
 			return successResult (
-				Optional.absent ());
+				optionalOf (
+					formatWriter.toString ()));
 
 		}
-
-		StringWriter stringWriter =
-			new StringWriter ();
-
-		FormatWriter formatWriter =
-			new WriterFormatWriter (
-				stringWriter);
-
-		formatWriter.writeFormat (
-			"<pre>\n");
-
-		JsonToHtml jsonToHtml =
-			new JsonToHtml ()
-
-			.formatWriter (
-				formatWriter);
-
-		jsonToHtml.write (
-			genericValue.get ());
-
-		formatWriter.writeFormat (
-			"\n</pre>");
-
-		return successResult (
-			optionalOf (
-				stringWriter.toString ()));
 
 	}
 

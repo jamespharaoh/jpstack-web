@@ -47,40 +47,46 @@ class FloatingPointFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		JavaPropertyWriter propertyWriter =
-			new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeClass (
-				Double.class)
+			JavaPropertyWriter propertyWriter =
+				new JavaPropertyWriter ()
 
-			.propertyNameFormat (
-				"%s",
-				spec.name ());
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-		if (spec.defaultValue () != null) {
+				.typeClass (
+					Double.class)
 
-			propertyWriter.defaultValueFormat (
-				"%s",
-				spec.defaultValue ().toString ());
+				.propertyNameFormat (
+					"%s",
+					spec.name ());
+
+			if (spec.defaultValue () != null) {
+
+				propertyWriter.defaultValueFormat (
+					"%s",
+					spec.defaultValue ().toString ());
+
+			}
+
+			propertyWriter.writeBlock (
+				taskLogger,
+				target.imports (),
+				target.formatWriter ());
 
 		}
-
-		propertyWriter.writeBlock (
-			taskLogger,
-			target.imports (),
-			target.formatWriter ());
 
 	}
 

@@ -99,93 +99,99 @@ class AutoResponderVotesPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// get fields
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		formFields =
-			autoResponderVotesConsoleModule.formFieldSetRequired (
-				"auto-responder-votes",
-				AutoResponderVotesForm.class);
-
-		// process form
-
-		formValue =
-			new AutoResponderVotesForm ()
-
-			.timePeriod (
-				TextualInterval.parseRequired (
-					consoleUserHelper.timezone (),
-					"last 12 hours",
-					consoleUserHelper.hourOffset ()));
-
-		formUpdate =
-			formFieldLogic.update (
-				taskLogger,
-				requestContext,
-				formFields,
-				formValue,
-				emptyMap (),
-				"votes");
-
-		if (formUpdate.errors ()) {
-			return;
-		}
-
-		// lookup objects
-
-		AutoResponderRec autoResponder =
-			autoResponderHelper.findFromContextRequired ();
-
-		ServiceRec autoResponderService =
-			serviceHelper.findByCodeRequired (
-				autoResponder,
-				"default");
-
-		// retrieve messages
-
-		MessageSearch messageSearch =
-			new MessageSearch ()
-
-			.serviceId (
-				autoResponderService.getId ())
-
-			.createdTime (
-				formValue.timePeriod ())
-
-			.direction (
-				MessageDirection.in);
-
-		List <MessageRec> messages =
-			messageHelper.search (
-				taskLogger,
-				messageSearch);
-
-		// now aggregate them
-
-		votes =
-			new TreeMap <String, Long> ();
-
-		for (
-			MessageRec message
-				: messages
 		) {
 
-			String body =
-				simplify (
-					message.getText ().getText ());
+			// get fields
 
-			Long oldVal =
-				ifNull (
-					votes.get (body),
-					0l);
+			formFields =
+				autoResponderVotesConsoleModule.formFieldSetRequired (
+					"auto-responder-votes",
+					AutoResponderVotesForm.class);
 
-			votes.put (
-				body,
-				oldVal + 1);
+			// process form
+
+			formValue =
+				new AutoResponderVotesForm ()
+
+				.timePeriod (
+					TextualInterval.parseRequired (
+						consoleUserHelper.timezone (),
+						"last 12 hours",
+						consoleUserHelper.hourOffset ()));
+
+			formUpdate =
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formFields,
+					formValue,
+					emptyMap (),
+					"votes");
+
+			if (formUpdate.errors ()) {
+				return;
+			}
+
+			// lookup objects
+
+			AutoResponderRec autoResponder =
+				autoResponderHelper.findFromContextRequired ();
+
+			ServiceRec autoResponderService =
+				serviceHelper.findByCodeRequired (
+					autoResponder,
+					"default");
+
+			// retrieve messages
+
+			MessageSearch messageSearch =
+				new MessageSearch ()
+
+				.serviceId (
+					autoResponderService.getId ())
+
+				.createdTime (
+					formValue.timePeriod ())
+
+				.direction (
+					MessageDirection.in);
+
+			List <MessageRec> messages =
+				messageHelper.search (
+					taskLogger,
+					messageSearch);
+
+			// now aggregate them
+
+			votes =
+				new TreeMap <String, Long> ();
+
+			for (
+				MessageRec message
+					: messages
+			) {
+
+				String body =
+					simplify (
+						message.getText ().getText ());
+
+				Long oldVal =
+					ifNull (
+						votes.get (body),
+						0l);
+
+				votes.put (
+					body,
+					oldVal + 1);
+
+			}
 
 		}
 
@@ -196,64 +202,70 @@ class AutoResponderVotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// form
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		formFieldLogic.outputFormTable (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFields,
-			optionalOf (
-				formUpdate),
-			formValue,
-			emptyMap (),
-			"get",
-			requestContext.resolveLocalUrl (
-				"/autoResponder.votes"),
-			"search",
-			FormType.search,
-			"votes");
-
-		// votes
-
-		if (
-			isNull (
-				votes)
-		) {
-			return;
-		}
-
-		htmlHeadingTwoWrite (
-			"Vote summary");
-
-		htmlTableOpenLayout ();
-
-		htmlTableHeaderRowWrite (
-			"Content",
-			"Votes");
-
-		for (
-			Map.Entry <String, Long> entry
-				: votes.entrySet ()
 		) {
 
-			htmlTableRowOpen ();
+			// form
 
-			htmlTableCellWrite (
-				entry.getKey ());
+			formFieldLogic.outputFormTable (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFields,
+				optionalOf (
+					formUpdate),
+				formValue,
+				emptyMap (),
+				"get",
+				requestContext.resolveLocalUrl (
+					"/autoResponder.votes"),
+				"search",
+				FormType.search,
+				"votes");
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					entry.getValue ()));
+			// votes
+
+			if (
+				isNull (
+					votes)
+			) {
+				return;
+			}
+
+			htmlHeadingTwoWrite (
+				"Vote summary");
+
+			htmlTableOpenLayout ();
+
+			htmlTableHeaderRowWrite (
+				"Content",
+				"Votes");
+
+			for (
+				Map.Entry <String, Long> entry
+					: votes.entrySet ()
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					entry.getKey ());
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						entry.getValue ()));
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

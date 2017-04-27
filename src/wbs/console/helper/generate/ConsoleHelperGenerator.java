@@ -545,249 +545,254 @@ class ConsoleHelperGenerator {
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeLifecycle");
+		try (
 
-		formatWriter.writeLineFormat (
-			"// lifecycle");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeLifecycle");
 
-		formatWriter.writeNewline ();
-
-		// open method
-
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				NormalLifecycleSetup.class));
-
-		formatWriter.writeLineFormat (
-			"public");
-
-		formatWriter.writeLineFormat (
-			"void setup (");
-
-		formatWriter.writeLineFormat (
-			"\t\t%s parentTaskLogger) {",
-			imports.register (
-				TaskLogger.class));
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-		// nest task logger
-
-		formatWriter.writeLineFormat (
-			"TaskLogger taskLogger =");
-
-		formatWriter.writeLineFormat (
-			"\tlogContext.nestTaskLogger (");
-
-		formatWriter.writeLineFormat (
-			"\t\tparentTaskLogger,");
-
-		formatWriter.writeLineFormat (
-			"\t\t\"setup\");");
-
-		formatWriter.writeNewline ();
-
-		// object model
-
-		formatWriter.writeLineFormat (
-			"objectModel =");
-
-		formatWriter.writeLineFormat (
-			"\tobjectHelper.objectModel ();");
-
-		formatWriter.writeNewline ();
-
-		// console helper provider spec
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHelperProviderSpec")
-
-			.value (
-				stringFormat (
-					"%s.get (\"%s\")",
-					"consoleHelperProviderSpecManager.specsByName ()",
-					model.objectName ()))
-
-			.write (
-				formatWriter);
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"if (consoleHelperProviderSpec == null) {");
-
-		formatWriter.writeNewline ();
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHelperProviderSpec")
-
-			.valueFormat (
-				"new %s ()",
-				imports.register (
-					ConsoleHelperProviderSpec.class))
-
-			.propertyFormat (
-				"objectName",
-				"\"%s\"",
-				model.objectName ())
-
-			.propertyFormat (
-				"idKey",
-				"\"%sId\"",
-				model.objectName ())
-
-			.write (
-				formatWriter);
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		formatWriter.writeNewline ();
-
-		// console helper provider
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHelperProvider")
-
-			.value (
-				"genericConsoleHelperProviderProvider.get ()")
-
-			.property (
-				"consoleHelperProviderSpec",
-				"consoleHelperProviderSpec")
-
-			.property (
-				"objectHelper",
-				stringFormat (
-					"%s (%s, \"%sObjectHelper\", %s.class)",
-					"componentManager.getComponentRequired",
-					"taskLogger",
-					model.objectName (),
-					imports.registerFormat (
-						"%s.model.%s",
-						packageName,
-						objectHelperInterfaceName)))
-
-			.propertyFormat (
-				"consoleHelperClass",
-				"%s.class",
-				imports.registerFormat (
-					"%s.console.%s",
-					packageName,
-					consoleHelperInterfaceName))
-
-			.call (
-				"init",
-				"taskLogger")
-
-			.write (
-				formatWriter);
-
-		// hooks
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHooksImplementation")
-
-			.valueFormat (
-				"%s.%s (%s (%s, \"%s\", %s.class))",
-				imports.register (
-					OptionalUtils.class),
-				"optionalOrNull",
-				"componentManager.getComponent",
-				"taskLogger",
-				consoleHooksComponentName,
-				imports.register (
-					ConsoleHooks.class))
-
-			.write (
-				formatWriter);
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"if (consoleHooksImplementation == null) {");
-
-		formatWriter.writeNewline ();
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHooksImplementation")
-
-			.valueFormat (
-				"new %s.DefaultImplementation ()",
-				imports.register (
-					ConsoleHooks.class))
-
-			.write (
-				formatWriter);
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		formatWriter.writeNewline ();
-
-		// console helper implementation
-
-		javaAssignmentWriterProvider.get ()
-
-			.variableName (
-				"consoleHelperImplementation")
-
-			.value (
-				"consoleHelperImplementationProvider.get ()")
-
-			.property (
-				"objectHelper",
-				"objectHelper")
-
-			.property (
-				"consoleHelperProvider",
-				"consoleHelperProvider")
-
-			.property (
-				"consoleHooks",
-				"consoleHooksImplementation")
-
-			.write (
-				formatWriter);
-
-		// components
-
-		ObjectHelperGenerator.componentNames.forEach (
-			componentName -> {
+		) {
 
 			formatWriter.writeLineFormat (
-				"%sImplementation =",
-				componentName);
-
-			formatWriter.writeLineFormat (
-				"\tobjectHelper.%sImplementation ();",
-				componentName);
+				"// lifecycle");
 
 			formatWriter.writeNewline ();
 
-		});
+			// open method
 
-		// close method
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					NormalLifecycleSetup.class));
 
-		formatWriter.decreaseIndent ();
+			formatWriter.writeLineFormat (
+				"public");
 
-		formatWriter.writeLineFormat (
-			"}");
+			formatWriter.writeLineFormat (
+				"void setup (");
 
-		formatWriter.writeNewline ();
+			formatWriter.writeLineFormat (
+				"\t\t%s parentTaskLogger) {",
+				imports.register (
+					TaskLogger.class));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.increaseIndent ();
+
+			// nest task logger
+
+			formatWriter.writeLineFormat (
+				"TaskLogger taskLogger =");
+
+			formatWriter.writeLineFormat (
+				"\tlogContext.nestTaskLogger (");
+
+			formatWriter.writeLineFormat (
+				"\t\tparentTaskLogger,");
+
+			formatWriter.writeLineFormat (
+				"\t\t\"setup\");");
+
+			formatWriter.writeNewline ();
+
+			// object model
+
+			formatWriter.writeLineFormat (
+				"objectModel =");
+
+			formatWriter.writeLineFormat (
+				"\tobjectHelper.objectModel ();");
+
+			formatWriter.writeNewline ();
+
+			// console helper provider spec
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHelperProviderSpec")
+
+				.value (
+					stringFormat (
+						"%s.get (\"%s\")",
+						"consoleHelperProviderSpecManager.specsByName ()",
+						model.objectName ()))
+
+				.write (
+					formatWriter);
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"if (consoleHelperProviderSpec == null) {");
+
+			formatWriter.writeNewline ();
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHelperProviderSpec")
+
+				.valueFormat (
+					"new %s ()",
+					imports.register (
+						ConsoleHelperProviderSpec.class))
+
+				.propertyFormat (
+					"objectName",
+					"\"%s\"",
+					model.objectName ())
+
+				.propertyFormat (
+					"idKey",
+					"\"%sId\"",
+					model.objectName ())
+
+				.write (
+					formatWriter);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			formatWriter.writeNewline ();
+
+			// console helper provider
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHelperProvider")
+
+				.value (
+					"genericConsoleHelperProviderProvider.get ()")
+
+				.property (
+					"consoleHelperProviderSpec",
+					"consoleHelperProviderSpec")
+
+				.property (
+					"objectHelper",
+					stringFormat (
+						"%s (%s, \"%sObjectHelper\", %s.class)",
+						"componentManager.getComponentRequired",
+						"taskLogger",
+						model.objectName (),
+						imports.registerFormat (
+							"%s.model.%s",
+							packageName,
+							objectHelperInterfaceName)))
+
+				.propertyFormat (
+					"consoleHelperClass",
+					"%s.class",
+					imports.registerFormat (
+						"%s.console.%s",
+						packageName,
+						consoleHelperInterfaceName))
+
+				.call (
+					"init",
+					"taskLogger")
+
+				.write (
+					formatWriter);
+
+			// hooks
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHooksImplementation")
+
+				.valueFormat (
+					"%s.%s (%s (%s, \"%s\", %s.class))",
+					imports.register (
+						OptionalUtils.class),
+					"optionalOrNull",
+					"componentManager.getComponent",
+					"taskLogger",
+					consoleHooksComponentName,
+					imports.register (
+						ConsoleHooks.class))
+
+				.write (
+					formatWriter);
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"if (consoleHooksImplementation == null) {");
+
+			formatWriter.writeNewline ();
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHooksImplementation")
+
+				.valueFormat (
+					"new %s.DefaultImplementation ()",
+					imports.register (
+						ConsoleHooks.class))
+
+				.write (
+					formatWriter);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			formatWriter.writeNewline ();
+
+			// console helper implementation
+
+			javaAssignmentWriterProvider.get ()
+
+				.variableName (
+					"consoleHelperImplementation")
+
+				.value (
+					"consoleHelperImplementationProvider.get ()")
+
+				.property (
+					"objectHelper",
+					"objectHelper")
+
+				.property (
+					"consoleHelperProvider",
+					"consoleHelperProvider")
+
+				.property (
+					"consoleHooks",
+					"consoleHooksImplementation")
+
+				.write (
+					formatWriter);
+
+			// components
+
+			ObjectHelperGenerator.componentNames.forEach (
+				componentName -> {
+
+				formatWriter.writeLineFormat (
+					"%sImplementation =",
+					componentName);
+
+				formatWriter.writeLineFormat (
+					"\tobjectHelper.%sImplementation ();",
+					componentName);
+
+				formatWriter.writeNewline ();
+
+			});
+
+			// close method
+
+			formatWriter.decreaseIndent ();
+
+			formatWriter.writeLineFormat (
+				"}");
+
+			formatWriter.writeNewline ();
+
+		}
 
 	}
 

@@ -5,13 +5,10 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -23,7 +20,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -113,62 +110,66 @@ class MediaburstProteusApiServletModule
 		@Override
 		public
 		void doPost (
-				@NonNull TaskLogger parentTaskLogger)
-			throws ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reportFile.doPost");
-
-			ReportRequestResult reportRequestResult =
-				processReportRequest (
-
-					taskLogger,
-					requestContext.inputStream ());
-
-			if (
-				isNull (
-					reportRequestResult.status)
-			) {
-				return;
-			}
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"MediaburstProteusApiServletModule.reportFile.doPost ()",
-						this);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"reportFile.doPost");
 
 			) {
 
-				RouteRec route =
-					routeHelper.findRequired (
-						requestContext.requestIntegerRequired (
-							"routeId"));
+				ReportRequestResult reportRequestResult =
+					processReportRequest (
 
-				reportLogic.deliveryReport (
-					taskLogger,
-					route,
-					reportRequestResult.otherId,
-					reportRequestResult.status,
-					Optional.of (
-						reportRequestResult.statusString),
-					Optional.absent (),
-					Optional.of (
-						joinWithSpace (
-							stringFormat (
-								"status=%s",
-								reportRequestResult.statusString),
-							stringFormat (
-								"errCode=%s",
-								reportRequestResult.errCode))),
-					Optional.absent ());
+						taskLogger,
+						requestContext.inputStream ());
 
-				transaction.commit ();
+				if (
+					isNull (
+						reportRequestResult.status)
+				) {
+					return;
+				}
+
+				try (
+
+					OwnedTransaction transaction =
+						database.beginReadWrite (
+							taskLogger,
+							"MediaburstProteusApiServletModule.reportFile.doPost ()",
+							this);
+
+				) {
+
+					RouteRec route =
+						routeHelper.findRequired (
+							requestContext.requestIntegerRequired (
+								"routeId"));
+
+					reportLogic.deliveryReport (
+						taskLogger,
+						route,
+						reportRequestResult.otherId,
+						reportRequestResult.status,
+						Optional.of (
+							reportRequestResult.statusString),
+						Optional.absent (),
+						Optional.of (
+							joinWithSpace (
+								stringFormat (
+									"status=%s",
+									reportRequestResult.statusString),
+								stringFormat (
+									"errCode=%s",
+									reportRequestResult.errCode))),
+						Optional.absent ());
+
+					transaction.commit ();
+
+				}
 
 			}
 

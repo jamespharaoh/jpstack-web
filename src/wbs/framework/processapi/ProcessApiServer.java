@@ -47,49 +47,55 @@ class ProcessApiServer {
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		// do nothing if process-api not configured
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		if (
-			isNull (
-				wbsConfig.processApi ())
 		) {
-			return;
-		}
 
-		// create http server
+			// do nothing if process-api not configured
 
-		httpServer =
-			HttpServer.createSimpleServer (
-				null,
-				toJavaIntegerRequired (
+			if (
+				isNull (
+					wbsConfig.processApi ())
+			) {
+				return;
+			}
+
+			// create http server
+
+			httpServer =
+				HttpServer.createSimpleServer (
+					null,
+					toJavaIntegerRequired (
+						wbsConfig.processApi ().listenPort ()));
+
+			httpServer.getServerConfiguration ().addHttpHandler (
+				processApiStatusHandler,
+				"/status");
+
+			// start http server
+
+			try {
+
+				httpServer.start ();
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
+			taskLogger.noticeFormat (
+				"Started process API server on port %s",
+				integerToDecimalString (
 					wbsConfig.processApi ().listenPort ()));
 
-		httpServer.getServerConfiguration ().addHttpHandler (
-			processApiStatusHandler,
-			"/status");
-
-		// start http server
-
-		try {
-
-			httpServer.start ();
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
 		}
-
-		taskLogger.noticeFormat (
-			"Started process API server on port %s",
-			integerToDecimalString (
-				wbsConfig.processApi ().listenPort ()));
 
 	}
 
@@ -98,43 +104,49 @@ class ProcessApiServer {
 	void tearDown (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"tearDown");
+		try (
 
-		// do nothing if http server not started
-
-		if (
-
-			isNull (
-				httpServer)
-
-			|| ! httpServer.isStarted ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"tearDown");
 
 		) {
-			return;
+
+			// do nothing if http server not started
+
+			if (
+
+				isNull (
+					httpServer)
+
+				|| ! httpServer.isStarted ()
+
+			) {
+				return;
+			}
+
+			// shut down
+
+			try {
+
+				httpServer.shutdown ().wait ();
+
+			} catch (InterruptedException interruptedException) {
+
+				taskLogger.warningFormat (
+					"Interrupted while waiting for process API server to stop");
+
+				httpServer.shutdownNow ();
+
+			}
+
+			taskLogger.noticeFormat (
+				"Stopped process API server on port %s",
+				integerToDecimalString (
+					wbsConfig.processApi ().listenPort ()));
+
 		}
-
-		// shut down
-
-		try {
-
-			httpServer.shutdown ().wait ();
-
-		} catch (InterruptedException interruptedException) {
-
-			taskLogger.warningFormat (
-				"Interrupted while waiting for process API server to stop");
-
-			httpServer.shutdownNow ();
-
-		}
-
-		taskLogger.noticeFormat (
-			"Stopped process API server on port %s",
-			integerToDecimalString (
-				wbsConfig.processApi ().listenPort ()));
 
 	}
 

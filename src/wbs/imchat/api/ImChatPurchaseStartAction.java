@@ -25,7 +25,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -136,30 +136,36 @@ class ImChatPurchaseStartAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		decodeRequest ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		Optional<Responder> createPurchaseResult =
-			createPurchase (
+		) {
+
+			decodeRequest ();
+
+			Optional<Responder> createPurchaseResult =
+				createPurchase (
+					taskLogger);
+
+			if (
+				optionalIsPresent (
+					createPurchaseResult)
+			) {
+				return createPurchaseResult.get ();
+			}
+
+			makeApiCall ();
+
+			updatePurchase (
 				taskLogger);
 
-		if (
-			optionalIsPresent (
-				createPurchaseResult)
-		) {
-			return createPurchaseResult.get ();
+			return createResponse ();
+
 		}
-
-		makeApiCall ();
-
-		updatePurchase (
-			taskLogger);
-
-		return createResponse ();
 
 	}
 
@@ -192,7 +198,7 @@ class ImChatPurchaseStartAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ImChatPurchaseStartAction.createPurchase ()",
@@ -465,16 +471,14 @@ class ImChatPurchaseStartAction
 	void updatePurchase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updatePurchase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updatePurchase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ImChatPurchaseStartAction.updatePurchase",

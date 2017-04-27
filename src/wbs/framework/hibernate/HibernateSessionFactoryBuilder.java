@@ -117,71 +117,77 @@ class HibernateSessionFactoryBuilder {
 	void initCustomTypes (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initCustomTypes");
+		try (
 
-		customTypes.put (
-			LocalDate.class,
-			"org.jadira.usertype.dateandtime.joda.PersistentLocalDate");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initCustomTypes");
 
-		customTypes.put (
-			Instant.class,
-			"org.jadira.usertype.dateandtime.joda.PersistentInstantAsString");
-
-		for (
-			PluginSpec plugin
-				: pluginManager.plugins ()
 		) {
 
-			if (plugin.models () == null)
-				continue;
+			customTypes.put (
+				LocalDate.class,
+				"org.jadira.usertype.dateandtime.joda.PersistentLocalDate");
+
+			customTypes.put (
+				Instant.class,
+				"org.jadira.usertype.dateandtime.joda.PersistentInstantAsString");
 
 			for (
-				PluginCustomTypeSpec customType
-					: plugin.models ().customTypes ()
+				PluginSpec plugin
+					: pluginManager.plugins ()
 			) {
 
-				initCustomType (
-					taskLogger,
-					customType);
+				if (plugin.models () == null)
+					continue;
+
+				for (
+					PluginCustomTypeSpec customType
+						: plugin.models ().customTypes ()
+				) {
+
+					initCustomType (
+						taskLogger,
+						customType);
+
+				}
+
+				for (
+					PluginEnumTypeSpec enumType
+						: plugin.models ().enumTypes ()
+				) {
+
+					initEnumType (
+						taskLogger,
+						enumType);
+
+				}
 
 			}
 
-			for (
-				PluginEnumTypeSpec enumType
-					: plugin.models ().enumTypes ()
-			) {
+			if (errorTypes > 0) {
 
-				initEnumType (
-					taskLogger,
-					enumType);
+				throw new RuntimeException (
+					stringFormat (
+						"Failed to find %s types",
+						integerToDecimalString (
+							errorTypes)));
 
 			}
 
+			valueFieldTypes =
+				ImmutableSet.<Class<?>>builder ()
+
+				.addAll (
+					builtinFieldTypes)
+
+				.addAll (
+					customTypes.keySet ())
+
+				.build ();
+
 		}
-
-		if (errorTypes > 0) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Failed to find %s types",
-					integerToDecimalString (
-						errorTypes)));
-
-		}
-
-		valueFieldTypes =
-			ImmutableSet.<Class<?>>builder ()
-
-			.addAll (
-				builtinFieldTypes)
-
-			.addAll (
-				customTypes.keySet ())
-
-			.build ();
 
 	}
 
@@ -189,74 +195,80 @@ class HibernateSessionFactoryBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginCustomTypeSpec type) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initCustomType");
+		try (
 
-		String objectClassName =
-			stringFormat (
-				"%s.model.%s",
-				type.plugin ().packageName (),
-				capitalise (
-					type.name ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initCustomType");
 
-		Optional <Class <?>> objectClassOptional =
-			classForName (
-				objectClassName);
-
-		if (
-			optionalIsNotPresent (
-				objectClassOptional)
 		) {
 
-			taskLogger.errorFormat (
-				"No such class %s",
-				objectClassName);
+			String objectClassName =
+				stringFormat (
+					"%s.model.%s",
+					type.plugin ().packageName (),
+					capitalise (
+						type.name ()));
 
-		}
+			Optional <Class <?>> objectClassOptional =
+				classForName (
+					objectClassName);
 
-		String helperClassName =
-			stringFormat (
-				"%s.hibernate.%sType",
-				type.plugin ().packageName (),
-				capitalise (
-					type.name ()));
+			if (
+				optionalIsNotPresent (
+					objectClassOptional)
+			) {
 
-		Optional <Class <?>> helperClassOptional =
-			classForName (
+				taskLogger.errorFormat (
+					"No such class %s",
+					objectClassName);
+
+			}
+
+			String helperClassName =
+				stringFormat (
+					"%s.hibernate.%sType",
+					type.plugin ().packageName (),
+					capitalise (
+						type.name ()));
+
+			Optional <Class <?>> helperClassOptional =
+				classForName (
+					helperClassName);
+
+			if (
+				optionalIsNotPresent (
+					helperClassOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"No such class %s",
+					helperClassName);
+
+			}
+
+			if (
+
+				optionalIsNotPresent (
+					objectClassOptional)
+
+				|| optionalIsNotPresent (
+					helperClassOptional)
+
+			) {
+
+				errorTypes ++;
+
+				return;
+
+			}
+
+			customTypes.put (
+				objectClassOptional.get (),
 				helperClassName);
 
-		if (
-			optionalIsNotPresent (
-				helperClassOptional)
-		) {
-
-			taskLogger.errorFormat (
-				"No such class %s",
-				helperClassName);
-
 		}
-
-		if (
-
-			optionalIsNotPresent (
-				objectClassOptional)
-
-			|| optionalIsNotPresent (
-				helperClassOptional)
-
-		) {
-
-			errorTypes ++;
-
-			return;
-
-		}
-
-		customTypes.put (
-			objectClassOptional.get (),
-			helperClassName);
 
 	}
 
@@ -264,55 +276,61 @@ class HibernateSessionFactoryBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginEnumTypeSpec enumType) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initEnumType");
+		try (
 
-		String enumClassName =
-			stringFormat (
-				"%s.model.%s",
-				enumType.plugin ().packageName (),
-				capitalise (
-					enumType.name ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initEnumType");
 
-		Optional<Class<?>> enumClassOptional =
-			classForName (
-				enumClassName);
-
-		if (
-			optionalIsNotPresent (
-				enumClassOptional)
 		) {
 
-			taskLogger.errorFormat (
-				"Enum class not found: %s",
-				enumClassName);
-
-			errorTypes ++;
-
-			return;
-
-		}
-
-		Class<?> enumClass =
-			enumClassOptional.get ();
-
-		if (
-			contains (
-				enumTypes,
-				enumClass)
-		) {
-
-			throw new RuntimeException (
+			String enumClassName =
 				stringFormat (
-					"Enum class specified multiple times: %s",
-					enumClass.getName ()));
+					"%s.model.%s",
+					enumType.plugin ().packageName (),
+					capitalise (
+						enumType.name ()));
+
+			Optional<Class<?>> enumClassOptional =
+				classForName (
+					enumClassName);
+
+			if (
+				optionalIsNotPresent (
+					enumClassOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"Enum class not found: %s",
+					enumClassName);
+
+				errorTypes ++;
+
+				return;
+
+			}
+
+			Class<?> enumClass =
+				enumClassOptional.get ();
+
+			if (
+				contains (
+					enumTypes,
+					enumClass)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Enum class specified multiple times: %s",
+						enumClass.getName ()));
+
+			}
+
+			enumTypes.add (
+				enumClass);
 
 		}
-
-		enumTypes.add (
-			enumClass);
 
 	}
 
@@ -320,26 +338,32 @@ class HibernateSessionFactoryBuilder {
 	SessionFactory build (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		initCustomTypes (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		Configuration config =
-			new Configuration ();
+		) {
 
-		config.setProperties (
-			configProperties);
+			initCustomTypes (
+				taskLogger);
 
-		SessionFactory sessionFactory =
-			buildSessionFactory (
-				taskLogger,
-				config);
+			Configuration config =
+				new Configuration ();
 
-		return sessionFactory;
+			config.setProperties (
+				configProperties);
+
+			SessionFactory sessionFactory =
+				buildSessionFactory (
+					taskLogger,
+					config);
+
+			return sessionFactory;
+
+		}
 
 	}
 
@@ -347,51 +371,57 @@ class HibernateSessionFactoryBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildSessionFactory");
+		try (
 
-		WbsConnectionProvider.setDataSource (
-			dataSource);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildSessionFactory");
 
-		config.setProperty (
-			"hibernate.connection.provider_class",
-			WbsConnectionProvider.class.getName ());
+		) {
 
-		loadConfiguration (
-			taskLogger,
-			config);
+			WbsConnectionProvider.setDataSource (
+				dataSource);
 
-		taskLogger.noticeFormat (
-			"Building session factory");
+			config.setProperty (
+				"hibernate.connection.provider_class",
+				WbsConnectionProvider.class.getName ());
 
-		Instant startTime =
-			Instant.now ();
+			loadConfiguration (
+				taskLogger,
+				config);
 
-		ServiceRegistry serviceRegistry =
-			new StandardServiceRegistryBuilder ()
-				.applySettings (config.getProperties ())
-				.build ();
+			taskLogger.noticeFormat (
+				"Building session factory");
 
-		SessionFactory sessionFactory =
-			config.buildSessionFactory (
-				serviceRegistry);
+			Instant startTime =
+				Instant.now ();
 
-		Instant endTime =
-			Instant.now ();
+			ServiceRegistry serviceRegistry =
+				new StandardServiceRegistryBuilder ()
+					.applySettings (config.getProperties ())
+					.build ();
 
-		Seconds buildSeconds =
-			Seconds.secondsBetween (
-				startTime,
-				endTime);
+			SessionFactory sessionFactory =
+				config.buildSessionFactory (
+					serviceRegistry);
 
-		taskLogger.noticeFormat (
-			"Session factory built in %s seconds",
-			integerToDecimalString (
-				buildSeconds.getSeconds ()));
+			Instant endTime =
+				Instant.now ();
 
-		return sessionFactory;
+			Seconds buildSeconds =
+				Seconds.secondsBetween (
+					startTime,
+					endTime);
+
+			taskLogger.noticeFormat (
+				"Session factory built in %s seconds",
+				integerToDecimalString (
+					buildSeconds.getSeconds ()));
+
+			return sessionFactory;
+
+		}
 
 	}
 
@@ -399,59 +429,65 @@ class HibernateSessionFactoryBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"loadConfiguration");
+		try (
 
-		taskLogger.noticeFormat (
-			"Loading configuration");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"loadConfiguration");
 
-		Instant startTime =
-			Instant.now ();
+		) {
 
-		try {
+			taskLogger.noticeFormat (
+				"Loading configuration");
 
-			FileUtils.deleteDirectory (
-				new File (
-					"work/hibernate"));
+			Instant startTime =
+				Instant.now ();
 
-			FileUtils.forceMkdir (
-				new File (
-					"work/hibernate"));
+			try {
 
-		} catch (IOException exception) {
+				FileUtils.deleteDirectory (
+					new File (
+						"work/hibernate"));
 
-			taskLogger.errorFormatException (
-				exception,
-				"Error deleting contents of work/hibernate");
+				FileUtils.forceMkdir (
+					new File (
+						"work/hibernate"));
 
-		}
+			} catch (IOException exception) {
 
-		loadXmlConfigurationReal (
-			taskLogger,
-			config);
+				taskLogger.errorFormatException (
+					exception,
+					"Error deleting contents of work/hibernate");
 
-		Instant endTime =
-			Instant.now ();
+			}
 
-		Seconds buildSeconds =
-			Seconds.secondsBetween (
-				startTime,
-				endTime);
+			loadXmlConfigurationReal (
+				taskLogger,
+				config);
 
-		taskLogger.noticeFormat (
-			"Configuration loaded in %s seconds",
-			integerToDecimalString (
-				buildSeconds.getSeconds ()));
+			Instant endTime =
+				Instant.now ();
 
-		if (errorClasses > 0) {
+			Seconds buildSeconds =
+				Seconds.secondsBetween (
+					startTime,
+					endTime);
 
-			throw new RuntimeException (
-				stringFormat (
-					"Failed to configure %s entities",
-					integerToDecimalString (
-						errorClasses)));
+			taskLogger.noticeFormat (
+				"Configuration loaded in %s seconds",
+				integerToDecimalString (
+					buildSeconds.getSeconds ()));
+
+			if (errorClasses > 0) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Failed to configure %s entities",
+						integerToDecimalString (
+							errorClasses)));
+
+			}
 
 		}
 
@@ -461,20 +497,26 @@ class HibernateSessionFactoryBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"loadXmlConfigurationReal");
+		try (
 
-		for (
-			Model <?> model
-				: entityHelper.models ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"loadXmlConfigurationReal");
+
 		) {
 
-			configureModel (
-				taskLogger,
-				config,
-				model);
+			for (
+				Model <?> model
+					: entityHelper.models ()
+			) {
+
+				configureModel (
+					taskLogger,
+					config,
+					model);
+
+			}
 
 		}
 
@@ -486,222 +528,230 @@ class HibernateSessionFactoryBuilder {
 			@NonNull Configuration config,
 			@NonNull Model <?> model) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"configureModel");
+		try (
 
-		taskLogger.debugFormat (
-			"Loading %s",
-			model.objectName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"configureModel");
 
-		String tableNameSql =
-			sqlLogic.quoteIdentifier (
-				model.tableName ());
-
-		classErrors = 0;
-
-		// create hibernate xml config for class
-
-		String namespace =
-			"http://www.hibernate.org/xsd/hibernate-mapping";
-
-		Document document =
-			DocumentHelper.createDocument ();
-
-		Element hibernateMappingElement =
-			document
-
-			.addElement (
-				"hibernate-mapping",
-				namespace)
-
-			.addAttribute (
-				QName.get (
-					"schemaLocation",
-					"xsi",
-					"http://www.w3.org/2001/XMLSchema-instance"),
-				joinWithSpace (
-					"http://www.hibernate.org/xsd/hibernate-mapping",
-					"classpath://org/hibernate/hibernate-mapping-4.0.xsd"))
-
-			.addAttribute (
-				"package",
-				model.objectClass ().getPackage ().getName ());
-
-		Element classElement =
-			hibernateMappingElement
-
-			.addElement (
-				"class")
-
-			.addAttribute (
-				"name",
-				model.objectClass ().getSimpleName ())
-
-			.addAttribute (
-				"table",
-				tableNameSql)
-
-			.addAttribute (
-				"lazy",
-				"true");
-
-		if (! model.mutable ()) {
-
-			classElement
-
-				.addAttribute (
-					"mutable",
-					"false");
-
-		}
-
-		// add fields
-
-		for (
-			ModelField modelField
-				: model.fields ()
 		) {
 
-			if (modelField.generatedId ()) {
+			taskLogger.debugFormat (
+				"Loading %s",
+				model.objectName ());
 
-				configureGeneratedId (
-					model,
-					modelField,
-					classElement);
+			String tableNameSql =
+				sqlLogic.quoteIdentifier (
+					model.tableName ());
 
-			} else if (modelField.assignedId ()) {
+			classErrors = 0;
 
-				configureAssignedId (
-					model,
-					modelField,
-					classElement);
+			// create hibernate xml config for class
 
-			} else if (modelField.foreignId ()) {
+			String namespace =
+				"http://www.hibernate.org/xsd/hibernate-mapping";
 
-				configureForeignId (
-					model,
-					modelField,
-					classElement);
+			Document document =
+				DocumentHelper.createDocument ();
 
-			} else if (modelField.value ()) {
+			Element hibernateMappingElement =
+				document
 
-				configureValue (
-					model,
-					modelField,
-					classElement);
+				.addElement (
+					"hibernate-mapping",
+					namespace)
 
-			} else if (modelField.reference ()) {
+				.addAttribute (
+					QName.get (
+						"schemaLocation",
+						"xsi",
+						"http://www.w3.org/2001/XMLSchema-instance"),
+					joinWithSpace (
+						"http://www.hibernate.org/xsd/hibernate-mapping",
+						"classpath://org/hibernate/hibernate-mapping-4.0.xsd"))
 
-				configureReference (
-					model,
-					modelField,
-					classElement);
+				.addAttribute (
+					"package",
+					model.objectClass ().getPackage ().getName ());
 
-			} else if (modelField.partner ()) {
+			Element classElement =
+				hibernateMappingElement
 
-				configurePartner (
-					model,
-					modelField,
-					classElement);
+				.addElement (
+					"class")
 
-			} else if (modelField.collection ()) {
+				.addAttribute (
+					"name",
+					model.objectClass ().getSimpleName ())
 
-				configureCollection (
-					taskLogger,
-					model,
-					modelField,
-					classElement);
+				.addAttribute (
+					"table",
+					tableNameSql)
 
-			} else if (modelField.link ()) {
+				.addAttribute (
+					"lazy",
+					"true");
 
-				configureLink (
-					taskLogger,
-					model,
-					modelField,
-					classElement);
+			if (! model.mutable ()) {
 
-			} else if (modelField.compositeId ()) {
+				classElement
 
-				configureCompositeId (
-					model,
-					modelField,
-					classElement);
-
-			} else if (modelField.component ()) {
-
-				configureComponent (
-					model,
-					modelField,
-					classElement);
-
-			} else {
-
-				taskLogger.errorFormat (
-					"Don't know how to map %s for %s",
-					modelField.type ().name (),
-					modelField.fullName ());
-
-				classErrors ++;
+					.addAttribute (
+						"mutable",
+						"false");
 
 			}
 
-		}
+			// add fields
 
-		// output document
+			for (
+				ModelField modelField
+					: model.fields ()
+			) {
 
-		File outputFile =
-			new File (
-				stringFormat (
-					"work/hibernate/%s.hbm.xml",
-					model.objectClass ().getSimpleName ()));
+				if (modelField.generatedId ()) {
 
-		try {
+					configureGeneratedId (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.assignedId ()) {
+
+					configureAssignedId (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.foreignId ()) {
+
+					configureForeignId (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.value ()) {
+
+					configureValue (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.reference ()) {
+
+					configureReference (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.partner ()) {
+
+					configurePartner (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.collection ()) {
+
+					configureCollection (
+						taskLogger,
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.link ()) {
+
+					configureLink (
+						taskLogger,
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.compositeId ()) {
+
+					configureCompositeId (
+						model,
+						modelField,
+						classElement);
+
+				} else if (modelField.component ()) {
+
+					configureComponent (
+						model,
+						modelField,
+						classElement);
+
+				} else {
+
+					taskLogger.errorFormat (
+						"Don't know how to map %s for %s",
+						modelField.type ().name (),
+						modelField.fullName ());
+
+					classErrors ++;
+
+				}
+
+			}
+
+			// output document
+
+			File outputFile =
+				new File (
+					stringFormat (
+						"work/hibernate/%s.hbm.xml",
+						model.objectClass ().getSimpleName ()));
 
 			OutputFormat format =
 				OutputFormat.createPrettyPrint ();
 
-			OutputStream outputStream =
-				new FileOutputStream (
-					outputFile);
+			try (
 
-			XMLWriter writer =
-				new XMLWriter (
-					outputStream,
-					format);
+				OutputStream outputStream =
+					new FileOutputStream (
+						outputFile);
 
-			writer.write (
-				document);
+			) {
 
-		} catch (IOException exception) {
+				XMLWriter writer =
+					new XMLWriter (
+						outputStream,
+						format);
 
-			taskLogger.warningFormat (
-				"Error writing %s",
-				outputFile.getAbsolutePath ());
+				writer.write (
+					document);
+
+			} catch (IOException exception) {
+
+				taskLogger.warningFormat (
+					"Error writing %s",
+					outputFile.getAbsolutePath ());
+
+			}
+
+			// skip this class if there were errors
+
+			if (classErrors > 0) {
+
+				taskLogger.errorFormat (
+					"Skipping %s due to %s errors",
+					model.objectName (),
+					integerToDecimalString (
+						classErrors));
+
+				errorClasses ++;
+
+				return;
+
+			}
+
+			// add document to hibernate
+
+			config.addCacheableFile (
+				outputFile);
 
 		}
-
-		// skip this class if there were errors
-
-		if (classErrors > 0) {
-
-			taskLogger.errorFormat (
-				"Skipping %s due to %s errors",
-				model.objectName (),
-				integerToDecimalString (
-					classErrors));
-
-			errorClasses ++;
-
-			return;
-
-		}
-
-		// add document to hibernate
-
-		config.addCacheableFile (
-			outputFile);
 
 	}
 
@@ -1019,42 +1069,48 @@ class HibernateSessionFactoryBuilder {
 			@NonNull ModelField modelField,
 			@NonNull Element classElement) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"configureCollection");
+		try (
 
-		if (modelField.valueType () == Set.class) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"configureCollection");
 
-			configureCollectionSet (
-				model,
-				modelField,
-				classElement);
+		) {
 
-		} else if (modelField.valueType () == List.class) {
+			if (modelField.valueType () == Set.class) {
 
-			configureCollectionList (
-				taskLogger,
-				model,
-				modelField,
-				classElement);
+				configureCollectionSet (
+					model,
+					modelField,
+					classElement);
 
-		} else if (modelField.valueType () == Map.class) {
+			} else if (modelField.valueType () == List.class) {
 
-			configureCollectionMap (
-				taskLogger,
-				model,
-				modelField,
-				classElement);
+				configureCollectionList (
+					taskLogger,
+					model,
+					modelField,
+					classElement);
 
-		} else {
+			} else if (modelField.valueType () == Map.class) {
 
-			taskLogger.errorFormat (
-				"Don't know how to map a collection with type %s for %s",
-				modelField.valueType ().getSimpleName (),
-				modelField.fullName ());
+				configureCollectionMap (
+					taskLogger,
+					model,
+					modelField,
+					classElement);
 
-			classErrors ++;
+			} else {
+
+				taskLogger.errorFormat (
+					"Don't know how to map a collection with type %s for %s",
+					modelField.valueType ().getSimpleName (),
+					modelField.fullName ());
+
+				classErrors ++;
+
+			}
 
 		}
 
@@ -1183,324 +1239,51 @@ class HibernateSessionFactoryBuilder {
 			@NonNull ModelField modelField,
 			@NonNull Element classElement) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"configureCollectionList");
+		try (
 
-		// list
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"configureCollectionList");
 
-		Element listElement =
-			classElement
-
-			.addElement (
-				"list")
-
-			.addAttribute (
-				"name",
-				modelField.name ())
-
-			.addAttribute (
-				"lazy",
-				"true")
-
-			.addAttribute (
-				"inverse",
-				"true");
-
-		if (
-			isNotNull (
-				modelField.orderSql ())
 		) {
 
-			listElement
+			// list
 
-				.addAttribute (
-					"order-by",
-					modelField.orderSql ());
-
-		}
-
-		if (modelField.whereSql () != null) {
-
-			listElement
-
-				.addAttribute (
-					"where",
-					modelField.whereSql ());
-
-		}
-
-		// key
-
-		String joinColumnSql =
-			sqlLogic.quoteIdentifier (
-				ifNull (
-					modelField.joinColumnName (),
-					sqlEntityNames.idColumnName (
-						model.objectClass ())));
-
-		listElement
-
-			.addElement (
-				"key")
-
-			.addAttribute (
-				"column",
-				joinColumnSql);
-
-		// list index
-
-		if (modelField.listIndexColumnName () == null) {
-
-			taskLogger.errorFormat (
-				"No index specified for list %s",
-				modelField.fullName ());
-
-			classErrors ++;
-
-			return;
-
-		}
-
-		String indexColumnSql =
-			sqlLogic.quoteIdentifier (
-				modelField.listIndexColumnName ());
-
-		listElement
-
-			.addElement (
-				"list-index")
-
-			.addAttribute (
-				"column",
-				indexColumnSql);
-
-		// value
-
-		if (
-			isNotNull (
-				modelField.valueColumnName ())
-		) {
-
-			if (
-				doesNotContain (
-					valueFieldTypes,
-					modelField.collectionValueType ())
-			) {
-				throw new RuntimeException ();
-			}
-
-			String elementColumnSql =
-				sqlLogic.quoteIdentifier (
-					modelField.valueColumnName ());
-
-			String elementType =
-				basicTypes.get (
-					modelField.collectionValueType ());
-
-			listElement
-
-				.addElement (
-					"element")
-
-				.addAttribute (
-					"column",
-					elementColumnSql)
-
-				.addAttribute (
-					"type",
-					elementType);
-
-		} else {
-
-			if (
-				contains (
-					valueFieldTypes,
-					modelField.collectionValueType ())
-			) {
-				throw new RuntimeException ();
-			}
-
-			listElement
-
-				.addElement (
-					"one-to-many")
-
-				.addAttribute (
-					"class",
-					modelField.collectionValueType ().getName ());
-
-		}
-
-	}
-
-	void configureCollectionMap (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Model <?> model,
-			@NonNull ModelField modelField,
-			@NonNull Element classElement) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"configureCollectionMap");
-
-		// map
-
-		Element mapElement =
-			classElement
-
-			.addElement (
-				"map")
-
-			.addAttribute (
-				"name",
-				modelField.name ())
-
-			.addAttribute (
-				"lazy",
-				"true")
-
-			.addAttribute (
-				"inverse",
-				"true");
-
-		// key
-
-		String keyColumnSql =
-			sqlLogic.quoteIdentifier (
-				ifNull (
-					modelField.joinColumnName (),
-					sqlEntityNames.idColumnName (
-						model.objectClass ())));
-
-		mapElement
-
-			.addElement (
-				"key")
-
-			.addAttribute (
-				"column",
-				keyColumnSql);
-
-		// map key
-
-		String indexColumnSql =
-			sqlLogic.quoteIdentifier (
-				modelField.mappingKeyColumnName ());
-
-		String indexType =
-			basicTypes.get (
-				modelField.collectionKeyType ());
-
-		if (indexType == null) {
-
-			taskLogger.errorFormat (
-				"Don't know index type %s for %s",
-				modelField.collectionKeyType ().getName (),
-				modelField.fullName ());
-
-			classErrors ++;
-
-			return;
-
-		}
-
-		mapElement
-
-			.addElement (
-				"map-key")
-
-			.addAttribute (
-				"column",
-				indexColumnSql)
-
-			.addAttribute (
-				"type",
-				indexType);
-
-		// value
-
-		if (
-			contains (
-				valueFieldTypes,
-				modelField.collectionValueType ())
-		) {
-			throw new RuntimeException ();
-		}
-
-		mapElement
-
-			.addElement (
-				"one-to-many")
-
-			.addAttribute (
-				"class",
-				modelField.collectionValueType ().getName ());
-
-	}
-
-	void configureLink (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Model <?> model,
-			@NonNull ModelField modelField,
-			@NonNull Element classElement) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"configureLink");
-
-		if (modelField.valueType () == Set.class) {
-
-			ParameterizedType type =
-				modelField.parameterizedType ();
-
-			Class<?> referencedClass =
-				(Class<?>) type.getActualTypeArguments () [0];
-
-			// set
-
-			Element setElement =
+			Element listElement =
 				classElement
 
 				.addElement (
-					"set")
+					"list")
 
 				.addAttribute (
 					"name",
 					modelField.name ())
 
 				.addAttribute (
-					"table",
-					modelField.associationTableName ())
+					"lazy",
+					"true")
 
 				.addAttribute (
-					"lazy",
+					"inverse",
 					"true");
 
-			if (modelField.owned ()) {
+			if (
+				isNotNull (
+					modelField.orderSql ())
+			) {
 
-				setElement
-
-					.addAttribute (
-						"cascade",
-						"all");
-
-			} else {
-
-				setElement
+				listElement
 
 					.addAttribute (
-						"inverse",
-						"true");
+						"order-by",
+						modelField.orderSql ());
 
 			}
 
 			if (modelField.whereSql () != null) {
 
-				setElement
+				listElement
 
 					.addAttribute (
 						"where",
@@ -1517,7 +1300,7 @@ class HibernateSessionFactoryBuilder {
 						sqlEntityNames.idColumnName (
 							model.objectClass ())));
 
-			setElement
+			listElement
 
 				.addElement (
 					"key")
@@ -1525,6 +1308,35 @@ class HibernateSessionFactoryBuilder {
 				.addAttribute (
 					"column",
 					joinColumnSql);
+
+			// list index
+
+			if (modelField.listIndexColumnName () == null) {
+
+				taskLogger.errorFormat (
+					"No index specified for list %s",
+					modelField.fullName ());
+
+				classErrors ++;
+
+				return;
+
+			}
+
+			String indexColumnSql =
+				sqlLogic.quoteIdentifier (
+					modelField.listIndexColumnName ());
+
+			listElement
+
+				.addElement (
+					"list-index")
+
+				.addAttribute (
+					"column",
+					indexColumnSql);
+
+			// value
 
 			if (
 				isNotNull (
@@ -1534,16 +1346,9 @@ class HibernateSessionFactoryBuilder {
 				if (
 					doesNotContain (
 						valueFieldTypes,
-						referencedClass)
+						modelField.collectionValueType ())
 				) {
-
-					taskLogger.errorFormat (
-						"Invalid element type %s for %s",
-						modelField.valueType ().getName (),
-						modelField.fullName ());
-
-					return;
-
+					throw new RuntimeException ();
 				}
 
 				String elementColumnSql =
@@ -1552,9 +1357,9 @@ class HibernateSessionFactoryBuilder {
 
 				String elementType =
 					basicTypes.get (
-						referencedClass);
+						modelField.collectionValueType ());
 
-				setElement
+				listElement
 
 					.addElement (
 						"element")
@@ -1569,6 +1374,391 @@ class HibernateSessionFactoryBuilder {
 
 			} else {
 
+				if (
+					contains (
+						valueFieldTypes,
+						modelField.collectionValueType ())
+				) {
+					throw new RuntimeException ();
+				}
+
+				listElement
+
+					.addElement (
+						"one-to-many")
+
+					.addAttribute (
+						"class",
+						modelField.collectionValueType ().getName ());
+
+			}
+
+		}
+
+	}
+
+	void configureCollectionMap (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"configureCollectionMap");
+
+		) {
+
+			// map
+
+			Element mapElement =
+				classElement
+
+				.addElement (
+					"map")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"lazy",
+					"true")
+
+				.addAttribute (
+					"inverse",
+					"true");
+
+			// key
+
+			String keyColumnSql =
+				sqlLogic.quoteIdentifier (
+					ifNull (
+						modelField.joinColumnName (),
+						sqlEntityNames.idColumnName (
+							model.objectClass ())));
+
+			mapElement
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
+
+			// map key
+
+			String indexColumnSql =
+				sqlLogic.quoteIdentifier (
+					modelField.mappingKeyColumnName ());
+
+			String indexType =
+				basicTypes.get (
+					modelField.collectionKeyType ());
+
+			if (indexType == null) {
+
+				taskLogger.errorFormat (
+					"Don't know index type %s for %s",
+					modelField.collectionKeyType ().getName (),
+					modelField.fullName ());
+
+				classErrors ++;
+
+				return;
+
+			}
+
+			mapElement
+
+				.addElement (
+					"map-key")
+
+				.addAttribute (
+					"column",
+					indexColumnSql)
+
+				.addAttribute (
+					"type",
+					indexType);
+
+			// value
+
+			if (
+				contains (
+					valueFieldTypes,
+					modelField.collectionValueType ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			mapElement
+
+				.addElement (
+					"one-to-many")
+
+				.addAttribute (
+					"class",
+					modelField.collectionValueType ().getName ());
+
+		}
+
+	}
+
+	void configureLink (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"configureLink");
+
+		) {
+
+			if (modelField.valueType () == Set.class) {
+
+				ParameterizedType type =
+					modelField.parameterizedType ();
+
+				Class<?> referencedClass =
+					(Class<?>) type.getActualTypeArguments () [0];
+
+				// set
+
+				Element setElement =
+					classElement
+
+					.addElement (
+						"set")
+
+					.addAttribute (
+						"name",
+						modelField.name ())
+
+					.addAttribute (
+						"table",
+						modelField.associationTableName ())
+
+					.addAttribute (
+						"lazy",
+						"true");
+
+				if (modelField.owned ()) {
+
+					setElement
+
+						.addAttribute (
+							"cascade",
+							"all");
+
+				} else {
+
+					setElement
+
+						.addAttribute (
+							"inverse",
+							"true");
+
+				}
+
+				if (modelField.whereSql () != null) {
+
+					setElement
+
+						.addAttribute (
+							"where",
+							modelField.whereSql ());
+
+				}
+
+				// key
+
+				String joinColumnSql =
+					sqlLogic.quoteIdentifier (
+						ifNull (
+							modelField.joinColumnName (),
+							sqlEntityNames.idColumnName (
+								model.objectClass ())));
+
+				setElement
+
+					.addElement (
+						"key")
+
+					.addAttribute (
+						"column",
+						joinColumnSql);
+
+				if (
+					isNotNull (
+						modelField.valueColumnName ())
+				) {
+
+					if (
+						doesNotContain (
+							valueFieldTypes,
+							referencedClass)
+					) {
+
+						taskLogger.errorFormat (
+							"Invalid element type %s for %s",
+							modelField.valueType ().getName (),
+							modelField.fullName ());
+
+						return;
+
+					}
+
+					String elementColumnSql =
+						sqlLogic.quoteIdentifier (
+							modelField.valueColumnName ());
+
+					String elementType =
+						basicTypes.get (
+							referencedClass);
+
+					setElement
+
+						.addElement (
+							"element")
+
+						.addAttribute (
+							"column",
+							elementColumnSql)
+
+						.addAttribute (
+							"type",
+							elementType);
+
+				} else {
+
+					if (valueFieldTypes.contains (referencedClass))
+						throw new RuntimeException ();
+
+					String manyToManyColumnSql =
+						sqlLogic.quoteIdentifier (
+							sqlEntityNames.idColumnName (referencedClass));
+
+					setElement
+
+						.addElement (
+							"many-to-many")
+
+						.addAttribute (
+							"column",
+							manyToManyColumnSql)
+
+						.addAttribute (
+							"class",
+							referencedClass.getName ());
+
+				}
+
+			} else if (modelField.valueType () == List.class) {
+
+				ParameterizedType type =
+					modelField.parameterizedType ();
+
+				Class<?> referencedClass =
+					(Class<?>) type.getActualTypeArguments () [0];
+
+				// list
+
+				Element listElement =
+					classElement
+
+					.addElement (
+						"list")
+
+					.addAttribute (
+						"name",
+						modelField.name ())
+
+					.addAttribute (
+						"table",
+						modelField.associationTableName ())
+
+					.addAttribute (
+						"lazy",
+						"true");
+
+				if (modelField.owned ()) {
+
+					listElement
+
+						.addAttribute (
+							"cascade",
+							"all");
+
+				} else {
+
+					listElement
+
+						.addAttribute (
+							"inverse",
+							"true");
+
+				}
+
+				if (
+					isNotNull (
+						modelField.whereSql ())
+				) {
+
+					listElement
+
+						.addAttribute (
+							"where",
+							modelField.whereSql ());
+
+				}
+
+				// key
+
+				String keyColumnSql =
+					sqlLogic.quoteIdentifier (
+						sqlEntityNames.idColumnName (
+							model.objectClass ()));
+
+				listElement
+
+					.addElement (
+						"key")
+
+					.addAttribute (
+						"column",
+						keyColumnSql);
+
+				// list index
+
+				if (modelField.listIndexColumnName () != null) {
+
+					String indexColumnSql =
+						sqlLogic.quoteIdentifier (
+							modelField.listIndexColumnName ());
+
+					listElement
+
+						.addElement (
+							"list-index")
+
+						.addAttribute (
+							"column",
+							indexColumnSql);
+
+				}
+
+				// many to many
+
 				if (valueFieldTypes.contains (referencedClass))
 					throw new RuntimeException ();
 
@@ -1576,7 +1766,7 @@ class HibernateSessionFactoryBuilder {
 					sqlLogic.quoteIdentifier (
 						sqlEntityNames.idColumnName (referencedClass));
 
-				setElement
+				listElement
 
 					.addElement (
 						"many-to-many")
@@ -1589,132 +1779,16 @@ class HibernateSessionFactoryBuilder {
 						"class",
 						referencedClass.getName ());
 
-			}
-
-		} else if (modelField.valueType () == List.class) {
-
-			ParameterizedType type =
-				modelField.parameterizedType ();
-
-			Class<?> referencedClass =
-				(Class<?>) type.getActualTypeArguments () [0];
-
-			// list
-
-			Element listElement =
-				classElement
-
-				.addElement (
-					"list")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"table",
-					modelField.associationTableName ())
-
-				.addAttribute (
-					"lazy",
-					"true");
-
-			if (modelField.owned ()) {
-
-				listElement
-
-					.addAttribute (
-						"cascade",
-						"all");
-
 			} else {
 
-				listElement
+				taskLogger.errorFormat (
+					"Don't know how to map link type %s for %s",
+					modelField.valueType ().getSimpleName (),
+					modelField.fullName ());
 
-					.addAttribute (
-						"inverse",
-						"true");
-
-			}
-
-			if (
-				isNotNull (
-					modelField.whereSql ())
-			) {
-
-				listElement
-
-					.addAttribute (
-						"where",
-						modelField.whereSql ());
+				classErrors ++;
 
 			}
-
-			// key
-
-			String keyColumnSql =
-				sqlLogic.quoteIdentifier (
-					sqlEntityNames.idColumnName (
-						model.objectClass ()));
-
-			listElement
-
-				.addElement (
-					"key")
-
-				.addAttribute (
-					"column",
-					keyColumnSql);
-
-			// list index
-
-			if (modelField.listIndexColumnName () != null) {
-
-				String indexColumnSql =
-					sqlLogic.quoteIdentifier (
-						modelField.listIndexColumnName ());
-
-				listElement
-
-					.addElement (
-						"list-index")
-
-					.addAttribute (
-						"column",
-						indexColumnSql);
-
-			}
-
-			// many to many
-
-			if (valueFieldTypes.contains (referencedClass))
-				throw new RuntimeException ();
-
-			String manyToManyColumnSql =
-				sqlLogic.quoteIdentifier (
-					sqlEntityNames.idColumnName (referencedClass));
-
-			listElement
-
-				.addElement (
-					"many-to-many")
-
-				.addAttribute (
-					"column",
-					manyToManyColumnSql)
-
-				.addAttribute (
-					"class",
-					referencedClass.getName ());
-
-		} else {
-
-			taskLogger.errorFormat (
-				"Don't know how to map link type %s for %s",
-				modelField.valueType ().getSimpleName (),
-				modelField.fullName ());
-
-			classErrors ++;
 
 		}
 

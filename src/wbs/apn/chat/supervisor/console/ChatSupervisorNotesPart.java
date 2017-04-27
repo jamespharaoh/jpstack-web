@@ -94,55 +94,61 @@ class ChatSupervisorNotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"Note",
-			"User",
-			"Monitor",
-			"By",
-			"Timestamp");
-
-		for (
-			ChatContactNoteRec chatContactNote
-				: chatContactNotes
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatContactNote.getNotes ());
+			htmlTableHeaderRowWrite (
+				"Note",
+				"User",
+				"Monitor",
+				"By",
+				"Timestamp");
 
-			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatContactNote.getUser (),
-				chatContactNote.getUser ().getChat ());
+			for (
+				ChatContactNoteRec chatContactNote
+					: chatContactNotes
+			) {
 
-			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatContactNote.getMonitor (),
-				chatContactNote.getMonitor ().getChat ());
+				htmlTableRowOpen ();
 
-			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatContactNote.getConsoleUser ());
+				htmlTableCellWrite (
+					chatContactNote.getNotes ());
 
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatMiscLogic.timezone (
-						chat),
-					chatContactNote.getTimestamp ()));
+				consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatContactNote.getUser (),
+					chatContactNote.getUser ().getChat ());
 
-			htmlTableRowClose ();
+				consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatContactNote.getMonitor (),
+					chatContactNote.getMonitor ().getChat ());
+
+				consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatContactNote.getConsoleUser ());
+
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatMiscLogic.timezone (
+							chat),
+						chatContactNote.getTimestamp ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableCellClose ();
 
 		}
-
-		htmlTableCellClose ();
 
 	}
 

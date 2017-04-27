@@ -37,8 +37,9 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.DefaultLogContext;
@@ -154,24 +155,30 @@ class ChatDateDaemon
 
 			// then do the run
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"runService");
+			try (
 
-			try {
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"runService");
 
-				doRun (
-					taskLogger);
+			) {
 
-			} catch (RuntimeException exception) {
+				try {
 
-				exceptionLogger.logThrowable (
-					taskLogger,
-					"daemon",
-					"Chat daemon dating",
-					exception,
-					optionalAbsent (),
-					GenericExceptionResolution.tryAgainLater);
+					doRun (
+						taskLogger);
+
+				} catch (RuntimeException exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"Chat daemon dating",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
@@ -182,42 +189,48 @@ class ChatDateDaemon
 	void doRun (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doRun");
-
-		taskLogger.noticeFormat (
-			"Dating batch started");
-
-		taskLogger.debugFormat (
-			"Retrieving list of chats");
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatDateDaemon.doRun ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doRun");
 
 		) {
 
-			List <Long> chatIds =
-				iterableMapToList (
-					ChatRec::getId,
-					chatHelper.findNotDeleted ());
-
-			transaction.close ();
-
-			chatIds.forEach (
-				chatId ->
-					doChat (
-						taskLogger,
-						chatId));
-
 			taskLogger.noticeFormat (
-				"Dating batch complete!");
+				"Dating batch started");
+
+			taskLogger.debugFormat (
+				"Retrieving list of chats");
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"ChatDateDaemon.doRun ()",
+						this);
+
+			) {
+
+				List <Long> chatIds =
+					iterableMapToList (
+						ChatRec::getId,
+						chatHelper.findNotDeleted ());
+
+				transaction.close ();
+
+				chatIds.forEach (
+					chatId ->
+						doChat (
+							taskLogger,
+							chatId));
+
+				taskLogger.noticeFormat (
+					"Dating batch complete!");
+
+			}
 
 		}
 
@@ -227,95 +240,101 @@ class ChatDateDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"doChat (%s)",
-				integerToDecimalString (
-					chatId));
+		try (
 
-		Optional <ChatData> chatDataOptional =
-			getChatData (
-				taskLogger,
-				chatId);
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"doChat (%s)",
+					integerToDecimalString (
+						chatId));
 
-		if (
-			optionalIsNotPresent (
-				chatDataOptional)
-		) {
-			return;
-		}
-
-		ChatData chatData =
-			optionalGetRequired (
-				chatDataOptional);
-
-		// output some info
-
-		taskLogger.noticeFormat (
-			"Got %s otherUserInfos users available to send",
-			integerToDecimalString (
-				chatData.otherUserInfos.size ()));
-
-		taskLogger.noticeFormat (
-			"Trying %s out of %s users ",
-			integerToDecimalString (
-				chatData.datingUserIds.size ()),
-			integerToDecimalString (
-				chatData.numUsers),
-			"(%s credit, %s hours, %s online and %s sent already)",
-			integerToDecimalString (
-				chatData.numCredit),
-			integerToDecimalString (
-				chatData.numHours),
-			integerToDecimalString (
-				chatData.numOnline),
-			integerToDecimalString (
-				chatData.numSent));
-
-		// then process each user
-
-		int count = 0;
-		int max = 1000;
-
-		for (
-			Long thisUserId
-				: chatData.datingUserIds
 		) {
 
-			try {
-
-				if (
-					doUser (
-						taskLogger,
-						chatData.otherUserInfos,
-						thisUserId)
-				) {
-					count ++;
-				}
-
-				if (count >= max) {
-					break;
-				}
-
-			} catch (Exception exception) {
-
-				exceptionLogger.logThrowable (
+			Optional <ChatData> chatDataOptional =
+				getChatData (
 					taskLogger,
-					"daemon",
-					"Chat daemon dating",
-					exception,
-					optionalAbsent (),
-					GenericExceptionResolution.tryAgainLater);
+					chatId);
+
+			if (
+				optionalIsNotPresent (
+					chatDataOptional)
+			) {
+				return;
+			}
+
+			ChatData chatData =
+				optionalGetRequired (
+					chatDataOptional);
+
+			// output some info
+
+			taskLogger.noticeFormat (
+				"Got %s otherUserInfos users available to send",
+				integerToDecimalString (
+					chatData.otherUserInfos.size ()));
+
+			taskLogger.noticeFormat (
+				"Trying %s out of %s users ",
+				integerToDecimalString (
+					chatData.datingUserIds.size ()),
+				integerToDecimalString (
+					chatData.numUsers),
+				"(%s credit, %s hours, %s online and %s sent already)",
+				integerToDecimalString (
+					chatData.numCredit),
+				integerToDecimalString (
+					chatData.numHours),
+				integerToDecimalString (
+					chatData.numOnline),
+				integerToDecimalString (
+					chatData.numSent));
+
+			// then process each user
+
+			int count = 0;
+			int max = 1000;
+
+			for (
+				Long thisUserId
+					: chatData.datingUserIds
+			) {
+
+				try {
+
+					if (
+						doUser (
+							taskLogger,
+							chatData.otherUserInfos,
+							thisUserId)
+					) {
+						count ++;
+					}
+
+					if (count >= max) {
+						break;
+					}
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"Chat daemon dating",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
-		}
+			taskLogger.noticeFormat (
+				"Dating done %s",
+				integerToDecimalString (
+					count));
 
-		taskLogger.noticeFormat (
-			"Dating done %s",
-			integerToDecimalString (
-				count));
+		}
 
 	}
 
@@ -336,7 +355,7 @@ class ChatDateDaemon
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					stringFormat (
@@ -701,7 +720,7 @@ class ChatDateDaemon
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
@@ -919,122 +938,130 @@ class ChatDateDaemon
 			boolean usersWithoutPhoto,
 			int num) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendSingleLot");
+		try (
 
-		// check each prospective user
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendSingleLot");
 
-		List<DatingUserDistance> prospectiveUserDistances =
-			new ArrayList<DatingUserDistance> ();
-
-		DateUserStats dateUserStats =
-			new DateUserStats ();
-
-		for (DatingUserInfo thatUserInfo
-				: otherUserInfos) {
-
-			DatingUserDistance dateUserDistance =
-				shouldSendUser (
-					thisUser,
-					thatUserInfo,
-					sendPhoto,
-					usersWithPhoto,
-					usersWithoutPhoto,
-					true,
-					dateUserStats);
-
-			if (dateUserDistance != null)
-				prospectiveUserDistances.add (dateUserDistance);
-		}
-
-		taskLogger.noticeFormat (
-			"Dating user %s: %s blocked, ",
-			integerToDecimalString (
-				thisUser.getId ()),
-			integerToDecimalString (
-				dateUserStats.numBlocked),
-			"%s incompatible, ",
-			integerToDecimalString (
-				dateUserStats.numIncompatible),
-			"%s no photo, ",
-			integerToDecimalString (
-				dateUserStats.numIncompatible),
-			"%s already sent, ",
-			integerToDecimalString (
-				dateUserStats.numIncompatible),
-			"%s no location, ",
-			integerToDecimalString (
-				dateUserStats.numIncompatible),
-			"%s too far, ",
-			integerToDecimalString (
-				dateUserStats.numIncompatible),
-			"%s remain",
-			integerToDecimalString (
-				dateUserStats.numOk));
-
-		// now pick the closest few, check they have info
-
-		Collections.sort (
-			prospectiveUserDistances);
-
-		List<ChatUserRec> otherUsers =
-			new ArrayList<ChatUserRec> ();
-
-		for (
-			DatingUserDistance datingUserDistance
-				: prospectiveUserDistances
 		) {
 
-			if (otherUsers.size () == num)
-				break;
+			// check each prospective user
 
-			ChatUserRec otherUser =
-				chatUserHelper.findRequired (
-					datingUserDistance.id);
+			List<DatingUserDistance> prospectiveUserDistances =
+				new ArrayList<DatingUserDistance> ();
 
-			if (otherUser.getInfoText () == null)
-				continue;
+			DateUserStats dateUserStats =
+				new DateUserStats ();
 
-			otherUsers.add (otherUser);
-		}
+			for (DatingUserInfo thatUserInfo
+					: otherUserInfos) {
 
-		if (otherUsers.size () < num)
-			return false; // still too few after the second attempt
+				DatingUserDistance dateUserDistance =
+					shouldSendUser (
+						thisUser,
+						thatUserInfo,
+						sendPhoto,
+						usersWithPhoto,
+						usersWithoutPhoto,
+						true,
+						dateUserStats);
 
-		// and send
+				if (dateUserDistance != null)
+					prospectiveUserDistances.add (dateUserDistance);
+			}
 
-		if (sendPhoto) {
+			taskLogger.noticeFormat (
+				"Dating user %s: %s blocked, ",
+				integerToDecimalString (
+					thisUser.getId ()),
+				integerToDecimalString (
+					dateUserStats.numBlocked),
+				"%s incompatible, ",
+				integerToDecimalString (
+					dateUserStats.numIncompatible),
+				"%s no photo, ",
+				integerToDecimalString (
+					dateUserStats.numIncompatible),
+				"%s already sent, ",
+				integerToDecimalString (
+					dateUserStats.numIncompatible),
+				"%s no location, ",
+				integerToDecimalString (
+					dateUserStats.numIncompatible),
+				"%s too far, ",
+				integerToDecimalString (
+					dateUserStats.numIncompatible),
+				"%s remain",
+				integerToDecimalString (
+					dateUserStats.numOk));
 
-			chatInfoLogic.sendUserPics (
-				taskLogger,
-				thisUser,
-				otherUsers,
-				null,
-				true);
+			// now pick the closest few, check they have info
 
-		} else {
+			Collections.sort (
+				prospectiveUserDistances);
+
+			List<ChatUserRec> otherUsers =
+				new ArrayList<ChatUserRec> ();
 
 			for (
-				ChatUserRec otherUser
-					: otherUsers
-			)
+				DatingUserDistance datingUserDistance
+					: prospectiveUserDistances
+			) {
 
-				chatInfoLogic.sendUserInfo (
+				if (otherUsers.size () == num)
+					break;
+
+				ChatUserRec otherUser =
+					chatUserHelper.findRequired (
+						datingUserDistance.id);
+
+				if (otherUser.getInfoText () == null)
+					continue;
+
+				otherUsers.add (otherUser);
+			}
+
+			if (otherUsers.size () < num) {
+				return false; // still too few after the second attempt
+			}
+
+			// and send
+
+			if (sendPhoto) {
+
+				chatInfoLogic.sendUserPics (
 					taskLogger,
 					thisUser,
-					otherUser,
+					otherUsers,
 					null,
 					true);
+
+			} else {
+
+				for (
+					ChatUserRec otherUser
+						: otherUsers
+				)
+
+					chatInfoLogic.sendUserInfo (
+						taskLogger,
+						thisUser,
+						otherUser,
+						null,
+						true);
+			}
+
+			// and update counter
+
+			thisUser.setDateDailyCount (
+				thisUser.getDateDailyCount () - num);
+
+			return true;
+
 		}
 
-		// and update counter
-
-		thisUser.setDateDailyCount (
-			thisUser.getDateDailyCount () - num);
-
-		return true;
 	}
 
 	/**
@@ -1055,7 +1082,7 @@ class ChatDateDaemon
 			boolean reuseOldUsers,
 			DateUserStats dateUserStats) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		// check its not us

@@ -64,69 +64,75 @@ class ConsoleFormActionsPart
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, Object> parameters) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		super.setup (
-			taskLogger,
-			parameters);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		pageParts =
-			formActions.stream ()
+		) {
 
-			.map (
-				formAction ->
-					Pair.of (
-						formAction.helper ().canBePerformed (
-							taskLogger),
-						formAction))
+			super.setup (
+				taskLogger,
+				parameters);
 
-			.filter (
-				showSubmitFormAction ->
-					showSubmitFormAction.getLeft ().canView ())
+			pageParts =
+				formActions.stream ()
 
-			.map (
-				showSubmitFormAction ->
-					consoleFormActionPartProvider.get ()
+				.map (
+					formAction ->
+						Pair.of (
+							formAction.helper ().canBePerformed (
+								taskLogger),
+							formAction))
 
-				.name (
-					showSubmitFormAction.getRight ().name ())
+				.filter (
+					showSubmitFormAction ->
+						showSubmitFormAction.getLeft ().canView ())
 
-				.formActionHelper (
-					genericCastUnchecked (
-						showSubmitFormAction.getRight ().helper ()))
+				.map (
+					showSubmitFormAction ->
+						consoleFormActionPartProvider.get ()
 
-				.formFields (
-					genericCastUncheckedNullSafe (
-						showSubmitFormAction.getRight ().formFields ()))
+					.name (
+						showSubmitFormAction.getRight ().name ())
 
-				.heading (
-					showSubmitFormAction.getRight ().heading ())
+					.formActionHelper (
+						genericCastUnchecked (
+							showSubmitFormAction.getRight ().helper ()))
 
-				.helpText (
-					showSubmitFormAction.getRight ().helpText ())
+					.formFields (
+						genericCastUncheckedNullSafe (
+							showSubmitFormAction.getRight ().formFields ()))
 
-				.submitLabel (
-					ifThenElse (
-						showSubmitFormAction.getLeft ().canPerform (),
-						() -> showSubmitFormAction.getRight ().submitLabel (),
-						() -> null))
+					.heading (
+						showSubmitFormAction.getRight ().heading ())
 
-				.localFile (
-					localFile)
+					.helpText (
+						showSubmitFormAction.getRight ().helpText ())
 
-			)
+					.submitLabel (
+						ifThenElse (
+							showSubmitFormAction.getLeft ().canPerform (),
+							() -> showSubmitFormAction.getRight ().submitLabel (),
+							() -> null))
 
-			.collect (
-				Collectors.toList ());
+					.localFile (
+						localFile)
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.setup (
-					taskLogger,
-					parameters));
+				)
+
+				.collect (
+					Collectors.toList ());
+
+			pageParts.forEach (
+				pagePart ->
+					pagePart.setup (
+						taskLogger,
+						parameters));
+
+		}
 
 	}
 
@@ -135,15 +141,21 @@ class ConsoleFormActionsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.prepare (
-					taskLogger));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
+
+		) {
+
+			pageParts.forEach (
+				pagePart ->
+					pagePart.prepare (
+						taskLogger));
+
+		}
 
 	}
 
@@ -152,15 +164,21 @@ class ConsoleFormActionsPart
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContent");
+		try (
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.renderHtmlHeadContent (
-					taskLogger));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContent");
+
+		) {
+
+			pageParts.forEach (
+				pagePart ->
+					pagePart.renderHtmlHeadContent (
+						taskLogger));
+
+		}
 
 	}
 
@@ -169,25 +187,31 @@ class ConsoleFormActionsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (
-			collectionIsNotEmpty (
-				pageParts)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
 		) {
 
-			pageParts.forEach (
-				pagePart ->
-					pagePart.renderHtmlBodyContent (
-						taskLogger));
+			if (
+				collectionIsNotEmpty (
+					pageParts)
+			) {
 
-		} else {
+				pageParts.forEach (
+					pagePart ->
+						pagePart.renderHtmlBodyContent (
+							taskLogger));
 
-			htmlParagraphWriteFormat (
-				"No actions can be performed at this time");
+			} else {
+
+				htmlParagraphWriteFormat (
+					"No actions can be performed at this time");
+
+			}
 
 		}
 

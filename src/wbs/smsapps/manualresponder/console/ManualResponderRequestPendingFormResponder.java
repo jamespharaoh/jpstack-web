@@ -153,141 +153,147 @@ class ManualResponderRequestPendingFormResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		request =
-			manualResponderRequestHelper.findFromContextRequired ();
-
-		manualResponderNumber =
-			request.getManualResponderNumber ();
-
-		manualResponder =
-			manualResponderNumber.getManualResponder ();
-
-		templates =
-			new TreeSet<> ();
-
-		for (
-			ManualResponderTemplateRec template
-				: manualResponder.getTemplates ()
 		) {
 
-			if (template.getRouter () == null) {
-				continue;
-			}
+			super.prepare (
+				taskLogger);
 
-			if (template.getHidden ()) {
-				continue;
-			}
+			request =
+				manualResponderRequestHelper.findFromContextRequired ();
 
-			if (template.getRules () != null) {
+			manualResponderNumber =
+				request.getManualResponderNumber ();
 
-				String rules =
-					template.getRules ();
+			manualResponder =
+				manualResponderNumber.getManualResponder ();
 
-				Pattern networkIsRulesPattern =
-					Pattern.compile (
-						"^network is ([0-9]+)$");
+			templates =
+				new TreeSet<> ();
 
-				Matcher networkIsRulesMatcher =
-					networkIsRulesPattern.matcher (
-						rules);
+			for (
+				ManualResponderTemplateRec template
+					: manualResponder.getTemplates ()
+			) {
 
-				if (networkIsRulesMatcher.matches ()) {
+				if (template.getRouter () == null) {
+					continue;
+				}
 
-					long networkId =
-						parseIntegerRequired (
-							networkIsRulesMatcher.group (1));
+				if (template.getHidden ()) {
+					continue;
+				}
+
+				if (template.getRules () != null) {
+
+					String rules =
+						template.getRules ();
+
+					Pattern networkIsRulesPattern =
+						Pattern.compile (
+							"^network is ([0-9]+)$");
+
+					Matcher networkIsRulesMatcher =
+						networkIsRulesPattern.matcher (
+							rules);
+
+					if (networkIsRulesMatcher.matches ()) {
+
+						long networkId =
+							parseIntegerRequired (
+								networkIsRulesMatcher.group (1));
+
+						if (
+							integerNotEqualSafe (
+								manualResponderNumber
+									.getNumber ()
+									.getNetwork ()
+									.getId (),
+								networkId)
+						) {
+							continue;
+						}
+
+					}
+
+					Pattern networkIsNotRulesPattern =
+						Pattern.compile (
+							"^network is not ([0-9]+)$");
+
+					Matcher networkIsNotRulesMatcher =
+						networkIsNotRulesPattern.matcher (
+							rules);
+
+					if (networkIsNotRulesMatcher.matches ()) {
+
+						long networkId =
+							parseIntegerRequired (
+								networkIsNotRulesMatcher.group (1));
+
+						if (
+							integerEqualSafe (
+								manualResponderNumber
+									.getNumber ()
+									.getNetwork ()
+									.getId (),
+								networkId)
+						) {
+							continue;
+						}
+
+					}
 
 					if (
-						integerNotEqualSafe (
-							manualResponderNumber
-								.getNumber ()
-								.getNetwork ()
-								.getId (),
-							networkId)
+						! networkIsRulesMatcher.matches ()
+						&& ! networkIsNotRulesMatcher.matches ()
 					) {
-						continue;
+
+						throw new RuntimeException (
+							"Invalid rules");
+
 					}
 
 				}
 
-				Pattern networkIsNotRulesPattern =
-					Pattern.compile (
-						"^network is not ([0-9]+)$");
-
-				Matcher networkIsNotRulesMatcher =
-					networkIsNotRulesPattern.matcher (
-						rules);
-
-				if (networkIsNotRulesMatcher.matches ()) {
-
-					long networkId =
-						parseIntegerRequired (
-							networkIsNotRulesMatcher.group (1));
-
-					if (
-						integerEqualSafe (
-							manualResponderNumber
-								.getNumber ()
-								.getNetwork ()
-								.getId (),
-							networkId)
-					) {
-						continue;
-					}
-
-				}
-
-				if (
-					! networkIsRulesMatcher.matches ()
-					&& ! networkIsNotRulesMatcher.matches ()
-				) {
-
-					throw new RuntimeException (
-						"Invalid rules");
-
-				}
+				templates.add (
+					template);
 
 			}
 
-			templates.add (
-				template);
+			summaryUrl =
+				requestContext.resolveApplicationUrlFormat (
+					"/manualResponderRequest.pending",
+					"/%u",
+					integerToDecimalString (
+						request.getId ()),
+					"/manualResponderRequest.pending.summary");
+
+			manager =
+				privChecker.canRecursive (
+					taskLogger,
+					manualResponder,
+					"manage");
+
+			canIgnore =
+				manager ||
+				manualResponder.getCanIgnore ();
+
+			gotTemplates =
+				! templates.isEmpty ();
+
+			Set<ManualResponderReplyRec> manualResponderReplies =
+				request.getReplies ();
+
+			alreadyReplied =
+				! manualResponderReplies.isEmpty ();
 
 		}
-
-		summaryUrl =
-			requestContext.resolveApplicationUrlFormat (
-				"/manualResponderRequest.pending",
-				"/%u",
-				integerToDecimalString (
-					request.getId ()),
-				"/manualResponderRequest.pending.summary");
-
-		manager =
-			privChecker.canRecursive (
-				taskLogger,
-				manualResponder,
-				"manage");
-
-		canIgnore =
-			manager ||
-			manualResponder.getCanIgnore ();
-
-		gotTemplates =
-			! templates.isEmpty ();
-
-		Set<ManualResponderReplyRec> manualResponderReplies =
-			request.getReplies ();
-
-		alreadyReplied =
-			! manualResponderReplies.isEmpty ();
 
 	}
 
@@ -296,35 +302,41 @@ class ManualResponderRequestPendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		// show relevant frames
+		) {
 
-		htmlScriptBlockOpen ();
+			super.renderHtmlHeadContents (
+				taskLogger);
 
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
+			// show relevant frames
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = 'about:blank';");
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"window.setTimeout (function () {");
+			formatWriter.writeLineFormat (
+				"top.show_inbox (true);");
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j'\n",
-			summaryUrl);
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = 'about:blank';");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}, 1);\n");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"window.setTimeout (function () {");
 
-		htmlScriptBlockClose ();
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j'\n",
+				summaryUrl);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}, 1);\n");
+
+			htmlScriptBlockClose ();
+
+		}
 
 	}
 
@@ -333,55 +345,61 @@ class ManualResponderRequestPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		requestContext.flushNotices (
-			formatWriter);
-
-		goLinks ();
-
-		if (request == null) {
-
-			goNotFound ();
-
-		} else if (! request.getPending ()) {
-
-			goNotPending ();
-
-		} else if (
-
-			! privChecker.canRecursive (
-				taskLogger,
-				manualResponder,
-				"reply")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
 		) {
 
-			goAccessDenied ();
+			requestContext.flushNotices (
+				formatWriter);
 
-		} else if (allOf (
+			goLinks ();
 
-			() -> templates.isEmpty (),
+			if (request == null) {
 
-			() -> not (
-				manualResponder.getCanIgnore ()),
+				goNotFound ();
 
-			() -> not (
-				privChecker.canRecursive (
+			} else if (! request.getPending ()) {
+
+				goNotPending ();
+
+			} else if (
+
+				! privChecker.canRecursive (
 					taskLogger,
 					manualResponder,
-					"manage"))
+					"reply")
 
-		)) {
+			) {
 
-			goNoTemplates ();
+				goAccessDenied ();
 
-		} else {
+			} else if (allOf (
 
-			goForm ();
+				() -> templates.isEmpty (),
+
+				() -> not (
+					manualResponder.getCanIgnore ()),
+
+				() -> not (
+					privChecker.canRecursive (
+						taskLogger,
+						manualResponder,
+						"manage"))
+
+			)) {
+
+				goNoTemplates ();
+
+			} else {
+
+				goForm ();
+
+			}
 
 		}
 

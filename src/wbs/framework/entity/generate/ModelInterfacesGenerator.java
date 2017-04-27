@@ -72,22 +72,28 @@ class ModelInterfacesGenerator {
 	void generateInterfaces (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateInterfaces");
+		try (
 
-		setup ();
-		findRelated ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateInterfaces");
 
-		generateDaoInterface (
-			taskLogger);
+		) {
 
-		generateObjectHelperInterface (
-			taskLogger);
+			setup ();
+			findRelated ();
 
-		generateConsoleHelperInterface (
-			taskLogger);
+			generateDaoInterface (
+				taskLogger);
+
+			generateObjectHelperInterface (
+				taskLogger);
+
+			generateConsoleHelperInterface (
+				taskLogger);
+
+		}
 
 	}
 
@@ -155,106 +161,112 @@ class ModelInterfacesGenerator {
 	void generateObjectHelperInterface (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateObjectHelperInterface");
-
-		// create directory
-
-		String directory =
-			stringFormat (
-				"work/generated/%s/model",
-				plugin.packageName ().replace ('.', '/'));
-
-		directoryCreateWithParents (
-			directory);
-
-		// write interface
-
-		String filename =
-			stringFormat (
-				"%s/%s.java",
-				directory,
-				objectHelperName);
-
 		try (
 
-			AtomicFileWriter formatWriter =
-				new AtomicFileWriter (
-					filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateObjectHelperInterface");
 
 		) {
 
-			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
+			// create directory
 
-				.formatWriter (
-					formatWriter)
+			String directory =
+				stringFormat (
+					"work/generated/%s/model",
+					plugin.packageName ().replace ('.', '/'));
 
-				.packageNameFormat (
-					"%s.model",
-					plugin.packageName ());
+			directoryCreateWithParents (
+				directory);
 
-			JavaInterfaceWriter objectHelperWriter =
-				javaInterfaceWriterProvider.get ()
+			// write interface
 
-				.interfaceName (
-					objectHelperName)
+			String filename =
+				stringFormat (
+					"%s/%s.java",
+					directory,
+					objectHelperName);
 
-				.addInterfaceModifier (
-					"public");
+			try (
 
-			if (gotObjectHelperMethods) {
+				AtomicFileWriter formatWriter =
+					new AtomicFileWriter (
+						filename);
+
+			) {
+
+				JavaClassUnitWriter classUnitWriter =
+					javaClassUnitWriterProvider.get ()
+
+					.formatWriter (
+						formatWriter)
+
+					.packageNameFormat (
+						"%s.model",
+						plugin.packageName ());
+
+				JavaInterfaceWriter objectHelperWriter =
+					javaInterfaceWriterProvider.get ()
+
+					.interfaceName (
+						objectHelperName)
+
+					.addInterfaceModifier (
+						"public");
+
+				if (gotObjectHelperMethods) {
+
+					objectHelperWriter
+
+						.addInterfaceFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							objectHelperMethodsName);
+
+				}
+
+				if (gotDaoMethods) {
+
+					objectHelperWriter
+
+						.addInterfaceFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							daoMethodsName);
+
+				}
 
 				objectHelperWriter
 
-					.addInterfaceFormat (
-						"%s.model.%s",
-						plugin.packageName (),
-						objectHelperMethodsName);
+					.addInterface (
+						imports ->
+							stringFormat (
+								"%s <%s>",
+								imports.register (
+									"wbs.framework.object.ObjectHelper"),
+								imports.registerFormat (
+									"%s.model.%s",
+									plugin.packageName (),
+									recordName)));
+
+				classUnitWriter.addBlock (
+					objectHelperWriter);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				classUnitWriter.write (
+					taskLogger);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				formatWriter.commit ();
 
 			}
-
-			if (gotDaoMethods) {
-
-				objectHelperWriter
-
-					.addInterfaceFormat (
-						"%s.model.%s",
-						plugin.packageName (),
-						daoMethodsName);
-
-			}
-
-			objectHelperWriter
-
-				.addInterface (
-					imports ->
-						stringFormat (
-							"%s <%s>",
-							imports.register (
-								"wbs.framework.object.ObjectHelper"),
-							imports.registerFormat (
-								"%s.model.%s",
-								plugin.packageName (),
-								recordName)));
-
-			classUnitWriter.addBlock (
-				objectHelperWriter);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			classUnitWriter.write (
-				taskLogger);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			formatWriter.commit ();
 
 		}
 
@@ -264,88 +276,94 @@ class ModelInterfacesGenerator {
 	void generateDaoInterface (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateDaoInterface");
-
-		if (! gotDaoMethods) {
-			return;
-		}
-
-		// create directory
-
-		String directory =
-			stringFormat (
-				"work/generated/%s/model",
-				plugin.packageName ().replace ('.', '/'));
-
-		directoryCreateWithParents (
-			directory);
-
-		// write interface
-
-		String filename =
-			stringFormat (
-				"%s/%s.java",
-				directory,
-				daoName);
-
-		// write interface
-
 		try (
 
-			AtomicFileWriter formatWriter =
-				new AtomicFileWriter (
-					filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateDaoInterface");
 
 		) {
 
-			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
-
-				.formatWriter (
-					formatWriter)
-
-				.packageNameFormat (
-					"%s.model",
-					plugin.packageName ());
-
-			JavaInterfaceWriter daoWriter =
-				javaInterfaceWriterProvider.get ()
-
-				.interfaceName (
-					daoName)
-
-				.addInterfaceModifier (
-					"public");
-
-			if (gotDaoMethods) {
-
-				daoWriter
-
-					.addInterfaceFormat (
-						"%s.model.%s",
-						plugin.packageName (),
-						daoMethodsName);
-
-			}
-
-			classUnitWriter.addBlock (
-				daoWriter);
-
-			if (taskLogger.errors ()) {
+			if (! gotDaoMethods) {
 				return;
 			}
 
-			classUnitWriter.write (
-				taskLogger);
+			// create directory
 
-			if (taskLogger.errors ()) {
-				return;
+			String directory =
+				stringFormat (
+					"work/generated/%s/model",
+					plugin.packageName ().replace ('.', '/'));
+
+			directoryCreateWithParents (
+				directory);
+
+			// write interface
+
+			String filename =
+				stringFormat (
+					"%s/%s.java",
+					directory,
+					daoName);
+
+			// write interface
+
+			try (
+
+				AtomicFileWriter formatWriter =
+					new AtomicFileWriter (
+						filename);
+
+			) {
+
+				JavaClassUnitWriter classUnitWriter =
+					javaClassUnitWriterProvider.get ()
+
+					.formatWriter (
+						formatWriter)
+
+					.packageNameFormat (
+						"%s.model",
+						plugin.packageName ());
+
+				JavaInterfaceWriter daoWriter =
+					javaInterfaceWriterProvider.get ()
+
+					.interfaceName (
+						daoName)
+
+					.addInterfaceModifier (
+						"public");
+
+				if (gotDaoMethods) {
+
+					daoWriter
+
+						.addInterfaceFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							daoMethodsName);
+
+				}
+
+				classUnitWriter.addBlock (
+					daoWriter);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				classUnitWriter.write (
+					taskLogger);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				formatWriter.commit ();
+
 			}
-
-			formatWriter.commit ();
 
 		}
 
@@ -355,108 +373,114 @@ class ModelInterfacesGenerator {
 	void generateConsoleHelperInterface (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateConsoleHelperInterface");
-
-		// create directory
-
-		String directory =
-			stringFormat (
-				"work/generated/%s/console",
-				plugin.packageName ().replace ('.', '/'));
-
-		directoryCreateWithParents (
-			directory);
-
-		// write interface
-
-		String filename =
-			stringFormat (
-				"%s/%s.java",
-				directory,
-				consoleHelperName);
-
-		// write interface
-
 		try (
 
-			AtomicFileWriter formatWriter =
-				new AtomicFileWriter (
-					filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateConsoleHelperInterface");
 
 		) {
 
-			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
+			// create directory
 
-				.formatWriter (
-					formatWriter)
+			String directory =
+				stringFormat (
+					"work/generated/%s/console",
+					plugin.packageName ().replace ('.', '/'));
 
-				.packageNameFormat (
-					"%s.console",
-					plugin.packageName ());
+			directoryCreateWithParents (
+				directory);
 
-			JavaInterfaceWriter consoleHelperWriter =
-				javaInterfaceWriterProvider.get ()
+			// write interface
 
-				.interfaceName (
-					consoleHelperName)
+			String filename =
+				stringFormat (
+					"%s/%s.java",
+					directory,
+					consoleHelperName);
 
-				.addInterfaceModifier (
-					"public");
+			// write interface
 
-			if (gotObjectHelperMethods) {
+			try (
+
+				AtomicFileWriter formatWriter =
+					new AtomicFileWriter (
+						filename);
+
+			) {
+
+				JavaClassUnitWriter classUnitWriter =
+					javaClassUnitWriterProvider.get ()
+
+					.formatWriter (
+						formatWriter)
+
+					.packageNameFormat (
+						"%s.console",
+						plugin.packageName ());
+
+				JavaInterfaceWriter consoleHelperWriter =
+					javaInterfaceWriterProvider.get ()
+
+					.interfaceName (
+						consoleHelperName)
+
+					.addInterfaceModifier (
+						"public");
+
+				if (gotObjectHelperMethods) {
+
+					consoleHelperWriter
+
+						.addInterfaceFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							objectHelperMethodsName);
+
+				}
+
+				if (gotDaoMethods) {
+
+					consoleHelperWriter
+
+						.addInterfaceFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							daoMethodsName);
+
+				}
 
 				consoleHelperWriter
 
-					.addInterfaceFormat (
-						"%s.model.%s",
-						plugin.packageName (),
-						objectHelperMethodsName);
+					.addInterface (
+						imports ->
+							stringFormat (
+								"%s <%s>",
+								imports.register (
+									"wbs.console.helper.core.ConsoleHelper"),
+								imports.registerFormat (
+									"%s.model.%s",
+									plugin.packageName (),
+									recordName)));
+
+				classUnitWriter.addBlock (
+					consoleHelperWriter);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				classUnitWriter.write (
+					taskLogger);
+
+				if (taskLogger.errors ()) {
+					return;
+				}
+
+				formatWriter.commit ();
 
 			}
-
-			if (gotDaoMethods) {
-
-				consoleHelperWriter
-
-					.addInterfaceFormat (
-						"%s.model.%s",
-						plugin.packageName (),
-						daoMethodsName);
-
-			}
-
-			consoleHelperWriter
-
-				.addInterface (
-					imports ->
-						stringFormat (
-							"%s <%s>",
-							imports.register (
-								"wbs.console.helper.core.ConsoleHelper"),
-							imports.registerFormat (
-								"%s.model.%s",
-								plugin.packageName (),
-								recordName)));
-
-			classUnitWriter.addBlock (
-				consoleHelperWriter);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			classUnitWriter.write (
-				taskLogger);
-
-			if (taskLogger.errors ()) {
-				return;
-			}
-
-			formatWriter.commit ();
 
 		}
 

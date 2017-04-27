@@ -25,29 +25,35 @@ class WbsConfigFactory {
 	WbsConfig wbsConfig (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"wbsConfig");
+		try (
 
-		String configFilename =
-			System.getenv (
-				"WBS_CONFIG_XML");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"wbsConfig");
 
-		if (configFilename == null) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Please set WBS_CONFIG_XML"));
+			String configFilename =
+				System.getenv (
+					"WBS_CONFIG_XML");
+
+			if (configFilename == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Please set WBS_CONFIG_XML"));
+
+			}
+
+			WbsConfig wbsConfig =
+				WbsConfig.readFilename (
+					taskLogger,
+					configFilename);
+
+			return wbsConfig;
 
 		}
-
-		WbsConfig wbsConfig =
-			WbsConfig.readFilename (
-				taskLogger,
-				configFilename);
-
-		return wbsConfig;
 
 	}
 

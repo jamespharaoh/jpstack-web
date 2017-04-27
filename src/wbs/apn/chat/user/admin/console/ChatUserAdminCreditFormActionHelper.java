@@ -22,7 +22,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -80,34 +80,40 @@ class ChatUserAdminCreditFormActionHelper
 	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canBePerformed");
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canBePerformed");
 
-		boolean canView =
-			userPrivChecker.canRecursive (
-				taskLogger,
-				chatUser.getChat (),
-				"user_credit");
+		) {
 
-		boolean canPerform = (
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.user)
+			boolean canView =
+				userPrivChecker.canRecursive (
+					taskLogger,
+					chatUser.getChat (),
+					"user_credit");
 
-			&& ! chatUserLogic.deleted (
-				chatUser)
+			boolean canPerform = (
 
-		);
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.user)
 
-		return new Permissions ()
-			.canView (canView)
-			.canPerform (canPerform);
+				&& ! chatUserLogic.deleted (
+					chatUser)
+
+			);
+
+			return new Permissions ()
+				.canView (canView)
+				.canPerform (canPerform);
+
+		}
 
 	}
 
@@ -198,66 +204,72 @@ class ChatUserAdminCreditFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ChatUserAdminCreditForm formState) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		ChatUserCreditRec chatUserCredit =
-			chatUserCreditHelper.insert (
-				taskLogger,
-				chatUserCreditHelper.createInstance ()
+		) {
 
-			.setChatUser (
-				chatUser)
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-			.setTimestamp (
-				transaction.now ())
+			ChatUserCreditRec chatUserCredit =
+				chatUserCreditHelper.insert (
+					taskLogger,
+					chatUserCreditHelper.createInstance ()
 
-			.setCreditAmount (
-				formState.creditAmount ())
+				.setChatUser (
+					chatUser)
 
-			.setBillAmount (
-				formState.billAmount ())
+				.setTimestamp (
+					transaction.now ())
 
-			.setUser (
-				userConsoleLogic.userRequired ())
+				.setCreditAmount (
+					formState.creditAmount ())
 
-			.setGift (
-				equalToZero (
-					formState.billAmount ()))
+				.setBillAmount (
+					formState.billAmount ())
 
-			.setDetails (
-				formState.details ())
+				.setUser (
+					userConsoleLogic.userRequired ())
 
-		);
+				.setGift (
+					equalToZero (
+						formState.billAmount ()))
 
-		chatUser
+				.setDetails (
+					formState.details ())
 
-			.setCredit (
-				+ chatUser.getCredit ()
-				+ formState.creditAmount ())
+			);
 
-			.setCreditBought (
-				+ chatUser.getCreditBought ()
-				+ formState.creditAmount ());
+			chatUser
 
-		transaction.commit ();
+				.setCredit (
+					+ chatUser.getCredit ()
+					+ formState.creditAmount ())
 
-		requestContext.setEmptyFormData ();
+				.setCreditBought (
+					+ chatUser.getCreditBought ()
+					+ formState.creditAmount ());
 
-		requestContext.addNoticeFormat (
-			"Credit adjusted, reference = %h",
-			integerToDecimalString (
-				chatUserCredit.getId ()));
+			transaction.commit ();
 
-		return optionalAbsent ();
+			requestContext.setEmptyFormData ();
+
+			requestContext.addNoticeFormat (
+				"Credit adjusted, reference = %h",
+				integerToDecimalString (
+					chatUserCredit.getId ()));
+
+			return optionalAbsent ();
+
+		}
 
 	}
 

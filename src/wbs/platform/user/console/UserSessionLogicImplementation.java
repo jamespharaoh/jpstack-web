@@ -37,8 +37,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -107,76 +108,82 @@ class UserSessionLogicImplementation
 			@NonNull Optional <String> userAgent,
 			@NonNull Optional <String> consoleDeploymentCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userLogon");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userLogon");
 
-		// end any existing session
+		) {
 
-		userLogoff (
-			taskLogger,
-			user);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// start the session log
+			// end any existing session
 
-		UserSessionRec session =
-			userSessionHelper.insert (
+			userLogoff (
 				taskLogger,
-				userSessionHelper.createInstance ()
+				user);
 
-			.setUser (
-				user)
+			// start the session log
 
-			.setStartTime (
-				transaction.now ())
-
-			.setUserAgent (
-				textHelper.findOrCreate (
+			UserSessionRec session =
+				userSessionHelper.insert (
 					taskLogger,
-					userAgent.orNull ()))
+					userSessionHelper.createInstance ()
 
-		);
+				.setUser (
+					user)
 
-		// go online
+				.setStartTime (
+					transaction.now ())
 
-		UserOnlineRec userOnline =
-			userOnlineHelper.insert (
-				taskLogger,
-				userOnlineHelper.createInstance ()
+				.setUserAgent (
+					textHelper.findOrCreate (
+						taskLogger,
+						userAgent.orNull ()))
 
-			.setUser (
-				user)
+			);
 
-			.setSessionId (
-				randomLogic.generateLowercase (
-					20))
+			// go online
 
-			.setTimestamp (
-				transaction.now ())
+			UserOnlineRec userOnline =
+				userOnlineHelper.insert (
+					taskLogger,
+					userOnlineHelper.createInstance ()
 
-			.setUserSession (
-				session)
+				.setUser (
+					user)
 
-		);
+				.setSessionId (
+					randomLogic.generateLowercase (
+						20))
 
-		// create cookies
+				.setTimestamp (
+					transaction.now ())
 
-		requestContext.cookieSet (
-			sessionIdCookieName,
-			userOnline.getSessionId ());
+				.setUserSession (
+					session)
 
-		requestContext.cookieSet (
-			userIdCookieName,
-			integerToDecimalString (
-				user.getId ()));
+			);
 
-		// return
+			// create cookies
 
-		return session;
+			requestContext.cookieSet (
+				sessionIdCookieName,
+				userOnline.getSessionId ());
+
+			requestContext.cookieSet (
+				userIdCookieName,
+				integerToDecimalString (
+					user.getId ()));
+
+			// return
+
+			return session;
+
+		}
 
 	}
 
@@ -230,55 +237,61 @@ class UserSessionLogicImplementation
 			@NonNull Optional <String> userAgent,
 			@NonNull Optional <String> consoleDeploymentCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userLogonTry");
+		try (
 
-		// lookup the user
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userLogonTry");
 
-		Optional <UserRec> userOptional =
-			userHelper.findByCode (
-				GlobalId.root,
-				sliceCode,
-				username);
-
-		if (
-			optionalIsNotPresent (
-				userOptional)
-		) {
-			return optionalAbsent ();
-		}
-
-		UserRec user =
-			userOptional.get ();
-
-		// check password
-
-		if (
-			! checkPassword (
-				user,
-				password)
 		) {
 
-			return optionalAbsent ();
+			// lookup the user
+
+			Optional <UserRec> userOptional =
+				userHelper.findByCode (
+					GlobalId.root,
+					sliceCode,
+					username);
+
+			if (
+				optionalIsNotPresent (
+					userOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			UserRec user =
+				userOptional.get ();
+
+			// check password
+
+			if (
+				! checkPassword (
+					user,
+					password)
+			) {
+
+				return optionalAbsent ();
+
+			}
+
+			// update user (bring online)
+
+			UserSessionRec userSession =
+				userLogon (
+					taskLogger,
+					requestContext,
+					user,
+					userAgent,
+					consoleDeploymentCode);
+
+			// and return
+
+			return optionalOf (
+				userSession);
 
 		}
-
-		// update user (bring online)
-
-		UserSessionRec userSession =
-			userLogon (
-				taskLogger,
-				requestContext,
-				user,
-				userAgent,
-				consoleDeploymentCode);
-
-		// and return
-
-		return optionalOf (
-			userSession);
 
 	}
 
@@ -290,61 +303,43 @@ class UserSessionLogicImplementation
 			@NonNull Long userId,
 			@NonNull Boolean forceReload) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userSessionVerify (sessionId, userId, forceReload)");
+		try (
 
-		Instant now =
-			Instant.now ();
-
-		// reload if overdue or not done yet, always for root path
-
-		boolean reloaded = false;
-
-		if (
-
-			forceReload
-
-			|| earlierThan (
-				nextReload,
-				now)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userSessionVerify (sessionId, userId, forceReload)");
 
 		) {
 
-			taskLogger.debugFormat (
-				"Reloading");
+			Instant now =
+				Instant.now ();
 
-			reload (
-				taskLogger);
+			// reload if overdue or not done yet, always for root path
 
-			reloaded = true;
+			boolean reloaded = false;
 
-		}
+			if (
 
-		// check his session is valid, reload if it doesn't look right still
+				forceReload
 
-		if (
-			optionalValueNotEqualWithClass (
-				String.class,
-				mapItemForKey (
-					onlineSessionIdsByUserId,
-					userId),
-				sessionId)
-		) {
+				|| earlierThan (
+					nextReload,
+					now)
 
-			taskLogger.debugFormat (
-				"Session not found in cache (1)");
+			) {
 
-			if (reloaded) {
-				return false;
+				taskLogger.debugFormat (
+					"Reloading");
+
+				reload (
+					taskLogger);
+
+				reloaded = true;
+
 			}
 
-			taskLogger.debugFormat (
-				"Reloading");
-
-			reload (
-				taskLogger);
+			// check his session is valid, reload if it doesn't look right still
 
 			if (
 				optionalValueNotEqualWithClass (
@@ -356,24 +351,48 @@ class UserSessionLogicImplementation
 			) {
 
 				taskLogger.debugFormat (
-					"Session not found in cache (2)");
+					"Session not found in cache (1)");
 
-				return false;
+				if (reloaded) {
+					return false;
+				}
+
+				taskLogger.debugFormat (
+					"Reloading");
+
+				reload (
+					taskLogger);
+
+				if (
+					optionalValueNotEqualWithClass (
+						String.class,
+						mapItemForKey (
+							onlineSessionIdsByUserId,
+							userId),
+						sessionId)
+				) {
+
+					taskLogger.debugFormat (
+						"Session not found in cache (2)");
+
+					return false;
+
+				}
 
 			}
 
+			// update his timestamp next time round
+
+			taskLogger.debugFormat (
+				"Session ok");
+
+			activeSessions.put (
+				sessionId,
+				now);
+
+			return true;
+
 		}
-
-		// update his timestamp next time round
-
-		taskLogger.debugFormat (
-			"Session ok");
-
-		activeSessions.put (
-			sessionId,
-			now);
-
-		return true;
 
 	}
 
@@ -383,85 +402,91 @@ class UserSessionLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userSessionVerify (requestContext)");
+		try (
 
-		// check the cookies are present
-
-		if (
-
-			optionalIsNotPresent (
-				requestContext.cookie (
-					sessionIdCookieName))
-
-			|| optionalIsNotPresent (
-				requestContext.cookie (
-					userIdCookieName))
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userSessionVerify (requestContext)");
 
 		) {
 
-			taskLogger.debugFormat (
-				"Cookies not found");
+			// check the cookies are present
 
-			return false;
+			if (
 
-		}
+				optionalIsNotPresent (
+					requestContext.cookie (
+						sessionIdCookieName))
 
-		String sessionId =
-			requestContext.cookieRequired (
-				sessionIdCookieName);
+				|| optionalIsNotPresent (
+					requestContext.cookie (
+						userIdCookieName))
 
-		Optional <Long> userIdOptional =
-			parseInteger (
+			) {
+
+				taskLogger.debugFormat (
+					"Cookies not found");
+
+				return false;
+
+			}
+
+			String sessionId =
 				requestContext.cookieRequired (
-					userIdCookieName));
+					sessionIdCookieName);
 
-		if (
-			optionalIsNotPresent (
-				userIdOptional)
-		) {
+			Optional <Long> userIdOptional =
+				parseInteger (
+					requestContext.cookieRequired (
+						userIdCookieName));
 
-			taskLogger.debugFormat (
-				"User id is not valid");
+			if (
+				optionalIsNotPresent (
+					userIdOptional)
+			) {
 
-			return false;
+				taskLogger.debugFormat (
+					"User id is not valid");
+
+				return false;
+
+			}
+
+			Long userId =
+				optionalGetRequired (
+					userIdOptional);
+
+			Boolean forceReload =
+				stringEqualSafe (
+					requestContext.servletPath (),
+					"/");
+
+			Boolean result =
+				userSessionVerify (
+					taskLogger,
+					sessionId,
+					userId,
+					forceReload);
+
+			if (! result) {
+
+				taskLogger.noticeFormat (
+					"Removing session cookies for user %s",
+					integerToDecimalString (
+						userId));
+
+				requestContext.cookieUnset (
+					sessionIdCookieName);
+
+				requestContext.cookieUnset (
+					userIdCookieName);
+
+			}
+
+			return result;
 
 		}
-
-		Long userId =
-			optionalGetRequired (
-				userIdOptional);
-
-		Boolean forceReload =
-			stringEqualSafe (
-				requestContext.servletPath (),
-				"/");
-
-		Boolean result =
-			userSessionVerify (
-				taskLogger,
-				sessionId,
-				userId,
-				forceReload);
-
-		if (! result) {
-
-			taskLogger.noticeFormat (
-				"Removing session cookies for user %s",
-				integerToDecimalString (
-					userId));
-
-			requestContext.cookieUnset (
-				sessionIdCookieName);
-
-			requestContext.cookieUnset (
-				userIdCookieName);
-
-		}
-
-		return result;
 
 	}
 
@@ -471,46 +496,52 @@ class UserSessionLogicImplementation
 	void reload (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reloadReal");
+		try (
 
-		for (
-			long attempt = 0l;
-			attempt < 16l;
-			attempt ++
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reloadReal");
+
 		) {
 
-			try {
-
-				reloadReal (
-					taskLogger);
-
-				return;
-
-			} catch (Exception reloadException) {
+			for (
+				long attempt = 0l;
+				attempt < 16l;
+				attempt ++
+			) {
 
 				try {
 
-					Thread.sleep (
-						attempt);
+					reloadReal (
+						taskLogger);
 
-				} catch (InterruptedException interruptedException) {
+					return;
 
-					throw new RuntimeException (
-						interruptedException);
+				} catch (Exception reloadException) {
+
+					try {
+
+						Thread.sleep (
+							attempt);
+
+					} catch (InterruptedException interruptedException) {
+
+						throw new RuntimeException (
+							interruptedException);
+
+					}
 
 				}
 
 			}
 
+			// one last try
+
+			reloadReal (
+				taskLogger);
+
 		}
-
-		// one last try
-
-		reloadReal (
-			taskLogger);
 
 	}
 
@@ -536,76 +567,82 @@ class UserSessionLogicImplementation
 			@NonNull String code,
 			@NonNull byte[] value) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userDataStore");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userDataStore");
 
-		Optional <UserDataRec> existingUserDataOptional =
-			userDataHelper.findByCode (
-				user,
-				code);
-
-		if (
-			optionalIsPresent (
-				existingUserDataOptional)
 		) {
 
-			taskLogger.noticeFormat (
-				"Update %s.%s.%s",
-				user.getSlice ().getCode (),
-				user.getUsername (),
-				code);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			optionalGetRequired (
-				existingUserDataOptional)
+			Optional <UserDataRec> existingUserDataOptional =
+				userDataHelper.findByCode (
+					user,
+					code);
 
-				.setCreatedTime (
-					transaction.now ())
+			if (
+				optionalIsPresent (
+					existingUserDataOptional)
+			) {
 
-				.setExpiryTime (
-					transaction.now ().plus (
-						Duration.standardDays (
-							1l)))
+				taskLogger.noticeFormat (
+					"Update %s.%s.%s",
+					user.getSlice ().getCode (),
+					user.getUsername (),
+					code);
 
-				.setData (
-					value)
+				optionalGetRequired (
+					existingUserDataOptional)
 
-			;
+					.setCreatedTime (
+						transaction.now ())
 
-		} else {
+					.setExpiryTime (
+						transaction.now ().plus (
+							Duration.standardDays (
+								1l)))
 
-			taskLogger.noticeFormat (
-				"Create %s.%s.%s",
-				user.getSlice ().getCode (),
-				user.getUsername (),
-				code);
+					.setData (
+						value)
 
-			userDataHelper.insert (
-				taskLogger,
-				userDataHelper.createInstance ()
+				;
 
-				.setUser (
-					user)
+			} else {
 
-				.setCode (
-					code)
+				taskLogger.noticeFormat (
+					"Create %s.%s.%s",
+					user.getSlice ().getCode (),
+					user.getUsername (),
+					code);
 
-				.setCreatedTime (
-					transaction.now ())
+				userDataHelper.insert (
+					taskLogger,
+					userDataHelper.createInstance ()
 
-				.setExpiryTime (
-					transaction.now ().plus (
-						Duration.standardDays (
-							1l)))
+					.setUser (
+						user)
 
-				.setData (
-					value)
+					.setCode (
+						code)
 
-			);
+					.setCreatedTime (
+						transaction.now ())
+
+					.setExpiryTime (
+						transaction.now ().plus (
+							Duration.standardDays (
+								1l)))
+
+					.setData (
+						value)
+
+				);
+
+			}
 
 		}
 
@@ -618,38 +655,44 @@ class UserSessionLogicImplementation
 			@NonNull UserRec user,
 			@NonNull String code) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userDataRemove");
+		try (
 
-		Optional <UserDataRec> userDataOptional =
-			userDataHelper.findByCode (
-				user,
-				code);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userDataRemove");
 
-		if (
-			optionalIsPresent (
-				userDataOptional)
 		) {
 
-			taskLogger.noticeFormat (
-				"Remove %s.%s.%s",
-				user.getSlice ().getCode (),
-				user.getUsername (),
-				code);
+			Optional <UserDataRec> userDataOptional =
+				userDataHelper.findByCode (
+					user,
+					code);
 
-			userDataHelper.remove (
-				optionalGetRequired (
-					userDataOptional));
+			if (
+				optionalIsPresent (
+					userDataOptional)
+			) {
 
-		} else {
+				taskLogger.noticeFormat (
+					"Remove %s.%s.%s",
+					user.getSlice ().getCode (),
+					user.getUsername (),
+					code);
 
-			taskLogger.noticeFormat (
-				"Remove %s.%s.%s (did not exist)",
-				user.getSlice ().getCode (),
-				user.getUsername (),
-				code);
+				userDataHelper.remove (
+					optionalGetRequired (
+						userDataOptional));
+
+			} else {
+
+				taskLogger.noticeFormat (
+					"Remove %s.%s.%s (did not exist)",
+					user.getSlice ().getCode (),
+					user.getUsername (),
+					code);
+
+			}
 
 		}
 
@@ -662,29 +705,35 @@ class UserSessionLogicImplementation
 			@NonNull UserRec user,
 			@NonNull String code) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"userDataObject");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userDataObject");
 
-			return optionalMapRequired (
-				userData (
-					user,
-					code),
-				SerializationUtils::deserialize);
+		) {
 
-		} catch (SerializationException serializationException) {
+			try {
 
-			taskLogger.warningFormatException (
-				serializationException,
-				"Error deserializing user data %s.%s.%s",
-				user.getSlice ().getCode (),
-				user.getUsername (),
-				code);
+				return optionalMapRequired (
+					userData (
+						user,
+						code),
+					SerializationUtils::deserialize);
 
-			return optionalAbsent ();
+			} catch (SerializationException serializationException) {
+
+				taskLogger.warningFormatException (
+					serializationException,
+					"Error deserializing user data %s.%s.%s",
+					user.getSlice ().getCode (),
+					user.getUsername (),
+					code);
+
+				return optionalAbsent ();
+
+			}
 
 		}
 
@@ -713,14 +762,14 @@ class UserSessionLogicImplementation
 	void reloadReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reload");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reload");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"UserSessionLogicImplementation.reload ()",

@@ -143,36 +143,42 @@ class ObjectSummaryPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildResponder ();
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextTabs (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildContextFile (
-				resolvedExtensionPoint);
+			buildResponder ();
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTabs (
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					resolvedExtensionPoint);
+
+			}
+
+			builder.descend (
+				taskLogger,
+				spec,
+				spec.builders (),
+				this,
+				MissingBuilderBehaviour.error);
 
 		}
-
-		builder.descend (
-			taskLogger,
-			spec,
-			spec.builders (),
-			this,
-			MissingBuilderBehaviour.error);
 
 	}
 
@@ -387,50 +393,56 @@ class ObjectSummaryPageBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			container.consoleHelper ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		formFieldSet =
-			ifNotNullThenElse (
-				spec.fieldsName (),
-				() -> consoleModule.formFieldSetRequired (
+		) {
+
+			consoleHelper =
+				container.consoleHelper ();
+
+			formFieldSet =
+				ifNotNullThenElse (
 					spec.fieldsName (),
-					consoleHelper.objectClass ()),
-				() -> defaultFields (
-					taskLogger));
+					() -> consoleModule.formFieldSetRequired (
+						spec.fieldsName (),
+						consoleHelper.objectClass ()),
+					() -> defaultFields (
+						taskLogger));
 
-		privKey =
-			spec.privKey ();
+			privKey =
+				spec.privKey ();
 
-		if (spec.builders ().isEmpty ()) {
+			if (spec.builders ().isEmpty ()) {
 
-			addFieldsPart (
-				formFieldSet);
+				addFieldsPart (
+					formFieldSet);
 
-		}
+			}
 
-		// if a provider name is provided
+			// if a provider name is provided
 
-		if (spec.fieldsProviderName () != null) {
+			if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						taskLogger,
-						spec.fieldsProviderName (),
-						FieldsProvider.class));
+				fieldsProvider =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							spec.fieldsProviderName (),
+							FieldsProvider.class));
 
-		}
+			}
 
-		else {
+			else {
 
-			fieldsProvider =
-				null;
+				fieldsProvider =
+					null;
+
+			}
 
 		}
 
@@ -439,71 +451,77 @@ class ObjectSummaryPageBuilder <
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defaultFields");
+		try (
 
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultFields");
 
-		formFieldSpecs.add (
-			new IdFormFieldSpec ());
-
-		if (consoleHelper.parentTypeIsFixed ()) {
-
-			// TODO this should not be disabled!
-
-			/*
-			ConsoleObjectHelper parentHelper =
-				objectManager.getConsoleObjectHelper (
-					maintSchedConsoleHelper.parentClass ());
-
-			if (! parentHelper.isRoot ())
-				fields.add (parentField.get ());
-			*/
-
-		} else {
-
-			formFieldSpecs.add (
-				new ParentFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.codeExists ()) {
-
-			formFieldSpecs.add (
-				new CodeFormFieldSpec ());
-
-		}
-
-		if (
-			consoleHelper.nameExists ()
-			&& ! consoleHelper.nameIsCode ()
 		) {
 
-			formFieldSpecs.add (
-				new NameFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.descriptionExists ()) {
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
 			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ());
+				new IdFormFieldSpec ());
+
+			if (consoleHelper.parentTypeIsFixed ()) {
+
+				// TODO this should not be disabled!
+
+				/*
+				ConsoleObjectHelper parentHelper =
+					objectManager.getConsoleObjectHelper (
+						maintSchedConsoleHelper.parentClass ());
+
+				if (! parentHelper.isRoot ())
+					fields.add (parentField.get ());
+				*/
+
+			} else {
+
+				formFieldSpecs.add (
+					new ParentFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.codeExists ()) {
+
+				formFieldSpecs.add (
+					new CodeFormFieldSpec ());
+
+			}
+
+			if (
+				consoleHelper.nameExists ()
+				&& ! consoleHelper.nameIsCode ()
+			) {
+
+				formFieldSpecs.add (
+					new NameFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.descriptionExists ()) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ());
+
+			}
+
+			String fieldSetName =
+				stringFormat (
+					"%s.summary",
+					consoleHelper.objectName ());
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				consoleHelper,
+				fieldSetName,
+				formFieldSpecs);
 
 		}
-
-		String fieldSetName =
-			stringFormat (
-				"%s.summary",
-				consoleHelper.objectName ());
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			consoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

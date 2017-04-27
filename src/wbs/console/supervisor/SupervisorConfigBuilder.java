@@ -90,34 +90,40 @@ class SupervisorConfigBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		builder.descend (
-			taskLogger,
-			spec,
-			spec.builders (),
-			this,
-			MissingBuilderBehaviour.ignore);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		consoleModule.addSupervisorConfig (
-			new SupervisorConfig ()
+		) {
 
-			.name (
-				spec.name ())
+			builder.descend (
+				taskLogger,
+				spec,
+				spec.builders (),
+				this,
+				MissingBuilderBehaviour.ignore);
 
-			.label (
-				spec.label ())
+			consoleModule.addSupervisorConfig (
+				new SupervisorConfig ()
 
-			.spec (
-				spec)
+				.name (
+					spec.name ())
 
-			.pagePartFactories (
-				pagePartFactories)
+				.label (
+					spec.label ())
 
-		);
+				.spec (
+					spec)
+
+				.pagePartFactories (
+					pagePartFactories)
+
+			);
+
+		}
 
 	}
 

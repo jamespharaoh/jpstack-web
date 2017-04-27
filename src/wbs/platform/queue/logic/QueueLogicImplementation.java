@@ -7,6 +7,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -18,13 +19,12 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -102,118 +102,125 @@ class QueueLogicImplementation
 			@NonNull String source,
 			@NonNull String details) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createQueueItem");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createQueueItem");
 
-		QueueRec queue =
-			queueSubject.getQueue ();
-
-		QueueTypeRec queueType =
-			queue.getQueueType ();
-
-		// sanity check
-
-		if (
-			integerNotEqualSafe (
-				objectManager.getObjectTypeId (
-					refObject),
-				queueType.getRefType ().getId ())
 		) {
 
-			throw new IllegalArgumentException ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		}
+			QueueRec queue =
+				queueSubject.getQueue ();
 
-		// create the queue item
+			QueueTypeRec queueType =
+				queue.getQueueType ();
 
-		boolean waiting =
-			queueSubject.getActiveItems () > 0;
+			// sanity check
 
-		QueueItemRec queueItem =
-			queueItemHelper.insert (
+			if (
+				integerNotEqualSafe (
+					objectManager.getObjectTypeId (
+						refObject),
+					queueType.getRefType ().getId ())
+			) {
+
+				throw new IllegalArgumentException ();
+
+			}
+
+			// create the queue item
+
+			boolean waiting =
+				queueSubject.getActiveItems () > 0;
+
+			QueueItemRec queueItem =
+				queueItemHelper.insert (
+					taskLogger,
+					queueItemHelper.createInstance ()
+
+				.setQueueSubject (
+					queueSubject)
+
+				.setIndex (
+					queueSubject.getTotalItems ())
+
+				.setQueue (
+					queue)
+
+				.setSource (
+					source)
+
+				.setDetails (
+					details)
+
+				.setRefObjectId (
+					refObject.getId ())
+
+				.setState (
+					waiting
+						? QueueItemState.waiting
+						: QueueItemState.pending)
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setPendingTime (
+					waiting
+						? null
+						: transaction.now ())
+
+				.setPriority (
+					ifNull (
+						queue.getDefaultPriority (),
+						0l))
+
+			);
+
+			// update queue subject
+
+			queueSubject
+
+				.setTotalItems (
+					queueSubject.getTotalItems () + 1)
+
+				.setActiveItems (
+					queueSubject.getActiveItems () + 1);
+
+			// update slice
+
+			Optional<SliceRec> optionalSlice =
+				objectManager.getAncestor (
+					SliceRec.class,
+					queue);
+
+			if (
+				optionalIsNotPresent (
+					optionalSlice)
+			) {
+
+				taskLogger.warningFormat (
+					"Unable to determine slice for queue %s",
+					integerToDecimalString (
+						queue.getId ()));
+
+			}
+
+			sliceLogic.updateSliceInactivityTimestamp (
 				taskLogger,
-				queueItemHelper.createInstance ()
+				optionalSlice.get (),
+				Optional.of (
+					transaction.now ()));
 
-			.setQueueSubject (
-				queueSubject)
+			// and return
 
-			.setIndex (
-				queueSubject.getTotalItems ())
-
-			.setQueue (
-				queue)
-
-			.setSource (
-				source)
-
-			.setDetails (
-				details)
-
-			.setRefObjectId (
-				refObject.getId ())
-
-			.setState (
-				waiting
-					? QueueItemState.waiting
-					: QueueItemState.pending)
-
-			.setCreatedTime (
-				transaction.now ())
-
-			.setPendingTime (
-				waiting
-					? null
-					: transaction.now ())
-
-			.setPriority (
-				ifNull (
-					queue.getDefaultPriority (),
-					0l))
-
-		);
-
-		// update queue subject
-
-		queueSubject
-
-			.setTotalItems (
-				queueSubject.getTotalItems () + 1)
-
-			.setActiveItems (
-				queueSubject.getActiveItems () + 1);
-
-		// update slice
-
-		Optional<SliceRec> optionalSlice =
-			objectManager.getAncestor (
-				SliceRec.class,
-				queue);
-
-		if (
-			optionalIsNotPresent (
-				optionalSlice)
-		) {
-
-			taskLogger.warningFormat (
-				"Unable to determine slice for queue %s",
-				integerToDecimalString (
-					queue.getId ()));
+			return queueItem;
 
 		}
-
-		sliceLogic.updateSliceInactivityTimestamp (
-			optionalSlice.get (),
-			Optional.of (
-				transaction.now ()));
-
-		// and return
-
-		return queueItem;
 
 	}
 
@@ -227,23 +234,29 @@ class QueueLogicImplementation
 			@NonNull String source,
 			@NonNull String details) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createQueueItem");
+		try (
 
-		QueueSubjectRec queueSubject =
-			findOrCreateQueueSubject (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createQueueItem");
+
+		) {
+
+			QueueSubjectRec queueSubject =
+				findOrCreateQueueSubject (
+					taskLogger,
+					queue,
+					subjectObject);
+
+			return createQueueItem (
 				taskLogger,
-				queue,
-				subjectObject);
+				queueSubject,
+				refObject,
+				source,
+				details);
 
-		return createQueueItem (
-			taskLogger,
-			queueSubject,
-			refObject,
-			source,
-			details);
+		}
 
 	}
 
@@ -254,155 +267,173 @@ class QueueLogicImplementation
 			@NonNull QueueRec queue,
 			@NonNull Record<?> object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateQueueSubject");
+		try (
 
-		QueueTypeRec queueType =
-			queue.getQueueType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateQueueSubject");
 
-		// sanity check
-
-		if (
-			integerNotEqualSafe (
-				objectManager.getObjectTypeId (
-					object),
-				queueType.getSubjectType ().getId ())
 		) {
 
-			throw new IllegalArgumentException (
-				stringFormat (
-					"Queue %s expected subject type %s, got %s",
-					objectManager.objectPath (
-						queue),
-					queueType.getSubjectType ().getCode (),
-					objectManager.getObjectTypeCode (
-						object)));
+			QueueTypeRec queueType =
+				queue.getQueueType ();
 
-		}
+			// sanity check
 
-		// lookup existing
+			if (
+				integerNotEqualSafe (
+					objectManager.getObjectTypeId (
+						object),
+					queueType.getSubjectType ().getId ())
+			) {
 
-		QueueSubjectRec queueSubject =
-			queueSubjectHelper.find (
-				queue,
-				object);
+				throw new IllegalArgumentException (
+					stringFormat (
+						"Queue %s expected subject type %s, got %s",
+						objectManager.objectPath (
+							queue),
+						queueType.getSubjectType ().getCode (),
+						objectManager.getObjectTypeCode (
+							object)));
 
-		if (queueSubject != null)
+			}
+
+			// lookup existing
+
+			QueueSubjectRec queueSubject =
+				queueSubjectHelper.find (
+					queue,
+					object);
+
+			if (queueSubject != null)
+				return queueSubject;
+
+			// create new
+
+			queueSubject =
+				queueSubjectHelper.insert (
+					taskLogger,
+					queueSubjectHelper.createInstance ()
+
+				.setQueue (
+					queue)
+
+				.setObjectId (
+					object.getId ())
+
+			);
+
 			return queueSubject;
 
-		// create new
-
-		queueSubject =
-			queueSubjectHelper.insert (
-				taskLogger,
-				queueSubjectHelper.createInstance ()
-
-			.setQueue (
-				queue)
-
-			.setObjectId (
-				object.getId ())
-
-		);
-
-		return queueSubject;
+		}
 
 	}
 
 	@Override
 	public
 	void cancelQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemRec queueItem) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		QueueSubjectRec queueSubject =
-			queueItem.getQueueSubject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"cancelQueueItem");
 
-		// sanity checks
-
-		long currentItemIndex =
-			+ queueSubject.getTotalItems ()
-			- queueSubject.getActiveItems ();
-
-		if (
-			integerNotEqualSafe (
-				queueItem.getIndex (),
-				currentItemIndex)
 		) {
-			throw new IllegalStateException ();
-		}
 
-		if (
-			enumNotInSafe (
-				queueItem.getState (),
-				QueueItemState.pending,
-				QueueItemState.claimed)) {
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			throw new RuntimeException (
-				stringFormat (
-					"Cannot cancel queue item in state: %s",
-					enumNameSpaces (
-						queueItem.getState ())));
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
 
-		}
+			// sanity checks
 
-		// update queue item claim
-
-		queueItem.getQueueItemClaim ()
-
-			.setEndTime (
-				transaction.now ())
-
-			.setStatus (
-				QueueItemClaimStatus.cancelled);
-
-		// update the queue item
-
-		queueItem
-
-			.setState (
-				QueueItemState.cancelled)
-
-			.setCancelledTime (
-				transaction.now ())
-
-			.setQueueItemClaim (
-				null);
-
-		// update the queue subject
-
-		queueSubject
-
-			.setActiveItems (
-				queueSubject.getActiveItems () - 1);
-
-		// activate next queue item (if any)
-
-		if (queueSubject.getActiveItems () > 0) {
-
-			long nextItemIndex =
+			long currentItemIndex =
 				+ queueSubject.getTotalItems ()
 				- queueSubject.getActiveItems ();
 
-			QueueItemRec nextQueueItem =
-				queueItemHelper.findByIndexRequired (
-					queueSubject,
-					nextItemIndex);
-
-			if (nextQueueItem.getState () != QueueItemState.waiting)
+			if (
+				integerNotEqualSafe (
+					queueItem.getIndex (),
+					currentItemIndex)
+			) {
 				throw new IllegalStateException ();
+			}
 
-			nextQueueItem
+			if (
+				enumNotInSafe (
+					queueItem.getState (),
+					QueueItemState.pending,
+					QueueItemState.claimed)) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Cannot cancel queue item in state: %s",
+						enumNameSpaces (
+							queueItem.getState ())));
+
+			}
+
+			// update queue item claim
+
+			queueItem.getQueueItemClaim ()
+
+				.setEndTime (
+					transaction.now ())
+
+				.setStatus (
+					QueueItemClaimStatus.cancelled);
+
+			// update the queue item
+
+			queueItem
 
 				.setState (
-					QueueItemState.pending)
+					QueueItemState.cancelled)
 
-				.setPendingTime (
-					transaction.now ());
+				.setCancelledTime (
+					transaction.now ())
+
+				.setQueueItemClaim (
+					null);
+
+			// update the queue subject
+
+			queueSubject
+
+				.setActiveItems (
+					queueSubject.getActiveItems () - 1);
+
+			// activate next queue item (if any)
+
+			if (queueSubject.getActiveItems () > 0) {
+
+				long nextItemIndex =
+					+ queueSubject.getTotalItems ()
+					- queueSubject.getActiveItems ();
+
+				QueueItemRec nextQueueItem =
+					queueItemHelper.findByIndexRequired (
+						queueSubject,
+						nextItemIndex);
+
+				if (nextQueueItem.getState () != QueueItemState.waiting)
+					throw new IllegalStateException ();
+
+				nextQueueItem
+
+					.setState (
+						QueueItemState.pending)
+
+					.setPendingTime (
+						transaction.now ());
+
+			}
 
 		}
 
@@ -411,135 +442,148 @@ class QueueLogicImplementation
 	@Override
 	public
 	void processQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemRec queueItem,
 			@NonNull UserRec user) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		QueueSubjectRec queueSubject =
-			queueItem.getQueueSubject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processQueueItem");
 
-		// sanity checks
+		) {
 
-		long currentItemIndex =
-			+ queueSubject.getTotalItems ()
-			- queueSubject.getActiveItems ();
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		if (queueItem.getIndex () != currentItemIndex) {
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
 
-			throw new IllegalStateException (
-				stringFormat (
-					"Cannot process queue item %s ",
-					integerToDecimalString (
-						queueItem.getId ()),
-					"with index %s ",
-					integerToDecimalString (
-						queueItem.getIndex ()),
-					"for queue subject %s ",
-					integerToDecimalString (
-						queueSubject.getId ()),
-					"whose total is %s ",
-					integerToDecimalString (
-						queueSubject.getTotalItems ()),
-					"and active is %s, ",
-					integerToDecimalString (
-						queueSubject.getActiveItems ()),
-					"implying a current item index of %s",
-					integerToDecimalString (
-						currentItemIndex)));
+			// sanity checks
 
-		}
-
-		if (queueItem.getState () != QueueItemState.claimed) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Cannot process queue item %s in state: %s",
-					integerToDecimalString (
-						queueItem.getId ()),
-					enumNameSpaces (
-						queueItem.getState ())));
-
-		}
-
-		if (queueItem.getQueueItemClaim ().getUser () != user) {
-
-			throw new RuntimeException (
-				"Trying to process item belonging to another user");
-
-		}
-
-		// update queue item claim
-
-		queueItem.getQueueItemClaim ()
-
-			.setEndTime (
-				transaction.now ())
-
-			.setStatus (
-				QueueItemClaimStatus.processed);
-
-		// update the queue item
-
-		queueItem
-
-			.setState (
-				QueueItemState.processed)
-
-			.setProcessedTime (
-				transaction.now ())
-
-			.setProcessedUser (
-				user)
-
-			.setProcessedByPreferredUser (
-				queueSubject.getPreferredUser () == null
-					? null
-					: queueSubject.getPreferredUser () == user)
-
-			.setQueueItemClaim (
-				null);
-
-		// update the queue subject
-
-		queueSubject
-
-			.setActiveItems (
-				queueSubject.getActiveItems () - 1)
-
-			.setPreferredUser (
-				user);
-
-		// update slice
-
-		sliceLogic.updateSliceInactivityTimestamp (
-			user.getSlice (),
-			Optional.<Instant>absent ());
-
-		// activate next queue item (if any)
-
-		if (queueSubject.getActiveItems () > 0) {
-
-			long nextItemIndex =
+			long currentItemIndex =
 				+ queueSubject.getTotalItems ()
 				- queueSubject.getActiveItems ();
 
-			QueueItemRec nextQueueItem =
-				queueItemHelper.findByIndexRequired (
-					queueSubject,
-					nextItemIndex);
+			if (queueItem.getIndex () != currentItemIndex) {
 
-			if (nextQueueItem.getState () != QueueItemState.waiting)
-				throw new IllegalStateException ();
+				throw new IllegalStateException (
+					stringFormat (
+						"Cannot process queue item %s ",
+						integerToDecimalString (
+							queueItem.getId ()),
+						"with index %s ",
+						integerToDecimalString (
+							queueItem.getIndex ()),
+						"for queue subject %s ",
+						integerToDecimalString (
+							queueSubject.getId ()),
+						"whose total is %s ",
+						integerToDecimalString (
+							queueSubject.getTotalItems ()),
+						"and active is %s, ",
+						integerToDecimalString (
+							queueSubject.getActiveItems ()),
+						"implying a current item index of %s",
+						integerToDecimalString (
+							currentItemIndex)));
 
-			nextQueueItem
+			}
+
+			if (queueItem.getState () != QueueItemState.claimed) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Cannot process queue item %s in state: %s",
+						integerToDecimalString (
+							queueItem.getId ()),
+						enumNameSpaces (
+							queueItem.getState ())));
+
+			}
+
+			if (queueItem.getQueueItemClaim ().getUser () != user) {
+
+				throw new RuntimeException (
+					"Trying to process item belonging to another user");
+
+			}
+
+			// update queue item claim
+
+			queueItem.getQueueItemClaim ()
+
+				.setEndTime (
+					transaction.now ())
+
+				.setStatus (
+					QueueItemClaimStatus.processed);
+
+			// update the queue item
+
+			queueItem
 
 				.setState (
-					QueueItemState.pending)
+					QueueItemState.processed)
 
-				.setPendingTime (
-					transaction.now ());
+				.setProcessedTime (
+					transaction.now ())
+
+				.setProcessedUser (
+					user)
+
+				.setProcessedByPreferredUser (
+					queueSubject.getPreferredUser () == null
+						? null
+						: queueSubject.getPreferredUser () == user)
+
+				.setQueueItemClaim (
+					null);
+
+			// update the queue subject
+
+			queueSubject
+
+				.setActiveItems (
+					queueSubject.getActiveItems () - 1)
+
+				.setPreferredUser (
+					user);
+
+			// update slice
+
+			sliceLogic.updateSliceInactivityTimestamp (
+				taskLogger,
+				user.getSlice (),
+				optionalAbsent ());
+
+			// activate next queue item (if any)
+
+			if (queueSubject.getActiveItems () > 0) {
+
+				long nextItemIndex =
+					+ queueSubject.getTotalItems ()
+					- queueSubject.getActiveItems ();
+
+				QueueItemRec nextQueueItem =
+					queueItemHelper.findByIndexRequired (
+						queueSubject,
+						nextItemIndex);
+
+				if (nextQueueItem.getState () != QueueItemState.waiting)
+					throw new IllegalStateException ();
+
+				nextQueueItem
+
+					.setState (
+						QueueItemState.pending)
+
+					.setPendingTime (
+						transaction.now ());
+
+			}
 
 		}
 
@@ -564,7 +608,7 @@ class QueueLogicImplementation
 	boolean sliceHasQueueActivity (
 			@NonNull SliceRec slice) {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		// active if no config or stats

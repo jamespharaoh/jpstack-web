@@ -37,37 +37,43 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// find existing
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		Optional <SimulatorSessionNumberRec> existingSimulatorSessionNumber =
-			simulatorSessionNumberHelper.find (
-				number.getId ());
-
-		if (
-			optionalIsPresent (
-				existingSimulatorSessionNumber)
 		) {
-			return existingSimulatorSessionNumber.get ();
+
+			// find existing
+
+			Optional <SimulatorSessionNumberRec> existingSimulatorSessionNumber =
+				simulatorSessionNumberHelper.find (
+					number.getId ());
+
+			if (
+				optionalIsPresent (
+					existingSimulatorSessionNumber)
+			) {
+				return existingSimulatorSessionNumber.get ();
+			}
+
+			// create new
+
+			SimulatorSessionNumberRec newSimulatorSessionNumber =
+				simulatorSessionNumberHelper.insert (
+					taskLogger,
+					simulatorSessionNumberHelper.createInstance ()
+
+				.setNumber (
+					number)
+
+			);
+
+			return newSimulatorSessionNumber;
+
 		}
-
-		// create new
-
-		SimulatorSessionNumberRec newSimulatorSessionNumber =
-			simulatorSessionNumberHelper.insert (
-				taskLogger,
-				simulatorSessionNumberHelper.createInstance ()
-
-			.setNumber (
-				number)
-
-		);
-
-		return newSimulatorSessionNumber;
 
 	}
 

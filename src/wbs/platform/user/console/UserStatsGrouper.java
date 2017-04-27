@@ -59,20 +59,26 @@ class UserStatsGrouper
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeTdForGroup");
+		try (
 
-		UserRec user =
-			userHelper.findRequired (
-				(Long)
-				group);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeTdForGroup");
 
-		consoleObjectManager.writeTdForObjectMiniLink (
-			taskLogger,
-			formatWriter,
-			user);
+		) {
+
+			UserRec user =
+				userHelper.findRequired (
+					(Long)
+					group);
+
+			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
+				formatWriter,
+				user);
+
+		}
 
 	}
 

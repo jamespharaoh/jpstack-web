@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -129,106 +129,112 @@ class UnwiredPlazaApiServletModule
 		void doGet (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reportFile.doGet");
-
-			// process request
-
-			Long routeId =
-				requestContext.requestIntegerRequired (
-					"routeId");
-
-			String idParam =
-				requestContext.parameterRequired (
-					"id");
-
-			Integer id =
-				Integer.parseInt (
-					idParam);
-
-			String statusParam =
-				requestContext.parameterRequired (
-					"status");
-
-			String subStatusParam =
-				requestContext.parameterRequired (
-					"status");
-
-			String finalParam =
-				requestContext.parameterRequired (
-					"final");
-
-			Long status =
-				Long.parseLong (
-					statusParam);
-
-			Long subStatus =
-				Long.parseLong (
-					subStatusParam);
-
-			Long finalValue =
-				Long.parseLong (
-					finalParam);
-
-			String statusCode =
-				statusCodes.get (
-					status);
-
-			String subStatusCode =
-				subStatusCodes.get (
-					subStatus);
-
-			MessageStatus result =
-				statusResults.get (
-					status);
-
-			// begin transaction
-
 			try (
 
-				Transaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"UnwiredPlazaApiServletModule.reportFile.doGet ()",
-						this);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"reportFile.doGet");
 
 			) {
 
-				RouteRec route =
-					routeHelper.findRequired (
-						routeId);
+				// process request
 
-				// process delivery report
+				Long routeId =
+					requestContext.requestIntegerRequired (
+						"routeId");
 
-				reportLogic.deliveryReport (
-					taskLogger,
-					route,
-					id.toString (),
-					result,
-					Optional.of (
-						statusParam),
-					Optional.of (
-						stringFormat (
-							"%s — %s",
-							statusCode,
-							subStatusCode)),
-					Optional.of (
-						joinWithSpace (
-							stringFormat (
-								"status = %s",
-								statusParam),
-							stringFormat (
-								"substatus = %s",
-								subStatusParam),
-							stringFormat (
-								"final = %s",
-								integerToDecimalString (
-									finalValue)))),
-					Optional.absent ());
+				String idParam =
+					requestContext.parameterRequired (
+						"id");
 
-				transaction.commit ();
+				Integer id =
+					Integer.parseInt (
+						idParam);
+
+				String statusParam =
+					requestContext.parameterRequired (
+						"status");
+
+				String subStatusParam =
+					requestContext.parameterRequired (
+						"status");
+
+				String finalParam =
+					requestContext.parameterRequired (
+						"final");
+
+				Long status =
+					Long.parseLong (
+						statusParam);
+
+				Long subStatus =
+					Long.parseLong (
+						subStatusParam);
+
+				Long finalValue =
+					Long.parseLong (
+						finalParam);
+
+				String statusCode =
+					statusCodes.get (
+						status);
+
+				String subStatusCode =
+					subStatusCodes.get (
+						subStatus);
+
+				MessageStatus result =
+					statusResults.get (
+						status);
+
+				// begin transaction
+
+				try (
+
+					OwnedTransaction transaction =
+						database.beginReadWrite (
+							taskLogger,
+							"UnwiredPlazaApiServletModule.reportFile.doGet ()",
+							this);
+
+				) {
+
+					RouteRec route =
+						routeHelper.findRequired (
+							routeId);
+
+					// process delivery report
+
+					reportLogic.deliveryReport (
+						taskLogger,
+						route,
+						id.toString (),
+						result,
+						Optional.of (
+							statusParam),
+						Optional.of (
+							stringFormat (
+								"%s — %s",
+								statusCode,
+								subStatusCode)),
+						Optional.of (
+							joinWithSpace (
+								stringFormat (
+									"status = %s",
+									statusParam),
+								stringFormat (
+									"substatus = %s",
+									subStatusParam),
+								stringFormat (
+									"final = %s",
+									integerToDecimalString (
+										finalValue)))),
+						Optional.absent ());
+
+					transaction.commit ();
+
+				}
 
 			}
 

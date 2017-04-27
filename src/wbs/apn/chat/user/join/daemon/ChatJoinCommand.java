@@ -130,143 +130,149 @@ class ChatJoinCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Object parent =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		if (parent instanceof ChatRec) {
+		) {
 
-			ChatRec chat =
-				(ChatRec) parent;
+			Object parent =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-			JoinType joinType =
-				commandCodeToJoinType.get (
-					command.getCode ());
+			if (parent instanceof ChatRec) {
 
-			if (joinType == null)
-				throw new RuntimeException ();
+				ChatRec chat =
+					(ChatRec) parent;
 
-			Gender gender =
-				commandCodeToGender.get (
-					command.getCode ());
+				JoinType joinType =
+					commandCodeToJoinType.get (
+						command.getCode ());
 
-			Orient orient =
-				commandCodeToOrient.get (
-					command.getCode ());
+				if (joinType == null)
+					throw new RuntimeException ();
 
-			return chatJoinerProvider.get ()
+				Gender gender =
+					commandCodeToGender.get (
+						command.getCode ());
 
-				.chatId (
-					chat.getId ())
+				Orient orient =
+					commandCodeToOrient.get (
+						command.getCode ());
 
-				.joinType (
-					joinType)
+				return chatJoinerProvider.get ()
 
-				.gender (
-					gender)
+					.chatId (
+						chat.getId ())
 
-				.orient (
-					orient)
+					.joinType (
+						joinType)
 
-				.inbox (
-					inbox)
+					.gender (
+						gender)
 
-				.rest (
-					rest)
+					.orient (
+						orient)
 
-				.handleInbox (
-					taskLogger,
-					command);
+					.inbox (
+						inbox)
+
+					.rest (
+						rest)
+
+					.handleInbox (
+						taskLogger,
+						command);
+
+			}
+
+			if (parent instanceof ChatSchemeRec) {
+
+				ChatSchemeRec chatScheme =
+					(ChatSchemeRec) parent;
+
+				ChatRec chat =
+					chatScheme.getChat ();
+
+				JoinType joinType =
+					commandCodeToJoinType.get (command.getCode ());
+
+				if (joinType == null)
+					throw new RuntimeException ();
+
+				return chatJoinerProvider.get ()
+
+					.chatId (
+						chat.getId ())
+
+					.chatSchemeId (
+						chatScheme.getId ())
+
+					.joinType (
+						joinType)
+
+					.inbox (
+						inbox)
+
+					.rest (
+						rest)
+
+					.handleInbox (
+						taskLogger,
+						command);
+
+			}
+
+			if (parent instanceof ChatAffiliateRec) {
+
+				ChatAffiliateRec chatAffiliate =
+					(ChatAffiliateRec) parent;
+
+				ChatSchemeRec chatScheme =
+					chatAffiliate.getChatScheme ();
+
+				ChatRec chat =
+					chatScheme.getChat ();
+
+				JoinType joinType =
+					commandCodeToJoinType.get (command.getCode ());
+
+				if (joinType == null)
+					throw new RuntimeException ();
+
+				return chatJoinerProvider.get ()
+
+					.chatId (
+						chat.getId ())
+
+					.joinType (
+						joinType)
+
+					.chatAffiliateId (
+						chatAffiliate.getId ())
+
+					.chatSchemeId (
+						chatScheme.getId ())
+
+					.inbox (
+						inbox)
+
+					.rest (
+						rest)
+
+					.handleInbox (
+						taskLogger,
+						command);
+
+			}
+
+			throw new RuntimeException ();
 
 		}
-
-		if (parent instanceof ChatSchemeRec) {
-
-			ChatSchemeRec chatScheme =
-				(ChatSchemeRec) parent;
-
-			ChatRec chat =
-				chatScheme.getChat ();
-
-			JoinType joinType =
-				commandCodeToJoinType.get (command.getCode ());
-
-			if (joinType == null)
-				throw new RuntimeException ();
-
-			return chatJoinerProvider.get ()
-
-				.chatId (
-					chat.getId ())
-
-				.chatSchemeId (
-					chatScheme.getId ())
-
-				.joinType (
-					joinType)
-
-				.inbox (
-					inbox)
-
-				.rest (
-					rest)
-
-				.handleInbox (
-					taskLogger,
-					command);
-
-		}
-
-		if (parent instanceof ChatAffiliateRec) {
-
-			ChatAffiliateRec chatAffiliate =
-				(ChatAffiliateRec) parent;
-
-			ChatSchemeRec chatScheme =
-				chatAffiliate.getChatScheme ();
-
-			ChatRec chat =
-				chatScheme.getChat ();
-
-			JoinType joinType =
-				commandCodeToJoinType.get (command.getCode ());
-
-			if (joinType == null)
-				throw new RuntimeException ();
-
-			return chatJoinerProvider.get ()
-
-				.chatId (
-					chat.getId ())
-
-				.joinType (
-					joinType)
-
-				.chatAffiliateId (
-					chatAffiliate.getId ())
-
-				.chatSchemeId (
-					chatScheme.getId ())
-
-				.inbox (
-					inbox)
-
-				.rest (
-					rest)
-
-				.handleInbox (
-					taskLogger,
-					command);
-
-		}
-
-		throw new RuntimeException ();
 
 	}
 

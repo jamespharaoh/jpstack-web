@@ -76,85 +76,97 @@ class SchemaTypesHelperImplementation
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		initTypeNames (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
+
+		) {
+
+			initTypeNames (
+				taskLogger);
+
+		}
 
 	}
 
 	void initTypeNames (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initTypeNames");
+		try (
 
-		ImmutableMap.Builder <Class <?>, List <String>> fieldTypeNamesBuilder =
-			ImmutableMap.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initTypeNames");
 
-		ImmutableMap.Builder <String, List <String>> enumTypesBuilder =
-			ImmutableMap.builder ();
-
-		for (
-			Map.Entry <Class <?>, String> entry
-				: builtinFieldTypeNames.entrySet ()
 		) {
 
-			fieldTypeNamesBuilder.put (
-				entry.getKey (),
-				ImmutableList.of (
-					entry.getValue ()));
+			ImmutableMap.Builder <Class <?>, List <String>> fieldTypeNamesBuilder =
+				ImmutableMap.builder ();
 
-		}
-
-		for (
-			PluginSpec plugin
-				: pluginManager.plugins ()
-		) {
-
-			if (plugin.models () == null)
-				continue;
+			ImmutableMap.Builder <String, List <String>> enumTypesBuilder =
+				ImmutableMap.builder ();
 
 			for (
-				PluginEnumTypeSpec enumType
-					: plugin.models ().enumTypes ()
+				Map.Entry <Class <?>, String> entry
+					: builtinFieldTypeNames.entrySet ()
 			) {
 
-				initEnumType (
-					taskLogger,
-					fieldTypeNamesBuilder,
-					enumTypesBuilder,
-					enumType);
+				fieldTypeNamesBuilder.put (
+					entry.getKey (),
+					ImmutableList.of (
+						entry.getValue ()));
 
 			}
 
 			for (
-				PluginCustomTypeSpec customType
-					: plugin.models ().customTypes ()
+				PluginSpec plugin
+					: pluginManager.plugins ()
 			) {
 
-				initCustomType (
-					taskLogger,
-					fieldTypeNamesBuilder,
-					enumTypesBuilder,
-					customType);
+				if (plugin.models () == null)
+					continue;
+
+				for (
+					PluginEnumTypeSpec enumType
+						: plugin.models ().enumTypes ()
+				) {
+
+					initEnumType (
+						taskLogger,
+						fieldTypeNamesBuilder,
+						enumTypesBuilder,
+						enumType);
+
+				}
+
+				for (
+					PluginCustomTypeSpec customType
+						: plugin.models ().customTypes ()
+				) {
+
+					initCustomType (
+						taskLogger,
+						fieldTypeNamesBuilder,
+						enumTypesBuilder,
+						customType);
+
+				}
 
 			}
 
+			taskLogger.makeException ();
+
+			fieldTypeNames =
+				fieldTypeNamesBuilder.build ();
+
+			enumTypes =
+				enumTypesBuilder.build ();
+
 		}
-
-		taskLogger.makeException ();
-
-		fieldTypeNames =
-			fieldTypeNamesBuilder.build ();
-
-		enumTypes =
-			enumTypesBuilder.build ();
 
 	}
 

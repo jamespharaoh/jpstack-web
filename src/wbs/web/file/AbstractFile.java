@@ -3,18 +3,19 @@ package wbs.web.file;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.action.ActionRequestHandler;
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpMethodNotAllowedException;
@@ -35,6 +36,9 @@ class AbstractFile
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -74,10 +78,7 @@ class AbstractFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (getHandler () != null) {
 
@@ -99,10 +100,7 @@ class AbstractFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (postHandler () != null) {
 
@@ -124,35 +122,40 @@ class AbstractFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 	}
 
 	public
 	RequestHandler handlerNameToRequestHandler (
-			final String handlerName) {
+			@NonNull String handlerName) {
 
 		return new RequestHandler () {
 
 			@Override
 			public
 			void handle (
-					@NonNull TaskLogger parentTaskLogger)
-				throws
-					ServletException,
-					IOException {
+					@NonNull TaskLogger parentTaskLogger) {
 
-				RequestHandler handler =
-					componentManager.getComponentRequired (
-						parentTaskLogger,
-						handlerName,
-						RequestHandler.class);
+				try (
 
-				handler.handle (
-					parentTaskLogger);
+					TaskLogger taskLogger =
+						logContext.nestTaskLogger (
+							parentTaskLogger,
+							"handlerNameToRequestHandler.handle");
+
+				) {
+
+					RequestHandler handler =
+						componentManager.getComponentRequired (
+							parentTaskLogger,
+							handlerName,
+							RequestHandler.class);
+
+					handler.handle (
+						parentTaskLogger);
+
+				}
 
 			}
 
@@ -169,16 +172,24 @@ class AbstractFile
 			@Override
 			public
 			void handle (
-					@NonNull TaskLogger parentTaskLogger)
-				throws
-					ServletException,
-					IOException {
+					@NonNull TaskLogger parentTaskLogger) {
 
-				Responder responder =
-					responderProvider.get ();
+				try (
 
-				responder.execute (
-					parentTaskLogger);
+					TaskLogger taskLogger =
+						logContext.nestTaskLogger (
+							parentTaskLogger,
+							"responderToRequestHandler.handle");
+
+				) {
+
+					Responder responder =
+						responderProvider.get ();
+
+					responder.execute (
+						parentTaskLogger);
+
+				}
 
 			}
 
@@ -195,19 +206,27 @@ class AbstractFile
 			@Override
 			public
 			void handle (
-					@NonNull TaskLogger parentTaskLogger)
-				throws
-					ServletException,
-					IOException {
+					@NonNull TaskLogger parentTaskLogger) {
 
-				Responder responder =
-					componentManager.getComponentRequired (
-						parentTaskLogger,
-						responderName,
-						Responder.class);
+				try (
 
-				responder.execute (
-					parentTaskLogger);
+					TaskLogger taskLogger =
+						logContext.nestTaskLogger (
+							parentTaskLogger,
+							"responderToRequestHandler.handle");
+
+				) {
+
+					Responder responder =
+						componentManager.getComponentRequired (
+							parentTaskLogger,
+							responderName,
+							Responder.class);
+
+					responder.execute (
+						parentTaskLogger);
+
+				}
 
 			}
 

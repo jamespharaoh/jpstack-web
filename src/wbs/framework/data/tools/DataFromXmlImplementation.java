@@ -22,7 +22,7 @@ import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -75,6 +75,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
+import wbs.utils.io.RuntimeIoException;
 
 /**
  * Automatically builds data objects from XML guided by annotations.
@@ -110,70 +111,76 @@ class DataFromXmlImplementation
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readInputStream");
+		try (
 
-		taskLogger.firstErrorFormat (
-			"Error reading %s from filesystem",
-			filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readInputStream");
 
-		SAXReader saxReader =
-			new SAXReader ();
+		) {
 
-		Document document;
+			taskLogger.firstErrorFormat (
+				"Error reading %s from filesystem",
+				filename);
 
-		try {
+			SAXReader saxReader =
+				new SAXReader ();
 
-			document =
-				saxReader.read (
-					inputStream,
-					filename);
+			Document document;
 
-		} catch (DocumentException exception) {
+			try {
 
-			taskLogger.errorFormatException (
-				exception,
-				"Error parsing XML");
+				document =
+					saxReader.read (
+						inputStream,
+						filename);
 
-			throw taskLogger.makeException ();
+			} catch (DocumentException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error parsing XML");
+
+				throw taskLogger.makeException ();
+
+			}
+
+			Object result;
+
+			try {
+
+				result =
+					new ElementBuilder ()
+
+					.element (
+						document.getRootElement ())
+
+					.parents (
+						parents)
+
+					.context (
+						ImmutableList.of (
+							document.getRootElement ().getName ()))
+
+					.build (
+						taskLogger);
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error building object tree from XML");
+
+				throw taskLogger.makeException ();
+
+			}
+
+			taskLogger.makeException ();
+
+			return result;
 
 		}
-
-		Object result;
-
-		try {
-
-			result =
-				new ElementBuilder ()
-
-				.element (
-					document.getRootElement ())
-
-				.parents (
-					parents)
-
-				.context (
-					ImmutableList.of (
-						document.getRootElement ().getName ()))
-
-				.build (
-					taskLogger);
-
-		} catch (Exception exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error building object tree from XML");
-
-			throw taskLogger.makeException ();
-
-		}
-
-		taskLogger.makeException ();
-
-		return result;
 
 	}
 
@@ -184,29 +191,40 @@ class DataFromXmlImplementation
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readClasspath");
+		try (
 
-		InputStream inputStream =
-			getClass ().getResourceAsStream (
-				filename);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readClasspath");
 
-		if (inputStream == null) {
+			InputStream inputStream =
+				getClass ().getResourceAsStream (
+					filename);
 
-			throw new RuntimeException (
-				stringFormat (
-					"Classpath resource %s not found",
-					filename));
+		) {
+
+			if (inputStream == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Classpath resource %s not found",
+						filename));
+
+			}
+
+			return readInputStream (
+				taskLogger,
+				inputStream,
+				filename,
+				parents);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
-
-		return readInputStream (
-			taskLogger,
-			inputStream,
-			filename,
-			parents);
 
 	}
 
@@ -217,33 +235,31 @@ class DataFromXmlImplementation
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readClasspath");
+		try (
 
-		InputStream inputStream;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readClasspath");
 
-		try {
-
-			inputStream =
+			InputStream inputStream =
 				new FileInputStream (
 					filename);
 
-		} catch (FileNotFoundException fileNotFoundException) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"File %s not found",
-					filename));
+			return readInputStream (
+				taskLogger,
+				inputStream,
+				filename,
+				parents);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
-
-		return readInputStream (
-			taskLogger,
-			inputStream,
-			filename,
-			parents);
 
 	}
 
@@ -270,219 +286,225 @@ class DataFromXmlImplementation
 		Object build (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"ElementBuilder.build");
+			try (
 
-			Iterator <Object> parentsIterator =
-				parents.iterator ();
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"ElementBuilder.build");
 
-			Class <?> parentClass =
-				parentsIterator.hasNext ()
-					? parentsIterator.next ().getClass ()
-					: Object.class;
-
-			// find the appropriate builder
-
-			List <DataClassInfo> dataClassInfosForElementName =
-				dataClassesMap.get (
-					element.getName ());
-
-			if (dataClassInfosForElementName == null) {
-
-				taskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't know how to map <%s>",
-					element.getName ());
-
-				return null;
-
-			}
-
-			List <DataClassInfo> matchingDataClassInfos =
-				new ArrayList<> ();
-
-			for (
-				DataClassInfo dataClassInfo :
-					dataClassInfosForElementName
 			) {
 
-				if (! dataClassInfo.parentClass.isAssignableFrom (
-						parentClass))
-					continue;
+				Iterator <Object> parentsIterator =
+					parents.iterator ();
 
-				matchingDataClassInfos.add (
-					dataClassInfo);
+				Class <?> parentClass =
+					parentsIterator.hasNext ()
+						? parentsIterator.next ().getClass ()
+						: Object.class;
 
-			}
+				// find the appropriate builder
 
-			if (matchingDataClassInfos.isEmpty ()) {
+				List <DataClassInfo> dataClassInfosForElementName =
+					dataClassesMap.get (
+						element.getName ());
 
-				taskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't know how to map <%s> with parent %s",
-					element.getName (),
-					parentClass.getName ());
+				if (dataClassInfosForElementName == null) {
 
-				return null;
-
-			}
-
-			if (matchingDataClassInfos.size () > 1) {
-
-				List <String> matchingDataClassNames =
-					new ArrayList<> ();
-
-				for (DataClassInfo matchingDataClassInfo
-						: matchingDataClassInfos) {
-
-					matchingDataClassNames.add (
-						matchingDataClassInfo.dataClass ().getName ());
-
-				}
-
-				throw new RuntimeException (
-					stringFormat (
+					taskLogger.errorFormat (
 						"%s: ",
 						joinWithFullStop (
 							context),
-						"Multiple mappings for <%s> with parent %s: %s",
-						element.getName (),
-						parentClass.getName (),
-						joinWithCommaAndSpace (
-							matchingDataClassNames)));
-
-			}
-
-			Provider <?> builder =
-				matchingDataClassInfos.get (0).provider ();
-
-			// build it
-
-			object =
-				builder.get ();
-
-			for (
-				Field field
-					: object.getClass ().getDeclaredFields ()
-			) {
-
-				buildField (
-					parentTaskLogger,
-					field);
-
-			}
-
-			// check for unmatched attributes
-
-			for (
-				Object attributeObject
-					: element.attributes ()
-			) {
-
-				Attribute attribute =
-					(Attribute)
-					attributeObject;
-
-				String attributeName =
-					attribute.getName ();
-
-				if (matchedAttributes.contains (
-						attributeName))
-					continue;
-
-				throw new RuntimeException (
-					stringFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Don't understand attribute %s on <%s>, using %s",
-						attributeName,
-						element.getName (),
-						object.getClass ().getSimpleName ()));
-
-			}
-
-			// check for unmatched elements
-
-			long unmatchedElementCount = 0;
-
-			for (
-				Object childElementObject
-					: element.elements ()
-			) {
-
-				Element childElement =
-					(Element) childElementObject;
-
-				if (matchedElementNames.contains (
-						childElement.getName ()))
-					continue;
-
-				taskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't understand element <%s> in <%s>, using %s",
-					childElement.getName (),
-					element.getName (),
-					object.getClass ().getSimpleName ());
-
-				unmatchedElementCount ++;
-
-			}
-
-			if (
-				moreThanZero (
-					unmatchedElementCount)
-			) {
-				return null;
-			}
-
-			// run init method
-
-			for (
-				Method method
-					: object.getClass ().getMethods ()
-			) {
-
-				DataInitMethod dataInitMethodAnnotation =
-					method.getAnnotation (DataInitMethod.class);
-
-				if (dataInitMethodAnnotation == null)
-					continue;
-
-				if (method.getParameterTypes ().length > 0)
-					throw new RuntimeException ();
-
-				try {
-
-					method.invoke (
-						object);
-
-				} catch (Exception exception) {
-
-					taskLogger.errorFormatException (
-						exception,
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Error invoking data init method %s.%s",
-						object.getClass ().getName (),
-						method.getName ());
+						"Don't know how to map <%s>",
+						element.getName ());
 
 					return null;
 
 				}
 
-			}
+				List <DataClassInfo> matchingDataClassInfos =
+					new ArrayList<> ();
 
-			return object;
+				for (
+					DataClassInfo dataClassInfo :
+						dataClassInfosForElementName
+				) {
+
+					if (! dataClassInfo.parentClass.isAssignableFrom (
+							parentClass))
+						continue;
+
+					matchingDataClassInfos.add (
+						dataClassInfo);
+
+				}
+
+				if (matchingDataClassInfos.isEmpty ()) {
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't know how to map <%s> with parent %s",
+						element.getName (),
+						parentClass.getName ());
+
+					return null;
+
+				}
+
+				if (matchingDataClassInfos.size () > 1) {
+
+					List <String> matchingDataClassNames =
+						new ArrayList<> ();
+
+					for (DataClassInfo matchingDataClassInfo
+							: matchingDataClassInfos) {
+
+						matchingDataClassNames.add (
+							matchingDataClassInfo.dataClass ().getName ());
+
+					}
+
+					throw new RuntimeException (
+						stringFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Multiple mappings for <%s> with parent %s: %s",
+							element.getName (),
+							parentClass.getName (),
+							joinWithCommaAndSpace (
+								matchingDataClassNames)));
+
+				}
+
+				Provider <?> builder =
+					matchingDataClassInfos.get (0).provider ();
+
+				// build it
+
+				object =
+					builder.get ();
+
+				for (
+					Field field
+						: object.getClass ().getDeclaredFields ()
+				) {
+
+					buildField (
+						parentTaskLogger,
+						field);
+
+				}
+
+				// check for unmatched attributes
+
+				for (
+					Object attributeObject
+						: element.attributes ()
+				) {
+
+					Attribute attribute =
+						(Attribute)
+						attributeObject;
+
+					String attributeName =
+						attribute.getName ();
+
+					if (matchedAttributes.contains (
+							attributeName))
+						continue;
+
+					throw new RuntimeException (
+						stringFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Don't understand attribute %s on <%s>, using %s",
+							attributeName,
+							element.getName (),
+							object.getClass ().getSimpleName ()));
+
+				}
+
+				// check for unmatched elements
+
+				long unmatchedElementCount = 0;
+
+				for (
+					Object childElementObject
+						: element.elements ()
+				) {
+
+					Element childElement =
+						(Element) childElementObject;
+
+					if (matchedElementNames.contains (
+							childElement.getName ()))
+						continue;
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't understand element <%s> in <%s>, using %s",
+						childElement.getName (),
+						element.getName (),
+						object.getClass ().getSimpleName ());
+
+					unmatchedElementCount ++;
+
+				}
+
+				if (
+					moreThanZero (
+						unmatchedElementCount)
+				) {
+					return null;
+				}
+
+				// run init method
+
+				for (
+					Method method
+						: object.getClass ().getMethods ()
+				) {
+
+					DataInitMethod dataInitMethodAnnotation =
+						method.getAnnotation (DataInitMethod.class);
+
+					if (dataInitMethodAnnotation == null)
+						continue;
+
+					if (method.getParameterTypes ().length > 0)
+						throw new RuntimeException ();
+
+					try {
+
+						method.invoke (
+							object);
+
+					} catch (Exception exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Error invoking data init method %s.%s",
+							object.getClass ().getName (),
+							method.getName ());
+
+						return null;
+
+					}
+
+				}
+
+				return object;
+
+			}
 
 		}
 

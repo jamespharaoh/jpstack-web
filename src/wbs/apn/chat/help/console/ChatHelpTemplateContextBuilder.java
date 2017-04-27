@@ -138,96 +138,102 @@ class ChatHelpTemplateContextBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildContextTypes ();
-		buildContexts ();
-		buildParentTab ();
-		buildListPage ();
-		buildCreatePage ();
-		buildSettingsPage ();
+		) {
 
-		ConsoleContextBuilderContainer <ChatHelpTemplateRec> listContainer =
-			new ConsoleContextBuilderContainerImplementation
-				<ChatHelpTemplateRec> ()
+			setDefaults ();
 
-			.taskLogger (
-				container.taskLogger ())
+			buildContextTypes ();
+			buildContexts ();
+			buildParentTab ();
+			buildListPage ();
+			buildCreatePage ();
+			buildSettingsPage ();
 
-			.consoleHelper (
-				chatHelpTemplateHelper)
+			ConsoleContextBuilderContainer <ChatHelpTemplateRec> listContainer =
+				new ConsoleContextBuilderContainerImplementation
+					<ChatHelpTemplateRec> ()
 
-			.structuralName (
-				structuralName)
+				.taskLogger (
+					container.taskLogger ())
 
-			.extensionPointName (
-				contextTypeName + ":list")
+				.consoleHelper (
+					chatHelpTemplateHelper)
 
-			.pathPrefix (
-				contextTypeName)
+				.structuralName (
+					structuralName)
 
-			.newBeanNamePrefix (
-				beanName)
+				.extensionPointName (
+					contextTypeName + ":list")
 
-			.existingBeanNamePrefix (
-				beanName)
+				.pathPrefix (
+					contextTypeName)
 
-			.tabLocation (
-				"end")
+				.newBeanNamePrefix (
+					beanName)
 
-			.friendlyName (
-				camelToSpaces (
-					beanName));
+				.existingBeanNamePrefix (
+					beanName)
 
-		builder.descend (
-			taskLogger,
-			listContainer,
-			listChildren,
-			consoleModule,
-			MissingBuilderBehaviour.error);
+				.tabLocation (
+					"end")
 
-		ConsoleContextBuilderContainer <ChatHelpTemplateRec> objectContainer =
-			new ConsoleContextBuilderContainerImplementation
-				<ChatHelpTemplateRec> ()
+				.friendlyName (
+					camelToSpaces (
+						beanName));
 
-			.taskLogger (
-				container.taskLogger ())
+			builder.descend (
+				taskLogger,
+				listContainer,
+				listChildren,
+				consoleModule,
+				MissingBuilderBehaviour.error);
 
-			.consoleHelper (
-				chatHelpTemplateHelper)
+			ConsoleContextBuilderContainer <ChatHelpTemplateRec> objectContainer =
+				new ConsoleContextBuilderContainerImplementation
+					<ChatHelpTemplateRec> ()
 
-			.structuralName (
-				structuralName)
+				.taskLogger (
+					container.taskLogger ())
 
-			.extensionPointName (
-				contextTypeName + ":object")
+				.consoleHelper (
+					chatHelpTemplateHelper)
 
-			.pathPrefix (
-				contextTypeName)
+				.structuralName (
+					structuralName)
 
-			.newBeanNamePrefix (
-				beanName)
+				.extensionPointName (
+					contextTypeName + ":object")
 
-			.existingBeanNamePrefix (
-				beanName)
+				.pathPrefix (
+					contextTypeName)
 
-			.tabLocation (
-				"end")
+				.newBeanNamePrefix (
+					beanName)
 
-			.friendlyName (
-				beanName);
+				.existingBeanNamePrefix (
+					beanName)
 
-		builder.descend (
-			taskLogger,
-			objectContainer,
-			objectBuilders,
-			consoleModule,
-			MissingBuilderBehaviour.error);
+				.tabLocation (
+					"end")
+
+				.friendlyName (
+					beanName);
+
+			builder.descend (
+				taskLogger,
+				objectContainer,
+				objectBuilders,
+				consoleModule,
+				MissingBuilderBehaviour.error);
+
+		}
 
 	}
 

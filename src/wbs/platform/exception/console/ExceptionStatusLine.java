@@ -73,43 +73,49 @@ class ExceptionStatusLine
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserPrivChecker privChecker) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getUpdateScript");
+		try (
 
-		JsonObject updateData =
-			new JsonObject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getUpdateScript");
 
-		// count exceptions (if visible)
-
-		if (
-			privChecker.canRecursive (
-				taskLogger,
-				GlobalId.root,
-				"alert")
 		) {
 
+			JsonObject updateData =
+				new JsonObject ();
+
+			// count exceptions (if visible)
+
+			if (
+				privChecker.canRecursive (
+					taskLogger,
+					GlobalId.root,
+					"alert")
+			) {
+
+				updateData.addProperty (
+					"exceptions",
+					numExceptionsCache.get (
+						taskLogger));
+
+			} else {
+
+				updateData.addProperty (
+					"exceptions",
+					0);
+
+			}
+
 			updateData.addProperty (
-				"exceptions",
-				numExceptionsCache.get (
+				"fatalExceptions",
+				numFatalExceptionsCache.get (
 					taskLogger));
 
-		} else {
-
-			updateData.addProperty (
-				"exceptions",
-				0);
+			return futureValue (
+				updateData);
 
 		}
-
-		updateData.addProperty (
-			"fatalExceptions",
-			numFatalExceptionsCache.get (
-				taskLogger));
-
-		return futureValue (
-			updateData);
 
 	}
 

@@ -62,143 +62,149 @@ class MessageTemplateLogicImplementation
 			@NonNull SliceRec slice,
 			@NonNull String resourceName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readMessageTemplateDatabaseFromClasspath");
+		try (
 
-		// load data
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readMessageTemplateDatabaseFromClasspath");
 
-		MessageTemplateDatabaseSpec databaseSpec =
-			(MessageTemplateDatabaseSpec)
-			dataFromXml.readClasspath (
-				taskLogger,
-				resourceName);
-
-		// create database
-
-		MessageTemplateDatabaseRec mtDatabase =
-			messageTemplateDatabaseHelper.insert (
-				taskLogger,
-				messageTemplateDatabaseHelper.createInstance ()
-
-			.setSlice (
-				slice)
-
-			.setCode (
-				simplifyToCodeRequired (
-					databaseSpec.name ()))
-
-			.setName (
-				databaseSpec.name ())
-
-			.setDescription (
-				emptyStringIfNull (
-					databaseSpec.description ()))
-
-		);
-
-		// create entry types
-
-		for (
-			MessageTemplateEntryTypeSpec entryTypeSpec
-				: databaseSpec.entryTypes ()
 		) {
 
-			MessageTemplateEntryTypeRec entryType =
-				messageTemplateEntryTypeHelper.insert (
-					taskLogger,
-					messageTemplateEntryTypeHelper.createInstance ()
+			// load data
 
-				.setMessageTemplateDatabase (
-					mtDatabase)
+			MessageTemplateDatabaseSpec databaseSpec =
+				(MessageTemplateDatabaseSpec)
+				dataFromXml.readClasspath (
+					taskLogger,
+					resourceName);
+
+			// create database
+
+			MessageTemplateDatabaseRec mtDatabase =
+				messageTemplateDatabaseHelper.insert (
+					taskLogger,
+					messageTemplateDatabaseHelper.createInstance ()
+
+				.setSlice (
+					slice)
 
 				.setCode (
 					simplifyToCodeRequired (
-						entryTypeSpec.name ()))
+						databaseSpec.name ()))
 
 				.setName (
-					entryTypeSpec.name ())
+					databaseSpec.name ())
 
 				.setDescription (
 					emptyStringIfNull (
-						entryTypeSpec.description ()))
+						databaseSpec.description ()))
 
 			);
 
-			// create field types
+			// create entry types
 
 			for (
-				MessageTemplateFieldTypeSpec fieldTypeSpec
-					: entryTypeSpec.fieldTypes ()
+				MessageTemplateEntryTypeSpec entryTypeSpec
+					: databaseSpec.entryTypes ()
 			) {
 
-				messageTemplateFieldTypeHelper.insert (
-					taskLogger,
-					messageTemplateFieldTypeHelper.createInstance ()
+				MessageTemplateEntryTypeRec entryType =
+					messageTemplateEntryTypeHelper.insert (
+						taskLogger,
+						messageTemplateEntryTypeHelper.createInstance ()
 
-					.setMessageTemplateEntryType (
-						entryType)
+					.setMessageTemplateDatabase (
+						mtDatabase)
 
 					.setCode (
 						simplifyToCodeRequired (
-							fieldTypeSpec.name ()))
+							entryTypeSpec.name ()))
 
 					.setName (
-						fieldTypeSpec.name ())
+						entryTypeSpec.name ())
 
 					.setDescription (
 						emptyStringIfNull (
-							fieldTypeSpec.description ()))
-
-					.setDefaultValue (
-						fieldTypeSpec.value ())
-
-					.setHelpText (
-						"")
-
-					.setCharset (
-						MessageTemplateTypeCharset.unicode)
+							entryTypeSpec.description ()))
 
 				);
 
+				// create field types
+
+				for (
+					MessageTemplateFieldTypeSpec fieldTypeSpec
+						: entryTypeSpec.fieldTypes ()
+				) {
+
+					messageTemplateFieldTypeHelper.insert (
+						taskLogger,
+						messageTemplateFieldTypeHelper.createInstance ()
+
+						.setMessageTemplateEntryType (
+							entryType)
+
+						.setCode (
+							simplifyToCodeRequired (
+								fieldTypeSpec.name ()))
+
+						.setName (
+							fieldTypeSpec.name ())
+
+						.setDescription (
+							emptyStringIfNull (
+								fieldTypeSpec.description ()))
+
+						.setDefaultValue (
+							fieldTypeSpec.value ())
+
+						.setHelpText (
+							"")
+
+						.setCharset (
+							MessageTemplateTypeCharset.unicode)
+
+					);
+
+				}
+
+				// create parameter types
+
+				for (
+					MessageTemplateParameterSpec parameterSpec
+						: entryTypeSpec.parameters ()
+				) {
+
+					messageTemplateParameterHelper.insert (
+						taskLogger,
+						messageTemplateParameterHelper.createInstance ()
+
+						.setMessageTemplateEntryType (
+							entryType)
+
+						.setCode (
+							simplifyToCodeRequired (
+								parameterSpec.name ()))
+
+						.setName (
+							parameterSpec.name ())
+
+						.setDescription (
+							emptyStringIfNull (
+								parameterSpec.description ()))
+
+						.setMaximumLength (
+							parameterSpec.maximumLength ())
+
+					);
+
+				}
+
 			}
 
-			// create parameter types
-
-			for (
-				MessageTemplateParameterSpec parameterSpec
-					: entryTypeSpec.parameters ()
-			) {
-
-				messageTemplateParameterHelper.insert (
-					taskLogger,
-					messageTemplateParameterHelper.createInstance ()
-
-					.setMessageTemplateEntryType (
-						entryType)
-
-					.setCode (
-						simplifyToCodeRequired (
-							parameterSpec.name ()))
-
-					.setName (
-						parameterSpec.name ())
-
-					.setDescription (
-						emptyStringIfNull (
-							parameterSpec.description ()))
-
-					.setMaximumLength (
-						parameterSpec.maximumLength ())
-
-				);
-
-			}
+			return mtDatabase;
 
 		}
-
-		return mtDatabase;
 
 	}
 

@@ -58,56 +58,62 @@ class TypeFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String fieldTypeName =
-			ifNull (
-				spec.typeName (),
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			String fieldTypeName =
+				ifNull (
+					spec.typeName (),
+					stringFormat (
+						"%sType",
+						context.modelMeta ().name ()));
+
+			String fieldName =
+				ifNull (
+					spec.name (),
+					fieldTypeName);
+
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					fieldTypeName);
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			String fullFieldTypeName =
 				stringFormat (
-					"%sType",
-					context.modelMeta ().name ()));
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						fieldTypeName));
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				fieldTypeName);
+			// write field
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				fieldTypeName);
+			new JavaPropertyWriter ()
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					fieldTypeName));
+				.typeName (
+					fullFieldTypeName)
 
-		// write field
+				.propertyName (
+					fieldName)
 
-		new JavaPropertyWriter ()
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
-
-			.typeName (
-				fullFieldTypeName)
-
-			.propertyName (
-				fieldName)
-
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+		}
 
 	}
 

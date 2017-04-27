@@ -32,8 +32,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -93,7 +94,7 @@ class ForwarderDaemon
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						"ForwarderDaemon.MainThread.doQuery ()",
@@ -162,29 +163,35 @@ class ForwarderDaemon
 
 			while (true) {
 
-				TaskLogger taskLogger =
-					logContext.createTaskLogger (
-						"MainThread.run");
+				try (
 
-				boolean moreMessages =
-					doQuery (
-						taskLogger);
+					TaskLogger taskLogger =
+						logContext.createTaskLogger (
+							"MainThread.run");
 
-				try {
+				) {
 
-					if (moreMessages) {
+					boolean moreMessages =
+						doQuery (
+							taskLogger);
 
-						buffer.waitNotFull ();
+					try {
 
-					} else {
+						if (moreMessages) {
 
-						Thread.sleep (
-							1000);
+							buffer.waitNotFull ();
+
+						} else {
+
+							Thread.sleep (
+								1000);
+						}
+
+					} catch (InterruptedException e) {
+
+						return;
+
 					}
-
-				} catch (InterruptedException e) {
-
-					return;
 
 				}
 
@@ -402,54 +409,60 @@ class ForwarderDaemon
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull ForwarderMessageInRec forwarderMessageIn) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"WorkerThread.doSend");
+			try (
 
-			if (
-
-				stringIsEmpty (
-					forwarderMessageIn.getForwarder ().getUrl ())
-
-				|| stringIsEmpty (
-					forwarderMessageIn.getForwarder ().getUrlParams ())
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"WorkerThread.doSend");
 
 			) {
 
-				return false;
+				if (
 
-			}
+					stringIsEmpty (
+						forwarderMessageIn.getForwarder ().getUrl ())
 
-			try {
+					|| stringIsEmpty (
+						forwarderMessageIn.getForwarder ().getUrlParams ())
 
-				HttpURLConnection urlConnection =
-					forwarderMessageIn.getForwarder ().getUrlPost ()
-						? openPost (forwarderMessageIn)
-						: openGet (forwarderMessageIn);
+				) {
 
-				Reader in =
-					new InputStreamReader (
-						urlConnection.getInputStream (),
-						"utf-8");
+					return false;
 
-				StringBuffer responseBuffer =
-					new StringBuffer ();
+				}
 
-				int numread;
-				char[] buffer = new char[1024];
-				while ((numread = in.read(buffer, 0, 1024)) > 0)
-					responseBuffer.append(buffer, 0, numread);
-				String response = responseBuffer.toString();
-				return successPattern.matcher(response).matches();
+				try {
 
-			} catch (IOException exception) {
+					HttpURLConnection urlConnection =
+						forwarderMessageIn.getForwarder ().getUrlPost ()
+							? openPost (forwarderMessageIn)
+							: openGet (forwarderMessageIn);
 
-				taskLogger.warningFormat (
-					"IO exception forwarding message: %s",
-					exception.getMessage ());
+					Reader in =
+						new InputStreamReader (
+							urlConnection.getInputStream (),
+							"utf-8");
 
-				return false;
+					StringBuffer responseBuffer =
+						new StringBuffer ();
+
+					int numread;
+					char[] buffer = new char[1024];
+					while ((numread = in.read(buffer, 0, 1024)) > 0)
+						responseBuffer.append(buffer, 0, numread);
+					String response = responseBuffer.toString();
+					return successPattern.matcher(response).matches();
+
+				} catch (IOException exception) {
+
+					taskLogger.warningFormat (
+						"IO exception forwarding message: %s",
+						exception.getMessage ());
+
+					return false;
+
+				}
 
 			}
 
@@ -460,14 +473,14 @@ class ForwarderDaemon
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long forwarderMessageInId) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"WorkerThread.doMessage");
-
 			try (
 
-				Transaction checkTransaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"WorkerThread.doMessage");
+
+				OwnedTransaction checkTransaction =
 					database.beginReadWrite (
 						taskLogger,
 						stringFormat (
@@ -533,7 +546,7 @@ class ForwarderDaemon
 
 				try (
 
-					Transaction resultTransaction =
+					OwnedTransaction resultTransaction =
 						database.beginReadWrite (
 							taskLogger,
 							"ForwarderDaemon.WorkerThread.doMessage",
@@ -558,7 +571,7 @@ class ForwarderDaemon
 				@NonNull Long forwarderMessageInId,
 				@NonNull Boolean success) {
 
-			Transaction transaction =
+			BorrowedTransaction transaction =
 				database.currentTransaction ();
 
 			ForwarderMessageInRec forwarderMessageIn =
@@ -620,16 +633,22 @@ class ForwarderDaemon
 
 				}
 
-				TaskLogger taskLogger =
-					logContext.createTaskLogger (
-						"WorkerThread.run");
+				try (
 
-				doMessage (
-					taskLogger,
-					forwarderMessageInId);
+					TaskLogger taskLogger =
+						logContext.createTaskLogger (
+							"WorkerThread.run");
 
-				buffer.remove (
-					forwarderMessageInId);
+				) {
+
+					doMessage (
+						taskLogger,
+						forwarderMessageInId);
+
+					buffer.remove (
+						forwarderMessageInId);
+
+				}
 
 			}
 

@@ -155,108 +155,132 @@ class UserPrivData {
 			@NonNull Collection <String> privCodes,
 			@NonNull Boolean recurse) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canList");
+		try (
 
-		ObjectData objectData =
-			sharedData.objectDatasByObjectId.get (
-				parentObjectId);
-
-		if (
-			isNull (
-				objectData)
-		) {
-
-			taskLogger.warningFormat (
-				"No priv data for %s",
-				parentObjectId.toString ());
-
-			return false;
-
-		}
-
-		// check manage priv
-
-		if (
-
-			recurse
-
-			&& isNotNull (
-				objectData.managePrivId)
-
-			&& canChain (
-				objectData.managePrivId)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canList");
 
 		) {
-			return true;
-		}
 
-		if (! privCodes.isEmpty ()) {
+			ObjectData objectData =
+				sharedData.objectDatasByObjectId.get (
+					parentObjectId);
 
-			// check each named priv and any chained
-
-			for (
-				String privCode
-					: privCodes
+			if (
+				isNull (
+					objectData)
 			) {
 
-				if (
-					stringEqualSafe (
-						privCode,
-						"manage")
+				taskLogger.warningFormat (
+					"No priv data for %s",
+					parentObjectId.toString ());
+
+				return false;
+
+			}
+
+			// check manage priv
+
+			if (
+
+				recurse
+
+				&& isNotNull (
+					objectData.managePrivId)
+
+				&& canChain (
+					objectData.managePrivId)
+
+			) {
+				return true;
+			}
+
+			if (! privCodes.isEmpty ()) {
+
+				// check each named priv and any chained
+
+				for (
+					String privCode
+						: privCodes
 				) {
-					continue;
-				}
 
-				Long privId =
-					objectData.privIdsByCode.get (
-						privCode);
+					if (
+						stringEqualSafe (
+							privCode,
+							"manage")
+					) {
+						continue;
+					}
 
-				if (
-					isNull (
-						privId)
-				) {
-
-					String objectTypeCode =
-						sharedData.objectTypeCodesById.get (
-							parentObjectId.typeId ());
+					Long privId =
+						objectData.privIdsByCode.get (
+							privCode);
 
 					if (
 						isNull (
-							objectTypeCode)
+							privId)
 					) {
 
-						throw new IllegalArgumentException (
-							stringFormat (
-								"Unknown object type %s",
-								integerToDecimalString (
-									parentObjectId.typeId ())));
+						String objectTypeCode =
+							sharedData.objectTypeCodesById.get (
+								parentObjectId.typeId ());
+
+						if (
+							isNull (
+								objectTypeCode)
+						) {
+
+							throw new IllegalArgumentException (
+								stringFormat (
+									"Unknown object type %s",
+									integerToDecimalString (
+										parentObjectId.typeId ())));
+
+						}
+
+						taskLogger.warningFormat (
+							"Unknown priv %s on object type %s (%s)",
+							privCode,
+							objectTypeCode,
+							integerToDecimalString (
+								parentObjectId.objectId ()));
+
+						return false;
 
 					}
 
-					taskLogger.warningFormat (
-						"Unknown priv %s on object type %s (%s)",
-						privCode,
-						objectTypeCode,
-						integerToDecimalString (
-							parentObjectId.objectId ()));
+					if (recurse) {
 
-					return false;
+						if (
+							canChain (
+								privId)
+						) {
+							return true;
+						}
+
+					} else {
+
+						if (
+							canSingle (
+								privId)
+						) {
+							return true;
+						}
+
+					}
 
 				}
 
-				if (recurse) {
+			} else {
 
-					if (
-						canChain (
-							privId)
-					) {
-						return true;
-					}
+				// check all this object's privs
 
-				} else {
+				for (
+					Long privId
+						: objectData.privIdsByCode.values ()
+				) {
 
 					if (
 						canSingle (
@@ -269,27 +293,9 @@ class UserPrivData {
 
 			}
 
-		} else {
-
-			// check all this object's privs
-
-			for (
-				Long privId
-					: objectData.privIdsByCode.values ()
-			) {
-
-				if (
-					canSingle (
-						privId)
-				) {
-					return true;
-				}
-
-			}
+			return false;
 
 		}
-
-		return false;
 
 	}
 

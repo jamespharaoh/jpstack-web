@@ -121,53 +121,107 @@ class ChatHelpCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			MessageRec message =
+				inbox.getMessage ();
 
-		// send barred users to help
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
 
-		if (creditCheckResult.failed ()) {
+			// send barred users to help
 
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				optionalAbsent (),
-				true);
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
+
+			if (creditCheckResult.failed ()) {
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					optionalAbsent (),
+					true);
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			if (rest.length () == 0) {
+
+				// send help error
+
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"help_error",
+					commandHelper.findByCodeRequired (
+						chat,
+						"magic"),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					TemplateMissing.error,
+					emptyMap ());
+
+			} else {
+
+				// store message as help request
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					optionalOf (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
+					true);
+
+			}
+
+			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
 				taskLogger,
@@ -179,54 +233,6 @@ class ChatHelpCommand
 				command);
 
 		}
-
-		if (rest.length () == 0) {
-
-			// send help error
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"help_error",
-				commandHelper.findByCodeRequired (
-					chat,
-					"magic"),
-				IdObject.objectId (
-					commandHelper.findByCodeRequired (
-						chat,
-						"help")),
-				TemplateMissing.error,
-				emptyMap ());
-
-		} else {
-
-			// store message as help request
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				optionalOf (
-					commandHelper.findByCodeRequired (
-						chat,
-						"help")),
-				true);
-
-		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

@@ -4,6 +4,7 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,9 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -92,7 +94,7 @@ class ForwarderUnqueueExRpcHandler
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ForwarderUnqueueExRpcHandler.handle (source)",
@@ -155,8 +157,8 @@ class ForwarderUnqueueExRpcHandler
 	void getParams (
 			RpcSource source) {
 
-		Map<String,Object> params =
-			forwarderApiLogic.unsafeMapStringObject (
+		Map <String, Object> params =
+			genericCastUnchecked (
 				source.obtain (
 					forwarderUnqueueExRequestDef,
 					statusMessages,
@@ -168,7 +170,7 @@ class ForwarderUnqueueExRpcHandler
 				"allow-partial");
 
 		List <Map <String, Object>> messageParamsList =
-			forwarderApiLogic.unsafeListMapStringObject (
+			genericCastUnchecked (
 				params.get (
 					"unqueueExMessages"));
 
@@ -194,8 +196,8 @@ class ForwarderUnqueueExRpcHandler
 
 		}
 
-		List<Map<String,Object>> reportParamsList =
-			forwarderApiLogic.unsafeListMapStringObject (
+		List <Map <String, Object>> reportParamsList =
+			genericCastUnchecked (
 				params.get (
 					"reports"));
 
@@ -324,7 +326,7 @@ class ForwarderUnqueueExRpcHandler
 	private
 	void unqueueReports () {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		for (
@@ -383,7 +385,7 @@ class ForwarderUnqueueExRpcHandler
 	private
 	void unqueueMessages () {
 
-		Transaction transaction =
+		BorrowedTransaction transaction =
 			database.currentTransaction ();
 
 		for (

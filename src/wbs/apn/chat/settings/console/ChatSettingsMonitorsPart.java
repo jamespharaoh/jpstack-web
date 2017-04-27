@@ -77,104 +77,110 @@ class ChatSettingsMonitorsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		List <Long> onlineMonitorIds =
-			chatUserHelper.searchIds (
-				taskLogger,
-				new ChatUserSearch ()
-
-			.chatId (
-				chat.getId ())
-
-			.type (
-				ChatUserType.monitor)
-
-			.online (
-				true)
-
-		);
-
-		taskLogger.debugFormat (
-			"Got %s",
-			integerToDecimalString (
-				onlineMonitorIds.size ()));
-
-		for (
-			Long monitorId
-				: onlineMonitorIds
 		) {
 
-			ChatUserRec monitor =
-				chatUserHelper.findRequired (
-					monitorId);
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
+
+			List <Long> onlineMonitorIds =
+				chatUserHelper.searchIds (
+					taskLogger,
+					new ChatUserSearch ()
+
+				.chatId (
+					chat.getId ())
+
+				.type (
+					ChatUserType.monitor)
+
+				.online (
+					true)
+
+			);
 
 			taskLogger.debugFormat (
-				"Orient %s, gender %s",
-				enumName (
-					monitor.getOrient ()),
-				enumName (
-					monitor.getGender ()));
+				"Got %s",
+				integerToDecimalString (
+					onlineMonitorIds.size ()));
 
-			switch (monitor.getOrient ()) {
+			for (
+				Long monitorId
+					: onlineMonitorIds
+			) {
 
-			case gay:
+				ChatUserRec monitor =
+					chatUserHelper.findRequired (
+						monitorId);
 
-				switch (monitor.getGender ()) {
+				taskLogger.debugFormat (
+					"Orient %s, gender %s",
+					enumName (
+						monitor.getOrient ()),
+					enumName (
+						monitor.getGender ()));
 
-				case male:
-					gayMale ++;
-					continue;
+				switch (monitor.getOrient ()) {
 
-				case female:
-					gayFemale++;
-					continue;
+				case gay:
 
-				}
+					switch (monitor.getGender ()) {
 
-				throw new RuntimeException ();
+					case male:
+						gayMale ++;
+						continue;
 
-			case bi:
+					case female:
+						gayFemale++;
+						continue;
 
-				switch (monitor.getGender ()) {
+					}
 
-				case male:
-					biMale ++;
-					continue;
+					throw new RuntimeException ();
 
-				case female:
-					biFemale ++;
-					continue;
+				case bi:
 
-				}
+					switch (monitor.getGender ()) {
 
-				throw new RuntimeException ();
+					case male:
+						biMale ++;
+						continue;
 
-			case straight:
+					case female:
+						biFemale ++;
+						continue;
 
-				switch (monitor.getGender ()) {
+					}
 
-				case male:
-					straightMale ++;
-					continue;
+					throw new RuntimeException ();
 
-				case female:
-					straightFemale ++;
-					continue;
+				case straight:
+
+					switch (monitor.getGender ()) {
+
+					case male:
+						straightMale ++;
+						continue;
+
+					case female:
+						straightFemale ++;
+						continue;
+
+					}
+
+					throw new RuntimeException ();
 
 				}
 
 				throw new RuntimeException ();
 
 			}
-
-			throw new RuntimeException ();
 
 		}
 

@@ -5,17 +5,13 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -69,18 +65,21 @@ class G8waveInFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doGet");
+		try (
 
-		doPost (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doGet");
+
+		) {
+
+			doPost (
+				taskLogger);
+
+		}
 
 	}
 
@@ -89,14 +88,14 @@ class G8waveInFile
 	void doPost (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doPost");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doPost");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"G8waveInFile.doPost ()",
@@ -192,11 +191,17 @@ class G8waveInFile
 
 			transaction.commit ();
 
-			FormatWriter formatWriter =
-				requestContext.formatWriter ();
+			try (
 
-			formatWriter.writeLineFormat (
-				"OK");
+				FormatWriter formatWriter =
+					requestContext.formatWriter ();
+
+			) {
+
+				formatWriter.writeLineFormat (
+					"OK");
+
+			}
 
 		}
 
@@ -205,10 +210,7 @@ class G8waveInFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 	}
 

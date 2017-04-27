@@ -2,8 +2,10 @@ package wbs.integrations.dialogue.api;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -18,6 +20,9 @@ class DialogueResponder
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -28,17 +33,28 @@ class DialogueResponder
 	void execute (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		FormatWriter formatWriter =
-			requestContext.formatWriter ();
+		try (
 
-		formatWriter.writeLineFormat (
-			"<HTML>");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
 
-		formatWriter.writeLineFormat (
-			"<!-- X-E3-Submission-Report: \"00\" -->");
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
 
-		formatWriter.writeLineFormat (
-			"</HTML>");
+		) {
+
+			formatWriter.writeLineFormat (
+				"<HTML>");
+
+			formatWriter.writeLineFormat (
+				"<!-- X-E3-Submission-Report: \"00\" -->");
+
+			formatWriter.writeLineFormat (
+				"</HTML>");
+
+		}
 
 	}
 

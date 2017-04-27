@@ -66,18 +66,24 @@ class ConsoleModuleSpecReader {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String xmlResourceName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readClasspath");
+		try (
 
-		ConsoleModuleSpec consoleSpec =
-			(ConsoleModuleSpec)
-			dataFromXml.readClasspath (
-				taskLogger,
-				xmlResourceName);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readClasspath");
 
-		return consoleSpec;
+		) {
+
+			ConsoleModuleSpec consoleSpec =
+				(ConsoleModuleSpec)
+				dataFromXml.readClasspath (
+					taskLogger,
+					xmlResourceName);
+
+			return consoleSpec;
+
+		}
 
 	}
 

@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -108,7 +108,7 @@ interface ConsoleFormActionHelper <FormState, History> {
 
 	Optional <Responder> processFormSubmission (
 			TaskLogger parentTaskLogger,
-			Transaction transaction,
+			OwnedTransaction transaction,
 			FormState formState);
 
 	default

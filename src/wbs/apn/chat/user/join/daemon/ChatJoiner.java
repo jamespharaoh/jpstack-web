@@ -32,8 +32,8 @@ import org.joda.time.LocalDate;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -231,13 +231,19 @@ class ChatJoiner {
 	void handleSimple (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleSimple");
+		try (
 
-		handleWithState (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleSimple");
+
+		) {
+
+			handleWithState (
+				taskLogger);
+
+		}
 
 	}
 
@@ -246,31 +252,37 @@ class ChatJoiner {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull CommandRec command) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleSimple");
+		try (
 
-		handleWithState (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleSimple");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			handleWithState (
+				taskLogger);
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
+
+		}
 
 	}
 
@@ -384,89 +396,95 @@ class ChatJoiner {
 	void updateUserDob (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateUserDob");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateUserDob");
 
-		Optional<LocalDate> dateOfBirth =
-			DateFinder.find (
-				rest,
-				1915);
-
-		if (
-			optionalIsPresent (
-				dateOfBirth)
 		) {
 
-			chatUser
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-				.setDob (
-					dateOfBirth.get ());
+			Optional <LocalDate> dateOfBirth =
+				DateFinder.find (
+					rest,
+					1915);
 
-		} else {
+			if (
+				optionalIsPresent (
+					dateOfBirth)
+			) {
 
-			chatUserDobFailureHelper.insert (
-				taskLogger,
-				chatUserDobFailureHelper.createInstance ()
+				chatUser
 
-				.setChatUser (
-					chatUser)
+					.setDob (
+						dateOfBirth.get ());
 
-				.setMessage (
-					message)
+			} else {
 
-				.setTimestamp (
-					transaction.now ())
+				chatUserDobFailureHelper.insert (
+					taskLogger,
+					chatUserDobFailureHelper.createInstance ()
 
-				.setFailingText (
-					textHelper.findOrCreate (
-						taskLogger,
-						rest))
+					.setChatUser (
+						chatUser)
 
-			);
+					.setMessage (
+						message)
 
-			emailLogic.sendSystemEmail (
-				ImmutableList.of (
-					wbsConfig.email ().developerAddress ()),
-				"DOB error",
-				stringFormat (
+					.setTimestamp (
+						transaction.now ())
 
-					"********** %s DOB ERROR **********\n",
-					wbsConfig.name ().toUpperCase (),
-					"\n",
+					.setFailingText (
+						textHelper.findOrCreate (
+							taskLogger,
+							rest))
 
-					"Application:  chat\n",
-					"Service:      %s.%s\n",
-					chat.getSlice ().getCode (),
-					chat.getCode (),
-					"Timestamp:    %s\n",
-					timeFormatter.timestampTimezoneString (
-						timeFormatter.timezone (
-							ifNull (
-								chat.getTimezone (),
-								chat.getSlice ().getDefaultTimezone (),
-								wbsConfig.defaultTimezone ())),
-						transaction.now ()),
-					"\n",
+				);
 
-					"Message ID:   %s\n",
-					integerToDecimalString (
-						message.getId ()),
-					"Route:        %s.%s\n",
-					message.getRoute ().getSlice ().getCode (),
-					message.getRoute ().getCode (),
-					"Number from:  %s\n",
-					message.getNumFrom (),
-					"Number to:    %s\n",
-					message.getNumTo (),
-					"Full message: %s\n",
-					message.getText ().getText (),
-					"Message rest: %s\n",
-					rest));
+				emailLogic.sendSystemEmail (
+					ImmutableList.of (
+						wbsConfig.email ().developerAddress ()),
+					"DOB error",
+					stringFormat (
+
+						"********** %s DOB ERROR **********\n",
+						wbsConfig.name ().toUpperCase (),
+						"\n",
+
+						"Application:  chat\n",
+						"Service:      %s.%s\n",
+						chat.getSlice ().getCode (),
+						chat.getCode (),
+						"Timestamp:    %s\n",
+						timeFormatter.timestampTimezoneString (
+							timeFormatter.timezone (
+								ifNull (
+									chat.getTimezone (),
+									chat.getSlice ().getDefaultTimezone (),
+									wbsConfig.defaultTimezone ())),
+							transaction.now ()),
+						"\n",
+
+						"Message ID:   %s\n",
+						integerToDecimalString (
+							message.getId ()),
+						"Route:        %s.%s\n",
+						message.getRoute ().getSlice ().getCode (),
+						message.getRoute ().getCode (),
+						"Number from:  %s\n",
+						message.getNumFrom (),
+						"Number to:    %s\n",
+						message.getNumTo (),
+						"Full message: %s\n",
+						message.getText ().getText (),
+						"Message rest: %s\n",
+						rest));
+
+			}
 
 		}
 
@@ -476,39 +494,45 @@ class ChatJoiner {
 	boolean updateUserPhoto (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateUserPhoto");
+		try (
 
-		Optional <ChatUserImageRec> chatUserImageOptional =
-			chatUserLogic.setPhotoFromMessage (
-				taskLogger,
-				chatUser,
-				message,
-				false);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateUserPhoto");
 
-		if (
-			optionalIsPresent (
-				chatUserImageOptional)
 		) {
 
-			chatSendLogic.sendSystemMmsFree (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"photo_error",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatAffiliate (),
-					"date_set_photo"),
-				TemplateMissing.error);
+			Optional <ChatUserImageRec> chatUserImageOptional =
+				chatUserLogic.setPhotoFromMessage (
+					taskLogger,
+					chatUser,
+					message,
+					false);
 
-			return false;
+			if (
+				optionalIsPresent (
+					chatUserImageOptional)
+			) {
+
+				chatSendLogic.sendSystemMmsFree (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"photo_error",
+					commandHelper.findByCodeRequired (
+						chatUser.getChatAffiliate (),
+						"date_set_photo"),
+					TemplateMissing.error);
+
+				return false;
+
+			}
+
+			return true;
 
 		}
-
-		return true;
 
 	}
 
@@ -516,33 +540,39 @@ class ChatJoiner {
 	void setAffiliateAndScheme (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setAffiliateAndScheme");
+		try (
 
-		// set affiliate
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setAffiliateAndScheme");
 
-		if (chatAffiliateId != null) {
+		) {
 
-			chatUserLogic.setAffiliate (
-				taskLogger,
-				chatUser,
-				chatAffiliateHelper.findRequired (
-					chatAffiliateId),
-				optionalFromNullable (
-					message));
+			// set affiliate
 
-		}
+			if (chatAffiliateId != null) {
 
-		// set the chat user's scheme if appropriate
+				chatUserLogic.setAffiliate (
+					taskLogger,
+					chatUser,
+					chatAffiliateHelper.findRequired (
+						chatAffiliateId),
+					optionalFromNullable (
+						message));
 
-		if (chatSchemeId != null) {
+			}
 
-			chatUserLogic.setScheme (
-				chatUser,
-				chatSchemeHelper.findRequired (
-					chatSchemeId));
+			// set the chat user's scheme if appropriate
+
+			if (chatSchemeId != null) {
+
+				chatUserLogic.setScheme (
+					chatUser,
+					chatSchemeHelper.findRequired (
+						chatSchemeId));
+
+			}
 
 		}
 
@@ -555,193 +585,200 @@ class ChatJoiner {
 	boolean updateUser (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateUser");
+		try (
 
-		chatUser
-
-			.setGender (
-				ifNull (
-					chatUser.getGender (),
-					gender))
-
-			.setOrient (
-				ifNull (
-					chatUser.getOrient (),
-					orient));
-
-		if (
-			isNotNull (
-				deliveryId)
-		) {
-
-			chatUserLogic.adultVerify (
-				chatUser);
-
-			return true;
-
-		}
-
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.chatPrefs)
-		) {
-
-			updateUserPrefs ();
-
-		}
-
-		// set gender
-
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.chatGender,
-				JoinType.dateGender)
-		) {
-
-			updateUserGender ();
-
-		}
-
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.chatGenderOther,
-				JoinType.dateGenderOther)
-		) {
-
-			updateUserGenderOther ();
-
-		}
-
-		// set info
-
-		if (allOf (
-
-			() -> enumInSafe (
-				joinType,
-				JoinType.chatSetInfo,
-				JoinType.dateSetInfo),
-
-			() -> stringLongerThan (
-				10l,
-				rest)
-
-		)) {
-
-			chatInfoLogic.chatUserSetInfo (
-				taskLogger,
-				chatUser,
-				rest,
-				optionalOf (
-					message.getThreadId ()));
-
-		}
-
-		// check age
-
-		if (
-
-			enumInSafe (
-				joinType,
-				JoinType.chatAge)
-
-			&& ChatPatterns.yes.matcher (rest).find ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateUser");
 
 		) {
 
 			chatUser
 
-				.setAgeChecked (
-					true);
+				.setGender (
+					ifNull (
+						chatUser.getGender (),
+						gender))
 
-		}
+				.setOrient (
+					ifNull (
+						chatUser.getOrient (),
+						orient));
 
-		// confirm charges
+			if (
+				isNotNull (
+					deliveryId)
+			) {
 
-		if (
+				chatUserLogic.adultVerify (
+					taskLogger,
+					chatUser);
 
-			enumInSafe (
-				joinType,
-				JoinType.chatCharges,
-				JoinType.dateCharges)
+				return true;
 
-			&& ChatPatterns.yes.matcher (rest).find ()
+			}
 
-		) {
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.chatPrefs)
+			) {
 
-			chatUser
+				updateUserPrefs ();
 
-				.setChargesConfirmed (
-					true);
+			}
 
-		}
+			// set gender
 
-		if (confirmCharges) {
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.chatGender,
+					JoinType.dateGender)
+			) {
 
-			chatUser
+				updateUserGender ();
 
-				.setChargesConfirmed (
-					true);
+			}
 
-		}
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.chatGenderOther,
+					JoinType.dateGenderOther)
+			) {
 
-		// set date of birth
+				updateUserGenderOther ();
 
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.chatDob,
-				JoinType.dateDob)
-		) {
+			}
 
-			updateUserDob (
-				taskLogger);
+			// set info
 
-		}
+			if (allOf (
 
-		// set location
+				() -> enumInSafe (
+					joinType,
+					JoinType.chatSetInfo,
+					JoinType.dateSetInfo),
 
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.chatLocation,
-				JoinType.dateLocation)
-		) {
+				() -> stringLongerThan (
+					10l,
+					rest)
 
-			gotPlace =
-				chatUserLogic.setPlace (
+			)) {
+
+				chatInfoLogic.chatUserSetInfo (
 					taskLogger,
 					chatUser,
 					rest,
 					optionalOf (
-						message),
-					optionalAbsent ());
+						message.getThreadId ()));
 
-		}
-
-		// set photo, if appropriate
-
-		if (
-			enumInSafe (
-				joinType,
-				JoinType.dateSetPhoto)
-		) {
-
-			if (
-				! updateUserPhoto (
-					taskLogger)
-			) {
-				return false;
 			}
 
-		}
+			// check age
 
-		return true;
+			if (
+
+				enumInSafe (
+					joinType,
+					JoinType.chatAge)
+
+				&& ChatPatterns.yes.matcher (rest).find ()
+
+			) {
+
+				chatUser
+
+					.setAgeChecked (
+						true);
+
+			}
+
+			// confirm charges
+
+			if (
+
+				enumInSafe (
+					joinType,
+					JoinType.chatCharges,
+					JoinType.dateCharges)
+
+				&& ChatPatterns.yes.matcher (rest).find ()
+
+			) {
+
+				chatUser
+
+					.setChargesConfirmed (
+						true);
+
+			}
+
+			if (confirmCharges) {
+
+				chatUser
+
+					.setChargesConfirmed (
+						true);
+
+			}
+
+			// set date of birth
+
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.chatDob,
+					JoinType.dateDob)
+			) {
+
+				updateUserDob (
+					taskLogger);
+
+			}
+
+			// set location
+
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.chatLocation,
+					JoinType.dateLocation)
+			) {
+
+				gotPlace =
+					chatUserLogic.setPlace (
+						taskLogger,
+						chatUser,
+						rest,
+						optionalOf (
+							message),
+						optionalAbsent ());
+
+			}
+
+			// set photo, if appropriate
+
+			if (
+				enumInSafe (
+					joinType,
+					JoinType.dateSetPhoto)
+			) {
+
+				if (
+					! updateUserPhoto (
+						taskLogger)
+				) {
+					return false;
+				}
+
+			}
+
+			return true;
+
+		}
 
 	}
 
@@ -758,334 +795,340 @@ class ChatJoiner {
 	boolean checkBeforeJoin (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkBeforeJoin");
+		try (
 
-		// check network
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkBeforeJoin");
 
-		if (chatUser.getNumber ().getNetwork ().getId () == 0) {
+		) {
 
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
+			// check network
 
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				Optional.of (
-					message.getThreadId ()),
-				"join_error",
-				commandHelper.findByCodeRequired (
-					chat,
-					"help"),
-				0l,
-				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+			if (chatUser.getNumber ().getNetwork ().getId () == 0) {
 
-			return false;
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					null,
+					true);
 
-		}
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					Optional.of (
+						message.getThreadId ()),
+					"join_error",
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
+					0l,
+					TemplateMissing.error,
+					Collections.<String,String>emptyMap ());
 
-		// check credit
+				return false;
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
+			}
 
-		if (creditCheckResult.failed ()) {
+			// check credit
 
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
 
-			return false;
+			if (creditCheckResult.failed ()) {
 
-		}
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					null,
+					true);
 
-		// check age
+				return false;
 
-		if (! chatUserLogic.gotDob (chatUser)) {
+			}
 
-			if (chat.getSendDobRequestFromShortcode ()) {
+			// check age
 
-				chatSendLogic.sendSystemRbFree (
+			if (! chatUserLogic.gotDob (chatUser)) {
+
+				if (chat.getSendDobRequestFromShortcode ()) {
+
+					chatSendLogic.sendSystemRbFree (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"dob_request",
+						TemplateMissing.error,
+						emptyMap ());
+
+					chatUser
+
+						.setNextJoinType (
+							joinTypeIsChat (joinType)
+								? ChatKeywordJoinType.chatDob
+								: ChatKeywordJoinType.dateDob);
+
+				} else {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"dob_request",
+						commandHelper.findByCodeRequired (
+							chatUser.getChatScheme (),
+							joinTypeIsChat (joinType)
+								? "chat_dob"
+								: "date_dob"),
+						0l,
+						TemplateMissing.error,
+						emptyMap ());
+
+				}
+
+				return false;
+
+			}
+
+			if (! chatUserLogic.dobOk (chatUser)) {
+
+				chatSendLogic.sendSystemMagic (
 					taskLogger,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
-					"dob_request",
+					"dob_too_young",
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
+					0l,
 					TemplateMissing.error,
 					emptyMap ());
+
+				return false;
+
+			}
+
+			// send join warning
+
+			if (
+				chat.getJoinWarningEnabled ()
+				&& ! chatUser.getJoinWarningSent ()
+			) {
+
+				if (chat.getSendWarningFromShortcode ()) {
+
+					chatSendLogic.sendSystemRbFree (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"join_warning",
+						TemplateMissing.error,
+						emptyMap ());
+
+					chatSendLogic.sendSystemRbFree (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"join_warning_2",
+						TemplateMissing.ignore,
+						emptyMap ());
+
+				} else {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"join_warning",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.error,
+						emptyMap ());
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"join_warning_2",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.ignore,
+						emptyMap ());
+
+				}
+
+				if (chat.getBillDuringJoin ()) {
+
+					chatCreditLogic.userBillReal (
+						taskLogger,
+						chatUser,
+						false);
+
+				}
 
 				chatUser
 
-					.setNextJoinType (
-						joinTypeIsChat (joinType)
-							? ChatKeywordJoinType.chatDob
-							: ChatKeywordJoinType.dateDob);
+					.setJoinWarningSent (
+						true);
 
-			} else {
+			}
+
+			// check charges confirmed
+
+			if (
+				chat.getConfirmCharges ()
+				&& ! chatUser.getChargesConfirmed ()
+			) {
 
 				chatSendLogic.sendSystemMagic (
 					taskLogger,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
-					"dob_request",
+					"charges_request",
 					commandHelper.findByCodeRequired (
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
-							? "chat_dob"
-							: "date_dob"),
+							? "chat_charges"
+							: "date_charges"),
 					0l,
 					TemplateMissing.error,
 					emptyMap ());
 
+				return false;
+
 			}
 
-			return false;
+			// check we got a decent location
 
-		}
+			if (
 
-		if (! chatUserLogic.dobOk (chatUser)) {
+				enumInSafe (
+					joinType,
+					JoinType.chatLocation,
+					JoinType.dateLocation)
 
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"dob_too_young",
-				commandHelper.findByCodeRequired (
-					chat,
-					"help"),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
+				&& ! gotPlace
 
-			return false;
-
-		}
-
-		// send join warning
-
-		if (
-			chat.getJoinWarningEnabled ()
-			&& ! chatUser.getJoinWarningSent ()
-		) {
-
-			if (chat.getSendWarningFromShortcode ()) {
-
-				chatSendLogic.sendSystemRbFree (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"join_warning",
-					TemplateMissing.error,
-					emptyMap ());
-
-				chatSendLogic.sendSystemRbFree (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"join_warning_2",
-					TemplateMissing.ignore,
-					emptyMap ());
-
-			} else {
+			) {
 
 				chatSendLogic.sendSystemMagic (
 					taskLogger,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
-					"join_warning",
+					"location_error",
 					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
+						chatUser.getChatScheme (),
+						ifThenElse (
+							joinTypeIsChat (
+								joinType),
+							() -> "chat_location",
+							() -> "date_location")),
 					0l,
 					TemplateMissing.error,
 					emptyMap ());
+
+				return false;
+
+			}
+
+			// check gender
+
+			if (chatUser.getGender () == null) {
 
 				chatSendLogic.sendSystemMagic (
 					taskLogger,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
-					"join_warning_2",
+					"gender_request",
 					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
+						chatUser.getChatScheme (),
+						joinTypeIsChat (joinType)
+							? "chat_gender"
+							: "date_gender"),
 					0l,
-					TemplateMissing.ignore,
+					TemplateMissing.error,
 					emptyMap ());
 
+				return false;
+
 			}
 
-			if (chat.getBillDuringJoin ()) {
+			// check orient
 
-				chatCreditLogic.userBillReal (
+			if (chatUser.getOrient () == null) {
+
+				chatSendLogic.sendSystemMagic (
 					taskLogger,
 					chatUser,
-					false);
+					optionalOf (
+						message.getThreadId ()),
+					"gender_other_request",
+					commandHelper.findByCodeRequired (
+						chatUser.getChatScheme (),
+						joinTypeIsChat (joinType)
+							? "chat_gender_other"
+							: "date_gender_other"),
+					0l,
+					TemplateMissing.error,
+					emptyMap ());
+
+				return false;
 
 			}
 
-			chatUser
+			// check info
 
-				.setJoinWarningSent (
-					true);
+			if (
+				chatUser.getInfoText () == null
+				&& chatUser.getNewChatUserInfo () == null
+			) {
 
-		}
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"info_request",
+					commandHelper.findByCodeRequired (
+						chatUser.getChatScheme (),
+						joinTypeIsChat (joinType)
+							? "chat_info"
+							: "date_info"),
+					0l,
+					TemplateMissing.error,
+					emptyMap ());
 
-		// check charges confirmed
+				return false;
 
-		if (
-			chat.getConfirmCharges ()
-			&& ! chatUser.getChargesConfirmed ()
-		) {
+			}
 
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"charges_request",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_charges"
-						: "date_charges"),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
-
-			return false;
+			return true;
 
 		}
-
-		// check we got a decent location
-
-		if (
-
-			enumInSafe (
-				joinType,
-				JoinType.chatLocation,
-				JoinType.dateLocation)
-
-			&& ! gotPlace
-
-		) {
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"location_error",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatScheme (),
-					ifThenElse (
-						joinTypeIsChat (
-							joinType),
-						() -> "chat_location",
-						() -> "date_location")),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
-
-			return false;
-
-		}
-
-		// check gender
-
-		if (chatUser.getGender () == null) {
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"gender_request",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_gender"
-						: "date_gender"),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
-
-			return false;
-
-		}
-
-		// check orient
-
-		if (chatUser.getOrient () == null) {
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"gender_other_request",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_gender_other"
-						: "date_gender_other"),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
-
-			return false;
-
-		}
-
-		// check info
-
-		if (
-			chatUser.getInfoText () == null
-			&& chatUser.getNewChatUserInfo () == null
-		) {
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"info_request",
-				commandHelper.findByCodeRequired (
-					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_info"
-						: "date_info"),
-				0l,
-				TemplateMissing.error,
-				emptyMap ());
-
-			return false;
-
-		}
-
-		return true;
 
 	}
 
@@ -1093,34 +1136,40 @@ class ChatJoiner {
 	boolean checkLocation (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkLocation");
+		try (
 
-		// if we have a location that's fine
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkLocation");
 
-		if (chatUser.getLocationLongLat () != null)
-			return true;
+		) {
 
-		// otherwise, send an error
+			// if we have a location that's fine
 
-		chatSendLogic.sendSystemMagic (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				message.getThreadId ()),
-			"location_request",
-			commandHelper.findByCodeRequired (
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_location"
-					: "date_location"),
-			0l,
-			TemplateMissing.error,
-			emptyMap ());
+			if (chatUser.getLocationLongLat () != null)
+				return true;
 
-		return false;
+			// otherwise, send an error
+
+			chatSendLogic.sendSystemMagic (
+				taskLogger,
+				chatUser,
+				optionalOf (
+					message.getThreadId ()),
+				"location_request",
+				commandHelper.findByCodeRequired (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_location"
+						: "date_location"),
+				0l,
+				TemplateMissing.error,
+				emptyMap ());
+
+			return false;
+
+		}
 
 	}
 
@@ -1128,20 +1177,26 @@ class ChatJoiner {
 	void handleReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleReal");
+		try (
 
-		if (
-			! joinPart1 (
-				taskLogger)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleReal");
+
 		) {
-			return;
-		}
 
-		joinPart2 (
-			taskLogger);
+			if (
+				! joinPart1 (
+					taskLogger)
+			) {
+				return;
+			}
+
+			joinPart2 (
+				taskLogger);
+
+		}
 
 	}
 
@@ -1149,31 +1204,37 @@ class ChatJoiner {
 	void handleWithState (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleWithState");
+		try (
 
-		if (state != State.created) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleWithState");
 
-			throw new IllegalStateException (
-				state.toString ());
+		) {
 
-		}
+			if (state != State.created) {
 
-		try {
+				throw new IllegalStateException (
+					state.toString ());
 
-			state = State.inProgress;
+			}
 
-			handleReal (
-				taskLogger);
+			try {
 
-			state = State.completed;
+				state = State.inProgress;
 
-		} finally {
+				handleReal (
+					taskLogger);
 
-			if (state == State.inProgress) {
-				state = State.error;
+				state = State.completed;
+
+			} finally {
+
+				if (state == State.inProgress) {
+					state = State.error;
+				}
+
 			}
 
 		}
@@ -1184,106 +1245,113 @@ class ChatJoiner {
 	boolean joinPart1 (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"joinPart1");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"joinPart1");
 
-		// lookup stuff
+		) {
 
-		message =
-			inbox != null
-				? inbox.getMessage ()
-				: null;
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		chat =
-			chatHelper.findRequired (
-				chatId);
+			// lookup stuff
 
-		// create chat user
+			message =
+				inbox != null
+					? inbox.getMessage ()
+					: null;
 
-		chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
+			chat =
+				chatHelper.findRequired (
+					chatId);
 
-		setAffiliateAndScheme (
-			taskLogger);
+			// create chat user
 
-		// make sure the user can join
+			chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
+			setAffiliateAndScheme (
+				taskLogger);
 
-		if (creditCheckResult.failed ()) {
+			// make sure the user can join
 
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
 
-			return false;
+			if (creditCheckResult.failed ()) {
 
-		}
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					null,
+					true);
 
-		// schedule a register help message (we cancel this when the join is
-		// successful)
+				return false;
 
-		if (chatUser.getLastJoin () == null) {
+			}
 
-			Instant nextRegisterHelpTime =
-				transaction
-					.now ()
-					.plus (Duration.standardMinutes (20));
+			// schedule a register help message (we cancel this when the join is
+			// successful)
+
+			if (chatUser.getLastJoin () == null) {
+
+				Instant nextRegisterHelpTime =
+					transaction
+						.now ()
+						.plus (Duration.standardMinutes (20));
+
+				chatUser
+
+					.setNextRegisterHelp (
+						nextRegisterHelpTime);
+
+			}
+
+			// set last action and schedule ad
 
 			chatUser
 
-				.setNextRegisterHelp (
-					nextRegisterHelpTime);
+				.setLastAction (
+					transaction.now ());
+
+			chatUserLogic.scheduleAd (
+				taskLogger,
+				chatUser);
+
+			// update the user as appropriate
+
+			if (
+				! updateUser (
+					taskLogger)
+			) {
+				return false;
+			}
+
+			// do pre-join checks
+
+			if (
+				! checkBeforeJoin (
+					taskLogger)
+			) {
+				return false;
+			}
+
+			return true;
 
 		}
-
-		// set last action and schedule ad
-
-		chatUser
-
-			.setLastAction (
-				transaction.now ());
-
-		chatUserLogic.scheduleAd (
-			chatUser);
-
-		// update the user as appropriate
-
-		if (
-			! updateUser (
-				taskLogger)
-		) {
-			return false;
-		}
-
-		// do pre-join checks
-
-		if (
-			! checkBeforeJoin (
-				taskLogger)
-		) {
-			return false;
-		}
-
-		return true;
 
 	}
 
@@ -1291,270 +1359,276 @@ class ChatJoiner {
 	boolean joinPart2 (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"joinPart2");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"joinPart2");
 
-		taskLogger.debugFormat (
-			"Checking location for chat user %s",
-			objectManager.objectPathMini (
-				chatUser));
-
-		// check we have a location of some sort
-
-		if (
-			! checkLocation (
-				taskLogger)
 		) {
-			return false;
-		}
 
-		taskLogger.debugFormat (
-			"Location ok for chat user %s (%s)",
-			objectManager.objectPathMini (
-				chatUser),
-			chatUser.getLocationLongLat ().toString ());
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// bring the user online if appropriate
+			taskLogger.debugFormat (
+				"Checking location for chat user %s",
+				objectManager.objectPathMini (
+					chatUser));
 
-		if (joinTypeIsChat (joinType)) {
-
-			chatMiscLogic.userJoin (
-				taskLogger,
-				chatUser,
-				true,
-				message.getThreadId (),
-				ChatMessageMethod.sms);
-
-		}
-
-		// schedule next outbound message
-
-		Instant nextQuietOutboundTime =
-			transaction
-				.now ()
-				.plus (Duration.standardSeconds (
-					chat.getTimeQuietOutbound ()));
-
-		chatUser
-
-			.setNextQuietOutbound (
-				nextQuietOutboundTime);
-
-		// schedule next join outbound message
-
-		Instant nextJoinOutboundTime =
-			transaction
-				.now ()
-				.plus (Duration.standardSeconds (
-					+ chat.getTimeJoinOutboundMin ()
-					+ randomLogic.randomInteger (
-						+ chat.getTimeJoinOutboundMax ()
-						- chat.getTimeJoinOutboundMin ())));
-
-		chatUser
-
-			.setNextJoinOutbound (
-				nextJoinOutboundTime);
-
-		// bring them into dating if appropriate
-
-		if (joinTypeIsDate (joinType)) {
-
-			if (chatUser.getDateMode () == ChatUserDateMode.none) {
-
-				chatSendLogic.sendSystemMagic (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"date_joined",
-					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
-					0l,
-					TemplateMissing.ignore,
-					emptyMap ());
-
-			}
-
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				optionalAbsent (),
-				optionalOf (
-					message),
-				chatUser.getMainChatUserImage () != null
-					? ChatUserDateMode.text
-					: ChatUserDateMode.photo,
-				false);
+			// check we have a location of some sort
 
 			if (
-				chatUser.getDateDailyCount ()
-					< chatUser.getDateDailyMax ()
+				! checkLocation (
+					taskLogger)
 			) {
+				return false;
+			}
 
-				chatUser.setDateDailyCount (
-					chatUser.getDateDailyMax ());
+			taskLogger.debugFormat (
+				"Location ok for chat user %s (%s)",
+				objectManager.objectPathMini (
+					chatUser),
+				chatUser.getLocationLongLat ().toString ());
+
+			// bring the user online if appropriate
+
+			if (joinTypeIsChat (joinType)) {
+
+				chatMiscLogic.userJoin (
+					taskLogger,
+					chatUser,
+					true,
+					message.getThreadId (),
+					ChatMessageMethod.sms);
 
 			}
 
-		}
+			// schedule next outbound message
 
-		// set session info remain
-
-		if (
-			joinType == JoinType.chatNext
-			&& chat.getSessionInfoLimit () != null
-		) {
+			Instant nextQuietOutboundTime =
+				transaction
+					.now ()
+					.plus (Duration.standardSeconds (
+						chat.getTimeQuietOutbound ()));
 
 			chatUser
 
-				.setSessionInfoRemain (
-					chat.getSessionInfoLimit ());
+				.setNextQuietOutbound (
+					nextQuietOutboundTime);
 
-		}
+			// schedule next join outbound message
 
-		// send them the next users or pictures or whatever
+			Instant nextJoinOutboundTime =
+				transaction
+					.now ()
+					.plus (Duration.standardSeconds (
+						+ chat.getTimeJoinOutboundMin ()
+						+ randomLogic.randomInteger (
+							+ chat.getTimeJoinOutboundMax ()
+							- chat.getTimeJoinOutboundMin ())));
 
-		switch (joinType) {
+			chatUser
 
-		case chatPics:
+				.setNextJoinOutbound (
+					nextJoinOutboundTime);
 
-			if (
-				equalToZero (
-					chatInfoLogic.sendUserPics (
+			// bring them into dating if appropriate
+
+			if (joinTypeIsDate (joinType)) {
+
+				if (chatUser.getDateMode () == ChatUserDateMode.none) {
+
+					chatSendLogic.sendSystemMagic (
 						taskLogger,
 						chatUser,
-						3l,
 						optionalOf (
-							message.getThreadId ())))
-			) {
-
-				chatSendLogic.sendSystemMagic (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"more_photos_error",
-					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
-					0l,
-					TemplateMissing.error,
-					emptyMap ());
-
-			}
-
-			break;
-
-		case chatVideos:
-
-			if (
-				equalToZero (
-					chatInfoLogic.sendUserVideos (
-						taskLogger,
-						chatUser,
-						3l,
-						optionalOf (
-							message.getThreadId ())))
-			) {
-
-				chatSendLogic.sendSystemMagic (
-					taskLogger,
-					chatUser,
-					optionalOf (
-						message.getThreadId ()),
-					"more_videos_error",
-					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
-					0l,
-					TemplateMissing.error,
-					emptyMap ());
-
-			}
-
-			break;
-
-		case chatNext:
-
-			long numSent =
-				chatInfoLogic.sendUserInfos (
-					taskLogger,
-					chatUser,
-					2l,
-					optionalOf (
-						message.getThreadId ()));
-
-			if (numSent > 1) {
-
-				if (chatUser.getSessionInfoRemain () != null) {
-
-					chatUser
-
-						.setSessionInfoRemain (
-							chatUser.getSessionInfoRemain () - numSent);
+							message.getThreadId ()),
+						"date_joined",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.ignore,
+						emptyMap ());
 
 				}
 
-			} else {
-
-				chatSendLogic.sendSystemMagic (
+				chatDateLogic.userDateStuff (
 					taskLogger,
 					chatUser,
-					Optional.of (
-						message.getThreadId ()),
-					"more_error",
-					commandHelper.findByCodeRequired (
-						chat,
-						"help"),
-					0l,
-					TemplateMissing.error,
-					Collections.emptyMap ());
+					optionalAbsent (),
+					optionalOf (
+						message),
+					chatUser.getMainChatUserImage () != null
+						? ChatUserDateMode.text
+						: ChatUserDateMode.photo,
+					false);
+
+				if (
+					chatUser.getDateDailyCount ()
+						< chatUser.getDateDailyMax ()
+				) {
+
+					chatUser.setDateDailyCount (
+						chatUser.getDateDailyMax ());
+
+				}
 
 			}
 
-			break;
+			// set session info remain
 
-		default:
+			if (
+				joinType == JoinType.chatNext
+				&& chat.getSessionInfoLimit () != null
+			) {
 
-			// do nothing
+				chatUser
 
-		}
+					.setSessionInfoRemain (
+						chat.getSessionInfoLimit ());
 
-		// send any queued message
+			}
 
-		ChatMessageRec oldMessage =
-			chatMessageHelper.findSignup (
+			// send them the next users or pictures or whatever
+
+			switch (joinType) {
+
+			case chatPics:
+
+				if (
+					equalToZero (
+						chatInfoLogic.sendUserPics (
+							taskLogger,
+							chatUser,
+							3l,
+							optionalOf (
+								message.getThreadId ())))
+				) {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"more_photos_error",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.error,
+						emptyMap ());
+
+				}
+
+				break;
+
+			case chatVideos:
+
+				if (
+					equalToZero (
+						chatInfoLogic.sendUserVideos (
+							taskLogger,
+							chatUser,
+							3l,
+							optionalOf (
+								message.getThreadId ())))
+				) {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							message.getThreadId ()),
+						"more_videos_error",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.error,
+						emptyMap ());
+
+				}
+
+				break;
+
+			case chatNext:
+
+				long numSent =
+					chatInfoLogic.sendUserInfos (
+						taskLogger,
+						chatUser,
+						2l,
+						optionalOf (
+							message.getThreadId ()));
+
+				if (numSent > 1) {
+
+					if (chatUser.getSessionInfoRemain () != null) {
+
+						chatUser
+
+							.setSessionInfoRemain (
+								chatUser.getSessionInfoRemain () - numSent);
+
+					}
+
+				} else {
+
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						Optional.of (
+							message.getThreadId ()),
+						"more_error",
+						commandHelper.findByCodeRequired (
+							chat,
+							"help"),
+						0l,
+						TemplateMissing.error,
+						Collections.emptyMap ());
+
+				}
+
+				break;
+
+			default:
+
+				// do nothing
+
+			}
+
+			// send any queued message
+
+			ChatMessageRec oldMessage =
+				chatMessageHelper.findSignup (
+					chatUser);
+
+			if (oldMessage != null) {
+
+				chatMessageLogic.chatMessageSendFromUserPartTwo (
+					taskLogger,
+					oldMessage);
+
+			}
+
+			// auto join chat and dating
+
+			chatMiscLogic.userAutoJoin (
+				taskLogger,
+				chatUser,
+				message,
+				false);
+
+			// run hooks
+
+			chatHooks.chatUserSignupComplete (
 				chatUser);
 
-		if (oldMessage != null) {
-
-			chatMessageLogic.chatMessageSendFromUserPartTwo (
-				taskLogger,
-				oldMessage);
+			return true;
 
 		}
-
-		// auto join chat and dating
-
-		chatMiscLogic.userAutoJoin (
-			taskLogger,
-			chatUser,
-			message,
-			false);
-
-		// run hooks
-
-		chatHooks.chatUserSignupComplete (
-			chatUser);
-
-		return true;
 
 	}
 

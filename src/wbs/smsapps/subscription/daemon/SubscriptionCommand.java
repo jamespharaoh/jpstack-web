@@ -21,8 +21,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -130,7 +130,7 @@ class SubscriptionCommand
 
 	// state
 
-	Transaction transaction;
+	BorrowedTransaction transaction;
 
 	MessageRec message;
 	NumberRec number;
@@ -169,51 +169,57 @@ class SubscriptionCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		findCommand ();
-
-		message =
-			inbox.getMessage ();
-
-		number =
-			message.getNumber ();
-
-		subscriptionNumber =
-			subscriptionNumberHelper.findOrCreate (
-				taskLogger,
-				subscription,
-				number);
-
-		if (
-			stringEqualSafe (
-				command.getCode (),
-				"subscribe")
 		) {
 
-			return doSubscribe (
-				taskLogger);
+			transaction =
+				database.currentTransaction ();
 
-		} else if (
-			stringEqualSafe (
-				command.getCode (),
-				"unsubscribe")
-		) {
+			findCommand ();
 
-			return doUnsubscribe ();
+			message =
+				inbox.getMessage ();
 
-		} else {
+			number =
+				message.getNumber ();
 
-			throw new RuntimeException (
-				stringFormat (
-					"Illegal command code: %s",
-					command.getCode ()));
+			subscriptionNumber =
+				subscriptionNumberHelper.findOrCreate (
+					taskLogger,
+					subscription,
+					number);
+
+			if (
+				stringEqualSafe (
+					command.getCode (),
+					"subscribe")
+			) {
+
+				return doSubscribe (
+					taskLogger);
+
+			} else if (
+				stringEqualSafe (
+					command.getCode (),
+					"unsubscribe")
+			) {
+
+				return doUnsubscribe ();
+
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Illegal command code: %s",
+						command.getCode ()));
+
+			}
 
 		}
 
@@ -221,7 +227,7 @@ class SubscriptionCommand
 
 	void matchKeyword () {
 
-		Optional<SubscriptionKeywordRec> subscriptionKeywordOptional =
+		Optional <SubscriptionKeywordRec> subscriptionKeywordOptional =
 			optionalFromJava (
 
 			keywordFinder.find (
@@ -269,215 +275,221 @@ class SubscriptionCommand
 	InboxAttemptRec doSubscribe (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doSubscribe");
+		try (
 
-		matchKeyword ();
-
-		// set affiliate
-
-		if (
-			subscriptionAffiliate != null
-			&& subscriptionNumber.getSubscriptionAffiliate () == null
-		) {
-
-			subscriptionNumber
-
-				.setSubscriptionAffiliate (
-					subscriptionAffiliate);
-
-			eventLogic.createEvent (
-				taskLogger,
-				"subscription_number_affiliate",
-				subscriptionNumber,
-				subscriptionAffiliate,
-				message);
-
-		}
-
-		// subscribe
-
-		SubscriptionSubRec activeSubscriptionSub =
-			subscriptionNumber.getActiveSubscriptionSub ();
-
-		if (
-
-			activeSubscriptionSub == null
-
-			|| referenceNotEqualWithClass (
-				SubscriptionListRec.class,
-				activeSubscriptionSub.getSubscriptionList (),
-				subscriptionList)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doSubscribe");
 
 		) {
 
-			if (activeSubscriptionSub != null) {
+			matchKeyword ();
 
-				// remove old sub
+			// set affiliate
 
-				activeSubscriptionSub
+			if (
+				subscriptionAffiliate != null
+				&& subscriptionNumber.getSubscriptionAffiliate () == null
+			) {
 
-					.setActive (
-						false)
+				subscriptionNumber
 
-					.setEndedThreadId (
+					.setSubscriptionAffiliate (
+						subscriptionAffiliate);
+
+				eventLogic.createEvent (
+					taskLogger,
+					"subscription_number_affiliate",
+					subscriptionNumber,
+					subscriptionAffiliate,
+					message);
+
+			}
+
+			// subscribe
+
+			SubscriptionSubRec activeSubscriptionSub =
+				subscriptionNumber.getActiveSubscriptionSub ();
+
+			if (
+
+				activeSubscriptionSub == null
+
+				|| referenceNotEqualWithClass (
+					SubscriptionListRec.class,
+					activeSubscriptionSub.getSubscriptionList (),
+					subscriptionList)
+
+			) {
+
+				if (activeSubscriptionSub != null) {
+
+					// remove old sub
+
+					activeSubscriptionSub
+
+						.setActive (
+							false)
+
+						.setEndedThreadId (
+							message.getThreadId ())
+
+						.setEnded (
+							transaction.now ());
+
+					// update stats
+
+					subscription
+
+						.setNumSubscribers (
+							subscription.getNumSubscribers () - 1);
+
+					SubscriptionAffiliateRec activeSubscriptionAffiliate =
+						activeSubscriptionSub.getSubscriptionAffiliate ();
+
+					activeSubscriptionAffiliate
+
+						.setNumSubscribers (
+							activeSubscriptionAffiliate.getNumSubscribers () - 1);
+
+					SubscriptionListRec activeSubscriptionList =
+						activeSubscriptionSub.getSubscriptionList ();
+
+					activeSubscriptionList
+
+						.setNumSubscribers (
+							activeSubscriptionList.getNumSubscribers () - 1);
+
+				}
+
+				// create new sub
+
+				SubscriptionSubRec newSubscriptionSub =
+					subscriptionSubHelper.insert (
+						taskLogger,
+						subscriptionSubHelper.createInstance ()
+
+					.setSubscriptionNumber (
+						subscriptionNumber)
+
+					.setIndex (
+						subscriptionNumber.getNumSubs ())
+
+					.setSubscriptionList (
+						subscriptionList)
+
+					.setSubscriptionAffiliate (
+						subscriptionAffiliate)
+
+					.setStartedThreadId (
 						message.getThreadId ())
 
-					.setEnded (
-						transaction.now ());
+					.setStarted (
+						transaction.now ())
+
+					.setActive (
+						true)
+
+				);
+
+				// update number
+
+				subscriptionNumber
+
+					.setActive (
+						true)
+
+					.setActiveSubscriptionSub (
+						newSubscriptionSub)
+
+					.setSubscriptionList (
+						subscriptionList)
+
+					.setFirstJoin (
+						ifNull (
+							subscriptionNumber.getFirstJoin (),
+							transaction.now ()))
+
+					.setLastJoin (
+						transaction.now ())
+
+					.setNumSubs (
+						subscriptionNumber.getNumSubs () + 1);
 
 				// update stats
 
 				subscription
 
 					.setNumSubscribers (
-						subscription.getNumSubscribers () - 1);
+						subscription.getNumSubscribers () + 1);
 
-				SubscriptionAffiliateRec activeSubscriptionAffiliate =
-					activeSubscriptionSub.getSubscriptionAffiliate ();
-
-				activeSubscriptionAffiliate
+				subscriptionList
 
 					.setNumSubscribers (
-						activeSubscriptionAffiliate.getNumSubscribers () - 1);
+						subscriptionList.getNumSubscribers () + 1);
 
-				SubscriptionListRec activeSubscriptionList =
-					activeSubscriptionSub.getSubscriptionList ();
-
-				activeSubscriptionList
+				subscriptionAffiliate
 
 					.setNumSubscribers (
-						activeSubscriptionList.getNumSubscribers () - 1);
+						subscriptionAffiliate.getNumSubscribers () + 1);
+
+				// create event
+
+				eventLogic.createEvent (
+					taskLogger,
+					"subscription_number_subscribe",
+					subscriptionNumber,
+					subscriptionList,
+					message);
 
 			}
 
-			// create new sub
+			// send response
 
-			SubscriptionSubRec newSubscriptionSub =
-				subscriptionSubHelper.insert (
-					taskLogger,
-					subscriptionSubHelper.createInstance ()
+			MessageRec response =
+				messageSenderProvider.get ()
 
-				.setSubscriptionNumber (
-					subscriptionNumber)
-
-				.setIndex (
-					subscriptionNumber.getNumSubs ())
-
-				.setSubscriptionList (
-					subscriptionList)
-
-				.setSubscriptionAffiliate (
-					subscriptionAffiliate)
-
-				.setStartedThreadId (
+				.threadId (
 					message.getThreadId ())
 
-				.setStarted (
-					transaction.now ())
+				.number (
+					message.getNumber ())
 
-				.setActive (
-					true)
+				.messageText (
+					subscription.getSubscribeMessageText ())
 
-			);
+				.numFrom (
+					subscription.getFreeNumber ())
 
-			// update number
+				.routerResolve (
+					subscription.getFreeRouter ())
 
-			subscriptionNumber
+				.service (
+					serviceHelper.findByCodeRequired (
+						subscriptionList,
+						"default"))
 
-				.setActive (
-					true)
+				.affiliate (
+					affiliateHelper.findByCodeRequired (
+						subscriptionAffiliate,
+						"default"))
 
-				.setActiveSubscriptionSub (
-					newSubscriptionSub)
+				.send (
+					taskLogger);
 
-				.setSubscriptionList (
-					subscriptionList)
+			// process message
 
-				.setFirstJoin (
-					ifNull (
-						subscriptionNumber.getFirstJoin (),
-						transaction.now ()))
-
-				.setLastJoin (
-					transaction.now ())
-
-				.setNumSubs (
-					subscriptionNumber.getNumSubs () + 1);
-
-			// update stats
-
-			subscription
-
-				.setNumSubscribers (
-					subscription.getNumSubscribers () + 1);
-
-			subscriptionList
-
-				.setNumSubscribers (
-					subscriptionList.getNumSubscribers () + 1);
-
-			subscriptionAffiliate
-
-				.setNumSubscribers (
-					subscriptionAffiliate.getNumSubscribers () + 1);
-
-			// create event
-
-			eventLogic.createEvent (
+			return smsInboxLogic.inboxProcessed (
 				taskLogger,
-				"subscription_number_subscribe",
-				subscriptionNumber,
-				subscriptionList,
-				message);
+				inbox,
+				optionalOf (
+					response.getService ()),
+				optionalOf (
+					response.getAffiliate ()),
+				command);
 
 		}
-
-		// send response
-
-		MessageRec response =
-			messageSenderProvider.get ()
-
-			.threadId (
-				message.getThreadId ())
-
-			.number (
-				message.getNumber ())
-
-			.messageText (
-				subscription.getSubscribeMessageText ())
-
-			.numFrom (
-				subscription.getFreeNumber ())
-
-			.routerResolve (
-				subscription.getFreeRouter ())
-
-			.service (
-				serviceHelper.findByCodeRequired (
-					subscriptionList,
-					"default"))
-
-			.affiliate (
-				affiliateHelper.findByCodeRequired (
-					subscriptionAffiliate,
-					"default"))
-
-			.send (
-				taskLogger);
-
-		// process message
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				response.getService ()),
-			optionalOf (
-				response.getAffiliate ()),
-			command);
 
 	}
 

@@ -127,59 +127,35 @@ class ConsoleContextType {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, ConsoleContextTab> allContextTabs) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"resolveTabSpecs");
+		try (
 
-		List<String> resolvedNames =
-			new LinkedList<String> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveTabSpecs");
 
-		resolvedNames.add ("+end");
+		) {
 
-		List<ContextTabPlacement> unresolvedPlacements =
-			new ArrayList<ContextTabPlacement> (
-				tabPlacements ());
+			List <String> resolvedNames =
+				new LinkedList<> ();
 
-		while (! unresolvedPlacements.isEmpty ()) {
+			resolvedNames.add ("+end");
 
-			boolean madeProgress = false;
+			List<ContextTabPlacement> unresolvedPlacements =
+				new ArrayList<ContextTabPlacement> (
+					tabPlacements ());
 
-			Iterator<ContextTabPlacement> tabPlacementIterator =
-				unresolvedPlacements.listIterator ();
+			while (! unresolvedPlacements.isEmpty ()) {
 
-			while (tabPlacementIterator.hasNext ()) {
+				boolean madeProgress = false;
 
-				ContextTabPlacement tabPlacement =
-					tabPlacementIterator.next ();
+				Iterator<ContextTabPlacement> tabPlacementIterator =
+					unresolvedPlacements.listIterator ();
 
-				String tabLocation =
-					tabPlacement.tabLocation ();
+				while (tabPlacementIterator.hasNext ()) {
 
-				String tabName =
-					tabPlacement.tabName ();
-
-				int position =
-					resolvedNames.indexOf (
-						"+" + tabLocation);
-
-				if (position < 0)
-					continue;
-
-				resolvedNames.add (
-					position,
-					tabName);
-
-				tabPlacementIterator.remove ();
-
-				madeProgress = true;
-
-			}
-
-			if (! madeProgress) {
-
-				for (ContextTabPlacement tabPlacement
-						: unresolvedPlacements) {
+					ContextTabPlacement tabPlacement =
+						tabPlacementIterator.next ();
 
 					String tabLocation =
 						tabPlacement.tabLocation ();
@@ -187,43 +163,73 @@ class ConsoleContextType {
 					String tabName =
 						tabPlacement.tabName ();
 
-					taskLogger.errorFormat (
-						"Location %s not found for tab %s in %s",
-						tabLocation,
-						tabName,
-						name);
+					int position =
+						resolvedNames.indexOf (
+							"+" + tabLocation);
+
+					if (position < 0)
+						continue;
+
+					resolvedNames.add (
+						position,
+						tabName);
+
+					tabPlacementIterator.remove ();
+
+					madeProgress = true;
 
 				}
 
-				throw new RuntimeException (
-					stringFormat (
-						"Unable to resolve %s tab locations",
-						integerToDecimalString (
-							unresolvedPlacements.size ())));
+				if (! madeProgress) {
+
+					for (ContextTabPlacement tabPlacement
+							: unresolvedPlacements) {
+
+						String tabLocation =
+							tabPlacement.tabLocation ();
+
+						String tabName =
+							tabPlacement.tabName ();
+
+						taskLogger.errorFormat (
+							"Location %s not found for tab %s in %s",
+							tabLocation,
+							tabName,
+							name);
+
+					}
+
+					throw new RuntimeException (
+						stringFormat (
+							"Unable to resolve %s tab locations",
+							integerToDecimalString (
+								unresolvedPlacements.size ())));
+
+				}
 
 			}
 
+			Map <String, ConsoleContextTab> myNewContextTabs =
+				new LinkedHashMap<> ();
+
+			for (
+				String tabSpec
+					: resolvedNames
+			) {
+
+				if (tabSpec.charAt (0) == '+')
+					continue;
+
+				myNewContextTabs.put (
+					tabSpec,
+					allContextTabs.get (tabSpec));
+
+			}
+
+			tabs =
+				myNewContextTabs;
+
 		}
-
-		Map <String, ConsoleContextTab> myNewContextTabs =
-			new LinkedHashMap<> ();
-
-		for (
-			String tabSpec
-				: resolvedNames
-		) {
-
-			if (tabSpec.charAt (0) == '+')
-				continue;
-
-			myNewContextTabs.put (
-				tabSpec,
-				allContextTabs.get (tabSpec));
-
-		}
-
-		tabs =
-			myNewContextTabs;
 
 	}
 

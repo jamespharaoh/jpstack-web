@@ -43,45 +43,51 @@ class ExceptionUtilsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable originalThrowable) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"throwableSummary");
+		try (
 
-		Throwable currentThrowable =
-			originalThrowable;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"throwableSummary");
 
-		try {
+		) {
 
-			StringBuilder stringBuilder =
-				new StringBuilder ();
+			Throwable currentThrowable =
+				originalThrowable;
 
-			for (;;) {
+			try {
 
-				stringBuilder.append (
-					currentThrowable.toString ());
+				StringBuilder stringBuilder =
+					new StringBuilder ();
 
-				currentThrowable =
-					currentThrowable.getCause ();
+				for (;;) {
 
-				if (
-					isNull (
-						currentThrowable)
-				) {
-					return stringBuilder.toString ();
+					stringBuilder.append (
+						currentThrowable.toString ());
+
+					currentThrowable =
+						currentThrowable.getCause ();
+
+					if (
+						isNull (
+							currentThrowable)
+					) {
+						return stringBuilder.toString ();
+					}
+
+					stringBuilder.append ("\n");
+
 				}
 
-				stringBuilder.append ("\n");
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Threw error in throwableSummary");
+
+				return "(error)";
 
 			}
-
-		} catch (Exception exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Threw error in throwableSummary");
-
-			return "(error)";
 
 		}
 
@@ -93,127 +99,148 @@ class ExceptionUtilsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"throwableDump");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"throwableDump");
 
-			StringWriter stringWriter =
-				new StringWriter ();
+		) {
 
-			PrintWriter printWriter =
-				new PrintWriter (stringWriter);
+			try {
 
-			writeThrowable (
-				throwable,
-				printWriter);
+				StringWriter stringWriter =
+					new StringWriter ();
 
-			printWriter.flush ();
+				PrintWriter printWriter =
+					new PrintWriter (stringWriter);
 
-			return stringWriter.toString ();
+				writeThrowable (
+					taskLogger,
+					throwable,
+					printWriter);
 
-		} catch (Exception exception) {
+				printWriter.flush ();
 
-			taskLogger.errorFormatException (
-				exception,
-				"Threw error in throwableDump");
+				return stringWriter.toString ();
 
-			return "(error)";
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Threw error in throwableDump");
+
+				return "(error)";
+
+			}
 
 		}
 
 	}
 
-	public static
+	@Override
+	public
 	void writeThrowable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable,
 			@NonNull PrintWriter printWriter) {
 
-		throwable.printStackTrace (
-			printWriter);
+		try (
 
-		if (throwable instanceof DetailedException) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeThrowable");
 
-			DetailedException detailedException =
-				genericCastUnchecked (
-					throwable);
+		) {
 
-			detailedException.details ().entrySet ().forEach (
-				detailsEntry -> {
+			throwable.printStackTrace (
+				printWriter);
 
-				printWriter.print (
-					stringFormat (
-						"\n%s:\n\n",
-						detailsEntry.getKey ()));
+			if (throwable instanceof DetailedException) {
 
-				detailsEntry.getValue ().forEach (
-					detailLine ->
-						printWriter.print (
-							stringFormat (
-								"%s\n",
-								detailLine)));
+				DetailedException detailedException =
+					genericCastUnchecked (
+						throwable);
 
-			});
-
-		}
-
-		if (throwable instanceof JDBCException) {
-
-			JDBCException jdbcException =
-				(JDBCException) throwable;
-
-			printWriter.print (
-				"\nSQL:\n\n");
-
-			printWriter.print (
-				jdbcException.getSQL ());
-
-			printWriter.print (
-				"\n");
-
-			if (throwable instanceof ConstraintViolationException) {
-
-				ConstraintViolationException constraintViolationException =
-					(ConstraintViolationException)
-					jdbcException;
-
-				if (
-					isNotNull (
-						constraintViolationException.getConstraintName ())
-				) {
+				detailedException.details ().entrySet ().forEach (
+					detailsEntry -> {
 
 					printWriter.print (
-						"\nCONSTRAINT:\n\n");
+						stringFormat (
+							"\n%s:\n\n",
+							detailsEntry.getKey ()));
 
-					printWriter.print (
-						constraintViolationException.getConstraintName ());
+					detailsEntry.getValue ().forEach (
+						detailLine ->
+							printWriter.print (
+								stringFormat (
+									"%s\n",
+									detailLine)));
 
-					printWriter.print (
-						"\n");
-
-				}
+				});
 
 			}
 
-			writeSqlException (
-				jdbcException.getSQLException (),
-				printWriter);
+			if (throwable instanceof JDBCException) {
 
-		}
+				JDBCException jdbcException =
+					(JDBCException) throwable;
 
-		Throwable cause =
-			throwable.getCause ();
+				printWriter.print (
+					"\nSQL:\n\n");
 
-		if (cause != null) {
+				printWriter.print (
+					jdbcException.getSQL ());
 
-			printWriter.print (
-				"\nCAUSE:\n\n");
+				printWriter.print (
+					"\n");
 
-			writeThrowable (
-				cause,
-				printWriter);
+				if (throwable instanceof ConstraintViolationException) {
+
+					ConstraintViolationException constraintViolationException =
+						(ConstraintViolationException)
+						jdbcException;
+
+					if (
+						isNotNull (
+							constraintViolationException.getConstraintName ())
+					) {
+
+						printWriter.print (
+							"\nCONSTRAINT:\n\n");
+
+						printWriter.print (
+							constraintViolationException.getConstraintName ());
+
+						printWriter.print (
+							"\n");
+
+					}
+
+				}
+
+				writeSqlException (
+					jdbcException.getSQLException (),
+					printWriter);
+
+			}
+
+			Throwable cause =
+				throwable.getCause ();
+
+			if (cause != null) {
+
+				printWriter.print (
+					"\nCAUSE:\n\n");
+
+				writeThrowable (
+					taskLogger,
+					cause,
+					printWriter);
+
+			}
 
 		}
 
@@ -269,70 +296,76 @@ class ExceptionUtilsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"throwableDumpJson");
+		try (
 
-		ImmutableMap.Builder<String,Object> dumpBuilder =
-			ImmutableMap.<String,Object>builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"throwableDumpJson");
 
-		// class
-
-		dumpBuilder.put (
-			"class",
-			throwable.getClass ().getName ());
-
-		// message
-
-		if (
-			isNotNull (
-				throwable.getMessage ())
 		) {
 
-			dumpBuilder.put (
-				"message",
-				emptyStringIfNull (
-					throwable.getMessage ()));
+			ImmutableMap.Builder<String,Object> dumpBuilder =
+				ImmutableMap.<String,Object>builder ();
 
-		}
-
-		// stack trace
-
-		dumpBuilder.put (
-			"stacktrace",
-			Arrays.asList (
-				throwable.getStackTrace ())
-
-				.stream ()
-
-				.map (
-					Object::toString)
-
-				.collect (
-					Collectors.toList ())
-
-		);
-
-		// cause
-
-		if (
-			isNotNull (
-				throwable.getCause ())
-		) {
+			// class
 
 			dumpBuilder.put (
-				"cause",
-				throwableDumpJson (
-					taskLogger,
-					throwable.getCause ()));
+				"class",
+				throwable.getClass ().getName ());
+
+			// message
+
+			if (
+				isNotNull (
+					throwable.getMessage ())
+			) {
+
+				dumpBuilder.put (
+					"message",
+					emptyStringIfNull (
+						throwable.getMessage ()));
+
+			}
+
+			// stack trace
+
+			dumpBuilder.put (
+				"stacktrace",
+				Arrays.asList (
+					throwable.getStackTrace ())
+
+					.stream ()
+
+					.map (
+						Object::toString)
+
+					.collect (
+						Collectors.toList ())
+
+			);
+
+			// cause
+
+			if (
+				isNotNull (
+					throwable.getCause ())
+			) {
+
+				dumpBuilder.put (
+					"cause",
+					throwableDumpJson (
+						taskLogger,
+						throwable.getCause ()));
+
+			}
+
+			// return
+
+			return new JSONObject (
+				dumpBuilder.build ());
 
 		}
-
-		// return
-
-		return new JSONObject (
-			dumpBuilder.build ());
 
 	}
 

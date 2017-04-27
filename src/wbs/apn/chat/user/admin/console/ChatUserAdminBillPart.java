@@ -28,8 +28,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -91,58 +91,69 @@ class ChatUserAdminBillPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		try (
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		if (
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.monitor)
 		) {
-			return;
+
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
+
+			chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			if (
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.monitor)
+			) {
+				return;
+			}
+
+			DateTimeZone timezone =
+				chatUserLogic.getTimezone (
+					chatUser);
+
+			LocalDate today =
+				transaction
+					.now ()
+					.toDateTime (timezone)
+					.toLocalDate ();
+
+			Instant startTime =
+				today
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
+
+			Instant endTime =
+				today
+					.plusDays (1)
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
+
+			todayBillLogs =
+				chatUserBillLogHelper.findByTimestamp (
+					chatUser,
+					new Interval (
+						startTime,
+						endTime));
+
+			allBillLogs =
+				chatUserBillLogHelper.findByTimestamp (
+					chatUser,
+					new Interval (
+						millisToInstant (0),
+						endTime));
+
+			billLimitReached =
+				chatCreditLogic.userBillLimitApplies (
+					chatUser);
+
 		}
-
-		DateTimeZone timezone =
-			chatUserLogic.getTimezone (
-				chatUser);
-
-		LocalDate today =
-			transaction
-				.now ()
-				.toDateTime (timezone)
-				.toLocalDate ();
-
-		Instant startTime =
-			today
-				.toDateTimeAtStartOfDay (timezone)
-				.toInstant ();
-
-		Instant endTime =
-			today
-				.plusDays (1)
-				.toDateTimeAtStartOfDay (timezone)
-				.toInstant ();
-
-		todayBillLogs =
-			chatUserBillLogHelper.findByTimestamp (
-				chatUser,
-				new Interval (
-					startTime,
-					endTime));
-
-		allBillLogs =
-			chatUserBillLogHelper.findByTimestamp (
-				chatUser,
-				new Interval (
-					millisToInstant (0),
-					endTime));
-
-		billLimitReached =
-			chatCreditLogic.userBillLimitApplies (
-				chatUser);
 
 	}
 
@@ -151,110 +162,116 @@ class ChatUserAdminBillPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		if (
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.monitor)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
 		) {
 
-			formatWriter.writeLineFormat (
-				"<p>This is a monitor and cannot be billed.</p>");
+			if (
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.monitor)
+			) {
 
-			return;
+				formatWriter.writeLineFormat (
+					"<p>This is a monitor and cannot be billed.</p>");
+
+				return;
+
+			}
+
+			boolean dailyAdminRebillLimitReached =
+				todayBillLogs.size () >= 3;
+
+			boolean canBypassDailyAdminRebillLimit =
+				requestContext.canContext (
+					"chat.manage");
+
+			if (billLimitReached) {
+
+				formatWriter.writeFormat (
+					"<p>Daily billed message limit reached.</p>");
+
+			}
+
+			if (dailyAdminRebillLimitReached) {
+
+				formatWriter.writeLineFormat (
+					"<p>Daily admin rebill limit reached<br>");
+
+				formatWriter.writeLineFormat (
+					"%h admin rebills have been actioned today</p>",
+					integerToDecimalString (
+						todayBillLogs.size ()));
+
+			}
+
+			if (
+				! billLimitReached
+				&& (
+					! dailyAdminRebillLimitReached
+					|| canBypassDailyAdminRebillLimit
+				)
+			) {
+
+				htmlFormOpenPostAction (
+					requestContext.resolveLocalUrl (
+						"/chatUser.admin.bill"));
+
+				formatWriter.writeFormat (
+					"<p><input",
+					" type=\"submit\"",
+					" value=\"reset billing\"",
+					"></p>");
+
+				htmlFormClose ();
+
+			}
+
+			htmlHeadingTwoWrite (
+				"History");
+
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Date",
+				"Time",
+				"User");
+
+			for (
+				ChatUserBillLogRec billLog
+					: allBillLogs
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					timeFormatter.dateStringShort (
+						chatUserLogic.getTimezone (
+							chatUser),
+						billLog.getTimestamp ()));
+
+				htmlTableCellWrite (
+					timeFormatter.timeString (
+						chatUserLogic.getTimezone (
+							chatUser),
+						billLog.getTimestamp ()));
+
+				consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					billLog.getUser ());
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		boolean dailyAdminRebillLimitReached =
-			todayBillLogs.size () >= 3;
-
-		boolean canBypassDailyAdminRebillLimit =
-			requestContext.canContext (
-				"chat.manage");
-
-		if (billLimitReached) {
-
-			formatWriter.writeFormat (
-				"<p>Daily billed message limit reached.</p>");
-
-		}
-
-		if (dailyAdminRebillLimitReached) {
-
-			formatWriter.writeLineFormat (
-				"<p>Daily admin rebill limit reached<br>");
-
-			formatWriter.writeLineFormat (
-				"%h admin rebills have been actioned today</p>",
-				integerToDecimalString (
-					todayBillLogs.size ()));
-
-		}
-
-		if (
-			! billLimitReached
-			&& (
-				! dailyAdminRebillLimitReached
-				|| canBypassDailyAdminRebillLimit
-			)
-		) {
-
-			htmlFormOpenPostAction (
-				requestContext.resolveLocalUrl (
-					"/chatUser.admin.bill"));
-
-			formatWriter.writeFormat (
-				"<p><input",
-				" type=\"submit\"",
-				" value=\"reset billing\"",
-				"></p>");
-
-			htmlFormClose ();
-
-		}
-
-		htmlHeadingTwoWrite (
-			"History");
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Date",
-			"Time",
-			"User");
-
-		for (
-			ChatUserBillLogRec billLog
-				: allBillLogs
-		) {
-
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				timeFormatter.dateStringShort (
-					chatUserLogic.getTimezone (
-						chatUser),
-					billLog.getTimestamp ()));
-
-			htmlTableCellWrite (
-				timeFormatter.timeString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					billLog.getTimestamp ()));
-
-			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				billLog.getUser ());
-
-			htmlTableRowClose ();
-
-		}
-
-		htmlTableClose ();
 
 	}
 

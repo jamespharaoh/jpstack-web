@@ -80,42 +80,49 @@ class MonthlyHistoGraphImageResponder
 	void prepareData (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareData");
+		try (
 
-		timezone =
-			timezone ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareData");
 
-		yearMonth =
-			YearMonth.parse (
-				requestContext.parameterRequired (
-					"month"));
+		) {
 
-		minTime =
-			yearMonth
-				.toLocalDate (1)
-				.toDateTimeAtStartOfDay (timezone)
-				.toInstant ();
+			timezone =
+				timezone ();
 
-		maxTime =
-			yearMonth
-				.plusMonths (1)
-				.toLocalDate (1)
-				.toDateTimeAtStartOfDay (timezone)
-				.toInstant ();
+			yearMonth =
+				YearMonth.parse (
+					requestContext.parameterRequired (
+						"month"));
 
-		prepareData (
-			taskLogger,
-			minTime,
-			maxTime);
+			minTime =
+				yearMonth
+					.toLocalDate (1)
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
+
+			maxTime =
+				yearMonth
+					.plusMonths (1)
+					.toLocalDate (1)
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
+
+			prepareData (
+				taskLogger,
+				minTime,
+				maxTime);
+
+		}
 
 	}
 
 	@Override
 	protected
-	void prepareVerticalScale () {
+	void prepareVerticalScale (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		int maxValue = 0;
 

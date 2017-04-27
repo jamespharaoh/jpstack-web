@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -36,40 +36,46 @@ class AutoResponderFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"auto_responder")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Auto responder")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"auto_responder")
 
-			.setLabel (
-				"Auto responder")
+				.setName (
+					"Auto responder")
 
-			.setTargetPath (
-				"/autoResponders")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main"));
+				.setLabel (
+					"Auto responder")
+
+				.setTargetPath (
+					"/autoResponders")
+
+				.setTargetFrame (
+					"main"));
+
+		}
 
 	}
 

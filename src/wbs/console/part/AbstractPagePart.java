@@ -18,8 +18,8 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -54,7 +54,7 @@ class AbstractPagePart
 	FormatWriter formatWriter;
 
 	protected
-	Transaction transaction;
+	BorrowedTransaction transaction;
 
 	private
 	boolean withMarkup = false;

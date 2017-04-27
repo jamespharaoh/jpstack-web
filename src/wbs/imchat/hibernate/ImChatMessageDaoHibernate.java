@@ -109,61 +109,67 @@ class ImChatMessageDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReportCriteria");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReportCriteria");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.property (
-					"_imChatMessage.senderUser"),
-				"user")
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.sqlProjection (
-					stringFormat (
-						"sum (CASE WHEN {alias}.price IS NULL THEN 1 ELSE 0 ",
-						"END) AS num_free_messages"),
-					new String [] {
-						"num_free_messages",
-					},
-					new Type [] {
-						LongType.INSTANCE,
-					}),
-				"numFreeMessages")
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.sqlProjection (
-					stringFormat (
-						"sum (CASE WHEN {alias}.price IS NOT NULL THEN 1 ELSE ",
-						"0 END) AS num_billed_messages"),
-					new String [] {
-						"num_billed_messages",
-					},
-					new Type [] {
-						LongType.INSTANCE,
-					}),
-				"numBilledMessages")
+				.add (
+					Projections.property (
+						"_imChatMessage.senderUser"),
+					"user")
 
-			.add (
-				Projections.groupProperty (
-					"_imChatMessage.senderUser"))
+				.add (
+					Projections.sqlProjection (
+						stringFormat (
+							"sum (CASE WHEN {alias}.price IS NULL THEN 1 ELSE 0 ",
+							"END) AS num_free_messages"),
+						new String [] {
+							"num_free_messages",
+						},
+						new Type [] {
+							LongType.INSTANCE,
+						}),
+					"numFreeMessages")
 
-		);
+				.add (
+					Projections.sqlProjection (
+						stringFormat (
+							"sum (CASE WHEN {alias}.price IS NOT NULL THEN 1 ELSE ",
+							"0 END) AS num_billed_messages"),
+						new String [] {
+							"num_billed_messages",
+						},
+						new Type [] {
+							LongType.INSTANCE,
+						}),
+					"numBilledMessages")
 
-		criteria.setResultTransformer (
-			Transformers.aliasToBean (
-				ImChatOperatorReport.class));
+				.add (
+					Projections.groupProperty (
+						"_imChatMessage.senderUser"))
 
-		return criteria;
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ImChatOperatorReport.class));
+
+			return criteria;
+
+		}
 
 	}
 
@@ -173,48 +179,54 @@ class ImChatMessageDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReportIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReportIds");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.distinct (
-					Projections.property (
-						"_senderUser.id")))
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.groupProperty (
-					"_senderUser.id"))
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.groupProperty (
-					"_senderUserSlice.code"))
+				.add (
+					Projections.distinct (
+						Projections.property (
+							"_senderUser.id")))
 
-			.add (
-				Projections.groupProperty (
-					"_senderUser.username"))
+				.add (
+					Projections.groupProperty (
+						"_senderUser.id"))
 
-		);
+				.add (
+					Projections.groupProperty (
+						"_senderUserSlice.code"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_senderUserSlice.code"));
+				.add (
+					Projections.groupProperty (
+						"_senderUser.username"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_senderUser.username"));
+			);
 
-		return findIdsOnly (
-			criteria.list ());
+			criteria.addOrder (
+				Order.asc (
+					"_senderUserSlice.code"));
+
+			criteria.addOrder (
+				Order.asc (
+					"_senderUser.username"));
+
+			return findIdsOnly (
+				criteria.list ());
+
+		}
 
 	}
 
@@ -225,26 +237,32 @@ class ImChatMessageDaoHibernate
 			@NonNull ImChatMessageSearch search,
 			@NonNull List <Long> ids) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOperatorReports");
+		try (
 
-		Criteria criteria =
-			searchOperatorReportCriteria (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOperatorReports");
+
+		) {
+
+			Criteria criteria =
+				searchOperatorReportCriteria (
+					taskLogger,
+					search);
+
+			criteria.add (
+				Restrictions.in (
+					"_senderUser.id",
+					ids));
+
+			return findOrdered (
 				taskLogger,
-				search);
+				ImChatOperatorReport.class,
+				ids,
+				criteria.list ());
 
-		criteria.add (
-			Restrictions.in (
-				"_senderUser.id",
-				ids));
-
-		return findOrdered (
-			taskLogger,
-			ImChatOperatorReport.class,
-			ids,
-			criteria.list ());
+		}
 
 	}
 

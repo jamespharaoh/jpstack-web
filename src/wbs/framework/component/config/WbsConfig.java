@@ -116,31 +116,37 @@ class WbsConfig {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"readFilename");
+		try (
 
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readFilename");
 
-			.registerBuilderClasses (
-				ImmutableList.of (
-					WbsConfig.class,
-					WbsConfigConsoleServer.class,
-					WbsConfigDatabase.class,
-					WbsConfigEmail.class,
-					WbsConfigProcessApi.class))
+		) {
 
-			.build ();
+			DataFromXml dataFromXml =
+				new DataFromXmlBuilder ()
 
-		WbsConfig wbsConfig =
-			(WbsConfig)
-			dataFromXml.readFilename (
-				taskLogger,
-				filename);
+				.registerBuilderClasses (
+					ImmutableList.of (
+						WbsConfig.class,
+						WbsConfigConsoleServer.class,
+						WbsConfigDatabase.class,
+						WbsConfigEmail.class,
+						WbsConfigProcessApi.class))
 
-		return wbsConfig;
+				.build ();
+
+			WbsConfig wbsConfig =
+				(WbsConfig)
+				dataFromXml.readFilename (
+					taskLogger,
+					filename);
+
+			return wbsConfig;
+
+		}
 
 	}
 

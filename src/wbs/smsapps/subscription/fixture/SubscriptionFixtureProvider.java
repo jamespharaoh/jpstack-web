@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -96,224 +96,116 @@ class SubscriptionFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"subscription")
-
-			.setName (
-				"Subscription")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Subscription")
-
-			.setTargetPath (
-				"/subscriptions")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
-		SubscriptionRec subscription =
-			subscriptionHelper.insert (
+			menuItemHelper.insert (
 				taskLogger,
-				subscriptionHelper.createInstance ()
+				menuItemHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setCode (
-				"test")
+				.setCode (
+					"subscription")
 
-			.setName (
-				"Test")
+				.setName (
+					"Subscription")
 
-			.setDescription (
-				"Test subscription")
+				.setDescription (
+					"")
 
-			.setBilledRoute (
-				routeHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"bill"))
+				.setLabel (
+					"Subscription")
 
-			.setBilledNumber (
-				"bill")
+				.setTargetPath (
+					"/subscriptions")
 
-			.setBilledMessage (
-				textHelper.findOrCreate (
+				.setTargetFrame (
+					"main")
+
+			);
+
+			SubscriptionRec subscription =
+				subscriptionHelper.insert (
 					taskLogger,
-					"Billed message"))
+					subscriptionHelper.createInstance ()
 
-			.setFreeRouter (
-				routerHelper.findByCodeRequired (
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					"test")
+
+				.setName (
+					"Test")
+
+				.setDescription (
+					"Test subscription")
+
+				.setBilledRoute (
 					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
-						"free"),
-					"static"))
+						"bill"))
 
-			.setFreeNumber (
-				"free")
+				.setBilledNumber (
+					"bill")
 
-			.setCreditsPerBill (
-				2l)
+				.setBilledMessage (
+					textHelper.findOrCreate (
+						taskLogger,
+						"Billed message"))
 
-			.setDebitsPerSend (
-				1l)
+				.setFreeRouter (
+					routerHelper.findByCodeRequired (
+						routeHelper.findByCodeRequired (
+							GlobalId.root,
+							"test",
+							"free"),
+						"static"))
 
-			.setSubscribeMessageText (
-				textHelper.findOrCreate (
-					taskLogger,
-					"Subsription confirmed"))
+				.setFreeNumber (
+					"free")
 
-			.setUnsubscribeMessageText (
-				textHelper.findOrCreate (
-					taskLogger,
-					"Subscription cancelled"))
+				.setCreditsPerBill (
+					2l)
 
-		);
+				.setDebitsPerSend (
+					1l)
 
-		database.flush ();
+				.setSubscribeMessageText (
+					textHelper.findOrCreate (
+						taskLogger,
+						"Subsription confirmed"))
 
-		KeywordSetRec inboundKeywordSet =
-			keywordSetHelper.findByCodeRequired (
-				GlobalId.root,
-				"test",
-				"inbound");
-
-		keywordHelper.insert (
-			taskLogger,
-			keywordHelper.createInstance ()
-
-			.setKeywordSet (
-				inboundKeywordSet)
-
-			.setKeyword (
-				"sub")
-
-			.setDescription (
-				"Subscription subscribe")
-
-			.setCommand (
-				commandHelper.findByCodeRequired (
-					subscription,
-					"subscribe"))
-
-		);
-
-		keywordHelper.insert (
-			taskLogger,
-			keywordHelper.createInstance ()
-
-			.setKeywordSet (
-				inboundKeywordSet)
-
-			.setKeyword (
-				"unsub")
-
-			.setDescription (
-				"Subscription unsubscribe")
-
-			.setCommand (
-				commandHelper.findByCodeRequired (
-					subscription,
-					"unsubscribe"))
-
-		);
-
-		for (
-			Map.Entry<String,String> listSpecEntry
-				: listSpecs.entrySet ()
-		) {
-
-			SubscriptionListRec list =
-				subscriptionListHelper.insert (
-					taskLogger,
-					subscriptionListHelper.createInstance ()
-
-				.setSubscription (
-					subscription)
-
-				.setCode (
-					simplifyToCodeRequired (
-						listSpecEntry.getValue ()))
-
-				.setName (
-					listSpecEntry.getValue ())
-
-				.setDescription (
-					listSpecEntry.getValue ())
-
-			);
-
-			subscriptionKeywordHelper.insert (
-				taskLogger,
-				subscriptionKeywordHelper.createInstance ()
-
-				.setSubscription (
-					subscription)
-
-				.setKeyword (
-					listSpecEntry.getKey ())
-
-				.setDescription (
-					listSpecEntry.getValue ())
-
-				.setSubscriptionList (
-					list)
-
-			);
-
-		}
-
-		for (
-			Map.Entry<String,String> affiliateSpecEntry
-				: affiliateSpecs.entrySet ()
-		) {
-
-			SubscriptionAffiliateRec affiliate =
-				subscriptionAffiliateHelper.insert (
-					taskLogger,
-					subscriptionAffiliateHelper.createInstance ()
-
-				.setSubscription (
-					subscription)
-
-				.setCode (
-					simplifyToCodeRequired (
-						affiliateSpecEntry.getValue ()))
-
-				.setName (
-					affiliateSpecEntry.getValue ())
-
-				.setDescription (
-					affiliateSpecEntry.getValue ())
+				.setUnsubscribeMessageText (
+					textHelper.findOrCreate (
+						taskLogger,
+						"Subscription cancelled"))
 
 			);
 
 			database.flush ();
+
+			KeywordSetRec inboundKeywordSet =
+				keywordSetHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"inbound");
 
 			keywordHelper.insert (
 				taskLogger,
@@ -323,17 +215,131 @@ class SubscriptionFixtureProvider
 					inboundKeywordSet)
 
 				.setKeyword (
-					affiliateSpecEntry.getKey ())
+					"sub")
 
 				.setDescription (
-					affiliateSpecEntry.getValue ())
+					"Subscription subscribe")
 
 				.setCommand (
 					commandHelper.findByCodeRequired (
-						affiliate,
+						subscription,
 						"subscribe"))
 
 			);
+
+			keywordHelper.insert (
+				taskLogger,
+				keywordHelper.createInstance ()
+
+				.setKeywordSet (
+					inboundKeywordSet)
+
+				.setKeyword (
+					"unsub")
+
+				.setDescription (
+					"Subscription unsubscribe")
+
+				.setCommand (
+					commandHelper.findByCodeRequired (
+						subscription,
+						"unsubscribe"))
+
+			);
+
+			for (
+				Map.Entry<String,String> listSpecEntry
+					: listSpecs.entrySet ()
+			) {
+
+				SubscriptionListRec list =
+					subscriptionListHelper.insert (
+						taskLogger,
+						subscriptionListHelper.createInstance ()
+
+					.setSubscription (
+						subscription)
+
+					.setCode (
+						simplifyToCodeRequired (
+							listSpecEntry.getValue ()))
+
+					.setName (
+						listSpecEntry.getValue ())
+
+					.setDescription (
+						listSpecEntry.getValue ())
+
+				);
+
+				subscriptionKeywordHelper.insert (
+					taskLogger,
+					subscriptionKeywordHelper.createInstance ()
+
+					.setSubscription (
+						subscription)
+
+					.setKeyword (
+						listSpecEntry.getKey ())
+
+					.setDescription (
+						listSpecEntry.getValue ())
+
+					.setSubscriptionList (
+						list)
+
+				);
+
+			}
+
+			for (
+				Map.Entry<String,String> affiliateSpecEntry
+					: affiliateSpecs.entrySet ()
+			) {
+
+				SubscriptionAffiliateRec affiliate =
+					subscriptionAffiliateHelper.insert (
+						taskLogger,
+						subscriptionAffiliateHelper.createInstance ()
+
+					.setSubscription (
+						subscription)
+
+					.setCode (
+						simplifyToCodeRequired (
+							affiliateSpecEntry.getValue ()))
+
+					.setName (
+						affiliateSpecEntry.getValue ())
+
+					.setDescription (
+						affiliateSpecEntry.getValue ())
+
+				);
+
+				database.flush ();
+
+				keywordHelper.insert (
+					taskLogger,
+					keywordHelper.createInstance ()
+
+					.setKeywordSet (
+						inboundKeywordSet)
+
+					.setKeyword (
+						affiliateSpecEntry.getKey ())
+
+					.setDescription (
+						affiliateSpecEntry.getValue ())
+
+					.setCommand (
+						commandHelper.findByCodeRequired (
+							affiliate,
+							"subscribe"))
+
+				);
+
+			}
 
 		}
 

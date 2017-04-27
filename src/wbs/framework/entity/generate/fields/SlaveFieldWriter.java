@@ -58,46 +58,52 @@ class SlaveFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		) {
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
 
-		// write field
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
 
-		new JavaPropertyWriter ()
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeName (
-				fullFieldTypeName)
+			new JavaPropertyWriter ()
 
-			.propertyName (
-				ifNull (
-					spec.name (),
-					spec.typeName ()))
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.typeName (
+					fullFieldTypeName)
+
+				.propertyName (
+					ifNull (
+						spec.name (),
+						spec.typeName ()))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

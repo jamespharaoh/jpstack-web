@@ -45,7 +45,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -158,24 +158,30 @@ class PrivDataLoaderImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long userId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getUserPrivData");
+		try (
 
-		UserPrivData userPrivData =
-			userPrivDataProvider.get ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getUserPrivData");
 
-		userPrivData.sharedData =
-			getPrivData (
-				taskLogger);
+		) {
 
-		userPrivData.userData =
-			getUserData (
-				taskLogger,
-				userId);
+			UserPrivData userPrivData =
+				userPrivDataProvider.get ();
 
-		return userPrivData;
+			userPrivData.sharedData =
+				getPrivData (
+					taskLogger);
+
+			userPrivData.userData =
+				getUserData (
+					taskLogger,
+					userId);
+
+			return userPrivData;
+
+		}
 
 	}
 
@@ -184,16 +190,22 @@ class PrivDataLoaderImplementation
 	void refresh (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"refresh");
+		try (
 
-		taskLogger.noticeFormat (
-			"Refreshing");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"refresh");
 
-		privDataCache.forceUpdate ();
-		userDataCachesByUserId.clear ();
+		) {
+
+			taskLogger.noticeFormat (
+				"Refreshing");
+
+			privDataCache.forceUpdate ();
+			userDataCachesByUserId.clear ();
+
+		}
 
 	}
 
@@ -248,7 +260,7 @@ class PrivDataLoaderImplementation
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnlyJoin (
 						taskLogger,
 						"PrivDataLoaderImplementation.PrivDataReloader.get ()",
@@ -566,76 +578,82 @@ class PrivDataLoaderImplementation
 				@NonNull Record <?> object,
 				@NonNull String code) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getChainedPrivId");
+			try (
 
-			Optional <Record <?>> currentObjectOptional =
-				optionalOf (
-					object);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"getChainedPrivId");
 
-			while (
-				optionalIsPresent (
-					currentObjectOptional)
 			) {
 
-				Record <?> currentObject =
-					optionalGetRequired (
-						currentObjectOptional);
+				Optional <Record <?>> currentObjectOptional =
+					optionalOf (
+						object);
 
-				GlobalId currentObjectId =
-					objectManager.getGlobalId (
-						currentObject);
+				while (
+					optionalIsPresent (
+						currentObjectOptional)
+				) {
 
-				ObjectData currentObjectData =
-					newData.objectDatasByObjectId.get (
-						currentObjectId);
+					Record <?> currentObject =
+						optionalGetRequired (
+							currentObjectOptional);
 
-				if (currentObjectData != null) {
+					GlobalId currentObjectId =
+						objectManager.getGlobalId (
+							currentObject);
 
-					Long chainedPrivId =
-						currentObjectData.privIdsByCode.get (
-							code);
+					ObjectData currentObjectData =
+						newData.objectDatasByObjectId.get (
+							currentObjectId);
 
-					if (chainedPrivId != null) {
+					if (currentObjectData != null) {
 
-						return optionalOf (
-							chainedPrivId);
+						Long chainedPrivId =
+							currentObjectData.privIdsByCode.get (
+								code);
+
+						if (chainedPrivId != null) {
+
+							return optionalOf (
+								chainedPrivId);
+
+						}
 
 					}
 
+					Either <Optional <Record <?>>, String> nextObjectOrError =
+						objectManager.getParentOrError (
+							currentObject);
+
+					if (
+						isError (
+							nextObjectOrError)
+					) {
+
+						taskLogger.warningFormat (
+							"Error getting parent for object %s of type %s: %s",
+							integerToDecimalString (
+								currentObjectId.typeId ()),
+							integerToDecimalString (
+								currentObjectId.objectId ()),
+							getError (
+								nextObjectOrError));
+
+						continue;
+
+					}
+
+					currentObjectOptional =
+						resultValueRequired (
+							nextObjectOrError);
+
 				}
 
-				Either <Optional <Record <?>>, String> nextObjectOrError =
-					objectManager.getParentOrError (
-						currentObject);
-
-				if (
-					isError (
-						nextObjectOrError)
-				) {
-
-					taskLogger.warningFormat (
-						"Error getting parent for object %s of type %s: %s",
-						integerToDecimalString (
-							currentObjectId.typeId ()),
-						integerToDecimalString (
-							currentObjectId.objectId ()),
-						getError (
-							nextObjectOrError));
-
-					continue;
-
-				}
-
-				currentObjectOptional =
-					resultValueRequired (
-						nextObjectOrError);
+				return optionalAbsent ();
 
 			}
-
-			return optionalAbsent ();
 
 		}
 
@@ -676,7 +694,7 @@ class PrivDataLoaderImplementation
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						"PrivDataLoaderImplementation.UserDataReloader.get ()",

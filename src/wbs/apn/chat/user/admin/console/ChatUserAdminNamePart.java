@@ -80,100 +80,106 @@ class ChatUserAdminNamePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.name"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenDetails ();
-
-		htmlTableDetailsRowWriteHtml (
-			"Name",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"name\"",
-				" value=\"%h\"",
-				requestContext.formOrElse (
-					"name",
-					() -> ifNullThenEmDash (
-						chatUser.getName ())),
-				">"));
-
-		htmlTableDetailsRowWriteHtml (
-			"Reason",
-			() -> chatConsoleLogic.writeSelectForChatUserEditReason (
-				"editReason",
-				requestContext.formOrEmptyString (
-					"editReason")));
-
-		htmlTableDetailsRowWriteHtml (
-			"Action",
-			stringFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"update name\"",
-				">"));
-
-		htmlTableClose ();
-
-		htmlFormClose ();
-
-		htmlHeadingTwoWrite (
-			"History");
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Timestamp",
-			"Original",
-			"Edited",
-			"Status",
-			"Reason",
-			"Moderator");
-
-		for (
-			ChatUserNameRec chatUserName
-				: chatUser.getChatUserNames ()
 		) {
 
-			htmlTableRowOpen ();
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.name"));
 
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					chatUserName.getCreationTime ()));
+			htmlTableOpenDetails ();
 
-			htmlTableCellWrite (
-				emptyStringIfNull (
-					chatUserName.getOriginalName ()));
+			htmlTableDetailsRowWriteHtml (
+				"Name",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"name\"",
+					" value=\"%h\"",
+					requestContext.formOrElse (
+						"name",
+						() -> ifNullThenEmDash (
+							chatUser.getName ())),
+					">"));
 
-			htmlTableCellWrite (
-				emptyStringIfNull (
-					chatUserName.getEditedName ()));
+			htmlTableDetailsRowWriteHtml (
+				"Reason",
+				() -> chatConsoleLogic.writeSelectForChatUserEditReason (
+					"editReason",
+					requestContext.formOrEmptyString (
+						"editReason")));
 
-			htmlTableCellWrite (
-				chatConsoleLogic.textForChatUserInfoStatus (
-					chatUserName.getStatus ()));
+			htmlTableDetailsRowWriteHtml (
+				"Action",
+				stringFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"update name\"",
+					">"));
 
-			htmlTableCellWrite (
-				chatConsoleLogic.textForChatUserEditReason (
-					chatUserName.getEditReason ()));
+			htmlTableClose ();
 
-			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatUserName.getModerator ());
+			htmlFormClose ();
 
-			htmlTableCellClose ();
+			htmlHeadingTwoWrite (
+				"History");
+
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Timestamp",
+				"Original",
+				"Edited",
+				"Status",
+				"Reason",
+				"Moderator");
+
+			for (
+				ChatUserNameRec chatUserName
+					: chatUser.getChatUserNames ()
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatUserLogic.getTimezone (
+							chatUser),
+						chatUserName.getCreationTime ()));
+
+				htmlTableCellWrite (
+					emptyStringIfNull (
+						chatUserName.getOriginalName ()));
+
+				htmlTableCellWrite (
+					emptyStringIfNull (
+						chatUserName.getEditedName ()));
+
+				htmlTableCellWrite (
+					chatConsoleLogic.textForChatUserInfoStatus (
+						chatUserName.getStatus ()));
+
+				htmlTableCellWrite (
+					chatConsoleLogic.textForChatUserEditReason (
+						chatUserName.getEditReason ()));
+
+				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatUserName.getModerator ());
+
+				htmlTableCellClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

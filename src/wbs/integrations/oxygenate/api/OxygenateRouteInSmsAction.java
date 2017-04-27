@@ -27,7 +27,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -127,34 +127,40 @@ class OxygenateRouteInSmsAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goApi");
 
-			logRequest ();
+		) {
 
-			processRequest ();
+			try {
 
-			updateDatabase (
-				taskLogger);
+				logRequest ();
 
-			return createResponse ();
+				processRequest ();
 
-		} catch (RuntimeException exception) {
+				updateDatabase (
+					taskLogger);
 
-			logFailure (
-				taskLogger,
-				exception);
+				return createResponse ();
 
-			throw exception;
+			} catch (RuntimeException exception) {
 
-		} finally {
+				logFailure (
+					taskLogger,
+					exception);
 
-			storeLog (
-				taskLogger);
+				throw exception;
+
+			} finally {
+
+				storeLog (
+					taskLogger);
+
+			}
 
 		}
 
@@ -228,36 +234,42 @@ class OxygenateRouteInSmsAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable exception) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logFailure");
+		try (
 
-		debugLog.append (
-			stringFormat (
-				"*** THREW EXCEPTION ***\n",
-				"\n"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logFailure");
 
-		debugLog.append (
-			stringFormat (
-				"%s\n",
-				exceptionLogic.throwableDump (
-					taskLogger,
-					exception)));
+		) {
+
+			debugLog.append (
+				stringFormat (
+					"*** THREW EXCEPTION ***\n",
+					"\n"));
+
+			debugLog.append (
+				stringFormat (
+					"%s\n",
+					exceptionLogic.throwableDump (
+						taskLogger,
+						exception)));
+
+		}
 
 	}
 
 	void storeLog (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"Oxygen8InboundSmsAction.storeLog ()",
@@ -376,14 +388,14 @@ class OxygenateRouteInSmsAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"Oxygen8InboundSmsAction.updateDatabase ()",

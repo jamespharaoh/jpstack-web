@@ -5,8 +5,9 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -72,18 +73,24 @@ class SimulatorFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItem (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createSimulator (
-			taskLogger);
+		) {
+
+			createMenuItem (
+				taskLogger);
+
+			createSimulator (
+				taskLogger);
+
+		}
 
 	}
 
@@ -91,40 +98,46 @@ class SimulatorFixtureProvider
 	void createMenuItem (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItem");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItem");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"test"))
+		) {
 
-			.setCode (
-				"simulator")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Simulator")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"simulator")
 
-			.setLabel (
-				"Simulator")
+				.setName (
+					"Simulator")
 
-			.setTargetPath (
-				"/simulators")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Simulator")
 
-		);
+				.setTargetPath (
+					"/simulators")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 
@@ -132,140 +145,146 @@ class SimulatorFixtureProvider
 	void createSimulator (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSimulator");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSimulator");
 
-		SimulatorRec simulator =
-			simulatorHelper.insert (
-				taskLogger,
-				simulatorHelper.createInstance ()
+		) {
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.setCode (
-				"test")
+			SimulatorRec simulator =
+				simulatorHelper.insert (
+					taskLogger,
+					simulatorHelper.createInstance ()
 
-			.setName (
-				"Test")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Test")
+				.setCode (
+					"test")
 
-		);
+				.setName (
+					"Test")
 
-		// free route
+				.setDescription (
+					"Test")
 
-		RouteRec freeRoute =
-			routeHelper.findByCodeRequired (
-				GlobalId.root,
-				"test",
-				"free");
+			);
 
-		freeRoute
+			// free route
 
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"simulator"));
-
-		// bill route
-
-		RouteRec billRoute =
-			routeHelper.findByCodeRequired (
-				GlobalId.root,
-				"test",
-				"bill");
-
-		billRoute
-
-			.setSender (
-				senderHelper.findByCodeRequired (
-					GlobalId.root,
-					"simulator"));
-
-		// magic route
-
-		/*
-		RouteRec magicRoute =
-			routeHelper.findByCode (
-				GlobalId.root,
-				"test",
-				"magic");
-
-		simulatorRouteHelper.insert (
-			new SimulatorRouteRec ()
-
-			.setSimulator (
-				simulator)
-
-			.setPrefix (
-				"magic")
-
-			.setDescription (
-				"Magic")
-
-			.setRoute (
-				magicRoute)
-
-		);
-		*/
-
-		// inbound route
-
-		RouteRec inboundRoute =
-			routeHelper.findByCodeRequired (
-				GlobalId.root,
-				"test",
-				"inbound");
-
-		simulatorRouteHelper.insert (
-			taskLogger,
-			simulatorRouteHelper.createInstance ()
-
-			.setSimulator (
-				simulator)
-
-			.setPrefix (
-				"inbound")
-
-			.setDescription (
-				"Inbound")
-
-			.setRoute (
-				inboundRoute)
-
-		);
-
-		// session
-
-		simulatorSessionHelper.insert (
-			taskLogger,
-			simulatorSessionHelper.createInstance ()
-
-			.setSimulator (
-				simulator)
-
-			.setDescription (
-				"Test simulator session")
-
-			.setCreatedTime (
-				transaction.now ())
-
-			.setCreatedUser (
-				userHelper.findByCodeRequired (
+			RouteRec freeRoute =
+				routeHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
-					"test0"))
+					"free");
 
-		);
+			freeRoute
+
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"simulator"));
+
+			// bill route
+
+			RouteRec billRoute =
+				routeHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"bill");
+
+			billRoute
+
+				.setSender (
+					senderHelper.findByCodeRequired (
+						GlobalId.root,
+						"simulator"));
+
+			// magic route
+
+			/*
+			RouteRec magicRoute =
+				routeHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"magic");
+
+			simulatorRouteHelper.insert (
+				new SimulatorRouteRec ()
+
+				.setSimulator (
+					simulator)
+
+				.setPrefix (
+					"magic")
+
+				.setDescription (
+					"Magic")
+
+				.setRoute (
+					magicRoute)
+
+			);
+			*/
+
+			// inbound route
+
+			RouteRec inboundRoute =
+				routeHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"inbound");
+
+			simulatorRouteHelper.insert (
+				taskLogger,
+				simulatorRouteHelper.createInstance ()
+
+				.setSimulator (
+					simulator)
+
+				.setPrefix (
+					"inbound")
+
+				.setDescription (
+					"Inbound")
+
+				.setRoute (
+					inboundRoute)
+
+			);
+
+			// session
+
+			simulatorSessionHelper.insert (
+				taskLogger,
+				simulatorSessionHelper.createInstance ()
+
+				.setSimulator (
+					simulator)
+
+				.setDescription (
+					"Test simulator session")
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setCreatedUser (
+					userHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test0"))
+
+			);
+
+		}
 
 	}
 

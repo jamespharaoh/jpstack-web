@@ -17,8 +17,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -69,236 +69,242 @@ class BroadcastLogicImplementation
 			@NonNull List <String> numberStrings,
 			UserRec user) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"addNumbers");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addNumbers");
 
-		AddResult result =
-			new AddResult ();
-
-		BroadcastConfigRec broadcastConfig =
-			broadcast.getBroadcastConfig ();
-
-		// add numbers
-
-		for (
-			List <String> numberStringsBatch
-				: Lists.partition (
-					numberStrings,
-					batchSize)
 		) {
 
-			List <NumberRec> batchNumbers =
-				numberHelper.findOrCreateMany (
-					taskLogger,
-					numberStringsBatch);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			Pair <List <NumberRec>, List <NumberRec>> batchSplitNumbers =
-				ifThenElse (
-					isNotNull (
-						broadcastConfig.getBlockNumberLookup ()),
-					() -> numberLookupManager.splitNumbersPresent (
-						broadcastConfig.getBlockNumberLookup (),
-						batchNumbers),
-					() -> Pair.of (
-						new ArrayList <NumberRec> (),
-						batchNumbers));
+			AddResult result =
+				new AddResult ();
 
-			// process rejected numbers
+			BroadcastConfigRec broadcastConfig =
+				broadcast.getBroadcastConfig ();
 
-			List <NumberRec> batchRejectedNumbers =
-				batchSplitNumbers.getLeft ();
-
-			List <BroadcastNumberRec> batchRejectedBroadcastNumbers =
-				broadcastNumberHelper.findOrCreateMany (
-					taskLogger,
-					broadcast,
-					batchRejectedNumbers);
+			// add numbers
 
 			for (
-				long index = 0;
-				index < collectionSize (batchRejectedNumbers);
-				index ++
+				List <String> numberStringsBatch
+					: Lists.partition (
+						numberStrings,
+						batchSize)
 			) {
 
-				BroadcastNumberRec rejectedBroadcastNumber =
-					listItemAtIndexRequired (
-						batchRejectedBroadcastNumbers,
-						index);
+				List <NumberRec> batchNumbers =
+					numberHelper.findOrCreateMany (
+						taskLogger,
+						numberStringsBatch);
 
-				// add number
+				Pair <List <NumberRec>, List <NumberRec>> batchSplitNumbers =
+					ifThenElse (
+						isNotNull (
+							broadcastConfig.getBlockNumberLookup ()),
+						() -> numberLookupManager.splitNumbersPresent (
+							broadcastConfig.getBlockNumberLookup (),
+							batchNumbers),
+						() -> Pair.of (
+							new ArrayList <NumberRec> (),
+							batchNumbers));
 
-				switch (rejectedBroadcastNumber.getState ()) {
+				// process rejected numbers
 
-				case removed:
+				List <NumberRec> batchRejectedNumbers =
+					batchSplitNumbers.getLeft ();
 
-					taskLogger.debugFormat (
-						"Reject number %s",
-						rejectedBroadcastNumber.getNumber ().getNumber ());
+				List <BroadcastNumberRec> batchRejectedBroadcastNumbers =
+					broadcastNumberHelper.findOrCreateMany (
+						taskLogger,
+						broadcast,
+						batchRejectedNumbers);
 
-					rejectedBroadcastNumber
+				for (
+					long index = 0;
+					index < collectionSize (batchRejectedNumbers);
+					index ++
+				) {
 
-						.setState (
-							BroadcastNumberState.rejected)
+					BroadcastNumberRec rejectedBroadcastNumber =
+						listItemAtIndexRequired (
+							batchRejectedBroadcastNumbers,
+							index);
 
-						.setAddedByUser (
-							user);
+					// add number
 
-					broadcast
+					switch (rejectedBroadcastNumber.getState ()) {
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () - 1)
+					case removed:
 
-						.setNumRejected (
-							broadcast.getNumRejected () + 1);
+						taskLogger.debugFormat (
+							"Reject number %s",
+							rejectedBroadcastNumber.getNumber ().getNumber ());
 
-					result.numRejected ++;
+						rejectedBroadcastNumber
 
-					break;
+							.setState (
+								BroadcastNumberState.rejected)
 
-				case accepted:
+							.setAddedByUser (
+								user);
 
-					taskLogger.debugFormat (
-						"Don't reject existing number %s",
-						rejectedBroadcastNumber.getNumber ().getNumber ());
+						broadcast
 
-					result.numAlreadyAdded ++;
+							.setNumRemoved (
+								broadcast.getNumRemoved () - 1)
 
-					break;
+							.setNumRejected (
+								broadcast.getNumRejected () + 1);
 
-				case rejected:
+						result.numRejected ++;
 
-					taskLogger.debugFormat (
-						"Already rejected number %s",
-						rejectedBroadcastNumber.getNumber ().getNumber ());
+						break;
 
-					result.numAlreadyRejected ++;
+					case accepted:
 
-					break;
+						taskLogger.debugFormat (
+							"Don't reject existing number %s",
+							rejectedBroadcastNumber.getNumber ().getNumber ());
 
-				case sent:
+						result.numAlreadyAdded ++;
 
-					throw new RuntimeException (
-						"Should never happen");
+						break;
+
+					case rejected:
+
+						taskLogger.debugFormat (
+							"Already rejected number %s",
+							rejectedBroadcastNumber.getNumber ().getNumber ());
+
+						result.numAlreadyRejected ++;
+
+						break;
+
+					case sent:
+
+						throw new RuntimeException (
+							"Should never happen");
+
+					}
 
 				}
 
-			}
+				// process accepted numbers
 
-			// process accepted numbers
+				List <NumberRec> batchAcceptedNumbers =
+					batchSplitNumbers.getRight ();
 
-			List <NumberRec> batchAcceptedNumbers =
-				batchSplitNumbers.getRight ();
+				List <BroadcastNumberRec> batchAcceptedBroadcastNumbers =
+					broadcastNumberHelper.findOrCreateMany (
+						taskLogger,
+						broadcast,
+						batchAcceptedNumbers);
 
-			List <BroadcastNumberRec> batchAcceptedBroadcastNumbers =
-				broadcastNumberHelper.findOrCreateMany (
-					taskLogger,
-					broadcast,
-					batchAcceptedNumbers);
+				for (
+					long index = 0;
+					index < collectionSize (batchAcceptedNumbers);
+					index ++
+				) {
 
-			for (
-				long index = 0;
-				index < collectionSize (batchAcceptedNumbers);
-				index ++
-			) {
+					BroadcastNumberRec acceptedBroadcastNumber =
+						listItemAtIndexRequired (
+							batchAcceptedBroadcastNumbers,
+							index);
 
-				BroadcastNumberRec acceptedBroadcastNumber =
-					listItemAtIndexRequired (
-						batchAcceptedBroadcastNumbers,
-						index);
+					// add number
 
-				// add number
+					switch (acceptedBroadcastNumber.getState ()) {
 
-				switch (acceptedBroadcastNumber.getState ()) {
+					case removed:
 
-				case removed:
+						taskLogger.debugFormat (
+							"Add number %s",
+							acceptedBroadcastNumber.getNumber ().getNumber ());
 
-					taskLogger.debugFormat (
-						"Add number %s",
-						acceptedBroadcastNumber.getNumber ().getNumber ());
+						acceptedBroadcastNumber
 
-					acceptedBroadcastNumber
+							.setState (
+								BroadcastNumberState.accepted)
 
-						.setState (
-							BroadcastNumberState.accepted)
+							.setAddedByUser (
+								user);
 
-						.setAddedByUser (
-							user);
+						broadcast
 
-					broadcast
+							.setNumRemoved (
+								broadcast.getNumRemoved () - 1)
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () - 1)
+							.setNumAccepted (
+								broadcast.getNumAccepted () + 1)
 
-						.setNumAccepted (
-							broadcast.getNumAccepted () + 1)
+							.setNumTotal (
+								broadcast.getNumTotal () + 1);
 
-						.setNumTotal (
-							broadcast.getNumTotal () + 1);
+						result.numAdded ++;
 
-					result.numAdded ++;
+						break;
 
-					break;
+					case accepted:
 
-				case accepted:
+						taskLogger.debugFormat (
+							"Already added number %s",
+							acceptedBroadcastNumber.getNumber ().getNumber ());
 
-					taskLogger.debugFormat (
-						"Already added number %s",
-						acceptedBroadcastNumber.getNumber ().getNumber ());
+						result.numAlreadyAdded ++;
 
-					result.numAlreadyAdded ++;
+						break;
 
-					break;
+					case rejected:
 
-				case rejected:
+						taskLogger.debugFormat (
+							"Adding previously rejected number %s",
+							acceptedBroadcastNumber.getNumber ().getNumber ());
 
-					taskLogger.debugFormat (
-						"Adding previously rejected number %s",
-						acceptedBroadcastNumber.getNumber ().getNumber ());
+						acceptedBroadcastNumber
 
-					acceptedBroadcastNumber
+							.setState (
+								BroadcastNumberState.accepted)
 
-						.setState (
-							BroadcastNumberState.accepted)
+							.setAddedByUser (
+								user);
 
-						.setAddedByUser (
-							user);
+						broadcast
 
-					broadcast
+							.setNumRejected (
+								broadcast.getNumRejected () - 1)
 
-						.setNumRejected (
-							broadcast.getNumRejected () - 1)
+							.setNumAccepted (
+								broadcast.getNumAccepted () + 1)
 
-						.setNumAccepted (
-							broadcast.getNumAccepted () + 1)
+							.setNumTotal (
+								broadcast.getNumTotal () + 1);
 
-						.setNumTotal (
-							broadcast.getNumTotal () + 1);
+						result.numAdded ++;
 
-					result.numAdded ++;
+						break;
 
-					break;
+					case sent:
 
-				case sent:
+						throw new RuntimeException (
+							"Should never happen");
 
-					throw new RuntimeException (
-						"Should never happen");
+					}
 
 				}
 
+				// flush transaction
+
+				transaction.flush ();
+
 			}
 
-			// flush transaction
-
-			transaction.flush ();
+			return result;
 
 		}
-
-		return result;
 
 	}
 

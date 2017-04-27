@@ -84,49 +84,68 @@ class ChatUserNotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		renderCreateForm ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderHistory (
-			taskLogger);
+		) {
+
+			renderCreateForm (
+				taskLogger);
+
+			renderHistory (
+				taskLogger);
+
+		}
 
 	}
 
 	private
-	void renderCreateForm () {
+	void renderCreateForm (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.notes"));
+		try (
 
-		htmlHeadingTwoWrite (
-			"Create note");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderCreateForm");
 
-		htmlTableOpenDetails ();
+		) {
 
-		htmlTableDetailsRowWriteHtml (
-			"Note",
-			stringFormat (
-				"<textarea",
-				" name=\"note\"",
-				">%h</textarea>",
-				requestContext.formOrEmptyString (
-					"note")));
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.notes"));
 
-		htmlTableClose ();
+			htmlHeadingTwoWrite (
+				"Create note");
 
-		formatWriter.writeFormat (
-			"<p><input",
-			" type=\"submit\"",
-			" name=\"createNote\"",
-			" value=\"create note\"",
-			"></p>\n");
+			htmlTableOpenDetails ();
 
-		htmlFormClose ();
+			htmlTableDetailsRowWriteHtml (
+				"Note",
+				stringFormat (
+					"<textarea",
+					" name=\"note\"",
+					">%h</textarea>",
+					requestContext.formOrEmptyString (
+						"note")));
+
+			htmlTableClose ();
+
+			formatWriter.writeFormat (
+				"<p><input",
+				" type=\"submit\"",
+				" name=\"createNote\"",
+				" value=\"create note\"",
+				"></p>\n");
+
+			htmlFormClose ();
+
+		}
 
 	}
 
@@ -134,46 +153,52 @@ class ChatUserNotesPart
 	void renderHistory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHistory");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Existing notes");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHistory");
 
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Timestamp",
-			"Note",
-			"User");
-
-		for (
-			ChatUserNoteRec chatUserNote
-				: chatUserNotes
 		) {
 
-			htmlTableRowOpen ();
+			htmlHeadingTwoWrite (
+				"Existing notes");
 
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					chatUserNote.getTimestamp ()));
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatUserNote.getText ().getText ());
+			htmlTableHeaderRowWrite (
+				"Timestamp",
+				"Note",
+				"User");
 
-			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatUserNote.getUser ());
+			for (
+				ChatUserNoteRec chatUserNote
+					: chatUserNotes
+			) {
 
-			htmlTableRowClose ();
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatUserLogic.getTimezone (
+							chatUser),
+						chatUserNote.getTimestamp ()));
+
+				htmlTableCellWrite (
+					chatUserNote.getText ().getText ());
+
+				consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatUserNote.getUser ());
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

@@ -64,111 +64,40 @@ class ChatUserNumberLinkProvider
 			@NonNull NumberRec number,
 			boolean active) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findLinks");
+		try (
 
-		// find relevant subs
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findLinks");
 
-		List <Long> chatUserIds =
-			chatUserHelper.searchIds (
-				taskLogger,
-				new ChatUserSearch ()
-
-			.numberId (
-				number.getId ())
-
-		);
-
-		// create advices
-
-		List<Link> advices =
-			new ArrayList<Link> ();
-
-		for (
-			Long chatUserId
-				: chatUserIds
 		) {
 
-			final ChatUserRec chatUser =
-				chatUserHelper.findRequired (
-					chatUserId);
+			// find relevant subs
 
-			advices.add (
-				new Link () {
+			List <Long> chatUserIds =
+				chatUserHelper.searchIds (
+					taskLogger,
+					new ChatUserSearch ()
 
-				@Override
-				public
-				NumberPlugin getProvider () {
-					return ChatUserNumberLinkProvider.this;
-				}
+				.numberId (
+					number.getId ())
 
-				@Override
-				public
-				NumberRec getNumber () {
-					return chatUser.getNumber ();
-				}
+			);
 
-				@Override
-				public
-				Boolean getActive () {
-					return !chatUser.getBlockAll ();
-				}
+			// create advices
 
-				@Override
-				public
-				Instant getStartTime () {
-					return chatUser.getFirstJoin ();
-				}
+			List<Link> advices =
+				new ArrayList<Link> ();
 
-				@Override
-				public
-				Instant getEndTime () {
-					return null;
-				}
+			for (
+				Long chatUserId
+					: chatUserIds
+			) {
 
-				@Override
-				public
-				Record<?> getParentObject () {
-					return chatUser.getChat ();
-				}
-
-				@Override
-				public
-				Record<?> getSubscriptionObject () {
-					return chatUser;
-				}
-
-				@Override
-				public
-				String getType () {
-					return "registered chat user";
-				}
-
-				@Override
-				public
-				boolean canView (
-						@NonNull TaskLogger parentTaskLogger) {
-
-					TaskLogger taskLogger =
-						logContext.nestTaskLogger (
-							parentTaskLogger,
-							"canView");
-
-					return privChecker.canRecursive (
-						taskLogger,
-						chatUser.getChat (),
-						"chat_user_create",
-						"chat_user_view",
-						"user_admin",
-						"user_credit");
-
-				}
-
-			});
-
-			if (chatUser.getOnline ()) {
+				final ChatUserRec chatUser =
+					chatUserHelper.findRequired (
+						chatUserId);
 
 				advices.add (
 					new Link () {
@@ -188,13 +117,13 @@ class ChatUserNumberLinkProvider
 					@Override
 					public
 					Boolean getActive () {
-						return ! chatUser.getBlockAll ();
+						return !chatUser.getBlockAll ();
 					}
 
 					@Override
 					public
 					Instant getStartTime () {
-						return chatUser.getLastJoin ();
+						return chatUser.getFirstJoin ();
 					}
 
 					@Override
@@ -218,7 +147,7 @@ class ChatUserNumberLinkProvider
 					@Override
 					public
 					String getType () {
-						return "online chat user";
+						return "registered chat user";
 					}
 
 					@Override
@@ -226,119 +155,214 @@ class ChatUserNumberLinkProvider
 					boolean canView (
 							@NonNull TaskLogger parentTaskLogger) {
 
-						TaskLogger taskLogger =
-							logContext.nestTaskLogger (
-								parentTaskLogger,
-								"canView");
+						try (
 
-						return privChecker.canRecursive (
-							taskLogger,
-							chatUser.getChat (),
-							"chat_user_create",
-							"chat_user_view",
-							"user_admin",
-							"user_credit");
+							TaskLogger taskLogger =
+								logContext.nestTaskLogger (
+									parentTaskLogger,
+									"canView");
 
-					}
+						) {
 
-				});
-
-			}
-
-			if (chatUser.getDateMode() != ChatUserDateMode.none) {
-
-				advices.add (
-					new Link () {
-
-					@Override
-					public
-					NumberPlugin getProvider () {
-						return ChatUserNumberLinkProvider.this;
-					}
-
-					@Override
-					public
-					NumberRec getNumber () {
-						return chatUser.getNumber ();
-					}
-
-					@Override
-					public
-					Boolean getActive () {
-						return true;
-					}
-
-					@Override
-					public
-					Instant getStartTime () {
-						return chatUser.getLastJoin ();
-					}
-
-					@Override
-					public
-					Instant getEndTime () {
-						return null;
-					}
-
-					@Override
-					public
-					Record<?> getParentObject () {
-						return chatUser.getChat ();
-					}
-
-					@Override
-					public
-					Record<?> getSubscriptionObject () {
-						return chatUser;
-					}
-
-					@Override
-					public
-					String getType () {
-
-						switch (chatUser.getDateMode ()) {
-
-						case text:
-							return "text dating user";
-
-						case photo:
-							return "photo dating user";
-
-						default:
-							throw new RuntimeException (
-								chatUser.getDateMode ().toString ());
+							return privChecker.canRecursive (
+								taskLogger,
+								chatUser.getChat (),
+								"chat_user_create",
+								"chat_user_view",
+								"user_admin",
+								"user_credit");
 
 						}
 
 					}
 
-					@Override
-					public
-					boolean canView (
-							@NonNull TaskLogger parentTaskLogger) {
-
-						TaskLogger taskLogger =
-							logContext.nestTaskLogger (
-								parentTaskLogger,
-								"canView");
-
-						return privChecker.canRecursive (
-							taskLogger,
-							chatUser.getChat (),
-							"chat_user_create",
-							"chat_user_view",
-							"user_admin",
-							"user_credit");
-
-					}
-
 				});
+
+				if (chatUser.getOnline ()) {
+
+					advices.add (
+						new Link () {
+
+						@Override
+						public
+						NumberPlugin getProvider () {
+							return ChatUserNumberLinkProvider.this;
+						}
+
+						@Override
+						public
+						NumberRec getNumber () {
+							return chatUser.getNumber ();
+						}
+
+						@Override
+						public
+						Boolean getActive () {
+							return ! chatUser.getBlockAll ();
+						}
+
+						@Override
+						public
+						Instant getStartTime () {
+							return chatUser.getLastJoin ();
+						}
+
+						@Override
+						public
+						Instant getEndTime () {
+							return null;
+						}
+
+						@Override
+						public
+						Record<?> getParentObject () {
+							return chatUser.getChat ();
+						}
+
+						@Override
+						public
+						Record<?> getSubscriptionObject () {
+							return chatUser;
+						}
+
+						@Override
+						public
+						String getType () {
+							return "online chat user";
+						}
+
+						@Override
+						public
+						boolean canView (
+								@NonNull TaskLogger parentTaskLogger) {
+
+							try (
+
+								TaskLogger taskLogger =
+									logContext.nestTaskLogger (
+										parentTaskLogger,
+										"canView");
+
+							) {
+
+								return privChecker.canRecursive (
+									taskLogger,
+									chatUser.getChat (),
+									"chat_user_create",
+									"chat_user_view",
+									"user_admin",
+									"user_credit");
+
+							}
+
+						}
+
+					});
+
+				}
+
+				if (chatUser.getDateMode() != ChatUserDateMode.none) {
+
+					advices.add (
+						new Link () {
+
+						@Override
+						public
+						NumberPlugin getProvider () {
+							return ChatUserNumberLinkProvider.this;
+						}
+
+						@Override
+						public
+						NumberRec getNumber () {
+							return chatUser.getNumber ();
+						}
+
+						@Override
+						public
+						Boolean getActive () {
+							return true;
+						}
+
+						@Override
+						public
+						Instant getStartTime () {
+							return chatUser.getLastJoin ();
+						}
+
+						@Override
+						public
+						Instant getEndTime () {
+							return null;
+						}
+
+						@Override
+						public
+						Record<?> getParentObject () {
+							return chatUser.getChat ();
+						}
+
+						@Override
+						public
+						Record<?> getSubscriptionObject () {
+							return chatUser;
+						}
+
+						@Override
+						public
+						String getType () {
+
+							switch (chatUser.getDateMode ()) {
+
+							case text:
+								return "text dating user";
+
+							case photo:
+								return "photo dating user";
+
+							default:
+								throw new RuntimeException (
+									chatUser.getDateMode ().toString ());
+
+							}
+
+						}
+
+						@Override
+						public
+						boolean canView (
+								@NonNull TaskLogger parentTaskLogger) {
+
+							try (
+
+								TaskLogger taskLogger =
+									logContext.nestTaskLogger (
+										parentTaskLogger,
+										"canView");
+
+							) {
+
+								return privChecker.canRecursive (
+									taskLogger,
+									chatUser.getChat (),
+									"chat_user_create",
+									"chat_user_view",
+									"user_admin",
+									"user_credit");
+
+							}
+
+						}
+
+					});
+
+				}
 
 			}
 
-		}
+			return advices;
 
-		return advices;
+		}
 
 	}
 

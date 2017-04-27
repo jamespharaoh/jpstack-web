@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -64,17 +64,23 @@ class OxygenateRouteInAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
+		try (
 
-		Action action =
-			chooseAction (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goApi");
+
+		) {
+
+			Action action =
+				chooseAction (
+					taskLogger);
+
+			return action.handle (
 				taskLogger);
 
-		return action.handle (
-			taskLogger);
+		}
 
 	}
 
@@ -91,7 +97,7 @@ class OxygenateRouteInAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"OxygenateRouteInAction.chooseAction (...)",

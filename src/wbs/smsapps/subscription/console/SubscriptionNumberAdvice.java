@@ -94,18 +94,24 @@ class SubscriptionNumberAdvice
 	boolean canView (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canView");
+		try (
 
-		return privChecker.canRecursive (
-			taskLogger,
-			subscriptionSub
-				.getSubscriptionNumber ()
-				.getSubscription (),
-			"manage",
-			"admin");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canView");
+
+		) {
+
+			return privChecker.canRecursive (
+				taskLogger,
+				subscriptionSub
+					.getSubscriptionNumber ()
+					.getSubscription (),
+				"manage",
+				"admin");
+
+		}
 
 	}
 

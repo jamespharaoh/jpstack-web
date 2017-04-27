@@ -60,36 +60,42 @@ class UserPrivCheckerImplementation
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		Optional <Long> userIdOptional =
-			consoleUserHelper.loggedInUserId ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		if (
-			optionalIsPresent (
-				userIdOptional)
 		) {
 
-			Long userId =
-				optionalGetRequired (
-					userIdOptional);
+			Optional <Long> userIdOptional =
+				consoleUserHelper.loggedInUserId ();
 
-			target =
-				privCheckerBuilderProvider.get ()
+			if (
+				optionalIsPresent (
+					userIdOptional)
+			) {
 
-				.userId (
-					userId)
+				Long userId =
+					optionalGetRequired (
+						userIdOptional);
 
-				.build (
-					taskLogger);
+				target =
+					privCheckerBuilderProvider.get ()
 
-		} else {
+					.userId (
+						userId)
 
-			target =
-				new NullUserPrivChecker ();
+					.build (
+						taskLogger);
+
+			} else {
+
+				target =
+					new NullUserPrivChecker ();
+
+			}
 
 		}
 
@@ -100,9 +106,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	Long userIdRequired () {
-
-		// TODO Auto-generated method stub
-		return null;
+		return target.userIdRequired ();
 	}
 
 	@Override

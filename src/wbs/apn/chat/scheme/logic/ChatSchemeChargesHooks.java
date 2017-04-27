@@ -34,29 +34,35 @@ class ChatSchemeChargesHooks
 		if (! (parent instanceof ChatSchemeRec))
 			return;
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSingletons");
+		try (
 
-		ChatSchemeRec chatScheme =
-			(ChatSchemeRec)
-			parent;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSingletons");
 
-		ChatSchemeChargesRec chatSchemeCharges =
-			chatSchemeChargesHelper.insert (
-				taskLogger,
-				chatSchemeChargesHelper.createInstance ()
+		) {
 
-			.setChatScheme (
-				chatScheme)
+			ChatSchemeRec chatScheme =
+				(ChatSchemeRec)
+				parent;
 
-		);
+			ChatSchemeChargesRec chatSchemeCharges =
+				chatSchemeChargesHelper.insert (
+					taskLogger,
+					chatSchemeChargesHelper.createInstance ()
 
-		chatScheme
+				.setChatScheme (
+					chatScheme)
 
-			.setCharges (
-				chatSchemeCharges);
+			);
+
+			chatScheme
+
+				.setCharges (
+					chatSchemeCharges);
+
+		}
 
 	}
 

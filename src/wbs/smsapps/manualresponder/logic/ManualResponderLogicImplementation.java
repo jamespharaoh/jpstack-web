@@ -20,8 +20,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -197,157 +197,163 @@ class ManualResponderLogicImplementation
 			@NonNull ManualResponderRequestRec request,
 			@NonNull ManualResponderTemplateRec template) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendTemplateAutomatically");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplateAutomatically");
 
-		ManualResponderNumberRec manualResponderNumber =
-			request.getManualResponderNumber ();
-
-		ManualResponderRec manualResponder =
-			manualResponderNumber.getManualResponder ();
-
-		// split message
-
-		boolean shortMessageParts =
-			request
-				.getNumber ()
-				.getNetwork ()
-				.getShortMultipartMessages ();
-
-		long maxLengthPerMultipartMessage =
-			shortMessageParts
-				? 134l
-				: 153l;
-
-		Pair<List<String>,Long> splitResult =
-			splitMessage (
-				template,
-				maxLengthPerMultipartMessage,
-				template.getDefaultText ());
-
-		List<String> messageParts =
-			splitResult.getLeft ();
-
-		Long effectiveParts =
-			splitResult.getRight ();
-
-		TextRec messageText =
-			textHelper.findOrCreate (
-				taskLogger,
-				template.getDefaultText ());
-
-		// resolve route
-
-		RouteRec route =
-			routerLogic.resolveRouter (
-				template.getRouter ());
-
-		// create reply
-
-		ManualResponderReplyRec reply =
-			manualResponderReplyHelper.insert (
-				taskLogger,
-				manualResponderReplyHelper.createInstance ()
-
-			.setManualResponderRequest (
-				request)
-
-			.setText (
-				messageText)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setNumFreeMessages (
-				route.getOutCharge () == 0
-					? effectiveParts
-					: 0l)
-
-			.setNumBilledMessages (
-				route.getOutCharge () > 0
-					? effectiveParts
-					: 0l)
-
-		);
-
-		// send messages
-
-		boolean first = true;
-
-		for (
-			String messagePart
-				: messageParts
 		) {
 
-			reply.getMessages ().add (
-				messageSenderProvider.get ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-				.threadId (
-					request.getMessage ().getThreadId ())
+			ManualResponderNumberRec manualResponderNumber =
+				request.getManualResponderNumber ();
 
-				.number (
-					request.getNumber ())
+			ManualResponderRec manualResponder =
+				manualResponderNumber.getManualResponder ();
 
-				.messageString (
+			// split message
+
+			boolean shortMessageParts =
+				request
+					.getNumber ()
+					.getNetwork ()
+					.getShortMultipartMessages ();
+
+			long maxLengthPerMultipartMessage =
+				shortMessageParts
+					? 134l
+					: 153l;
+
+			Pair<List<String>,Long> splitResult =
+				splitMessage (
+					template,
+					maxLengthPerMultipartMessage,
+					template.getDefaultText ());
+
+			List<String> messageParts =
+				splitResult.getLeft ();
+
+			Long effectiveParts =
+				splitResult.getRight ();
+
+			TextRec messageText =
+				textHelper.findOrCreate (
 					taskLogger,
-					messagePart)
+					template.getDefaultText ());
 
-				.numFrom (
-					template.getNumber ())
+			// resolve route
 
-				.routerResolve (
-					template.getRouter ())
+			RouteRec route =
+				routerLogic.resolveRouter (
+					template.getRouter ());
 
-				.serviceLookup (
-					manualResponder,
-					"default")
+			// create reply
 
-				.affiliate (
-					optionalOrNull (
-						customerAffiliate (
-							manualResponderNumber)))
+			ManualResponderReplyRec reply =
+				manualResponderReplyHelper.insert (
+					taskLogger,
+					manualResponderReplyHelper.createInstance ()
 
-				.deliveryTypeCode (
-					"manual_responder")
+				.setManualResponderRequest (
+					request)
 
-				.ref (
-					reply.getId ())
+				.setText (
+					messageText)
 
-				.sendNow (
-					first
-					|| ! template.getSequenceParts ())
+				.setTimestamp (
+					transaction.now ())
 
-				.send (
-					taskLogger)
+				.setNumFreeMessages (
+					route.getOutCharge () == 0
+						? effectiveParts
+						: 0l)
+
+				.setNumBilledMessages (
+					route.getOutCharge () > 0
+						? effectiveParts
+						: 0l)
 
 			);
 
-			first = false;
+			// send messages
 
-		}
+			boolean first = true;
 
-		// create keyword set fallback if appropriate
+			for (
+				String messagePart
+					: messageParts
+			) {
 
-		if (
-			isNotNull (
-				template.getReplyKeywordSet ())
-		) {
+				reply.getMessages ().add (
+					messageSenderProvider.get ()
 
-			CommandRec command =
-				commandHelper.findByCodeRequired (
-					manualResponder,
-					"default");
+					.threadId (
+						request.getMessage ().getThreadId ())
 
-			keywordLogic.createOrUpdateKeywordSetFallback (
-				taskLogger,
-				template.getReplyKeywordSet (),
-				request.getNumber (),
-				command);
+					.number (
+						request.getNumber ())
+
+					.messageString (
+						taskLogger,
+						messagePart)
+
+					.numFrom (
+						template.getNumber ())
+
+					.routerResolve (
+						template.getRouter ())
+
+					.serviceLookup (
+						manualResponder,
+						"default")
+
+					.affiliate (
+						optionalOrNull (
+							customerAffiliate (
+								manualResponderNumber)))
+
+					.deliveryTypeCode (
+						"manual_responder")
+
+					.ref (
+						reply.getId ())
+
+					.sendNow (
+						first
+						|| ! template.getSequenceParts ())
+
+					.send (
+						taskLogger)
+
+				);
+
+				first = false;
+
+			}
+
+			// create keyword set fallback if appropriate
+
+			if (
+				isNotNull (
+					template.getReplyKeywordSet ())
+			) {
+
+				CommandRec command =
+					commandHelper.findByCodeRequired (
+						manualResponder,
+						"default");
+
+				keywordLogic.createOrUpdateKeywordSetFallback (
+					taskLogger,
+					template.getReplyKeywordSet (),
+					request.getNumber (),
+					command);
+
+			}
 
 		}
 

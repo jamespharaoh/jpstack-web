@@ -471,7 +471,7 @@ class PaypalApiImplementation
 
 					log.info (
 						stringFormat (
-							"Transaction id: %s",
+							"OwnedTransaction id: %s",
 							paymentInfo.getTransactionID ()));
 
 				}

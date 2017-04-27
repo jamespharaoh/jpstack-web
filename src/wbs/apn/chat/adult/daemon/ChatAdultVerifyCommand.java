@@ -14,8 +14,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -120,129 +120,137 @@ class ChatAdultVerifyCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ChatRec chat =
-			chatHelper.findRequired (
-				command.getParentId ());
+		) {
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				chatHelper.findRequired (
+					command.getParentId ());
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// ignore if there is no chat scheme
+
+			if (chatUser.getChatScheme () == null) {
+
+				return smsInboxLogic.inboxNotProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalFromNullable (
+						affiliate),
+					optionalOf (
+						command),
+					"No chat scheme for chat user");
+
+			}
+
+			// mark the user as adult verified
+
+			boolean alreadyVerified =
+				chatUser.getAdultVerified ();
+
+			chatUserLogic.adultVerify (
 				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
 				chatUser);
 
-		// ignore if there is no chat scheme
+			// credit the user
 
-		if (chatUser.getChatScheme () == null) {
+			ChatSchemeChargesRec chatSchemeCharges =
+				chatSchemeChargesHelper.findRequired (
+					chatUser.getChatScheme ().getId ());
 
-			return smsInboxLogic.inboxNotProcessed (
+			long credit =
+				chatSchemeCharges.getAdultVerifyCredit ();
+
+			if (! alreadyVerified && credit > 0) {
+
+				chatUserCreditHelper.insert (
+					taskLogger,
+					chatUserCreditHelper.createInstance ()
+
+					.setChatUser (
+						chatUser)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setCreditAmount (
+						credit)
+
+					.setBillAmount (
+						0l)
+
+					.setGift (
+						true)
+
+					.setDetails (
+						"adult verify")
+
+				);
+
+				chatUser
+
+					.setCredit (
+						chatUser.getCredit () + credit)
+
+					.setCreditBought (
+						+ chatUser.getCreditBought ()
+						+ credit);
+
+			}
+
+			// send them a message to confirm
+
+			chatSendLogic.sendSystemRbFree (
+				taskLogger,
+				chatUser,
+				optionalOf (
+					message.getThreadId ()),
+				alreadyVerified
+					? "adult_already"
+					: "adult_confirm",
+				TemplateMissing.error,
+				emptyMap ());
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
 				taskLogger,
 				inbox,
 				optionalOf (
 					defaultService),
-				optionalFromNullable (
-					affiliate),
 				optionalOf (
-					command),
-				"No chat scheme for chat user");
+					affiliate),
+				command);
 
 		}
-
-		// mark the user as adult verified
-
-		boolean alreadyVerified =
-			chatUser.getAdultVerified ();
-
-		chatUserLogic.adultVerify (chatUser);
-
-		// credit the user
-
-		ChatSchemeChargesRec chatSchemeCharges =
-			chatSchemeChargesHelper.findRequired (
-				chatUser.getChatScheme ().getId ());
-
-		long credit =
-			chatSchemeCharges.getAdultVerifyCredit ();
-
-		if (! alreadyVerified && credit > 0) {
-
-			chatUserCreditHelper.insert (
-				taskLogger,
-				chatUserCreditHelper.createInstance ()
-
-				.setChatUser (
-					chatUser)
-
-				.setTimestamp (
-					transaction.now ())
-
-				.setCreditAmount (
-					credit)
-
-				.setBillAmount (
-					0l)
-
-				.setGift (
-					true)
-
-				.setDetails (
-					"adult verify")
-
-			);
-
-			chatUser
-
-				.setCredit (
-					chatUser.getCredit () + credit)
-
-				.setCreditBought (
-					+ chatUser.getCreditBought ()
-					+ credit);
-
-		}
-
-		// send them a message to confirm
-
-		chatSendLogic.sendSystemRbFree (
-			taskLogger,
-			chatUser,
-			optionalOf (
-				message.getThreadId ()),
-			alreadyVerified
-				? "adult_already"
-				: "adult_confirm",
-			TemplateMissing.error,
-			emptyMap ());
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

@@ -139,16 +139,22 @@ class ConsoleContextTab {
 		String getUrl (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"RealTab.getUrl");
+			try (
 
-			return consoleManager.resolveLocalFile (
-				taskLogger,
-				contextStuff,
-				consoleContext,
-				localFile);
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"RealTab.getUrl");
+
+			) {
+
+				return consoleManager.resolveLocalFile (
+					taskLogger,
+					contextStuff,
+					consoleContext,
+					localFile);
+
+			}
 
 		}
 

@@ -134,119 +134,125 @@ class GenericConsoleHelperProvider <
 	GenericConsoleHelperProvider <RecordType> init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		// check required properties
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		if (consoleHelperProviderSpec == null)
-			throw new NullPointerException ("consoleHelperProviderSpec");
-
-		if (objectHelper == null)
-			throw new NullPointerException ("objectHelper");
-
-		if (consoleHelperClass == null)
-			throw new NullPointerException ("consoleHelperClass");
-
-		// initialise other stuff
-
-		objectClass (
-			objectHelper.objectClass ());
-
-		objectName (
-			objectHelper.objectName ());
-
-		idKey (
-			consoleHelperProviderSpec.idKey ());
-
-		defaultListContextName (
-			ifNull (
-				consoleHelperProviderSpec.defaultListContextName (),
-				naivePluralise (
-					objectName ())));
-
-		defaultObjectContextName (
-			ifNull (
-				consoleHelperProviderSpec.defaultObjectContextName (),
-				objectHelper.objectName ()));
-
-		if (
-			isNotNull (
-				consoleHelperProviderSpec.viewPriv ())
 		) {
 
-			List <String> viewPrivParts =
-				stringSplitColon (
-					consoleHelperProviderSpec.viewPriv ());
+			// check required properties
 
-			if (viewPrivParts.size () == 1) {
+			if (consoleHelperProviderSpec == null)
+				throw new NullPointerException ("consoleHelperProviderSpec");
 
-				viewDelegateField (
-					viewPrivParts.get (0));
+			if (objectHelper == null)
+				throw new NullPointerException ("objectHelper");
 
-			} else if (viewPrivParts.size () == 2) {
+			if (consoleHelperClass == null)
+				throw new NullPointerException ("consoleHelperClass");
 
-				viewDelegateField (
-					viewPrivParts.get (0));
+			// initialise other stuff
 
-				viewDelegatePrivCode (
-					viewPrivParts.get (1));
+			objectClass (
+				objectHelper.objectClass ());
 
-			} else {
+			objectName (
+				objectHelper.objectName ());
 
-				throw new RuntimeException ();
+			idKey (
+				consoleHelperProviderSpec.idKey ());
 
-			}
+			defaultListContextName (
+				ifNull (
+					consoleHelperProviderSpec.defaultListContextName (),
+					naivePluralise (
+						objectName ())));
 
-		}
-
-		if (consoleHelperProviderSpec.cryptorBeanName () != null) {
-
-			cryptor (
-				componentManager.getComponentRequired (
-					taskLogger,
-					consoleHelperProviderSpec.cryptorBeanName (),
-					Cryptor.class));
-
-		}
-
-		// collect view priv key specs
-
-		String viewPrivKey =
-			stringFormat (
-				"%s.view",
-				objectName ());
-
-		for (
-			PrivKeySpec privKeySpec
-				: consoleHelperProviderSpec.privKeys ()
-		) {
+			defaultObjectContextName (
+				ifNull (
+					consoleHelperProviderSpec.defaultObjectContextName (),
+					objectHelper.objectName ()));
 
 			if (
-				stringNotEqualSafe (
-					privKeySpec.name (),
-					viewPrivKey)
+				isNotNull (
+					consoleHelperProviderSpec.viewPriv ())
 			) {
-				continue;
+
+				List <String> viewPrivParts =
+					stringSplitColon (
+						consoleHelperProviderSpec.viewPriv ());
+
+				if (viewPrivParts.size () == 1) {
+
+					viewDelegateField (
+						viewPrivParts.get (0));
+
+				} else if (viewPrivParts.size () == 2) {
+
+					viewDelegateField (
+						viewPrivParts.get (0));
+
+					viewDelegatePrivCode (
+						viewPrivParts.get (1));
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
 			}
 
-			if (viewPrivKeySpecs == null) {
+			if (consoleHelperProviderSpec.cryptorBeanName () != null) {
 
-				viewPrivKeySpecs =
-					new ArrayList<> ();
+				cryptor (
+					componentManager.getComponentRequired (
+						taskLogger,
+						consoleHelperProviderSpec.cryptorBeanName (),
+						Cryptor.class));
 
 			}
 
-			viewPrivKeySpecs.add (
-				privKeySpec);
+			// collect view priv key specs
+
+			String viewPrivKey =
+				stringFormat (
+					"%s.view",
+					objectName ());
+
+			for (
+				PrivKeySpec privKeySpec
+					: consoleHelperProviderSpec.privKeys ()
+			) {
+
+				if (
+					stringNotEqualSafe (
+						privKeySpec.name (),
+						viewPrivKey)
+				) {
+					continue;
+				}
+
+				if (viewPrivKeySpecs == null) {
+
+					viewPrivKeySpecs =
+						new ArrayList<> ();
+
+				}
+
+				viewPrivKeySpecs.add (
+					privKeySpec);
+
+			}
+
+			// and return
+
+			return this;
 
 		}
-
-		// and return
-
-		return this;
 
 	}
 
@@ -256,313 +262,79 @@ class GenericConsoleHelperProvider <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"postProcess");
+		try (
 
-		taskLogger.debugFormat (
-			"Running post processor for %s",
-			objectName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"postProcess");
 
-		// lookup object
-
-		Long id =
-			(Long)
-			contextStuff.get (
-				idKey ());
-
-		Record <?> object =
-			objectHelper.findRequired (
-				id);
-
-		// set context stuff
-
-		for (
-			ConsoleContextStuffSpec contextStuffSpec
-				: consoleHelperProviderSpec.contextStuffs ()
 		) {
 
-			if (
-				contextStuffSpec.fieldName () != null
-				&& contextStuffSpec.template () != null
-			) {
-				throw new RuntimeException ();
-			}
+			taskLogger.debugFormat (
+				"Running post processor for %s",
+				objectName ());
 
-			if (contextStuffSpec.template () != null) {
+			// lookup object
 
-				contextStuff.set (
-					contextStuffSpec.name (),
-					contextStuff.substitutePlaceholders (
-						contextStuffSpec.template ()));
+			Long id =
+				(Long)
+				contextStuff.get (
+					idKey ());
 
-			} else {
+			Record <?> object =
+				objectHelper.findRequired (
+					id);
 
-				contextStuff.set (
-					contextStuffSpec.name (),
-					objectManager.dereferenceRequired (
-						object,
-						contextStuffSpec.fieldName ()));
+			// set context stuff
 
-			}
-
-		}
-
-		// set privs
-
-		UserPrivChecker privChecker =
-			(UserPrivChecker)
-			this.privChecker;
-
-		for (
-			PrivKeySpec privKeySpec
-				: consoleHelperProviderSpec.privKeys ()
-		) {
-
-			List <String> privCodeParts =
-				stringSplitColon (
-					privKeySpec.privCode ());
-
-			Record <?> privObject;
-			String privCode;
-
-			if (
-				collectionHasOneElement (
-					privCodeParts)
+			for (
+				ConsoleContextStuffSpec contextStuffSpec
+					: consoleHelperProviderSpec.contextStuffs ()
 			) {
 
-				privObject =
-					object;
+				if (
+					contextStuffSpec.fieldName () != null
+					&& contextStuffSpec.template () != null
+				) {
+					throw new RuntimeException ();
+				}
 
-				privCode =
-					privKeySpec.privCode ();
+				if (contextStuffSpec.template () != null) {
 
-			} else if (
-				collectionHasTwoElements (
-					privCodeParts)
-			) {
+					contextStuff.set (
+						contextStuffSpec.name (),
+						contextStuff.substitutePlaceholders (
+							contextStuffSpec.template ()));
 
-				privObject =
-					genericCastUnchecked (
+				} else {
+
+					contextStuff.set (
+						contextStuffSpec.name (),
 						objectManager.dereferenceRequired (
 							object,
-							listFirstElementRequired (
-								privCodeParts)));
+							contextStuffSpec.fieldName ()));
 
-				privCode =
-					listSecondElementRequired (
-						privCodeParts);
-
-			} else {
-
-				throw new RuntimeException ();
+				}
 
 			}
 
-			if (
-				privChecker.canRecursive (
-					taskLogger,
-					privObject,
-					privCode)
-			) {
+			// set privs
 
-				contextStuff.grant (
-					privKeySpec.name ());
-
-			}
-
-		}
-
-		// run chained post processors
-
-		for (
-			RunPostProcessorSpec runPostProcessorSpec
-				: consoleHelperProviderSpec.runPostProcessors ()
-		) {
-
-			consoleManager.runPostProcessors (
-				taskLogger,
-				runPostProcessorSpec.name (),
-				contextStuff);
-
-		}
-
-	}
-
-	@Override
-	public
-	String getPathId (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Long objectId) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getPathId");
-
-		if (cryptor != null) {
-
-			return cryptor.encryptInteger (
-				taskLogger,
-				objectId);
-
-		} else {
-
-			return Long.toString (
-				objectId);
-
-		}
-
-	}
-
-	@Override
-	public
-	String getDefaultContextPath (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RecordType object) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getDefaultContextPath");
-
-		StringSubstituter stringSubstituter =
-			new StringSubstituter ();
-
-		if (objectHelper.typeCodeExists ()) {
-
-			stringSubstituter
-
-				.param (
-					"typeCode",
-					objectHelper.getTypeCode (
-						object))
-
-				.param (
-					"typeCamel",
-					underscoreToCamel (
-						objectHelper.getTypeCode (
-							object)));
-
-		}
-
-		String url =
-			stringFormat (
-
-				"/%s",
-				defaultObjectContextName (),
-
-				"/%s",
-				getPathId (
-					taskLogger,
-					object.getId ()));
-
-		return stringSubstituter.substitute (
-			url);
-
-	}
-
-	@Override
-	public
-	String localPath (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RecordType object) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"localPath");
-
-		String urlTemplate =
-
-			stringFormat (
-				"/-/%s",
-				defaultObjectContextName (),
-
-				"/%s",
-				getPathId (
-					taskLogger,
-					object.getId ()));
-
-		StringSubstituter stringSubstituter =
-			new StringSubstituter ();
-
-		if (objectHelper.typeCodeExists ()) {
-
-			stringSubstituter.param (
-				"typeCode",
-				objectHelper.getTypeCode (
-					object));
-
-		}
-
-		return stringSubstituter.substitute (
-			urlTemplate);
-
-	}
-
-	@Override
-	public
-	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RecordType object) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"canView (%s)",
-				object.toString ());
-
-		// types are always visible
-
-		if (objectHelper.type ()) {
-
-			taskLogger.debugFormat (
-				"Object types are visible to everyone");
-
-			return true;
-
-		}
-
-		// objects with cryptors are always visible
-
-		if (
-			isNotNull (
-				cryptor)
-		) {
-
-			taskLogger.debugFormat (
-				"Object with encrypted IDs are visible to everyone");
-
-			return true;
-
-		}
-
-		// view privs
-
-		if (
-			isNotNull (
-				viewPrivKeySpecs)
-		) {
-
-			taskLogger.debugFormat (
-				"Checking view priv keys");
-
-			Boolean visible =
-				false;
+			UserPrivChecker privChecker =
+				(UserPrivChecker)
+				this.privChecker;
 
 			for (
 				PrivKeySpec privKeySpec
-					: viewPrivKeySpecs
+					: consoleHelperProviderSpec.privKeys ()
 			) {
 
 				List <String> privCodeParts =
 					stringSplitColon (
 						privKeySpec.privCode ());
 
-				String privObjectPath;
-				Optional <Record <?>> privObjectOptional;
+				Record <?> privObject;
 				String privCode;
 
 				if (
@@ -570,11 +342,8 @@ class GenericConsoleHelperProvider <
 						privCodeParts)
 				) {
 
-					privObjectPath = null;
-
-					privObjectOptional =
-						optionalOf (
-							object);
+					privObject =
+						object;
 
 					privCode =
 						privKeySpec.privCode ();
@@ -584,15 +353,12 @@ class GenericConsoleHelperProvider <
 						privCodeParts)
 				) {
 
-					privObjectPath =
-						listFirstElementRequired (
-							privCodeParts);
-
-					privObjectOptional =
+					privObject =
 						genericCastUnchecked (
-							objectManager.dereference (
+							objectManager.dereferenceRequired (
 								object,
-								privObjectPath));
+								listFirstElementRequired (
+									privCodeParts)));
 
 					privCode =
 						listSecondElementRequired (
@@ -605,151 +371,421 @@ class GenericConsoleHelperProvider <
 				}
 
 				if (
-					optionalIsNotPresent (
-						privObjectOptional)
-				) {
-
-					taskLogger.debugFormat (
-						"Can't find delegate %s for view priv key",
-						privObjectPath);
-
-					continue;
-
-				}
-
-				Record <?> privObject =
-					privObjectOptional.get ();
-
-				if (
 					privChecker.canRecursive (
 						taskLogger,
 						privObject,
 						privCode)
 				) {
 
-					taskLogger.debugFormat (
-						"Object is visible because of priv '%s' on: %s",
-						privCode,
-						objectManager.objectPathMini (
-							privObject));
-
-					visible = true;
-
-				} else if (
-					isNotNull (
-						privObjectPath)
-				) {
-
-					taskLogger.debugFormat (
-						"Not granted visibility because of priv '%s' on: %s",
-						privCode,
-						privObjectPath);
-
-				} else {
-
-					taskLogger.debugFormat (
-						"Not granted visibility because of priv '%s'",
-						privCode);
+					contextStuff.grant (
+						privKeySpec.name ());
 
 				}
 
 			}
 
-			if (visible) {
-				return true;
+			// run chained post processors
+
+			for (
+				RunPostProcessorSpec runPostProcessorSpec
+					: consoleHelperProviderSpec.runPostProcessors ()
+			) {
+
+				consoleManager.runPostProcessors (
+					taskLogger,
+					runPostProcessorSpec.name (),
+					contextStuff);
+
 			}
 
 		}
 
-		// view delegate
+	}
 
-		if (
-			isNotNull (
-				viewDelegateField)
+	@Override
+	public
+	String getPathId (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long objectId) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getPathId");
+
 		) {
 
-			// special keyword 'public'
+			if (cryptor != null) {
 
-			if (
-				stringEqualSafe (
-					viewDelegateField,
-					"public")
-			) {
-				return true;
-			}
-
-			// lookup delegate
-
-			Optional <Record <?>> delegateOptional =
-				genericCastUnchecked (
-					optionalGetOrAbsent (
-						resultValue (
-							objectManager.dereferenceOrError (
-								object,
-								viewDelegateField))));
-
-			if (
-				optionalIsNotPresent (
-					delegateOptional)
-			) {
-
-				taskLogger.debugFormat (
-					"Object is not visible because view delegate %s ",
-					viewDelegateField,
-					"is not present");
-
-				return false;
-
-			}
-
-			Record <?> delegate =
-				optionalGetRequired (
-					delegateOptional);
-
-			// check priv
-
-			if (
-				isNotNull (
-					viewDelegatePrivCode)
-			) {
-
-				taskLogger.debugFormat (
-					"Delegating to %s priv %s",
-					viewDelegateField,
-					viewDelegatePrivCode);
-
-				return privChecker.canRecursive (
+				return cryptor.encryptInteger (
 					taskLogger,
-					delegate,
-					viewDelegatePrivCode);
+					objectId);
 
 			} else {
 
-				ConsoleHelper <?> delegateHelper =
-					consoleObjectManager.findConsoleHelperRequired (
-						delegate);
-
-				taskLogger.debugFormat (
-					"Delegating to %s",
-					viewDelegateField);
-
-				return delegateHelper.canView (
-					taskLogger,
-					genericCastUnchecked (
-						delegate));
+				return Long.toString (
+					objectId);
 
 			}
 
 		}
 
-		// default
+	}
 
-		taskLogger.debugFormat (
-			"Delegating to priv checker");
+	@Override
+	public
+	String getDefaultContextPath (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull RecordType object) {
 
-		return privChecker.canRecursive (
-			taskLogger,
-			object);
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getDefaultContextPath");
+
+		) {
+
+			StringSubstituter stringSubstituter =
+				new StringSubstituter ();
+
+			if (objectHelper.typeCodeExists ()) {
+
+				stringSubstituter
+
+					.param (
+						"typeCode",
+						objectHelper.getTypeCode (
+							object))
+
+					.param (
+						"typeCamel",
+						underscoreToCamel (
+							objectHelper.getTypeCode (
+								object)));
+
+			}
+
+			String url =
+				stringFormat (
+
+					"/%s",
+					defaultObjectContextName (),
+
+					"/%s",
+					getPathId (
+						taskLogger,
+						object.getId ()));
+
+			return stringSubstituter.substitute (
+				url);
+
+		}
+
+	}
+
+	@Override
+	public
+	String localPath (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull RecordType object) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"localPath");
+
+		) {
+
+			String urlTemplate =
+
+				stringFormat (
+					"/-/%s",
+					defaultObjectContextName (),
+
+					"/%s",
+					getPathId (
+						taskLogger,
+						object.getId ()));
+
+			StringSubstituter stringSubstituter =
+				new StringSubstituter ();
+
+			if (objectHelper.typeCodeExists ()) {
+
+				stringSubstituter.param (
+					"typeCode",
+					objectHelper.getTypeCode (
+						object));
+
+			}
+
+			return stringSubstituter.substitute (
+				urlTemplate);
+
+		}
+
+	}
+
+	@Override
+	public
+	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull RecordType object) {
+
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"canView (%s)",
+					object.toString ());
+
+		) {
+
+			// types are always visible
+
+			if (objectHelper.type ()) {
+
+				taskLogger.debugFormat (
+					"Object types are visible to everyone");
+
+				return true;
+
+			}
+
+			// objects with cryptors are always visible
+
+			if (
+				isNotNull (
+					cryptor)
+			) {
+
+				taskLogger.debugFormat (
+					"Object with encrypted IDs are visible to everyone");
+
+				return true;
+
+			}
+
+			// view privs
+
+			if (
+				isNotNull (
+					viewPrivKeySpecs)
+			) {
+
+				taskLogger.debugFormat (
+					"Checking view priv keys");
+
+				Boolean visible =
+					false;
+
+				for (
+					PrivKeySpec privKeySpec
+						: viewPrivKeySpecs
+				) {
+
+					List <String> privCodeParts =
+						stringSplitColon (
+							privKeySpec.privCode ());
+
+					String privObjectPath;
+					Optional <Record <?>> privObjectOptional;
+					String privCode;
+
+					if (
+						collectionHasOneElement (
+							privCodeParts)
+					) {
+
+						privObjectPath = null;
+
+						privObjectOptional =
+							optionalOf (
+								object);
+
+						privCode =
+							privKeySpec.privCode ();
+
+					} else if (
+						collectionHasTwoElements (
+							privCodeParts)
+					) {
+
+						privObjectPath =
+							listFirstElementRequired (
+								privCodeParts);
+
+						privObjectOptional =
+							genericCastUnchecked (
+								objectManager.dereference (
+									object,
+									privObjectPath));
+
+						privCode =
+							listSecondElementRequired (
+								privCodeParts);
+
+					} else {
+
+						throw new RuntimeException ();
+
+					}
+
+					if (
+						optionalIsNotPresent (
+							privObjectOptional)
+					) {
+
+						taskLogger.debugFormat (
+							"Can't find delegate %s for view priv key",
+							privObjectPath);
+
+						continue;
+
+					}
+
+					Record <?> privObject =
+						privObjectOptional.get ();
+
+					if (
+						privChecker.canRecursive (
+							taskLogger,
+							privObject,
+							privCode)
+					) {
+
+						taskLogger.debugFormat (
+							"Object is visible because of priv '%s' on: %s",
+							privCode,
+							objectManager.objectPathMini (
+								privObject));
+
+						visible = true;
+
+					} else if (
+						isNotNull (
+							privObjectPath)
+					) {
+
+						taskLogger.debugFormat (
+							"Not granted visibility because of priv '%s' on: %s",
+							privCode,
+							privObjectPath);
+
+					} else {
+
+						taskLogger.debugFormat (
+							"Not granted visibility because of priv '%s'",
+							privCode);
+
+					}
+
+				}
+
+				if (visible) {
+					return true;
+				}
+
+			}
+
+			// view delegate
+
+			if (
+				isNotNull (
+					viewDelegateField)
+			) {
+
+				// special keyword 'public'
+
+				if (
+					stringEqualSafe (
+						viewDelegateField,
+						"public")
+				) {
+					return true;
+				}
+
+				// lookup delegate
+
+				Optional <Record <?>> delegateOptional =
+					genericCastUnchecked (
+						optionalGetOrAbsent (
+							resultValue (
+								objectManager.dereferenceOrError (
+									object,
+									viewDelegateField))));
+
+				if (
+					optionalIsNotPresent (
+						delegateOptional)
+				) {
+
+					taskLogger.debugFormat (
+						"Object is not visible because view delegate %s ",
+						viewDelegateField,
+						"is not present");
+
+					return false;
+
+				}
+
+				Record <?> delegate =
+					optionalGetRequired (
+						delegateOptional);
+
+				// check priv
+
+				if (
+					isNotNull (
+						viewDelegatePrivCode)
+				) {
+
+					taskLogger.debugFormat (
+						"Delegating to %s priv %s",
+						viewDelegateField,
+						viewDelegatePrivCode);
+
+					return privChecker.canRecursive (
+						taskLogger,
+						delegate,
+						viewDelegatePrivCode);
+
+				} else {
+
+					ConsoleHelper <?> delegateHelper =
+						consoleObjectManager.findConsoleHelperRequired (
+							delegate);
+
+					taskLogger.debugFormat (
+						"Delegating to %s",
+						viewDelegateField);
+
+					return delegateHelper.canView (
+						taskLogger,
+						genericCastUnchecked (
+							delegate));
+
+				}
+
+			}
+
+			// default
+
+			taskLogger.debugFormat (
+				"Delegating to priv checker");
+
+			return privChecker.canRecursive (
+				taskLogger,
+				object);
+
+		}
 
 	}
 

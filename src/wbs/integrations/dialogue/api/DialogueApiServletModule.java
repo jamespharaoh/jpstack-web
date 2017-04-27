@@ -5,7 +5,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -32,7 +31,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -139,270 +138,280 @@ class DialogueApiServletModule
 		@Override
 		public
 		void doPost (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
+				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"inFile.doPost");
+			try (
 
-			// get request stuff
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"inFile.doPost");
 
-			Long routeId =
-				requestContext.requestIntegerRequired (
-					"route_id");
+			) {
 
-			// get params in local variables
+				// get request stuff
 
-			String numFromParam =
-				requestContext.parameterRequired (
-					"X-E3-Originating-Address");
+				Long routeId =
+					requestContext.requestIntegerRequired (
+						"route_id");
 
-			String numToParam =
-				requestContext.parameterRequired (
-					"X-E3-Recipients");
+				// get params in local variables
 
-			String idParam =
-				requestContext.parameterRequired (
-					"X-E3-ID");
+				String numFromParam =
+					requestContext.parameterRequired (
+						"X-E3-Originating-Address");
 
-			String networkParam =
-				requestContext.parameterRequired (
-					"X-E3-Network");
+				String numToParam =
+					requestContext.parameterRequired (
+						"X-E3-Recipients");
 
-			String hexMessageParam =
-				requestContext.parameterRequired (
-					"X-E3-Hex-Message");
+				String idParam =
+					requestContext.parameterRequired (
+						"X-E3-ID");
 
-			String userDataHeaderIndicatorParam =
-				requestContext.parameterRequired (
-					"X-E3-User-Data-Header-Indicator");
+				String networkParam =
+					requestContext.parameterRequired (
+						"X-E3-Network");
 
-			String dataCodingSchemeParam =
-				requestContext.parameterRequired (
-					"X-E3-Data-Coding-Scheme");
+				String hexMessageParam =
+					requestContext.parameterRequired (
+						"X-E3-Hex-Message");
 
-			// decode the network
+				String userDataHeaderIndicatorParam =
+					requestContext.parameterRequired (
+						"X-E3-User-Data-Header-Indicator");
 
-			Long networkId =
-				networks.get (
-					networkParam);
+				String dataCodingSchemeParam =
+					requestContext.parameterRequired (
+						"X-E3-Data-Coding-Scheme");
 
-			// determine the character set from the data coding scheme
+				// decode the network
 
-			int dataCodingScheme =
-				Integer.parseInt (
-					dataCodingSchemeParam,
-					16);
+				Long networkId =
+					networks.get (
+						networkParam);
 
-			String charset =
-				((dataCodingScheme & 0x08) == 0x08)
-					? "utf16"
-					: "iso-8859-1";
+				// determine the character set from the data coding scheme
 
-			byte[] allBytes;
+				int dataCodingScheme =
+					Integer.parseInt (
+						dataCodingSchemeParam,
+						16);
 
-			try {
+				String charset =
+					((dataCodingScheme & 0x08) == 0x08)
+						? "utf16"
+						: "iso-8859-1";
 
-				allBytes =
-					hexMessageParam != null
-						? Hex.decodeHex (hexMessageParam.toCharArray ())
-						: new byte [0];
+				byte[] allBytes;
 
-			} catch (DecoderException exception) {
-
-				throw new RuntimeException (exception);
-
-			}
-
-			// strip off the user data header (if present)
-
-			byte[] messageBytes;
-
-			UserDataHeader userDataHeader = null;
-
-			if ("1".equals (userDataHeaderIndicatorParam)) {
 				try {
 
-					// get header
+					allBytes =
+						hexMessageParam != null
+							? Hex.decodeHex (hexMessageParam.toCharArray ())
+							: new byte [0];
 
-					if (allBytes.length == 0)
-						throw new ServletException();
+				} catch (DecoderException exception) {
 
-					byte[] headerBytes =
-						new byte [(allBytes [0] & 0xFF) + 1];
-
-					if (allBytes.length < headerBytes.length)
-						throw new ServletException ();
-
-					System.arraycopy (
-						allBytes,
-						0,
-						headerBytes,
-						0,
-						headerBytes.length);
-
-					taskLogger.debugFormat (
-						"udh.length = %s",
-						integerToDecimalString (
-							headerBytes.length));
-
-					for (int i = 0; i < headerBytes.length; i++) {
-
-						taskLogger.debugFormat (
-							"udh [%s] = %s",
-							integerToDecimalString (
-								i),
-							integerToDecimalString (
-								headerBytes [i] & 0xff));
-
-					}
-
-					// and decode it
-
-					userDataHeader =
-						UserDataHeader.decode (ByteBuffer.wrap (headerBytes));
-
-					// then find the message bytes
-
-					messageBytes =
-						new byte [allBytes.length - headerBytes.length];
-
-					System.arraycopy (
-						allBytes,
-						headerBytes.length,
-						messageBytes,
-						0,
-						messageBytes.length);
-
-				} catch (Exception exception) {
-
-					taskLogger.debugFormat (
-						"Error decoding user data header: %s",
-						exception.getMessage ());
-
-					requestContext.debugParameters (
-						taskLogger);
-
-					throw new ServletException (
+					throw new RuntimeException (
 						exception);
 
 				}
 
-			} else {
+				// strip off the user data header (if present)
 
-				messageBytes = allBytes;
+				byte[] messageBytes;
 
-			}
+				UserDataHeader userDataHeader = null;
 
-			// decode the message body
+				if ("1".equals (userDataHeaderIndicatorParam)) {
+					try {
 
-			String message;
+						// get header
 
-			try {
+						if (allBytes.length == 0)
+							throw new ServletException();
 
-				message =
-					new String (
-						messageBytes,
-						charset);
+						byte[] headerBytes =
+							new byte [(allBytes [0] & 0xFF) + 1];
 
-			} catch (UnsupportedEncodingException exception) {
+						if (allBytes.length < headerBytes.length)
+							throw new ServletException ();
 
-				throw new RuntimeException (
-					exception);
+						System.arraycopy (
+							allBytes,
+							0,
+							headerBytes,
+							0,
+							headerBytes.length);
 
-			}
+						taskLogger.debugFormat (
+							"udh.length = %s",
+							integerToDecimalString (
+								headerBytes.length));
 
-			// save the message
+						for (int i = 0; i < headerBytes.length; i++) {
 
-			try (
+							taskLogger.debugFormat (
+								"udh [%s] = %s",
+								integerToDecimalString (
+									i),
+								integerToDecimalString (
+									headerBytes [i] & 0xff));
 
-				Transaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"DialogueApiServletModule.inFile.doPost ()",
-						this);
+						}
 
-			) {
+						// and decode it
 
-				RouteRec route =
-					routeHelper.findRequired (
-						routeId);
+						userDataHeader =
+							UserDataHeader.decode (ByteBuffer.wrap (headerBytes));
 
-				NetworkRec network =
-					networkId == null
-						? null
-						: networkHelper.findRequired (
-							networkId);
+						// then find the message bytes
 
-				// if it's a concatenated message...
+						messageBytes =
+							new byte [allBytes.length - headerBytes.length];
 
-				ConcatenatedInformationElement concat =
-					userDataHeader != null
-						? userDataHeader.find (
-							ConcatenatedInformationElement.class)
-						: null;
+						System.arraycopy (
+							allBytes,
+							headerBytes.length,
+							messageBytes,
+							0,
+							messageBytes.length);
 
-				if (concat != null) {
+					} catch (Exception exception) {
 
-					// insert a part message
+						taskLogger.debugFormat (
+							"Error decoding user data header: %s",
+							exception.getMessage ());
 
-					inboxMultipartLogic.insertInboxMultipart (
-						taskLogger,
-						route,
-						concat.getRef (),
-						concat.getSeqMax (),
-						concat.getSeqNum (),
-						numToParam,
-						numFromParam,
-						null,
-						network,
-						idParam,
-						message);
+						requestContext.debugParameters (
+							taskLogger);
+
+						throw new RuntimeException (
+							exception);
+
+					}
 
 				} else {
 
-					// insert a message
-
-					smsInboxLogic.inboxInsert (
-						taskLogger,
-						optionalOf (
-							idParam),
-						textHelper.findOrCreate (
-							taskLogger,
-							message),
-						smsNumberHelper.findOrCreate (
-							taskLogger,
-							numFromParam),
-						numToParam,
-						route,
-						optionalOf (
-							network),
-						optionalAbsent (),
-						emptyList (),
-						optionalAbsent (),
-						optionalAbsent ());
+					messageBytes = allBytes;
 
 				}
 
-				transaction.commit ();
+				// decode the message body
+
+				String message;
+
+				try {
+
+					message =
+						new String (
+							messageBytes,
+							charset);
+
+				} catch (UnsupportedEncodingException exception) {
+
+					throw new RuntimeException (
+						exception);
+
+				}
+
+				// save the message
+
+				try (
+
+					OwnedTransaction transaction =
+						database.beginReadWrite (
+							taskLogger,
+							"DialogueApiServletModule.inFile.doPost ()",
+							this);
+
+				) {
+
+					RouteRec route =
+						routeHelper.findRequired (
+							routeId);
+
+					NetworkRec network =
+						networkId == null
+							? null
+							: networkHelper.findRequired (
+								networkId);
+
+					// if it's a concatenated message...
+
+					ConcatenatedInformationElement concat =
+						userDataHeader != null
+							? userDataHeader.find (
+								ConcatenatedInformationElement.class)
+							: null;
+
+					if (concat != null) {
+
+						// insert a part message
+
+						inboxMultipartLogic.insertInboxMultipart (
+							taskLogger,
+							route,
+							concat.getRef (),
+							concat.getSeqMax (),
+							concat.getSeqNum (),
+							numToParam,
+							numFromParam,
+							null,
+							network,
+							idParam,
+							message);
+
+					} else {
+
+						// insert a message
+
+						smsInboxLogic.inboxInsert (
+							taskLogger,
+							optionalOf (
+								idParam),
+							textHelper.findOrCreate (
+								taskLogger,
+								message),
+							smsNumberHelper.findOrCreate (
+								taskLogger,
+								numFromParam),
+							numToParam,
+							route,
+							optionalOf (
+								network),
+							optionalAbsent (),
+							emptyList (),
+							optionalAbsent (),
+							optionalAbsent ());
+
+					}
+
+					transaction.commit ();
+
+				}
+
+				try (
+
+					FormatWriter formatWriter =
+						requestContext.formatWriter ();
+
+				) {
+
+					formatWriter.writeLineFormat (
+						"<HTML>");
+
+					formatWriter.writeLineFormat (
+						"<!-- X-E3-Submission-Report: \"00\" -->");
+
+					formatWriter.writeLineFormat (
+						"</HTML>");
+
+				}
 
 			}
-
-			FormatWriter formatWriter =
-				requestContext.formatWriter ();
-
-			formatWriter.writeLineFormat (
-				"<HTML>");
-
-			formatWriter.writeLineFormat (
-				"<!-- X-E3-Submission-Report: \"00\" -->");
-
-			formatWriter.writeLineFormat (
-				"</HTML>");
 
 		}
 
@@ -417,150 +426,156 @@ class DialogueApiServletModule
 		Responder handle (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reportAction.handle");
+			try (
 
-			String idParam =
-				requestContext.parameterRequired (
-					"X-E3-ID");
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"reportAction.handle");
 
-			String deliveryReportParam =
-				requestContext.parameterRequired (
-					"X-E3-Delivery-Report");
-
-			String submissionReportParam =
-				requestContext.parameterRequired (
-					"X-E3-Submission-Report");
-
-			String userKeyParam =
-				requestContext.parameterRequired (
-					"X-E3-User-Key");
-
-			// TODO dump params
-
-			for (
-				Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()
 			) {
 
-				String name =
-					entry.getKey ();
+				String idParam =
+					requestContext.parameterRequired (
+						"X-E3-ID");
 
-				List<String> values =
-					entry.getValue ();
+				String deliveryReportParam =
+					requestContext.parameterRequired (
+						"X-E3-Delivery-Report");
+
+				String submissionReportParam =
+					requestContext.parameterRequired (
+						"X-E3-Submission-Report");
+
+				String userKeyParam =
+					requestContext.parameterRequired (
+						"X-E3-User-Key");
+
+				// TODO dump params
 
 				for (
-					String value
-						: values
+					Map.Entry<String,List<String>> entry
+						: requestContext.parameterMap ().entrySet ()
 				) {
 
-					taskLogger.debugFormat (
-						"Param %s = %s",
-						name,
-						value);
+					String name =
+						entry.getKey ();
+
+					List<String> values =
+						entry.getValue ();
+
+					for (
+						String value
+							: values
+					) {
+
+						taskLogger.debugFormat (
+							"Param %s = %s",
+							name,
+							value);
+
+					}
 
 				}
 
-			}
+				// check for a user key
 
-			// check for a user key
+				if (userKeyParam == null) {
 
-			if (userKeyParam == null) {
+					taskLogger.warningFormat (
+						"Ignoring dialogue report with no user key, X-E3-ID=%s",
+						idParam);
 
-				taskLogger.warningFormat (
-					"Ignoring dialogue report with no user key, X-E3-ID=%s",
-					idParam);
+					return dialogueResponderProvider
+						.get ();
 
-				return dialogueResponderProvider
-					.get ();
+				}
 
-			}
-
-			Long messageId =
-				Long.parseLong (
-					userKeyParam);
-
-			// work out the delivery report's meaning
-
-			MessageStatus newMessageStatus = null;
-
-			if (
-				deliveryReportParam != null
-				&& submissionReportParam != null
-			) {
-
-				throw new RuntimeException (
-					"Got both delivery and submission reports!");
-
-			}
-
-			Long statusCode;
-
-			if (deliveryReportParam != null) {
-
-				statusCode =
+				Long messageId =
 					Long.parseLong (
-						deliveryReportParam,
-						16);
+						userKeyParam);
 
-				if (statusCode == 0)
-					newMessageStatus = MessageStatus.delivered;
+				// work out the delivery report's meaning
 
-				else if (statusCode >= 0x40 && statusCode <= 0x5f)
-					newMessageStatus = MessageStatus.undelivered;
+				MessageStatus newMessageStatus = null;
 
-				// code = deliveryReportParam;
+				if (
+					deliveryReportParam != null
+					&& submissionReportParam != null
+				) {
 
-			} else if (submissionReportParam != null) {
+					throw new RuntimeException (
+						"Got both delivery and submission reports!");
 
-				statusCode =
-					Long.parseLong (
-						submissionReportParam,
-						16);
+				}
 
-				if (statusCode == 0)
-					newMessageStatus = MessageStatus.submitted;
+				Long statusCode;
 
-				// code = submissionReportParam;
+				if (deliveryReportParam != null) {
 
-			} else {
+					statusCode =
+						Long.parseLong (
+							deliveryReportParam,
+							16);
 
-				taskLogger.errorFormat (
-					"Unrecognised report for %s",
-					integerToDecimalString (
-						messageId));
+					if (statusCode == 0)
+						newMessageStatus = MessageStatus.delivered;
 
-				return dialogueResponderProvider
-					.get ();
+					else if (statusCode >= 0x40 && statusCode <= 0x5f)
+						newMessageStatus = MessageStatus.undelivered;
 
-			}
+					// code = deliveryReportParam;
 
-			try (
+				} else if (submissionReportParam != null) {
 
-				Transaction transaction =
-					database.beginReadWrite (
+					statusCode =
+						Long.parseLong (
+							submissionReportParam,
+							16);
+
+					if (statusCode == 0)
+						newMessageStatus = MessageStatus.submitted;
+
+					// code = submissionReportParam;
+
+				} else {
+
+					taskLogger.errorFormat (
+						"Unrecognised report for %s",
+						integerToDecimalString (
+							messageId));
+
+					return dialogueResponderProvider
+						.get ();
+
+				}
+
+				try (
+
+					OwnedTransaction transaction =
+						database.beginReadWrite (
+							taskLogger,
+							"DialogueApiServletModule.reportAction.handle ()",
+							this);
+
+				) {
+
+					reportLogic.deliveryReport (
 						taskLogger,
-						"DialogueApiServletModule.reportAction.handle ()",
-						this);
+						messageId,
+						newMessageStatus,
+						Optional.of (
+							deliveryReportParam),
+						Optional.absent (),
+						Optional.absent (),
+						Optional.absent ());
 
-			) {
+					transaction.commit ();
 
-				reportLogic.deliveryReport (
-					taskLogger,
-					messageId,
-					newMessageStatus,
-					Optional.of (
-						deliveryReportParam),
-					Optional.absent (),
-					Optional.absent (),
-					Optional.absent ());
+					return dialogueResponderProvider
+						.get ();
 
-				transaction.commit ();
-
-				return dialogueResponderProvider
-					.get ();
+				}
 
 			}
 

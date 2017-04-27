@@ -39,7 +39,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
@@ -136,7 +136,7 @@ class EventConsoleLogicImplementation
 
 			try (
 
-				Transaction transaction =
+				OwnedTransaction transaction =
 					database.beginReadOnly (
 						taskLogger,
 						stringFormat (
@@ -170,127 +170,139 @@ class EventConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeEventHtml");
+		try (
 
-		EventTypeRec eventType =
-			event.getEventType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeEventHtml");
 
-		String text =
-			HtmlUtils.htmlEncode (
-				eventType.getDescription ());
-
-		// TODO this is not correct and will not handle text matching "%#" in
-		// the previous replacements. it should be replaced with a single pass.
-
-		for (
-			EventLinkRec eventLink
-				: event.getEventLinks ()
 		) {
 
-			if (
-				integerEqualSafe (
-					eventLink.getTypeId (),
-					EventLogic.integerEventLinkType)
+			EventTypeRec eventType =
+				event.getEventType ();
+
+			String text =
+				HtmlUtils.htmlEncode (
+					eventType.getDescription ());
+
+			// TODO this is not correct and will not handle text matching "%#" in
+			// the previous replacements. it should be replaced with a single pass.
+
+			for (
+				EventLinkRec eventLink
+					: event.getEventLinks ()
 			) {
 
-				// integer
+				if (
+					integerEqualSafe (
+						eventLink.getTypeId (),
+						EventLogic.integerEventLinkType)
+				) {
 
-				text =
-					text.replaceAll (
-						"%" + eventLink.getIndex (),
-						HtmlUtils.htmlEncode (
-							eventLink.getRefId ().toString ()));
+					// integer
 
-			} else if (
-				integerEqualSafe (
-					eventLink.getTypeId (),
-					EventLogic.booleanEventLinkType)
-			) {
+					text =
+						text.replaceAll (
+							"%" + eventLink.getIndex (),
+							HtmlUtils.htmlEncode (
+								eventLink.getRefId ().toString ()));
 
-				// boolean
+				} else if (
+					integerEqualSafe (
+						eventLink.getTypeId (),
+						EventLogic.booleanEventLinkType)
+				) {
 
-				text =
-					text.replaceAll (
-						"%" + eventLink.getIndex (),
-						eventLink.getRefId () != 0 ? "yes" : "no");
+					// boolean
 
-			} else if (
-				integerEqualSafe (
-					eventLink.getTypeId (),
-					EventLogic.instantEventLinkType)
-			) {
+					text =
+						text.replaceAll (
+							"%" + eventLink.getIndex (),
+							eventLink.getRefId () != 0 ? "yes" : "no");
 
-				// instant
+				} else if (
+					integerEqualSafe (
+						eventLink.getTypeId (),
+						EventLogic.instantEventLinkType)
+				) {
 
-				text =
-					text.replaceAll (
-						"%" + eventLink.getIndex (),
-						userConsoleLogic.timestampWithTimezoneString (
-							millisToInstant (
-								eventLink.getRefId ())));
+					// instant
 
-			} else if (
-				integerEqualSafe (
-					eventLink.getTypeId (),
-					EventLogic.durationEventLinkType)
-			) {
+					text =
+						text.replaceAll (
+							"%" + eventLink.getIndex (),
+							userConsoleLogic.timestampWithTimezoneString (
+								millisToInstant (
+									eventLink.getRefId ())));
 
-				// duration
+				} else if (
+					integerEqualSafe (
+						eventLink.getTypeId (),
+						EventLogic.durationEventLinkType)
+				) {
 
-				text =
-					text.replaceAll (
-						"%" + eventLink.getIndex (),
-						userConsoleLogic.prettyDuration (
-							millisecondsToDuration (
-								eventLink.getRefId ())));
+					// duration
 
-			} else {
+					text =
+						text.replaceAll (
+							"%" + eventLink.getIndex (),
+							userConsoleLogic.prettyDuration (
+								millisecondsToDuration (
+									eventLink.getRefId ())));
 
-				// locate referenced object
+				} else {
 
-				Record <?> object =
-					objectManager.findObject (
-						new GlobalId (
-							eventLink.getTypeId (),
-							eventLink.getRefId ()));
+					// locate referenced object
 
-				// escape replacement text, what a mess ;-)
+					Record <?> object =
+						objectManager.findObject (
+							new GlobalId (
+								eventLink.getTypeId (),
+								eventLink.getRefId ()));
 
-				StringFormatWriter objectFormatWriter =
-					new StringFormatWriter ();
+					// escape replacement text, what a mess ;-)
 
-				writeObjectAsHtml (
-					taskLogger,
-					objectFormatWriter,
-					object);
+					try (
 
-				String replacement =
-					objectFormatWriter.toString ()
+						StringFormatWriter objectFormatWriter =
+							new StringFormatWriter ();
 
-					.replaceAll (
-						"\\\\",
-						"\\\\\\\\")
+					) {
 
-					.replaceAll (
-						"\\$",
-						"\\\\\\$");
+						writeObjectAsHtml (
+							taskLogger,
+							objectFormatWriter,
+							object);
 
-				// perform replacement
+						String replacement =
+							objectFormatWriter.toString ()
 
-				text =
-					text.replaceAll (
-						"%" + eventLink.getIndex (),
-						replacement);
+							.replaceAll (
+								"\\\\",
+								"\\\\\\\\")
+
+							.replaceAll (
+								"\\$",
+								"\\\\\\$");
+
+						// perform replacement
+
+						text =
+							text.replaceAll (
+								"%" + eventLink.getIndex (),
+								replacement);
+
+					}
+
+				}
 
 			}
 
-		}
+			formatWriter.writeString (
+				text);
 
-		formatWriter.writeString (
-			text);
+		}
 
 	}
 
@@ -301,57 +313,63 @@ class EventConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object object) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeObjectAsHtml");
+		try (
 
-		if (object instanceof Integer) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeObjectAsHtml");
 
-			formatWriter.writeString (
-				object.toString ());
+		) {
 
-		} else if (object instanceof TextRec) {
+			if (object instanceof Integer) {
 
-			TextRec text =
-				(TextRec)
-				object;
+				formatWriter.writeString (
+					object.toString ());
 
-			formatWriter.writeFormat (
-				"\"%s\"",
-				text.getText ());
+			} else if (object instanceof TextRec) {
 
-		} else if (object instanceof MediaRec) {
+				TextRec text =
+					(TextRec)
+					object;
 
-			MediaRec media =
-				(MediaRec)
-				object;
+				formatWriter.writeFormat (
+					"\"%s\"",
+					text.getText ());
 
-			htmlLinkWriteHtml (
-				objectManager.localLink (
-					taskLogger,
-					media),
-				() -> mediaConsoleLogic.writeMediaThumb32 (
+			} else if (object instanceof MediaRec) {
+
+				MediaRec media =
+					(MediaRec)
+					object;
+
+				htmlLinkWriteHtml (
+					objectManager.localLink (
+						taskLogger,
+						media),
+					() -> mediaConsoleLogic.writeMediaThumb32 (
+						taskLogger,
+						formatWriter,
+						media));
+
+			} else if (object instanceof Record) {
+
+				Record <?> dataObject =
+					(Record <?>)
+					object;
+
+				objectManager.writeHtmlForObject (
 					taskLogger,
 					formatWriter,
-					media));
+					dataObject,
+					optionalAbsent (),
+					false);
 
-		} else if (object instanceof Record) {
+			} else {
 
-			Record <?> dataObject =
-				(Record <?>)
-				object;
+				throw new IllegalArgumentException ();
 
-			objectManager.writeHtmlForObject (
-				taskLogger,
-				formatWriter,
-				dataObject,
-				optionalAbsent (),
-				false);
-
-		} else {
-
-			throw new IllegalArgumentException ();
+			}
 
 		}
 
@@ -364,64 +382,70 @@ class EventConsoleLogicImplementation
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Iterable <EventRec> events) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeEventsTable");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeEventsTable");
 
-		htmlTableHeaderRowWrite (
-			"Time",
-			"Details");
-
-		int dayNumber = 0;
-
-		for (
-			EventRec event
-				: events
 		) {
 
-			Calendar calendar =
-				Calendar.getInstance ();
+			htmlTableOpenList ();
 
-			calendar.setTime (
-				instantToDateNullSafe (
-					event.getTimestamp ()));
+			htmlTableHeaderRowWrite (
+				"Time",
+				"Details");
 
-			int newDayNumber =
-				(calendar.get (Calendar.YEAR) << 9)
-				+ calendar.get (Calendar.DAY_OF_YEAR);
+			int dayNumber = 0;
 
-			if (newDayNumber != dayNumber) {
+			for (
+				EventRec event
+					: events
+			) {
 
-				htmlTableRowSeparatorWrite ();
+				Calendar calendar =
+					Calendar.getInstance ();
 
-				htmlTableRowOpen (
-					htmlStyleRuleEntry (
-						"font-weight",
-						"bold"));
+				calendar.setTime (
+					instantToDateNullSafe (
+						event.getTimestamp ()));
 
-				htmlTableCellWrite (
-					userConsoleLogic.dateStringLong (
-						event.getTimestamp ()),
-					htmlColumnSpanAttribute (2l));
+				int newDayNumber =
+					(calendar.get (Calendar.YEAR) << 9)
+					+ calendar.get (Calendar.DAY_OF_YEAR);
 
-				htmlTableRowClose ();
+				if (newDayNumber != dayNumber) {
 
-				dayNumber =
-					newDayNumber;
+					htmlTableRowSeparatorWrite ();
+
+					htmlTableRowOpen (
+						htmlStyleRuleEntry (
+							"font-weight",
+							"bold"));
+
+					htmlTableCellWrite (
+						userConsoleLogic.dateStringLong (
+							event.getTimestamp ()),
+						htmlColumnSpanAttribute (2l));
+
+					htmlTableRowClose ();
+
+					dayNumber =
+						newDayNumber;
+
+				}
+
+				writeEventRow (
+					taskLogger,
+					htmlWriter,
+					event);
 
 			}
 
-			writeEventRow (
-				taskLogger,
-				htmlWriter,
-				event);
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
@@ -432,44 +456,52 @@ class EventConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeEventRow");
+		try (
 
-		htmlTableRowOpen ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeEventRow");
 
-		htmlTableCellWrite (
-			userConsoleLogic.timeString (
-				event.getTimestamp ()));
+		) {
 
-		try {
-
-			StringFormatWriter eventFormatWriter =
-				new StringFormatWriter ();
-
-			writeEventHtml (
-				taskLogger,
-				eventFormatWriter,
-				event);
-
-			htmlTableCellWriteHtml (
-				eventFormatWriter.toString ());
-
-		} catch (RuntimeException exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error displaying event %s",
-				integerToDecimalString (
-					event.getId ()));
+			htmlTableRowOpen ();
 
 			htmlTableCellWrite (
-				"(error displaying this event)");
+				userConsoleLogic.timeString (
+					event.getTimestamp ()));
+
+			try (
+
+				StringFormatWriter eventFormatWriter =
+					new StringFormatWriter ();
+
+			) {
+
+				writeEventHtml (
+					taskLogger,
+					eventFormatWriter,
+					event);
+
+				htmlTableCellWriteHtml (
+					eventFormatWriter.toString ());
+
+			} catch (RuntimeException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error displaying event %s",
+					integerToDecimalString (
+						event.getId ()));
+
+				htmlTableCellWrite (
+					"(error displaying this event)");
+
+			}
+
+			htmlTableRowClose ();
 
 		}
-
-		htmlTableRowClose ();
 
 	}
 

@@ -87,152 +87,158 @@ class ChatMessagePendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		// script open
-
-		htmlScriptBlockOpen ();
-
-		// original message
-
-		formatWriter.writeLineFormat (
-			"var originalMessage = '%j';",
-			chatMessage.getOriginalText ().getText ());
-
-		// edited message
-
-		formatWriter.writeLineFormat (
-			"var editedMessage = '%j';",
-			chatMessage.getEditedText ().getText ());
-
-		// help templates
-
-		formatWriter.writeLineFormat (
-			"var helpTemplates = new Array ();");
-
-		for (
-			ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates
 		) {
 
-			formatWriter.writeLineFormat (
-				"helpTemplates [%s] = '%j';",
-				integerToDecimalString (
-					chatHelpTemplate.getId ()),
-				chatHelpTemplate.getText ());
+			super.renderHtmlHeadContents (
+				taskLogger);
 
-		}
+			// script open
 
-		// use template function
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function useTemplate () {");
-
-		formatWriter.writeLineFormat (
-			"var templateId = document.getElementById ('templateId');");
-
-		formatWriter.writeLineFormat (
-			"var text = document.getElementById ('message');");
-
-		formatWriter.writeLineFormat (
-			"if (templateId.value == '') return;");
-
-		formatWriter.writeLineFormat (
-			"var template = helpTemplates[templateId.value];");
-
-		formatWriter.writeLineFormat (
-			"if (template) text.value = template;");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// show message function
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function showMessage (message) {");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('message').value = message;");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('helpRow').style.display = 'none';");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('sendButton').style.display = 'inline';");
-
-		if (
-			isNotNull (
-				requestContext.request (
-					"showSendWithoutApproval"))
-		) {
+			// original message
 
 			formatWriter.writeLineFormat (
-				"document.getElementById ('sendWithoutApprovalButton').style",
-				".display = 'inline';");
+				"var originalMessage = '%j';",
+				chatMessage.getOriginalText ().getText ());
 
-		}
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('rejectButton').style.display = 'none';");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// show reject function
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function showReject () {");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('message').value = '';");
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"try {");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('helpRow').style.display = 'table-row';");
-
-		formatWriter.writeLineFormatDecreaseIncreaseIndent (
-			"} catch (e) {");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('helpRow').style.display = 'block';");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('sendButton').style.display =\n",
-			"    'none';\n");
-
-		if (
-			isNotNull (
-				requestContext.request (
-					"showSendWithoutApproval"))
-		) {
+			// edited message
 
 			formatWriter.writeLineFormat (
-				"document.getElementById ('sendWithoutApprovalButton').style",
-				".display = 'none';");
+				"var editedMessage = '%j';",
+				chatMessage.getEditedText ().getText ());
+
+			// help templates
+
+			formatWriter.writeLineFormat (
+				"var helpTemplates = new Array ();");
+
+			for (
+				ChatHelpTemplateRec chatHelpTemplate
+					: chatHelpTemplates
+			) {
+
+				formatWriter.writeLineFormat (
+					"helpTemplates [%s] = '%j';",
+					integerToDecimalString (
+						chatHelpTemplate.getId ()),
+					chatHelpTemplate.getText ());
+
+			}
+
+			// use template function
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function useTemplate () {");
+
+			formatWriter.writeLineFormat (
+				"var templateId = document.getElementById ('templateId');");
+
+			formatWriter.writeLineFormat (
+				"var text = document.getElementById ('message');");
+
+			formatWriter.writeLineFormat (
+				"if (templateId.value == '') return;");
+
+			formatWriter.writeLineFormat (
+				"var template = helpTemplates[templateId.value];");
+
+			formatWriter.writeLineFormat (
+				"if (template) text.value = template;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// show message function
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function showMessage (message) {");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('message').value = message;");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('helpRow').style.display = 'none';");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('sendButton').style.display = 'inline';");
+
+			if (
+				isNotNull (
+					requestContext.request (
+						"showSendWithoutApproval"))
+			) {
+
+				formatWriter.writeLineFormat (
+					"document.getElementById ('sendWithoutApprovalButton').style",
+					".display = 'inline';");
+
+			}
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('rejectButton').style.display = 'none';");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// show reject function
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function showReject () {");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('message').value = '';");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"try {");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('helpRow').style.display = 'table-row';");
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"} catch (e) {");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('helpRow').style.display = 'block';");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('sendButton').style.display =\n",
+				"    'none';\n");
+
+			if (
+				isNotNull (
+					requestContext.request (
+						"showSendWithoutApproval"))
+			) {
+
+				formatWriter.writeLineFormat (
+					"document.getElementById ('sendWithoutApprovalButton').style",
+					".display = 'none';");
+
+			}
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('rejectButton').style.display = ",
+				"'inline';");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			// script close
+
+			htmlScriptBlockClose ();
 
 		}
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('rejectButton').style.display = ",
-			"'inline';");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		// script close
-
-		htmlScriptBlockClose ();
 
 	}
 

@@ -1,5 +1,6 @@
 package wbs.apn.chat.date.daemon;
 
+import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -122,52 +123,136 @@ class ChatDateCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
-
-		MessageRec message =
-			inbox.getMessage ();
-
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// work out date mode
-
-		if (! validCommandCodes.contains (
-				command.getCode ()))
-			throw new RuntimeException ();
-
-		ChatUserDateMode dateMode =
-			dateModeByCommandCode.get (
-				command.getCode ());
-
-		// do join
-
-		if (
-			chatUser.getDateMode () == ChatUserDateMode.none
-			&& dateMode != ChatUserDateMode.none
 		) {
 
-			// log request
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
+
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// work out date mode
+
+			if (
+				doesNotContain (
+					validCommandCodes,
+					command.getCode ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			ChatUserDateMode dateMode =
+				dateModeByCommandCode.get (
+					command.getCode ());
+
+			// do join
+
+			if (
+				chatUser.getDateMode () == ChatUserDateMode.none
+				&& dateMode != ChatUserDateMode.none
+			) {
+
+				// log request
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					optionalOf (
+						command),
+					false);
+
+				// set date mode
+
+				chatDateLogic.userDateStuff (
+					taskLogger,
+					chatUser,
+					null,
+					optionalOf (
+						message),
+					dateMode,
+					true);
+
+				// process inbox
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// do upgrade
+
+			if (
+				chatUser.getDateMode () == ChatUserDateMode.text
+				&& dateMode == null
+				&& ChatPatterns.yes.matcher (rest).find ()
+			) {
+
+				// log request
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					optionalOf (
+						command),
+					false);
+
+				// update user
+
+				chatDateLogic.userDateStuff (
+					taskLogger,
+					chatUser,
+					null,
+					optionalOf (
+						message),
+					dateMode,
+					true);
+
+				// process inbox
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalAbsent (),
+					optionalAbsent (),
+					command);
+
+			}
+
+			// manually process
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				taskLogger,
@@ -176,60 +261,6 @@ class ChatDateCommand
 				rest,
 				optionalOf (
 					command),
-				false);
-
-			// set date mode
-
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				null,
-				optionalOf (
-					message),
-				dateMode,
-				true);
-
-			// process inbox
-
-			return smsInboxLogic.inboxProcessed (
-				taskLogger,
-				inbox,
-				optionalOf (
-					defaultService),
-				optionalOf (
-					affiliate),
-				command);
-
-		}
-
-		// do upgrade
-
-		if (
-			chatUser.getDateMode () == ChatUserDateMode.text
-			&& dateMode == null
-			&& ChatPatterns.yes.matcher (rest).find ()
-		) {
-
-			// log request
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				optionalOf (
-					command),
-				false);
-
-			// update user
-
-			chatDateLogic.userDateStuff (
-				taskLogger,
-				chatUser,
-				null,
-				optionalOf (
-					message),
-				dateMode,
 				true);
 
 			// process inbox
@@ -242,26 +273,6 @@ class ChatDateCommand
 				command);
 
 		}
-
-		// manually process
-
-		chatHelpLogLogic.createChatHelpLogIn (
-			taskLogger,
-			chatUser,
-			message,
-			rest,
-			optionalOf (
-				command),
-			true);
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalAbsent (),
-			optionalAbsent (),
-			command);
 
 	}
 

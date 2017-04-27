@@ -106,53 +106,60 @@ class ChatUserSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		creditCheckResult =
-			chatCreditLogic.userCreditCheck (
-				taskLogger,
-				chatUser);
+		) {
 
-		internalChatUserCharges =
-			new ArrayList<> ();
+			chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		externalChatUserCharges =
-			new ArrayList<> ();
+			creditCheckResult =
+				chatCreditLogic.userCreditCheck (
+					taskLogger,
+					chatUser);
 
-		chatHooks.collectChatUserCharges (
-			chatUser,
-			internalChatUserCharges,
-			externalChatUserCharges);
+			internalChatUserCharges =
+				new ArrayList<> ();
 
-		Comparator<ChatLogicHooks.ChatUserCharge> comparator =
-			new Comparator<ChatLogicHooks.ChatUserCharge> () {
+			externalChatUserCharges =
+				new ArrayList<> ();
 
-			@Override
-			public
-			int compare (
-					ChatUserCharge left,
-					ChatUserCharge right) {
+			chatHooks.collectChatUserCharges (
+				chatUser,
+				internalChatUserCharges,
+				externalChatUserCharges);
 
-				return left.name.compareTo (
-					right.name);
+			Comparator<ChatLogicHooks.ChatUserCharge> comparator =
+				new Comparator<ChatLogicHooks.ChatUserCharge> () {
 
-			}
+				@Override
+				public
+				int compare (
+						ChatUserCharge left,
+						ChatUserCharge right) {
 
-		};
+					return left.name.compareTo (
+						right.name);
 
-		Collections.sort (
-			internalChatUserCharges,
-			comparator);
+				}
 
-		Collections.sort (
-			externalChatUserCharges,
-			comparator);
+			};
+
+			Collections.sort (
+				internalChatUserCharges,
+				comparator);
+
+			Collections.sort (
+				externalChatUserCharges,
+				comparator);
+
+		}
+
 	}
 
 	@Override
@@ -160,363 +167,369 @@ class ChatUserSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		boolean isUser =
-			chatUser.getType () == ChatUserType.user;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenDetails ();
+		) {
 
-		htmlTableDetailsRowWrite (
-			"Id",
-			integerToDecimalString (
-				chatUser.getId ()));
+			boolean isUser =
+				chatUser.getType () == ChatUserType.user;
 
-		htmlTableDetailsRowWrite (
-			"Code",
-			chatUser.getCode ());
-
-		htmlTableDetailsRowWrite (
-			"Type",
-			chatUser.getType ().name ());
-
-		htmlTableDetailsRowWrite (
-			"Gender",
-			ifNotNullThenElseEmDash (
-				chatUser.getGender (),
-				() -> chatUser.getGender ().name ()));
-
-		htmlTableDetailsRowWrite (
-			"Orient",
-			ifNotNullThenElseEmDash (
-				chatUser.getOrient (),
-				() -> chatUser.getOrient ().name ()));
-
-		htmlTableDetailsRowWrite (
-			"Operator label",
-			ifNotNullThenElseEmDash (
-				chatUser.getOperatorLabel (),
-				() -> chatUser.getOperatorLabel ().name ()));
-
-		htmlTableDetailsRowWrite (
-			"Date of birth",
-			ifNotNullThenElseEmDash (
-				chatUser.getDob (),
-				() ->
-					timeFormatter.dateString (
-						chatUser.getDob ())));
-
-		htmlTableDetailsRowWrite (
-			"Name",
-			ifNotNullThenElseEmDash (
-				chatUser.getName (),
-				() -> chatUser.getName ()));
-
-		htmlTableDetailsRowWrite (
-			"Info",
-			ifNotNullThenElseEmDash (
-				chatUser.getInfoText (),
-				() -> chatUser.getInfoText ().getText ()));
-
-		if (! chatUser.getChatUserImageList ().isEmpty ()) {
-
-			htmlTableDetailsRowWriteHtml (
-				"Pic",
-				() -> mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
-					chatUser.getChatUserImageList ().get (0).getMedia ()));
-
-		}
-
-		htmlTableDetailsRowWriteRaw (
-			"Location",
-			ifNotNullThenElseEmDash (
-				chatUser.getLocationLongLat (),
-				() -> gazetteerLogic.findNearestCanonicalEntry (
-					chatUser.getChat ().getGazetteer (),
-					chatUser.getLocationLongLat ()
-				).getName ()));
-
-		htmlTableDetailsRowWrite (
-			"Online",
-			booleanToYesNo (
-				chatUser.getOnline ()));
-
-		if (isUser) {
+			htmlTableOpenDetails ();
 
 			htmlTableDetailsRowWrite (
-				"First join",
-				ifNotNullThenElseEmDash (
-					chatUser.getFirstJoin (),
-					() -> timeFormatter.timestampTimezoneString (
-						chatUserLogic.getTimezone (
-							chatUser),
-						chatUser.getFirstJoin ())));
+				"Id",
+				integerToDecimalString (
+					chatUser.getId ()));
 
 			htmlTableDetailsRowWrite (
-				"Last join",
+				"Code",
+				chatUser.getCode ());
+
+			htmlTableDetailsRowWrite (
+				"Type",
+				chatUser.getType ().name ());
+
+			htmlTableDetailsRowWrite (
+				"Gender",
 				ifNotNullThenElseEmDash (
-					chatUser.getLastJoin (),
-					() -> timeFormatter.timestampTimezoneString (
-						chatUserLogic.getTimezone (
-							chatUser),
-						chatUser.getLastJoin ())));
+					chatUser.getGender (),
+					() -> chatUser.getGender ().name ()));
 
-		}
+			htmlTableDetailsRowWrite (
+				"Orient",
+				ifNotNullThenElseEmDash (
+					chatUser.getOrient (),
+					() -> chatUser.getOrient ().name ()));
 
-		if (isUser) {
+			htmlTableDetailsRowWrite (
+				"Operator label",
+				ifNotNullThenElseEmDash (
+					chatUser.getOperatorLabel (),
+					() -> chatUser.getOperatorLabel ().name ()));
 
-			ChatSchemeChargesRec charges =
-				chatUser.getChatScheme () != null
-					? chatUser.getChatScheme ().getCharges ()
-					: null;
+			htmlTableDetailsRowWrite (
+				"Date of birth",
+				ifNotNullThenElseEmDash (
+					chatUser.getDob (),
+					() ->
+						timeFormatter.dateString (
+							chatUser.getDob ())));
 
-			htmlTableRowSeparatorWrite ();
+			htmlTableDetailsRowWrite (
+				"Name",
+				ifNotNullThenElseEmDash (
+					chatUser.getName (),
+					() -> chatUser.getName ()));
+
+			htmlTableDetailsRowWrite (
+				"Info",
+				ifNotNullThenElseEmDash (
+					chatUser.getInfoText (),
+					() -> chatUser.getInfoText ().getText ()));
+
+			if (! chatUser.getChatUserImageList ().isEmpty ()) {
+
+				htmlTableDetailsRowWriteHtml (
+					"Pic",
+					() -> mediaConsoleLogic.writeMediaThumb100 (
+						taskLogger,
+						chatUser.getChatUserImageList ().get (0).getMedia ()));
+
+			}
 
 			htmlTableDetailsRowWriteRaw (
-				"Number",
-				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					chatUser.getOldNumber ()));
+				"Location",
+				ifNotNullThenElseEmDash (
+					chatUser.getLocationLongLat (),
+					() -> gazetteerLogic.findNearestCanonicalEntry (
+						chatUser.getChat ().getGazetteer (),
+						chatUser.getLocationLongLat ()
+					).getName ()));
 
-			htmlTableDetailsRowWriteRaw (
-				"Scheme",
-				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
-					chatUser.getChatScheme (),
-					chatUser.getChat ()));
+			htmlTableDetailsRowWrite (
+				"Online",
+				booleanToYesNo (
+					chatUser.getOnline ()));
 
-			htmlTableDetailsRowWriteRaw (
-				"Affiliate",
-				() -> ifNotNullThenElse (
-					chatUser.getChatAffiliate (),
+			if (isUser) {
+
+				htmlTableDetailsRowWrite (
+					"First join",
+					ifNotNullThenElseEmDash (
+						chatUser.getFirstJoin (),
+						() -> timeFormatter.timestampTimezoneString (
+							chatUserLogic.getTimezone (
+								chatUser),
+							chatUser.getFirstJoin ())));
+
+				htmlTableDetailsRowWrite (
+					"Last join",
+					ifNotNullThenElseEmDash (
+						chatUser.getLastJoin (),
+						() -> timeFormatter.timestampTimezoneString (
+							chatUserLogic.getTimezone (
+								chatUser),
+							chatUser.getLastJoin ())));
+
+			}
+
+			if (isUser) {
+
+				ChatSchemeChargesRec charges =
+					chatUser.getChatScheme () != null
+						? chatUser.getChatScheme ().getCharges ()
+						: null;
+
+				htmlTableRowSeparatorWrite ();
+
+				htmlTableDetailsRowWriteRaw (
+					"Number",
 					() -> objectManager.writeTdForObjectMiniLink (
 						taskLogger,
+						chatUser.getOldNumber ()));
+
+				htmlTableDetailsRowWriteRaw (
+					"Scheme",
+					() -> objectManager.writeTdForObjectMiniLink (
+						taskLogger,
+						chatUser.getChatScheme (),
+						chatUser.getChat ()));
+
+				htmlTableDetailsRowWriteRaw (
+					"Affiliate",
+					() -> ifNotNullThenElse (
 						chatUser.getChatAffiliate (),
-						chatUser.getChatScheme ()),
-					() -> htmlTableCellWrite (
-						"—")));
+						() -> objectManager.writeTdForObjectMiniLink (
+							taskLogger,
+							chatUser.getChatAffiliate (),
+							chatUser.getChatScheme ()),
+						() -> htmlTableCellWrite (
+							"—")));
 
-			htmlTableDetailsRowWrite (
-				"Barred",
-				booleanToYesNo (
-					chatUser.getBarred ()));
+				htmlTableDetailsRowWrite (
+					"Barred",
+					booleanToYesNo (
+						chatUser.getBarred ()));
 
-			htmlTableDetailsRowWrite (
-				"Adult verified",
-				booleanToYesNo (
-					chatUser.getAdultVerified ()));
+				htmlTableDetailsRowWrite (
+					"Adult verified",
+					booleanToYesNo (
+						chatUser.getAdultVerified ()));
 
-			htmlTableRowSeparatorWrite ();
-
-			htmlTableDetailsRowWriteHtml (
-				"User messages",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getUserMessageCharge ()),
-					integerToDecimalString (
-						chatUser.getUserMessageCount ())));
-
-			htmlTableDetailsRowWriteHtml (
-				"Monitor messages",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getMonitorMessageCharge ()),
-					integerToDecimalString (
-						chatUser.getMonitorMessageCount ())));
-
-			htmlTableDetailsRowWriteHtml (
-				"Text profile",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getTextProfileCharge ()),
-					integerToDecimalString (
-						chatUser.getTextProfileCount ())));
-
-			htmlTableDetailsRowWriteHtml (
-				"Image profile",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getImageProfileCharge ()),
-					integerToDecimalString (
-						chatUser.getImageProfileCount ())));
-
-			htmlTableDetailsRowWriteHtml (
-				"Video profile",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getVideoProfileCharge ()),
-					integerToDecimalString (
-						chatUser.getVideoProfileCount ())));
-
-			htmlTableDetailsRowWriteHtml (
-				"Received message",
-				stringFormat (
-					"%s (%h)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getReceivedMessageCharge ()),
-					integerToDecimalString (
-						chatUser.getReceivedMessageCount ())));
-
-			for (
-				ChatLogicHooks.ChatUserCharge chatUserCharge
-					: internalChatUserCharges
-			) {
+				htmlTableRowSeparatorWrite ();
 
 				htmlTableDetailsRowWriteHtml (
-					chatUserCharge.name,
+					"User messages",
 					stringFormat (
 						"%s (%h)",
-						chatUserCharge.name,
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							chatUserCharge.charge),
+							chatUser.getUserMessageCharge ()),
 						integerToDecimalString (
-							chatUserCharge.count)));
+							chatUser.getUserMessageCount ())));
+
+				htmlTableDetailsRowWriteHtml (
+					"Monitor messages",
+					stringFormat (
+						"%s (%h)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getMonitorMessageCharge ()),
+						integerToDecimalString (
+							chatUser.getMonitorMessageCount ())));
+
+				htmlTableDetailsRowWriteHtml (
+					"Text profile",
+					stringFormat (
+						"%s (%h)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getTextProfileCharge ()),
+						integerToDecimalString (
+							chatUser.getTextProfileCount ())));
+
+				htmlTableDetailsRowWriteHtml (
+					"Image profile",
+					stringFormat (
+						"%s (%h)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getImageProfileCharge ()),
+						integerToDecimalString (
+							chatUser.getImageProfileCount ())));
+
+				htmlTableDetailsRowWriteHtml (
+					"Video profile",
+					stringFormat (
+						"%s (%h)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getVideoProfileCharge ()),
+						integerToDecimalString (
+							chatUser.getVideoProfileCount ())));
+
+				htmlTableDetailsRowWriteHtml (
+					"Received message",
+					stringFormat (
+						"%s (%h)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getReceivedMessageCharge ()),
+						integerToDecimalString (
+							chatUser.getReceivedMessageCount ())));
+
+				for (
+					ChatLogicHooks.ChatUserCharge chatUserCharge
+						: internalChatUserCharges
+				) {
+
+					htmlTableDetailsRowWriteHtml (
+						chatUserCharge.name,
+						stringFormat (
+							"%s (%h)",
+							chatUserCharge.name,
+							currencyLogic.formatHtml (
+								chatUser.getChat ().getCurrency (),
+								chatUserCharge.charge),
+							integerToDecimalString (
+								chatUserCharge.count)));
+
+				}
+
+				htmlTableDetailsRowWriteHtml (
+					"Total spent",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+
+						chatUser.getValueSinceEver ()));
+
+				htmlTableRowSeparatorWrite ();
+
+				long total =
+					chatUser.getValueSinceEver ();
+
+				for (
+					ChatLogicHooks.ChatUserCharge chatUserCharge
+						: externalChatUserCharges
+				) {
+
+					htmlTableDetailsRowWriteHtml (
+						chatUserCharge.name,
+						stringFormat (
+							"%s (%h)",
+							chatUserCharge.name,
+							currencyLogic.formatHtml (
+								chatUser.getChat ().getCurrency (),
+								chatUserCharge.charge),
+							integerToDecimalString (
+								chatUserCharge.count)));
+
+					total += chatUserCharge.charge;
+
+				}
+
+				htmlTableDetailsRowWriteHtml (
+					"Grand total",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						total));
+
+				htmlTableRowSeparatorWrite ();
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCredit ()));
+
+				htmlTableDetailsRowWrite (
+					"Credit mode",
+					camelToSpaces (
+						chatUser.getCreditMode ().name ()));
+
+				htmlTableDetailsRowWrite (
+					"Credit check",
+					creditCheckResult.details ());
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit pending strict",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditPendingStrict ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit success",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditSuccess ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit awaiting retry",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditRevoked ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Free usage",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditAdded ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit bought/given",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditBought ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Credit limit",
+					ifThenElse (
+						isNotNull (
+							charges)
+						&& lessThan (
+							charges.getCreditLimit (),
+							chatUser.getCreditLimit ()),
+
+					() -> stringFormat (
+						"%s (%s)",
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							charges.getCreditLimit ()),
+						currencyLogic.formatHtml (
+							chatUser.getChat ().getCurrency (),
+							chatUser.getCreditLimit ())),
+
+					() -> currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditLimit ()))
+
+				);
+
+				htmlTableRowSeparatorWrite ();
+
+				htmlTableDetailsRowWriteHtml (
+					"Daily Billed",
+					currencyLogic.formatHtml (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCreditDailyAmount ()));
+
+				htmlTableDetailsRowWriteHtml (
+					"Last bill date",
+					ifNotNullThenElseEmDash (
+						chatUser.getCreditDailyDate (),
+						() -> timeFormatter.dateString (
+							chatUser.getCreditDailyDate ())));
 
 			}
 
-			htmlTableDetailsRowWriteHtml (
-				"Total spent",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-
-					chatUser.getValueSinceEver ()));
-
-			htmlTableRowSeparatorWrite ();
-
-			long total =
-				chatUser.getValueSinceEver ();
-
-			for (
-				ChatLogicHooks.ChatUserCharge chatUserCharge
-					: externalChatUserCharges
-			) {
-
-				htmlTableDetailsRowWriteHtml (
-					chatUserCharge.name,
-					stringFormat (
-						"%s (%h)",
-						chatUserCharge.name,
-						currencyLogic.formatHtml (
-							chatUser.getChat ().getCurrency (),
-							chatUserCharge.charge),
-						integerToDecimalString (
-							chatUserCharge.count)));
-
-				total += chatUserCharge.charge;
-
-			}
-
-			htmlTableDetailsRowWriteHtml (
-				"Grand total",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					total));
-
-			htmlTableRowSeparatorWrite ();
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCredit ()));
-
-			htmlTableDetailsRowWrite (
-				"Credit mode",
-				camelToSpaces (
-					chatUser.getCreditMode ().name ()));
-
-			htmlTableDetailsRowWrite (
-				"Credit check",
-				creditCheckResult.details ());
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit pending strict",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditPendingStrict ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit success",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditSuccess ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit awaiting retry",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditRevoked ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Free usage",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditAdded ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit bought/given",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditBought ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Credit limit",
-				ifThenElse (
-					isNotNull (
-						charges)
-					&& lessThan (
-						charges.getCreditLimit (),
-						chatUser.getCreditLimit ()),
-
-				() -> stringFormat (
-					"%s (%s)",
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						charges.getCreditLimit ()),
-					currencyLogic.formatHtml (
-						chatUser.getChat ().getCurrency (),
-						chatUser.getCreditLimit ())),
-
-				() -> currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditLimit ()))
-
-			);
-
-			htmlTableRowSeparatorWrite ();
-
-			htmlTableDetailsRowWriteHtml (
-				"Daily Billed",
-				currencyLogic.formatHtml (
-					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditDailyAmount ()));
-
-			htmlTableDetailsRowWriteHtml (
-				"Last bill date",
-				ifNotNullThenElseEmDash (
-					chatUser.getCreditDailyDate (),
-					() -> timeFormatter.dateString (
-						chatUser.getCreditDailyDate ())));
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

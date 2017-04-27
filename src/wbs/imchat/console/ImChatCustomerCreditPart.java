@@ -123,52 +123,58 @@ class ImChatCustomerCreditPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		requestContext.flushNotices ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlHeadingTwoWrite (
-			"Customer details");
+		) {
 
-		formFieldLogic.outputDetailsTable (
-			taskLogger,
-			formatWriter,
-			customerFormFields,
-			request.customer (),
-			emptyMap ());
+			requestContext.flushNotices ();
 
-		htmlHeadingTwoWrite (
-			"Apply credit");
+			htmlHeadingTwoWrite (
+				"Customer details");
 
-		formFieldLogic.outputFormTable (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			creditFormFields,
-			updateResultSet,
-			request,
-			emptyMap (),
-			"post",
-			requestContext.resolveLocalUrl (
-				"/imChatCustomer.credit"),
-			"apply credit",
-			FormType.perform,
-			"credit");
+			formFieldLogic.outputDetailsTable (
+				taskLogger,
+				formatWriter,
+				customerFormFields,
+				request.customer (),
+				emptyMap ());
 
-		htmlHeadingTwoWrite (
-			"Recent credit history");
+			htmlHeadingTwoWrite (
+				"Apply credit");
 
-		formFieldLogic.outputListTable (
-			taskLogger,
-			formatWriter,
-			creditHistoryFormFields,
-			Lists.reverse (
-				creditHistory),
-			emptyMap (),
-			true);
+			formFieldLogic.outputFormTable (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				creditFormFields,
+				updateResultSet,
+				request,
+				emptyMap (),
+				"post",
+				requestContext.resolveLocalUrl (
+					"/imChatCustomer.credit"),
+				"apply credit",
+				FormType.perform,
+				"credit");
+
+			htmlHeadingTwoWrite (
+				"Recent credit history");
+
+			formFieldLogic.outputListTable (
+				taskLogger,
+				formatWriter,
+				creditHistoryFormFields,
+				Lists.reverse (
+					creditHistory),
+				emptyMap (),
+				true);
+
+		}
 
 	}
 

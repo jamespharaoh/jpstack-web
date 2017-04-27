@@ -125,130 +125,134 @@ class JavaInterfaceWriter
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
-		// singleton dependencies
+		try (
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeBlock");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeBlock");
 
-		// interface annotations
-
-		for (
-			JavaAnnotationWriter annotationWriter
-				: interfaceAnnotations
 		) {
 
-			annotationWriter.writeAnnotation (
-				imports,
-				formatWriter);
+			// interface annotations
 
-		}
+			for (
+				JavaAnnotationWriter annotationWriter
+					: interfaceAnnotations
+			) {
 
-		// interface modifiers
+				annotationWriter.writeAnnotation (
+					imports,
+					formatWriter);
 
-		if (
-			collectionIsNotEmpty (
-				interfaceModifiers)
-		) {
+			}
 
-			formatWriter.writeLineFormat (
-				"%s",
-				joinWithSpace (
-					interfaceModifiers));
-
-		}
-
-		// interface declaration
-
-		if (
-			collectionIsEmpty (
-				extendsInterfaceNames)
-		) {
-
-			formatWriter.writeLineFormat (
-				"interface %s {",
-				interfaceName);
-
-		} else {
-
-			formatWriter.writeLineFormat (
-				"interface %s",
-				interfaceName);
-
-		}
-
-		// extends declaration
-
-		if (
-			collectionIsNotEmpty (
-				extendsInterfaceNames)
-		) {
+			// interface modifiers
 
 			if (
-				collectionHasOneElement (
+				collectionIsNotEmpty (
+					interfaceModifiers)
+			) {
+
+				formatWriter.writeLineFormat (
+					"%s",
+					joinWithSpace (
+						interfaceModifiers));
+
+			}
+
+			// interface declaration
+
+			if (
+				collectionIsEmpty (
 					extendsInterfaceNames)
 			) {
 
-				Function <JavaImportRegistry, String> extendsInterfaceName =
-					listFirstElementRequired (
-						extendsInterfaceNames);
-
 				formatWriter.writeLineFormat (
-					"\textends %s {",
-					extendsInterfaceName.apply (
-						imports));
+					"interface %s {",
+					interfaceName);
 
 			} else {
 
 				formatWriter.writeLineFormat (
-					"\textends");
+					"interface %s",
+					interfaceName);
 
-				for (
-					Function <JavaImportRegistry, String> extendsInterfaceName
-						: listSliceAllButLastItemRequired (
-							extendsInterfaceNames)
+			}
+
+			// extends declaration
+
+			if (
+				collectionIsNotEmpty (
+					extendsInterfaceNames)
+			) {
+
+				if (
+					collectionHasOneElement (
+						extendsInterfaceNames)
 				) {
 
+					Function <JavaImportRegistry, String> extendsInterfaceName =
+						listFirstElementRequired (
+							extendsInterfaceNames);
+
 					formatWriter.writeLineFormat (
-						"\t\t%s,",
+						"\textends %s {",
+						extendsInterfaceName.apply (
+							imports));
+
+				} else {
+
+					formatWriter.writeLineFormat (
+						"\textends");
+
+					for (
+						Function <JavaImportRegistry, String> extendsInterfaceName
+							: listSliceAllButLastItemRequired (
+								extendsInterfaceNames)
+					) {
+
+						formatWriter.writeLineFormat (
+							"\t\t%s,",
+							extendsInterfaceName.apply (
+								imports));
+
+					}
+
+					Function <JavaImportRegistry, String> extendsInterfaceName =
+						listLastItemRequired (
+							extendsInterfaceNames);
+
+					formatWriter.writeLineFormat (
+						"\t\t%s {",
 						extendsInterfaceName.apply (
 							imports));
 
 				}
 
-				Function <JavaImportRegistry, String> extendsInterfaceName =
-					listLastItemRequired (
-						extendsInterfaceNames);
-
-				formatWriter.writeLineFormat (
-					"\t\t%s {",
-					extendsInterfaceName.apply (
-						imports));
-
 			}
 
+			formatWriter.writeNewline ();
+
+			// interface body
+
+			formatWriter.increaseIndent ();
+
+			blocks.forEach (
+				block ->
+					block.writeBlock (
+						taskLogger,
+						imports,
+						formatWriter));
+
+			formatWriter.decreaseIndent ();
+
+			// end class
+
+			formatWriter.writeLineFormat (
+				"}");
+
 		}
-
-		formatWriter.writeNewline ();
-
-		// interface body
-
-		formatWriter.increaseIndent ();
-
-		blocks.forEach (
-			block ->
-				block.writeBlock (
-					taskLogger,
-					imports,
-					formatWriter));
-
-		formatWriter.decreaseIndent ();
-
-		// end class
-
-		formatWriter.writeLineFormat (
-			"}");
 
 	}
 

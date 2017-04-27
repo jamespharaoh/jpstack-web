@@ -12,8 +12,8 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtilsImplementation;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -63,68 +63,74 @@ class ExceptionLogLogicImplementation
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logException");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logException");
 
-		// lookup type
+		) {
 
-		ExceptionLogTypeRec exceptionLogType =
-			exceptionLogTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				typeCode);
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		// lookup user
+			// lookup type
 
-		UserRec user =
-			userId.isPresent ()
-				? userHelper.findRequired (
-					userId.get ())
-				: null;
+			ExceptionLogTypeRec exceptionLogType =
+				exceptionLogTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					typeCode);
 
-		// create exception log
+			// lookup user
 
-		ExceptionLogRec exceptionLog =
-			exceptionLogHelper.insert (
-				taskLogger,
-				exceptionLogHelper.createInstance ()
+			UserRec user =
+				userId.isPresent ()
+					? userHelper.findRequired (
+						userId.get ())
+					: null;
 
-			.setTimestamp (
-				transaction.now ())
+			// create exception log
 
-			.setType (
-				exceptionLogType)
+			ExceptionLogRec exceptionLog =
+				exceptionLogHelper.insert (
+					taskLogger,
+					exceptionLogHelper.createInstance ()
 
-			.setSource (
-				source)
+				.setTimestamp (
+					transaction.now ())
 
-			.setSummary (
-				ExceptionUtilsImplementation.substituteNuls (
-					summary))
+				.setType (
+					exceptionLogType)
 
-			.setUser (
-				user)
+				.setSource (
+					source)
 
-			.setDump (
-				ExceptionUtilsImplementation.substituteNuls (
-					dump))
+				.setSummary (
+					ExceptionUtilsImplementation.substituteNuls (
+						summary))
 
-			.setFatal (
-				enumEqualSafe (
-					resolution,
-					GenericExceptionResolution.fatalError))
+				.setUser (
+					user)
 
-			.setResolution (
-				conreteMap.get (
-					resolution))
+				.setDump (
+					ExceptionUtilsImplementation.substituteNuls (
+						dump))
 
-		);
+				.setFatal (
+					enumEqualSafe (
+						resolution,
+						GenericExceptionResolution.fatalError))
 
-		return exceptionLog;
+				.setResolution (
+					conreteMap.get (
+						resolution))
+
+			);
+
+			return exceptionLog;
+
+		}
 
 	}
 

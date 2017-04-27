@@ -18,8 +18,8 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -124,122 +124,127 @@ class ChatUserImageUploadCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		MessageRec messageIn =
-			inbox.getMessage ();
+		) {
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				messageIn);
+			MessageRec messageIn =
+				inbox.getMessage ();
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// generate token and url
-
-		String token =
-			randomLogic.generateLowercase (10);
-
-		String url =
-			stringFormat (
-				"http://txtit.com/iu/%u",
-				token);
-
-		// send message
-
-		CommandRec magicCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"magic");
-
-		CommandRec helpCommand =
-			commandHelper.findByCodeRequired (
-				chat,
-				"help");
-
-		MessageRec messageOut =
-			optionalGetRequired (
-				chatSendLogic.sendSystemMagic (
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
 					taskLogger,
-					chatUser,
-					optionalOf (
-						messageIn.getThreadId ()),
-					"image_upload_link",
-					magicCommand,
-					helpCommand.getId (),
-					TemplateMissing.error,
-					ImmutableMap.of (
-						"url",
-						url)));
+					chat,
+					messageIn);
 
-		// save token in database
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		chatUserImageUploadTokenHelper.insert (
-			taskLogger,
-			chatUserImageUploadTokenHelper.createInstance ()
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
 
-			.setChatUser (
-				chatUser)
+			// generate token and url
 
-			.setIndex (
-				chatUser.getNumImageUploadTokens ())
+			String token =
+				randomLogic.generateLowercase (10);
 
-			.setToken (
-				token)
+			String url =
+				stringFormat (
+					"http://txtit.com/iu/%u",
+					token);
 
-			.setMessageIn (
-				messageIn)
+			// send message
 
-			.setMessageOut (
-				messageOut)
+			CommandRec magicCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic");
 
-			.setCreatedTime (
-				transaction.now ())
+			CommandRec helpCommand =
+				commandHelper.findByCodeRequired (
+					chat,
+					"help");
 
-			.setExpiryTime (
-				transaction.now ().plus (
-					Duration.standardHours (24)))
+			MessageRec messageOut =
+				optionalGetRequired (
+					chatSendLogic.sendSystemMagic (
+						taskLogger,
+						chatUser,
+						optionalOf (
+							messageIn.getThreadId ()),
+						"image_upload_link",
+						magicCommand,
+						helpCommand.getId (),
+						TemplateMissing.error,
+						ImmutableMap.of (
+							"url",
+							url)));
 
-		);
+			// save token in database
 
-		// update chat user
+			chatUserImageUploadTokenHelper.insert (
+				taskLogger,
+				chatUserImageUploadTokenHelper.createInstance ()
 
-		chatUser
+				.setChatUser (
+					chatUser)
 
-			.setNumImageUploadTokens (
-				chatUser.getNumImageUploadTokens () + 1);
+				.setIndex (
+					chatUser.getNumImageUploadTokens ())
 
-		// process inbox
+				.setToken (
+					token)
 
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
+				.setMessageIn (
+					messageIn)
 
+				.setMessageOut (
+					messageOut)
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setExpiryTime (
+					transaction.now ().plus (
+						Duration.standardHours (24)))
+
+			);
+
+			// update chat user
+
+			chatUser
+
+				.setNumImageUploadTokens (
+					chatUser.getNumImageUploadTokens () + 1);
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
+
+		}
 
 	}
 

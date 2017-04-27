@@ -58,6 +58,7 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	void renderFormReset (
+			TaskLogger parentTaskLogger,
 			FormatWriter htmlWriter,
 			Container container,
 			Optional <Interface> interfaceValue,

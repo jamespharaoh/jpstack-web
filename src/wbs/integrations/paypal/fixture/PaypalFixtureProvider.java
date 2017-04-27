@@ -10,7 +10,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -54,49 +54,55 @@ class PaypalFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"integration"))
+		) {
 
-			.setCode (
-				"paypal")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Paypal")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"integration"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"paypal")
 
-			.setLabel (
-				"Paypal")
+				.setName (
+					"Paypal")
 
-			.setTargetPath (
-				"/paypalAccounts")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Paypal")
 
-		);
+				.setTargetPath (
+					"/paypalAccounts")
 
-		testAccounts.forEach (
-			"paypal",
-			testAccount ->
-				createTestAccount (
-					taskLogger,
-					testAccount));
+				.setTargetFrame (
+					"main")
+
+			);
+
+			testAccounts.forEach (
+				"paypal",
+				testAccount ->
+					createTestAccount (
+						taskLogger,
+						testAccount));
+
+		}
 
 	}
 
@@ -104,69 +110,75 @@ class PaypalFixtureProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createTestAccount");
+		try (
 
-		paypalAccountHelper.insert (
-			taskLogger,
-			paypalAccountHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTestAccount");
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+		) {
 
-			.setCode (
-				simplifyToCodeRequired (
-					params.get ("name")))
+			paypalAccountHelper.insert (
+				taskLogger,
+				paypalAccountHelper.createInstance ()
 
-			.setName (
-				params.get ("name"))
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				params.get ("description"))
+				.setCode (
+					simplifyToCodeRequired (
+						params.get ("name")))
 
-			.setUsername (
-				params.get ("username"))
+				.setName (
+					params.get ("name"))
 
-			.setPassword (
-				params.get ("password"))
+				.setDescription (
+					params.get ("description"))
 
-			.setSignature (
-				params.get ("signature"))
+				.setUsername (
+					params.get ("username"))
 
-			.setAppId (
-				params.get ("app-id"))
+				.setPassword (
+					params.get ("password"))
 
-			.setServiceEndpointPaypalApi (
-				"https://api-3t.sandbox.paypal.com/2.0")
+				.setSignature (
+					params.get ("signature"))
 
-			.setServiceEndpointPaypalApiAa (
-				"https://api-3t.sandbox.paypal.com/2.0")
+				.setAppId (
+					params.get ("app-id"))
 
-			.setServiceEndpointPermissions (
-				"https://svcs.sandbox.paypal.com/")
+				.setServiceEndpointPaypalApi (
+					"https://api-3t.sandbox.paypal.com/2.0")
 
-			.setServiceEndpointAdaptivePayments (
-				"https://svcs.sandbox.paypal.com/")
+				.setServiceEndpointPaypalApiAa (
+					"https://api-3t.sandbox.paypal.com/2.0")
 
-			.setServiceEndpointAdaptiveAccounts (
-				"https://svcs.sandbox.paypal.com/")
+				.setServiceEndpointPermissions (
+					"https://svcs.sandbox.paypal.com/")
 
-			.setServiceEndpointInvoice (
-				"https://svcs.sandbox.paypal.com/")
+				.setServiceEndpointAdaptivePayments (
+					"https://svcs.sandbox.paypal.com/")
 
-			.setCheckoutUrl (
-				joinWithoutSeparator (
-					"https://www.paypal.com/cgi-bin/webscr",
-					"?cmd=_express-checkout&token={token}"))
+				.setServiceEndpointAdaptiveAccounts (
+					"https://svcs.sandbox.paypal.com/")
 
-			.setMode (
-				"live")
+				.setServiceEndpointInvoice (
+					"https://svcs.sandbox.paypal.com/")
 
-		);
+				.setCheckoutUrl (
+					joinWithoutSeparator (
+						"https://www.paypal.com/cgi-bin/webscr",
+						"?cmd=_express-checkout&token={token}"))
+
+				.setMode (
+					"live")
+
+			);
+
+		}
 
 	}
 

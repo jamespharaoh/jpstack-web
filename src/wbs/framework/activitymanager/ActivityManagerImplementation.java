@@ -301,24 +301,30 @@ class ActivityManagerImplementation
 			StringWriter stringWriter =
 				new StringWriter ();
 
-			FormatWriter formatWriter =
-				new WriterFormatWriter (
-					stringWriter);
+			try (
 
-			formatWriter.writeFormat (
-				"Slow %s task took %s: %s\n",
-					task.taskType (),
-					taskDuration.toString (),
-					task.summary ());
+				FormatWriter formatWriter =
+					new WriterFormatWriter (
+						stringWriter);
 
-			writeTaskRecursive (
-				formatWriter,
-				"  ",
-				showTaskDuration,
-				task);
+			) {
 
-			log.warn (
-				stringWriter.toString ());
+				formatWriter.writeFormat (
+					"Slow %s task took %s: %s\n",
+						task.taskType (),
+						taskDuration.toString (),
+						task.summary ());
+
+				writeTaskRecursive (
+					formatWriter,
+					"  ",
+					showTaskDuration,
+					task);
+
+				log.warn (
+					stringWriter.toString ());
+
+			}
 
 		}
 
@@ -333,28 +339,34 @@ class ActivityManagerImplementation
 	public synchronized
 	void logActiveTasks () {
 
-		StringFormatWriter formatWriter =
-			new StringFormatWriter ();
+		try (
 
-		if (
-			mapIsEmpty (
-				activeTasks)
+			StringFormatWriter formatWriter =
+				new StringFormatWriter ();
+
 		) {
 
-			log.info (
-				"No active tasks");
+			if (
+				mapIsEmpty (
+					activeTasks)
+			) {
 
-		} else {
+				log.info (
+					"No active tasks");
 
-			formatWriter.writeFormat (
-				"Dumping active tasks\n");
+			} else {
 
-			writeActiveTasks (
-				formatWriter,
-				"  ");
+				formatWriter.writeFormat (
+					"Dumping active tasks\n");
 
-			log.info (
-				formatWriter.toString ());
+				writeActiveTasks (
+					formatWriter,
+					"  ");
+
+				log.info (
+					formatWriter.toString ());
+
+			}
 
 		}
 

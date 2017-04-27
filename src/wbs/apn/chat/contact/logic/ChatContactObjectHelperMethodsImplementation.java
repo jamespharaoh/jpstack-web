@@ -64,36 +64,41 @@ class ChatContactObjectHelperMethodsImplementation
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		// from and to user id
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		fromAndToUserCache =
-			idCacheBuilderProvider.get ()
+		) {
 
-			.lookupByIdFunction (
-				chatContactHelper::find)
+			// from and to user id
 
-			.lookupByKeyFunction (
-				key ->
+			fromAndToUserCache =
+				idCacheBuilderProvider.get ()
 
-				chatContactHelper.findNoCache (
-					chatUserHelper.findRequired (
-						key.getLeft ()),
-					chatUserHelper.findRequired (
-						key.getRight ())))
+				.lookupByIdFunction (
+					chatContactHelper::find)
 
-			.getIdFunction (
-				ChatContactRec::getId)
+				.lookupByKeyFunction (
+					key ->
 
-			.createFunction (
-				this::findOrCreateReal)
+					chatContactHelper.findNoCache (
+						chatUserHelper.findRequired (
+							key.getLeft ()),
+						chatUserHelper.findRequired (
+							key.getRight ())))
 
-			.build ();
+				.getIdFunction (
+					ChatContactRec::getId)
+
+				.createFunction (
+					this::findOrCreateReal)
+
+				.build ();
+
+		}
 
 	}
 
@@ -119,16 +124,22 @@ class ChatContactObjectHelperMethodsImplementation
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		return fromAndToUserCache.findOrCreate (
-			taskLogger,
-			Pair.of (
-				fromUser.getId (),
-				toUser.getId ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
+
+		) {
+
+			return fromAndToUserCache.findOrCreate (
+				taskLogger,
+				Pair.of (
+					fromUser.getId (),
+					toUser.getId ()));
+
+		}
 
 	}
 
@@ -138,73 +149,79 @@ class ChatContactObjectHelperMethodsImplementation
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreateReal");
+		try (
 
-		// look for existing
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreateReal");
 
-		Optional <ChatContactRec> chatContactOptional =
-			chatContactHelper.find (
-				fromUser,
-				toUser);
-
-		if (
-			optionalIsPresent (
-				chatContactOptional)
 		) {
 
-			return chatContactOptional.get ();
+			// look for existing
 
-		}
+			Optional <ChatContactRec> chatContactOptional =
+				chatContactHelper.find (
+					fromUser,
+					toUser);
 
-		// find inverse
+			if (
+				optionalIsPresent (
+					chatContactOptional)
+			) {
 
-		Optional <ChatContactRec> chatContactInverseOptional =
-			chatContactHelper.find (
-				toUser,
-				fromUser);
+				return chatContactOptional.get ();
 
-		// create chat contact
+			}
 
-		ChatContactRec chatContact =
-			chatContactHelper.insert (
-				taskLogger,
-				chatContactHelper.createInstance ()
+			// find inverse
 
-			.setFromUser (
-				fromUser)
+			Optional <ChatContactRec> chatContactInverseOptional =
+				chatContactHelper.find (
+					toUser,
+					fromUser);
 
-			.setToUser (
-				toUser)
+			// create chat contact
 
-			.setChat (
-				fromUser.getChat ())
+			ChatContactRec chatContact =
+				chatContactHelper.insert (
+					taskLogger,
+					chatContactHelper.createInstance ()
 
-			.setInverseChatContact (
-				optionalOrNull (
-					chatContactInverseOptional))
+				.setFromUser (
+					fromUser)
 
-		);
+				.setToUser (
+					toUser)
 
-		// update inverse
-
-		if (
-			optionalIsPresent (
-				chatContactInverseOptional)
-		) {
-
-			chatContactInverseOptional.get ()
+				.setChat (
+					fromUser.getChat ())
 
 				.setInverseChatContact (
-					chatContact);
+					optionalOrNull (
+						chatContactInverseOptional))
+
+			);
+
+			// update inverse
+
+			if (
+				optionalIsPresent (
+					chatContactInverseOptional)
+			) {
+
+				chatContactInverseOptional.get ()
+
+					.setInverseChatContact (
+						chatContact);
+
+			}
+
+			// and return
+
+			return chatContact;
 
 		}
-
-		// and return
-
-		return chatContact;
 
 	}
 

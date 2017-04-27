@@ -13,9 +13,11 @@ public
 interface ImChatLogic {
 
 	void conversationEnd (
+			TaskLogger parentTaskLogger,
 			ImChatConversationRec conversation);
 
 	void conversationEmailSend (
+			TaskLogger parentTaskLogger,
 			ImChatConversationRec conversation);
 
 	void customerPasswordGenerate (

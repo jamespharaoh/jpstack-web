@@ -287,42 +287,48 @@ class ClockworkSmsSenderHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ClockworkSmsMessageSender clockworkSender) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"performSend");
+		try (
 
-		PerformSendResult result =
-			new PerformSendResult ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"performSend");
 
-		// encode
+		) {
 
-		try {
+			PerformSendResult result =
+				new PerformSendResult ();
 
-			clockworkSender.send ();
+			// encode
 
-			clockworkSender.receive ();
+			try {
 
-			result.responseTrace (
-				clockworkSender.responseTrace ());
+				clockworkSender.send ();
 
-			clockworkSender.decode (
-				taskLogger);
+				clockworkSender.receive ();
 
-			return result
+				result.responseTrace (
+					clockworkSender.responseTrace ());
 
-				.status (
-					PerformSendStatus.success);
+				clockworkSender.decode (
+					taskLogger);
 
-		} catch (Exception exception) {
+				return result
 
-			return result
+					.status (
+						PerformSendStatus.success);
 
-				.status (
-					PerformSendStatus.communicationError)
+			} catch (Exception exception) {
 
-				.exception (
-					exception);
+				return result
+
+					.status (
+						PerformSendStatus.communicationError)
+
+					.exception (
+						exception);
+
+			}
 
 		}
 

@@ -156,78 +156,84 @@ class CoreSidebarMenuResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		htmlTableOpen (
-			htmlClassAttribute (
-				"menu"),
-			htmlAttribute (
-				"width",
-				"100%"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		ABSwap abSwap =
-			new ABSwap ();
-
-		for (
-			MenuGroupRec menuGroup
-				: menuGroups
 		) {
 
-			boolean doneGroup = false;
+			htmlTableOpen (
+				htmlClassAttribute (
+					"menu"),
+				htmlAttribute (
+					"width",
+					"100%"));
+
+			ABSwap abSwap =
+				new ABSwap ();
 
 			for (
-				MenuItemRec menu
-					: menuGroup.getMenus ()
+				MenuGroupRec menuGroup
+					: menuGroups
 			) {
 
-				if (menu.getDeleted ())
-					continue;
+				boolean doneGroup = false;
 
-				if (
-					! objectManager.canView (
-						taskLogger,
-						menu)
+				for (
+					MenuItemRec menu
+						: menuGroup.getMenus ()
 				) {
-					continue;
-				}
 
-				if (! doneGroup) {
+					if (menu.getDeleted ())
+						continue;
 
-					htmlTableRowOpen ();
+					if (
+						! objectManager.canView (
+							taskLogger,
+							menu)
+					) {
+						continue;
+					}
 
-					htmlTableHeaderCellWrite (
-						menuGroup.getLabel ());
+					if (! doneGroup) {
+
+						htmlTableRowOpen ();
+
+						htmlTableHeaderCellWrite (
+							menuGroup.getLabel ());
+
+						htmlTableRowClose ();
+
+						doneGroup = true;
+
+					}
+
+					htmlTableRowOpen (
+
+						htmlClassAttribute (
+							"magic-table-row",
+							abSwap.swap ()),
+
+						htmlDataAttribute (
+							"target-href",
+							requestContext.resolveApplicationUrl (
+								menu.getTargetPath ())),
+
+						htmlDataAttribute (
+							"target-frame",
+							menu.getTargetFrame ())
+
+					);
+
+					htmlTableCellWrite (
+						menu.getLabel ());
 
 					htmlTableRowClose ();
 
-					doneGroup = true;
-
 				}
-
-				htmlTableRowOpen (
-
-					htmlClassAttribute (
-						"magic-table-row",
-						abSwap.swap ()),
-
-					htmlDataAttribute (
-						"target-href",
-						requestContext.resolveApplicationUrl (
-							menu.getTargetPath ())),
-
-					htmlDataAttribute (
-						"target-frame",
-						menu.getTargetFrame ())
-
-				);
-
-				htmlTableCellWrite (
-					menu.getLabel ());
-
-				htmlTableRowClose ();
 
 			}
 

@@ -26,7 +26,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -79,32 +79,39 @@ class DialogueLocator
 			@NonNull Long locatorId,
 			@NonNull String number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"lookup");
+		try (
 
-		LocatorInfo locatorInfo =
-			new LocatorInfo ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"lookup");
 
-		locatorInfo.number =
-			number;
+		) {
 
-		lookupDialogueLocator (
-			taskLogger,
-			locatorInfo,
-			locatorId);
+			LocatorInfo locatorInfo =
+				new LocatorInfo ();
 
-		createContent (
-			locatorInfo);
+			locatorInfo.number =
+				number;
 
-		openConnection (
-			locatorInfo);
+			lookupDialogueLocator (
+				taskLogger,
+				locatorInfo,
+				locatorId);
 
-		sendRequest (
-			locatorInfo);
+			createContent (
+				locatorInfo);
 
-		return readResponse (locatorInfo);
+			openConnection (
+				locatorInfo);
+
+			sendRequest (
+				locatorInfo);
+
+			return readResponse (
+				locatorInfo);
+
+		}
 
 	}
 
@@ -113,14 +120,14 @@ class DialogueLocator
 			@NonNull LocatorInfo locatorInfo,
 			@NonNull Long locatorId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"lookupDialogueLocator");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"lookupDialogueLocator");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"DialogueLocator.lookupDialogueLocator (...)",
@@ -209,10 +216,12 @@ class DialogueLocator
 	void sendRequest (
 			LocatorInfo locatorInfo) {
 
-		try {
+		try (
 
 			OutputStream outputStream =
 				locatorInfo.urlConn.getOutputStream ();
+
+		) {
 
 			outputStream.write (
 				locatorInfo.content);

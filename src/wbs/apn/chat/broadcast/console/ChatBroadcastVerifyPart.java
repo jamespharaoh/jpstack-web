@@ -199,212 +199,218 @@ class ChatBroadcastVerifyPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// form
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlFormOpenPost ();
+		) {
 
-		// always hidden
+			// form
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			searchFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			htmlFormOpenPost ();
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			numbersFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			// always hidden
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			commonFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				searchFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageUserFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				numbersFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormAlwaysHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageMessageFields,
-			updateResults,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				commonFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		// temporarily hidden
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageUserFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormTemporarilyHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			searchFields,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormAlwaysHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageMessageFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormTemporarilyHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			numbersFields,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			// temporarily hidden
 
-		formFieldLogic.outputFormTemporarilyHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			commonFields,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				searchFields,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		formFieldLogic.outputFormTemporarilyHidden (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageUserFields,
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				numbersFields,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		// message info
+			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				commonFields,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		htmlHeadingThreeWrite (
-			"Message");
+			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageUserFields,
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		htmlTableOpenDetails ();
+			// message info
 
-		htmlTableDetailsRowWrite (
-			"From user code",
-			fromUser.getCode ());
+			htmlHeadingThreeWrite (
+				"Message");
 
-		htmlTableDetailsRowWrite (
-			"From user name",
-			fromUser.getName ());
+			htmlTableOpenDetails ();
 
-		htmlTableDetailsRowWrite (
-			"From user info",
-			ifNotNullThenElseEmDash (
-				fromUser.getInfoText (),
-				() -> fromUser.getInfoText ().getText ()));
+			htmlTableDetailsRowWrite (
+				"From user code",
+				fromUser.getCode ());
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			messageMessageFields,
-			optionalAbsent (),
-			form,
-			formHints,
-			FormType.search,
-			"send");
+			htmlTableDetailsRowWrite (
+				"From user name",
+				fromUser.getName ());
 
-		htmlTableClose ();
+			htmlTableDetailsRowWrite (
+				"From user info",
+				ifNotNullThenElseEmDash (
+					fromUser.getInfoText (),
+					() -> fromUser.getInfoText ().getText ()));
 
-		// form controls
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				messageMessageFields,
+				optionalAbsent (),
+				form,
+				formHints,
+				FormType.search,
+				"send");
 
-		htmlParagraphOpen ();
+			htmlTableClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send\"",
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"back\"",
-			" value=\"back\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// form close
-
-		htmlFormClose ();
-
-		// recipients info
-
-		htmlHeadingThreeWrite (
-			"Recipients");
-
-		List <Long> chatUserIds =
-			genericCastUnchecked (
-				requestContext.requestRequired (
-					"chatBroadcastChatUserIds"));
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"%s recipients in total.",
-			integerToDecimalString (
-				chatUserIds.size ()));
-
-		if (form.search ()) {
+			// form controls
 
 			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
-				"The actual number of recipients may change slightly on send ",
-				"as the search will be performed again.");
+				"<input",
+				" type=\"submit\"",
+				" name=\"send\"",
+				" value=\"send\"",
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"back\"",
+				" value=\"back\"",
+				">");
 
 			htmlParagraphClose ();
 
+			// form close
+
+			htmlFormClose ();
+
+			// recipients info
+
+			htmlHeadingThreeWrite (
+				"Recipients");
+
+			List <Long> chatUserIds =
+				genericCastUnchecked (
+					requestContext.requestRequired (
+						"chatBroadcastChatUserIds"));
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"%s recipients in total.",
+				integerToDecimalString (
+					chatUserIds.size ()));
+
+			if (form.search ()) {
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"The actual number of recipients may change slightly on send ",
+					"as the search will be performed again.");
+
+				htmlParagraphClose ();
+
+			}
+
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findManyRequired (
+					chatUserIds);
+
+			formFieldLogic.outputListTable (
+				taskLogger,
+				formatWriter,
+				verifyUserFields,
+				chatUsers,
+				emptyMap (),
+				false);
+
 		}
-
-		List <ChatUserRec> chatUsers =
-			chatUserHelper.findManyRequired (
-				chatUserIds);
-
-		formFieldLogic.outputListTable (
-			taskLogger,
-			formatWriter,
-			verifyUserFields,
-			chatUsers,
-			emptyMap (),
-			false);
 
 	}
 

@@ -14,7 +14,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -58,26 +58,32 @@ class DaemonDeploymentRestartFormActionHelper
 	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canBePerformed");
+		try (
 
-		DaemonDeploymentRec daemonDeployment =
-			daemonDeploymentHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canBePerformed");
 
-		boolean show =
-			userPrivChecker.canRecursive (
-				taskLogger,
-				daemonDeployment,
-				"restart");
+		) {
 
-		boolean enable =
-			! daemonDeployment.getRestart ();
+			DaemonDeploymentRec daemonDeployment =
+				daemonDeploymentHelper.findFromContextRequired ();
 
-		return new Permissions ()
-			.canView (show)
-			.canPerform (enable);
+			boolean show =
+				userPrivChecker.canRecursive (
+					taskLogger,
+					daemonDeployment,
+					"restart");
+
+			boolean enable =
+				! daemonDeployment.getRestart ();
+
+			return new Permissions ()
+				.canView (show)
+				.canPerform (enable);
+
+		}
 
 	}
 
@@ -88,20 +94,31 @@ class DaemonDeploymentRestartFormActionHelper
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
-		DaemonDeploymentRec daemonDeployment =
-			daemonDeploymentHelper.findFromContextRequired ();
+		try (
 
-		if (daemonDeployment.getRestart ()) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writePreamble");
 
-			htmlParagraphWriteFormat (
-				"There is already a restart scheduled for this daemon ",
-				"deployment, but it has not yet taken place. If this message ",
-				"persists, please contact support.");
+		) {
 
-		} else {
+			DaemonDeploymentRec daemonDeployment =
+				daemonDeploymentHelper.findFromContextRequired ();
 
-			htmlParagraphWriteFormat (
-				"Trigger a restart for this daemon deployment");
+			if (daemonDeployment.getRestart ()) {
+
+				htmlParagraphWriteFormat (
+					"There is already a restart scheduled for this daemon ",
+					"deployment, but it has not yet taken place. If this ",
+					"message persists, please contact support.");
+
+			} else {
+
+				htmlParagraphWriteFormat (
+					"Trigger a restart for this daemon deployment");
+
+			}
 
 		}
 
@@ -111,51 +128,57 @@ class DaemonDeploymentRestartFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Object formState) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		// load data
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		DaemonDeploymentRec daemonDeployment =
-			daemonDeploymentHelper.findFromContextRequired ();
+		) {
 
-		// check state
+			// load data
 
-		if (daemonDeployment.getRestart ()) {
+			DaemonDeploymentRec daemonDeployment =
+				daemonDeploymentHelper.findFromContextRequired ();
+
+			// check state
+
+			if (daemonDeployment.getRestart ()) {
+
+				requestContext.addNotice (
+					"Restart already scheduled for this daemon deployment");
+
+				return optionalAbsent ();
+
+			}
+
+			// perform update
+
+			daemonDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"daemon_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				daemonDeployment);
+
+			// commit and return
+
+			transaction.commit ();
 
 			requestContext.addNotice (
-				"Restart already scheduled for this daemon deployment");
+				"Daemon deployment restart triggered");
 
 			return optionalAbsent ();
 
 		}
-
-		// perform update
-
-		daemonDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"daemon_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			daemonDeployment);
-
-		// commit and return
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Daemon deployment restart triggered");
-
-		return optionalAbsent ();
 
 	}
 

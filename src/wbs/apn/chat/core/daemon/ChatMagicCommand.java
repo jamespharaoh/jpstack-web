@@ -99,66 +99,72 @@ class ChatMagicCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		// look for a single keyword
-
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (rest)
 		) {
 
-			if (! rest.isEmpty ())
-				continue;
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-			Optional <ChatKeywordRec> chatKeywordOptional =
-				chatKeywordHelper.findByCode (
-					chat,
-					match.simpleKeyword ());
+			// look for a single keyword
 
-			if (
-
-				optionalIsPresent (
-					chatKeywordOptional)
-
-				&& chatKeywordOptional.get ().getGlobal ()
-
-				&& isNotNull (
-					chatKeywordOptional.get ().getCommand ())
-
+			for (
+				KeywordFinder.Match match
+					: keywordFinder.find (rest)
 			) {
 
-				return commandManager.handle (
-					taskLogger,
-					inbox,
-					chatKeywordOptional.get ().getCommand (),
-					optionalAbsent (),
-					"");
+				if (! rest.isEmpty ())
+					continue;
+
+				Optional <ChatKeywordRec> chatKeywordOptional =
+					chatKeywordHelper.findByCode (
+						chat,
+						match.simpleKeyword ());
+
+				if (
+
+					optionalIsPresent (
+						chatKeywordOptional)
+
+					&& chatKeywordOptional.get ().getGlobal ()
+
+					&& isNotNull (
+						chatKeywordOptional.get ().getCommand ())
+
+				) {
+
+					return commandManager.handle (
+						taskLogger,
+						inbox,
+						chatKeywordOptional.get ().getCommand (),
+						optionalAbsent (),
+						"");
+
+				}
 
 			}
 
+			// use the default command
+
+			CommandRec defaultCommand =
+				commandHelper.findRequired (
+					commandRef.get ());
+
+			return commandManager.handle (
+				taskLogger,
+				inbox,
+				defaultCommand,
+				optionalAbsent (),
+				rest);
+
 		}
-
-		// use the default command
-
-		CommandRec defaultCommand =
-			commandHelper.findRequired (
-				commandRef.get ());
-
-		return commandManager.handle (
-			taskLogger,
-			inbox,
-			defaultCommand,
-			optionalAbsent (),
-			rest);
 
 	}
 

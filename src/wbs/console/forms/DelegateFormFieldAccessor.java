@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.base.Optional;
@@ -48,26 +50,37 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PrincipalContainer principalContainer) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"read");
+		try (
 
-		DelegateContainer delegateContainer =
-			genericCastUnchecked (
-				objectManager.dereferenceObsolete (
-					principalContainer,
-					path));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"read");
 
-		if (delegateContainer == null) {
+		) {
 
-			return optionalAbsent ();
+			Optional <DelegateContainer> delegateContainerOptional =
+				genericCastUnchecked (
+					objectManager.dereference (
+						principalContainer,
+						path));
+
+			if (
+				optionalIsNotPresent (
+					delegateContainerOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			DelegateContainer delegateContainer =
+				optionalGetRequired (
+					delegateContainerOptional);
+
+			return delegateFormFieldAccessor.read (
+				taskLogger,
+				delegateContainer);
 
 		}
-
-		return delegateFormFieldAccessor.read (
-			taskLogger,
-			delegateContainer);
 
 	}
 
@@ -78,25 +91,27 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 			@NonNull PrincipalContainer principalContainer,
 			@NonNull Optional <Native> nativeValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"write");
+		try (
 
-		DelegateContainer delegateContainer =
-			genericCastUnchecked (
-				objectManager.dereferenceObsolete (
-					principalContainer,
-					path));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"write");
 
-		if (delegateContainer == null) {
-			throw new RuntimeException ();
+		) {
+
+			DelegateContainer delegateContainer =
+				genericCastUnchecked (
+					objectManager.dereferenceRequired (
+						principalContainer,
+						path));
+
+			delegateFormFieldAccessor.write (
+				taskLogger,
+				delegateContainer,
+				nativeValue);
+
 		}
-
-		delegateFormFieldAccessor.write (
-			taskLogger,
-			delegateContainer,
-			nativeValue);
 
 	}
 

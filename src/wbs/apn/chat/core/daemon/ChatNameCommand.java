@@ -120,108 +120,114 @@ class ChatNameCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		String newName =
-			rest.replaceAll ("\\s*$", "");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+		) {
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+			String newName =
+				rest.replaceAll ("\\s*$", "");
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// limit name
-
-		if (newName.length () > 16) {
-
-			newName =
-				newName.substring (0, 16);
-
-		}
-
-		// make sure the user can send
-
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
-
-		if (creditCheckResult.failed ()) {
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				null,
-				true);
-
-		} else if (newName.length () > 0) {
-
-			// set name
-
-			chatMiscLogic.chatUserSetName (
-				taskLogger,
-				chatUser,
-				newName,
-				message.getThreadId ());
-
-		} else {
-
-			// send reply
-
-			chatSendLogic.sendSystemMagic (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"name_error",
-				commandHelper.findByCodeRequired (
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
 					chat,
-					"magic"),
-				objectId (
+					"default");
+
+			MessageRec message =
+				inbox.getMessage ();
+
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// limit name
+
+			if (newName.length () > 16) {
+
+				newName =
+					newName.substring (0, 16);
+
+			}
+
+			// make sure the user can send
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
+
+			if (creditCheckResult.failed ()) {
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					null,
+					true);
+
+			} else if (newName.length () > 0) {
+
+				// set name
+
+				chatMiscLogic.chatUserSetName (
+					taskLogger,
+					chatUser,
+					newName,
+					message.getThreadId ());
+
+			} else {
+
+				// send reply
+
+				chatSendLogic.sendSystemMagic (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"name_error",
 					commandHelper.findByCodeRequired (
 						chat,
-						"name")),
-				TemplateMissing.error,
-				emptyMap ());
+						"magic"),
+					objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"name")),
+					TemplateMissing.error,
+					emptyMap ());
+
+			}
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

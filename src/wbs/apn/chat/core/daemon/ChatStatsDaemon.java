@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -79,15 +79,22 @@ class ChatStatsDaemon
 
 			}
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"runService ()");
+			try (
 
-			taskLogger.debugFormat (
-				"Doing stats");
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"runService ()");
 
-			doStats (
-				fiveMinuteTime);
+			) {
+
+				taskLogger.debugFormat (
+					"Doing stats");
+
+				doStats (
+					taskLogger,
+					fiveMinuteTime);
+
+			}
 
 		}
 
@@ -130,44 +137,52 @@ class ChatStatsDaemon
 	}
 
 	void doStats (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Instant timestamp) {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"doStats");
-
-		// get list of chats
-
-		List <Long> chatIds;
 
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doStats");
+
+		) {
+
+			// get list of chats
+
+			List <Long> chatIds;
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"ChatStatsDaemon.doStats (timestamp)",
+						this);
+
+			) {
+
+				chatIds =
+					iterableMapToList (
+						ChatRec::getId,
+						chatHelper.findAll ());
+
+				transaction.close ();
+
+			}
+
+			for (
+				Long chatId
+					: chatIds
+			) {
+
+				doStats (
 					taskLogger,
-					"ChatStatsDaemon.doStats (timestamp)",
-					this);
+					timestamp,
+					chatId);
 
-		) {
-
-			chatIds =
-				iterableMapToList (
-					ChatRec::getId,
-					chatHelper.findAll ());
-
-			transaction.close ();
-
-		}
-
-		for (
-			Long chatId
-				: chatIds
-		) {
-
-			doStats (
-				taskLogger,
-				timestamp,
-				chatId);
+			}
 
 		}
 
@@ -178,14 +193,14 @@ class ChatStatsDaemon
 			@NonNull Instant timestamp,
 			@NonNull Long chatId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doStats");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doStats");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatStatsDaemon.doStats (timestamp, chatId)",

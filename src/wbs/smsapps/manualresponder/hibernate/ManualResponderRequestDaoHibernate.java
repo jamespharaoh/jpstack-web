@@ -267,49 +267,55 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchIds");
 
-		// set order
+		) {
 
-		switch (search.order ()) {
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-		case timestampDesc:
+			// set order
 
-			criteria
+			switch (search.order ()) {
 
-				.addOrder (
-					Order.desc (
-						"timestamp"))
+			case timestampDesc:
 
-				.addOrder (
-					Order.desc (
-						"id"));
+				criteria
 
-			break;
+					.addOrder (
+						Order.desc (
+							"timestamp"))
 
-		default:
+					.addOrder (
+						Order.desc (
+							"id"));
 
-			throw new RuntimeException ();
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
+
+			// set projection
+
+			criteria.setProjection (
+				Projections.id ());
+
+			return findMany (
+				"searchIds (search)",
+				Long.class,
+				criteria);
 
 		}
-
-		// set projection
-
-		criteria.setProjection (
-			Projections.id ());
-
-		return findMany (
-			"searchIds (search)",
-			Long.class,
-			criteria);
 
 	}
 
@@ -319,45 +325,51 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchServiceReportCriteria");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchServiceReportCriteria");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.property (
-					"_manualResponderNumber.manualResponder"),
-				"manualResponder")
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.sum (
-					"_manualResponderRequest.numFreeMessages"),
-				"numFree")
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.sum (
-					"_manualResponderRequest.numBilledMessages"),
-				"numBilled")
+				.add (
+					Projections.property (
+						"_manualResponderNumber.manualResponder"),
+					"manualResponder")
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponderNumber.manualResponder"))
+				.add (
+					Projections.sum (
+						"_manualResponderRequest.numFreeMessages"),
+					"numFree")
 
-		);
+				.add (
+					Projections.sum (
+						"_manualResponderRequest.numBilledMessages"),
+					"numBilled")
 
-		criteria.setResultTransformer (
-			Transformers.aliasToBean (
-				ManualResponderServiceReport.class));
+				.add (
+					Projections.groupProperty (
+						"_manualResponderNumber.manualResponder"))
 
-		return criteria;
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ManualResponderServiceReport.class));
+
+			return criteria;
+
+		}
 
 	}
 
@@ -367,48 +379,54 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchServiceReportIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchServiceReportIds");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.distinct (
-					Projections.property (
-						"_manualResponder.id")))
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponder.id"))
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponder.code"))
+				.add (
+					Projections.distinct (
+						Projections.property (
+							"_manualResponder.id")))
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponderSlice.code"))
+				.add (
+					Projections.groupProperty (
+						"_manualResponder.id"))
 
-		);
+				.add (
+					Projections.groupProperty (
+						"_manualResponder.code"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_manualResponderSlice.code"));
+				.add (
+					Projections.groupProperty (
+						"_manualResponderSlice.code"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_manualResponder.code"));
+			);
 
-		return findIdsOnly (
-			criteria.list ());
+			criteria.addOrder (
+				Order.asc (
+					"_manualResponderSlice.code"));
+
+			criteria.addOrder (
+				Order.asc (
+					"_manualResponder.code"));
+
+			return findIdsOnly (
+				criteria.list ());
+
+		}
 
 	}
 
@@ -418,20 +436,26 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchServiceReports");
+		try (
 
-		Criteria criteria =
-			searchServiceReportCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchServiceReports");
 
-		return findMany (
-			"searchServiceReports (search)",
-			ManualResponderServiceReport.class,
-			criteria);
+		) {
+
+			Criteria criteria =
+				searchServiceReportCriteria (
+					taskLogger,
+					search);
+
+			return findMany (
+				"searchServiceReports (search)",
+				ManualResponderServiceReport.class,
+				criteria);
+
+		}
 
 	}
 
@@ -442,26 +466,32 @@ class ManualResponderRequestDaoHibernate
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchServiceReports");
+		try (
 
-		Criteria criteria =
-			searchServiceReportCriteria (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchServiceReports");
+
+		) {
+
+			Criteria criteria =
+				searchServiceReportCriteria (
+					taskLogger,
+					search);
+
+			criteria.add (
+				Restrictions.in (
+					"_manualResponder.id",
+					objectIds));
+
+			return findOrdered (
 				taskLogger,
-				search);
+				ManualResponderServiceReport.class,
+				objectIds,
+				criteria.list ());
 
-		criteria.add (
-			Restrictions.in (
-				"_manualResponder.id",
-				objectIds));
-
-		return findOrdered (
-			taskLogger,
-			ManualResponderServiceReport.class,
-			objectIds,
-			criteria.list ());
+		}
 
 	}
 
@@ -471,45 +501,51 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReportCriteria");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReportCriteria");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.property (
-					"_manualResponderRequest.user"),
-				"user")
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.sum (
-					"_manualResponderRequest.numFreeMessages"),
-				"numFree")
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.sum (
-					"_manualResponderRequest.numBilledMessages"),
-				"numBilled")
+				.add (
+					Projections.property (
+						"_manualResponderRequest.user"),
+					"user")
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponderRequest.user"))
+				.add (
+					Projections.sum (
+						"_manualResponderRequest.numFreeMessages"),
+					"numFree")
 
-		);
+				.add (
+					Projections.sum (
+						"_manualResponderRequest.numBilledMessages"),
+					"numBilled")
 
-		criteria.setResultTransformer (
-			Transformers.aliasToBean (
-				ManualResponderOperatorReport.class));
+				.add (
+					Projections.groupProperty (
+						"_manualResponderRequest.user"))
 
-		return criteria;
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ManualResponderOperatorReport.class));
+
+			return criteria;
+
+		}
 
 	}
 
@@ -519,48 +555,54 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReportIds");
+		try (
 
-		Criteria criteria =
-			searchCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReportIds");
 
-		criteria.setProjection (
-			Projections.projectionList ()
+		) {
 
-			.add (
-				Projections.distinct (
-					Projections.property (
-						"_manualResponderRequest.user.id")))
+			Criteria criteria =
+				searchCriteria (
+					taskLogger,
+					search);
 
-			.add (
-				Projections.groupProperty (
-					"_manualResponderRequest.user.id"))
+			criteria.setProjection (
+				Projections.projectionList ()
 
-			.add (
-				Projections.groupProperty (
-					"_processedByUserSlice.code"))
+				.add (
+					Projections.distinct (
+						Projections.property (
+							"_manualResponderRequest.user.id")))
 
-			.add (
-				Projections.groupProperty (
-					"_processedByUser.username"))
+				.add (
+					Projections.groupProperty (
+						"_manualResponderRequest.user.id"))
 
-		);
+				.add (
+					Projections.groupProperty (
+						"_processedByUserSlice.code"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_processedByUserSlice.code"));
+				.add (
+					Projections.groupProperty (
+						"_processedByUser.username"))
 
-		criteria.addOrder (
-			Order.asc (
-				"_processedByUser.username"));
+			);
 
-		return findIdsOnly (
-			criteria.list ());
+			criteria.addOrder (
+				Order.asc (
+					"_processedByUserSlice.code"));
+
+			criteria.addOrder (
+				Order.asc (
+					"_processedByUser.username"));
+
+			return findIdsOnly (
+				criteria.list ());
+
+		}
 
 	}
 
@@ -570,20 +612,26 @@ class ManualResponderRequestDaoHibernate
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReports");
+		try (
 
-		Criteria criteria =
-			searchOperatorReportCriteria (
-				taskLogger,
-				search);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReports");
 
-		return findMany (
-			"searchOperatorReports (search)",
-			ManualResponderOperatorReport.class,
-			criteria);
+		) {
+
+			Criteria criteria =
+				searchOperatorReportCriteria (
+					taskLogger,
+					search);
+
+			return findMany (
+				"searchOperatorReports (search)",
+				ManualResponderOperatorReport.class,
+				criteria);
+
+		}
 
 	}
 
@@ -594,26 +642,32 @@ class ManualResponderRequestDaoHibernate
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"searchOperatorReports");
+		try (
 
-		Criteria criteria =
-			searchOperatorReportCriteria (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"searchOperatorReports");
+
+		) {
+
+			Criteria criteria =
+				searchOperatorReportCriteria (
+					taskLogger,
+					search);
+
+			criteria.add (
+				Restrictions.in (
+					"_processedByUser.id",
+					objectIds));
+
+			return findOrdered (
 				taskLogger,
-				search);
+				ManualResponderOperatorReport.class,
+				objectIds,
+				criteria.list ());
 
-		criteria.add (
-			Restrictions.in (
-				"_processedByUser.id",
-				objectIds));
-
-		return findOrdered (
-			taskLogger,
-			ManualResponderOperatorReport.class,
-			objectIds,
-			criteria.list ());
+		}
 
 	}
 

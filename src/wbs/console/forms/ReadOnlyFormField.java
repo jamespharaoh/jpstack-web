@@ -130,79 +130,85 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canView");
+		try (
 
-		// check feature
-
-		if (
-
-			isNotNull (
-				featureCode)
-
-			&& ! featureChecker.checkFeatureAccess (
-				taskLogger,
-				privChecker,
-				featureCode)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canView");
 
 		) {
-			return false;
-		}
 
-		// check view priv
+			// check feature
 
-		if (
-			isNull (
-				viewPriv)
-		) {
-			return true;
-		}
+			if (
 
-		List <String> privParts =
-			stringSplitColon (
-				viewPriv);
+				isNotNull (
+					featureCode)
 
-		if (
-			collectionHasOneElement (
-				privParts)
-		) {
+				&& ! featureChecker.checkFeatureAccess (
+					taskLogger,
+					privChecker,
+					featureCode)
 
-			String privCode =
-				privParts.get (0);
+			) {
+				return false;
+			}
 
-			return privChecker.canRecursive (
-				taskLogger,
-				(Record<?>) container,
-				privCode);
+			// check view priv
 
-		} else if (
-			collectionHasTwoElements (
-				privParts)
-		) {
+			if (
+				isNull (
+					viewPriv)
+			) {
+				return true;
+			}
 
-			String delegatePath =
-				privParts.get (0);
+			List <String> privParts =
+				stringSplitColon (
+					viewPriv);
 
-			String privCode =
-				privParts.get (1);
+			if (
+				collectionHasOneElement (
+					privParts)
+			) {
 
-			Record<?> delegate =
-				(Record<?>)
-				objectManager.dereferenceObsolete (
-					container,
-					delegatePath,
-					hints);
+				String privCode =
+					privParts.get (0);
 
-			return privChecker.canRecursive (
-				taskLogger,
-				delegate,
-				privCode);
+				return privChecker.canRecursive (
+					taskLogger,
+					(Record<?>) container,
+					privCode);
 
-		} else {
+			} else if (
+				collectionHasTwoElements (
+					privParts)
+			) {
 
-			throw new RuntimeException ();
+				String delegatePath =
+					privParts.get (0);
+
+				String privCode =
+					privParts.get (1);
+
+				Record<?> delegate =
+					(Record<?>)
+					objectManager.dereferenceObsolete (
+						container,
+						delegatePath,
+						hints);
+
+				return privChecker.canRecursive (
+					taskLogger,
+					delegate,
+					privCode);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
@@ -219,46 +225,52 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormAlwaysHidden");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormAlwaysHidden");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+		) {
 
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
-						container,
-						hints,
-						genericValue)));
+						container));
 
-		htmlWriter.writeLineFormat (
-			"<input",
-			" type=\"hidden\"",
-			" id=\"%h-%h\"",
-			formName,
-			name (),
-			" name=\"%h-%h\"",
-			formName,
-			name (),
-			" value=\"%h\"",
-			interfaceValue.isPresent ()
-				? interfaceValue.get ().toString ()
-				: "",
-			">\n");
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			htmlWriter.writeLineFormat (
+				"<input",
+				" type=\"hidden\"",
+				" id=\"%h-%h\"",
+				formName,
+				name (),
+				" name=\"%h-%h\"",
+				formName,
+				name (),
+				" value=\"%h\"",
+				interfaceValue.isPresent ()
+					? interfaceValue.get ().toString ()
+					: "",
+				">\n");
+
+		}
 
 	}
 
@@ -272,40 +284,46 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderTableCellList");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderTableCellList");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+		) {
 
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
-						container,
-						hints,
-						genericValue)));
+						container));
 
-		renderer.renderHtmlTableCellList (
-			taskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			link,
-			columnSpan);
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			renderer.renderHtmlTableCellList (
+				taskLogger,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link,
+				columnSpan);
+
+		}
 
 	}
 
@@ -317,40 +335,46 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderTableCellProperties");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderTableCellProperties");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+		) {
 
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
-						container,
-						hints,
-						genericValue)));
+						container));
 
-		renderer.renderHtmlTableCellProperties (
-			taskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			true,
-			1l);
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+			renderer.renderHtmlTableCellProperties (
+				taskLogger,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				true,
+				1l);
+
+		}
 
 	}
 
@@ -366,54 +390,60 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormRow");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormRow");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+		) {
 
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
 						container,
-						hints,
-						genericValue)));
+						nativeValue));
 
-		htmlTableRowOpen (
-			htmlWriter);
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
 
-		htmlTableHeaderCellWrite (
-			htmlWriter,
-			label ());
+			htmlTableRowOpen (
+				htmlWriter);
 
-		htmlTableCellOpen (
-			htmlWriter);
+			htmlTableHeaderCellWrite (
+				htmlWriter,
+				label ());
 
-		renderer.renderHtmlComplex (
-			taskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue);
+			htmlTableCellOpen (
+				htmlWriter);
 
-		htmlTableCellClose (
-			htmlWriter);
+			renderer.renderHtmlComplex (
+				taskLogger,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue);
 
-		htmlTableRowClose (
-			htmlWriter);
+			htmlTableCellClose (
+				htmlWriter);
+
+			htmlTableRowClose (
+				htmlWriter);
+
+		}
 
 	}
 
@@ -437,50 +467,56 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderCsvRow");
+		try (
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderCsvRow");
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
-
-		Optional <String> csvValueOptional =
-			resultValueRequired (
-				csvMapping.genericToInterface (
-					taskLogger,
-					container,
-					hints,
-					genericValue));
-
-		if (
-			optionalIsNotPresent (
-				csvValueOptional)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Missing CSV value for %s.%s",
-					container.getClass ().getName (),
-					name ()));
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
+						taskLogger,
+						container));
+
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <String> csvValueOptional =
+				resultValueRequired (
+					csvMapping.genericToInterface (
+						taskLogger,
+						container,
+						hints,
+						genericValue));
+
+			if (
+				optionalIsNotPresent (
+					csvValueOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Missing CSV value for %s.%s",
+						container.getClass ().getName (),
+						name ()));
+
+			}
+
+			String csvValue =
+				csvValueOptional.get ();
+
+			out.writeFormat (
+				"\"%s\"",
+				csvValue.replace ("\"", "\"\""));
 
 		}
-
-		String csvValue =
-			csvValueOptional.get ();
-
-		out.writeFormat (
-			"\"%s\"",
-			csvValue.replace ("\"", "\"\""));
 
 	}
 

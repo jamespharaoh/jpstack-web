@@ -15,7 +15,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -95,58 +95,64 @@ class ChatUserAdminLocationFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ChatUserAdminLocationForm formState) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		// check form is filled in ok
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		if (formState.newLocationName () == null) {
+		) {
 
-			requestContext.addWarning (
-				"Please specify a location");
+			// check form is filled in ok
+
+			if (formState.newLocationName () == null) {
+
+				requestContext.addWarning (
+					"Please specify a location");
+
+				return optionalAbsent ();
+
+			}
+
+			// perform update
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			boolean success =
+				chatUserLogic.setPlace (
+					taskLogger,
+					chatUser,
+					formState.newLocationName (),
+					optionalAbsent (),
+					optionalOf (
+						userConsoleLogic.userRequired ()));
+
+			// handle location not found
+
+			if (! success) {
+
+				requestContext.addError (
+					"That location could not be found");
+
+				return optionalAbsent ();
+
+			}
+
+			// finish
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Location updated successfully");
 
 			return optionalAbsent ();
 
 		}
-
-		// perform update
-
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
-
-		boolean success =
-			chatUserLogic.setPlace (
-				taskLogger,
-				chatUser,
-				formState.newLocationName (),
-				optionalAbsent (),
-				optionalOf (
-					userConsoleLogic.userRequired ()));
-
-		// handle location not found
-
-		if (! success) {
-
-			requestContext.addError (
-				"That location could not be found");
-
-			return optionalAbsent ();
-
-		}
-
-		// finish
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Location updated successfully");
-
-		return optionalAbsent ();
 
 	}
 

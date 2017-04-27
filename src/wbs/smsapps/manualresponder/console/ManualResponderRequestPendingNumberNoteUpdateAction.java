@@ -22,7 +22,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -107,46 +107,44 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		Matcher idMatcher =
-			idPattern.matcher (
-				requestContext.parameterRequired (
-					"id"));
-
-		if (! idMatcher.matches ()) {
-
-			throw new RuntimeException (
-				"Invalid id in post");
-
-		}
-
-		Long numberId =
-			Long.parseLong (
-				idMatcher.group (
-					1));
-
-		valueParam =
-			stringTrim (
-				requestContext.parameterRequired (
-					"value"));
-
-		// start transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ManualResponderRequestPendingNumberNoteUpdateAction.goReal ()",
 					this);
 
 		) {
+
+			// get params
+
+			Matcher idMatcher =
+				idPattern.matcher (
+					requestContext.parameterRequired (
+						"id"));
+
+			if (! idMatcher.matches ()) {
+
+				throw new RuntimeException (
+					"Invalid id in post");
+
+			}
+
+			Long numberId =
+				Long.parseLong (
+					idMatcher.group (
+						1));
+
+			valueParam =
+				stringTrim (
+					requestContext.parameterRequired (
+						"value"));
 
 			manualResponder =
 				manualResponderHelper.findFromContextRequired ();
@@ -194,33 +192,81 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	Responder updateNumber (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateNumber");
+		try (
 
-		// find old and new value
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateNumber");
 
-		TextRec oldValue =
-			manualResponderNumber.getNotesText ();
-
-		TextRec newValue =
-			valueParam.isEmpty ()
-				? null
-				: textHelper.findOrCreate (
-					taskLogger,
-					valueParam);
-
-		if (
-			optionalEqualOrNotPresentWithClass (
-				TextRec.class,
-				optionalFromNullable (
-					oldValue),
-				optionalFromNullable (
-					newValue))
 		) {
+
+			// find old and new value
+
+			TextRec oldValue =
+				manualResponderNumber.getNotesText ();
+
+			TextRec newValue =
+				valueParam.isEmpty ()
+					? null
+					: textHelper.findOrCreate (
+						taskLogger,
+						valueParam);
+
+			if (
+				optionalEqualOrNotPresentWithClass (
+					TextRec.class,
+					optionalFromNullable (
+						oldValue),
+					optionalFromNullable (
+						newValue))
+			) {
+
+				return textResponderProvider.get ()
+
+					.text (
+						newValue != null
+							? HtmlUtils.encodeNewlineToBr (
+								newValue.getText ())
+							: "");
+
+			}
+
+			// update note
+
+			manualResponderNumber
+
+				.setNotesText (
+					newValue);
+
+			// create event
+
+			if (newValue != null) {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"object_field_updated",
+					userConsoleLogic.userRequired (),
+					"notesText",
+					manualResponderNumber,
+					newValue);
+
+			} else {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"object_field_nulled",
+					userConsoleLogic.userRequired (),
+					"notesText",
+					manualResponderNumber);
+
+			}
+
+			// finish off
+
+			transaction.commit ();
 
 			return textResponderProvider.get ()
 
@@ -231,80 +277,86 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 						: "");
 
 		}
-
-		// update note
-
-		manualResponderNumber
-
-			.setNotesText (
-				newValue);
-
-		// create event
-
-		if (newValue != null) {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_field_updated",
-				userConsoleLogic.userRequired (),
-				"notesText",
-				manualResponderNumber,
-				newValue);
-
-		} else {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_field_nulled",
-				userConsoleLogic.userRequired (),
-				"notesText",
-				manualResponderNumber);
-
-		}
-
-		// finish off
-
-		transaction.commit ();
-
-		return textResponderProvider.get ()
-
-			.text (
-				newValue != null
-					? HtmlUtils.encodeNewlineToBr (
-						newValue.getText ())
-					: "");
 
 	}
 
 	Responder updateCustomer (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateCustomer");
+		try (
 
-		// find old and new value
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateCustomer");
 
-		TextRec oldValue =
-			customer.getNotesText ();
-
-		TextRec newValue =
-			valueParam.isEmpty ()
-				? null
-				: textHelper.findOrCreate (
-					taskLogger,
-					valueParam);
-
-		if (
-			optionalEqualOrNotPresentWithClass (
-				TextRec.class,
-				optionalFromNullable (
-					oldValue),
-				optionalFromNullable (
-					newValue))
 		) {
+
+			// find old and new value
+
+			TextRec oldValue =
+				customer.getNotesText ();
+
+			TextRec newValue =
+				valueParam.isEmpty ()
+					? null
+					: textHelper.findOrCreate (
+						taskLogger,
+						valueParam);
+
+			if (
+				optionalEqualOrNotPresentWithClass (
+					TextRec.class,
+					optionalFromNullable (
+						oldValue),
+					optionalFromNullable (
+						newValue))
+			) {
+
+				return textResponderProvider.get ()
+
+					.text (
+						newValue != null
+							? HtmlUtils.encodeNewlineToBr (
+								newValue.getText ())
+							: "");
+
+			}
+
+			// update note
+
+			customer
+
+				.setNotesText (
+					newValue);
+
+			// create event
+
+			if (newValue != null) {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"object_field_updated",
+					userConsoleLogic.userRequired (),
+					"notesText",
+					customer,
+					newValue);
+
+			} else {
+
+				eventLogic.createEvent (
+					taskLogger,
+					"object_field_nulled",
+					userConsoleLogic.userRequired (),
+					"notesText",
+					customer);
+
+			}
+
+			// finish off
+
+			transaction.commit ();
 
 			return textResponderProvider.get ()
 
@@ -315,48 +367,6 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 						: "");
 
 		}
-
-		// update note
-
-		customer
-
-			.setNotesText (
-				newValue);
-
-		// create event
-
-		if (newValue != null) {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_field_updated",
-				userConsoleLogic.userRequired (),
-				"notesText",
-				customer,
-				newValue);
-
-		} else {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_field_nulled",
-				userConsoleLogic.userRequired (),
-				"notesText",
-				customer);
-
-		}
-
-		// finish off
-
-		transaction.commit ();
-
-		return textResponderProvider.get ()
-
-			.text (
-				newValue != null
-					? HtmlUtils.encodeNewlineToBr (
-						newValue.getText ())
-					: "");
 
 	}
 

@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -59,120 +59,126 @@ class ForwarderInAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ForwarderInAction.goApi ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
-			String slice =
-				requestContext.parameterRequired (
-					"slice");
+			try (
 
-			String code =
-				requestContext.parameterRequired (
-					"code");
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ForwarderInAction.goApi ()",
+						this);
 
-			String password =
-				requestContext.parameterRequired (
-					"password");
-
-			String action =
-				requestContext.parameterRequired (
-					"action");
-
-			ForwarderRec forwarder;
-
-			try {
-
-				forwarder =
-					forwarderApiLogic.lookupForwarder (
-						requestContext,
-						slice,
-						code,
-						password);
-
-			} catch (ForwarderNotFoundException exception) {
-
-				throw new ReportableException (
-					"Forwarder not found: " + code);
-
-			} catch (IncorrectPasswordException exception) {
-
-				throw new ReportableException (
-					"Password incorrect");
-
-			}
-
-			transaction.commit ();
-
-			if (action.equalsIgnoreCase ("get")) {
-
-				return forwarderApiLogic.controlActionGet (
-					requestContext,
-					forwarder);
-
-			} else if (action.equalsIgnoreCase ("borrow")) {
-
-				return forwarderApiLogic.controlActionBorrow (
-					requestContext,
-					forwarder);
-
-			} else if (action.equalsIgnoreCase ("unqueue")) {
-
-				return forwarderApiLogic.controlActionUnqueue (
-					requestContext,
-					forwarder);
-
-			} else {
-
-				throw new ReportableException (
-					"Unknown action: " + action);
-
-			}
-
-		} catch (ReportableException exception) {
-
-			taskLogger.errorFormatException (
-				exception,
-				"Error doing 'in'");
-
-			for (
-				Map.Entry <String, List <String>> entry
-					: requestContext.parameterMap ().entrySet ()
 			) {
 
-				String name =
-					entry.getKey ();
+				String slice =
+					requestContext.parameterRequired (
+						"slice");
 
-				List <String> values =
-					entry.getValue ();
+				String code =
+					requestContext.parameterRequired (
+						"code");
 
-				for (
-					String value
-						: values
-				) {
+				String password =
+					requestContext.parameterRequired (
+						"password");
 
-					taskLogger.errorFormat (
-						"Param %s: %s",
-						 name,
-						 value);
+				String action =
+					requestContext.parameterRequired (
+						"action");
+
+				ForwarderRec forwarder;
+
+				try {
+
+					forwarder =
+						forwarderApiLogic.lookupForwarder (
+							requestContext,
+							slice,
+							code,
+							password);
+
+				} catch (ForwarderNotFoundException exception) {
+
+					throw new ReportableException (
+						"Forwarder not found: " + code);
+
+				} catch (IncorrectPasswordException exception) {
+
+					throw new ReportableException (
+						"Password incorrect");
 
 				}
 
-			}
+				transaction.commit ();
 
-			return textResponderProvider.get ()
-				.text ("ERROR\n" + exception.getMessage () + "\n");
+				if (action.equalsIgnoreCase ("get")) {
+
+					return forwarderApiLogic.controlActionGet (
+						requestContext,
+						forwarder);
+
+				} else if (action.equalsIgnoreCase ("borrow")) {
+
+					return forwarderApiLogic.controlActionBorrow (
+						requestContext,
+						forwarder);
+
+				} else if (action.equalsIgnoreCase ("unqueue")) {
+
+					return forwarderApiLogic.controlActionUnqueue (
+						requestContext,
+						forwarder);
+
+				} else {
+
+					throw new ReportableException (
+						"Unknown action: " + action);
+
+				}
+
+			} catch (ReportableException exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error doing 'in'");
+
+				for (
+					Map.Entry <String, List <String>> entry
+						: requestContext.parameterMap ().entrySet ()
+				) {
+
+					String name =
+						entry.getKey ();
+
+					List <String> values =
+						entry.getValue ();
+
+					for (
+						String value
+							: values
+					) {
+
+						taskLogger.errorFormat (
+							"Param %s: %s",
+							 name,
+							 value);
+
+					}
+
+				}
+
+				return textResponderProvider.get ()
+					.text ("ERROR\n" + exception.getMessage () + "\n");
+
+			}
 
 		}
 

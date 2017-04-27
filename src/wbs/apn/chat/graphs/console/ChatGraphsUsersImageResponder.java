@@ -128,7 +128,8 @@ class ChatGraphsUsersImageResponder
 
 	@Override
 	protected
-	void prepareVerticalScale () {
+	void prepareVerticalScale (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		long realMax = 0;
 

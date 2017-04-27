@@ -13,6 +13,7 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -27,6 +28,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -109,284 +111,290 @@ class TextAreaFormFieldBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String name =
-			spec.name ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+		) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String name =
+				spec.name ();
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		Integer rows =
-			ifNull (
-				spec.rows (),
-				4);
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		Integer cols =
-			ifNull (
-				spec.cols (),
-				FormField.defaultSize);
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		Boolean dynamic =
-			spec.dynamic ();
+			Integer rows =
+				ifNull (
+					spec.rows (),
+					4);
 
-		Record<?> parent =
-			spec.parent ();
+			Integer cols =
+				ifNull (
+					spec.cols (),
+					FormField.defaultSize);
 
-		String charCountFunction =
-			spec.charCountFunction ();
+			Boolean dynamic =
+				spec.dynamic ();
 
-		String charCountData =
-			spec.charCountData ();
+			Record<?> parent =
+				spec.parent ();
 
-		// if a data provider is provided
+			String charCountFunction =
+				spec.charCountFunction ();
 
-		Class<?> propertyClass = null;
+			String charCountData =
+				spec.charCountData ();
 
-		if (spec.dataProvider () != null) {
+			// if a data provider is provided
 
-			propertyClass =
-				String.class;
+			Class<?> propertyClass = null;
 
-			dataProvider =
-				componentManager.getComponentRequired (
+			if (spec.dataProvider () != null) {
+
+				propertyClass =
+					String.class;
+
+				dataProvider =
+					componentManager.getComponentRequired (
+						taskLogger,
+						spec.dataProvider (),
+						FormFieldDataProvider.class);
+
+			} else if (! dynamic) {
+
+				propertyClass =
+					PropertyUtils.propertyClassForClass (
+						context.containerClass (),
+						name);
+
+			} else {
+
+				propertyClass =
+					String.class;
+
+			}
+
+			String updateHookBeanName =
+				spec.updateHookBeanName ();
+
+			// constraint validator only use for simple type settings
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+			// accessor
+
+			FormFieldAccessor accessor;
+
+			if (dynamic) {
+
+				accessor =
+					dynamicFormFieldAccessorProvider.get ()
+
+					.name (
+						name)
+
+					.nativeClass (
+						propertyClass);
+
+			} else {
+
+				accessor =
+					simpleFormFieldAccessorProvider.get ()
+
+					.name (
+						name)
+
+					.nativeClass (
+						propertyClass);
+
+			}
+
+			// TODO dynamic
+
+			// native mapping
+
+			FormFieldNativeMapping nativeMapping;
+
+			if (
+				classEqualSafe (
+					propertyClass,
+					byte[].class)
+			) {
+
+				nativeMapping =
+					utf8StringFormFieldNativeMappingProvider.get ();
+
+
+			} else {
+
+				nativeMapping =
+					formFieldPluginManager.getNativeMappingRequired (
+						context,
+						context.containerClass (),
+						name,
+						String.class,
+						propertyClass);
+
+			}
+
+			// value validator
+
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// renderer
+
+			FormFieldRenderer formFieldRenderer =
+				textAreaFormFieldRendererProvider.get ()
+
+				.name (
+					name)
+
+				.label (
+					label)
+
+				.nullable (
+					nullable)
+
+				.rows (
+					rows)
+
+				.cols (
+					cols)
+
+				.charCountFunction (
+					charCountFunction)
+
+				.charCountData (
+					charCountData)
+
+				.parent (
+					parent)
+
+				.formFieldDataProvider (
+					dataProvider);
+
+			// update hook
+
+			FormFieldUpdateHook formFieldUpdateHook =
+				updateHookBeanName != null
+
+				? componentManager.getComponentRequired (
 					taskLogger,
-					spec.dataProvider (),
-					FormFieldDataProvider.class);
+					updateHookBeanName,
+					FormFieldUpdateHook.class)
 
-		} else if (! dynamic) {
-
-			propertyClass =
-				PropertyUtils.propertyClassForClass (
+				: formFieldPluginManager.getUpdateHook (
+					context,
 					context.containerClass (),
 					name);
 
-		} else {
+			// field
 
-			propertyClass =
-				String.class;
+			if (readOnly) {
 
-		}
+				formFieldSet.addFormItem (
 
-		String updateHookBeanName =
-			spec.updateHookBeanName ();
+					readOnlyFormFieldProvider.get ()
 
-		// constraint validator only use for simple type settings
+					.large (
+						true)
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+					.name (
+						name)
 
-		// accessor
+					.label (
+						label)
 
-		FormFieldAccessor accessor;
+					.accessor (
+						accessor)
 
-		if (dynamic) {
+					.nativeMapping (
+						nativeMapping)
 
-			accessor =
-				dynamicFormFieldAccessorProvider.get ()
+					.interfaceMapping (
+						interfaceMapping)
 
-				.name (
-					name)
+					.csvMapping (
+						interfaceMapping)
 
-				.nativeClass (
-					propertyClass);
+					.renderer (
+						formFieldRenderer)
 
-		} else {
+				);
 
-			accessor =
-				simpleFormFieldAccessorProvider.get ()
+			} else {
 
-				.name (
-					name)
+				formFieldSet.addFormItem (
 
-				.nativeClass (
-					propertyClass);
+					updatableFormFieldProvider.get ()
 
-		}
+					.large (
+						true)
 
-		// TODO dynamic
+					.name (
+						name)
 
-		// native mapping
+					.label (
+						label)
 
-		FormFieldNativeMapping nativeMapping;
+					.accessor (
+						accessor)
 
-		if (
-			classEqualSafe (
-				propertyClass,
-				byte[].class)
-		) {
+					.nativeMapping (
+						nativeMapping)
 
-			nativeMapping =
-				utf8StringFormFieldNativeMappingProvider.get ();
+					.valueValidators (
+						valueValidators)
 
+					.constraintValidator (
+						constraintValidator)
 
-		} else {
+					.interfaceMapping (
+						interfaceMapping)
 
-			nativeMapping =
-				formFieldPluginManager.getNativeMappingRequired (
-					context,
-					context.containerClass (),
-					name,
-					String.class,
-					propertyClass);
+					.csvMapping (
+						interfaceMapping)
 
-		}
+					.renderer (
+						formFieldRenderer)
 
-		// value validator
+					.updateHook (
+						formFieldUpdateHook)
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+				);
 
-		if (! nullable) {
-
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
-
-		}
-
-		// interface mapping
-
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer formFieldRenderer =
-			textAreaFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				nullable)
-
-			.rows (
-				rows)
-
-			.cols (
-				cols)
-
-			.charCountFunction (
-				charCountFunction)
-
-			.charCountData (
-				charCountData)
-
-			.parent (
-				parent)
-
-			.formFieldDataProvider (
-				dataProvider);
-
-		// update hook
-
-		FormFieldUpdateHook formFieldUpdateHook =
-			updateHookBeanName != null
-
-			? componentManager.getComponentRequired (
-				taskLogger,
-				updateHookBeanName,
-				FormFieldUpdateHook.class)
-
-			: formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// field
-
-		if (readOnly) {
-
-			formFieldSet.addFormItem (
-
-				readOnlyFormFieldProvider.get ()
-
-				.large (
-					true)
-
-				.name (
-					name)
-
-				.label (
-					label)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.interfaceMapping (
-					interfaceMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.renderer (
-					formFieldRenderer)
-
-			);
-
-		} else {
-
-			formFieldSet.addFormItem (
-
-				updatableFormFieldProvider.get ()
-
-				.large (
-					true)
-
-				.name (
-					name)
-
-				.label (
-					label)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.valueValidators (
-					valueValidators)
-
-				.constraintValidator (
-					constraintValidator)
-
-				.interfaceMapping (
-					interfaceMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.renderer (
-					formFieldRenderer)
-
-				.updateHook (
-					formFieldUpdateHook)
-
-			);
+			}
 
 		}
 

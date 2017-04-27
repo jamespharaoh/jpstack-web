@@ -75,18 +75,24 @@ class EntityHelperImplementation
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		initEntityClassNames ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		initEntityClasses (
-			taskLogger);
+		) {
 
-		initModels (
-			taskLogger);
+			initEntityClassNames ();
+
+			initEntityClasses (
+				taskLogger);
+
+			initModels (
+				taskLogger);
+
+		}
 
 	}
 
@@ -124,150 +130,162 @@ class EntityHelperImplementation
 	void initEntityClasses (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initEntityClasses");
+		try (
 
-		ImmutableList.Builder <Class <?>> entityClassesBuilder =
-			ImmutableList.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initEntityClasses");
 
-		for (
-			String entityClassName
-				: entityClassNames
 		) {
 
-			try {
+			ImmutableList.Builder <Class <?>> entityClassesBuilder =
+				ImmutableList.builder ();
 
-				Class <?> entityClass =
-					Class.forName (
+			for (
+				String entityClassName
+					: entityClassNames
+			) {
+
+				try {
+
+					Class <?> entityClass =
+						Class.forName (
+							entityClassName);
+
+					entityClassesBuilder.add (
+						entityClass);
+
+				} catch (ClassNotFoundException exception) {
+
+					taskLogger.errorFormat (
+						"No such class %s",
 						entityClassName);
 
-				entityClassesBuilder.add (
-					entityClass);
-
-			} catch (ClassNotFoundException exception) {
-
-				taskLogger.errorFormat (
-					"No such class %s",
-					entityClassName);
+				}
 
 			}
 
+			taskLogger.makeException ();
+
+			entityClasses =
+				entityClassesBuilder.build ();
+
 		}
-
-		taskLogger.makeException ();
-
-		entityClasses =
-			entityClassesBuilder.build ();
 
 	}
 
 	void initModels (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initModels");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initModels");
 
-			deleteDirectory (
-				"work/model");
-
-			forceMkdir (
-				"work/model");
-
-		} catch (RuntimeException exception) {
-
-			taskLogger.errorFormat (
-				"Error deleting contents of work/model: %s",
-				exception.getMessage ());
-
-		}
-
-		ImmutableList.Builder <Model <?>> modelsBuilder =
-			ImmutableList.builder ();
-
-		ImmutableMap.Builder <Class <?>, Model <?>> modelsByClassBuilder =
-			ImmutableMap.builder ();
-
-		ImmutableMap.Builder <String, Model <?>> modelsByNameBuilder =
-			ImmutableMap.builder ();
-
-		int errors = 0;
-
-		for (
-			ModelMetaSpec modelMeta
-				: modelMetaLoader.modelMetas ().values ()
 		) {
-
-			if (! modelMeta.type ().record ()) {
-				continue;
-			}
-
-			Model <?> model =
-				modelBuilder.get ()
-
-				.modelMeta (
-					modelMeta)
-
-				.build (
-					taskLogger);
-
-			if (model == null) {
-
-				errors ++;
-
-				continue;
-
-			}
-
-			modelsBuilder.add (
-				model);
-
-			modelsByClassBuilder.put (
-				model.objectClass (),
-				model);
-
-			modelsByNameBuilder.put (
-				model.objectName (),
-				model);
-
-			String outputFilename =
-				stringFormat (
-					"work/model/%s.xml",
-					camelToHyphen (
-						model.objectName ()));
 
 			try {
 
-				new DataToXml ().writeToFile (
-					outputFilename,
-					model);
+				deleteDirectory (
+					"work/model");
 
-			} catch (Exception exception) {
+				forceMkdir (
+					"work/model");
 
-				taskLogger.warningFormat (
-					"Error writing %s",
-					outputFilename);
+			} catch (RuntimeException exception) {
+
+				taskLogger.errorFormat (
+					"Error deleting contents of work/model: %s",
+					exception.getMessage ());
 
 			}
 
+			ImmutableList.Builder <Model <?>> modelsBuilder =
+				ImmutableList.builder ();
+
+			ImmutableMap.Builder <Class <?>, Model <?>> modelsByClassBuilder =
+				ImmutableMap.builder ();
+
+			ImmutableMap.Builder <String, Model <?>> modelsByNameBuilder =
+				ImmutableMap.builder ();
+
+			int errors = 0;
+
+			for (
+				ModelMetaSpec modelMeta
+					: modelMetaLoader.modelMetas ().values ()
+			) {
+
+				if (! modelMeta.type ().record ()) {
+					continue;
+				}
+
+				Model <?> model =
+					modelBuilder.get ()
+
+					.modelMeta (
+						modelMeta)
+
+					.build (
+						taskLogger);
+
+				if (model == null) {
+
+					errors ++;
+
+					continue;
+
+				}
+
+				modelsBuilder.add (
+					model);
+
+				modelsByClassBuilder.put (
+					model.objectClass (),
+					model);
+
+				modelsByNameBuilder.put (
+					model.objectName (),
+					model);
+
+				String outputFilename =
+					stringFormat (
+						"work/model/%s.xml",
+						camelToHyphen (
+							model.objectName ()));
+
+				try {
+
+					new DataToXml ().writeToFile (
+						outputFilename,
+						model);
+
+				} catch (Exception exception) {
+
+					taskLogger.warningFormat (
+						"Error writing %s",
+						outputFilename);
+
+				}
+
+			}
+
+			if (errors > 0)
+				throw new RuntimeException ();
+
+			models =
+				modelsBuilder.build ();
+
+			modelsByClass =
+				modelsByClassBuilder.build ();
+
+			modelsByName =
+				modelsByNameBuilder.build ();
+
 		}
-
-		if (errors > 0)
-			throw new RuntimeException ();
-
-		models =
-			modelsBuilder.build ();
-
-		modelsByClass =
-			modelsByClassBuilder.build ();
-
-		modelsByName =
-			modelsByNameBuilder.build ();
 
 	}
 

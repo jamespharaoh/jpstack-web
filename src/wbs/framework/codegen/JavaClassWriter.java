@@ -593,181 +593,187 @@ class JavaClassWriter
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeBlock");
+		try (
 
-		// class annotations
-
-		for (
-			JavaAnnotationWriter annotationWriter
-				: classAnnotations
-		) {
-
-			annotationWriter.writeAnnotation (
-				imports,
-				formatWriter);
-
-		}
-
-		// class modifiers
-
-		if (
-			collectionIsNotEmpty (
-				classModifiers)
-		) {
-
-			formatWriter.writeLineFormat (
-				"%s",
-				joinWithSpace (
-					classModifiers));
-
-		}
-
-		// class declaration
-
-		if (
-
-			isNull (
-				extendsClassName)
-
-			&& collectionIsEmpty (
-				implementsInterfaces)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeBlock");
 
 		) {
 
-			formatWriter.writeLineFormat (
-				"class %s {",
-				className);
+			// class annotations
 
-		} else {
-
-			formatWriter.writeLineFormat (
-				"class %s",
-				className);
-
-		}
-
-		// class extends declaration
-
-		if (
-			isNotNull (
-				extendsClassName)
-		) {
-
-			if (
-				collectionIsEmpty (
-					implementsInterfaces)
+			for (
+				JavaAnnotationWriter annotationWriter
+					: classAnnotations
 			) {
 
-				formatWriter.writeLineFormat (
-					"\textends %s {",
-					imports.register (
-						extendsClassName));
-
-			} else {
-
-				formatWriter.writeLineFormat (
-					"\textends %s",
-					imports.register (
-						extendsClassName));
+				annotationWriter.writeAnnotation (
+					imports,
+					formatWriter);
 
 			}
 
-		}
-
-		// class implements declaration
-
-		if (
-			collectionIsNotEmpty (
-				implementsInterfaces)
-		) {
+			// class modifiers
 
 			if (
-				collectionHasOneElement (
-					implementsInterfaces)
+				collectionIsNotEmpty (
+					classModifiers)
 			) {
 
-				Function <JavaImportRegistry, String> implementsInterface =
-					listFirstElementRequired (
-						implementsInterfaces);
+				formatWriter.writeLineFormat (
+					"%s",
+					joinWithSpace (
+						classModifiers));
+
+			}
+
+			// class declaration
+
+			if (
+
+				isNull (
+					extendsClassName)
+
+				&& collectionIsEmpty (
+					implementsInterfaces)
+
+			) {
 
 				formatWriter.writeLineFormat (
-					"\timplements %s {",
-					implementsInterface.apply (
-						imports));
+					"class %s {",
+					className);
 
 			} else {
 
 				formatWriter.writeLineFormat (
-					"\timplements");
+					"class %s",
+					className);
 
-				for (
-					Function <JavaImportRegistry, String> implementsInterface
-						: listSliceAllButLastItemRequired (
-							implementsInterfaces)
+			}
+
+			// class extends declaration
+
+			if (
+				isNotNull (
+					extendsClassName)
+			) {
+
+				if (
+					collectionIsEmpty (
+						implementsInterfaces)
 				) {
 
 					formatWriter.writeLineFormat (
-						"\t\t%s,",
+						"\textends %s {",
+						imports.register (
+							extendsClassName));
+
+				} else {
+
+					formatWriter.writeLineFormat (
+						"\textends %s",
+						imports.register (
+							extendsClassName));
+
+				}
+
+			}
+
+			// class implements declaration
+
+			if (
+				collectionIsNotEmpty (
+					implementsInterfaces)
+			) {
+
+				if (
+					collectionHasOneElement (
+						implementsInterfaces)
+				) {
+
+					Function <JavaImportRegistry, String> implementsInterface =
+						listFirstElementRequired (
+							implementsInterfaces);
+
+					formatWriter.writeLineFormat (
+						"\timplements %s {",
+						implementsInterface.apply (
+							imports));
+
+				} else {
+
+					formatWriter.writeLineFormat (
+						"\timplements");
+
+					for (
+						Function <JavaImportRegistry, String> implementsInterface
+							: listSliceAllButLastItemRequired (
+								implementsInterfaces)
+					) {
+
+						formatWriter.writeLineFormat (
+							"\t\t%s,",
+							implementsInterface.apply (
+								imports));
+
+					}
+
+					Function <JavaImportRegistry, String> implementsInterface =
+						listLastItemRequired (
+							implementsInterfaces);
+
+					formatWriter.writeLineFormat (
+						"\t\t%s {",
 						implementsInterface.apply (
 							imports));
 
 				}
 
-				Function <JavaImportRegistry, String> implementsInterface =
-					listLastItemRequired (
-						implementsInterfaces);
-
-				formatWriter.writeLineFormat (
-					"\t\t%s {",
-					implementsInterface.apply (
-						imports));
-
 			}
 
+			formatWriter.writeNewline ();
+
+			// class body
+
+			formatWriter.increaseIndent ();
+
+			writeLogger (
+				imports,
+				formatWriter);
+
+			writeSingletonDependencies (
+				imports,
+				formatWriter);
+
+			writePrototypeDependencies (
+				imports,
+				formatWriter);
+
+			writeState (
+				imports,
+				formatWriter);
+
+			blocks.forEach (
+				block ->
+					block.writeBlock (
+						taskLogger,
+						imports,
+						formatWriter));
+
+			writeDelegations (
+				imports,
+				formatWriter);
+
+			formatWriter.decreaseIndent ();
+
+			// end class
+
+			formatWriter.writeLineFormat (
+				"}");
+
 		}
-
-		formatWriter.writeNewline ();
-
-		// class body
-
-		formatWriter.increaseIndent ();
-
-		writeLogger (
-			imports,
-			formatWriter);
-
-		writeSingletonDependencies (
-			imports,
-			formatWriter);
-
-		writePrototypeDependencies (
-			imports,
-			formatWriter);
-
-		writeState (
-			imports,
-			formatWriter);
-
-		blocks.forEach (
-			block ->
-				block.writeBlock (
-					taskLogger,
-					imports,
-					formatWriter));
-
-		writeDelegations (
-			imports,
-			formatWriter);
-
-		formatWriter.decreaseIndent ();
-
-		// end class
-
-		formatWriter.writeLineFormat (
-			"}");
 
 	}
 

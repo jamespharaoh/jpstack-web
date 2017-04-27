@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -48,7 +47,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -143,18 +142,17 @@ class ObjectSearchPostAction <
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal",
-				true);
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal",
+					true);
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ObjectSearchPostAction.goReal ()",

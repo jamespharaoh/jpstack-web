@@ -272,42 +272,48 @@ class OxygenateSmsSenderServiceHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OxygenateSmsSender sender) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"performSend");
+		try (
 
-		PerformSendResult result =
-			new PerformSendResult ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"performSend");
 
-		// encode
+		) {
 
-		try {
+			PerformSendResult result =
+				new PerformSendResult ();
 
-			sender.send ();
+			// encode
 
-			sender.receive ();
+			try {
 
-			result.responseTrace (
-				sender.responseTrace ());
+				sender.send ();
 
-			sender.decode (
-				taskLogger);
+				sender.receive ();
 
-			return result
+				result.responseTrace (
+					sender.responseTrace ());
 
-				.status (
-					PerformSendStatus.success);
+				sender.decode (
+					taskLogger);
 
-		} catch (Exception exception) {
+				return result
 
-			return result
+					.status (
+						PerformSendStatus.success);
 
-				.status (
-					PerformSendStatus.communicationError)
+			} catch (Exception exception) {
 
-				.exception (
-					exception);
+				return result
+
+					.status (
+						PerformSendStatus.communicationError)
+
+					.exception (
+						exception);
+
+			}
 
 		}
 

@@ -82,19 +82,25 @@ class FormFieldLogic {
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container container) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"implicit");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"implicit");
+
 		) {
 
-			formField.implicit (
-				taskLogger,
-				container);
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				formField.implicit (
+					taskLogger,
+					container);
+
+			}
 
 		}
 
@@ -106,19 +112,25 @@ class FormFieldLogic {
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container container) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"implicit");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"implicit");
+
 		) {
 
-			formField.setDefault (
-				taskLogger,
-				container);
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				formField.setDefault (
+					taskLogger,
+					container);
+
+			}
 
 		}
 
@@ -181,58 +193,64 @@ class FormFieldLogic {
 			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"update");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"update");
+
 		) {
 
-			UpdateResult updateResult;
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
 
-			try {
+				UpdateResult updateResult;
 
-				updateResult =
-					formField.update (
-						taskLogger,
-						submission,
-						container,
-						hints,
-						formName);
+				try {
 
-			} catch (Exception exception) {
+					updateResult =
+						formField.update (
+							taskLogger,
+							submission,
+							container,
+							hints,
+							formName);
 
-				throw new RuntimeException (
-					stringFormat (
-						"Error updating field %s",
+				} catch (Exception exception) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Error updating field %s",
+							formField.name ()),
+						exception);
+
+				}
+
+				if (
+					optionalIsPresent (
+						updateResult.error ())
+				) {
+
+					updateResults.errorCount ++;
+
+				} else if (
+					updateResult.updated ()
+				) {
+
+					updateResults.updateCount ++;
+
+				}
+
+				updateResults.updateResults ().put (
+					Pair.of (
+						formName,
 						formField.name ()),
-					exception);
+					updateResult);
 
 			}
-
-			if (
-				optionalIsPresent (
-					updateResult.error ())
-			) {
-
-				updateResults.errorCount ++;
-
-			} else if (
-				updateResult.updated ()
-			) {
-
-				updateResults.updateCount ++;
-
-			}
-
-			updateResults.updateResults ().put (
-				Pair.of (
-					formName,
-					formField.name ()),
-				updateResult);
 
 		}
 
@@ -344,43 +362,49 @@ class FormFieldLogic {
 			@NonNull Optional <String> objectType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runUpdateHooks");
+		try (
 
-		for (
-			Map.Entry <Pair <String, String>, UpdateResult <?, ?>>
-			updateResultEntry
-				: updateResultSet.updateResults ().entrySet ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runUpdateHooks");
+
 		) {
 
-			if (
-				stringNotEqualSafe (
-					updateResultEntry.getKey ().getLeft (),
-					formName)
+			for (
+				Map.Entry <Pair <String, String>, UpdateResult <?, ?>>
+				updateResultEntry
+					: updateResultSet.updateResults ().entrySet ()
 			) {
-				continue;
+
+				if (
+					stringNotEqualSafe (
+						updateResultEntry.getKey ().getLeft (),
+						formName)
+				) {
+					continue;
+				}
+
+				FormField formField =
+					formFieldSet.formField (
+						updateResultEntry.getKey ().getRight ());
+
+				UpdateResult updateResult =
+					(UpdateResult)
+					updateResultEntry.getValue ();
+
+				if (! updateResult.updated ())
+					continue;
+
+				formField.runUpdateHook (
+					taskLogger,
+					updateResult,
+					container,
+					linkObject,
+					objectRef,
+					objectType);
+
 			}
-
-			FormField formField =
-				formFieldSet.formField (
-					updateResultEntry.getKey ().getRight ());
-
-			UpdateResult updateResult =
-				(UpdateResult)
-				updateResultEntry.getValue ();
-
-			if (! updateResult.updated ())
-				continue;
-
-			formField.runUpdateHook (
-				taskLogger,
-				updateResult,
-				container,
-				linkObject,
-				objectRef,
-				objectType);
 
 		}
 
@@ -532,46 +556,52 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputFormAlwaysHidden");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputFormAlwaysHidden");
+
 		) {
 
-			if (
-				! formField.canView (
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				if (
+					! formField.canView (
+						taskLogger,
+						object,
+						hints)
+				) {
+					continue;
+				}
+
+				if (
+					optionalIsPresent (
+						updateResultSet)
+				) {
+
+					updateResultSet.get ().updateResults ().get (
+						stringFormat (
+							"%s-%s",
+							formName,
+							formField.name ()));
+
+				}
+
+				formField.renderFormAlwaysHidden (
 					taskLogger,
+					submission,
+					htmlWriter,
 					object,
-					hints)
-			) {
-				continue;
-			}
-
-			if (
-				optionalIsPresent (
-					updateResultSet)
-			) {
-
-				updateResultSet.get ().updateResults ().get (
-					stringFormat (
-						"%s-%s",
-						formName,
-						formField.name ()));
+					hints,
+					formType,
+					formName);
 
 			}
-
-			formField.renderFormAlwaysHidden (
-				taskLogger,
-				submission,
-				htmlWriter,
-				object,
-				hints,
-				formType,
-				formName);
 
 		}
 
@@ -612,33 +642,39 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputFormTemporarilyHidden");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputFormTemporarilyHidden");
+
 		) {
 
-			if (
-				! formField.canView (
-					taskLogger,
-					object,
-					hints)
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
 			) {
-				continue;
-			}
 
-			formField.renderFormTemporarilyHidden (
-				parentTaskLogger,
-				submission,
-				htmlWriter,
-				object,
-				hints,
-				formType,
-				formName);
+				if (
+					! formField.canView (
+						taskLogger,
+						object,
+						hints)
+				) {
+					continue;
+				}
+
+				formField.renderFormTemporarilyHidden (
+					parentTaskLogger,
+					submission,
+					htmlWriter,
+					object,
+					hints,
+					formType,
+					formName);
+
+			}
 
 		}
 
@@ -656,87 +692,93 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputFormRows");
+		try (
 
-		for (
-			FormField formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputFormRows");
+
 		) {
 
-			if (
-				! formField.canView (
-					taskLogger,
-					object,
-					hints)
+			for (
+				FormField formField
+					: formFieldSet.formFields ()
 			) {
-				continue;
-			}
-
-			Optional <String> error;
-
-			if (
-				optionalIsPresent (
-					updateResultSet)
-			) {
-
-				Optional <UpdateResult <?, ?>> updateResultOptional =
-					mapItemForKey (
-						updateResultSet.get ().updateResults (),
-						Pair.of (
-							formName,
-							formField.name ()));
 
 				if (
-					optionalIsNotPresent (
-						updateResultOptional)
+					! formField.canView (
+						taskLogger,
+						object,
+						hints)
+				) {
+					continue;
+				}
+
+				Optional <String> error;
+
+				if (
+					optionalIsPresent (
+						updateResultSet)
 				) {
 
-					taskLogger.errorFormat (
-						"Unable to find update result for %s-%s",
-						formName,
-						formField.name ());
+					Optional <UpdateResult <?, ?>> updateResultOptional =
+						mapItemForKey (
+							updateResultSet.get ().updateResults (),
+							Pair.of (
+								formName,
+								formField.name ()));
 
-					error =
-						optionalAbsent ();
+					if (
+						optionalIsNotPresent (
+							updateResultOptional)
+					) {
+
+						taskLogger.errorFormat (
+							"Unable to find update result for %s-%s",
+							formName,
+							formField.name ());
+
+						error =
+							optionalAbsent ();
+
+					} else {
+
+						error =
+							updateResultOptional.get ().error ();
+
+					}
 
 				} else {
 
 					error =
-						updateResultOptional.get ().error ();
+						optionalAbsent ();
 
 				}
 
-			} else {
+				try {
 
-				error =
-					optionalAbsent ();
+					formField.renderFormRow (
+						taskLogger,
+						submission,
+						htmlWriter,
+						object,
+						hints,
+						error,
+						formType,
+						formName);
 
-			}
+				} catch (Exception exception) {
 
-			try {
+					throw new DetailedException (
+						stringFormat (
+							"Error rendering field %s",
+							formField.name ()),
+						exception,
+						exceptionDetails (
+							hints));
 
-				formField.renderFormRow (
-					taskLogger,
-					submission,
-					htmlWriter,
-					object,
-					hints,
-					error,
-					formType,
-					formName);
-
-			} catch (Exception exception) {
-
-				throw new DetailedException (
-					stringFormat (
-						"Error rendering field %s",
-						formField.name ()),
-					exception,
-					exceptionDetails (
-						hints));
+				}
 
 			}
 
@@ -818,75 +860,81 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputFormTable");
+		try (
 
-		outputFormDebug (
-			taskLogger,
-			formatWriter,
-			formFieldSet,
-			object,
-			hints);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputFormTable");
 
-		String enctype = (
-			(BooleanSupplier)
-			() -> {
-				try {
-					return formFieldSet.fileUpload ();
-				} catch (Exception exception) {
-					return false;
+		) {
+
+			outputFormDebug (
+				taskLogger,
+				formatWriter,
+				formFieldSet,
+				object,
+				hints);
+
+			String enctype = (
+				(BooleanSupplier)
+				() -> {
+					try {
+						return formFieldSet.fileUpload ();
+					} catch (Exception exception) {
+						return false;
+					}
 				}
-			}
-		).getAsBoolean ()
-			? "multipart/form-data"
-			: "application/x-www-form-urlencoded";
+			).getAsBoolean ()
+				? "multipart/form-data"
+				: "application/x-www-form-urlencoded";
 
-		htmlFormOpenMethodActionEncoding (
-			formatWriter,
-			method,
-			actionUrl,
-			enctype);
+			htmlFormOpenMethodActionEncoding (
+				formatWriter,
+				method,
+				actionUrl,
+				enctype);
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"form.name\"",
-			" value=\"%h\"",
-			formName,
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"form.name\"",
+				" value=\"%h\"",
+				formName,
+				">");
 
-		htmlTableOpenDetails (
-			formatWriter);
+			htmlTableOpenDetails (
+				formatWriter);
 
-		outputFormRows (
-			taskLogger,
-			submission,
-			formatWriter,
-			formFieldSet,
-			updateResultSet,
-			object,
-			hints,
-			formType,
-			formName);
+			outputFormRows (
+				taskLogger,
+				submission,
+				formatWriter,
+				formFieldSet,
+				updateResultSet,
+				object,
+				hints,
+				formType,
+				formName);
 
-		htmlTableClose (
-			formatWriter);
+			htmlTableClose (
+				formatWriter);
 
-		htmlParagraphOpen (
-			formatWriter);
+			htmlParagraphOpen (
+				formatWriter);
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"%h\"",
-			submitButtonLabel,
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"%h\"",
+				submitButtonLabel,
+				">");
 
-		htmlParagraphClose ();
+			htmlParagraphClose ();
 
-		htmlFormClose ();
+			htmlFormClose ();
+
+		}
 
 	}
 
@@ -898,22 +946,28 @@ class FormFieldLogic {
 			@NonNull Object object,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputDetailsTable");
+		try (
 
-		htmlTableOpenDetails (
-			htmlWriter);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputDetailsTable");
 
-		outputTableRows (
-			taskLogger,
-			htmlWriter,
-			formFieldSet,
-			object,
-			hints);
+		) {
 
-		htmlTableClose ();
+			htmlTableOpenDetails (
+				htmlWriter);
+
+			outputTableRows (
+				taskLogger,
+				htmlWriter,
+				formFieldSet,
+				object,
+				hints);
+
+			htmlTableClose ();
+
+		}
 
 	}
 
@@ -926,76 +980,82 @@ class FormFieldLogic {
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputListTable");
+		try (
 
-		// table open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputListTable");
 
-		htmlTableOpenList (
-			htmlWriter);
-
-		// table header
-
-		htmlTableRowOpen (
-			htmlWriter);
-
-		outputTableHeadings (
-			htmlWriter,
-			formFieldSet);
-
-		htmlTableRowClose (
-			htmlWriter);
-
-		// table content
-
-		if (
-			collectionIsEmpty (
-				objects)
 		) {
+
+			// table open
+
+			htmlTableOpenList (
+				htmlWriter);
+
+			// table header
 
 			htmlTableRowOpen (
 				htmlWriter);
 
-			htmlTableCellWrite (
+			outputTableHeadings (
 				htmlWriter,
-				"There is no data to display",
-				htmlColumnSpanAttribute (
-					formFieldSet.columns ()));
+				formFieldSet);
 
 			htmlTableRowClose (
 				htmlWriter);
 
-		} else {
+			// table content
 
-			for (
-				Container object
-					: objects
+			if (
+				collectionIsEmpty (
+					objects)
 			) {
 
 				htmlTableRowOpen (
 					htmlWriter);
 
-				outputTableCellsList (
-					taskLogger,
+				htmlTableCellWrite (
 					htmlWriter,
-					formFieldSet,
-					object,
-					hints,
-					links);
+					"There is no data to display",
+					htmlColumnSpanAttribute (
+						formFieldSet.columns ()));
 
 				htmlTableRowClose (
 					htmlWriter);
 
+			} else {
+
+				for (
+					Container object
+						: objects
+				) {
+
+					htmlTableRowOpen (
+						htmlWriter);
+
+					outputTableCellsList (
+						taskLogger,
+						htmlWriter,
+						formFieldSet,
+						object,
+						hints,
+						links);
+
+					htmlTableRowClose (
+						htmlWriter);
+
+				}
+
 			}
 
+			// table close
+
+			htmlTableClose (
+				htmlWriter);
+
 		}
-
-		// table close
-
-		htmlTableClose (
-			htmlWriter);
 
 	}
 
@@ -1052,35 +1112,41 @@ class FormFieldLogic {
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputTableCellsList");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputTableCellsList");
+
 		) {
 
-			try {
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
 
-				formField.renderTableCellList (
-					taskLogger,
-					htmlWriter,
-					object,
-					hints,
-					links,
-					1l);
+				try {
 
-			} catch (Exception exception) {
+					formField.renderTableCellList (
+						taskLogger,
+						htmlWriter,
+						object,
+						hints,
+						links,
+						1l);
 
-				throw new RuntimeException (
-					stringFormat (
-						"Error rendering field %s for %s",
-						formField.name (),
-						objectToString (
-							object)),
-					exception);
+				} catch (Exception exception) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Error rendering field %s for %s",
+							formField.name (),
+							objectToString (
+								object)),
+						exception);
+
+				}
 
 			}
 
@@ -1097,23 +1163,29 @@ class FormFieldLogic {
 			@NonNull Boolean links,
 			@NonNull Long columnSpan) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputTableRowsList");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputTableRowsList");
+
 		) {
 
-			formField.renderTableCellList (
-				taskLogger,
-				htmlWriter,
-				object,
-				ImmutableMap.of (),
-				links,
-				columnSpan);
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				formField.renderTableCellList (
+					taskLogger,
+					htmlWriter,
+					object,
+					ImmutableMap.of (),
+					links,
+					columnSpan);
+
+			}
 
 		}
 
@@ -1127,40 +1199,46 @@ class FormFieldLogic {
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputTableRows");
+		try (
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputTableRows");
+
 		) {
 
-			if (
-				! formField.canView (
-					taskLogger,
-					object,
-					hints)
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
 			) {
-				continue;
+
+				if (
+					! formField.canView (
+						taskLogger,
+						object,
+						hints)
+				) {
+					continue;
+				}
+
+				htmlTableRowOpen (
+					htmlWriter);
+
+				htmlTableHeaderCellWrite (
+					htmlWriter,
+					formField.label ());
+
+				formField.renderTableCellProperties (
+					taskLogger,
+					htmlWriter,
+					object,
+					hints);
+
+				htmlTableRowClose (
+					htmlWriter);
+
 			}
-
-			htmlTableRowOpen (
-				htmlWriter);
-
-			htmlTableHeaderCellWrite (
-				htmlWriter,
-				formField.label ());
-
-			formField.renderTableCellProperties (
-				taskLogger,
-				htmlWriter,
-				object,
-				hints);
-
-			htmlTableRowClose (
-				htmlWriter);
 
 		}
 
@@ -1174,49 +1252,55 @@ class FormFieldLogic {
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"outputFormDebug");
+		try (
 
-		if (
-			! privChecker.canSimple (
-				taskLogger,
-				GlobalId.root,
-				"debug")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"outputFormDebug");
+
 		) {
-			return;
+
+			if (
+				! privChecker.canSimple (
+					taskLogger,
+					GlobalId.root,
+					"debug")
+			) {
+				return;
+			}
+
+			// open comment
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<!--");
+
+			// hints
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"Hints");
+
+			formatWriter.writeNewline ();
+
+			hints.entrySet ().forEach (
+				hintEntry ->
+					formatWriter.writeLineFormat (
+						"%s = %s",
+						hintEntry.getKey (),
+						hintEntry.getValue ().toString ()));
+
+			formatWriter.decreaseIndent ();
+
+			// close comment
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"-->");
+
 		}
-
-		// open comment
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<!--");
-
-		// hints
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"Hints");
-
-		formatWriter.writeNewline ();
-
-		hints.entrySet ().forEach (
-			hintEntry ->
-				formatWriter.writeLineFormat (
-					"%s = %s",
-					hintEntry.getKey (),
-					hintEntry.getValue ().toString ()));
-
-		formatWriter.decreaseIndent ();
-
-		// close comment
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"-->");
 
 	}
 

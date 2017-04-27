@@ -24,9 +24,13 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import org.joda.time.Instant;
+
 public
 class TaskLogger
-	implements TaskLogEvent {
+	implements
+		AutoCloseable,
+		TaskLogEvent {
 
 	// state
 
@@ -47,6 +51,12 @@ class TaskLogger
 
 	private final
 	Boolean debugEnabled;
+
+	private final
+	Instant startTime;
+
+	private
+	Instant endTime;
 
 	LogSeverity severity =
 		LogSeverity.trace;
@@ -121,10 +131,32 @@ class TaskLogger
 
 		}
 
+		this.startTime =
+			Instant.now ();
+
+	}
+
+	// life cycle
+
+	@Override
+	public
+	void close () {
+
+		if (
+			isNotNull (
+				this.endTime)
+		) {
+			return;
+		}
+
+		this.endTime =
+			Instant.now ();
+
 	}
 
 	// accessors
 
+	@SuppressWarnings ("resource")
 	public
 	TaskLogger findRoot () {
 
@@ -254,6 +286,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.fatal,
 			message,
 			optionalAbsent ());
@@ -279,6 +312,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.fatal,
 			message,
 			optionalOf (
@@ -307,6 +341,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.error,
 			message,
 			optionalAbsent ());
@@ -332,6 +367,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.error,
 			message,
 			optionalOf (
@@ -355,6 +391,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.warning,
 			message,
 			optionalAbsent ());
@@ -378,6 +415,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.warning,
 			message,
 			optionalOf (
@@ -401,6 +439,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.notice,
 			message,
 			optionalAbsent ());
@@ -424,6 +463,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.notice,
 			message,
 			optionalOf (
@@ -447,6 +487,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.debug,
 			message,
 			optionalAbsent ());
@@ -470,6 +511,7 @@ class TaskLogger
 				arguments);
 
 		logTarget.writeToLog (
+			this,
 			LogSeverity.debug,
 			message,
 			optionalOf (
@@ -498,6 +540,7 @@ class TaskLogger
 						errorCount));
 
 			logTarget.writeToLog (
+				this,
 				LogSeverity.error,
 				message,
 				optionalAbsent ());
@@ -531,6 +574,7 @@ class TaskLogger
 						errorCount));
 
 			logTarget.writeToLog (
+				this,
 				LogSeverity.error,
 				message,
 				optionalAbsent ());
@@ -616,6 +660,7 @@ class TaskLogger
 			// write first error
 
 			logTarget.writeToLog (
+				this,
 				LogSeverity.error,
 				firstError,
 				optionalAbsent ());
@@ -711,6 +756,22 @@ class TaskLogger
 			"%s.%s",
 			staticContext,
 			dynamicContext);
+
+	}
+
+	@Override
+	public
+	Instant eventStartTime () {
+
+		return startTime;
+
+	}
+
+	@Override
+	public
+	Instant eventEndTime () {
+
+		return endTime;
 
 	}
 

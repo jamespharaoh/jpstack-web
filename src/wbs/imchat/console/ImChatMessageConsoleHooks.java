@@ -51,24 +51,29 @@ class ImChatMessageConsoleHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"applySearchFilter");
+		try (
 
-		ImChatMessageSearch search =
-			genericCastUnchecked (
-				searchObject);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"applySearchFilter");
 
-		search
+		) {
 
-			.imChatId (
-				optionalOrNull (
-					requestContext.stuffInteger (
-						"imChatId")))
+			ImChatMessageSearch search =
+				genericCastUnchecked (
+					searchObject);
 
-		;
+			search
+
+				.imChatId (
+					optionalOrNull (
+						requestContext.stuffInteger (
+							"imChatId")))
+
+			;
+
+		}
 
 	}
 

@@ -37,58 +37,64 @@ class ChatBroadcastLogicImplementation
 			boolean includeBlocked,
 			boolean includeOptedOut) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canSendToUser");
+		try (
 
-		// exclude incomplete users
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canSendToUser");
 
-		if (chatUser.getFirstJoin () == null)
-			return false;
-
-		// exclude blocked users, unless operator includes them
-
-		if (
-			chatUser.getBlockAll ()
-			&& ! includeBlocked
 		) {
-			return false;
+
+			// exclude incomplete users
+
+			if (chatUser.getFirstJoin () == null)
+				return false;
+
+			// exclude blocked users, unless operator includes them
+
+			if (
+				chatUser.getBlockAll ()
+				&& ! includeBlocked
+			) {
+				return false;
+			}
+
+			// exclude opted out users, unless operator includes them
+
+			if (
+				chatUser.getBroadcastOptOut ()
+				&& ! includeOptedOut
+			) {
+				return false;
+			}
+
+			// exclude barred users
+
+			if (chatUser.getBarred ())
+				return false;
+
+			// perform a credit check
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					false,
+					optionalAbsent ());
+
+			if (
+				creditCheckResult.failed ()
+				&& creditCheckResult != ChatCreditCheckResult.failedBlocked
+			) {
+				return false;
+			}
+
+			// otherwise, include
+
+			return true;
+
 		}
-
-		// exclude opted out users, unless operator includes them
-
-		if (
-			chatUser.getBroadcastOptOut ()
-			&& ! includeOptedOut
-		) {
-			return false;
-		}
-
-		// exclude barred users
-
-		if (chatUser.getBarred ())
-			return false;
-
-		// perform a credit check
-
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				chatUser,
-				false,
-				optionalAbsent ());
-
-		if (
-			creditCheckResult.failed ()
-			&& creditCheckResult != ChatCreditCheckResult.failedBlocked
-		) {
-			return false;
-		}
-
-		// otherwise, include
-
-		return true;
 
 	}
 

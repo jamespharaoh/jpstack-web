@@ -35,37 +35,43 @@ class SubscriptionNumberObjectHelperMethodsImplementation
 			@NonNull SubscriptionRec subscription,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// find existing
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		SubscriptionNumberRec subscriptionNumber =
-			subscriptionNumberHelper.find (
-				subscription,
-				number);
+		) {
 
-		if (subscriptionNumber != null)
-			return subscriptionNumber;
+			// find existing
 
-		// create new
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionNumberHelper.find (
+					subscription,
+					number);
 
-		return subscriptionNumberHelper.insert (
-			taskLogger,
-			subscriptionNumberHelper.createInstance ()
+			if (subscriptionNumber != null)
+				return subscriptionNumber;
 
-			.setSubscription (
-				subscription)
+			// create new
 
-			.setNumber (
-				number)
+			return subscriptionNumberHelper.insert (
+				taskLogger,
+				subscriptionNumberHelper.createInstance ()
 
-			.setActive (
-				false)
+				.setSubscription (
+					subscription)
 
-		);
+				.setNumber (
+					number)
+
+				.setActive (
+					false)
+
+			);
+
+		}
 
 	}
 

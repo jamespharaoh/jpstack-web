@@ -13,7 +13,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
 
 public abstract
 class ConsolePrintResponder
@@ -35,15 +34,13 @@ class ConsolePrintResponder
 
 	// implenentation
 
-	@SuppressWarnings ("resource")
 	@Override
 	protected
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		formatWriter =
-			new WriterFormatWriter (
-				requestContext.printWriter ())
+			requestContext.formatWriter ()
 
 			.indentString (
 				"  ");

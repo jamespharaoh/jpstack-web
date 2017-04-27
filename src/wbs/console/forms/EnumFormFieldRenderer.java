@@ -99,104 +99,122 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderFormInput");
+		try (
 
-		Optional <Interface> currentValue =
-			formValuePresent (
-					submission,
-					formName)
-				? resultValueRequired (
-					formToInterface (
-						taskLogger,
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormInput");
+
+		) {
+
+			Optional <Interface> currentValue =
+				formValuePresent (
 						submission,
-						formName))
-				: interfaceValue;
+						formName)
+					? resultValueRequired (
+						formToInterface (
+							taskLogger,
+							submission,
+							formName))
+					: interfaceValue;
 
-		htmlWriter.writeLineFormatIncreaseIndent (
-			"<select",
-			" id=\"%h.%h\"",
-			formName,
-			name,
-			" name=\"%h.%h\"",
-			formName,
-			name,
-			">");
+			htmlWriter.writeLineFormatIncreaseIndent (
+				"<select",
+				" id=\"%h.%h\"",
+				formName,
+				name,
+				" name=\"%h.%h\"",
+				formName,
+				name,
+				">");
 
-		if (
+			if (
 
-			nullable ()
+				nullable ()
 
-			|| optionalIsNotPresent (
-				currentValue)
+				|| optionalIsNotPresent (
+					currentValue)
 
-			|| enumInSafe (
-				formType,
-				FormType.create,
-				FormType.search,
-				FormType.update)
+				|| enumInSafe (
+					formType,
+					FormType.create,
+					FormType.search,
+					FormType.update)
 
-		) {
+			) {
 
-			htmlWriter.writeLineFormat (
-				"<option",
-				" value=\"none\"",
-				currentValue.isPresent ()
-					? ""
-					: " selected",
-				">&mdash;</option>");
+				htmlWriter.writeLineFormat (
+					"<option",
+					" value=\"none\"",
+					currentValue.isPresent ()
+						? ""
+						: " selected",
+					">&mdash;</option>");
+
+			}
+
+			for (
+				Map.Entry <Interface, String> optionEntry
+					: enumConsoleHelper.map ().entrySet ()
+			) {
+
+				Interface optionValue =
+					optionEntry.getKey ();
+
+				String optionLabel =
+					optionEntry.getValue ();
+
+				htmlWriter.writeLineFormat (
+					"<option",
+					" value=\"%h\"",
+					camelToHyphen (
+						optionValue.name ()),
+					optionValue == currentValue.orNull ()
+						? " selected"
+						: "",
+					">%h</option>",
+					optionLabel);
+
+			}
+
+			htmlWriter.writeLineFormatDecreaseIndent (
+				"</select>");
 
 		}
-
-		for (
-			Map.Entry <Interface, String> optionEntry
-				: enumConsoleHelper.map ().entrySet ()
-		) {
-
-			Interface optionValue =
-				optionEntry.getKey ();
-
-			String optionLabel =
-				optionEntry.getValue ();
-
-			htmlWriter.writeLineFormat (
-				"<option",
-				" value=\"%h\"",
-				camelToHyphen (
-					optionValue.name ()),
-				optionValue == currentValue.orNull ()
-					? " selected"
-					: "",
-				">%h</option>",
-				optionLabel);
-
-		}
-
-		htmlWriter.writeLineFormatDecreaseIndent (
-			"</select>");
 
 	}
 
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"%j\").val (\"%h\");",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name),
-			interfaceValue.isPresent ()
-				? camelToHyphen (
-					interfaceValue.get ().name ())
-				: "none");
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"%j\").val (\"%h\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
+				interfaceValue.isPresent ()
+					? camelToHyphen (
+						interfaceValue.get ().name ())
+					: "none");
+
+		}
 
 	}
 

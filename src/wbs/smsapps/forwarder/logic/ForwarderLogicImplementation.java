@@ -237,106 +237,116 @@ class ForwarderLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SendTemplate template) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendTemplateCheck");
+		try (
 
-		SendTemplateCheckWork work =
-			new SendTemplateCheckWork ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplateCheck");
 
-		work.template = template;
+		) {
 
-		if (template.forwarder == null)
-			throw new NullPointerException ("template.forwarder not supplied");
+			SendTemplateCheckWork work =
+				new SendTemplateCheckWork ();
 
-		// lookup forwarderMessageIn
+			work.template = template;
 
-		sendTemplateCheckFmIn (work);
+			if (template.forwarder == null) {
 
-		// check reply to message id
+				throw new NullPointerException (
+					"template.forwarder not supplied");
 
-		if (! work.template.forwarder.getAllowNewSends ()
-				&& template.fmIn == null) {
+			}
 
-			taskLogger.debugFormat (
-				"no reply-to on template: %s",
-				template.toString ());
+			// lookup forwarderMessageIn
 
-			work.template.errors.add (
-				"Reply-to-message-id must be specified");
+			sendTemplateCheckFmIn (work);
 
-			if (work.template.sendError == null)
-				template.sendError = SendError.missingReplyToMessageId;
+			// check reply to message id
 
-			work.ret = false;
+			if (! work.template.forwarder.getAllowNewSends ()
+					&& template.fmIn == null) {
+
+				taskLogger.debugFormat (
+					"no reply-to on template: %s",
+					template.toString ());
+
+				work.template.errors.add (
+					"Reply-to-message-id must be specified");
+
+				if (work.template.sendError == null)
+					template.sendError = SendError.missingReplyToMessageId;
+
+				work.ret = false;
+
+			}
+
+			// check parts
+
+			sendTemplateCheckParts (
+				taskLogger,
+				work);
+
+			// match against existing message
+
+			sendTemplateCheckExisting (work);
+
+			// check counters (if necessary)
+
+			if (work.notSentSome && template.fmIn != null) {
+
+				if (template.fmIn.getBillRepliesSent ()
+						+ template.fmIn.getFreeRepliesSent ()
+						+ work.freeParts
+						+ work.billParts
+						+ work.unknownParts
+						> template.forwarder.getMaxReplies ()) {
+
+					template.errors.add (
+						"Too many replies to this message");
+
+					if (work.template.sendError == null)
+						template.sendError = SendError.tooManyReplies;
+
+					work.ret = false;
+
+				}
+
+				if (template.fmIn.getBillRepliesSent ()
+						+ work.billParts
+						> template.forwarder.getMaxBillReplies ()) {
+
+					template.errors.add (
+						"Too many billed replies to this message");
+
+					if (work.template.sendError == null)
+						template.sendError = SendError.tooManyReplies;
+
+					work.ret = false;
+
+				}
+
+				if (template.fmIn.getFreeRepliesSent ()
+						+ work.freeParts
+						> template.forwarder.getMaxFreeReplies ()) {
+
+					template.errors.add (
+						"Too many free replies to this message");
+
+					if (work.template.sendError == null)
+						template.sendError = SendError.tooManyReplies;
+
+					work.ret = false;
+
+				}
+
+			}
+
+			// return
+
+			return work.ret;
 
 		}
-
-		// check parts
-
-		sendTemplateCheckParts (
-			taskLogger,
-			work);
-
-		// match against existing message
-
-		sendTemplateCheckExisting (work);
-
-		// check counters (if necessary)
-
-		if (work.notSentSome && template.fmIn != null) {
-
-			if (template.fmIn.getBillRepliesSent ()
-					+ template.fmIn.getFreeRepliesSent ()
-					+ work.freeParts
-					+ work.billParts
-					+ work.unknownParts
-					> template.forwarder.getMaxReplies ()) {
-
-				template.errors.add (
-					"Too many replies to this message");
-
-				if (work.template.sendError == null)
-					template.sendError = SendError.tooManyReplies;
-
-				work.ret = false;
-
-			}
-
-			if (template.fmIn.getBillRepliesSent ()
-					+ work.billParts
-					> template.forwarder.getMaxBillReplies ()) {
-
-				template.errors.add (
-					"Too many billed replies to this message");
-
-				if (work.template.sendError == null)
-					template.sendError = SendError.tooManyReplies;
-
-				work.ret = false;
-
-			}
-
-			if (template.fmIn.getFreeRepliesSent ()
-					+ work.freeParts
-					> template.forwarder.getMaxFreeReplies ()) {
-
-				template.errors.add (
-					"Too many free replies to this message");
-
-				if (work.template.sendError == null)
-					template.sendError = SendError.tooManyReplies;
-
-				work.ret = false;
-
-			}
-
-		}
-
-		// return
-
-		return work.ret;
 
 	}
 
@@ -390,224 +400,230 @@ class ForwarderLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SendTemplateCheckWork work) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendTemplateCheckParts");
+		try (
 
-		for (
-			SendPart part
-				: work.template.parts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplateCheckParts");
+
 		) {
 
-			// lookup route
+			for (
+				SendPart part
+					: work.template.parts
+			) {
 
-			if ((part.routeCode != null ? 1 : 0)
-					+ (part.forwarderRoute != null ? 1 : 0)
-					!= 1) {
-				throw new RuntimeException ();
+				// lookup route
 
-			} else if (part.routeCode != null) {
+				if ((part.routeCode != null ? 1 : 0)
+						+ (part.forwarderRoute != null ? 1 : 0)
+						!= 1) {
+					throw new RuntimeException ();
 
-				Optional<ForwarderRouteRec> forwarderRouteOptional =
-					forwarderRouteHelper.findByCode (
-						work.template.forwarder,
-						part.routeCode);
+				} else if (part.routeCode != null) {
+
+					Optional<ForwarderRouteRec> forwarderRouteOptional =
+						forwarderRouteHelper.findByCode (
+							work.template.forwarder,
+							part.routeCode);
+
+					if (
+						optionalIsNotPresent (
+							forwarderRouteOptional)
+					) {
+
+						sendTemplateCheckError (
+							work,
+							part,
+							SendError.invalidRoute,
+							"Route not recognised: " + part.routeCode);
+
+					}
+
+					part.forwarderRoute =
+						forwarderRouteOptional.get ();
+
+					part.routeCode = null;
+
+				}
+
+				// check route is set up
 
 				if (
-					optionalIsNotPresent (
-						forwarderRouteOptional)
+					part.forwarderRoute != null
+					&& part.forwarderRoute.getRouter () == null
 				) {
 
 					sendTemplateCheckError (
 						work,
 						part,
 						SendError.invalidRoute,
-						"Route not recognised: " + part.routeCode);
+						stringFormat (
+							"Route not configured correctly: %s",
+							part.forwarderRoute.getCode ()));
 
 				}
 
-				part.forwarderRoute =
-					forwarderRouteOptional.get ();
-
-				part.routeCode = null;
-
-			}
-
-			// check route is set up
-
-			if (
-				part.forwarderRoute != null
-				&& part.forwarderRoute.getRouter () == null
-			) {
-
-				sendTemplateCheckError (
-					work,
-					part,
-					SendError.invalidRoute,
-					stringFormat (
-						"Route not configured correctly: %s",
-						part.forwarderRoute.getCode ()));
-
-			}
-
-			// check route/number
-
-			if (
-				part.forwarderRoute != null
-
-				&& part.forwarderRoute.getNumber ().length () > 0
-
-				&& stringNotEqualSafe (
-					part.forwarderRoute.getNumber (),
-					part.numFrom)
-
-			) {
-
-				sendTemplateCheckError (
-					work,
-					part,
-					SendError.invalidNumFrom,
-					stringFormat (
-						"Number is not valid for route: %s",
-						part.numFrom));
-
-			}
-
-			// check service
-
-			int serviceCount =
-				+ (part.serviceCode != null ? 1 : 0)
-				+ (part.service != null ? 1 : 0);
-
-			if (serviceCount == 0)
-				throw new RuntimeException (
-					"Must specify serviceCode or service (not neither)");
-
-			if (serviceCount > 1)
-				throw new RuntimeException (
-					"Must specify serviceCode or service (not both)");
-
-			if (part.serviceCode != null) {
-
-				part.service =
-					serviceHelper.findOrCreate (
-						taskLogger,
-						work.template.forwarder,
-						"default",
-						part.serviceCode);
-
-			}
-
-			// check network
-			int networkCount = (part.networkId != null ? 1 : 0)
-					+ (part.network != null ? 1 : 0);
-
-			if (networkCount > 1) {
-
-				throw new RuntimeException (
-					"Cannot specify networkId and network");
-
-			}
-
-			if (
-				isNotNull (
-					part.networkId)
-			) {
-
-				if (part.networkId == 0) {
-
-					sendTemplateCheckError (
-						work,
-						part,
-						SendError.invalidNetworkId,
-						"Network ID 0 should not be specified");
-
-				}
-
-				Optional<NetworkRec> networkOptional =
-					networkHelper.find (
-						part.networkId);
+				// check route/number
 
 				if (
-					optionalIsNotPresent (
-						networkOptional)
+					part.forwarderRoute != null
+
+					&& part.forwarderRoute.getNumber ().length () > 0
+
+					&& stringNotEqualSafe (
+						part.forwarderRoute.getNumber (),
+						part.numFrom)
+
 				) {
 
 					sendTemplateCheckError (
 						work,
 						part,
-						SendError.invalidNetworkId,
-						"Network ID not recognised: " + part.networkId);
+						SendError.invalidNumFrom,
+						stringFormat (
+							"Number is not valid for route: %s",
+							part.numFrom));
 
 				}
 
-				part.network =
-					networkOptional.get ();
+				// check service
 
-			}
+				int serviceCount =
+					+ (part.serviceCode != null ? 1 : 0)
+					+ (part.service != null ? 1 : 0);
 
-			// check client-id
+				if (serviceCount == 0)
+					throw new RuntimeException (
+						"Must specify serviceCode or service (not neither)");
 
-			if (! work.template.forwarder.getAllowNullOtherId ()
-					&& part.clientId == null) {
+				if (serviceCount > 1)
+					throw new RuntimeException (
+						"Must specify serviceCode or service (not both)");
 
-				sendTemplateCheckError (
-					work,
-					part,
-					SendError.missingClientId,
-					"Client ID must be supplied");
+				if (part.serviceCode != null) {
 
-			}
+					part.service =
+						serviceHelper.findOrCreate (
+							taskLogger,
+							work.template.forwarder,
+							"default",
+							part.serviceCode);
 
-			// check tracker
+				}
 
-			if (work.template.forwarder.getSmsTracker() != null) {
+				// check network
+				int networkCount = (part.networkId != null ? 1 : 0)
+						+ (part.network != null ? 1 : 0);
 
-				part.numToNumber =
-					numberHelper.findOrCreate (
-						taskLogger,
-						part.numTo);
+				if (networkCount > 1) {
+
+					throw new RuntimeException (
+						"Cannot specify networkId and network");
+
+				}
 
 				if (
-					! smsTrackerManager.canSend (
-						taskLogger,
-						work.template.forwarder.getSmsTracker (),
-						part.numToNumber,
-						optionalAbsent ())
+					isNotNull (
+						part.networkId)
 				) {
+
+					if (part.networkId == 0) {
+
+						sendTemplateCheckError (
+							work,
+							part,
+							SendError.invalidNetworkId,
+							"Network ID 0 should not be specified");
+
+					}
+
+					Optional<NetworkRec> networkOptional =
+						networkHelper.find (
+							part.networkId);
+
+					if (
+						optionalIsNotPresent (
+							networkOptional)
+					) {
+
+						sendTemplateCheckError (
+							work,
+							part,
+							SendError.invalidNetworkId,
+							"Network ID not recognised: " + part.networkId);
+
+					}
+
+					part.network =
+						networkOptional.get ();
+
+				}
+
+				// check client-id
+
+				if (! work.template.forwarder.getAllowNullOtherId ()
+						&& part.clientId == null) {
 
 					sendTemplateCheckError (
 						work,
 						part,
-						SendError.trackerBlocked,
-						"Messages to this number are blocked");
+						SendError.missingClientId,
+						"Client ID must be supplied");
 
 				}
 
-			}
+				// check tracker
 
-			// inc counters
+				if (work.template.forwarder.getSmsTracker() != null) {
 
-			if (part.forwarderRoute != null) {
+					part.numToNumber =
+						numberHelper.findOrCreate (
+							taskLogger,
+							part.numTo);
 
-				RouteRec route =
-					routerLogic.resolveRouter (
-						part.forwarderRoute.getRouter ());
+					if (
+						! smsTrackerManager.canSend (
+							taskLogger,
+							work.template.forwarder.getSmsTracker (),
+							part.numToNumber,
+							optionalAbsent ())
+					) {
 
-				if (route.getOutCharge () > 0) {
+						sendTemplateCheckError (
+							work,
+							part,
+							SendError.trackerBlocked,
+							"Messages to this number are blocked");
 
-					work.billParts ++;
+					}
+
+				}
+
+				// inc counters
+
+				if (part.forwarderRoute != null) {
+
+					RouteRec route =
+						routerLogic.resolveRouter (
+							part.forwarderRoute.getRouter ());
+
+					if (route.getOutCharge () > 0) {
+
+						work.billParts ++;
+
+					} else {
+
+						work.freeParts ++;
+
+					}
 
 				} else {
 
-					work.freeParts ++;
+					work.unknownParts ++;
 
 				}
-
-			} else {
-
-				work.unknownParts ++;
 
 			}
 
@@ -729,79 +745,85 @@ class ForwarderLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SendTemplate sendTemplate) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendTemplateSend");
+		try (
 
-		ForwarderMessageOutRec lastForwarderMessageOut = null;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplateSend");
 
-		Long threadId =
-			sendTemplate.fmIn != null
-				? sendTemplate.fmIn.getMessage ().getThreadId ()
-				: null;
-
-		// for each part
-
-		for (
-			SendPart sendPart
-				: sendTemplate.parts
 		) {
 
-			// check it is still going
+			ForwarderMessageOutRec lastForwarderMessageOut = null;
 
-			if (sendPart.forwarderMessageOut != null)
-				continue;
+			Long threadId =
+				sendTemplate.fmIn != null
+					? sendTemplate.fmIn.getMessage ().getThreadId ()
+					: null;
 
-			// send it
+			// for each part
 
-			sendPart.forwarderMessageOut =
-				createMessage (
-					taskLogger,
-					sendTemplate.forwarder,
-					sendTemplate.fmIn,
-					sendPart.message,
-					sendPart.url,
-					sendPart.numFrom,
-					sendPart.numTo,
-					threadId,
-					sendPart.forwarderRoute,
-					sendPart.service,
-					sendPart.clientId,
-					sendPart.pri,
-					lastForwarderMessageOut == null,
-					sendPart.tags,
-					sendPart.network,
-					sendPart.subject,
-					sendPart.medias);
+			for (
+				SendPart sendPart
+					: sendTemplate.parts
+			) {
 
-			// save the thread id if we haven't got one yet
+				// check it is still going
 
-			if (threadId == null) {
+				if (sendPart.forwarderMessageOut != null)
+					continue;
 
-				threadId =
-					sendPart.forwarderMessageOut.getMessage ().getThreadId ();
+				// send it
+
+				sendPart.forwarderMessageOut =
+					createMessage (
+						taskLogger,
+						sendTemplate.forwarder,
+						sendTemplate.fmIn,
+						sendPart.message,
+						sendPart.url,
+						sendPart.numFrom,
+						sendPart.numTo,
+						threadId,
+						sendPart.forwarderRoute,
+						sendPart.service,
+						sendPart.clientId,
+						sendPart.pri,
+						lastForwarderMessageOut == null,
+						sendPart.tags,
+						sendPart.network,
+						sendPart.subject,
+						sendPart.medias);
+
+				// save the thread id if we haven't got one yet
+
+				if (threadId == null) {
+
+					threadId =
+						sendPart.forwarderMessageOut.getMessage ().getThreadId ();
+
+				}
+
+				// link unqueueExMessages where appropriate
+
+				if (lastForwarderMessageOut != null) {
+
+					lastForwarderMessageOut
+
+						.setNextForwarderMessageOut (
+							sendPart.forwarderMessageOut);
+
+					sendPart.forwarderMessageOut
+
+						.setPrevForwarderMessageOut (
+							lastForwarderMessageOut);
+
+				}
+
+				lastForwarderMessageOut =
+					sendPart.forwarderMessageOut;
 
 			}
-
-			// link unqueueExMessages where appropriate
-
-			if (lastForwarderMessageOut != null) {
-
-				lastForwarderMessageOut
-
-					.setNextForwarderMessageOut (
-						sendPart.forwarderMessageOut);
-
-				sendPart.forwarderMessageOut
-
-					.setPrevForwarderMessageOut (
-						lastForwarderMessageOut);
-
-			}
-
-			lastForwarderMessageOut =
-				sendPart.forwarderMessageOut;
 
 		}
 
@@ -822,66 +844,72 @@ class ForwarderLogicImplementation
 			Long pri,
 			Collection <MediaRec> medias) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessage");
+		try (
 
-		SendTemplate sendTemplate =
-			new SendTemplate ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessage");
 
-		sendTemplate.forwarder = forwarder;
-		sendTemplate.fmIn = fmIn;
-
-		SendPart sendPart =
-			new SendPart ();
-
-		sendTemplate.parts.add (
-			sendPart);
-
-		sendPart.message = message;
-		sendPart.url = url;
-		sendPart.numFrom = numFrom;
-		sendPart.numTo = numTo;
-		sendPart.routeCode = routeCode;
-		sendPart.serviceCode = "default";
-		sendPart.clientId = myId;
-		sendPart.pri = pri;
-		sendPart.medias = medias;
-
-		if (
-			! sendTemplateCheck (
-				taskLogger,
-				sendTemplate)
 		) {
 
+			SendTemplate sendTemplate =
+				new SendTemplate ();
+
+			sendTemplate.forwarder = forwarder;
+			sendTemplate.fmIn = fmIn;
+
+			SendPart sendPart =
+				new SendPart ();
+
+			sendTemplate.parts.add (
+				sendPart);
+
+			sendPart.message = message;
+			sendPart.url = url;
+			sendPart.numFrom = numFrom;
+			sendPart.numTo = numTo;
+			sendPart.routeCode = routeCode;
+			sendPart.serviceCode = "default";
+			sendPart.clientId = myId;
+			sendPart.pri = pri;
+			sendPart.medias = medias;
+
 			if (
-				enumEqualSafe (
-					sendTemplate.sendError,
-					SendError.trackerBlocked)
+				! sendTemplateCheck (
+					taskLogger,
+					sendTemplate)
 			) {
 
-				return null;
+				if (
+					enumEqualSafe (
+						sendTemplate.sendError,
+						SendError.trackerBlocked)
+				) {
 
-			} else if (sendTemplate.errors.size () > 0) {
+					return null;
 
-				throw new RuntimeException (
-					sendTemplate.errors.get (0));
+				} else if (sendTemplate.errors.size () > 0) {
 
-			} else {
+					throw new RuntimeException (
+						sendTemplate.errors.get (0));
 
-				throw new RuntimeException (
-					sendTemplate.parts.get (0).errors.get (0));
+				} else {
+
+					throw new RuntimeException (
+						sendTemplate.parts.get (0).errors.get (0));
+
+				}
 
 			}
 
+			sendTemplateSend (
+				taskLogger,
+				sendTemplate);
+
+			return sendTemplate.parts.get (0).forwarderMessageOut;
+
 		}
-
-		sendTemplateSend (
-			taskLogger,
-			sendTemplate);
-
-		return sendTemplate.parts.get (0).forwarderMessageOut;
 
 	}
 
@@ -1023,136 +1051,142 @@ class ForwarderLogicImplementation
 			String subject,
 			Collection <MediaRec> medias) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMessage");
+		try (
 
-		// lookup some stuff
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMessage");
 
-		NumberRec number =
-			numberHelper.findOrCreate (
-				taskLogger,
-				numto);
+		) {
 
-		if (threadId == null && fmIn != null) {
+			// lookup some stuff
 
-			threadId =
-				fmIn.getMessage ().getThreadId ();
+			NumberRec number =
+				numberHelper.findOrCreate (
+					taskLogger,
+					numto);
 
-		}
+			if (threadId == null && fmIn != null) {
 
-		// create the out record
+				threadId =
+					fmIn.getMessage ().getThreadId ();
 
-		ForwarderMessageOutRec forwarderMessageOut =
-			forwarderMessageOutHelper.insert (
-				taskLogger,
-				forwarderMessageOutHelper.createInstance ()
+			}
 
-			.setForwarder (
-				forwarder)
+			// create the out record
 
-			.setForwarderMessageIn (
-				fmIn)
+			ForwarderMessageOutRec forwarderMessageOut =
+				forwarderMessageOutHelper.insert (
+					taskLogger,
+					forwarderMessageOutHelper.createInstance ()
 
-			.setNumber (
-				number)
+				.setForwarder (
+					forwarder)
 
-			.setOtherId (
-				myId)
+				.setForwarderMessageIn (
+					fmIn)
 
-			.setBill (
-				false)
-
-			.setForwarderRoute (
-				forwarderRoute)
-
-		);
-
-		// send the message
-
-		MessageRec messageOut;
-
-		if (url == null) {
-
-			messageOut =
-				messageSenderProvider.get ()
-
-				.threadId (
-					threadId)
-
-				.number (
+				.setNumber (
 					number)
 
-				.messageString (
-					taskLogger,
-					message)
+				.setOtherId (
+					myId)
 
-				.numFrom (
-					numfrom)
+				.setBill (
+					false)
 
-				.routerResolve (
-					forwarderRoute.getRouter ())
+				.setForwarderRoute (
+					forwarderRoute)
 
-				.service (
-					service)
+			);
 
-				.deliveryTypeCode (
-					"forwarder")
+			// send the message
 
-				.ref (
-					forwarderMessageOut.getId ())
+			MessageRec messageOut;
 
-				.subjectString (
-					taskLogger,
-					optionalFromNullable (
-						subject))
+			if (url == null) {
 
-				.medias (
-					medias)
+				messageOut =
+					messageSenderProvider.get ()
 
-				.sendNow (
-					sendNow)
+					.threadId (
+						threadId)
 
-				.tags (
-					tags)
+					.number (
+						number)
 
-				.network (
-					network)
-
-				.send (
-					taskLogger);
-
-		} else {
-
-			messageOut =
-				wapPushLogic.wapPushSend (
-					taskLogger,
-					threadId,
-					number,
-					numfrom,
-					textHelper.findOrCreate (
+					.messageString (
 						taskLogger,
-						message),
-					textHelper.findOrCreate (
+						message)
+
+					.numFrom (
+						numfrom)
+
+					.routerResolve (
+						forwarderRoute.getRouter ())
+
+					.service (
+						service)
+
+					.deliveryTypeCode (
+						"forwarder")
+
+					.ref (
+						forwarderMessageOut.getId ())
+
+					.subjectString (
 						taskLogger,
-						url),
-					forwarderRoute.getRouter (),
-					service,
-					null,
-					null,
-					deliveryTypeHelper.findByCodeRequired (
-						GlobalId.root,
-						"forwarder"),
-					forwarderMessageOut.getId (),
-					sendNow,
-					tags,
-					network);
+						optionalFromNullable (
+							subject))
+
+					.medias (
+						medias)
+
+					.sendNow (
+						sendNow)
+
+					.tags (
+						tags)
+
+					.network (
+						network)
+
+					.send (
+						taskLogger);
+
+			} else {
+
+				messageOut =
+					wapPushLogic.wapPushSend (
+						taskLogger,
+						threadId,
+						number,
+						numfrom,
+						textHelper.findOrCreate (
+							taskLogger,
+							message),
+						textHelper.findOrCreate (
+							taskLogger,
+							url),
+						forwarderRoute.getRouter (),
+						service,
+						null,
+						null,
+						deliveryTypeHelper.findByCodeRequired (
+							GlobalId.root,
+							"forwarder"),
+						forwarderMessageOut.getId (),
+						sendNow,
+						tags,
+						network);
+			}
+
+			forwarderMessageOut.setMessage (messageOut);
+
+			return forwarderMessageOut;
+
 		}
-
-		forwarderMessageOut.setMessage (messageOut);
-
-		return forwarderMessageOut;
 
 	}
 

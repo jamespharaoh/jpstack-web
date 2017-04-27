@@ -1,8 +1,7 @@
 package wbs.console.tab;
 
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import java.io.IOException;
 
 import javax.inject.Provider;
 
@@ -80,35 +79,41 @@ class TabContextResponder
 			PagePart buildPagePart (
 					@NonNull TaskLogger parentTaskLogger) {
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"buildPagePart");
+				try (
 
-				Object bean =
-					componentManager.getComponentRequired (
-						taskLogger,
-						pagePartName,
-						Object.class);
+					TaskLogger taskLogger =
+						logContext.nestTaskLogger (
+							parentTaskLogger,
+							"buildPagePart");
 
-				if (bean instanceof PagePart) {
-					return (PagePart) bean;
+				) {
+
+					Object bean =
+						componentManager.getComponentRequired (
+							taskLogger,
+							pagePartName,
+							Object.class);
+
+					if (bean instanceof PagePart) {
+						return (PagePart) bean;
+					}
+
+					if (bean instanceof Provider) {
+
+						Provider<?> provider =
+							(Provider<?>) bean;
+
+						return (PagePart)
+							provider.get ();
+
+					}
+
+					throw new ClassCastException (
+						stringFormat (
+							"Cannot cast %s to PagePart or Provider<PagePart>",
+							bean.getClass ().getName ()));
+
 				}
-
-				if (bean instanceof Provider) {
-
-					Provider<?> provider =
-						(Provider<?>) bean;
-
-					return (PagePart)
-						provider.get ();
-
-				}
-
-				throw new ClassCastException (
-					stringFormat (
-						"Cannot cast %s to PagePart or Provider<PagePart>",
-						bean.getClass ().getName ()));
 
 			}
 
@@ -132,37 +137,45 @@ class TabContextResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"execute");
+		try (
 
-		if (pagePartFactory == null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
 
-			throw new NullPointerException (
-				"pagePartFactory");
+		) {
+
+			if (
+				isNull (
+					pagePartFactory)
+			) {
+
+				throw new NullPointerException (
+					"pagePartFactory");
+
+			}
+
+			tabbedPageProvider.get ()
+
+				.tab (
+					requestContext.consoleContextStuffRequired ().getTab (
+						requestContext.consoleContextRequired (),
+						tab))
+
+				.title (
+					title)
+
+				.pagePart (
+					pagePartFactory.buildPagePart (
+						taskLogger))
+
+				.execute (
+					taskLogger);
 
 		}
-
-		tabbedPageProvider.get ()
-
-			.tab (
-				requestContext.consoleContextStuffRequired ().getTab (
-					requestContext.consoleContextRequired (),
-					tab))
-
-			.title (
-				title)
-
-			.pagePart (
-				pagePartFactory.buildPagePart (
-					taskLogger))
-
-			.execute (
-				taskLogger);
 
 	}
 

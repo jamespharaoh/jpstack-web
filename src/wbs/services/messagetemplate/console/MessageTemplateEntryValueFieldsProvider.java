@@ -62,89 +62,95 @@ class MessageTemplateEntryValueFieldsProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MessageTemplateEntryValueRec entryValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getFieldsForObject");
+		try (
 
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getFieldsForObject");
 
-		// retrieve existing message template types
+		) {
 
-		MessageTemplateEntryTypeRec entryType =
-			entryValue.getMessageTemplateEntryType ();
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
-		if (mode != "list") {
+			// retrieve existing message template types
 
-			formFieldSpecs.add (
-				new ScriptRefFormFieldSpec ()
+			MessageTemplateEntryTypeRec entryType =
+				entryValue.getMessageTemplateEntryType ();
 
-				.path (
-					"/js/jquery-1.7.1.js")
-
-			);
-
-			formFieldSpecs.add (
-				new ScriptRefFormFieldSpec ()
-
-				.path (
-					"/js/message-template.js")
-
-			);
-
-			formFieldSpecs.add (
-				new ScriptRefFormFieldSpec ()
-
-				.path (
-					"/js/gsm.js")
-
-			);
-
-			// build dynamic form fields
-
-			for (
-				MessageTemplateFieldTypeRec fieldType
-					: entryType.getMessageTemplateFieldTypes ()
-			) {
+			if (mode != "list") {
 
 				formFieldSpecs.add (
-					new TextAreaFormFieldSpec ()
+					new ScriptRefFormFieldSpec ()
 
-					.name (
-						fieldType.getCode ())
-
-					.label (
-						fieldType.getName ())
-
-					.dataProvider (
-						"messageTemplateEntryValueFormFieldDataProvider")
-
-					.parent (
-						fieldType)
-
-					.dynamic (
-						true)
+					.path (
+						"/js/jquery-1.7.1.js")
 
 				);
 
+				formFieldSpecs.add (
+					new ScriptRefFormFieldSpec ()
+
+					.path (
+						"/js/message-template.js")
+
+				);
+
+				formFieldSpecs.add (
+					new ScriptRefFormFieldSpec ()
+
+					.path (
+						"/js/gsm.js")
+
+				);
+
+				// build dynamic form fields
+
+				for (
+					MessageTemplateFieldTypeRec fieldType
+						: entryType.getMessageTemplateFieldTypes ()
+				) {
+
+					formFieldSpecs.add (
+						new TextAreaFormFieldSpec ()
+
+						.name (
+							fieldType.getCode ())
+
+						.label (
+							fieldType.getName ())
+
+						.dataProvider (
+							"messageTemplateEntryValueFormFieldDataProvider")
+
+						.parent (
+							fieldType)
+
+						.dynamic (
+							true)
+
+					);
+
+				}
+
 			}
 
+			// build field set
+
+			String fieldSetName =
+				stringFormat (
+					"%s.%s",
+					messageTemplateSetConsoleHelper.objectName (),
+					mode);
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				messageTemplateSetConsoleHelper,
+				fieldSetName,
+				formFieldSpecs);
+
 		}
-
-		// build field set
-
-		String fieldSetName =
-			stringFormat (
-				"%s.%s",
-				messageTemplateSetConsoleHelper.objectName (),
-				mode);
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			messageTemplateSetConsoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

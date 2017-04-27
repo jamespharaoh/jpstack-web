@@ -63,61 +63,67 @@ class ConsoleAsyncManagerImplementation
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		ImmutableMap.Builder <String, ConsoleAsyncEndpoint>
-			asyncEndpointsByEndpointBuilder =
-				ImmutableMap.builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		Set <String> asyncEndpointPaths =
-			new HashSet <String> ();
-
-		for (
-			Map.Entry <String, ConsoleAsyncEndpoint> asyncEndpointEntry
-				: asyncEndpointsByComponentName.entrySet ()
 		) {
 
-			String componentName =
-				asyncEndpointEntry.getKey ();
+			ImmutableMap.Builder <String, ConsoleAsyncEndpoint>
+				asyncEndpointsByEndpointBuilder =
+					ImmutableMap.builder ();
 
-			ConsoleAsyncEndpoint asyncEndpoint =
-				asyncEndpointEntry.getValue ();
+			Set <String> asyncEndpointPaths =
+				new HashSet <String> ();
 
-			taskLogger.debugFormat (
-				"Setting up endpoint with component name: %s",
-				componentName);
-
-			String endpointPath =
-				asyncEndpoint.endpointPath ();
-
-			if (
-				contains (
-					asyncEndpointPaths,
-					endpointPath)
+			for (
+				Map.Entry <String, ConsoleAsyncEndpoint> asyncEndpointEntry
+					: asyncEndpointsByComponentName.entrySet ()
 			) {
 
-				taskLogger.errorFormat (
-					"Duplicated endpoint path: %s",
-					endpointPath);
+				String componentName =
+					asyncEndpointEntry.getKey ();
 
-				continue;
+				ConsoleAsyncEndpoint asyncEndpoint =
+					asyncEndpointEntry.getValue ();
+
+				taskLogger.debugFormat (
+					"Setting up endpoint with component name: %s",
+					componentName);
+
+				String endpointPath =
+					asyncEndpoint.endpointPath ();
+
+				if (
+					contains (
+						asyncEndpointPaths,
+						endpointPath)
+				) {
+
+					taskLogger.errorFormat (
+						"Duplicated endpoint path: %s",
+						endpointPath);
+
+					continue;
+
+				}
+
+				asyncEndpointsByEndpointBuilder.put (
+					endpointPath,
+					asyncEndpoint);
+
+				asyncEndpointPaths.add (
+					endpointPath);
 
 			}
 
-			asyncEndpointsByEndpointBuilder.put (
-				endpointPath,
-				asyncEndpoint);
-
-			asyncEndpointPaths.add (
-				endpointPath);
+			asyncEndpointsByEndpoint =
+				asyncEndpointsByEndpointBuilder.build ();
 
 		}
-
-		asyncEndpointsByEndpoint =
-			asyncEndpointsByEndpointBuilder.build ();
 
 	}
 
@@ -154,21 +160,27 @@ class ConsoleAsyncManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String connectionId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"closeConnection");
+		try (
 
-		ConsoleAsyncConnection connection =
-			mapItemForKeyRequired (
-				connectionsByConnectionId,
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"closeConnection");
+
+		) {
+
+			ConsoleAsyncConnection connection =
+				mapItemForKeyRequired (
+					connectionsByConnectionId,
+					connectionId);
+
+			connection.handleConnectionClosed (
+				taskLogger);
+
+			connectionsByConnectionId.remove (
 				connectionId);
 
-		connection.handleConnectionClosed (
-			taskLogger);
-
-		connectionsByConnectionId.remove (
-			connectionId);
+		}
 
 	}
 

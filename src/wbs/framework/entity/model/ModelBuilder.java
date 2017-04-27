@@ -76,12 +76,14 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 	Model <?> build (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
 
 			return buildReal (
 				taskLogger);
@@ -102,135 +104,141 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 	Model <?> buildReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"buildReal");
+		try (
 
-		plugin =
-			modelMeta.plugin ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildReal");
 
-		// record class
+		) {
 
-		recordClassName =
-			stringFormat (
-				"%sRec",
-				capitalise (
-					modelMeta.name ()));
+			plugin =
+				modelMeta.plugin ();
 
-		recordClassNameFull =
-			stringFormat (
-				"%s.model.%s",
-				plugin.packageName (),
-				recordClassName);
+			// record class
 
-		Class <RecordType> recordClassTemp =
-			genericCastUnchecked (
-				classForNameRequired (
-					recordClassNameFull));
+			recordClassName =
+				stringFormat (
+					"%sRec",
+					capitalise (
+						modelMeta.name ()));
 
-		recordClass =
-			recordClassTemp;
+			recordClassNameFull =
+				stringFormat (
+					"%s.model.%s",
+					plugin.packageName (),
+					recordClassName);
 
-		// object helper class
+			Class <RecordType> recordClassTemp =
+				genericCastUnchecked (
+					classForNameRequired (
+						recordClassNameFull));
 
-		objectHelperClassName =
-			stringFormat (
-				"%sObjectHelper",
-				capitalise (
-					modelMeta.name ()));
+			recordClass =
+				recordClassTemp;
 
-		objectHelperClassNameFull =
-			stringFormat (
-				"%s.model.%s",
-				plugin.packageName (),
-				objectHelperClassName);
+			// object helper class
 
-		Class <ObjectHelper <RecordType>> objectHelperClassTemp =
-			genericCastUnchecked (
-				classForNameRequired (
-					objectHelperClassNameFull));
+			objectHelperClassName =
+				stringFormat (
+					"%sObjectHelper",
+					capitalise (
+						modelMeta.name ()));
 
-		objectHelperClass =
-			objectHelperClassTemp;
+			objectHelperClassNameFull =
+				stringFormat (
+					"%s.model.%s",
+					plugin.packageName (),
+					objectHelperClassName);
 
-		// model
+			Class <ObjectHelper <RecordType>> objectHelperClassTemp =
+				genericCastUnchecked (
+					classForNameRequired (
+						objectHelperClassNameFull));
 
-		model =
-			new ModelImplementation <RecordType> ()
+			objectHelperClass =
+				objectHelperClassTemp;
 
-			.objectClass (
-				recordClass)
+			// model
 
-			.objectName (
-				modelMeta.name ())
+			model =
+				new ModelImplementation <RecordType> ()
 
-			.oldObjectName (
-				modelMeta.oldName ())
+				.objectClass (
+					recordClass)
 
-			.objectTypeCode (
-				camelToUnderscore (
+				.objectName (
+					modelMeta.name ())
+
+				.oldObjectName (
+					modelMeta.oldName ())
+
+				.objectTypeCode (
+					camelToUnderscore (
+						ifNull (
+							modelMeta.oldName (),
+							modelMeta.name ())))
+
+				.tableName (
 					ifNull (
-						modelMeta.oldName (),
-						modelMeta.name ())))
+						modelMeta.tableName (),
+						schemaNamesHelper.tableName (
+							recordClass)))
 
-			.tableName (
-				ifNull (
-					modelMeta.tableName (),
-					schemaNamesHelper.tableName (
-						recordClass)))
+				.create (
+					ifNull (
+						modelMeta.create (),
+						true))
 
-			.create (
-				ifNull (
-					modelMeta.create (),
-					true))
+				.mutable (
+					ifNull (
+						modelMeta.mutable (),
+						true))
 
-			.mutable (
-				ifNull (
-					modelMeta.mutable (),
-					true))
+				.helperClass (
+					objectHelperClass);
 
-			.helperClass (
-				objectHelperClass);
+			// model fields
 
-		// model fields
+			ModelFieldBuilderContext context =
+				new ModelFieldBuilderContext ()
 
-		ModelFieldBuilderContext context =
-			new ModelFieldBuilderContext ()
+				.modelMeta (
+					modelMeta)
 
-			.modelMeta (
-				modelMeta)
+				.recordClass (
+					recordClass);
 
-			.recordClass (
-				recordClass);
+			ModelFieldBuilderTarget target =
+				new ModelFieldBuilderTarget ()
 
-		ModelFieldBuilderTarget target =
-			new ModelFieldBuilderTarget ()
+				.model (
+					model)
 
-			.model (
-				model)
+				.fields (
+					model.fields ())
 
-			.fields (
-				model.fields ())
+				.fieldsByName (
+					model.fieldsByName ());
 
-			.fieldsByName (
-				model.fieldsByName ());
+			modelBuilderManager.build (
+				taskLogger,
+				context,
+				modelMeta.fields (),
+				target);
 
-		modelBuilderManager.build (
-			taskLogger,
-			context,
-			modelMeta.fields (),
-			target);
+			modelBuilderManager.build (
+				taskLogger,
+				context,
+				modelMeta.collections (),
+				target);
 
-		modelBuilderManager.build (
-			taskLogger,
-			context,
-			modelMeta.collections (),
-			target);
+			// and return
 
-		// and return
+			return model;
 
-		return model;
+		}
 
 	}
 

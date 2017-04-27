@@ -45,60 +45,36 @@ class ModelGeneratorTool {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateModels");
+		try (
 
-		taskLogger.noticeFormat (
-			"About to generate %s models",
-			integerToDecimalString (
-				modelMetaLoader.modelMetas ().size ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateModels");
 
-		StatusCounters statusCounters =
-			new StatusCounters ();
-
-		for (
-			ModelMetaSpec modelMeta
-				: Iterables.concat (
-					modelMetaLoader.modelMetas ().values (),
-					modelMetaLoader.componentMetas ().values ())
 		) {
 
-			PluginSpec plugin =
-				modelMeta.plugin ();
+			taskLogger.noticeFormat (
+				"About to generate %s models",
+				integerToDecimalString (
+					modelMetaLoader.modelMetas ().size ()));
 
-			try {
+			StatusCounters statusCounters =
+				new StatusCounters ();
 
-				modelRecordGeneratorProvider.get ()
+			for (
+				ModelMetaSpec modelMeta
+					: Iterables.concat (
+						modelMetaLoader.modelMetas ().values (),
+						modelMetaLoader.componentMetas ().values ())
+			) {
 
-					.plugin (
-						plugin)
-
-					.modelMeta (
-						modelMeta)
-
-					.generateRecord (
-						taskLogger);
-
-				statusCounters.recordSuccessCount ++;
-
-			} catch (Exception exception) {
-
-				taskLogger.errorFormatException (
-					exception,
-					"Error writing model record for %s",
-					modelMeta.name ());
-
-				statusCounters.recordErrorCount ++;
-
-			}
-
-			if (modelMeta.type ().record ()) {
+				PluginSpec plugin =
+					modelMeta.plugin ();
 
 				try {
 
-					modelInterfacesGeneratorProvider.get ()
+					modelRecordGeneratorProvider.get ()
 
 						.plugin (
 							plugin)
@@ -106,43 +82,73 @@ class ModelGeneratorTool {
 						.modelMeta (
 							modelMeta)
 
-						.generateInterfaces (
+						.generateRecord (
 							taskLogger);
 
-					statusCounters.interfacesSuccessCount ++;
+					statusCounters.recordSuccessCount ++;
 
 				} catch (Exception exception) {
 
 					taskLogger.errorFormatException (
 						exception,
-						"Error writing model interfaces for %s",
+						"Error writing model record for %s",
 						modelMeta.name ());
 
-					statusCounters.interfacesErrorCount ++;
+					statusCounters.recordErrorCount ++;
+
+				}
+
+				if (modelMeta.type ().record ()) {
+
+					try {
+
+						modelInterfacesGeneratorProvider.get ()
+
+							.plugin (
+								plugin)
+
+							.modelMeta (
+								modelMeta)
+
+							.generateInterfaces (
+								taskLogger);
+
+						statusCounters.interfacesSuccessCount ++;
+
+					} catch (Exception exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"Error writing model interfaces for %s",
+							modelMeta.name ());
+
+						statusCounters.interfacesErrorCount ++;
+
+					}
 
 				}
 
 			}
 
-		}
-
-		taskLogger.noticeFormat (
-			"Successfully generated %s records and %s interfaces",
-			integerToDecimalString (
-				statusCounters.recordSuccessCount),
-			integerToDecimalString (
-				statusCounters.interfacesSuccessCount));
-
-		if (
-			statusCounters.recordErrorCount > 0
-			|| statusCounters.interfacesErrorCount > 0
-		) {
-
-			taskLogger.errorFormat (
-				"Aborting due to %s errors",
+			taskLogger.noticeFormat (
+				"Successfully generated %s records and %s interfaces",
 				integerToDecimalString (
-					+ statusCounters.recordErrorCount
-					+ statusCounters.interfacesErrorCount));
+					statusCounters.recordSuccessCount),
+				integerToDecimalString (
+					statusCounters.interfacesSuccessCount));
+
+			if (
+				statusCounters.recordErrorCount > 0
+				|| statusCounters.interfacesErrorCount > 0
+			) {
+
+				taskLogger.errorFormat (
+					"Aborting due to %s errors",
+					integerToDecimalString (
+						+ statusCounters.recordErrorCount
+						+ statusCounters.interfacesErrorCount));
+
+			}
 
 		}
 

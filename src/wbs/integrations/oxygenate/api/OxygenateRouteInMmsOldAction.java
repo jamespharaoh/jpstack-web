@@ -29,7 +29,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -136,7 +136,7 @@ class OxygenateRouteInMmsOldAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"Oxygen8InboundMmsAction.goApi ()",
@@ -164,272 +164,290 @@ class OxygenateRouteInMmsOldAction
 	void processRequestHeaders (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processRequestHeaders");
+		try (
 
-		// route id
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequestHeaders");
 
-		routeId =
-			requestContext.requestIntegerRequired (
-				"routeId");
-
-		// message id
-
-		mmsMessageId =
-			requestContext.headerRequired (
-				"X-Mms-Message-Id");
-
-		if (mmsMessageId.length () != 32) {
-
-			taskLogger.errorFormat (
-				"Header expected to be 32 characters but was %s: ",
-				integerToDecimalString (
-					mmsMessageId.length ()),
-				"X-Mms-Message-Id");
-
-		}
-
-		// message type
-
-		mmsMessageType =
-			requestContext.headerRequired (
-				"X-Mms-Message-Type");
-
-		if (
-			stringNotEqualSafe (
-				mmsMessageType,
-				"MO_MMS")
 		) {
 
-			taskLogger.errorFormat (
-				"Header expected to equal 'MO_MMS' but was '%s': ",
-				mmsMessageType,
-				"X-Mms-Message-Type");
+			// route id
 
-		}
+			routeId =
+				requestContext.requestIntegerRequired (
+					"routeId");
 
-		// sender address
+			// message id
 
-		mmsSenderAddress =
-			requestContext.headerRequired (
-				"X-Mms-Sender-Address");
-
-		if (
-			stringIsEmpty (
-				mmsSenderAddress)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header empty: X-Mms-Sender-Address");
-
-		}
-
-		// recipient address
-
-		mmsRecipientAddress =
-			requestContext.headerRequired (
-				"X-Mms-Recipient-Address");
-
-		if (
-			stringIsEmpty (
-				mmsRecipientAddress)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header empty: X-Mms-Recipient-Address");
-
-		}
-
-		// subject
-
-		mmsSubject =
-			optionalFromNullable (
+			mmsMessageId =
 				requestContext.headerRequired (
-					"X-Mms-Subject"));
+					"X-Mms-Message-Id");
 
-		// date
+			if (mmsMessageId.length () != 32) {
 
-		String mmsDateParam =
-			requestContext.headerRequired (
-				"X-Mms-Date");
+				taskLogger.errorFormat (
+					"Header expected to be 32 characters but was %s: ",
+					integerToDecimalString (
+						mmsMessageId.length ()),
+					"X-Mms-Message-Id");
 
-		try {
+			}
 
-			mmsDate =
-				Instant.parse (
-					mmsDateParam);
+			// message type
 
-		} catch (Exception exception) {
+			mmsMessageType =
+				requestContext.headerRequired (
+					"X-Mms-Message-Type");
 
-			taskLogger.errorFormat (
-				"Error parsing header: X-Mms-Date");
+			if (
+				stringNotEqualSafe (
+					mmsMessageType,
+					"MO_MMS")
+			) {
+
+				taskLogger.errorFormat (
+					"Header expected to equal 'MO_MMS' but was '%s': ",
+					mmsMessageType,
+					"X-Mms-Message-Type");
+
+			}
+
+			// sender address
+
+			mmsSenderAddress =
+				requestContext.headerRequired (
+					"X-Mms-Sender-Address");
+
+			if (
+				stringIsEmpty (
+					mmsSenderAddress)
+			) {
+
+				taskLogger.errorFormat (
+					"Required header empty: X-Mms-Sender-Address");
+
+			}
+
+			// recipient address
+
+			mmsRecipientAddress =
+				requestContext.headerRequired (
+					"X-Mms-Recipient-Address");
+
+			if (
+				stringIsEmpty (
+					mmsRecipientAddress)
+			) {
+
+				taskLogger.errorFormat (
+					"Required header empty: X-Mms-Recipient-Address");
+
+			}
+
+			// subject
+
+			mmsSubject =
+				optionalFromNullable (
+					requestContext.headerRequired (
+						"X-Mms-Subject"));
+
+			// date
+
+			String mmsDateParam =
+				requestContext.headerRequired (
+					"X-Mms-Date");
+
+			try {
+
+				mmsDate =
+					Instant.parse (
+						mmsDateParam);
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormat (
+					"Error parsing header: X-Mms-Date");
+
+			}
+
+			// network
+
+			mmsNetwork =
+				requestContext.headerRequired (
+					"X-Mms-Network");
+
+			// errors
+
+			taskLogger.makeException ();
 
 		}
-
-		// network
-
-		mmsNetwork =
-			requestContext.headerRequired (
-				"X-Mms-Network");
-
-		// errors
-
-		taskLogger.makeException ();
 
 	}
 
 	void processRequestBody (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processRequestBody");
+		try (
 
-		for (
-			FileItem fileItem
-				: requestContext.fileItems ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequestBody");
+
 		) {
 
-			Matcher matcher =
-				contentTypePattern.matcher (
-					fileItem.getContentType ());
-
-			if (! matcher.matches ()) {
-
-				taskLogger.errorFormat (
-					"Invalid content type: %s",
-					fileItem.getContentType ());
-
-				continue;
-
-			}
-
-			String type =
-				matcher.group (1);
-
-			String charset =
-				matcher.group (2);
-
-			medias.add (
-				mediaLogic.createMediaRequired (
-					taskLogger,
-					fileItem.get (),
-					type,
-					fileItem.getName (),
-					optionalOf (
-						charset)));
-
-			if (
-
-				messageString == null
-
-				&& mediaLogic.isText (
-					type)
-
-				&& fileItem.getString () != null
-
-				&& ! fileItem.getString ().isEmpty ()
-
+			for (
+				FileItem fileItem
+					: requestContext.fileItems ()
 			) {
 
-				messageString =
-					fileItem.getString ();
+				Matcher matcher =
+					contentTypePattern.matcher (
+						fileItem.getContentType ());
+
+				if (! matcher.matches ()) {
+
+					taskLogger.errorFormat (
+						"Invalid content type: %s",
+						fileItem.getContentType ());
+
+					continue;
+
+				}
+
+				String type =
+					matcher.group (1);
+
+				String charset =
+					matcher.group (2);
+
+				medias.add (
+					mediaLogic.createMediaRequired (
+						taskLogger,
+						fileItem.get (),
+						type,
+						fileItem.getName (),
+						optionalOf (
+							charset)));
+
+				if (
+
+					messageString == null
+
+					&& mediaLogic.isText (
+						type)
+
+					&& fileItem.getString () != null
+
+					&& ! fileItem.getString ().isEmpty ()
+
+				) {
+
+					messageString =
+						fileItem.getString ();
+
+				}
 
 			}
 
-		}
+			if (messageString == null) {
+				messageString = "";
+			}
 
-		if (messageString == null) {
-			messageString = "";
-		}
+			taskLogger.makeException ();
 
-		taskLogger.makeException ();
+		}
 
 	}
 
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
+		try (
 
-		// lookup route
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
 
-		OxygenateRouteInRec oxygenateRouteIn =
-			oxygenateRouteInHelper.findRequired (
-				routeId);
+		) {
 
-		RouteRec route =
-			oxygenateRouteIn.getRoute ();
+			// lookup route
 
-		// check route supports inbound mms
+			OxygenateRouteInRec oxygenateRouteIn =
+				oxygenateRouteInHelper.findRequired (
+					routeId);
 
-		if (! route.getCanReceive ())
-			throw new RuntimeException ();
+			RouteRec route =
+				oxygenateRouteIn.getRoute ();
 
-		MessageTypeRec mmsMessageType =
-			messageTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				"mms");
+			// check route supports inbound mms
 
-		if (! route.getInboundMessageTypes ().contains (
-				mmsMessageType))
-			throw new RuntimeException ();
+			if (! route.getCanReceive ())
+				throw new RuntimeException ();
 
-		// lookup network
+			MessageTypeRec mmsMessageType =
+				messageTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					"mms");
 
-		/*
-		Oxygen8NetworkRec oxygen8Network =
-			oxygen8NetworkHelper.findByChannel (
-				oxygen8RouteIn.getOxygen8Config (),
-				mmsNetwork);
+			if (! route.getInboundMessageTypes ().contains (
+					mmsMessageType))
+				throw new RuntimeException ();
 
-		if (oxygen8Network == null) {
+			// lookup network
 
-			throw new RuntimeException (
-				stringFormat (
-					"No oxygen8 network for channel: %s",
-					mmsNetwork));
+			/*
+			Oxygen8NetworkRec oxygen8Network =
+				oxygen8NetworkHelper.findByChannel (
+					oxygen8RouteIn.getOxygen8Config (),
+					mmsNetwork);
+
+			if (oxygen8Network == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"No oxygen8 network for channel: %s",
+						mmsNetwork));
+
+			}
+
+			NetworkRec network =
+				oxygen8Network.getNetwork ();
+			*/
+
+			NetworkRec network =
+				networkHelper.findRequired (
+					0l);
+
+			// insert message
+
+			TextRec messageText =
+				textHelper.findOrCreate (
+					taskLogger,
+					messageString);
+
+			smsInboxLogic.inboxInsert (
+				taskLogger,
+				optionalOf (
+					mmsMessageId),
+				messageText,
+				smsNumberHelper.findOrCreate (
+					taskLogger,
+					mmsSenderAddress),
+				mmsRecipientAddress,
+				route,
+				optionalOf (
+					network),
+				optionalOf (
+					mmsDate),
+				medias,
+				optionalAbsent (),
+				mmsSubject);
 
 		}
-
-		NetworkRec network =
-			oxygen8Network.getNetwork ();
-		*/
-
-		NetworkRec network =
-			networkHelper.findRequired (
-				0l);
-
-		// insert message
-
-		TextRec messageText =
-			textHelper.findOrCreate (
-				taskLogger,
-				messageString);
-
-		smsInboxLogic.inboxInsert (
-			taskLogger,
-			optionalOf (
-				mmsMessageId),
-			messageText,
-			smsNumberHelper.findOrCreate (
-				taskLogger,
-				mmsSenderAddress),
-			mmsRecipientAddress,
-			route,
-			optionalOf (
-				network),
-			optionalOf (
-				mmsDate),
-			medias,
-			optionalAbsent (),
-			mmsSubject);
 
 	}
 

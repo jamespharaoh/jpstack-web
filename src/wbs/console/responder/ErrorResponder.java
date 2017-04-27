@@ -55,38 +55,44 @@ class ErrorResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		htmlHeadingOneWrite (
-			title);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		requestContext.flushNotices ();
-
-		htmlParagraphWrite (
-			title,
-			htmlClassAttribute (
-				"error"));
-
-		htmlParagraphWrite (
-			message);
-
-		if (
-			exception != null
-			&& privChecker.canRecursive (
-				taskLogger,
-				GlobalId.root,
-				"debug")
 		) {
 
-			htmlParagraphWriteHtml (
-				stringFormat (
-					"<pre>%h</pre>",
-					exceptionLogic.throwableDump (
-						taskLogger,
-						exception)));
+			htmlHeadingOneWrite (
+				title);
+
+			requestContext.flushNotices ();
+
+			htmlParagraphWrite (
+				title,
+				htmlClassAttribute (
+					"error"));
+
+			htmlParagraphWrite (
+				message);
+
+			if (
+				exception != null
+				&& privChecker.canRecursive (
+					taskLogger,
+					GlobalId.root,
+					"debug")
+			) {
+
+				htmlParagraphWriteHtml (
+					stringFormat (
+						"<pre>%h</pre>",
+						exceptionLogic.throwableDump (
+							taskLogger,
+							exception)));
+
+			}
 
 		}
 

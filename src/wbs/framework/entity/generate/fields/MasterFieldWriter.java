@@ -58,47 +58,53 @@ class MasterFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		) {
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
 
-		// write field
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
 
-		new JavaPropertyWriter ()
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
 
-			.thisClassNameFormat (
-				"%s",
-				context.recordClassName ())
+			// write field
 
-			.typeNameFormat (
-				"%s",
-				fullFieldTypeName)
+			new JavaPropertyWriter ()
 
-			.propertyNameFormat (
-				"%s",
-				ifNull (
-					spec.name (),
-					spec.typeName ()))
+				.thisClassNameFormat (
+					"%s",
+					context.recordClassName ())
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.typeNameFormat (
+					"%s",
+					fullFieldTypeName)
+
+				.propertyNameFormat (
+					"%s",
+					ifNull (
+						spec.name (),
+						spec.typeName ()))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

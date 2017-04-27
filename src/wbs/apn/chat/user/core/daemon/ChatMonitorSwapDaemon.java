@@ -19,7 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -81,22 +81,22 @@ class ChatMonitorSwapDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		// get list of chats
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ChatMonitorSwapDaemon.runOnce ()",
 					this);
 
 		) {
+
+			// get list of chats
 
 			List <Long> chatIds =
 				iterableMapToList (
@@ -130,7 +130,7 @@ class ChatMonitorSwapDaemon
 	private
 	boolean chatNeedsMonitorSwap (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ChatRec chat) {
 
 		return (
@@ -154,35 +154,41 @@ class ChatMonitorSwapDaemon
 			@NonNull Gender gender,
 			@NonNull Orient orient) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doMonitorSwap");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doMonitorSwap");
 
-			doMonitorSwapReal (
-				taskLogger,
-				chatId,
-				gender,
-				orient);
+		) {
 
-		} catch (Exception exception) {
+			try {
 
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"daemon",
-				stringFormat (
-					"chat %s %s %s",
-					integerToDecimalString (
-						chatId),
-					enumName (
-						gender),
-					enumName (
-						orient)),
-				exception,
-				optionalAbsent (),
-				GenericExceptionResolution.tryAgainLater);
+				doMonitorSwapReal (
+					taskLogger,
+					chatId,
+					gender,
+					orient);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"daemon",
+					stringFormat (
+						"chat %s %s %s",
+						integerToDecimalString (
+							chatId),
+						enumName (
+							gender),
+						enumName (
+							orient)),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
+
+			}
 
 		}
 
@@ -194,14 +200,14 @@ class ChatMonitorSwapDaemon
 			@NonNull Gender gender,
 			@NonNull Orient orient) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doMonitorSwapReal");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doMonitorSwapReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (

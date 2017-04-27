@@ -47,17 +47,23 @@ class GenericConfigLoader {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String configFilePath) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"load");
+		try (
 
-		return new AbstractGenericConfig <Config> ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"load");
 
-			.genericConfigSpec (
-				loadSpec (
-					taskLogger,
-					configFilePath));
+		) {
+
+			return new AbstractGenericConfig <Config> ()
+
+				.genericConfigSpec (
+					loadSpec (
+						taskLogger,
+						configFilePath));
+
+		}
 
 	}
 

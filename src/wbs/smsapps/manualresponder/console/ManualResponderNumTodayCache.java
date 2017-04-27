@@ -17,8 +17,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -79,60 +79,66 @@ class ManualResponderNumTodayCache
 	Long refresh (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"PerOperatorCaches.NumTodayCache.refresh ()");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"PerOperatorCaches.NumTodayCache.refresh ()");
 
-		UserRec user =
-			userHelper.findRequired (
-				userId);
-
-		Instant startOfDay =
-			transaction.now ()
-				.toDateTime ()
-				.toLocalDate ()
-				.toDateTimeAtStartOfDay ()
-				.toInstant ();
-
-		List <ManualResponderOperatorReport> reports =
-			manualResponderRequestHelper.searchOperatorReports (
-				taskLogger,
-				new ManualResponderRequestSearch ()
-
-			.processedByUserId (
-				userId)
-
-			.processedTime (
-				TextualInterval.forInterval (
-					timeFormatter.timezone (
-						ifNull (
-							user.getDefaultTimezone (),
-							user.getSlice ().getDefaultTimezone (),
-							wbsConfig.defaultTimezone ())),
-					new Interval (
-						startOfDay,
-						transaction.now ())))
-
-		);
-
-		if (reports.size () > 1) {
-			throw new RuntimeException ();
-		}
-
-		if (
-			collectionIsEmpty (
-				reports)
 		) {
 
-			return 0l;
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		} else {
+			UserRec user =
+				userHelper.findRequired (
+					userId);
 
-			return reports.get (0).numBilled ();
+			Instant startOfDay =
+				transaction.now ()
+					.toDateTime ()
+					.toLocalDate ()
+					.toDateTimeAtStartOfDay ()
+					.toInstant ();
+
+			List <ManualResponderOperatorReport> reports =
+				manualResponderRequestHelper.searchOperatorReports (
+					taskLogger,
+					new ManualResponderRequestSearch ()
+
+				.processedByUserId (
+					userId)
+
+				.processedTime (
+					TextualInterval.forInterval (
+						timeFormatter.timezone (
+							ifNull (
+								user.getDefaultTimezone (),
+								user.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
+						new Interval (
+							startOfDay,
+							transaction.now ())))
+
+			);
+
+			if (reports.size () > 1) {
+				throw new RuntimeException ();
+			}
+
+			if (
+				collectionIsEmpty (
+					reports)
+			) {
+
+				return 0l;
+
+			} else {
+
+				return reports.get (0).numBilled ();
+
+			}
 
 		}
 

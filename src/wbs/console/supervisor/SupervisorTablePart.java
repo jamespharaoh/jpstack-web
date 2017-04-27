@@ -47,38 +47,44 @@ class SupervisorTablePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// prepare page parts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		ImmutableList.Builder <PagePart> pagePartsBuilder =
-			ImmutableList.<PagePart> builder ();
-
-		for (
-			Provider <PagePart> pagePartFactory
-				: supervisorTablePartBuilder.pagePartFactories ()
 		) {
 
-			PagePart pagePart =
-				pagePartFactory.get ();
+			// prepare page parts
 
-			pagePart.setup (
-				taskLogger,
-				parameters);
+			ImmutableList.Builder <PagePart> pagePartsBuilder =
+				ImmutableList.<PagePart> builder ();
 
-			pagePart.prepare (
-				taskLogger);
+			for (
+				Provider <PagePart> pagePartFactory
+					: supervisorTablePartBuilder.pagePartFactories ()
+			) {
 
-			pagePartsBuilder.add (
-				pagePart);
+				PagePart pagePart =
+					pagePartFactory.get ();
+
+				pagePart.setup (
+					taskLogger,
+					parameters);
+
+				pagePart.prepare (
+					taskLogger);
+
+				pagePartsBuilder.add (
+					pagePart);
+
+			}
+
+			pageParts =
+				pagePartsBuilder.build ();
 
 		}
-
-		pageParts =
-			pagePartsBuilder.build ();
 
 	}
 
@@ -87,18 +93,24 @@ class SupervisorTablePart
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContent");
+		try (
 
-		for (
-			PagePart pagePart
-				: pageParts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContent");
+
 		) {
 
-			pagePart.renderHtmlHeadContent (
-				taskLogger);
+			for (
+				PagePart pagePart
+					: pageParts
+			) {
+
+				pagePart.renderHtmlHeadContent (
+					taskLogger);
+
+			}
 
 		}
 
@@ -109,24 +121,30 @@ class SupervisorTablePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		for (
-			PagePart pagePart
-				: pageParts
 		) {
 
-			pagePart.renderHtmlBodyContent (
-				taskLogger);
+			htmlTableOpenList ();
+
+			for (
+				PagePart pagePart
+					: pageParts
+			) {
+
+				pagePart.renderHtmlBodyContent (
+					taskLogger);
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

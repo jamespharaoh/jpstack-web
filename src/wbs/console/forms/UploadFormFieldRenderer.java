@@ -18,7 +18,9 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
@@ -31,6 +33,11 @@ import fj.data.Either;
 public
 class UploadFormFieldRenderer <Container>
 	implements FormFieldRenderer <Container, FileUpload> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -87,24 +94,36 @@ class UploadFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <FileUpload> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"%j\").replaceWith (",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name));
+		try (
 
-		javascriptWriter.writeLineFormat (
-			"\t$(\"%j\").clone (true));",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"%j\").replaceWith (",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
+
+			javascriptWriter.writeLineFormat (
+				"\t$(\"%j\").clone (true));",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
+
+		}
 
 	}
 

@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -105,52 +105,58 @@ class ChatMessagePendingFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
+		try (
 
-		// get the message id
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
-		Long chatMessageId =
-			requestContext.parameterIntegerRequired (
-				"chat_message_id");
-
-		requestContext.request (
-			"chatMessageId",
-			chatMessageId);
-
-		// delegate appropriately
-
-		if (
-
-			optionalIsPresent (
-				requestContext.parameter (
-					"send"))
-
-			|| optionalIsPresent (
-				requestContext.parameter (
-					"sendWithoutApproval"))
 		) {
 
-			return goSend (
-				taskLogger);
+			// get the message id
+
+			Long chatMessageId =
+				requestContext.parameterIntegerRequired (
+					"chat_message_id");
+
+			requestContext.request (
+				"chatMessageId",
+				chatMessageId);
+
+			// delegate appropriately
+
+			if (
+
+				optionalIsPresent (
+					requestContext.parameter (
+						"send"))
+
+				|| optionalIsPresent (
+					requestContext.parameter (
+						"sendWithoutApproval"))
+			) {
+
+				return goSend (
+					taskLogger);
+
+			}
+
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"reject"))
+			) {
+
+				return goReject (
+					taskLogger);
+
+			}
+
+			throw new RuntimeException (
+				"Expected send or reject parameters");
 
 		}
-
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"reject"))
-		) {
-
-			return goReject (
-				taskLogger);
-
-		}
-
-		throw new RuntimeException (
-			"Expected send or reject parameters");
 
 	}
 
@@ -171,7 +177,7 @@ class ChatMessagePendingFormAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatMessagePendingFormAction.goSend ()",
@@ -232,6 +238,7 @@ class ChatMessagePendingFormAction
 			// process the queue item
 
 			queueLogic.processQueueItem (
+				taskLogger,
 				chatMessage.getQueueItem (),
 				userConsoleLogic.userRequired ());
 
@@ -373,107 +380,114 @@ class ChatMessagePendingFormAction
 	Responder goReject (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReject");
-
-		// get params
-
-		String messageParam =
-			stringTrim (
-				requestContext.parameterRequired (
-					"message"));
-
-		if (GsmUtils.gsmStringLength (messageParam) == 0) {
-
-			requestContext.addError (
-				"Please enter a message to send");
-
-			return null;
-
-		}
-
-		if (GsmUtils.gsmStringLength (messageParam) > 149) {
-
-			requestContext.addError (
-				"Message is too long");
-
-			return null;
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatMessagePendingFormAction.goReject ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReject");
 
 		) {
 
-			// get database objects
+			// get params
 
-			ChatMessageRec chatMessage =
-				chatMessageHelper.findFromContextRequired ();
+			String messageParam =
+				stringTrim (
+					requestContext.parameterRequired (
+						"message"));
 
-			// confirm message status
-
-			if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
+			if (GsmUtils.gsmStringLength (messageParam) == 0) {
 
 				requestContext.addError (
-					"Message is already approved");
+					"Please enter a message to send");
 
-				return responder ("queueHomeResponder");
+				return null;
 
 			}
 
-			// remove the queue item
+			if (GsmUtils.gsmStringLength (messageParam) > 149) {
 
-			queueLogic.processQueueItem (
-				chatMessage.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				requestContext.addError (
+					"Message is too long");
 
-			// update the chatMessage
+				return null;
 
-			chatMessage
+			}
 
-				.setModerator (
-					userConsoleLogic.userRequired ())
+			try (
 
-				.setStatus (
-					ChatMessageStatus.moderatorRejected)
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ChatMessagePendingFormAction.goReject ()",
+						this);
 
-				.setEditedText (
-					null);
+			) {
 
-			// and send help message
+				// get database objects
 
-			chatHelpLogic.sendHelpMessage (
-				taskLogger,
-				userConsoleLogic.userRequired (),
-				chatMessage.getFromUser (),
-				messageParam,
-				optionalOf (
-					chatMessage.getThreadId ()),
-				optionalAbsent ());
+				ChatMessageRec chatMessage =
+					chatMessageHelper.findFromContextRequired ();
 
-			// inc rejection count
+				// confirm message status
 
-			chatMessageLogic.chatUserRejectionCountInc (
-				taskLogger,
-				chatMessage.getFromUser (),
-				smsMessageHelper.findRequired (
-					chatMessage.getThreadId ()));
+				if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
 
-			transaction.commit ();
+					requestContext.addError (
+						"Message is already approved");
 
-			requestContext.addNotice (
-				"Rejection sent");
+					return responder ("queueHomeResponder");
 
-			return responder (
-				"queueHomeResponder");
+				}
+
+				// remove the queue item
+
+				queueLogic.processQueueItem (
+					taskLogger,
+					chatMessage.getQueueItem (),
+					userConsoleLogic.userRequired ());
+
+				// update the chatMessage
+
+				chatMessage
+
+					.setModerator (
+						userConsoleLogic.userRequired ())
+
+					.setStatus (
+						ChatMessageStatus.moderatorRejected)
+
+					.setEditedText (
+						null);
+
+				// and send help message
+
+				chatHelpLogic.sendHelpMessage (
+					taskLogger,
+					userConsoleLogic.userRequired (),
+					chatMessage.getFromUser (),
+					messageParam,
+					optionalOf (
+						chatMessage.getThreadId ()),
+					optionalAbsent ());
+
+				// inc rejection count
+
+				chatMessageLogic.chatUserRejectionCountInc (
+					taskLogger,
+					chatMessage.getFromUser (),
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
+
+				transaction.commit ();
+
+				requestContext.addNotice (
+					"Rejection sent");
+
+				return responder (
+					"queueHomeResponder");
+
+			}
 
 		}
 

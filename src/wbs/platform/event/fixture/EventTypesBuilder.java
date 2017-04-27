@@ -50,17 +50,23 @@ class EventTypesBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		builder.descend (
-			taskLogger,
-			parent,
-			spec.eventTypes (),
-			model,
-			MissingBuilderBehaviour.error);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			builder.descend (
+				taskLogger,
+				parent,
+				spec.eventTypes (),
+				model,
+				MissingBuilderBehaviour.error);
+
+		}
 
 	}
 

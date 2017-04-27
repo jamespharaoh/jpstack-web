@@ -78,39 +78,45 @@ class ContextActionPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			consoleModule.addContextFile (
-				fileName,
-				consoleFile.get ()
+			setDefaults ();
 
-					.getResponderName (
-						responderName)
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
 
-					.postActionName (
-						taskLogger,
-						actionName),
+				consoleModule.addContextFile (
+					fileName,
+					consoleFile.get ()
 
-				resolvedExtensionPoint.contextTypeNames ());
+						.getResponderName (
+							responderName)
+
+						.postActionName (
+							taskLogger,
+							actionName),
+
+					resolvedExtensionPoint.contextTypeNames ());
+
+			}
+
+			consoleModule.addResponder (
+				responderName,
+				consoleModule.beanResponder (
+					taskLogger,
+					responderBeanName));
 
 		}
-
-		consoleModule.addResponder (
-			responderName,
-			consoleModule.beanResponder (
-				taskLogger,
-				responderBeanName));
 
 	}
 

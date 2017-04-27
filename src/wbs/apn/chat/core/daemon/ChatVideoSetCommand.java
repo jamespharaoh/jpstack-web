@@ -118,97 +118,103 @@ class ChatVideoSetCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
-
-		MessageRec message =
-			inbox.getMessage ();
-
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		// log request
-
-		chatHelpLogLogic.createChatHelpLogIn (
-			taskLogger,
-			chatUser,
-			message,
-			rest,
-			optionalOf (
-				command),
-			false);
-
-		if (
-			chatUserLogic.setVideo (
-				taskLogger,
-				chatUser,
-				message,
-				false)
 		) {
 
-			// send a message
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-			chatSendLogic.sendSystemRbFree (
-				taskLogger,
-				chatUser,
-				optionalOf (
-					message.getThreadId ()),
-				"video_set_pending",
-				TemplateMissing.error,
-				emptyMap ());
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-			// auto join
+			MessageRec message =
+				inbox.getMessage ();
 
-			chatMiscLogic.userAutoJoin (
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// log request
+
+			chatHelpLogLogic.createChatHelpLogIn (
 				taskLogger,
 				chatUser,
 				message,
-				true);
-
-		} else {
-
-			// no video found
-
-			chatSendLogic.sendSystemRbFree (
-				taskLogger,
-				chatUser,
+				rest,
 				optionalOf (
-					message.getThreadId ()),
-				"video_set_error",
-				TemplateMissing.error,
-				emptyMap ());
+					command),
+				false);
+
+			if (
+				chatUserLogic.setVideo (
+					taskLogger,
+					chatUser,
+					message,
+					false)
+			) {
+
+				// send a message
+
+				chatSendLogic.sendSystemRbFree (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"video_set_pending",
+					TemplateMissing.error,
+					emptyMap ());
+
+				// auto join
+
+				chatMiscLogic.userAutoJoin (
+					taskLogger,
+					chatUser,
+					message,
+					true);
+
+			} else {
+
+				// no video found
+
+				chatSendLogic.sendSystemRbFree (
+					taskLogger,
+					chatUser,
+					optionalOf (
+						message.getThreadId ()),
+					"video_set_error",
+					TemplateMissing.error,
+					emptyMap ());
+
+			}
+
+			// process inbox
+
+			return smsInboxLogic.inboxProcessed (
+				taskLogger,
+				inbox,
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
+				command);
 
 		}
-
-		// process inbox
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

@@ -56,41 +56,47 @@ class TimestampFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.propertyNameFormat (
-				"%s",
-				spec.name ())
+			new JavaPropertyWriter ()
 
-			.typeClass (
-				Instant.class)
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-			.setterTypeClass (
-				ReadableInstant.class)
+				.propertyNameFormat (
+					"%s",
+					spec.name ())
 
-			.setterConversion (
-				methodGetStaticRequired (
-					TimeUtils.class,
-					"toInstantNullSafe",
-					ImmutableList.of (
-						ReadableInstant.class)))
+				.typeClass (
+					Instant.class)
 
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.setterTypeClass (
+					ReadableInstant.class)
+
+				.setterConversion (
+					methodGetStaticRequired (
+						TimeUtils.class,
+						"toInstantNullSafe",
+						ImmutableList.of (
+							ReadableInstant.class)))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
+		}
 
 	}
 

@@ -91,13 +91,18 @@ class DataToXml {
 			@NonNull String filename,
 			@NonNull Object object) {
 
-		try {
+		try (
 
-			write (
+			Writer fileWriter =
 				new FileWriterWithEncoding (
 					new File (
 						filename),
-					"utf-8"),
+					"utf-8");
+
+		) {
+
+			write (
+				fileWriter,
 				object);
 
 		} catch (IOException ioException) {

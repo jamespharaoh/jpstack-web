@@ -140,19 +140,25 @@ class TabbedResponder
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		super.setup (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		if (pagePart != null) {
+		) {
 
-			pagePart.setup (
-				taskLogger,
-				Collections.emptyMap ());
+			super.setup (
+				taskLogger);
+
+			if (pagePart != null) {
+
+				pagePart.setup (
+					taskLogger,
+					Collections.emptyMap ());
+
+			}
 
 		}
 
@@ -163,86 +169,92 @@ class TabbedResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		TabContext tabContext =
-			requestContext.tabContextRequired ();
-
-		MyLayer myLayer1 = null;
-
-		for (
-			TabContext.Layer tabContextLayer
-				: tabContext.getLayers ()
 		) {
 
-			myLayers.add (
-				myLayer1 =
-					new MyLayer ()
+			super.prepare (
+				taskLogger);
 
-				.title (
-					tabContextLayer.title ())
+			TabContext tabContext =
+				requestContext.tabContextRequired ();
 
-				.tabList (
-					tabContextLayer.tabList ())
+			MyLayer myLayer1 = null;
 
-				.tab (
-					tabContextLayer.tab ())
+			for (
+				TabContext.Layer tabContextLayer
+					: tabContext.getLayers ()
+			) {
 
-			);
+				myLayers.add (
+					myLayer1 =
+						new MyLayer ()
 
-		}
+					.title (
+						tabContextLayer.title ())
 
-		if (myLayer1 == null) {
-			throw new RuntimeException ();
-		}
+					.tabList (
+						tabContextLayer.tabList ())
 
-		myLayer1.tab (tab);
+					.tab (
+						tabContextLayer.tab ())
 
-		if (pagePart != null) {
+				);
 
-			try {
+			}
 
-				pagePart.prepare (
-					taskLogger);
+			if (myLayer1 == null) {
+				throw new RuntimeException ();
+			}
 
-			} catch (RuntimeException exception) {
+			myLayer1.tab (tab);
 
-				String path =
-					joinWithoutSeparator (
-						requestContext.servletPath (),
-						optionalOrEmptyString (
-							requestContext.pathInfo ()));
+			if (pagePart != null) {
 
-				// log the exception
+				try {
 
-				taskLogger.warningFormatException (
-					exception,
-					"Exception while reponding to: %s",
-					path);
+					pagePart.prepare (
+						taskLogger);
 
-				// record the exception
+				} catch (RuntimeException exception) {
 
-				exceptionLogger.logThrowable (
-					taskLogger,
-					"console",
-					path,
-					exception,
-					consoleUserHelper.loggedInUserId (),
-					GenericExceptionResolution.ignoreWithUserWarning);
+					String path =
+						joinWithoutSeparator (
+							requestContext.servletPath (),
+							optionalOrEmptyString (
+								requestContext.pathInfo ()));
 
-				// and remember we had a problem
+					// log the exception
 
-				pagePartThrew =
-					exception;
+					taskLogger.warningFormatException (
+						exception,
+						"Exception while reponding to: %s",
+						path);
 
-				requestContext.addError (
-					"Internal error");
+					// record the exception
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"console",
+						path,
+						exception,
+						consoleUserHelper.loggedInUserId (),
+						GenericExceptionResolution.ignoreWithUserWarning);
+
+					// and remember we had a problem
+
+					pagePartThrew =
+						exception;
+
+					requestContext.addError (
+						"Internal error");
+
+				}
 
 			}
 
@@ -255,62 +267,68 @@ class TabbedResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
-
-		if (
-
-			isNotNull (
-				pagePart)
-
-			&& isNull (
-				pagePartThrew)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
 		) {
 
-			pagePart.renderHtmlHeadContent (
+			super.renderHtmlHeadContents (
 				taskLogger);
 
+			if (
+
+				isNotNull (
+					pagePart)
+
+				&& isNull (
+					pagePartThrew)
+
+			) {
+
+				pagePart.renderHtmlHeadContent (
+					taskLogger);
+
+			}
+
+			htmlScriptBlockOpen ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function toggleHead (elem) {");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"while (elem.nodeName.toLowerCase () != 'table') {");
+
+			formatWriter.writeLineFormat (
+				"elem = elem.parentNode;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"if (elem.className == 'head-1-big') {");
+
+			formatWriter.writeLineFormat (
+				"elem.className = 'head-1-small';");
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"} else if (elem.className == 'head-1-small') {");
+
+			formatWriter.writeLineFormat (
+				"elem.className = 'head-1-big';");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			htmlScriptBlockClose ();
+
 		}
-
-		htmlScriptBlockOpen ();
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function toggleHead (elem) {");
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"while (elem.nodeName.toLowerCase () != 'table') {");
-
-		formatWriter.writeLineFormat (
-			"elem = elem.parentNode;");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"if (elem.className == 'head-1-big') {");
-
-		formatWriter.writeLineFormat (
-			"elem.className = 'head-1-small';");
-
-		formatWriter.writeLineFormatDecreaseIncreaseIndent (
-			"} else if (elem.className == 'head-1-small') {");
-
-		formatWriter.writeLineFormat (
-			"elem.className = 'head-1-big';");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		htmlScriptBlockClose ();
 
 	}
 
@@ -323,22 +341,28 @@ class TabbedResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContents");
+		try (
 
-		htmlHeadingOneWrite (
-			title);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContents");
 
-		renderTabs (
-			taskLogger);
+		) {
 
-		requestContext.flushNotices (
-			formatWriter);
+			htmlHeadingOneWrite (
+				title);
 
-		renderPagePart (
-			taskLogger);
+			renderTabs (
+				taskLogger);
+
+			requestContext.flushNotices (
+				formatWriter);
+
+			renderPagePart (
+				taskLogger);
+
+		}
 
 	}
 
@@ -348,92 +372,98 @@ class TabbedResponder
 	void renderTabs (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderTabs");
+		try (
 
-		for (
-			MyLayer myLayer
-				: myLayers
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderTabs");
+
 		) {
 
-			htmlTableOpen (
-				formatWriter,
-				htmlClassAttribute (
-					"head-1-big"));
-
-			htmlTableRowOpen (
-				formatWriter);
-
-			htmlTableCellWrite (
-				formatWriter,
-				myLayer.title,
-				htmlClassAttribute (
-					"h"),
-				htmlAttribute (
-					"onclick",
-					"toggleHead (this)"));
-
-			htmlTableCellOpen (
-				formatWriter,
-				htmlClassAttribute (
-					"l"));
-
 			for (
-				TabRef tabRef
-					: myLayer.tabList.getTabRefs ()
+				MyLayer myLayer
+					: myLayers
 			) {
 
-				if (! tabRef.getTab ().isAvailable ())
-					continue;
+				htmlTableOpen (
+					formatWriter,
+					htmlClassAttribute (
+						"head-1-big"));
 
-				if (tabRef.getTab () == myLayer.tab) {
+				htmlTableRowOpen (
+					formatWriter);
 
-					htmlLinkWrite (
-						formatWriter,
-						tabRef.getTab ().getUrl (
-							taskLogger),
-						tabRef.getLabel (),
-						htmlClassAttribute (
-							"selected"));
+				htmlTableCellWrite (
+					formatWriter,
+					myLayer.title,
+					htmlClassAttribute (
+						"h"),
+					htmlAttribute (
+						"onclick",
+						"toggleHead (this)"));
 
-				} else {
+				htmlTableCellOpen (
+					formatWriter,
+					htmlClassAttribute (
+						"l"));
 
-					htmlLinkWrite (
-						formatWriter,
-						tabRef.getTab ().getUrl (
-							taskLogger),
-						tabRef.getLabel ());
+				for (
+					TabRef tabRef
+						: myLayer.tabList.getTabRefs ()
+				) {
+
+					if (! tabRef.getTab ().isAvailable ())
+						continue;
+
+					if (tabRef.getTab () == myLayer.tab) {
+
+						htmlLinkWrite (
+							formatWriter,
+							tabRef.getTab ().getUrl (
+								taskLogger),
+							tabRef.getLabel (),
+							htmlClassAttribute (
+								"selected"));
+
+					} else {
+
+						htmlLinkWrite (
+							formatWriter,
+							tabRef.getTab ().getUrl (
+								taskLogger),
+							tabRef.getLabel ());
+
+					}
 
 				}
 
+				htmlTableCellClose (
+					formatWriter);
+
+				htmlTableRowClose (
+					formatWriter);
+
+				htmlTableClose (
+					formatWriter);
+
 			}
 
-			htmlTableCellClose (
-				formatWriter);
-
-			htmlTableRowClose (
-				formatWriter);
-
-			htmlTableClose (
-				formatWriter);
+			htmlDivWrite (
+				formatWriter,
+				"",
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"clear",
+						"both"),
+					htmlStyleRuleEntry (
+						"border-top",
+						"1px solid white"),
+					htmlStyleRuleEntry (
+						"margin-bottom",
+						"1ex")));
 
 		}
-
-		htmlDivWrite (
-			formatWriter,
-			"",
-			htmlStyleAttribute (
-				htmlStyleRuleEntry (
-					"clear",
-					"both"),
-				htmlStyleRuleEntry (
-					"border-top",
-					"1px solid white"),
-				htmlStyleRuleEntry (
-					"margin-bottom",
-					"1ex")));
 
 	}
 
@@ -441,43 +471,49 @@ class TabbedResponder
 	void renderPagePart (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderPagePart");
+		try (
 
-		if (
-			isNotNull (
-				pagePartThrew)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderPagePart");
+
 		) {
-
-			htmlParagraphWrite (
-				"Unable to show page contents.");
 
 			if (
-				privChecker.canSimple (
-					taskLogger,
-					GlobalId.root,
-					"debug")
+				isNotNull (
+					pagePartThrew)
 			) {
 
-				htmlParagraphWriteHtml (
-					formatWriter,
-					stringFormat (
-						"<pre>%h</pre>",
-						exceptionLogic.throwableDump (
-							taskLogger,
-							pagePartThrew)));
+				htmlParagraphWrite (
+					"Unable to show page contents.");
+
+				if (
+					privChecker.canSimple (
+						taskLogger,
+						GlobalId.root,
+						"debug")
+				) {
+
+					htmlParagraphWriteHtml (
+						formatWriter,
+						stringFormat (
+							"<pre>%h</pre>",
+							exceptionLogic.throwableDump (
+								taskLogger,
+								pagePartThrew)));
+
+				}
+
+			} else if (
+				isNotNull (
+					pagePart)
+			) {
+
+				pagePart.renderHtmlBodyContent (
+					taskLogger);
 
 			}
-
-		} else if (
-			isNotNull (
-				pagePart)
-		) {
-
-			pagePart.renderHtmlBodyContent (
-				taskLogger);
 
 		}
 

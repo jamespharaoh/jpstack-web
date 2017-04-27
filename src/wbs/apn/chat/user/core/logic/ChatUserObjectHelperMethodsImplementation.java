@@ -7,8 +7,8 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -63,63 +63,69 @@ class ChatUserObjectHelperMethodsImplementation
 			@NonNull ChatRec chat,
 			@NonNull MessageRec message) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// resolve stuff
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		NumberRec number =
-			message.getNumber ();
+		) {
 
-		// check for an existing ChatUser
+			// resolve stuff
 
-		ChatUserRec chatUser =
-			chatUserHelper.find (
-				chat,
-				number);
+			NumberRec number =
+				message.getNumber ();
 
-		if (chatUser != null) {
+			// check for an existing ChatUser
 
-			// check number
-
-			if (
-
-				! chatNumberReportLogic.isNumberReportSuccessful (
-					taskLogger,
-					number)
-
-				&& isNull (
-					number.getArchiveDate ())
-
-			) {
-
-				taskLogger.debugFormat (
-					"Number archiving %s code %s",
-					number.getNumber (),
-					chatUser.getCode ());
-
-				NumberRec newNumber =
-					numberLogic.archiveNumberFromMessage (
-						taskLogger,
-						message);
-
-				return create (
-					taskLogger,
+			ChatUserRec chatUser =
+				chatUserHelper.find (
 					chat,
-					newNumber);
+					number);
+
+			if (chatUser != null) {
+
+				// check number
+
+				if (
+
+					! chatNumberReportLogic.isNumberReportSuccessful (
+						taskLogger,
+						number)
+
+					&& isNull (
+						number.getArchiveDate ())
+
+				) {
+
+					taskLogger.debugFormat (
+						"Number archiving %s code %s",
+						number.getNumber (),
+						chatUser.getCode ());
+
+					NumberRec newNumber =
+						numberLogic.archiveNumberFromMessage (
+							taskLogger,
+							message);
+
+					return create (
+						taskLogger,
+						chat,
+						newNumber);
+
+				}
+
+				return chatUser;
 
 			}
 
-			return chatUser;
+			return create (
+				taskLogger,
+				chat,
+				number);
 
 		}
-
-		return create (
-			taskLogger,
-			chat,
-			number);
 
 	}
 
@@ -130,25 +136,31 @@ class ChatUserObjectHelperMethodsImplementation
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// check for an existing ChatUser
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		ChatUserRec chatUser =
-			chatUserHelper.find (
+		) {
+
+			// check for an existing ChatUser
+
+			ChatUserRec chatUser =
+				chatUserHelper.find (
+					chat,
+					number);
+
+			if (chatUser != null)
+				return chatUser;
+
+			return create (
+				taskLogger,
 				chat,
 				number);
 
-		if (chatUser != null)
-			return chatUser;
-
-		return create (
-			taskLogger,
-			chat,
-			number);
+		}
 
 	}
 
@@ -159,56 +171,62 @@ class ChatUserObjectHelperMethodsImplementation
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"create");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"create");
 
-		// create him
+		) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.createInstance ()
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			.setChat (
-				chat)
+			// create him
 
-			.setCode (
-				randomLogic.generateNumericNoZero (6))
+			ChatUserRec chatUser =
+				chatUserHelper.createInstance ()
 
-			.setCreated (
-				transaction.now ())
+				.setChat (
+					chat)
 
-			.setNumber (
-				number)
+				.setCode (
+					randomLogic.generateNumericNoZero (6))
 
-			.setOldNumber (
-				number)
+				.setCreated (
+					transaction.now ())
 
-			.setType (
-				ChatUserType.user)
+				.setNumber (
+					number)
 
-			.setDeliveryMethod (
-				ChatMessageMethod.sms)
+				.setOldNumber (
+					number)
 
-			.setGender (
-				chat.getGender ())
+				.setType (
+					ChatUserType.user)
 
-			.setOrient (
-				chat.getOrient ())
+				.setDeliveryMethod (
+					ChatMessageMethod.sms)
 
-			.setCreditMode (
-				number.getFree ()
-					? ChatUserCreditMode.free
-					: ChatUserCreditMode.billedMessages);
+				.setGender (
+					chat.getGender ())
 
-		chatUserHelper.insert (
-			taskLogger,
-			chatUser);
+				.setOrient (
+					chat.getOrient ())
 
-		return chatUser;
+				.setCreditMode (
+					number.getFree ()
+						? ChatUserCreditMode.free
+						: ChatUserCreditMode.billedMessages);
+
+			chatUserHelper.insert (
+				taskLogger,
+				chatUser);
+
+			return chatUser;
+
+		}
 
 	}
 

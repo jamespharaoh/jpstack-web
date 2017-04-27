@@ -77,118 +77,124 @@ class ChatUserAdminDeletePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// can't delete monitors
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		if (chatUser.getType () != ChatUserType.user) {
+		) {
 
-			formatWriter.writeLineFormat (
-				"<p>Monitors can not be deleted.</p>");
+			// can't delete monitors
 
-			return;
+			if (chatUser.getType () != ChatUserType.user) {
 
-		}
+				formatWriter.writeLineFormat (
+					"<p>Monitors can not be deleted.</p>");
 
-		// information about this user
+				return;
 
-		htmlTableOpenDetails ();
+			}
 
-		htmlTableDetailsRowWrite (
-			"User ID",
-			integerToDecimalString (
-				chatUser.getId ()));
+			// information about this user
 
-		htmlTableDetailsRowWrite (
-			"Code",
-			chatUser.getCode ());
+			htmlTableOpenDetails ();
 
-		htmlTableDetailsRowWriteRaw (
-			"Number",
-			() -> consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				chatUser.getOldNumber ()));
+			htmlTableDetailsRowWrite (
+				"User ID",
+				integerToDecimalString (
+					chatUser.getId ()));
 
-		htmlTableDetailsRowWrite (
-			"Deleted",
-			booleanToYesNo (
+			htmlTableDetailsRowWrite (
+				"Code",
+				chatUser.getCode ());
+
+			htmlTableDetailsRowWriteRaw (
+				"Number",
+				() -> consoleObjectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					chatUser.getOldNumber ()));
+
+			htmlTableDetailsRowWrite (
+				"Deleted",
+				booleanToYesNo (
+					isNotNull (
+						chatUser.getNumber ())));
+
+			htmlTableClose ();
+
+			// general information
+
+			formatWriter.writeFormat (
+				"<p>The delete function simply removes the connection between the ",
+				"user and their phone number. This appears to the customer as if ",
+				"their profile has gone, while still allowing us to view ",
+				"historical information in the console.</p>");
+
+			// action button, or excuse for having none
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.delete"));
+
+			if (
 				isNotNull (
-					chatUser.getNumber ())));
+					chatUser.getNumber ())
+			) {
 
-		htmlTableClose ();
+				formatWriter.writeLineFormat (
+					"<p><input",
+					" type=\"submit\"",
+					" name=\"deleteUser\"",
+					" value=\"delete user\"",
+					"></p>");
 
-		// general information
+			} else if (allOf (
 
-		formatWriter.writeFormat (
-			"<p>The delete function simply removes the connection between the ",
-			"user and their phone number. This appears to the customer as if ",
-			"their profile has gone, while still allowing us to view ",
-			"historical information in the console.</p>");
+				() -> isNotNull (
+					chatUser.getOldNumber ()),
 
-		// action button, or excuse for having none
+				() -> isNull (
+					newChatUser)
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.delete"));
+			)) {
 
-		if (
-			isNotNull (
-				chatUser.getNumber ())
-		) {
+				formatWriter.writeLineFormat (
+					"<p><input",
+					" type=\"submit\"",
+					" name=\"undeleteUser\"",
+					" value=\"undelete user\"",
+					"></p>");
 
-			formatWriter.writeLineFormat (
-				"<p><input",
-				" type=\"submit\"",
-				" name=\"deleteUser\"",
-				" value=\"delete user\"",
-				"></p>");
+			} else if (allOf (
 
-		} else if (allOf (
+				() -> isNull (
+					chatUser.getOldNumber ()),
 
-			() -> isNotNull (
-				chatUser.getOldNumber ()),
+				() -> isNotNull (
+					newChatUser)
 
-			() -> isNull (
-				newChatUser)
+			)) {
 
-		)) {
+				formatWriter.writeLineFormat (
+					"<p>This user cannot be undeleted, because there is a new ",
+					"chat user profile with the same number.</p>");
 
-			formatWriter.writeLineFormat (
-				"<p><input",
-				" type=\"submit\"",
-				" name=\"undeleteUser\"",
-				" value=\"undelete user\"",
-				"></p>");
+			} else if (
+				isNull (chatUser.getOldNumber ())
+			) {
 
-		} else if (allOf (
+				formatWriter.writeLineFormat (
+					"<p>This user cannot be undeleted because the phone number ",
+					"it was associated with has been deleted from the ",
+					"system.</p>");
 
-			() -> isNull (
-				chatUser.getOldNumber ()),
+			}
 
-			() -> isNotNull (
-				newChatUser)
-
-		)) {
-
-			formatWriter.writeLineFormat (
-				"<p>This user cannot be undeleted, because there is a new ",
-				"chat user profile with the same number.</p>");
-
-		} else if (
-			isNull (chatUser.getOldNumber ())
-		) {
-
-			formatWriter.writeLineFormat (
-				"<p>This user cannot be undeleted because the phone number ",
-				"it was associated with has been deleted from the ",
-				"system.</p>");
+			htmlFormClose ();
 
 		}
-
-		htmlFormClose ();
 
 	}
 

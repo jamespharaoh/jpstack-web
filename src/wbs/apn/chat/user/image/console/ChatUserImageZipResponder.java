@@ -10,14 +10,19 @@ import java.util.zip.ZipOutputStream;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.io.RuntimeIoException;
+
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
 
 @PrototypeComponent ("chatUserImageZipResponder")
 public
@@ -25,6 +30,9 @@ class ChatUserImageZipResponder
 	extends ConsoleResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -49,15 +57,27 @@ class ChatUserImageZipResponder
 
 	@Override
 	public
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"application/zip");
+		try (
 
-		requestContext.setHeader (
-			"Content-Disposition",
-			"download; filename=photos.zip");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"application/zip");
+
+			requestContext.setHeader (
+				"Content-Disposition",
+				"download; filename=photos.zip");
+
+		}
 
 	}
 
@@ -66,11 +86,13 @@ class ChatUserImageZipResponder
 	void render (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		try {
+		try (
 
 			ZipOutputStream zipOutputStream =
 				new ZipOutputStream (
 					requestContext.outputStream ());
+
+		) {
 
 			zipOutputStream.setMethod (
 				ZipOutputStream.STORED);

@@ -37,8 +37,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -94,9 +94,9 @@ class ChatUserOnlinePart
 
 	// state
 
-	Transaction transaction;
+	BorrowedTransaction transaction;
 
-	Collection<ChatUserRec> users;
+	Collection <ChatUserRec> users;
 
 	ConsoleContextType targetContextType;
 	ConsoleContext targetContext;
@@ -146,35 +146,41 @@ class ChatUserOnlinePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
+		) {
 
-		users =
-			new TreeSet<> (
-				ChatUserOnlineComparator.INSTANCE);
+			transaction =
+				database.currentTransaction ();
 
-		users.addAll (
-			chatUserHelper.findOnline (
-				chat));
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
 
-		targetContextType =
-			consoleManager.contextType (
-				"chatUser:combo",
-				true);
+			users =
+				new TreeSet<> (
+					ChatUserOnlineComparator.INSTANCE);
 
-		targetContext =
-			consoleManager.relatedContextRequired (
-				taskLogger,
-				requestContext.consoleContextRequired (),
-				targetContextType);
+			users.addAll (
+				chatUserHelper.findOnline (
+					chat));
+
+			targetContextType =
+				consoleManager.contextType (
+					"chatUser:combo",
+					true);
+
+			targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					targetContextType);
+
+		}
 
 	}
 
@@ -183,123 +189,129 @@ class ChatUserOnlinePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"User",
-			"T",
-			"G",
-			"O",
-			"Name",
-			"Pic",
-			"Info",
-			"Loc",
-			"Idle");
-
-		for (
-			ChatUserRec chatUser
-				: users
 		) {
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"magic-table-row"),
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveContextUrlFormat (
-						"%s",
-						targetContext.pathPrefix (),
-						"/%u",
-						integerToDecimalString (
-							chatUser.getId ()))));
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatUser.getCode ());
+			htmlTableHeaderRowWrite (
+				"User",
+				"T",
+				"G",
+				"O",
+				"Name",
+				"Pic",
+				"Info",
+				"Loc",
+				"Idle");
 
-			chatConsoleLogic.writeTdForChatUserTypeShort (
-				chatUser);
-
-			chatConsoleLogic.writeTdForChatUserGenderShort (
-				chatUser);
-
-			chatConsoleLogic.writeTdForChatUserOrientShort (
-				chatUser);
-
-			htmlTableCellWriteHtml (
-				ifNotNullThenElseEmDash (
-					chatUser.getName (),
-					() -> htmlEncodeNonBreakingWhitespace (
-						chatUser.getName ())));
-
-			if (! chatUser.getChatUserImageList ().isEmpty ()) {
-
-				htmlTableCellOpen ();
-
-				mediaConsoleLogic.writeMediaThumb32 (
-					taskLogger,
-					chatUser.getChatUserImageList ().get (0).getMedia ());
-
-				htmlTableCellClose ();
-
-			} else {
-
-				htmlTableCellWrite (
-					"—");
-
-			}
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUser.getInfoText (),
-					() -> spacify (
-						chatUser.getInfoText ().getText ())));
-
-			String placeName =
-				"—";
-
-			if (chatUser.getLocationLongLat () != null) {
-
-				GazetteerEntryRec gazetteerEntry =
-					gazetteerLogic.findNearestCanonicalEntry (
-						chatUser.getChat ().getGazetteer (),
-						chatUser.getLocationLongLat ());
-
-				placeName =
-					gazetteerEntry.getName ();
-
-			}
-
-			htmlTableCellWrite (
-				placeName);
-
-			if (
-				isNotNull (
-					chatUser.getLastAction ())
+			for (
+				ChatUserRec chatUser
+					: users
 			) {
 
-				htmlTableCellWriteHtml (
-					htmlEncodeNonBreakingWhitespace (
-						timeFormatter.prettyDuration (
-							chatUser.getLastAction (),
-							transaction.now ())));
-
-			} else {
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"magic-table-row"),
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveContextUrlFormat (
+							"%s",
+							targetContext.pathPrefix (),
+							"/%u",
+							integerToDecimalString (
+								chatUser.getId ()))));
 
 				htmlTableCellWrite (
-					"—");
+					chatUser.getCode ());
+
+				chatConsoleLogic.writeTdForChatUserTypeShort (
+					chatUser);
+
+				chatConsoleLogic.writeTdForChatUserGenderShort (
+					chatUser);
+
+				chatConsoleLogic.writeTdForChatUserOrientShort (
+					chatUser);
+
+				htmlTableCellWriteHtml (
+					ifNotNullThenElseEmDash (
+						chatUser.getName (),
+						() -> htmlEncodeNonBreakingWhitespace (
+							chatUser.getName ())));
+
+				if (! chatUser.getChatUserImageList ().isEmpty ()) {
+
+					htmlTableCellOpen ();
+
+					mediaConsoleLogic.writeMediaThumb32 (
+						taskLogger,
+						chatUser.getChatUserImageList ().get (0).getMedia ());
+
+					htmlTableCellClose ();
+
+				} else {
+
+					htmlTableCellWrite (
+						"—");
+
+				}
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatUser.getInfoText (),
+						() -> spacify (
+							chatUser.getInfoText ().getText ())));
+
+				String placeName =
+					"—";
+
+				if (chatUser.getLocationLongLat () != null) {
+
+					GazetteerEntryRec gazetteerEntry =
+						gazetteerLogic.findNearestCanonicalEntry (
+							chatUser.getChat ().getGazetteer (),
+							chatUser.getLocationLongLat ());
+
+					placeName =
+						gazetteerEntry.getName ();
+
+				}
+
+				htmlTableCellWrite (
+					placeName);
+
+				if (
+					isNotNull (
+						chatUser.getLastAction ())
+				) {
+
+					htmlTableCellWriteHtml (
+						htmlEncodeNonBreakingWhitespace (
+							timeFormatter.prettyDuration (
+								chatUser.getLastAction (),
+								transaction.now ())));
+
+				} else {
+
+					htmlTableCellWrite (
+						"—");
+
+				}
+
+				htmlTableRowClose ();
 
 			}
 
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

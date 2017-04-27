@@ -78,105 +78,111 @@ class ObjectContextMetaBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// extension points
+		) {
 
-		metaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+			setDefaults ();
 
-			.name (
-				contextTypeName + ":list")
+			// extension points
 
-			.contextTypeNames (
-				listContextTypeNames)
+			metaModule.addExtensionPoint (
+				rootExtensionPointProvider.get ()
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+				.name (
+					contextTypeName + ":list")
 
-			.parentContextNames (
-				ImmutableList.<String>of (
-					naivePluralise (
-						contextTypeName),
-					contextTypeName))
+				.contextTypeNames (
+					listContextTypeNames)
 
-		);
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						contextTypeName))
 
-		metaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+				.parentContextNames (
+					ImmutableList.<String>of (
+						naivePluralise (
+							contextTypeName),
+						contextTypeName))
 
-			.name (
-				contextTypeName + ":object")
+			);
 
-			.contextTypeNames (
-				objectContextTypeNames)
+			metaModule.addExtensionPoint (
+				rootExtensionPointProvider.get ()
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+				.name (
+					contextTypeName + ":object")
 
-			.parentContextNames (
-				ImmutableList.<String>of (
-					contextTypeName,
-					"link:" + contextTypeName))
+				.contextTypeNames (
+					objectContextTypeNames)
 
-		);
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						contextTypeName))
 
-		// context hints
+				.parentContextNames (
+					ImmutableList.<String>of (
+						contextTypeName,
+						"link:" + contextTypeName))
 
-		metaModule.addContextHint (
-			new ConsoleContextHint ()
+			);
 
-			.linkName (
-				contextTypeName)
+			// context hints
 
-			.singular (
-				true)
+			metaModule.addContextHint (
+				new ConsoleContextHint ()
 
-			.plural (
-				true)
+				.linkName (
+					contextTypeName)
 
-		);
+				.singular (
+					true)
 
-		// descend
+				.plural (
+					true)
 
-		ConsoleContextMetaBuilderContainer listContainer =
-			new ConsoleContextMetaBuilderContainer ()
+			);
 
-			.structuralName (
-				contextTypeName)
+			// descend
 
-			.extensionPointName (
-				contextTypeName + ":list");
+			ConsoleContextMetaBuilderContainer listContainer =
+				new ConsoleContextMetaBuilderContainer ()
 
-		builder.descend (
-			taskLogger,
-			listContainer,
-			spec.listChildren (),
-			metaModule,
-			MissingBuilderBehaviour.ignore);
+				.structuralName (
+					contextTypeName)
 
-		ConsoleContextMetaBuilderContainer objectContainer =
-			new ConsoleContextMetaBuilderContainer ()
+				.extensionPointName (
+					contextTypeName + ":list");
 
-			.structuralName (
-				contextTypeName)
+			builder.descend (
+				taskLogger,
+				listContainer,
+				spec.listChildren (),
+				metaModule,
+				MissingBuilderBehaviour.ignore);
 
-			.extensionPointName (
-				contextTypeName + ":object");
+			ConsoleContextMetaBuilderContainer objectContainer =
+				new ConsoleContextMetaBuilderContainer ()
 
-		builder.descend (
-			taskLogger,
-			objectContainer,
-			spec.objectChildren (),
-			metaModule,
-			MissingBuilderBehaviour.ignore);
+				.structuralName (
+					contextTypeName)
+
+				.extensionPointName (
+					contextTypeName + ":object");
+
+			builder.descend (
+				taskLogger,
+				objectContainer,
+				spec.objectChildren (),
+				metaModule,
+				MissingBuilderBehaviour.ignore);
+
+		}
 
 	}
 

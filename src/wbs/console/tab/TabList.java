@@ -167,50 +167,56 @@ class TabList {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Tab currentTab) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		Prepared prepared =
-			new Prepared ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		boolean foundCurrent = false;
+		) {
 
-		for (TabRef tabRef
-				: tabRefs) {
+			Prepared prepared =
+				new Prepared ();
 
-			if (tabRef.getTab () == currentTab) {
+			boolean foundCurrent = false;
 
-				foundCurrent = true;
+			for (TabRef tabRef
+					: tabRefs) {
 
-			} else if (! tabRef.getTab ().isAvailable ()) {
+				if (tabRef.getTab () == currentTab) {
 
-				continue;
+					foundCurrent = true;
+
+				} else if (! tabRef.getTab ().isAvailable ()) {
+
+					continue;
+
+				}
+
+				prepared.preparedTabs.add (
+					new PreparedTab (
+						tabRef.getTab ().getUrl (
+							taskLogger),
+						tabRef.getLabel (),
+						tabRef.getTab () == currentTab));
 
 			}
 
-			prepared.preparedTabs.add (
-				new PreparedTab (
-					tabRef.getTab ().getUrl (
-						taskLogger),
-					tabRef.getLabel (),
-					tabRef.getTab () == currentTab));
+			if (! foundCurrent) {
+
+				prepared.preparedTabs.add (
+					new PreparedTab (
+						currentTab.getUrl (
+							taskLogger),
+						currentTab.getDefaultLabel (),
+						true));
+
+			}
+
+			return prepared;
 
 		}
-
-		if (! foundCurrent) {
-
-			prepared.preparedTabs.add (
-				new PreparedTab (
-					currentTab.getUrl (
-						taskLogger),
-					currentTab.getDefaultLabel (),
-					true));
-
-		}
-
-		return prepared;
 
 	}
 

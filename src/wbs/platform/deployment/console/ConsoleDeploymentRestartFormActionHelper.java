@@ -14,7 +14,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -58,26 +58,32 @@ class ConsoleDeploymentRestartFormActionHelper
 	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canBePerformed");
+		try (
 
-		ConsoleDeploymentRec consoleDeployment =
-			consoleDeploymentHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canBePerformed");
 
-		boolean show =
-			userPrivChecker.canRecursive (
-				taskLogger,
-				consoleDeployment,
-				"restart");
+		) {
 
-		boolean enable =
-			! consoleDeployment.getRestart ();
+			ConsoleDeploymentRec consoleDeployment =
+				consoleDeploymentHelper.findFromContextRequired ();
 
-		return new Permissions ()
-			.canView (show)
-			.canPerform (enable);
+			boolean show =
+				userPrivChecker.canRecursive (
+					taskLogger,
+					consoleDeployment,
+					"restart");
+
+			boolean enable =
+				! consoleDeployment.getRestart ();
+
+			return new Permissions ()
+				.canView (show)
+				.canPerform (enable);
+
+		}
 
 	}
 
@@ -111,51 +117,57 @@ class ConsoleDeploymentRestartFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Object formState) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		// load data
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		ConsoleDeploymentRec consoleDeployment =
-			consoleDeploymentHelper.findFromContextRequired ();
+		) {
 
-		// check state
+			// load data
 
-		if (consoleDeployment.getRestart ()) {
+			ConsoleDeploymentRec consoleDeployment =
+				consoleDeploymentHelper.findFromContextRequired ();
+
+			// check state
+
+			if (consoleDeployment.getRestart ()) {
+
+				requestContext.addNotice (
+					"Restart already scheduled for this console deployment");
+
+				return optionalAbsent ();
+
+			}
+
+			// perform update
+
+			consoleDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"console_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				consoleDeployment);
+
+			// commit and return
+
+			transaction.commit ();
 
 			requestContext.addNotice (
-				"Restart already scheduled for this console deployment");
+				"Console deployment restart triggered");
 
 			return optionalAbsent ();
 
 		}
-
-		// perform update
-
-		consoleDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"console_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			consoleDeployment);
-
-		// commit and return
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Console deployment restart triggered");
-
-		return optionalAbsent ();
 
 	}
 

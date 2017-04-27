@@ -14,7 +14,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -58,26 +58,32 @@ class ApiDeploymentRestartFormActionHelper
 	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"canBePerformed");
+		try (
 
-		ApiDeploymentRec apiDeployment =
-			apiDeploymentHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"canBePerformed");
 
-		boolean show =
-			userPrivChecker.canRecursive (
-				taskLogger,
-				apiDeployment,
-				"restart");
+		) {
 
-		boolean enable =
-			! apiDeployment.getRestart ();
+			ApiDeploymentRec apiDeployment =
+				apiDeploymentHelper.findFromContextRequired ();
 
-		return new Permissions ()
-			.canView (show)
-			.canPerform (enable);
+			boolean show =
+				userPrivChecker.canRecursive (
+					taskLogger,
+					apiDeployment,
+					"restart");
+
+			boolean enable =
+				! apiDeployment.getRestart ();
+
+			return new Permissions ()
+				.canView (show)
+				.canPerform (enable);
+
+		}
 
 	}
 
@@ -111,51 +117,57 @@ class ApiDeploymentRestartFormActionHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Object formState) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		// load data
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		ApiDeploymentRec apiDeployment =
-			apiDeploymentHelper.findFromContextRequired ();
+		) {
 
-		// check state
+			// load data
 
-		if (apiDeployment.getRestart ()) {
+			ApiDeploymentRec apiDeployment =
+				apiDeploymentHelper.findFromContextRequired ();
+
+			// check state
+
+			if (apiDeployment.getRestart ()) {
+
+				requestContext.addNotice (
+					"Restart already scheduled for this API deployment");
+
+				return optionalAbsent ();
+
+			}
+
+			// perform update
+
+			apiDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"api_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				apiDeployment);
+
+			// commit and return
+
+			transaction.commit ();
 
 			requestContext.addNotice (
-				"Restart already scheduled for this API deployment");
+				"API deployment restart triggered");
 
 			return optionalAbsent ();
 
 		}
-
-		// perform update
-
-		apiDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"api_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			apiDeployment);
-
-		// commit and return
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"API deployment restart triggered");
-
-		return optionalAbsent ();
 
 	}
 

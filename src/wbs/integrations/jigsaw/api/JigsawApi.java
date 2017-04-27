@@ -1,5 +1,10 @@
 package wbs.integrations.jigsaw.api;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.utf8ToString;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -8,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -22,9 +27,21 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-@Log4j
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.io.RuntimeIoException;
+
+@PrototypeComponent ("jigsawApi")
 public
 class JigsawApi {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	public
 	String getUrl () {
@@ -86,15 +103,31 @@ class JigsawApi {
 	@SuppressWarnings ("unchecked")
 	public
 	void pushServer (
-			PushRequest request) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PushRequest request) {
 
-		try {
+		try (
 
-			log.debug ("Preparing request to " + url);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"pushServer");
+
+		) {
+
+			taskLogger.debugFormat (
+				"Preparing request to %s",
+				url);
 
 			// prepare json
-			JSONObject obj = new JSONObject ();
-			obj.put ("applicationIdentifier", request.applicationIdentifier);
+
+			JSONObject obj =
+				new JSONObject ();
+
+			obj.put (
+				"applicationIdentifier",
+				request.applicationIdentifier);
+
 			JSONArray tokens = new JSONArray ();
 			for (String token : request.tokens)
 				tokens.add (token);
@@ -112,13 +145,32 @@ class JigsawApi {
 				message.put ("customProperties", customProperties);
 			}
 			obj.put ("message", message);
-			Writer stringWriter = new StringWriter ();
-			obj.writeJSONString (stringWriter);
+
+			Writer stringWriter =
+				new StringWriter ();
+
+			try {
+
+				obj.writeJSONString (
+					stringWriter);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
 			String json = stringWriter.toString ();
 
 			// output json (for debugging)
-			if (log.isDebugEnabled ()) {
-				log.debug ("Request entity: " + json);
+
+			if (taskLogger.debugEnabled ()) {
+
+				taskLogger.debugFormat (
+					"Request entity: %s",
+					json);
+
 			}
 
 			// make call
@@ -135,40 +187,93 @@ class JigsawApi {
 					new HttpPost (url);
 
 				StringEntity postEntity =
-					new StringEntity (json, "utf-8");
+					new StringEntity (
+						json,
+						"utf-8");
 
-				postEntity.setContentType ("application/json");
+				postEntity.setContentType (
+					"application/json");
 
-				post.setEntity (postEntity);
+				post.setEntity (
+					postEntity);
 
-				HttpResponse response =
-					httpClient.execute (post);
+				try (
 
-				// output response (for debugging)
-				if (log.isDebugEnabled ()) {
-					HttpEntity responseEntity = response.getEntity ();
-					byte[] responseBytes = IOUtils.toByteArray (responseEntity.getContent ());
-					log.debug ("Response entity " + new String (responseBytes, "utf-8"));
+					CloseableHttpResponse response =
+						httpClient.execute (
+							post);
+
+				) {
+
+					// output response (for debugging)
+
+					if (taskLogger.debugEnabled ()) {
+
+						HttpEntity responseEntity =
+							response.getEntity ();
+
+						byte[] responseBytes =
+							IOUtils.toByteArray (
+								responseEntity.getContent ());
+
+						taskLogger.debugFormat (
+							"Response entity %s",
+							utf8ToString (
+								responseBytes));
+
+					}
+
+					// check status
+
+					int status =
+						response.getStatusLine ().getStatusCode ();
+
+					if (status != 200) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Jigsaw API call failed with status code %s",
+								integerToDecimalString (
+									status)));
+
+					}
+
+					for (
+						String token
+							: request.tokens
+					) {
+
+						taskLogger.noticeFormat (
+							"Jigsaw push notification sent to %s: %s",
+							request.applicationIdentifier,
+							token);
+
+					}
+
 				}
 
-				// check status
-				int status = response.getStatusLine ().getStatusCode ();
-				if (status != 200) {
-					throw new RuntimeException ("Jigsaw API call failed with status code " + status);
+			} catch (Exception e) {
+
+				for (
+					String token
+						: request.tokens
+				) {
+
+					taskLogger.warningFormat (
+						"Jigsaw push notification failed to %s: %s",
+						request.applicationIdentifier,
+						token);
+
 				}
 
-				for (String token : request.tokens) {
-					log.info ("Jigsaw push notification sent to " + request.applicationIdentifier + ": " + token);
-				}
+				throw new RuntimeException (
+					"Unable to contact Jigsaw server",
+					e);
 
 			}
 
-		} catch (Exception e) {
-			for (String token : request.tokens) {
-				log.warn ("Jigsaw push notification failed to " + request.applicationIdentifier + ": " + token);
-			}
-			throw new RuntimeException ("Unable to contact Jigsaw server", e);
 		}
+
 	}
 
 }

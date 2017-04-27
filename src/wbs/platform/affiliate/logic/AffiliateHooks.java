@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -56,14 +56,14 @@ class AffiliateHooks
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"AffiliateHooks.init ()",
@@ -107,45 +107,51 @@ class AffiliateHooks
 			return;
 		}
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSingletons");
+		try (
 
-		ObjectTypeRec parentType =
-			objectTypeDao.findById (
-				parentHelper.objectTypeId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSingletons");
 
-		for (
-			Long affiliateTypeId
-				: affiliateTypeIdsByParentTypeId.get (
-					parentHelper.objectTypeId ())
 		) {
 
-			AffiliateTypeRec affiliateType =
-				affiliateTypeDao.findRequired (
-					affiliateTypeId);
+			ObjectTypeRec parentType =
+				objectTypeDao.findById (
+					parentHelper.objectTypeId ());
 
-			affiliateHelper.insert (
-				taskLogger,
-				affiliateHelper.createInstance ()
+			for (
+				Long affiliateTypeId
+					: affiliateTypeIdsByParentTypeId.get (
+						parentHelper.objectTypeId ())
+			) {
 
-				.setAffiliateType (
-					affiliateType)
+				AffiliateTypeRec affiliateType =
+					affiliateTypeDao.findRequired (
+						affiliateTypeId);
 
-				.setCode (
-					affiliateType.getCode ())
+				affiliateHelper.insert (
+					taskLogger,
+					affiliateHelper.createInstance ()
 
-				.setDescription (
-					affiliateType.getDescription ())
+					.setAffiliateType (
+						affiliateType)
 
-				.setParentType (
-					parentType)
+					.setCode (
+						affiliateType.getCode ())
 
-				.setParentId (
-					parent.getId ())
+					.setDescription (
+						affiliateType.getDescription ())
 
-			);
+					.setParentType (
+						parentType)
+
+					.setParentId (
+						parent.getId ())
+
+				);
+
+			}
 
 		}
 

@@ -19,7 +19,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -31,6 +33,11 @@ import fj.data.Either;
 public
 class TextFormFieldRenderer <Container>
 	implements FormFieldRenderer <Container, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -195,18 +202,30 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull String formName) {
 
-		javascriptWriter.writeLineFormat (
-			"$(\"%j\").val (\"%j\");",
-			stringFormat (
-				"#%s\\.%s",
-				formName,
-				name),
-			interfaceValue.or (""));
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderFormReset");
+
+		) {
+
+			javascriptWriter.writeLineFormat (
+				"$(\"%j\").val (\"%j\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
+				interfaceValue.or (""));
+
+		}
 
 	}
 

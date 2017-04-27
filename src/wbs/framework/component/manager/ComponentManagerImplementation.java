@@ -642,88 +642,94 @@ class ComponentManagerImplementation
 			@NonNull Object component,
 			@NonNull ComponentMetaDataImplementation componentMetaData) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"initializeComponent");
+		try (
 
-		synchronized (componentMetaData) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initializeComponent");
 
-			if (
-				enumNotEqualSafe (
-					componentMetaData.state,
-					ComponentState.uninitialized)
-			) {
+		) {
 
-				throw new IllegalStateException (
-					stringFormat (
-						"Tried to initialize component %s ",
-						componentMetaData.definition.name (),
-						"in %s state",
-						componentMetaData.state.name ()));
-
-			}
-
-			try {
-
-				// run eager lifecycle setup
-
-				for (
-					Method method
-						: component.getClass ().getMethods ()
-				) {
-
-					NormalLifecycleSetup eagerLifecycleSetupAnnotation =
-						method.getAnnotation (
-							NormalLifecycleSetup.class);
-
-					if (
-						isNull (
-							eagerLifecycleSetupAnnotation)
-					) {
-						continue;
-					}
-
-					taskLogger.debugFormat (
-						stringFormat (
-							"Running eager lifecycle setup method %s.%s",
-							componentDefinition.name (),
-							method.getName ()));
-
-					if (method.getParameterCount () == 0) {
-
-						methodInvoke (
-							method,
-							component);
-
-					} else if (method.getParameterCount () == 1) {
-
-						methodInvoke (
-							method,
-							component,
-							taskLogger);
-
-					} else {
-
-						throw new RuntimeException ();
-
-					}
-
-				}
-
-				componentMetaData.state =
-					ComponentState.active;
-
-			} finally {
+			synchronized (componentMetaData) {
 
 				if (
 					enumNotEqualSafe (
 						componentMetaData.state,
-						ComponentState.active)
+						ComponentState.uninitialized)
 				) {
 
+					throw new IllegalStateException (
+						stringFormat (
+							"Tried to initialize component %s ",
+							componentMetaData.definition.name (),
+							"in %s state",
+							componentMetaData.state.name ()));
+
+				}
+
+				try {
+
+					// run eager lifecycle setup
+
+					for (
+						Method method
+							: component.getClass ().getMethods ()
+					) {
+
+						NormalLifecycleSetup eagerLifecycleSetupAnnotation =
+							method.getAnnotation (
+								NormalLifecycleSetup.class);
+
+						if (
+							isNull (
+								eagerLifecycleSetupAnnotation)
+						) {
+							continue;
+						}
+
+						taskLogger.debugFormat (
+							stringFormat (
+								"Running eager lifecycle setup method %s.%s",
+								componentDefinition.name (),
+								method.getName ()));
+
+						if (method.getParameterCount () == 0) {
+
+							methodInvoke (
+								method,
+								component);
+
+						} else if (method.getParameterCount () == 1) {
+
+							methodInvoke (
+								method,
+								component,
+								taskLogger);
+
+						} else {
+
+							throw new RuntimeException ();
+
+						}
+
+					}
+
 					componentMetaData.state =
-						ComponentState.error;
+						ComponentState.active;
+
+				} finally {
+
+					if (
+						enumNotEqualSafe (
+							componentMetaData.state,
+							ComponentState.active)
+					) {
+
+						componentMetaData.state =
+							ComponentState.error;
+
+					}
 
 				}
 
@@ -771,12 +777,12 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setComponentValueProperties");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setComponentValueProperties");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -810,12 +816,12 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setComponentReferenceProperties");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setComponentReferenceProperties");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -855,12 +861,12 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setComponentInjectedProperties");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setComponentInjectedProperties");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -887,7 +893,9 @@ class ComponentManagerImplementation
 	private static
 	class Injection {
 
+		@SuppressWarnings ("unused")
 		String componentName;
+
 		Object component;
 
 		InjectedProperty injectedProperty;
@@ -907,213 +915,219 @@ class ComponentManagerImplementation
 			@NonNull Object component,
 			@NonNull InjectedProperty injectedProperty) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"injectProperty");
+		try (
 
-		taskLogger.debugFormat (
-			"Setting injected property %s.%s",
-			classNameSimple (
-				injectedProperty.field ().getDeclaringClass ()),
-			injectedProperty.field ().getName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"injectProperty");
 
-		Injection injection =
-			new Injection ();
-
-		injection.componentName =
-			componentDefinition.name ();
-
-		injection.component =
-			component;
-
-		injection.injectedProperty =
-			injectedProperty;
-
-		injection.targetComponents =
-			iterableMapToList (
-				registry::byNameRequired,
-				injectedProperty.targetComponentNames ());
-
-		// define transformer
-
-		if (injectedProperty.prototype ()) {
-
-			injection.transformer =
-				provider -> provider;
-
-		} else {
-
-			injection.transformer =
-				provider -> provider.get ();
-
-		}
-
-		// define aggregator
-
-		if (
-			enumEqualSafe (
-				injectedProperty.collectionType (),
-				CollectionType.componentClassMap)
 		) {
 
-			injection.aggregator =
-				targetComponents -> {
+			taskLogger.debugFormat (
+				"Setting injected property %s.%s",
+				classNameSimple (
+					injectedProperty.field ().getDeclaringClass ()),
+				injectedProperty.field ().getName ());
 
-				Map <Class <?>, Object> componentClassMap =
-					new LinkedHashMap<> ();
+			Injection injection =
+				new Injection ();
 
-				for (
-					Pair <ComponentDefinition, Object> pair
-						: targetComponents
-				) {
+			injection.componentName =
+				componentDefinition.name ();
 
-					componentClassMap.put (
-						pair.getLeft ().componentClass (),
-						pair.getRight ());
+			injection.component =
+				component;
 
-				}
+			injection.injectedProperty =
+				injectedProperty;
 
-				return componentClassMap;
+			injection.targetComponents =
+				iterableMapToList (
+					registry::byNameRequired,
+					injectedProperty.targetComponentNames ());
 
-			};
+			// define transformer
 
-		} else if (
-			enumEqualSafe (
-				injectedProperty.collectionType (),
-				CollectionType.componentNameMap)
-		) {
+			if (injectedProperty.prototype ()) {
 
-			injection.aggregator =
-				targetComponents -> {
+				injection.transformer =
+					provider -> provider;
 
-				Map <String, Object> componentNameMap =
-					new LinkedHashMap<> ();
+			} else {
 
-				for (
-					Pair <ComponentDefinition, Object> pair
-						: targetComponents
-				) {
+				injection.transformer =
+					provider -> provider.get ();
 
-					componentNameMap.put (
-						pair.getLeft ().name (),
-						pair.getRight ());
+			}
 
-				}
+			// define aggregator
 
-				return componentNameMap;
-
-			};
-
-		} else if (
-			enumEqualSafe (
-				injectedProperty.collectionType (),
-				CollectionType.list)
-		) {
-
-			injection.aggregator =
-				targetComponents -> {
-
-				List <Object> componentsList =
-					new ArrayList <> ();
-
-				for (
-					Pair <ComponentDefinition, Object> pair
-						: targetComponents
-				) {
-
-					componentsList.add (
-						pair.getRight ());
-
-				}
-
-				return componentsList;
-
-			};
-
-		} else if (
-			enumEqualSafe (
-				injectedProperty.collectionType (),
-				CollectionType.single)
-		) {
-
-			injection.aggregator =
-				targetComponents -> {
-
-				if (targetComponents.size () != 1) {
-
-					throw new RuntimeExceptionWithTask (
-						activityManager.currentTask (),
-						stringFormat (
-							"Trying to inject %s ",
-							integerToDecimalString (
-								targetComponents.size ()),
-							"components into a single field %s.%s",
-							classNameSimple (
-								injectedProperty.field ().getDeclaringClass ()),
-							injectedProperty.field ().getName ()));
-
-				}
-
-				return targetComponents.get (0).getRight ();
-
-			};
-
-		} else {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask ());
-
-		}
-
-		if (injectedProperty.weak ()) {
-
-			injection.missingComponents =
-				injection.targetComponents.stream ()
-
-				.filter (
-					definition ->
-						doesNotContain (
-							singletonComponents.keySet (),
-							definition.name ()))
-
-				.map (
-					definition ->
-						definition.name ())
-
-				.collect (
-					Collectors.toSet ());
-
-		} else {
-
-			injection.missingComponents =
-				ImmutableSet.of ();
-
-		}
-
-		if (
-			collectionIsEmpty (
-				injection.missingComponents)
-		) {
-
-			performInjection (
-				taskLogger,
-				injection);
-
-		} else {
-
-			for (
-				String missingComponentName
-					: injection.missingComponents
+			if (
+				enumEqualSafe (
+					injectedProperty.collectionType (),
+					CollectionType.componentClassMap)
 			) {
 
-				List <Injection> injectionsByDependency =
-					pendingInjectionsByDependencyName.computeIfAbsent (
-						missingComponentName,
-						name -> new ArrayList<> ());
+				injection.aggregator =
+					targetComponents -> {
 
-				injectionsByDependency.add (
+					Map <Class <?>, Object> componentClassMap =
+						new LinkedHashMap<> ();
+
+					for (
+						Pair <ComponentDefinition, Object> pair
+							: targetComponents
+					) {
+
+						componentClassMap.put (
+							pair.getLeft ().componentClass (),
+							pair.getRight ());
+
+					}
+
+					return componentClassMap;
+
+				};
+
+			} else if (
+				enumEqualSafe (
+					injectedProperty.collectionType (),
+					CollectionType.componentNameMap)
+			) {
+
+				injection.aggregator =
+					targetComponents -> {
+
+					Map <String, Object> componentNameMap =
+						new LinkedHashMap<> ();
+
+					for (
+						Pair <ComponentDefinition, Object> pair
+							: targetComponents
+					) {
+
+						componentNameMap.put (
+							pair.getLeft ().name (),
+							pair.getRight ());
+
+					}
+
+					return componentNameMap;
+
+				};
+
+			} else if (
+				enumEqualSafe (
+					injectedProperty.collectionType (),
+					CollectionType.list)
+			) {
+
+				injection.aggregator =
+					targetComponents -> {
+
+					List <Object> componentsList =
+						new ArrayList <> ();
+
+					for (
+						Pair <ComponentDefinition, Object> pair
+							: targetComponents
+					) {
+
+						componentsList.add (
+							pair.getRight ());
+
+					}
+
+					return componentsList;
+
+				};
+
+			} else if (
+				enumEqualSafe (
+					injectedProperty.collectionType (),
+					CollectionType.single)
+			) {
+
+				injection.aggregator =
+					targetComponents -> {
+
+					if (targetComponents.size () != 1) {
+
+						throw new RuntimeExceptionWithTask (
+							activityManager.currentTask (),
+							stringFormat (
+								"Trying to inject %s ",
+								integerToDecimalString (
+									targetComponents.size ()),
+								"components into a single field %s.%s",
+								classNameSimple (
+									injectedProperty.field ().getDeclaringClass ()),
+								injectedProperty.field ().getName ()));
+
+					}
+
+					return targetComponents.get (0).getRight ();
+
+				};
+
+			} else {
+
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask ());
+
+			}
+
+			if (injectedProperty.weak ()) {
+
+				injection.missingComponents =
+					injection.targetComponents.stream ()
+
+					.filter (
+						definition ->
+							doesNotContain (
+								singletonComponents.keySet (),
+								definition.name ()))
+
+					.map (
+						definition ->
+							definition.name ())
+
+					.collect (
+						Collectors.toSet ());
+
+			} else {
+
+				injection.missingComponents =
+					ImmutableSet.of ();
+
+			}
+
+			if (
+				collectionIsEmpty (
+					injection.missingComponents)
+			) {
+
+				performInjection (
+					taskLogger,
 					injection);
+
+			} else {
+
+				for (
+					String missingComponentName
+						: injection.missingComponents
+				) {
+
+					List <Injection> injectionsByDependency =
+						pendingInjectionsByDependencyName.computeIfAbsent (
+							missingComponentName,
+							name -> new ArrayList<> ());
+
+					injectionsByDependency.add (
+						injection);
+
+				}
 
 			}
 
@@ -1126,35 +1140,41 @@ class ComponentManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Injection injection) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"performInjection");
+		try (
 
-		List <Pair <ComponentDefinition, Object>> unaggregatedValues =
-			iterableMapToList (
-				targetComponentDefinition ->
-					Pair.of (
-						targetComponentDefinition,
-						injection.transformer.apply (
-							getComponentProvider (
-								taskLogger,
-								targetComponentDefinition,
-								injection.injectedProperty.initialized ()))),
-				injection.targetComponents);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"performInjection");
 
-		Object aggregatedValue =
-			injection.aggregator.apply (
-				unaggregatedValues);
+		) {
 
-		Field field =
-			injection.injectedProperty.field ();
+			List <Pair <ComponentDefinition, Object>> unaggregatedValues =
+				iterableMapToList (
+					targetComponentDefinition ->
+						Pair.of (
+							targetComponentDefinition,
+							injection.transformer.apply (
+								getComponentProvider (
+									taskLogger,
+									targetComponentDefinition,
+									injection.injectedProperty.initialized ()))),
+					injection.targetComponents);
 
-		fieldSet (
-			field,
-			injection.component,
-			optionalOf (
-				aggregatedValue));
+			Object aggregatedValue =
+				injection.aggregator.apply (
+					unaggregatedValues);
+
+			Field field =
+				injection.injectedProperty.field ();
+
+			fieldSet (
+				field,
+				injection.component,
+				optionalOf (
+					aggregatedValue));
+
+		}
 
 	}
 
@@ -1387,19 +1407,19 @@ class ComponentManagerImplementation
 	public
 	void close () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"close ()");
-
-		taskLogger.noticeFormat (
-			"Closing component manager");
-
 		try (
+
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"close ()");
 
 			HeldLock heldlock =
 				lock.write ();
 
 		) {
+
+			taskLogger.noticeFormat (
+				"Closing component manager");
 
 			if (
 				! enumEqualSafe (
@@ -1567,14 +1587,20 @@ class ComponentManagerImplementation
 				public
 				Object get () {
 
-					TaskLogger taskLogger =
-						logContext.createTaskLogger (
-							"getComponentProvider.Provider.get");
+					try (
 
-					return getComponent (
-						taskLogger,
-						componentDefinition,
-						initialized);
+						TaskLogger taskLogger =
+							logContext.createTaskLogger (
+								"getComponentProvider.Provider.get");
+
+					) {
+
+						return getComponent (
+							taskLogger,
+							componentDefinition,
+							initialized);
+
+					}
 
 				}
 

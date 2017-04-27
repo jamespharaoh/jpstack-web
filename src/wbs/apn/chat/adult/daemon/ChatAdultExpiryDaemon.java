@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
@@ -63,23 +63,23 @@ class ChatAdultExpiryDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
-		taskLogger.debugFormat (
-			"Checking for all users whose adult verification has expired");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"ChatAdultExpiryDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Checking for all users whose adult verification has expired");
 
 			List <ChatUserRec> chatUsers =
 				chatUserHelper.findAdultExpiryLimit (
@@ -107,16 +107,16 @@ class ChatAdultExpiryDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"doUserAdultExpiry (%s)",
-				integerToDecimalString (
-					chatUserId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"doUserAdultExpiry (%s)",
+					integerToDecimalString (
+						chatUserId));
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatAdultExpiryDaemon.runOnce ()",

@@ -30,7 +30,7 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -123,44 +123,50 @@ class ClockworkSmsRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processRequest");
+		try (
 
-		// read and log request
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequest");
 
-		byte[] requestBytes =
-			requestContext.requestBodyRaw ();
+		) {
 
-		debugWriter.writeString (
-			"== REQUEST BODY ==\n\n");
+			// read and log request
 
-		debugWriter.writeString (
-			utf8ToString (
-				requestBytes));
+			byte[] requestBytes =
+				requestContext.requestBodyRaw ();
 
-		debugWriter.writeString (
-			"\n\n");
+			debugWriter.writeString (
+				"== REQUEST BODY ==\n\n");
 
-		// decode request
+			debugWriter.writeString (
+				utf8ToString (
+					requestBytes));
 
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
+			debugWriter.writeString (
+				"\n\n");
 
-			.registerBuilderClasses (
-				ClockworkSmsRouteReportRequest.class,
-				ClockworkSmsRouteReportRequest.Item.class)
+			// decode request
 
-			.build ();
+			DataFromXml dataFromXml =
+				new DataFromXmlBuilder ()
 
-		request =
-			(ClockworkSmsRouteReportRequest)
-			dataFromXml.readInputStream (
-				taskLogger,
-				new ByteArrayInputStream (
-					requestBytes),
-				"clockwork-sms-route-report.xml");
+				.registerBuilderClasses (
+					ClockworkSmsRouteReportRequest.class,
+					ClockworkSmsRouteReportRequest.Item.class)
+
+				.build ();
+
+			request =
+				(ClockworkSmsRouteReportRequest)
+				dataFromXml.readInputStream (
+					taskLogger,
+					new ByteArrayInputStream (
+						requestBytes),
+					"clockwork-sms-route-report.xml");
+
+		}
 
 	}
 
@@ -169,110 +175,116 @@ class ClockworkSmsRouteReportAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ClockworkSmsRouteOutAction.handle ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
-			// lookup route
+			// begin transaction
 
-			Optional <RouteRec> smsRouteOptional =
-				smsRouteHelper.find (
-					Long.parseLong (
-						requestContext.requestStringRequired (
-							"smsRouteId")));
+			try (
 
-			if (
-
-				optionalIsNotPresent (
-					smsRouteOptional)
-
-				|| booleanEqual (
-					smsRouteOptional.get ().getDeleted (),
-					true)
-
-				|| booleanEqual (
-					smsRouteOptional.get ().getCanSend (),
-					false)
-
-				|| booleanEqual (
-					smsRouteOptional.get ().getDeliveryReports (),
-					false)
-
-			) {
-
-				throw new HttpNotFoundException (
-					optionalAbsent (),
-					emptyList ());
-
-			}
-
-			RouteRec smsRoute =
-				optionalGetRequired (
-					smsRouteOptional);
-
-			// lookup clockwork sms route in
-
-			Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
-				clockworkSmsRouteOutHelper.find (
-					smsRoute.getId ());
-
-			if (
-
-				optionalIsNotPresent (
-					clockworkSmsRouteOutOptional)
-
-				|| booleanEqual (
-					clockworkSmsRouteOutOptional.get ().getDeleted (),
-					true)
-
-			) {
-
-				throw new HttpNotFoundException (
-					optionalAbsent (),
-					emptyList ());
-
-			}
-
-			ClockworkSmsRouteOutRec clockworkSmsRouteOut =
-				optionalGetRequired (
-					clockworkSmsRouteOutOptional);
-
-			// iterate delivery reports
-
-			response =
-				new ClockworkSmsRouteReportResponse ();
-
-			for (
-				ClockworkSmsRouteReportRequest.Item item
-					: request.items ()
-			) {
-
-				response.items.add (
-					handleDeliveryReport (
+				OwnedTransaction transaction =
+					database.beginReadWrite (
 						taskLogger,
-						clockworkSmsRouteOut,
-						item));
+						"ClockworkSmsRouteOutAction.handle ()",
+						this);
+
+			) {
+
+				// lookup route
+
+				Optional <RouteRec> smsRouteOptional =
+					smsRouteHelper.find (
+						Long.parseLong (
+							requestContext.requestStringRequired (
+								"smsRouteId")));
+
+				if (
+
+					optionalIsNotPresent (
+						smsRouteOptional)
+
+					|| booleanEqual (
+						smsRouteOptional.get ().getDeleted (),
+						true)
+
+					|| booleanEqual (
+						smsRouteOptional.get ().getCanSend (),
+						false)
+
+					|| booleanEqual (
+						smsRouteOptional.get ().getDeliveryReports (),
+						false)
+
+				) {
+
+					throw new HttpNotFoundException (
+						optionalAbsent (),
+						emptyList ());
+
+				}
+
+				RouteRec smsRoute =
+					optionalGetRequired (
+						smsRouteOptional);
+
+				// lookup clockwork sms route in
+
+				Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
+					clockworkSmsRouteOutHelper.find (
+						smsRoute.getId ());
+
+				if (
+
+					optionalIsNotPresent (
+						clockworkSmsRouteOutOptional)
+
+					|| booleanEqual (
+						clockworkSmsRouteOutOptional.get ().getDeleted (),
+						true)
+
+				) {
+
+					throw new HttpNotFoundException (
+						optionalAbsent (),
+						emptyList ());
+
+				}
+
+				ClockworkSmsRouteOutRec clockworkSmsRouteOut =
+					optionalGetRequired (
+						clockworkSmsRouteOutOptional);
+
+				// iterate delivery reports
+
+				response =
+					new ClockworkSmsRouteReportResponse ();
+
+				for (
+					ClockworkSmsRouteReportRequest.Item item
+						: request.items ()
+				) {
+
+					response.items.add (
+						handleDeliveryReport (
+							taskLogger,
+							clockworkSmsRouteOut,
+							item));
+
+				}
+
+				// commit and return
+
+				transaction.commit ();
+
+				success = true;
 
 			}
-
-			// commit and return
-
-			transaction.commit ();
-
-			success = true;
 
 		}
 
@@ -284,144 +296,150 @@ class ClockworkSmsRouteReportAction
 			@NonNull ClockworkSmsRouteOutRec clockworkSmsRouteOut,
 			@NonNull ClockworkSmsRouteReportRequest.Item item) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleDeliveryReport");
+		try (
 
-		// lookup the delivery status
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleDeliveryReport");
 
-		Optional <ClockworkSmsDeliveryStatusRec> deliveryStatusOptional =
-			clockworkSmsDeliveryStatusHelper.findByCode (
-				clockworkSmsRouteOut.getClockworkSmsConfig (),
-				lowercase (
-					item.status ()));
-
-		if (
-			optionalIsNotPresent (
-				deliveryStatusOptional)
 		) {
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			// lookup the delivery status
 
-				.dlrId (
-					item.dlrId ())
+			Optional <ClockworkSmsDeliveryStatusRec> deliveryStatusOptional =
+				clockworkSmsDeliveryStatusHelper.findByCode (
+					clockworkSmsRouteOut.getClockworkSmsConfig (),
+					lowercase (
+						item.status ()));
 
-				.response (
-					"status not recognised");
+			if (
+				optionalIsNotPresent (
+					deliveryStatusOptional)
+			) {
 
-		}
+				return new ClockworkSmsRouteReportResponse.Item ()
 
-		ClockworkSmsDeliveryStatusRec deliveryStatus =
-			optionalGetRequired (
-				deliveryStatusOptional);
+					.dlrId (
+						item.dlrId ())
 
-		// lookup the delivery status detail code
+					.response (
+						"status not recognised");
 
-		Optional <ClockworkSmsDeliveryStatusDetailCodeRec>
-		deliveryStatusDetailCodeOptional =
-			clockworkSmsDeliveryStatusDetailCodeHelper.findByCode (
-				clockworkSmsRouteOut.getClockworkSmsConfig (),
-				item.errCode ());
+			}
 
-		if (
-			optionalIsNotPresent (
-				deliveryStatusDetailCodeOptional)
-		) {
+			ClockworkSmsDeliveryStatusRec deliveryStatus =
+				optionalGetRequired (
+					deliveryStatusOptional);
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			// lookup the delivery status detail code
 
-				.dlrId (
-					item.dlrId ())
+			Optional <ClockworkSmsDeliveryStatusDetailCodeRec>
+			deliveryStatusDetailCodeOptional =
+				clockworkSmsDeliveryStatusDetailCodeHelper.findByCode (
+					clockworkSmsRouteOut.getClockworkSmsConfig (),
+					item.errCode ());
 
-				.response (
-					"status detail code not recognised");
+			if (
+				optionalIsNotPresent (
+					deliveryStatusDetailCodeOptional)
+			) {
 
-		}
+				return new ClockworkSmsRouteReportResponse.Item ()
 
-		ClockworkSmsDeliveryStatusDetailCodeRec deliveryStatusDeliveryCode =
-			optionalGetRequired (
-				deliveryStatusDetailCodeOptional);
+					.dlrId (
+						item.dlrId ())
 
-		// lookup the message
+					.response (
+						"status detail code not recognised");
 
-		Optional <MessageRec> smsMessageOptional =
-			smsMessageLogic.findMessageByMangledId (
-				item.clientId ());
+			}
 
-		if (
-			optionalIsNotPresent (
-				smsMessageOptional)
-		) {
+			ClockworkSmsDeliveryStatusDetailCodeRec deliveryStatusDeliveryCode =
+				optionalGetRequired (
+					deliveryStatusDetailCodeOptional);
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			// lookup the message
 
-				.dlrId (
-					item.dlrId ())
+			Optional <MessageRec> smsMessageOptional =
+				smsMessageLogic.findMessageByMangledId (
+					item.clientId ());
 
-				.response (
-					"message not recognised");
+			if (
+				optionalIsNotPresent (
+					smsMessageOptional)
+			) {
 
-		}
+				return new ClockworkSmsRouteReportResponse.Item ()
 
-		MessageRec smsMessage =
-			optionalGetRequired (
-				smsMessageOptional);
+					.dlrId (
+						item.dlrId ())
 
-		// store the delivery report
+					.response (
+						"message not recognised");
 
-		try {
+			}
 
-			smsDeliveryReportLogic.deliveryReport (
-				taskLogger,
-				smsMessage,
-				deliveryStatus.getMessageStatus (),
-				Optional.of (
-					item.status ()),
-				Optional.of (
-					ifThenElse (
-						isNotNull (
-							deliveryStatusDeliveryCode),
-						() -> stringFormat (
-							"%s — %s",
-							deliveryStatus.getTheirDescription (),
-							deliveryStatusDeliveryCode.getTheirDescription ()),
-						() -> deliveryStatus.getTheirDescription ())),
-				Optional.of (
-					joinWithSpace (
-						stringFormat (
-							"status=%s",
-							item.status ()),
-						stringFormat (
-							"errCode=%s",
-							item.errCode ()))),
-				Optional.absent ());
+			MessageRec smsMessage =
+				optionalGetRequired (
+					smsMessageOptional);
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			// store the delivery report
 
-				.dlrId (
-					item.dlrId ())
+			try {
 
-				.response (
-					"ok");
+				smsDeliveryReportLogic.deliveryReport (
+					taskLogger,
+					smsMessage,
+					deliveryStatus.getMessageStatus (),
+					Optional.of (
+						item.status ()),
+					Optional.of (
+						ifThenElse (
+							isNotNull (
+								deliveryStatusDeliveryCode),
+							() -> stringFormat (
+								"%s — %s",
+								deliveryStatus.getTheirDescription (),
+								deliveryStatusDeliveryCode.getTheirDescription ()),
+							() -> deliveryStatus.getTheirDescription ())),
+					Optional.of (
+						joinWithSpace (
+							stringFormat (
+								"status=%s",
+								item.status ()),
+							stringFormat (
+								"errCode=%s",
+								item.errCode ()))),
+					Optional.absent ());
 
-		} catch (Exception exception) {
+				return new ClockworkSmsRouteReportResponse.Item ()
 
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"webapi",
-				requestContext.requestUri (),
-				exception,
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithThirdPartyWarning);
+					.dlrId (
+						item.dlrId ())
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+					.response (
+						"ok");
 
-				.dlrId (
-					item.dlrId ())
+			} catch (Exception exception) {
 
-				.response (
-					"internal error");
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"webapi",
+					requestContext.requestUri (),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.ignoreWithThirdPartyWarning);
+
+				return new ClockworkSmsRouteReportResponse.Item ()
+
+					.dlrId (
+						item.dlrId ())
+
+					.response (
+						"internal error");
+
+			}
 
 		}
 
@@ -433,35 +451,46 @@ class ClockworkSmsRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		// encode response
+		try (
 
-		DataToXml dataToXml =
-			new DataToXml ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
 
-		String responseString =
-			dataToXml.writeToString (
-				response);
+		) {
 
-		// write to debug log
+			// encode response
 
-		debugWriter.writeString (
-			"== RESPONSE BODY ==\n\n");
+			DataToXml dataToXml =
+				new DataToXml ();
 
-		debugWriter.writeString (
-			responseString);
+			String responseString =
+				dataToXml.writeToString (
+					response);
 
-		debugWriter.writeString (
-			"\n\n");
+			// write to debug log
 
-		// create responder
+			debugWriter.writeString (
+				"== RESPONSE BODY ==\n\n");
 
-		return textResponderProvider.get ()
-
-			.contentType (
-				"application/xml")
-
-			.text (
+			debugWriter.writeString (
 				responseString);
+
+			debugWriter.writeString (
+				"\n\n");
+
+			// create responder
+
+			return textResponderProvider.get ()
+
+				.contentType (
+					"application/xml")
+
+				.text (
+					responseString);
+
+		}
 
 	}
 
@@ -471,14 +500,14 @@ class ClockworkSmsRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ClockworkSmsRouteReportAction.storeLog ()",

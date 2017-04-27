@@ -55,48 +55,54 @@ class ChatUserImageApiModule
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		imageUploadFile =
-			apiFileProvider.get ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-			.getActionName (
-				taskLogger,
-				"chatUserImageUploadViewAction")
+		) {
 
-			.postActionName (
-				taskLogger,
-				"chatUserImageUploadPostAction");
+			imageUploadFile =
+				apiFileProvider.get ()
 
-		imageUploadEntry =
-			new RegexpPathHandler.Entry (
-				"/([a-z]+)") {
+				.getActionName (
+					taskLogger,
+					"chatUserImageUploadViewAction")
 
-			@Override
-			protected
-			WebFile handle (
-					Matcher matcher) {
+				.postActionName (
+					taskLogger,
+					"chatUserImageUploadPostAction");
 
-				requestContext.request (
-					"chatUserImageUploadToken",
-					matcher.group (1));
+			imageUploadEntry =
+				new RegexpPathHandler.Entry (
+					"/([a-z]+)") {
 
-				return imageUploadFile;
+				@Override
+				protected
+				WebFile handle (
+						Matcher matcher) {
 
-			}
+					requestContext.request (
+						"chatUserImageUploadToken",
+						matcher.group (1));
 
-		};
+					return imageUploadFile;
+
+				}
+
+			};
+
+		}
 
 	}
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap.<String, PathHandler> builder ()
 
 			.put (
 				"/chat/imageUpload",

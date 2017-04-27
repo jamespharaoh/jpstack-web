@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -134,751 +134,757 @@ class ImChatCoreFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		// menu
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+		) {
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+			// menu
 
-			.setCode (
-				"im_chat")
-
-			.setName (
-				"IM Chat")
-
-			.setDescription (
-				"Instant message chat service")
-
-			.setLabel (
-				"IM Chat")
-
-			.setTargetPath (
-				"/imChats")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
-		// message template databases
-
-		MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
-			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+			menuItemHelper.insert (
 				taskLogger,
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"),
-				joinWithSlash (
-					"/wbs/imchat/fixture",
-					"im-chat-message-template-database.xml"));
+				menuItemHelper.createInstance ()
 
-		messageTemplateSetHelper.insert (
-			taskLogger,
-			messageTemplateSetHelper.createInstance ()
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setMessageTemplateDatabase (
-				primaryMessageTemplateDatabase)
+				.setCode (
+					"im_chat")
 
-			.setCode (
-				"default")
+				.setName (
+					"IM Chat")
 
-			.setName (
-				"Default")
+				.setDescription (
+					"Instant message chat service")
 
-			.setDescription (
-				"")
+				.setLabel (
+					"IM Chat")
 
-		);
+				.setTargetPath (
+					"/imChats")
 
-		MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
-			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+				.setTargetFrame (
+					"main")
+
+			);
+
+			// message template databases
+
+			MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
+				messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+					taskLogger,
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"),
+					joinWithSlash (
+						"/wbs/imchat/fixture",
+						"im-chat-message-template-database.xml"));
+
+			messageTemplateSetHelper.insert (
 				taskLogger,
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"),
-				joinWithSlash (
-					"/wbs/imchat/fixture",
-					"im-chat-embedded-message-template-database.xml"));
+				messageTemplateSetHelper.createInstance ()
 
-		messageTemplateSetHelper.insert (
-			taskLogger,
-			messageTemplateSetHelper.createInstance ()
+				.setMessageTemplateDatabase (
+					primaryMessageTemplateDatabase)
 
-			.setMessageTemplateDatabase (
-				embeddedMessageTemplateDatabase)
+				.setCode (
+					"default")
 
-			.setCode (
-				"default")
+				.setName (
+					"Default")
 
-			.setName (
-				"Default")
+				.setDescription (
+					"")
 
-			.setDescription (
-				"")
+			);
 
-		);
+			MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
+				messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+					taskLogger,
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"),
+					joinWithSlash (
+						"/wbs/imchat/fixture",
+						"im-chat-embedded-message-template-database.xml"));
 
-		// im chat
-
-		ImChatRec imChat =
-			imChatHelper.insert (
+			messageTemplateSetHelper.insert (
 				taskLogger,
-				imChatHelper.createInstance ()
+				messageTemplateSetHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setMessageTemplateDatabase (
+					embeddedMessageTemplateDatabase)
 
-			.setCode (
-				"test")
+				.setCode (
+					"default")
 
-			.setName (
-				"Test")
+				.setName (
+					"Default")
 
-			.setDescription (
-				"Test IM chat")
+				.setDescription (
+					"")
 
-			.setPaypalAccount (
-				paypalAccountHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"sandbox"))
+			);
 
-			.setBillingCurrency (
-				currencyHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"gbp"))
+			// im chat
 
-			.setCreditCurrency (
-				currencyHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"credit"))
+			ImChatRec imChat =
+				imChatHelper.insert (
+					taskLogger,
+					imChatHelper.createInstance ()
 
-			.setMessageTemplateDatabase (
-				primaryMessageTemplateDatabase)
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setPreferredQueueTime (
-				5l * 60l)
+				.setCode (
+					"test")
 
-			.setMessageCost (
-				300l)
+				.setName (
+					"Test")
 
-			.setFreeMessageLimit (
-				3l)
+				.setDescription (
+					"Test IM chat")
 
-			.setBillMessageEnabled (
-				true)
+				.setPaypalAccount (
+					paypalAccountHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"sandbox"))
 
-			.setBillMessageMinChars (
-				50l)
+				.setBillingCurrency (
+					currencyHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"gbp"))
 
-			.setBillMessageMaxChars (
-				100l)
+				.setCreditCurrency (
+					currencyHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"credit"))
 
-			.setFreeMessageEnabled (
-				true)
+				.setMessageTemplateDatabase (
+					primaryMessageTemplateDatabase)
 
-			.setFreeMessageMinChars (
-				10l)
+				.setPreferredQueueTime (
+					5l * 60l)
 
-			.setFreeMessageMaxChars (
-				50l)
+				.setMessageCost (
+					300l)
 
-			.setDevelopmentMode (
-				true)
+				.setFreeMessageLimit (
+					3l)
 
-			.setEmailFromName (
-				"IM chat test")
+				.setBillMessageEnabled (
+					true)
 
-			.setEmailFromAddress (
-				"im-chat-test@wellbehavedsoftware.com")
+				.setBillMessageMinChars (
+					50l)
 
-			.setEmailReplyToAddress (
-				"im-chat-test@wellbehavedsoftware.com")
+				.setBillMessageMaxChars (
+					100l)
 
-			.setEmailSubjectForgotPassword (
-				"New password for IM chat test")
+				.setFreeMessageEnabled (
+					true)
 
-			.setProfilePageBeforeLogin (
-				true)
+				.setFreeMessageMinChars (
+					10l)
 
-			.setDetailsPageOnFirstLogin (
-				true)
+				.setFreeMessageMaxChars (
+					50l)
 
-		);
+				.setDevelopmentMode (
+					true)
 
-		// price points
+				.setEmailFromName (
+					"IM chat test")
 
-		ImChatPricePointRec basicPricePoint =
+				.setEmailFromAddress (
+					"im-chat-test@wellbehavedsoftware.com")
+
+				.setEmailReplyToAddress (
+					"im-chat-test@wellbehavedsoftware.com")
+
+				.setEmailSubjectForgotPassword (
+					"New password for IM chat test")
+
+				.setProfilePageBeforeLogin (
+					true)
+
+				.setDetailsPageOnFirstLogin (
+					true)
+
+			);
+
+			// price points
+
+			ImChatPricePointRec basicPricePoint =
+				imChatPricePointHelper.insert (
+					taskLogger,
+					imChatPricePointHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					"basic")
+
+				.setName (
+					"Basic")
+
+				.setDescription (
+					"Basic credit package")
+
+				.setPublicName (
+					"Basic")
+
+				.setPublicDescription (
+					"Basic credit package")
+
+				.setPrice (
+					599l)
+
+				.setValue (
+					600l)
+
+				.setOrder (
+					1l)
+
+			);
+
 			imChatPricePointHelper.insert (
 				taskLogger,
 				imChatPricePointHelper.createInstance ()
 
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"basic")
-
-			.setName (
-				"Basic")
-
-			.setDescription (
-				"Basic credit package")
-
-			.setPublicName (
-				"Basic")
-
-			.setPublicDescription (
-				"Basic credit package")
-
-			.setPrice (
-				599l)
-
-			.setValue (
-				600l)
-
-			.setOrder (
-				1l)
-
-		);
-
-		imChatPricePointHelper.insert (
-			taskLogger,
-			imChatPricePointHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"saver")
-
-			.setName (
-				"Saver")
-
-			.setDescription (
-				"Saver credit offer")
-
-			.setPublicName (
-				"Saver")
-
-			.setPublicDescription (
-				"Saver credit offer")
-
-			.setPrice (
-				1099l)
-
-			.setValue (
-				1200l)
-
-			.setOrder (
-				2l)
-
-		);
-
-		imChatPricePointHelper.insert (
-			taskLogger,
-			imChatPricePointHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"super_saver")
-
-			.setName (
-				"Super saver")
-
-			.setDescription (
-				"Super saver credit offer")
-
-			.setPublicName (
-				"Super saver")
-
-			.setPublicDescription (
-				"Super saver credit offer")
-
-			.setPrice (
-				1499l)
-
-			.setValue (
-				1800l)
-
-			.setOrder (
-				3l)
-
-		);
-
-		// im chat template
-
-		for (
-			int index = 0;
-			index < 3;
-			index ++
-		) {
-
-			imChatTemplateHelper.insert (
-				taskLogger,
-				imChatTemplateHelper.createInstance ()
-
 				.setImChat (
 					imChat)
 
 				.setCode (
-					stringFormat (
-						"template_%s",
-						integerToDecimalString (
-							index)))
+					"saver")
 
 				.setName (
-					stringFormat (
-						"Template %s",
-						integerToDecimalString (
-							index)))
+					"Saver")
 
 				.setDescription (
-					stringFormat (
-						"Test template %s",
-						integerToDecimalString (
-							index)))
+					"Saver credit offer")
 
-				.setText (
-					stringFormat (
-						"Test IM chat template %s",
-						integerToDecimalString (
-							index)))
+				.setPublicName (
+					"Saver")
+
+				.setPublicDescription (
+					"Saver credit offer")
+
+				.setPrice (
+					1099l)
+
+				.setValue (
+					1200l)
+
+				.setOrder (
+					2l)
 
 			);
 
-		}
-
-		// customer detail types
-
-		imChatCustomerDetailTypeHelper.insert (
-			taskLogger,
-			imChatCustomerDetailTypeHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"name")
-
-			.setName (
-				"Name")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Name")
-
-			.setHelp (
-				"Please enter your name")
-
-			.setRequired (
-				true)
-
-			.setRequiredLabel (
-				"(required)")
-
-			.setRestricted (
-				false)
-
-			.setWhenCreatingAccount (
-				true)
-
-			.setDataType (
-				ImChatCustomerDetailDataType.text)
-
-			.setOrdering (
-				1l)
-
-		);
-
-		imChatCustomerDetailTypeHelper.insert (
-			taskLogger,
-			imChatCustomerDetailTypeHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"date_of_birth")
-
-			.setName (
-				"Date of birth")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Date of birth")
-
-			.setHelp (
-				"Please enter your date of birth")
-
-			.setRequired (
-				true)
-
-			.setRequiredLabel (
-				"")
-
-			.setRestricted (
-				false)
-
-			.setWhenCreatingAccount (
-				true)
-
-			.setDataType (
-				ImChatCustomerDetailDataType.dateOfBirth)
-
-			.setMinimumAge (
-				18l)
-
-			.setOrdering (
-				2l)
-
-		);
-
-		imChatCustomerDetailTypeHelper.insert (
-			taskLogger,
-			imChatCustomerDetailTypeHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"star_sign")
-
-			.setName (
-				"Star sign")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Star sign")
-
-			.setHelp (
-				"Please enter your star sign")
-
-			.setRequired (
-				false)
-
-			.setRequiredLabel (
-				"")
-
-			.setRestricted (
-				false)
-
-			.setWhenCreatingAccount (
-				false)
-
-			.setDataType (
-				ImChatCustomerDetailDataType.chooseOne)
-
-			.setOrdering (
-				3l)
-
-		);
-
-		imChatCustomerDetailTypeHelper.insert (
-			taskLogger,
-			imChatCustomerDetailTypeHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				"phone_number")
-
-			.setName (
-				"Phone number")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Phone number")
-
-			.setHelp (
-				"Please enter your phone number")
-
-			.setRequired (
-				false)
-
-			.setRequiredLabel (
-				"(required)")
-
-			.setRestricted (
-				true)
-
-			.setWhenCreatingAccount (
-				false)
-
-			.setDataType (
-				ImChatCustomerDetailDataType.text)
-
-			.setOrdering (
-				4l)
-
-		);
-
-		// im chat profile
-
-		MediaRec dougalMedia =
-			mediaLogic.createMediaFromImageRequired (
+			imChatPricePointHelper.insert (
 				taskLogger,
-				fileReadBytes (
-					"binaries/test/dougal.jpg"),
-				"image/jpeg",
-				"dougal.jpg");
-
-		MediaRec ermintrudeMedia =
-			mediaLogic.createMediaFromImageRequired (
-				taskLogger,
-				fileReadBytes (
-					"binaries/test/dougal.jpg"),
-				"image/jpeg",
-				"ermintrude.jpg");
-
-		List<ImChatProfileRec> profiles =
-			new ArrayList<ImChatProfileRec> ();
-
-		for (
-			int index = 0;
-			index < 10;
-			index ++
-		) {
-
-			profiles.add (
-				imChatProfileHelper.insert (
-					taskLogger,
-					imChatProfileHelper.createInstance ()
+				imChatPricePointHelper.createInstance ()
 
 				.setImChat (
 					imChat)
 
 				.setCode (
-					stringFormat (
-						"profile_%s",
-						integerToDecimalString (
-							index)))
+					"super_saver")
 
 				.setName (
-					stringFormat (
-						"Profile %s",
-						integerToDecimalString (
-							index)))
+					"Super saver")
 
 				.setDescription (
-					stringFormat (
-						"Test IM chat profile %s",
-						integerToDecimalString (
-							index)))
-
-				.setState (
-					ImChatProfileState.ready)
+					"Super saver credit offer")
 
 				.setPublicName (
-					stringFormat (
-						"Profile %s",
-						integerToDecimalString (
-							index)))
+					"Super saver")
 
 				.setPublicDescription (
-					stringFormat (
-						"Test IM chat profile %s",
-						integerToDecimalString (
-							index)))
+					"Super saver credit offer")
 
-				.setPublicDescriptionShort (
-					stringFormat (
-						"Test IM chat profile %s",
-						integerToDecimalString (
-							index)))
+				.setPrice (
+					1499l)
 
-				.setProfileImage (
-					index % 2 == 0
-						? dougalMedia
-						: ermintrudeMedia)
+				.setValue (
+					1800l)
 
-			));
+				.setOrder (
+					3l)
+
+			);
+
+			// im chat template
+
+			for (
+				int index = 0;
+				index < 3;
+				index ++
+			) {
+
+				imChatTemplateHelper.insert (
+					taskLogger,
+					imChatTemplateHelper.createInstance ()
+
+					.setImChat (
+						imChat)
+
+					.setCode (
+						stringFormat (
+							"template_%s",
+							integerToDecimalString (
+								index)))
+
+					.setName (
+						stringFormat (
+							"Template %s",
+							integerToDecimalString (
+								index)))
+
+					.setDescription (
+						stringFormat (
+							"Test template %s",
+							integerToDecimalString (
+								index)))
+
+					.setText (
+						stringFormat (
+							"Test IM chat template %s",
+							integerToDecimalString (
+								index)))
+
+				);
+
+			}
+
+			// customer detail types
+
+			imChatCustomerDetailTypeHelper.insert (
+				taskLogger,
+				imChatCustomerDetailTypeHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					"name")
+
+				.setName (
+					"Name")
+
+				.setDescription (
+					"")
+
+				.setLabel (
+					"Name")
+
+				.setHelp (
+					"Please enter your name")
+
+				.setRequired (
+					true)
+
+				.setRequiredLabel (
+					"(required)")
+
+				.setRestricted (
+					false)
+
+				.setWhenCreatingAccount (
+					true)
+
+				.setDataType (
+					ImChatCustomerDetailDataType.text)
+
+				.setOrdering (
+					1l)
+
+			);
+
+			imChatCustomerDetailTypeHelper.insert (
+				taskLogger,
+				imChatCustomerDetailTypeHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					"date_of_birth")
+
+				.setName (
+					"Date of birth")
+
+				.setDescription (
+					"")
+
+				.setLabel (
+					"Date of birth")
+
+				.setHelp (
+					"Please enter your date of birth")
+
+				.setRequired (
+					true)
+
+				.setRequiredLabel (
+					"")
+
+				.setRestricted (
+					false)
+
+				.setWhenCreatingAccount (
+					true)
+
+				.setDataType (
+					ImChatCustomerDetailDataType.dateOfBirth)
+
+				.setMinimumAge (
+					18l)
+
+				.setOrdering (
+					2l)
+
+			);
+
+			imChatCustomerDetailTypeHelper.insert (
+				taskLogger,
+				imChatCustomerDetailTypeHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					"star_sign")
+
+				.setName (
+					"Star sign")
+
+				.setDescription (
+					"")
+
+				.setLabel (
+					"Star sign")
+
+				.setHelp (
+					"Please enter your star sign")
+
+				.setRequired (
+					false)
+
+				.setRequiredLabel (
+					"")
+
+				.setRestricted (
+					false)
+
+				.setWhenCreatingAccount (
+					false)
+
+				.setDataType (
+					ImChatCustomerDetailDataType.chooseOne)
+
+				.setOrdering (
+					3l)
+
+			);
+
+			imChatCustomerDetailTypeHelper.insert (
+				taskLogger,
+				imChatCustomerDetailTypeHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					"phone_number")
+
+				.setName (
+					"Phone number")
+
+				.setDescription (
+					"")
+
+				.setLabel (
+					"Phone number")
+
+				.setHelp (
+					"Please enter your phone number")
+
+				.setRequired (
+					false)
+
+				.setRequiredLabel (
+					"(required)")
+
+				.setRestricted (
+					true)
+
+				.setWhenCreatingAccount (
+					false)
+
+				.setDataType (
+					ImChatCustomerDetailDataType.text)
+
+				.setOrdering (
+					4l)
+
+			);
+
+			// im chat profile
+
+			MediaRec dougalMedia =
+				mediaLogic.createMediaFromImageRequired (
+					taskLogger,
+					fileReadBytes (
+						"binaries/test/dougal.jpg"),
+					"image/jpeg",
+					"dougal.jpg");
+
+			MediaRec ermintrudeMedia =
+				mediaLogic.createMediaFromImageRequired (
+					taskLogger,
+					fileReadBytes (
+						"binaries/test/dougal.jpg"),
+					"image/jpeg",
+					"ermintrude.jpg");
+
+			List<ImChatProfileRec> profiles =
+				new ArrayList<ImChatProfileRec> ();
+
+			for (
+				int index = 0;
+				index < 10;
+				index ++
+			) {
+
+				profiles.add (
+					imChatProfileHelper.insert (
+						taskLogger,
+						imChatProfileHelper.createInstance ()
+
+					.setImChat (
+						imChat)
+
+					.setCode (
+						stringFormat (
+							"profile_%s",
+							integerToDecimalString (
+								index)))
+
+					.setName (
+						stringFormat (
+							"Profile %s",
+							integerToDecimalString (
+								index)))
+
+					.setDescription (
+						stringFormat (
+							"Test IM chat profile %s",
+							integerToDecimalString (
+								index)))
+
+					.setState (
+						ImChatProfileState.ready)
+
+					.setPublicName (
+						stringFormat (
+							"Profile %s",
+							integerToDecimalString (
+								index)))
+
+					.setPublicDescription (
+						stringFormat (
+							"Test IM chat profile %s",
+							integerToDecimalString (
+								index)))
+
+					.setPublicDescriptionShort (
+						stringFormat (
+							"Test IM chat profile %s",
+							integerToDecimalString (
+								index)))
+
+					.setProfileImage (
+						index % 2 == 0
+							? dougalMedia
+							: ermintrudeMedia)
+
+				));
+
+			}
+
+			// im chat customer
+
+			ImChatCustomerRec imChatCustomer =
+				imChatCustomerHelper.insert (
+					taskLogger,
+					imChatCustomerHelper.createInstance ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					randomLogic.generateNumericNoZero (8))
+
+				.setEmail (
+					"test@example.com")
+
+				.setPassword (
+					"topsecret")
+
+				.setFirstSession (
+					transaction.now ())
+
+				.setLastSession (
+					transaction.now ())
+
+			);
+
+			// im chat conversation
+
+			ImChatConversationRec imChatConversation =
+				imChatConversationHelper.insert (
+					taskLogger,
+					imChatConversationHelper.createInstance ()
+
+				.setImChatCustomer (
+					imChatCustomer)
+
+				.setIndex (
+					imChatCustomer.getNumConversations ())
+
+				.setImChatProfile (
+					profiles.get (0))
+
+				.setStartTime (
+					transaction.now ())
+
+				.setPendingReply (
+					false)
+
+			);
+
+			imChatCustomer
+
+				.setNumConversations (
+					imChatCustomer.getNumConversations () + 1);
+
+			// im chat session
+
+			ImChatSessionRec imChatSession =
+				imChatSessionHelper.insert (
+					taskLogger,
+					imChatSessionHelper.createInstance ()
+
+				.setImChatCustomer (
+					imChatCustomer)
+
+				.setSecret (
+					randomLogic.generateLowercase (20))
+
+				.setStartTime (
+					transaction.now ())
+
+				.setUpdateTime (
+					transaction.now ())
+
+				.setEndTime (
+					transaction.now ())
+
+				.setActive (
+					true)
+
+				.setUserAgentText (
+					textHelper.findOrCreate (
+						taskLogger,
+						"User agent"))
+
+				.setIpAddress (
+					"1.2.3.4")
+
+			);
+
+			// im chat purchase
+
+			imChatPurchaseHelper.insert (
+				taskLogger,
+				imChatPurchaseHelper.createInstance ()
+
+				.setImChatCustomer (
+					imChatCustomer)
+
+				.setIndex (
+					imChatCustomer.getNumPurchases ())
+
+				.setImChatSession (
+					imChatSession)
+
+				.setImChatPricePoint (
+					basicPricePoint)
+
+				.setState (
+					ImChatPurchaseState.unknown)
+
+				.setPrice (
+					599l)
+
+				.setValue (
+					600l)
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setPaypalPayment (
+					null)
+
+			);
+
+			imChatCustomer
+
+				.setNumPurchases (
+					imChatCustomer.getNumPurchases () + 1);
+
+			// im chat message
+
+			imChatMessageHelper.insert (
+				taskLogger,
+				imChatMessageHelper.createInstance ()
+
+				.setImChatConversation (
+					imChatConversation)
+
+				.setIndex (
+					imChatConversation.getNumMessages ())
+
+				.setMessageText (
+					"Text message.")
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
+
+			imChatConversation
+
+				.setNumMessages (
+					imChatConversation.getNumMessages () + 1);
 
 		}
-
-		// im chat customer
-
-		ImChatCustomerRec imChatCustomer =
-			imChatCustomerHelper.insert (
-				taskLogger,
-				imChatCustomerHelper.createInstance ()
-
-			.setImChat (
-				imChat)
-
-			.setCode (
-				randomLogic.generateNumericNoZero (8))
-
-			.setEmail (
-				"test@example.com")
-
-			.setPassword (
-				"topsecret")
-
-			.setFirstSession (
-				transaction.now ())
-
-			.setLastSession (
-				transaction.now ())
-
-		);
-
-		// im chat conversation
-
-		ImChatConversationRec imChatConversation =
-			imChatConversationHelper.insert (
-				taskLogger,
-				imChatConversationHelper.createInstance ()
-
-			.setImChatCustomer (
-				imChatCustomer)
-
-			.setIndex (
-				imChatCustomer.getNumConversations ())
-
-			.setImChatProfile (
-				profiles.get (0))
-
-			.setStartTime (
-				transaction.now ())
-
-			.setPendingReply (
-				false)
-
-		);
-
-		imChatCustomer
-
-			.setNumConversations (
-				imChatCustomer.getNumConversations () + 1);
-
-		// im chat session
-
-		ImChatSessionRec imChatSession =
-			imChatSessionHelper.insert (
-				taskLogger,
-				imChatSessionHelper.createInstance ()
-
-			.setImChatCustomer (
-				imChatCustomer)
-
-			.setSecret (
-				randomLogic.generateLowercase (20))
-
-			.setStartTime (
-				transaction.now ())
-
-			.setUpdateTime (
-				transaction.now ())
-
-			.setEndTime (
-				transaction.now ())
-
-			.setActive (
-				true)
-
-			.setUserAgentText (
-				textHelper.findOrCreate (
-					taskLogger,
-					"User agent"))
-
-			.setIpAddress (
-				"1.2.3.4")
-
-		);
-
-		// im chat purchase
-
-		imChatPurchaseHelper.insert (
-			taskLogger,
-			imChatPurchaseHelper.createInstance ()
-
-			.setImChatCustomer (
-				imChatCustomer)
-
-			.setIndex (
-				imChatCustomer.getNumPurchases ())
-
-			.setImChatSession (
-				imChatSession)
-
-			.setImChatPricePoint (
-				basicPricePoint)
-
-			.setState (
-				ImChatPurchaseState.unknown)
-
-			.setPrice (
-				599l)
-
-			.setValue (
-				600l)
-
-			.setCreatedTime (
-				transaction.now ())
-
-			.setPaypalPayment (
-				null)
-
-		);
-
-		imChatCustomer
-
-			.setNumPurchases (
-				imChatCustomer.getNumPurchases () + 1);
-
-		// im chat message
-
-		imChatMessageHelper.insert (
-			taskLogger,
-			imChatMessageHelper.createInstance ()
-
-			.setImChatConversation (
-				imChatConversation)
-
-			.setIndex (
-				imChatConversation.getNumMessages ())
-
-			.setMessageText (
-				"Text message.")
-
-			.setTimestamp (
-				transaction.now ())
-
-		);
-
-		imChatConversation
-
-			.setNumMessages (
-				imChatConversation.getNumMessages () + 1);
 
 	}
 

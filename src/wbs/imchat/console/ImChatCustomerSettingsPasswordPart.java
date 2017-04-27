@@ -103,17 +103,23 @@ class ImChatCustomerSettingsPasswordPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		requestContext.flushNotices ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderRequestNewPasswordForm ();
+		) {
 
-		renderRecentPasswordEvents (
-			taskLogger);
+			requestContext.flushNotices ();
+
+			renderRequestNewPasswordForm ();
+
+			renderRecentPasswordEvents (
+				taskLogger);
+
+		}
 
 	}
 
@@ -160,29 +166,35 @@ class ImChatCustomerSettingsPasswordPart
 	void renderRecentPasswordEvents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderRecentPasswordEvents");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Recent forgotten password events");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderRecentPasswordEvents");
 
-		if (
-			collectionIsEmpty (
-				events)
 		) {
 
-			htmlParagraphWriteFormat (
-				"No forgotten password events have been logged for this ",
-				"customer.");
+			htmlHeadingTwoWrite (
+				"Recent forgotten password events");
 
-		} else {
+			if (
+				collectionIsEmpty (
+					events)
+			) {
 
-			eventConsoleLogic.writeEventsTable (
-				taskLogger,
-				formatWriter,
-				events);
+				htmlParagraphWriteFormat (
+					"No forgotten password events have been logged for this ",
+					"customer.");
+
+			} else {
+
+				eventConsoleLogic.writeEventsTable (
+					taskLogger,
+					formatWriter,
+					events);
+
+			}
 
 		}
 

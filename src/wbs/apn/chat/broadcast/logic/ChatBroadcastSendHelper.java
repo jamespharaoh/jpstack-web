@@ -18,8 +18,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
@@ -237,41 +237,47 @@ class ChatBroadcastSendHelper
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendStart");
+		try (
 
-		// sanity check
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendStart");
 
-		if (
-			chatBroadcast.getState ()
-				!= ChatBroadcastState.scheduled
 		) {
-			throw new IllegalStateException ();
+
+			// sanity check
+
+			if (
+				chatBroadcast.getState ()
+					!= ChatBroadcastState.scheduled
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// update broadcast
+
+			chatBroadcast
+
+				.setState (
+					ChatBroadcastState.sending);
+
+			chat
+
+				.setNumChatBroadcastScheduled (
+					chat.getNumChatBroadcastScheduled () - 1)
+
+				.setNumChatBroadcastSending (
+					chat.getNumChatBroadcastSending () + 1);
+
+			// create event
+
+			eventLogic.createEvent (
+				taskLogger,
+				"chat_broadcast_send_begun",
+				chatBroadcast);
+
 		}
-
-		// update broadcast
-
-		chatBroadcast
-
-			.setState (
-				ChatBroadcastState.sending);
-
-		chat
-
-			.setNumChatBroadcastScheduled (
-				chat.getNumChatBroadcastScheduled () - 1)
-
-			.setNumChatBroadcastSending (
-				chat.getNumChatBroadcastSending () + 1);
-
-		// create event
-
-		eventLogic.createEvent (
-			taskLogger,
-			"chat_broadcast_send_begun",
-			chatBroadcast);
 
 	}
 
@@ -283,19 +289,25 @@ class ChatBroadcastSendHelper
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"verifyItem");
+		try (
 
-		ChatUserRec chatUser =
-			chatBroadcastNumber.getChatUser ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"verifyItem");
 
-		return chatBroadcastLogic.canSendToUser (
-			taskLogger,
-			chatUser,
-			chatBroadcast.getIncludeBlocked (),
-			chatBroadcast.getIncludeOptedOut ());
+		) {
+
+			ChatUserRec chatUser =
+				chatBroadcastNumber.getChatUser ();
+
+			return chatBroadcastLogic.canSendToUser (
+				taskLogger,
+				chatUser,
+				chatBroadcast.getIncludeBlocked (),
+				chatBroadcast.getIncludeOptedOut ());
+
+		}
 
 	}
 
@@ -340,121 +352,127 @@ class ChatBroadcastSendHelper
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendItem");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendItem");
 
-		// sanity check
-
-		if (
-			chatBroadcastNumber.getState ()
-				!= ChatBroadcastNumberState.accepted
 		) {
-			throw new IllegalStateException ();
-		}
 
-		// misc stuff
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-		ChatUserRec fromChatUser =
-			chatBroadcast.getChatUser ();
+			// sanity check
 
-		ChatUserRec toChatUser =
-			chatBroadcastNumber.getChatUser ();
+			if (
+				chatBroadcastNumber.getState ()
+					!= ChatBroadcastNumberState.accepted
+			) {
+				throw new IllegalStateException ();
+			}
 
-		ChatSchemeRec chatScheme =
-			toChatUser.getChatScheme ();
+			// misc stuff
 
-		ServiceRec broadcastService =
-			requiredValue (
-				serviceHelper.findByCodeRequired (
-					chat,
-					"broadcast"));
+			ChatUserRec fromChatUser =
+				chatBroadcast.getChatUser ();
 
-		BatchRec batch =
-			requiredValue (
-				batchHelper.findByCodeRequired (
-					chatBroadcast,
-					"broadcast"));
+			ChatUserRec toChatUser =
+				chatBroadcastNumber.getChatUser ();
 
-		AffiliateRec affiliate =
-			requiredValue (
-				chatUserLogic.getAffiliate (
-					toChatUser));
+			ChatSchemeRec chatScheme =
+				toChatUser.getChatScheme ();
 
-		// send message
+			ServiceRec broadcastService =
+				requiredValue (
+					serviceHelper.findByCodeRequired (
+						chat,
+						"broadcast"));
 
-		MessageRec message =
-			magicNumberLogic.sendMessage (
+			BatchRec batch =
+				requiredValue (
+					batchHelper.findByCodeRequired (
+						chatBroadcast,
+						"broadcast"));
+
+			AffiliateRec affiliate =
+				requiredValue (
+					chatUserLogic.getAffiliate (
+						toChatUser));
+
+			// send message
+
+			MessageRec message =
+				magicNumberLogic.sendMessage (
+					taskLogger,
+					chatScheme.getMagicNumberSet (),
+					toChatUser.getNumber (),
+					commandHelper.findByCodeRequired (
+						chat,
+						"chat"),
+					fromChatUser.getId (),
+					optionalAbsent (),
+					chatBroadcast.getText (),
+					chatScheme.getMagicRouter (),
+					broadcastService,
+					optionalOf (
+						batch),
+					affiliate,
+					optionalOf (
+						chatBroadcast.getSentUser ()));
+
+			// create chat message
+
+			chatMessageHelper.insert (
 				taskLogger,
-				chatScheme.getMagicNumberSet (),
-				toChatUser.getNumber (),
-				commandHelper.findByCodeRequired (
-					chat,
-					"chat"),
-				fromChatUser.getId (),
-				optionalAbsent (),
-				chatBroadcast.getText (),
-				chatScheme.getMagicRouter (),
-				broadcastService,
-				optionalOf (
-					batch),
-				affiliate,
-				optionalOf (
-					chatBroadcast.getSentUser ()));
+				chatMessageHelper.createInstance ()
 
-		// create chat message
+				.setChat (
+					chat)
 
-		chatMessageHelper.insert (
-			taskLogger,
-			chatMessageHelper.createInstance ()
+				.setFromUser (
+					fromChatUser)
 
-			.setChat (
-				chat)
+				.setToUser (
+					toChatUser)
 
-			.setFromUser (
-				fromChatUser)
+				.setTimestamp (
+					transaction.now ())
 
-			.setToUser (
-				toChatUser)
+				.setOriginalText (
+					chatBroadcast.getText ())
 
-			.setTimestamp (
-				transaction.now ())
+				.setEditedText (
+					chatBroadcast.getText ())
 
-			.setOriginalText (
-				chatBroadcast.getText ())
+				.setStatus (
+					ChatMessageStatus.broadcast)
 
-			.setEditedText (
-				chatBroadcast.getText ())
+				.setSender (
+					chatBroadcast.getSentUser ())
 
-			.setStatus (
-				ChatMessageStatus.broadcast)
+			);
 
-			.setSender (
-				chatBroadcast.getSentUser ())
+			// mark the number as sent
 
-		);
+			chatBroadcastNumber
 
-		// mark the number as sent
+				.setState (
+					ChatBroadcastNumberState.sent)
 
-		chatBroadcastNumber
+				.setMessage (
+					message);
 
-			.setState (
-				ChatBroadcastNumberState.sent)
+			chatBroadcast
 
-			.setMessage (
-				message);
+				.setNumAccepted (
+					chatBroadcast.getNumAccepted () - 1)
 
-		chatBroadcast
+				.setNumSent (
+					chatBroadcast.getNumSent () + 1);
 
-			.setNumAccepted (
-				chatBroadcast.getNumAccepted () - 1)
-
-			.setNumSent (
-				chatBroadcast.getNumSent () + 1);
+		}
 
 	}
 
@@ -465,55 +483,61 @@ class ChatBroadcastSendHelper
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendComplete");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendComplete");
 
-		// sanity check
+		) {
 
-		if (chatBroadcast.getNumAccepted () != 0) {
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			throw new IllegalStateException (
-				stringFormat (
-					"Unable to complete send to chat broadcast %s ",
-					integerToDecimalString (
-						chatBroadcast.getId ()),
-					"with %s numbers accepted",
-					integerToDecimalString (
-						chatBroadcast.getNumAccepted ())));
+			// sanity check
+
+			if (chatBroadcast.getNumAccepted () != 0) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"Unable to complete send to chat broadcast %s ",
+						integerToDecimalString (
+							chatBroadcast.getId ()),
+						"with %s numbers accepted",
+						integerToDecimalString (
+							chatBroadcast.getNumAccepted ())));
+
+			}
+
+			// update broadcast
+
+			chatBroadcast
+
+				.setState (
+					ChatBroadcastState.sent)
+
+				.setSentTime (
+					transaction.now ());
+
+			// update chat
+
+			chat
+
+				.setNumChatBroadcastSending (
+					chat.getNumChatBroadcastSending () - 1)
+
+				.setNumChatBroadcastSent (
+					chat.getNumChatBroadcastSent () + 1);
+
+			// create event
+
+			eventLogic.createEvent (
+				taskLogger,
+				"chat_broadcast_send_completed",
+				chatBroadcast);
 
 		}
-
-		// update broadcast
-
-		chatBroadcast
-
-			.setState (
-				ChatBroadcastState.sent)
-
-			.setSentTime (
-				transaction.now ());
-
-		// update chat
-
-		chat
-
-			.setNumChatBroadcastSending (
-				chat.getNumChatBroadcastSending () - 1)
-
-			.setNumChatBroadcastSent (
-				chat.getNumChatBroadcastSent () + 1);
-
-		// create event
-
-		eventLogic.createEvent (
-			taskLogger,
-			"chat_broadcast_send_completed",
-			chatBroadcast);
 
 	}
 

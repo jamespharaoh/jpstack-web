@@ -26,7 +26,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
@@ -126,14 +126,14 @@ class AlertsDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce ()");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce ()");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"AlertsDaemon.runOnce ()",
@@ -226,29 +226,27 @@ class AlertsDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long alertsSettingsId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runOnce (%s)",
-				integerToDecimalString (
-					alertsSettingsId));
-
-		taskLogger.debugFormat (
-			"checking if we should send an alert for %s",
-			integerToDecimalString (
-				alertsSettingsId));
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runOnce (%s)",
+					integerToDecimalString (
+						alertsSettingsId));
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"AlertsDaemon.runOnce ()",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"checking if we should send an alert for %s",
+				integerToDecimalString (
+					alertsSettingsId));
 
 			AlertsSettingsRec alertsSettings =
 				alertsSettingsHelper.findRequired (
@@ -556,99 +554,111 @@ class AlertsDaemon
 			@NonNull Long numUnclaimed,
 			@NonNull Duration maximumDuration) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"constructMessage");
+		try (
 
-		Integer maxDurationMinutes =
-			maximumDuration
-				.toStandardMinutes ()
-				.getMinutes ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"constructMessage");
 
-		String message =
-			new StringSubstituter ()
+		) {
 
-			.param (
-				"numItems",
-				Long.toString (
-					numUnclaimed))
+			Integer maxDurationMinutes =
+				maximumDuration
+					.toStandardMinutes ()
+					.getMinutes ();
 
-			.param (
-				"numMinutes",
-				Integer.toString (
-					maxDurationMinutes))
+			String message =
+				new StringSubstituter ()
 
-			.substitute (
-				alertsSettings.getTemplate ());
+				.param (
+					"numItems",
+					Long.toString (
+						numUnclaimed))
 
-		taskLogger.warningFormat (
-			"%s",
-			message);
+				.param (
+					"numMinutes",
+					Integer.toString (
+						maxDurationMinutes))
 
-		TextRec messageText =
-			textHelper.findOrCreate (
-				taskLogger,
+				.substitute (
+					alertsSettings.getTemplate ());
+
+			taskLogger.warningFormat (
+				"%s",
 				message);
 
-		return messageText;
+			TextRec messageText =
+				textHelper.findOrCreate (
+					taskLogger,
+					message);
+
+			return messageText;
+
+		}
 
 	}
 
 	boolean checkSentRecently (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull AlertsSettingsRec alertsSettings) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkSentRecently");
+		try (
 
-		Duration minAlertFrequency =
-			new Duration (
-				alertsSettings.getMaxAlertFrequency ()
-				* 1000L);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkSentRecently");
 
-		if (alertsSettings.getLastAlert () == null)
-			return false;
-
-		taskLogger.debugFormat (
-			"last alert was at %s",
-			timeFormatter.timestampSecondStringIso (
-				alertsSettings.getLastAlert ()));
-
-		Duration durationSinceLastSend =
-			new Duration (
-				alertsSettings.getLastAlert (),
-				transaction.now ());
-
-		taskLogger.debugFormat (
-			"duration since last alert is %s",
-			timeFormatter.prettyDuration (
-				durationSinceLastSend));
-
-		if (
-			shorterThan (
-				durationSinceLastSend,
-				minAlertFrequency)
 		) {
 
+			Duration minAlertFrequency =
+				new Duration (
+					alertsSettings.getMaxAlertFrequency ()
+					* 1000L);
+
+			if (alertsSettings.getLastAlert () == null)
+				return false;
+
 			taskLogger.debugFormat (
-				"mininum alert frequency of %s not exceeded",
-				timeFormatter.prettyDuration (
-					minAlertFrequency));
+				"last alert was at %s",
+				timeFormatter.timestampSecondStringIso (
+					alertsSettings.getLastAlert ()));
 
-			return true;
-
-		} else {
+			Duration durationSinceLastSend =
+				new Duration (
+					alertsSettings.getLastAlert (),
+					transaction.now ());
 
 			taskLogger.debugFormat (
-				"minimum alert frequency of %s exceeded",
+				"duration since last alert is %s",
 				timeFormatter.prettyDuration (
-					minAlertFrequency));
+					durationSinceLastSend));
 
-			return false;
+			if (
+				shorterThan (
+					durationSinceLastSend,
+					minAlertFrequency)
+			) {
+
+				taskLogger.debugFormat (
+					"mininum alert frequency of %s not exceeded",
+					timeFormatter.prettyDuration (
+						minAlertFrequency));
+
+				return true;
+
+			} else {
+
+				taskLogger.debugFormat (
+					"minimum alert frequency of %s exceeded",
+					timeFormatter.prettyDuration (
+						minAlertFrequency));
+
+				return false;
+
+			}
 
 		}
 
@@ -656,7 +666,7 @@ class AlertsDaemon
 
 
 	boolean checkActive (
-			Transaction transaction,
+			OwnedTransaction transaction,
 			AlertsSettingsRec alertsSettings) {
 
 		// check time
@@ -723,61 +733,67 @@ class AlertsDaemon
 			@NonNull AlertsSettingsRec alertsSettings,
 			@NonNull TextRec messageText) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendAlerts");
+		try (
 
-		// send alerts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendAlerts");
 
-		int numSent = 0;
-
-		for (
-			AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()
 		) {
 
-			if (! alertsNumber.getEnabled ())
-				continue;
+			// send alerts
 
-			taskLogger.noticeFormat (
-				"sending alert to %s",
-				alertsNumber.getNumber ().getNumber ());
+			int numSent = 0;
 
-			ServiceRec alertsService =
-				serviceHelper.findByCodeRequired (
-					alertsSettings,
-					"alerts");
+			for (
+				AlertsNumberRec alertsNumber
+					: alertsSettings.getAlertsNumbers ()
+			) {
 
-			RouteRec route =
-				routerLogic.resolveRouter (
-					alertsSettings.getRouter ());
+				if (! alertsNumber.getEnabled ())
+					continue;
 
-			messageSenderProvider.get ()
+				taskLogger.noticeFormat (
+					"sending alert to %s",
+					alertsNumber.getNumber ().getNumber ());
 
-				.number (
-					alertsNumber.getNumber ())
+				ServiceRec alertsService =
+					serviceHelper.findByCodeRequired (
+						alertsSettings,
+						"alerts");
 
-				.messageText (
-					messageText)
+				RouteRec route =
+					routerLogic.resolveRouter (
+						alertsSettings.getRouter ());
 
-				.numFrom (
-					alertsSettings.getNumFrom ())
+				messageSenderProvider.get ()
 
-				.route (
-					route)
+					.number (
+						alertsNumber.getNumber ())
 
-				.service (
-					alertsService)
+					.messageText (
+						messageText)
 
-				.send (
-					taskLogger);
+					.numFrom (
+						alertsSettings.getNumFrom ())
 
-			numSent ++;
+					.route (
+						route)
+
+					.service (
+						alertsService)
+
+					.send (
+						taskLogger);
+
+				numSent ++;
+
+			}
+
+			return numSent;
 
 		}
-
-		return numSent;
 
 	}
 

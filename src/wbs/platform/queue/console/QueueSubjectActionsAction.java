@@ -1,7 +1,5 @@
 package wbs.platform.queue.console;
 
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -40,14 +38,13 @@ class QueueSubjectActionsAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		/*
 
 		// begin transaction
 
-		Transaction transaction =
+		OwnedTransaction transaction =
 			database.beginReadWrite (
 				"QueueSubjectActionsAction.goReal ()",
 				this);
@@ -111,7 +108,7 @@ class QueueSubjectActionsAction
 
 	private
 	Responder manuallyUndeliver (
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
 		if (
 			notEqual (
@@ -156,7 +153,7 @@ class QueueSubjectActionsAction
 
 	private
 	Responder manuallyDeliver (
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
 		if (
 			notEqual (
@@ -201,7 +198,7 @@ class QueueSubjectActionsAction
 
 	private
 	Responder manuallyUnhold (
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
 		if (
 			notEqual (
@@ -235,7 +232,7 @@ class QueueSubjectActionsAction
 
 	private
 	Responder manuallyRetry (
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
 		if (
 			notIn (

@@ -178,23 +178,29 @@ class ChatRebillSendPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlParagraphWriteFormat (
-			"This tool allows you to rebill users who have not performed an ",
-			"action recently.");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		renderSearchForm (
-			taskLogger);
+		) {
 
-		renderBillSearchResults (
-			taskLogger);
+			htmlParagraphWriteFormat (
+				"This tool allows you to rebill users who have not performed an ",
+				"action recently.");
 
-		renderNonBillSearchResults (
-			taskLogger);
+			renderSearchForm (
+				taskLogger);
+
+			renderBillSearchResults (
+				taskLogger);
+
+			renderNonBillSearchResults (
+				taskLogger);
+
+		}
 
 	}
 
@@ -202,61 +208,67 @@ class ChatRebillSendPart
 	void renderSearchForm (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderSearchForm");
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chat.rebill.send"));
-
-		htmlTableOpenDetails ();
-
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			searchFormFields,
-			formUpdates,
-			formValues,
-			formHints,
-			FormType.search,
-			"rebill");
-
-		htmlTableClose ();
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"search\"",
-			" value=\"search users\"",
-			">");
-
-		if (
-
-			optionalIsPresent (
-				billSearchResults)
-
-			&& collectionIsNotEmpty (
-				billSearchResults.get ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderSearchForm");
 
 		) {
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chat.rebill.send"));
+
+			htmlTableOpenDetails ();
+
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				searchFormFields,
+				formUpdates,
+				formValues,
+				formHints,
+				FormType.search,
+				"rebill");
+
+			htmlTableClose ();
+
+			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"rebill\"",
-				" value=\"rebill users\"",
+				" name=\"search\"",
+				" value=\"search users\"",
 				">");
 
+			if (
+
+				optionalIsPresent (
+					billSearchResults)
+
+				&& collectionIsNotEmpty (
+					billSearchResults.get ())
+
+			) {
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"rebill\"",
+					" value=\"rebill users\"",
+					">");
+
+			}
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
 		}
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
 
 	}
 
@@ -264,55 +276,61 @@ class ChatRebillSendPart
 	void renderBillSearchResults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderBillSearchResults");
+		try (
 
-		if (
-			optionalIsNotPresent (
-				billSearchResults)
-		) {
-			return;
-		}
-
-		htmlHeadingTwoWrite (
-			"Search results");
-
-		htmlParagraphWriteFormat (
-			"Found %s users who qualify for rebilling under the criteria ",
-			integerToDecimalString (
-				collectionSize (
-					billSearchResults.get ())),
-			"specified. Please note that these results are not saved and so ",
-			"the list of actual users billed may be slightly different.");
-
-		if (
-
-			optionalIsPresent (
-				nonBillSearchResults)
-
-			&& collectionIsNotEmpty (
-				nonBillSearchResults.get ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderBillSearchResults");
 
 		) {
+
+			if (
+				optionalIsNotPresent (
+					billSearchResults)
+			) {
+				return;
+			}
+
+			htmlHeadingTwoWrite (
+				"Search results");
 
 			htmlParagraphWriteFormat (
-				"Another %s users who did not meet the requirements for ",
+				"Found %s users who qualify for rebilling under the criteria ",
 				integerToDecimalString (
 					collectionSize (
-						nonBillSearchResults.get ())),
-				"rebilling are shown further down the page.");
+						billSearchResults.get ())),
+				"specified. Please note that these results are not saved and so ",
+				"the list of actual users billed may be slightly different.");
+
+			if (
+
+				optionalIsPresent (
+					nonBillSearchResults)
+
+				&& collectionIsNotEmpty (
+					nonBillSearchResults.get ())
+
+			) {
+
+				htmlParagraphWriteFormat (
+					"Another %s users who did not meet the requirements for ",
+					integerToDecimalString (
+						collectionSize (
+							nonBillSearchResults.get ())),
+					"rebilling are shown further down the page.");
+
+			}
+
+			formFieldLogic.outputListTable (
+				taskLogger,
+				formatWriter,
+				billResultsFormFields,
+				billSearchResults.get (),
+				emptyMap (),
+				true);
 
 		}
-
-		formFieldLogic.outputListTable (
-			taskLogger,
-			formatWriter,
-			billResultsFormFields,
-			billSearchResults.get (),
-			emptyMap (),
-			true);
 
 	}
 
@@ -320,42 +338,48 @@ class ChatRebillSendPart
 	void renderNonBillSearchResults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderNonBillSearchResults");
+		try (
 
-		if (
-
-			optionalIsNotPresent (
-				nonBillSearchResults)
-
-			|| collectionIsEmpty (
-				nonBillSearchResults.get ())
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderNonBillSearchResults");
 
 		) {
-			return;
+
+			if (
+
+				optionalIsNotPresent (
+					nonBillSearchResults)
+
+				|| collectionIsEmpty (
+					nonBillSearchResults.get ())
+
+			) {
+				return;
+			}
+
+			htmlHeadingTwoWrite (
+				"Non-billable results");
+
+			htmlParagraphWriteFormat (
+				"Found %s users who match the search criteria but who are not ",
+				integerToDecimalString (
+					collectionSize (
+						nonBillSearchResults.get ())),
+				"able to be be billed at this time, due to restrictions that are ",
+				"built into the system. Some of these may be bypassed with ",
+				"settings on the search form.");
+
+			formFieldLogic.outputListTable (
+				taskLogger,
+				formatWriter,
+				nonBillResultsFormFields,
+				nonBillSearchResults.get (),
+				emptyMap (),
+				true);
+
 		}
-
-		htmlHeadingTwoWrite (
-			"Non-billable results");
-
-		htmlParagraphWriteFormat (
-			"Found %s users who match the search criteria but who are not ",
-			integerToDecimalString (
-				collectionSize (
-					nonBillSearchResults.get ())),
-			"able to be be billed at this time, due to restrictions that are ",
-			"built into the system. Some of these may be bypassed with ",
-			"settings on the search form.");
-
-		formFieldLogic.outputListTable (
-			taskLogger,
-			formatWriter,
-			nonBillResultsFormFields,
-			nonBillSearchResults.get (),
-			emptyMap (),
-			true);
 
 	}
 

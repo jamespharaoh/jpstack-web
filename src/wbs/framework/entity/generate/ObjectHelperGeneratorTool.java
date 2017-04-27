@@ -40,64 +40,70 @@ class ObjectHelperGeneratorTool {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"generateObjectHelpers");
+		try (
 
-		List <Model <?>> models =
-			entityHelper.models ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateObjectHelpers");
 
-		taskLogger.noticeFormat (
-			"About to generate %s object helpers",
-			integerToDecimalString (
-				collectionSize (
-					models)));
-
-		long numSuccess = 0;
-		long numFailures = 0;
-
-		for (
-			Model <?> model
-				: models
 		) {
 
-			try {
+			List <Model <?>> models =
+				entityHelper.models ();
 
-				objectHelperGeneratorProvider.get ()
+			taskLogger.noticeFormat (
+				"About to generate %s object helpers",
+				integerToDecimalString (
+					collectionSize (
+						models)));
 
-					.model (
-						model)
+			long numSuccess = 0;
+			long numFailures = 0;
 
-					.generateHelper (
-						taskLogger);
+			for (
+				Model <?> model
+					: models
+			) {
 
-				numSuccess ++;
+				try {
 
-			} catch (Exception exception) {
+					objectHelperGeneratorProvider.get ()
 
-				taskLogger.errorFormatException (
-					exception,
-					"Error writing object helper for %s",
-					model.objectName ());
+						.model (
+							model)
 
-				numFailures ++;
+						.generateHelper (
+							taskLogger);
+
+					numSuccess ++;
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
+						"Error writing object helper for %s",
+						model.objectName ());
+
+					numFailures ++;
+
+				}
 
 			}
 
-		}
-
-		taskLogger.noticeFormat (
-			"Successfully generated %s object helpers",
-			integerToDecimalString (
-				numSuccess));
-
-		if (numFailures > 0) {
-
-			taskLogger.errorFormat (
-				"Aborting due to %s errors",
+			taskLogger.noticeFormat (
+				"Successfully generated %s object helpers",
 				integerToDecimalString (
-					numFailures));
+					numSuccess));
+
+			if (numFailures > 0) {
+
+				taskLogger.errorFormat (
+					"Aborting due to %s errors",
+					integerToDecimalString (
+						numFailures));
+
+			}
 
 		}
 

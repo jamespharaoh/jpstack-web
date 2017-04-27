@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
@@ -100,54 +100,60 @@ class ChatAdultAdDaemon
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce");
-
-		taskLogger.debugFormat (
-			"Looking for users to send an adult ad to");
-
-		// get a list of users who have passed their ad time
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatAdultAdDaemon.runOnce ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
-			List <ChatUserRec> chatUsers =
-				chatUserHelper.findWantingAdultAd (
-					transaction.now ());
+			taskLogger.debugFormat (
+				"Looking for users to send an adult ad to");
 
-			transaction.close ();
+			// get a list of users who have passed their ad time
 
-			// then call doAdultAd for each one
+			try (
 
-			for (
-				ChatUserRec chatUser
-					: chatUsers
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"ChatAdultAdDaemon.runOnce ()",
+						this);
+
 			) {
 
-				try {
+				List <ChatUserRec> chatUsers =
+					chatUserHelper.findWantingAdultAd (
+						transaction.now ());
 
-					doAdultAd (
-						taskLogger,
-						chatUser.getId ());
+				transaction.close ();
 
-				} catch (Exception exception) {
+				// then call doAdultAd for each one
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						"ChatAdDaemon",
-						exception,
-						Optional.absent (),
-						GenericExceptionResolution.tryAgainLater);
+				for (
+					ChatUserRec chatUser
+						: chatUsers
+				) {
+
+					try {
+
+						doAdultAd (
+							taskLogger,
+							chatUser.getId ());
+
+					} catch (Exception exception) {
+
+						exceptionLogger.logThrowable (
+							taskLogger,
+							"daemon",
+							"ChatAdDaemon",
+							exception,
+							Optional.absent (),
+							GenericExceptionResolution.tryAgainLater);
+
+					}
 
 				}
 
@@ -162,25 +168,25 @@ class ChatAdultAdDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doAdultAd");
-
-		taskLogger.debugFormat (
-			"Attempting to send adult ad to %s",
-			integerToDecimalString (
-				chatUserId));
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doAdultAd");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ChatAdultAdDaemon.doAdultAd (chatUserId)",
 					this);
 
 		) {
+
+			taskLogger.debugFormat (
+				"Attempting to send adult ad to %s",
+				integerToDecimalString (
+					chatUserId));
 
 			// find the user
 

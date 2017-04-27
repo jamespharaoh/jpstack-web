@@ -14,13 +14,10 @@ import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
-
-import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -32,7 +29,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -198,19 +195,16 @@ class MediaburstApiServletModule
 		@Override
 		public
 		void doPost (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"inFile.doPost");
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"inFile.doPost");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"MediaburstApiServletModule.inFile.doPost ()",
@@ -378,11 +372,17 @@ class MediaburstApiServletModule
 
 			// send response
 
-			FormatWriter formatWriter =
-				requestContext.formatWriter ();
+			try (
 
-			formatWriter.writeLineFormat (
-				"OK");
+				FormatWriter formatWriter =
+					requestContext.formatWriter ();
+
+			) {
+
+				formatWriter.writeLineFormat (
+					"OK");
+
+			}
 
 		}
 
@@ -412,19 +412,16 @@ class MediaburstApiServletModule
 		@Override
 		public
 		void doGet (
-				@NonNull TaskLogger parentTaskLogger)
-			throws
-				ServletException,
-				IOException {
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reportFile.doGet");
+				@NonNull TaskLogger parentTaskLogger) {
 
 			try (
 
-				Transaction transaction =
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"reportFile.doGet");
+
+				OwnedTransaction transaction =
 					database.beginReadWrite (
 						taskLogger,
 						"MediaburstApiServletModule.reportFile.doGet ()",

@@ -44,72 +44,78 @@ class StatusLineManager {
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		Set <String> statusLineNames =
-			new HashSet<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		ImmutableList.Builder <StatusLine> statusLinesBuilder =
-			ImmutableList.builder ();
-
-		taskLogger.debugFormat (
-			"About to initialise status lines");
-
-		for (
-			Map.Entry <String, StatusLine> entry
-				: statusLinesByBeanName.entrySet ()
 		) {
 
-			String beanName =
-				entry.getKey ();
+			Set <String> statusLineNames =
+				new HashSet<> ();
 
-			StatusLine statusLine =
-				entry.getValue ();
-
-			String statusLineName =
-				statusLine.typeName ();
+			ImmutableList.Builder <StatusLine> statusLinesBuilder =
+				ImmutableList.builder ();
 
 			taskLogger.debugFormat (
-				"Adding status line %s from %s",
-				statusLineName,
-				beanName);
+				"About to initialise status lines");
 
-			if (
-				statusLineNames
-					.contains (statusLineName)
+			for (
+				Map.Entry <String, StatusLine> entry
+					: statusLinesByBeanName.entrySet ()
 			) {
 
-				throw new RuntimeException (
-					stringFormat (
-						"Duplicated status line name %s in %s",
-						statusLineName,
-						beanName));
+				String beanName =
+					entry.getKey ();
+
+				StatusLine statusLine =
+					entry.getValue ();
+
+				String statusLineName =
+					statusLine.typeName ();
+
+				taskLogger.debugFormat (
+					"Adding status line %s from %s",
+					statusLineName,
+					beanName);
+
+				if (
+					statusLineNames
+						.contains (statusLineName)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Duplicated status line name %s in %s",
+							statusLineName,
+							beanName));
+
+				}
+
+				statusLineNames.add (
+					statusLineName);
+
+				statusLinesBuilder.add (
+					statusLine);
+
+				taskLogger.debugFormat (
+					"Adding status line %s from %s",
+					statusLineName,
+					beanName);
 
 			}
 
-			statusLineNames.add (
-				statusLineName);
+			statusLines =
+				statusLinesBuilder.build ();
 
-			statusLinesBuilder.add (
-				statusLine);
-
-			taskLogger.debugFormat (
-				"Adding status line %s from %s",
-				statusLineName,
-				beanName);
+			taskLogger.noticeFormat (
+				"Initialised %s status lines",
+				integerToDecimalString (
+					statusLines.size ()));
 
 		}
-
-		statusLines =
-			statusLinesBuilder.build ();
-
-		taskLogger.noticeFormat (
-			"Initialised %s status lines",
-			integerToDecimalString (
-				statusLines.size ()));
 
 	}
 

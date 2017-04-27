@@ -118,53 +118,76 @@ class ChatLogoffCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
+		try (
 
-		ChatRec chat =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					command));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
+		) {
 
-		MessageRec message =
-			inbox.getMessage ();
+			ChatRec chat =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						command));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findOrCreate (
-				taskLogger,
-				chat,
-				message);
+			ServiceRec defaultService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default");
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			MessageRec message =
+				inbox.getMessage ();
 
-		// send barred users to help
+			ChatUserRec chatUser =
+				chatUserHelper.findOrCreate (
+					taskLogger,
+					chat,
+					message);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
+
+			// send barred users to help
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
+					chatUser,
+					true,
+					optionalOf (
+						message.getThreadId ()));
+
+			if (creditCheckResult.failed ()) {
+
+				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
+					chatUser,
+					message,
+					rest,
+					optionalAbsent (),
+					true);
+
+				return smsInboxLogic.inboxProcessed (
+					taskLogger,
+					inbox,
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
+					command);
+
+			}
+
+			// log the user off
+
+			chatMiscLogic.userLogoffWithMessage (
 				taskLogger,
 				chatUser,
-				true,
-				optionalOf (
-					message.getThreadId ()));
-
-		if (creditCheckResult.failed ()) {
-
-			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
-				chatUser,
-				message,
-				rest,
-				optionalAbsent (),
-				true);
+				message.getThreadId (),
+				false);
 
 			return smsInboxLogic.inboxProcessed (
 				taskLogger,
@@ -176,23 +199,6 @@ class ChatLogoffCommand
 				command);
 
 		}
-
-		// log the user off
-
-		chatMiscLogic.userLogoffWithMessage (
-			taskLogger,
-			chatUser,
-			message.getThreadId (),
-			false);
-
-		return smsInboxLogic.inboxProcessed (
-			taskLogger,
-			inbox,
-			optionalOf (
-				defaultService),
-			optionalOf (
-				affiliate),
-			command);
 
 	}
 

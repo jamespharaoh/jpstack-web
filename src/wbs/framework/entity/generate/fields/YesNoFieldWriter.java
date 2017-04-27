@@ -47,42 +47,48 @@ class YesNoFieldWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		// write field
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		JavaPropertyWriter propertyWriter =
-			new JavaPropertyWriter ()
+		) {
 
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
+			// write field
 
-			.typeClass (
-				Boolean.class)
+			JavaPropertyWriter propertyWriter =
+				new JavaPropertyWriter ()
 
-			.propertyNameFormat (
-				"%s",
-				spec.name ());
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
 
-		if (spec.defaultValue () != null) {
+				.typeClass (
+					Boolean.class)
 
-			propertyWriter.defaultValueFormat (
-				"%s",
-				spec.defaultValue ()
-					? "true"
-					: "false");
+				.propertyNameFormat (
+					"%s",
+					spec.name ());
+
+			if (spec.defaultValue () != null) {
+
+				propertyWriter.defaultValueFormat (
+					"%s",
+					spec.defaultValue ()
+						? "true"
+						: "false");
+
+			}
+
+			propertyWriter.writeBlock (
+				taskLogger,
+				target.imports (),
+				target.formatWriter ());
 
 		}
-
-		propertyWriter.writeBlock (
-			taskLogger,
-			target.imports (),
-			target.formatWriter ());
 
 	}
 

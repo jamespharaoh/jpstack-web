@@ -24,7 +24,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -144,16 +144,14 @@ class FonixRouteReportAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateDatabase");
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateDatabase");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (
@@ -249,71 +247,77 @@ class FonixRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixRouteOutRec fonixRouteOut) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handleDeliveryReport");
+		try (
 
-		// lookup the delivery status
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleDeliveryReport");
 
-		Optional <FonixDeliveryStatusRec> deliveryStatusOptional =
-			fonixDeliveryStatusHelper.findByCode (
-				fonixRouteOut.getFonixConfig (),
-				lowercase (
-					request.statusCode ()));
-
-		if (
-			optionalIsNotPresent (
-				deliveryStatusOptional)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Delivery status not recognised: %s",
-					request.statusCode ()));
+			// lookup the delivery status
+
+			Optional <FonixDeliveryStatusRec> deliveryStatusOptional =
+				fonixDeliveryStatusHelper.findByCode (
+					fonixRouteOut.getFonixConfig (),
+					lowercase (
+						request.statusCode ()));
+
+			if (
+				optionalIsNotPresent (
+					deliveryStatusOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Delivery status not recognised: %s",
+						request.statusCode ()));
+
+			}
+
+			FonixDeliveryStatusRec deliveryStatus =
+				optionalGetRequired (
+					deliveryStatusOptional);
+
+			// lookup the message
+
+			Optional <MessageRec> smsMessageOptional =
+				smsMessageLogic.findMessageByMangledId (
+					request.requestId ());
+
+			if (
+				optionalIsNotPresent (
+					smsMessageOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Message guid not recognised: %s",
+						request.guid ()));
+
+			}
+
+			MessageRec smsMessage =
+				optionalGetRequired (
+					smsMessageOptional);
+
+			// store the delivery report
+
+			smsDeliveryReportLogic.deliveryReport (
+				taskLogger,
+				smsMessage,
+				deliveryStatus.getMessageStatus (),
+				optionalOf (
+					request.statusCode ()),
+				optionalOf  (
+					request.statusText ()),
+				optionalAbsent (),
+				optionalOf (
+					fonixLogic.stringToInstant (
+						request.statusTime ())));
 
 		}
-
-		FonixDeliveryStatusRec deliveryStatus =
-			optionalGetRequired (
-				deliveryStatusOptional);
-
-		// lookup the message
-
-		Optional <MessageRec> smsMessageOptional =
-			smsMessageLogic.findMessageByMangledId (
-				request.requestId ());
-
-		if (
-			optionalIsNotPresent (
-				smsMessageOptional)
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Message guid not recognised: %s",
-					request.guid ()));
-
-		}
-
-		MessageRec smsMessage =
-			optionalGetRequired (
-				smsMessageOptional);
-
-		// store the delivery report
-
-		smsDeliveryReportLogic.deliveryReport (
-			taskLogger,
-			smsMessage,
-			deliveryStatus.getMessageStatus (),
-			optionalOf (
-				request.statusCode ()),
-			optionalOf  (
-				request.statusText ()),
-			optionalAbsent (),
-			optionalOf (
-				fonixLogic.stringToInstant (
-					request.statusTime ())));
 
 	}
 
@@ -356,14 +360,14 @@ class FonixRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"storeLog");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"storeLog");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					stringFormat (

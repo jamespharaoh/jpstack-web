@@ -57,70 +57,76 @@ class ChatUserImageRemovePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlFormOpenPost ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		if (chatUser.getChatUserImageList ().isEmpty ()) {
+		) {
 
-			formatWriter.writeLineFormat (
-				"<p>No photo to remove.</p>");
+			htmlFormOpenPost ();
 
-		} else {
+			if (chatUser.getChatUserImageList ().isEmpty ()) {
 
-			htmlParagraphOpen ();
+				formatWriter.writeLineFormat (
+					"<p>No photo to remove.</p>");
 
-			mediaConsoleLogic.writeMediaContent (
-				taskLogger,
-				chatUser.getChatUserImageList ().get (0).getMedia ());
+			} else {
 
-			htmlParagraphClose ();
+				htmlParagraphOpen ();
 
-			htmlParagraphOpen ();
+				mediaConsoleLogic.writeMediaContent (
+					taskLogger,
+					chatUser.getChatUserImageList ().get (0).getMedia ());
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"remove_photo\"",
-				" value=\"remove photo\"",
-				">");
+				htmlParagraphClose ();
 
-			htmlParagraphClose ();
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"remove_photo\"",
+					" value=\"remove photo\"",
+					">");
+
+				htmlParagraphClose ();
+
+			}
+
+			if (chatUser.getChatUserVideoList ().isEmpty ()) {
+
+				formatWriter.writeLineFormat (
+					"<p>No video to remove.</p>");
+
+			} else {
+
+				htmlParagraphOpen ();
+
+				mediaConsoleLogic.writeMediaContent (
+					taskLogger,
+					chatUser.getChatUserVideoList ().get (0).getMedia ());
+
+				htmlParagraphClose ();
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"remove_video\"",
+					" value=\"remove video\"",
+					">");
+
+				htmlParagraphClose ();
+
+			}
+
+			htmlFormClose ();
 
 		}
-
-		if (chatUser.getChatUserVideoList ().isEmpty ()) {
-
-			formatWriter.writeLineFormat (
-				"<p>No video to remove.</p>");
-
-		} else {
-
-			htmlParagraphOpen ();
-
-			mediaConsoleLogic.writeMediaContent (
-				taskLogger,
-				chatUser.getChatUserVideoList ().get (0).getMedia ());
-
-			htmlParagraphClose ();
-
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"remove_video\"",
-				" value=\"remove video\"",
-				">");
-
-			htmlParagraphClose ();
-
-		}
-
-		htmlFormClose ();
 
 	}
 

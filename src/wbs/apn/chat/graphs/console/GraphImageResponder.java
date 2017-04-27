@@ -73,7 +73,8 @@ class GraphImageResponder
 			TaskLogger parentTaskLogger);
 
 	protected abstract
-	void prepareVerticalScale ();
+	void prepareVerticalScale (
+			TaskLogger parentTaskLogger);
 
 	protected abstract
 	void prepareImageData ();
@@ -278,7 +279,8 @@ class GraphImageResponder
 	}
 
 	protected
-	void prepareImage () {
+	void prepareImage (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		prepareImageCreate ();
 		prepareImageDimensions ();
@@ -296,26 +298,47 @@ class GraphImageResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		prepareData (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		prepareVerticalScale ();
-		prepareImage ();
+		) {
+
+			prepareData (
+				taskLogger);
+
+			prepareVerticalScale (
+				taskLogger);
+
+			prepareImage (
+				taskLogger);
+
+		}
 
 	}
 
 	@Override
 	protected
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"image/png");
+		try (
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"image/png");
+
+		}
 
 	}
 

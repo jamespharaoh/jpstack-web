@@ -103,45 +103,51 @@ class ChatMonitorInboxFormResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
-			chatMonitorInboxHelper.findFromContext ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		if (
-			optionalIsNotPresent (
-				chatMonitorInboxOptional)
 		) {
 
-			requestContext.addError (
-				"Chat monitor inbox item not found");
+			Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
+				chatMonitorInboxHelper.findFromContext ();
 
-			taskLogger.errorFormat (
-				"Chat monitor inbox not found: %s",
-				integerToDecimalString (
-					requestContext.stuffIntegerRequired (
-						"chatMonitorInboxId")));
+			if (
+				optionalIsNotPresent (
+					chatMonitorInboxOptional)
+			) {
 
-			return;
+				requestContext.addError (
+					"Chat monitor inbox item not found");
+
+				taskLogger.errorFormat (
+					"Chat monitor inbox not found: %s",
+					integerToDecimalString (
+						requestContext.stuffIntegerRequired (
+							"chatMonitorInboxId")));
+
+				return;
+
+			}
+
+			chatMonitorInbox =
+				chatMonitorInboxOptional.get ();
+
+			userChatUser =
+				chatMonitorInbox.getUserChatUser ();
+
+			monitorChatUser =
+				chatMonitorInbox.getMonitorChatUser ();
+
+			alarm =
+				chatUserAlarmHelper.find (
+					userChatUser,
+					monitorChatUser);
 
 		}
-
-		chatMonitorInbox =
-			chatMonitorInboxOptional.get ();
-
-		userChatUser =
-			chatMonitorInbox.getUserChatUser ();
-
-		monitorChatUser =
-			chatMonitorInbox.getMonitorChatUser ();
-
-		alarm =
-			chatUserAlarmHelper.find (
-				userChatUser,
-				monitorChatUser);
 
 	}
 
@@ -150,69 +156,75 @@ class ChatMonitorInboxFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		if (chatMonitorInbox == null)
-			return;
-
-		// script block open
-
-		htmlScriptBlockOpen ();
-
-		// show inbox
-
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
-
-		// set location
-
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j';",
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"%s",
-					consoleManager
-						.context (
-							"chatMonitorInbox",
-							true)
-						.pathPrefix (),
-					"/%u",
-					integerToDecimalString (
-						chatMonitorInbox.getId ()),
-					"/chatMonitorInbox.summary")));
-
-		// script block close
-
-		htmlScriptBlockClose ();
-
-		// style block
-
-		if (
-			userChatUser.getOperatorLabel ()
-				== ChatUserOperatorLabel.operator
 		) {
 
-			htmlStyleBlockOpen ();
+			super.renderHtmlHeadContents (
+				taskLogger);
 
-			htmlStyleRuleWrite (
-				"h2",
-				htmlStyleRuleEntry (
-					"background",
-					"#800000"));
+			if (chatMonitorInbox == null)
+				return;
 
-			htmlStyleRuleWrite (
-				"table.details th",
-				htmlStyleRuleEntry (
-					"background",
-					"#800000"));
+			// script block open
 
-			htmlStyleBlockClose ();
+			htmlScriptBlockOpen ();
+
+			// show inbox
+
+			formatWriter.writeLineFormat (
+				"top.show_inbox (true);");
+
+			// set location
+
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j';",
+				requestContext.resolveApplicationUrl (
+					stringFormat (
+						"%s",
+						consoleManager
+							.context (
+								"chatMonitorInbox",
+								true)
+							.pathPrefix (),
+						"/%u",
+						integerToDecimalString (
+							chatMonitorInbox.getId ()),
+						"/chatMonitorInbox.summary")));
+
+			// script block close
+
+			htmlScriptBlockClose ();
+
+			// style block
+
+			if (
+				userChatUser.getOperatorLabel ()
+					== ChatUserOperatorLabel.operator
+			) {
+
+				htmlStyleBlockOpen ();
+
+				htmlStyleRuleWrite (
+					"h2",
+					htmlStyleRuleEntry (
+						"background",
+						"#800000"));
+
+				htmlStyleRuleWrite (
+					"table.details th",
+					htmlStyleRuleEntry (
+						"background",
+						"#800000"));
+
+				htmlStyleBlockClose ();
+
+			}
 
 		}
 

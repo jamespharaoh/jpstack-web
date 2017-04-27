@@ -216,94 +216,100 @@ class DbPool
 
 	void closeIdle () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"closeIdle ()");
+		try (
 
-		long now =
-			System.currentTimeMillis ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"closeIdle ()");
 
-		List<Connection> connectionsToClose =
-			new ArrayList<Connection> ();
+		) {
 
-		synchronized (lock) {
+			long now =
+				System.currentTimeMillis ();
 
-			// if not enough time has passed, don't bother
+			List<Connection> connectionsToClose =
+				new ArrayList<Connection> ();
 
-			if (now < nextIdleCheck)
-				return;
+			synchronized (lock) {
 
-			// collect collections to close
+				// if not enough time has passed, don't bother
 
-			Iterator<ConnectionStuff> iterator =
-				idleConnections.iterator ();
+				if (now < nextIdleCheck)
+					return;
 
-			while (iterator.hasNext ()) {
+				// collect collections to close
 
-				ConnectionStuff connectionStuff =
-					iterator.next ();
+				Iterator<ConnectionStuff> iterator =
+					idleConnections.iterator ();
 
-				if (now < connectionStuff.idleExpiryTime) {
+				while (iterator.hasNext ()) {
 
-					connectionsToClose.add (
-						connectionStuff.realConnection);
+					ConnectionStuff connectionStuff =
+						iterator.next ();
 
-					iterator.remove ();
+					if (now < connectionStuff.idleExpiryTime) {
+
+						connectionsToClose.add (
+							connectionStuff.realConnection);
+
+						iterator.remove ();
+
+					}
 
 				}
 
+				// schedule the next check
+
+				nextIdleCheck =
+					now + idleCheckInterval;
+
+				/*
+				// dump info about idle connections
+
+				for (ConnectionStuff connectionStuff
+						: usedConnections) {
+
+					logger.info (
+						"Connection " +
+						connectionStuff.serial +
+						" in use by thread " +
+						connectionStuff.clientThread.getName () +
+						" (" +
+						connectionStuff.clientThread.getId () +
+						")");
+
+					System.out.println ("---- BEGIN STACK TRACE:");
+
+					for (StackTraceElement elem : connectionStuff.clientStackTrace)
+						System.out.println (elem.toString ());
+
+					System.out.println ("---- CURRENT STACK TRACE:");
+
+					for (StackTraceElement elem : connectionStuff.clientThread.getStackTrace ())
+						System.out.println (elem.toString ());
+
+				}
+				*/
+
 			}
 
-			// schedule the next check
+			// close connections
+			// TODO do this in a separate thread or something
 
-			nextIdleCheck =
-				now + idleCheckInterval;
+			for (Connection connection
+					: connectionsToClose) {
 
-			/*
-			// dump info about idle connections
+				try {
 
-			for (ConnectionStuff connectionStuff
-					: usedConnections) {
+					connection.close ();
 
-				logger.info (
-					"Connection " +
-					connectionStuff.serial +
-					" in use by thread " +
-					connectionStuff.clientThread.getName () +
-					" (" +
-					connectionStuff.clientThread.getId () +
-					")");
+				} catch (SQLException exception) {
 
-				System.out.println ("---- BEGIN STACK TRACE:");
+					taskLogger.fatalFormatException (
+						exception,
+						"Unable to close idle connection");
 
-				for (StackTraceElement elem : connectionStuff.clientStackTrace)
-					System.out.println (elem.toString ());
-
-				System.out.println ("---- CURRENT STACK TRACE:");
-
-				for (StackTraceElement elem : connectionStuff.clientThread.getStackTrace ())
-					System.out.println (elem.toString ());
-
-			}
-			*/
-
-		}
-
-		// close connections
-		// TODO do this in a separate thread or something
-
-		for (Connection connection
-				: connectionsToClose) {
-
-			try {
-
-				connection.close ();
-
-			} catch (SQLException exception) {
-
-				taskLogger.fatalFormatException (
-					exception,
-					"Unable to close idle connection");
+				}
 
 			}
 

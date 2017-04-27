@@ -54,26 +54,32 @@ class SubscriptionNumberAddRemovePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		addRemoveFormFieldSet =
-			subscriptionNumberConsoleModule.formFieldSetRequired (
-				"addRemoveForm",
-				SubscriptionNumberAddRemoveForm.class);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		addRemoveForm =
-			new SubscriptionNumberAddRemoveForm ();
+		) {
 
-		formFieldLogic.update (
-			taskLogger,
-			requestContext,
-			addRemoveFormFieldSet,
-			addRemoveForm,
-			ImmutableMap.of (),
-			"update");
+			addRemoveFormFieldSet =
+				subscriptionNumberConsoleModule.formFieldSetRequired (
+					"addRemoveForm",
+					SubscriptionNumberAddRemoveForm.class);
+
+			addRemoveForm =
+				new SubscriptionNumberAddRemoveForm ();
+
+			formFieldLogic.update (
+				taskLogger,
+				requestContext,
+				addRemoveFormFieldSet,
+				addRemoveForm,
+				ImmutableMap.of (),
+				"update");
+
+		}
 
 	}
 
@@ -82,47 +88,53 @@ class SubscriptionNumberAddRemovePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/subscriptionNumber.addRemove"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableOpenDetails ();
+		) {
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			addRemoveFormFieldSet,
-			Optional.absent (),
-			addRemoveForm,
-			ImmutableMap.of (),
-			FormType.perform,
-			"update");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/subscriptionNumber.addRemove"));
 
-		htmlTableOpenDetails ();
+			htmlTableOpenDetails ();
 
-		htmlParagraphOpen ();
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				addRemoveFormFieldSet,
+				Optional.absent (),
+				addRemoveForm,
+				ImmutableMap.of (),
+				FormType.perform,
+				"update");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"add\"",
-			" value=\"add numbers\"",
-			">");
+			htmlTableOpenDetails ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"remove\"",
-			" value=\"remove numbers\"",
-			">");
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"add\"",
+				" value=\"add numbers\"",
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"remove\"",
+				" value=\"remove numbers\"",
+				">");
+
+			htmlFormClose ();
+
+		}
 
 	}
 

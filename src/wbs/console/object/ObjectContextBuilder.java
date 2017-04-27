@@ -128,110 +128,116 @@ class ObjectContextBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildContextTypes ();
-
-		buildSimpleContexts ();
-		buildSimpleTabs ();
-
-		List <ResolvedConsoleContextLink> resolvedContextLinks =
-			consoleMetaManager.resolveContextLink (
-				name);
-
-		for (
-			ResolvedConsoleContextLink resolvedContextLink
-				: resolvedContextLinks
 		) {
 
-			buildResolvedContexts (
-				resolvedContextLink);
+			setDefaults (
+				taskLogger);
 
-			buildResolvedTabs (
-				resolvedContextLink);
+			buildContextTypes ();
+
+			buildSimpleContexts ();
+			buildSimpleTabs ();
+
+			List <ResolvedConsoleContextLink> resolvedContextLinks =
+				consoleMetaManager.resolveContextLink (
+					name);
+
+			for (
+				ResolvedConsoleContextLink resolvedContextLink
+					: resolvedContextLinks
+			) {
+
+				buildResolvedContexts (
+					resolvedContextLink);
+
+				buildResolvedTabs (
+					resolvedContextLink);
+
+			}
+
+			ConsoleContextBuilderContainer <ObjectType> listContainer =
+				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
+
+				.taskLogger (
+					container.taskLogger ())
+
+				.consoleHelper (
+					consoleHelper)
+
+				.structuralName (
+					structuralName)
+
+				.extensionPointName (
+					name + ":list")
+
+				.pathPrefix (
+					name)
+
+				.newBeanNamePrefix (
+					beanName)
+
+				.existingBeanNamePrefix (
+					beanName)
+
+				.tabLocation (
+					"end")
+
+				.friendlyName (
+					camelToSpaces (
+						beanName));
+
+			builder.descend (
+				taskLogger,
+				listContainer,
+				spec.listChildren (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
+
+			ConsoleContextBuilderContainer <ObjectType> objectContainer =
+				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
+
+				.taskLogger (
+					container.taskLogger ())
+
+				.consoleHelper (
+					consoleHelper)
+
+				.structuralName (
+					structuralName)
+
+				.extensionPointName (
+					name + ":object")
+
+				.pathPrefix (
+					name)
+
+				.newBeanNamePrefix (
+					beanName)
+
+				.existingBeanNamePrefix (
+					beanName)
+
+				.tabLocation (
+					"end")
+
+				.friendlyName (
+					camelToSpaces (beanName));
+
+			builder.descend (
+				taskLogger,
+				objectContainer,
+				spec.objectChildren (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
 
 		}
-
-		ConsoleContextBuilderContainer <ObjectType> listContainer =
-			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-			.taskLogger (
-				container.taskLogger ())
-
-			.consoleHelper (
-				consoleHelper)
-
-			.structuralName (
-				structuralName)
-
-			.extensionPointName (
-				name + ":list")
-
-			.pathPrefix (
-				name)
-
-			.newBeanNamePrefix (
-				beanName)
-
-			.existingBeanNamePrefix (
-				beanName)
-
-			.tabLocation (
-				"end")
-
-			.friendlyName (
-				camelToSpaces (
-					beanName));
-
-		builder.descend (
-			taskLogger,
-			listContainer,
-			spec.listChildren (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
-
-		ConsoleContextBuilderContainer <ObjectType> objectContainer =
-			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-			.taskLogger (
-				container.taskLogger ())
-
-			.consoleHelper (
-				consoleHelper)
-
-			.structuralName (
-				structuralName)
-
-			.extensionPointName (
-				name + ":object")
-
-			.pathPrefix (
-				name)
-
-			.newBeanNamePrefix (
-				beanName)
-
-			.existingBeanNamePrefix (
-				beanName)
-
-			.tabLocation (
-				"end")
-
-			.friendlyName (
-				camelToSpaces (beanName));
-
-		builder.descend (
-			taskLogger,
-			objectContainer,
-			spec.objectChildren (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
 
 	}
 
@@ -519,94 +525,100 @@ class ObjectContextBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			genericCastUnchecked (
-				objectManager.findConsoleHelperRequired (
-					spec.objectName ()));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		name =
-			spec.name ();
+		) {
 
-		structuralName =
-			name;
+			consoleHelper =
+				genericCastUnchecked (
+					objectManager.findConsoleHelperRequired (
+						spec.objectName ()));
 
-		beanName =
-			ifNull (
-				spec.beanName (),
-				name);
+			name =
+				spec.name ();
 
-		if (beanName.contains ("_")) {
+			structuralName =
+				name;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Object context name %s cannot be used as bean name",
-					name));
+			beanName =
+				ifNull (
+					spec.beanName (),
+					name);
+
+			if (beanName.contains ("_")) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Object context name %s cannot be used as bean name",
+						name));
+
+			}
+
+			objectTitle =
+				ifNull (
+					spec.objectTitle (),
+					stringFormat (
+						"%s {%s}",
+						capitalise (
+							consoleHelper.friendlyName ()),
+						stringFormat (
+							"%sName",
+							consoleHelper.objectName ())));
+
+			defaultFileName =
+				Optional.fromNullable (
+					spec.defaultFileName ());
+
+			cryptor =
+				spec.cryptorBeanName () != null
+					? componentManager.getComponentRequired (
+						taskLogger,
+						spec.cryptorBeanName (),
+						Cryptor.class)
+					: null;
+
+			hasListChildren =
+				! spec.listChildren ().isEmpty ();
+
+			hasObjectChildren =
+				! spec.objectChildren ().isEmpty ();
+
+			listContextTypeNames =
+				ImmutableList.<String> builder ()
+
+					.addAll (
+						maybeList (
+							hasListChildren,
+							name + ":list"))
+
+					.addAll (
+						maybeList (
+							hasObjectChildren,
+							name + ":combo"))
+
+					.build ();
+
+			objectContextTypeNames =
+				ImmutableList.<String> builder ()
+
+					.addAll (
+						maybeList (
+							hasListChildren,
+							name + ":combo"))
+
+					.addAll (
+						maybeList (
+							hasObjectChildren,
+							name + ":object"))
+
+					.build ();
 
 		}
-
-		objectTitle =
-			ifNull (
-				spec.objectTitle (),
-				stringFormat (
-					"%s {%s}",
-					capitalise (
-						consoleHelper.friendlyName ()),
-					stringFormat (
-						"%sName",
-						consoleHelper.objectName ())));
-
-		defaultFileName =
-			Optional.fromNullable (
-				spec.defaultFileName ());
-
-		cryptor =
-			spec.cryptorBeanName () != null
-				? componentManager.getComponentRequired (
-					taskLogger,
-					spec.cryptorBeanName (),
-					Cryptor.class)
-				: null;
-
-		hasListChildren =
-			! spec.listChildren ().isEmpty ();
-
-		hasObjectChildren =
-			! spec.objectChildren ().isEmpty ();
-
-		listContextTypeNames =
-			ImmutableList.<String> builder ()
-
-				.addAll (
-					maybeList (
-						hasListChildren,
-						name + ":list"))
-
-				.addAll (
-					maybeList (
-						hasObjectChildren,
-						name + ":combo"))
-
-				.build ();
-
-		objectContextTypeNames =
-			ImmutableList.<String> builder ()
-
-				.addAll (
-					maybeList (
-						hasListChildren,
-						name + ":combo"))
-
-				.addAll (
-					maybeList (
-						hasObjectChildren,
-						name + ":object"))
-
-				.build ();
 
 	}
 

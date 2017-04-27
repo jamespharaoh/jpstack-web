@@ -8,7 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.sql.SQLException;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -19,7 +18,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -33,7 +32,6 @@ import wbs.platform.affiliate.model.AffiliateTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
-@Log4j
 @PrototypeComponent ("affiliateTypeBuilder")
 @ModelMetaBuilderHandler
 public
@@ -75,22 +73,23 @@ class AffiliateTypeBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			log.info (
-				stringFormat (
-					"Create affiliate type %s.%s",
-					camelToUnderscore (
-						ifNull (
-							spec.subject (),
-							parent.name ())),
-					simplifyToCodeRequired (
-						spec.name ())));
+		) {
+
+			taskLogger.noticeFormat (
+				"Create affiliate type %s.%s",
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ())),
+				simplifyToCodeRequired (
+					spec.name ()));
 
 			createAffiliateType (
 				taskLogger);
@@ -117,16 +116,16 @@ class AffiliateTypeBuilder {
 			@NonNull TaskLogger parentTaskLogger)
 		throws SQLException {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createAffiliateType");
-
 		// begin transaction
 
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createAffiliateType");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"AffiliateTypeBuilder.createAffiliateType ()",

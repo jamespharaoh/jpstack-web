@@ -58,33 +58,39 @@ class ParentFormFieldConstraintValidator <
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"validate");
+		try (
 
-		Record <?> privDelegate =
-			createPrivDelegate != null
-				? (Record <?>)
-					objectManager.dereferenceObsolete (
-						nativeValue.get (),
-						createPrivDelegate)
-				: nativeValue.get ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"validate");
 
-		if (
-			! privChecker.canRecursive (
-				taskLogger,
-				privDelegate,
-				createPrivCode)
 		) {
 
-			return optionalOf (
-				stringFormat (
-					"Permission denied"));
+			Record <?> privDelegate =
+				createPrivDelegate != null
+					? (Record <?>)
+						objectManager.dereferenceObsolete (
+							nativeValue.get (),
+							createPrivDelegate)
+					: nativeValue.get ();
+
+			if (
+				! privChecker.canRecursive (
+					taskLogger,
+					privDelegate,
+					createPrivCode)
+			) {
+
+				return optionalOf (
+					stringFormat (
+						"Permission denied"));
+
+			}
+
+			return optionalAbsent ();
 
 		}
-
-		return optionalAbsent ();
 
 	}
 

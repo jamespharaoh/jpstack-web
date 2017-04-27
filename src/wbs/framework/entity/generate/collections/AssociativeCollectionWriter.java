@@ -65,80 +65,86 @@ class AssociativeCollectionWriter
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		String fullFieldTypeName;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		if (
-			stringEqualSafe (
-				spec.typeName (),
-				"string")
 		) {
 
-			fullFieldTypeName =
-				"java.lang.String";
+			String fullFieldTypeName;
 
-		} else {
+			if (
+				stringEqualSafe (
+					spec.typeName (),
+					"string")
+			) {
 
-			PluginModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
-					spec.typeName ());
+				fullFieldTypeName =
+					"java.lang.String";
 
-			PluginSpec fieldTypePlugin =
-				fieldTypePluginModel.plugin ();
+			} else {
 
-			fullFieldTypeName =
-				stringFormat (
-					"%s.model.%sRec",
-					fieldTypePlugin.packageName (),
-					capitalise (
+				PluginModelSpec fieldTypePluginModel =
+					pluginManager.pluginModelsByName ().get (
+						spec.typeName ());
+
+				PluginSpec fieldTypePlugin =
+					fieldTypePluginModel.plugin ();
+
+				fullFieldTypeName =
+					stringFormat (
+						"%s.model.%sRec",
+						fieldTypePlugin.packageName (),
+						capitalise (
+							spec.typeName ()));
+
+			}
+
+			String fieldName =
+				ifNull (
+					spec.name (),
+					naivePluralise (
 						spec.typeName ()));
 
+			// write field
+
+			new JavaPropertyWriter ()
+
+				.thisClassNameFormat (
+					"%s.model.%s",
+					context.modelMeta ().plugin ().packageName (),
+					context.recordClassName ())
+
+				.typeName (
+					imports ->
+						stringFormat (
+							"%s <%s>",
+							imports.register (
+								Set.class),
+							imports.register (
+								fullFieldTypeName)))
+
+				.propertyName (
+					fieldName)
+
+				.defaultValue (
+					imports ->
+						stringFormat (
+							"new %s <%s> ()",
+							imports.register (
+								LinkedHashSet.class),
+							imports.register (
+								fullFieldTypeName)))
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ());
+
 		}
-
-		String fieldName =
-			ifNull (
-				spec.name (),
-				naivePluralise (
-					spec.typeName ()));
-
-		// write field
-
-		new JavaPropertyWriter ()
-
-			.thisClassNameFormat (
-				"%s.model.%s",
-				context.modelMeta ().plugin ().packageName (),
-				context.recordClassName ())
-
-			.typeName (
-				imports ->
-					stringFormat (
-						"%s <%s>",
-						imports.register (
-							Set.class),
-						imports.register (
-							fullFieldTypeName)))
-
-			.propertyName (
-				fieldName)
-
-			.defaultValue (
-				imports ->
-					stringFormat (
-						"new %s <%s> ()",
-						imports.register (
-							LinkedHashSet.class),
-						imports.register (
-							fullFieldTypeName)))
-
-			.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
 
 	}
 

@@ -1,5 +1,7 @@
 package wbs.framework.exception;
 
+import java.io.PrintWriter;
+
 import org.json.simple.JSONObject;
 
 import wbs.framework.logging.TaskLogger;
@@ -18,5 +20,10 @@ interface ExceptionUtils {
 	JSONObject throwableDumpJson (
 			TaskLogger parentTaskLogger,
 			Throwable throwable);
+
+	void writeThrowable (
+			TaskLogger parentTaskLogger,
+			Throwable throwable,
+			PrintWriter printWriter);
 
 }

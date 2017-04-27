@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -74,113 +74,120 @@ class QueueUsersAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		long userId =
-			requestContext.parameterIntegerRequired (
-				"userId");
-
-		boolean reclaim;
-
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"reclaim"))
-		) {
-
-			reclaim = true;
-
-		} else if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"unclaim"))
-		) {
-
-			reclaim = false;
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"QueueUsersAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			// load stuff
+			// get params
 
-			UserRec theUser =
-				userHelper.findRequired (
-					userId);
+			long userId =
+				requestContext.parameterIntegerRequired (
+					"userId");
 
-			// load items
+			boolean reclaim;
 
-			List<QueueItemClaimRec> queueItemClaims =
-				queueItemClaimHelper.findClaimed (
-					theUser);
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"reclaim"))
+			) {
 
-			int numQueueItems =
-				queueItemClaims.size ();
+				reclaim = true;
 
-			// process items
+			} else if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"unclaim"))
+			) {
 
-			for (QueueItemClaimRec queueItemClaim
-					: queueItemClaims) {
-
-				QueueItemRec queueItem =
-					queueItemClaim.getQueueItem ();
-
-				if (reclaim) {
-
-					queueConsoleLogic.reclaimQueueItem (
-						taskLogger,
-						queueItem,
-						theUser,
-						userConsoleLogic.userRequired ());
-
-				} else {
-
-					queueConsoleLogic.unclaimQueueItem (
-						queueItem,
-						theUser);
-
-				}
-
-			}
-
-			transaction.commit ();
-
-			// add notice
-
-			if (reclaim) {
-
-				requestContext.addNoticeFormat (
-					"Reclaimed %s queue items",
-					integerToDecimalString (
-						numQueueItems));
+				reclaim = false;
 
 			} else {
 
-				requestContext.addNoticeFormat (
-					"Unclaimed %s queue items",
-					integerToDecimalString (
-						numQueueItems));
+				throw new RuntimeException ();
 
 			}
 
-			return null;
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"QueueUsersAction.goReal ()",
+						this);
+
+			) {
+
+				// load stuff
+
+				UserRec theUser =
+					userHelper.findRequired (
+						userId);
+
+				// load items
+
+				List<QueueItemClaimRec> queueItemClaims =
+					queueItemClaimHelper.findClaimed (
+						theUser);
+
+				int numQueueItems =
+					queueItemClaims.size ();
+
+				// process items
+
+				for (QueueItemClaimRec queueItemClaim
+						: queueItemClaims) {
+
+					QueueItemRec queueItem =
+						queueItemClaim.getQueueItem ();
+
+					if (reclaim) {
+
+						queueConsoleLogic.reclaimQueueItem (
+							taskLogger,
+							queueItem,
+							theUser,
+							userConsoleLogic.userRequired ());
+
+					} else {
+
+						queueConsoleLogic.unclaimQueueItem (
+							taskLogger,
+							queueItem,
+							theUser);
+
+					}
+
+				}
+
+				transaction.commit ();
+
+				// add notice
+
+				if (reclaim) {
+
+					requestContext.addNoticeFormat (
+						"Reclaimed %s queue items",
+						integerToDecimalString (
+							numQueueItems));
+
+				} else {
+
+					requestContext.addNoticeFormat (
+						"Unclaimed %s queue items",
+						integerToDecimalString (
+							numQueueItems));
+
+				}
+
+				return null;
+
+			}
 
 		}
 

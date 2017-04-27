@@ -40,7 +40,6 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
-import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.router.model.RouterRec;
@@ -122,61 +121,67 @@ class ChatSendLogicImplementation
 			@NonNull ServiceRec service,
 			@NonNull String message) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessageRbFree");
+		try (
 
-		if (chatUser.getNumber () == null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessageRbFree");
 
-			throw new NullPointerException (
-				stringFormat (
-					"%s has no number",
-					objectManager.objectPath (chatUser)));
+		) {
+
+			if (chatUser.getNumber () == null) {
+
+				throw new NullPointerException (
+					stringFormat (
+						"%s has no number",
+						objectManager.objectPath (chatUser)));
+
+			}
+
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
+
+			if (chatScheme == null) {
+
+				throw new NullPointerException (
+					stringFormat (
+						"%s has no chat scheme",
+						objectManager.objectPath (chatUser)));
+
+			}
+
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (chatUser);
+
+			return messageSenderProvider.get ()
+
+				.threadId (
+					threadId.orNull ())
+
+				.number (
+					chatUser.getNumber ())
+
+				.messageString (
+					taskLogger,
+					message)
+
+				.numFrom (
+					chatScheme.getRbNumber ())
+
+				.routerResolve (
+					chatScheme.getRbFreeRouter ())
+
+				.service (
+					service)
+
+				.affiliate (
+					affiliate)
+
+				.send (
+					taskLogger);
 
 		}
-
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
-
-		if (chatScheme == null) {
-
-			throw new NullPointerException (
-				stringFormat (
-					"%s has no chat scheme",
-					objectManager.objectPath (chatUser)));
-
-		}
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (chatUser);
-
-		return messageSenderProvider.get ()
-
-			.threadId (
-				threadId.orNull ())
-
-			.number (
-				chatUser.getNumber ())
-
-			.messageString (
-				taskLogger,
-				message)
-
-			.numFrom (
-				chatScheme.getRbNumber ())
-
-			.routerResolve (
-				chatScheme.getRbFreeRouter ())
-
-			.service (
-				service)
-
-			.affiliate (
-				affiliate)
-
-			.send (
-				taskLogger);
 
 	}
 
@@ -210,118 +215,124 @@ class ChatSendLogicImplementation
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendSystem");
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendSystem");
 
-		// find the template
+		) {
 
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				"system",
-				templateCode);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (chatHelpTemplate == null) {
+			// find the template
 
-			if (templateMissing == TemplateMissing.error) {
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
+					chatUser,
+					"system",
+					templateCode);
 
-				throw new RuntimeException (
-					stringFormat (
-						"System template %s not found for chat %s",
-						templateCode,
-						objectManager.objectPathMini (
-							chat)));
+			if (chatHelpTemplate == null) {
 
-			} else {
+				if (templateMissing == TemplateMissing.error) {
 
-				return Optional.absent ();
+					throw new RuntimeException (
+						stringFormat (
+							"System template %s not found for chat %s",
+							templateCode,
+							objectManager.objectPathMini (
+								chat)));
+
+				} else {
+
+					return Optional.absent ();
+
+				}
 
 			}
 
-		}
+			// substitute the params
 
-		// substitute the params
+			Map<String,String> allParams =
+				addDefaultParams (
+					chatUser,
+					suppliedParams);
 
-		Map<String,String> allParams =
-			addDefaultParams (
-				chatUser,
-				suppliedParams);
+			String originalText =
+				chatHelpTemplate.getText ();
 
-		String originalText =
-			chatHelpTemplate.getText ();
+			String finalText =
+				MapStringSubstituter.substitute (
+					originalText,
+					allParams);
 
-		String finalText =
-			MapStringSubstituter.substitute (
-				originalText,
-				allParams);
+			ServiceRec service =
+				serviceHelper.findByCodeRequired (
+					chat,
+					serviceCode);
 
-		ServiceRec service =
-			serviceHelper.findByCodeRequired (
-				chat,
-				serviceCode);
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			// send the message
 
-		// send the message
+			MessageRec message =
+				messageSenderProvider.get ()
 
-		MessageRec message =
-			messageSenderProvider.get ()
+				.threadId (
+					threadId.orNull ())
 
-			.threadId (
-				threadId.orNull ())
+				.number (
+					chatUser.getNumber ())
 
-			.number (
-				chatUser.getNumber ())
+				.messageString (
+					taskLogger,
+					finalText)
 
-			.messageString (
+				.numFrom (
+					numFrom)
+
+				.routerResolve (
+					router)
+
+				.service (
+					service)
+
+				.affiliate (
+					affiliate)
+
+				.deliveryTypeCode (
+					deliveryTypeCode)
+
+				.ref (
+					chatUser.getId ())
+
+				.tags (
+					tags)
+
+				.send (
+					taskLogger);
+
+			// log it
+
+			chatHelpLogLogic.createChatHelpLogOut (
 				taskLogger,
-				finalText)
+				chatUser,
+				optionalAbsent (),
+				optionalAbsent (),
+				message,
+				optionalAbsent (),
+				finalText,
+				optionalAbsent ());
 
-			.numFrom (
-				numFrom)
+			return Optional.of (
+				message);
 
-			.routerResolve (
-				router)
-
-			.service (
-				service)
-
-			.affiliate (
-				affiliate)
-
-			.deliveryTypeCode (
-				deliveryTypeCode)
-
-			.ref (
-				chatUser.getId ())
-
-			.tags (
-				tags)
-
-			.send (
-				taskLogger);
-
-		// log it
-
-		chatHelpLogLogic.createChatHelpLogOut (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			optionalAbsent (),
-			message,
-			optionalAbsent (),
-			finalText,
-			optionalAbsent ());
-
-		return Optional.of (
-			message);
+		}
 
 	}
 
@@ -335,80 +346,86 @@ class ChatSendLogicImplementation
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendSystemRbFree");
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendSystemRbFree");
 
-		// find the template
+		) {
 
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				"system",
-				templateCode);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (chatHelpTemplate == null) {
+			// find the template
 
-			if (templateMissing == TemplateMissing.error) {
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
+					chatUser,
+					"system",
+					templateCode);
 
-				throw new RuntimeException (
-					"System template not found: " + templateCode);
+			if (chatHelpTemplate == null) {
 
-			} else {
+				if (templateMissing == TemplateMissing.error) {
 
-				return Optional.absent ();
+					throw new RuntimeException (
+						"System template not found: " + templateCode);
+
+				} else {
+
+					return Optional.absent ();
+
+				}
 
 			}
 
-		}
+			// substitute the params
 
-		// substitute the params
+			String originalText =
+				chatHelpTemplate.getText ();
 
-		String originalText =
-			chatHelpTemplate.getText ();
+			Map <String, String> allParams =
+				addDefaultParams (
+					chatUser,
+					suppliedParams);
 
-		Map <String, String> allParams =
-			addDefaultParams (
-				chatUser,
-				suppliedParams);
+			String finalText =
+				MapStringSubstituter.substitute (
+					originalText,
+					allParams);
 
-		String finalText =
-			MapStringSubstituter.substitute (
-				originalText,
-				allParams);
+			// send the message
 
-		// send the message
+			MessageRec message =
+				sendMessageRbFree (
+					taskLogger,
+					chatUser,
+					threadId,
+					serviceHelper.findByCodeRequired (
+						chat,
+						"system"),
+					finalText);
 
-		MessageRec message =
-			sendMessageRbFree (
+			// log it
+
+			chatHelpLogLogic.createChatHelpLogOut (
 				taskLogger,
 				chatUser,
-				threadId,
-				serviceHelper.findByCodeRequired (
-					chat,
-					"system"),
-				finalText);
+				optionalAbsent (),
+				optionalAbsent (),
+				message,
+				optionalAbsent (),
+				finalText,
+				optionalAbsent ());
 
-		// log it
+			// and return
 
-		chatHelpLogLogic.createChatHelpLogOut (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			optionalAbsent (),
-			message,
-			optionalAbsent (),
-			finalText,
-			optionalAbsent ());
+			return optionalOf (
+				message);
 
-		// and return
-
-		return optionalOf (
-			message);
+		}
 
 	}
 
@@ -422,64 +439,70 @@ class ChatSendLogicImplementation
 			@NonNull CommandRec command,
 			@NonNull ServiceRec service) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessageMmsFree");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessageMmsFree");
 
-		// send the message
+		) {
 
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		MessageRec ret =
-			messageSenderProvider.get ()
+			// send the message
 
-			.threadId (
-				threadId.orNull ())
+			AffiliateRec affiliate =
+				chatUserLogic.getAffiliate (
+					chatUser);
 
-			.number (
-				chatUser.getNumber ())
+			MessageRec ret =
+				messageSenderProvider.get ()
 
-			.messageString (
-				taskLogger,
-				message)
+				.threadId (
+					threadId.orNull ())
 
-			.numFrom (
-				chatScheme.getMmsNumber ())
+				.number (
+					chatUser.getNumber ())
 
-			.routerResolve (
-				chatScheme.getMmsFreeRouter ())
+				.messageString (
+					taskLogger,
+					message)
 
-			.service (
-				service)
+				.numFrom (
+					chatScheme.getMmsNumber ())
 
-			.affiliate (
-				affiliate)
+				.routerResolve (
+					chatScheme.getMmsFreeRouter ())
 
-			.send (
-				taskLogger);
+				.service (
+					service)
 
-		// set the fallback keyword on the mms thing to handle a reply with no
-		// keyword
+				.affiliate (
+					affiliate)
 
-		if (chatScheme.getMmsKeywordSet () != null) {
+				.send (
+					taskLogger);
 
-			keywordLogic.createOrUpdateKeywordSetFallback (
-				taskLogger,
-				chatScheme.getMmsKeywordSet (),
-				chatUser.getNumber (),
-				command);
+			// set the fallback keyword on the mms thing to handle a reply with no
+			// keyword
+
+			if (chatScheme.getMmsKeywordSet () != null) {
+
+				keywordLogic.createOrUpdateKeywordSetFallback (
+					taskLogger,
+					chatScheme.getMmsKeywordSet (),
+					chatUser.getNumber (),
+					command);
+
+			}
+
+			// and return
+
+			return ret;
 
 		}
-
-		// and return
-
-		return ret;
 
 	}
 
@@ -493,73 +516,79 @@ class ChatSendLogicImplementation
 			@NonNull CommandRec command,
 			@NonNull TemplateMissing templateMissing) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendSystemMmsFree");
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendSystemMmsFree");
 
-		// look up the template
+		) {
 
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				"system",
-				templateCode);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (chatHelpTemplate == null) {
+			// look up the template
 
-			if (templateMissing == TemplateMissing.error) {
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
+					chatUser,
+					"system",
+					templateCode);
 
-				throw new RuntimeException (
-					stringFormat (
-						"System template %s not found for chat %s.%s",
-						templateCode,
-						chat.getSlice ().getCode (),
-						chat.getCode ()));
+			if (chatHelpTemplate == null) {
 
-			} else {
+				if (templateMissing == TemplateMissing.error) {
 
-				return Optional.absent ();
+					throw new RuntimeException (
+						stringFormat (
+							"System template %s not found for chat %s.%s",
+							templateCode,
+							chat.getSlice ().getCode (),
+							chat.getCode ()));
+
+				} else {
+
+					return Optional.absent ();
+
+				}
 
 			}
 
-		}
+			// send it
 
-		// send it
+			ServiceRec systemService =
+				serviceHelper.findByCodeRequired (
+					chat,
+					"system");
 
-		ServiceRec systemService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"system");
+			MessageRec message =
+				sendMessageMmsFree (
+					taskLogger,
+					chatUser,
+					threadId,
+					chatHelpTemplate.getText (),
+					command,
+					systemService);
 
-		MessageRec message =
-			sendMessageMmsFree (
+			// log it
+
+			chatHelpLogLogic.createChatHelpLogOut (
 				taskLogger,
 				chatUser,
-				threadId,
+				optionalAbsent (),
+				optionalAbsent (),
+				message,
+				optionalAbsent (),
 				chatHelpTemplate.getText (),
-				command,
-				systemService);
+				optionalAbsent ());
 
-		// log it
+			// and return
 
-		chatHelpLogLogic.createChatHelpLogOut (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			optionalAbsent (),
-			message,
-			optionalAbsent (),
-			chatHelpTemplate.getText (),
-			optionalAbsent ());
+			return Optional.of (
+				message);
 
-		// and return
-
-		return Optional.of (
-			message);
+		}
 
 	}
 
@@ -574,45 +603,51 @@ class ChatSendLogicImplementation
 			@NonNull ServiceRec service,
 			@NonNull Long magicRef) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessageMagic");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessageMagic");
 
-		// sanity check
+		) {
 
-		if (chatScheme.getMagicNumberSet () == null) {
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-			throw new NullPointerException (
-				stringFormat (
-					"Error sending to chat user %s: " +
-					"Chat scheme %s has no magic number set",
-					objectManager.objectPath (
-						chatUser),
-					objectManager.objectPath (
-						chatScheme)));
+			// sanity check
+
+			if (chatScheme.getMagicNumberSet () == null) {
+
+				throw new NullPointerException (
+					stringFormat (
+						"Error sending to chat user %s: " +
+						"Chat scheme %s has no magic number set",
+						objectManager.objectPath (
+							chatUser),
+						objectManager.objectPath (
+							chatScheme)));
+
+			}
+
+			// send the message and return
+
+			return magicNumberLogic.sendMessage (
+				taskLogger,
+				chatScheme.getMagicNumberSet (),
+				chatUser.getNumber (),
+				magicCommand,
+				magicRef,
+				threadId,
+				message,
+				chatScheme.getMagicRouter (),
+				service,
+				optionalAbsent (),
+				chatUserLogic.getAffiliate (
+					chatUser),
+				optionalAbsent ());
 
 		}
-
-		// send the message and return
-
-		return magicNumberLogic.sendMessage (
-			taskLogger,
-			chatScheme.getMagicNumberSet (),
-			chatUser.getNumber (),
-			magicCommand,
-			magicRef,
-			threadId,
-			message,
-			chatScheme.getMagicRouter (),
-			service,
-			Optional.<BatchRec>absent (),
-			chatUserLogic.getAffiliate (
-				chatUser),
-			Optional.<UserRec>absent ());
 
 	}
 
@@ -628,110 +663,116 @@ class ChatSendLogicImplementation
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map <String, String> suppliedParams) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendSystemMagic");
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendSystemMagic");
 
-		// lookup template
+		) {
 
-		ChatHelpTemplateRec chatHelpTemplate =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				"system",
-				templateCode);
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (chatHelpTemplate == null) {
+			// lookup template
 
-			if (templateMissing == TemplateMissing.error) {
+			ChatHelpTemplateRec chatHelpTemplate =
+				chatTemplateLogic.findChatHelpTemplate (
+					chatUser,
+					"system",
+					templateCode);
 
-				throw new RuntimeException (
-					stringFormat (
-						"System template not found: %s ",
-						templateCode,
-						"for chat %s, ",
-						integerToDecimalString (
-							chatUser.getChat ().getId ()),
-						"user %s ",
-						integerToDecimalString (
-							chatUser.getId ()),
-						"and thread %s ",
-						optionalMapRequiredOrDefault (
-							NumberUtils::integerToDecimalString,
-							threadId,
-							"(none)"),
-						"and template code %s",
-						templateCode));
+			if (chatHelpTemplate == null) {
 
-			} else {
+				if (templateMissing == TemplateMissing.error) {
 
-				return Optional.absent ();
+					throw new RuntimeException (
+						stringFormat (
+							"System template not found: %s ",
+							templateCode,
+							"for chat %s, ",
+							integerToDecimalString (
+								chatUser.getChat ().getId ()),
+							"user %s ",
+							integerToDecimalString (
+								chatUser.getId ()),
+							"and thread %s ",
+							optionalMapRequiredOrDefault (
+								NumberUtils::integerToDecimalString,
+								threadId,
+								"(none)"),
+							"and template code %s",
+							templateCode));
+
+				} else {
+
+					return Optional.absent ();
+
+				}
 
 			}
 
+			// substitude params
+
+			String originalText =
+				chatHelpTemplate.getText ();
+
+			Map<String,String> allParams =
+				addDefaultParams (
+					chatUser,
+					suppliedParams);
+
+			String finalText =
+				MapStringSubstituter.substitute (
+					originalText,
+					allParams);
+
+			TextRec text =
+				textHelper.findOrCreate (
+					taskLogger,
+					finalText);
+
+			// send message
+
+			MessageRec message =
+				sendMessageMagic (
+					taskLogger,
+					chatUser,
+					threadId,
+					text,
+					magicCommand,
+					serviceHelper.findByCodeRequired (
+						chat,
+						"system"),
+					magicRef);
+
+			// log it
+
+			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				optionalAbsent (),
+				message,
+				optionalAbsent (),
+				finalText,
+				optionalOf (
+					ifThenElse (
+						referenceEqualWithClass (
+							CommandRec.class,
+							magicCommand,
+							commandHelper.findByCodeRequired (
+								chat,
+								"magic")),
+						() -> commandHelper.findRequired (
+							magicRef),
+						() -> magicCommand)));
+
+			return optionalOf (
+				message);
+
 		}
-
-		// substitude params
-
-		String originalText =
-			chatHelpTemplate.getText ();
-
-		Map<String,String> allParams =
-			addDefaultParams (
-				chatUser,
-				suppliedParams);
-
-		String finalText =
-			MapStringSubstituter.substitute (
-				originalText,
-				allParams);
-
-		TextRec text =
-			textHelper.findOrCreate (
-				taskLogger,
-				finalText);
-
-		// send message
-
-		MessageRec message =
-			sendMessageMagic (
-				taskLogger,
-				chatUser,
-				threadId,
-				text,
-				magicCommand,
-				serviceHelper.findByCodeRequired (
-					chat,
-					"system"),
-				magicRef);
-
-		// log it
-
-		chatHelpLogLogic.createChatHelpLogOut (
-			taskLogger,
-			chatUser,
-			optionalAbsent (),
-			optionalAbsent (),
-			message,
-			optionalAbsent (),
-			finalText,
-			optionalOf (
-				ifThenElse (
-					referenceEqualWithClass (
-						CommandRec.class,
-						magicCommand,
-						commandHelper.findByCodeRequired (
-							chat,
-							"magic")),
-					() -> commandHelper.findRequired (
-						magicRef),
-					() -> magicCommand)));
-
-		return optionalOf (
-			message);
 
 	}
 
@@ -747,36 +788,42 @@ class ChatSendLogicImplementation
 			@NonNull Long magicRef,
 			@NonNull Optional <UserRec> user) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessageMagic");
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendMessageMagic");
 
-		return magicNumberLogic.sendMessage (
-			taskLogger,
-			chatScheme.getMagicNumberSet (),
-			chatUser.getNumber (),
-			magicCommand,
-			magicRef,
-			threadId,
-			parts,
-			chatScheme.getMagicRouter (),
-			service,
-			optionalAbsent (),
-			chatUserLogic.getAffiliate (
-				chatUser),
-			user);
+		) {
+
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
+
+			return magicNumberLogic.sendMessage (
+				taskLogger,
+				chatScheme.getMagicNumberSet (),
+				chatUser.getNumber (),
+				magicCommand,
+				magicRef,
+				threadId,
+				parts,
+				chatScheme.getMagicRouter (),
+				service,
+				optionalAbsent (),
+				chatUserLogic.getAffiliate (
+					chatUser),
+				user);
+
+		}
 
 	}
 
 	@Override
 	public
-	Map<String,String> addDefaultParams (
+	Map <String, String> addDefaultParams (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Map<String,String> params) {
+			@NonNull Map <String, String> params) {
 
 		return ImmutableMap.<String,String>builder ()
 

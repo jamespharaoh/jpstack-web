@@ -95,73 +95,79 @@ class ConsoleContextSectionBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildContextTypes ();
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildResolvedContexts (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildContextTabs (
-				resolvedExtensionPoint);
+			buildContextTypes ();
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildResolvedContexts (
+					resolvedExtensionPoint);
+
+				buildContextTabs (
+					resolvedExtensionPoint);
+
+			}
+
+			ConsoleContextBuilderContainer<ObjectType> nextContextBuilderContainer =
+				new ConsoleContextBuilderContainerImplementation<ObjectType> ()
+
+				.taskLogger (
+					container.taskLogger ())
+
+				.consoleHelper (
+					consoleHelper)
+
+				.structuralName (
+					structuralName)
+
+				.extensionPointName (
+					"section:" + contextTypeName)
+
+				.pathPrefix (
+					contextTypeName)
+
+				.existingBeanNamePrefix (
+					stringFormat (
+						"%s%s",
+						container.existingBeanNamePrefix (),
+						capitalise (
+							aliasOf)))
+
+				.newBeanNamePrefix (
+					stringFormat (
+						"%s%s",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)))
+
+				.tabLocation (
+					"end")
+
+				.friendlyName (
+					container.friendlyName ());
+
+			builder.descend (
+				taskLogger,
+				nextContextBuilderContainer,
+				spec.children (),
+				consoleModule,
+				MissingBuilderBehaviour.error);
 
 		}
-
-		ConsoleContextBuilderContainer<ObjectType> nextContextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
-
-			.taskLogger (
-				container.taskLogger ())
-
-			.consoleHelper (
-				consoleHelper)
-
-			.structuralName (
-				structuralName)
-
-			.extensionPointName (
-				"section:" + contextTypeName)
-
-			.pathPrefix (
-				contextTypeName)
-
-			.existingBeanNamePrefix (
-				stringFormat (
-					"%s%s",
-					container.existingBeanNamePrefix (),
-					capitalise (
-						aliasOf)))
-
-			.newBeanNamePrefix (
-				stringFormat (
-					"%s%s",
-					container.newBeanNamePrefix (),
-					capitalise (
-						name)))
-
-			.tabLocation (
-				"end")
-
-			.friendlyName (
-				container.friendlyName ());
-
-		builder.descend (
-			taskLogger,
-			nextContextBuilderContainer,
-			spec.children (),
-			consoleModule,
-			MissingBuilderBehaviour.error);
 
 	}
 

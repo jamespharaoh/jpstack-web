@@ -1,7 +1,5 @@
 package wbs.smsapps.autoresponder.console;
 
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -28,19 +26,23 @@ class AutoResponderSettingsTemplatesAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
+		try (
 
-		requestContext.addNotice (
-			"Action performed");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
-		return null;
+		) {
+
+			requestContext.addNotice (
+				"Action performed");
+
+			return null;
+
+		}
 
 	}
 

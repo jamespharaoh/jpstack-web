@@ -55,28 +55,34 @@ class ExtendContextMetaBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		ConsoleContextMetaBuilderContainer nextContainer =
-			new ConsoleContextMetaBuilderContainer ()
+		) {
 
-			.structuralName (
-				baseName)
+			setDefaults ();
 
-			.extensionPointName (
-				extensionPointName);
+			ConsoleContextMetaBuilderContainer nextContainer =
+				new ConsoleContextMetaBuilderContainer ()
 
-		builder.descend (
-			taskLogger,
-			nextContainer,
-			spec.children (),
-			metaModule,
-			MissingBuilderBehaviour.ignore);
+				.structuralName (
+					baseName)
+
+				.extensionPointName (
+					extensionPointName);
+
+			builder.descend (
+				taskLogger,
+				nextContainer,
+				spec.children (),
+				metaModule,
+				MissingBuilderBehaviour.ignore);
+
+		}
 
 	}
 

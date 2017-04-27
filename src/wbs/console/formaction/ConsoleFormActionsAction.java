@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
 
-import javax.servlet.ServletException;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -25,7 +23,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -74,64 +72,69 @@ class ConsoleFormActionsAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger parentTaskLogger)
-		throws ServletException {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		String formName =
-			requestContext.formRequired (
-				"form.name");
-
-		ConsoleFormAction <?, ?> formAction =
-			iterableFindExactlyOneRequired (
-				candidateFormAction ->
-					stringEqualSafe (
-						candidateFormAction.name (),
-						formName),
-				formActions);
-
-		Object formState =
-			formAction.helper ().constructFormState ();
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ContextFormActionAction.goReal ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
-			formAction.helper ().updatePassiveFormState (
-				genericCastUnchecked (
-					formState));
+			String formName =
+				requestContext.formRequired (
+					"form.name");
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
-					taskLogger,
-					requestContext,
-					formAction.formFields (),
-					formState,
-					ImmutableMap.of (),
-					formName);
+			ConsoleFormAction <?, ?> formAction =
+				iterableFindExactlyOneRequired (
+					candidateFormAction ->
+						stringEqualSafe (
+							candidateFormAction.name (),
+							formName),
+					formActions);
 
-			if (updateResultSet.errorCount () > 0) {
-				return null;
-			}
+			Object formState =
+				formAction.helper ().constructFormState ();
 
-			Optional <Responder> responder =
-				formAction.helper ().processFormSubmission (
-					taskLogger,
-					transaction,
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						taskLogger,
+						"ContextFormActionAction.goReal ()",
+						this);
+
+			) {
+
+				formAction.helper ().updatePassiveFormState (
 					genericCastUnchecked (
 						formState));
 
-			return responder.orNull ();
+				UpdateResultSet updateResultSet =
+					formFieldLogic.update (
+						taskLogger,
+						requestContext,
+						formAction.formFields (),
+						formState,
+						ImmutableMap.of (),
+						formName);
+
+				if (updateResultSet.errorCount () > 0) {
+					return null;
+				}
+
+				Optional <Responder> responder =
+					formAction.helper ().processFormSubmission (
+						taskLogger,
+						transaction,
+						genericCastUnchecked (
+							formState));
+
+				return responder.orNull ();
+
+			}
 
 		}
 
