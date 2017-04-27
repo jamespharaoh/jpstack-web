@@ -1,7 +1,7 @@
 package wbs.web.responder;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.inject.Provider;
 
@@ -12,10 +12,15 @@ import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToJson;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 
@@ -28,6 +33,9 @@ class JsonResponder
 		Responder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -42,28 +50,59 @@ class JsonResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"application/json");
+		try (
 
-		PrintWriter out =
-			requestContext.printWriter ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
 
-		DataToJson dataToJson =
-			new DataToJson ();
+		) {
 
-		Object jsonValue =
-			dataToJson.toJson (
-				value);
+			requestContext.setHeader (
+				"Content-Type",
+				"application/json");
 
-		JSONValue.writeJSONString (
-			jsonValue,
-			out);
+			try (
 
-		out.println ();
+				FormatWriter formatWriter =
+					requestContext.formatWriter ();
+
+			) {
+
+				DataToJson dataToJson =
+					new DataToJson ();
+
+				Object jsonValue =
+					dataToJson.toJson (
+						value);
+
+				try (
+
+					StringWriter stringWriter =
+						new StringWriter ();
+
+				) {
+
+					JSONValue.writeJSONString (
+						jsonValue,
+						stringWriter);
+
+					formatWriter.writeLineFormat (
+						stringWriter.toString ());
+
+				} catch (IOException ioException) {
+
+					throw new RuntimeIoException (
+						ioException);
+
+				}
+
+			}
+
+		}
 
 	}
 

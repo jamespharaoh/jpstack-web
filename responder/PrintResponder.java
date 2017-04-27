@@ -9,7 +9,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
 
 public abstract
 class PrintResponder
@@ -39,8 +38,7 @@ class PrintResponder
 				"setup");
 
 		formatWriter =
-			new WriterFormatWriter (
-				requestContext.printWriter ())
+			requestContext.formatWriter ()
 
 			.indentString (
 				"  ");

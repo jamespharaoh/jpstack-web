@@ -5,42 +5,32 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.file.WebFile;
 
+@PrototypeComponent ("regexpPathHandler")
 public
 class RegexpPathHandler
 	implements PathHandler {
 
-	public abstract static
-	class Entry {
+	// singleton dependencies
 
-		Pattern pattern;
+	@ClassSingletonDependency
+	LogContext logContext;
 
-		public
-		Entry (
-				String patternString) {
-
-			pattern =
-				Pattern.compile (
-					patternString);
-
-		}
-
-		protected abstract
-		WebFile handle (
-				Matcher matcher)
-			throws ServletException;
-
-	}
+	// state
 
 	private
-	List<Entry> entries =
-		new ArrayList<Entry> ();
+	List <Entry> entries =
+		new ArrayList<> ();
+
+	// constructors
 
 	public
 	RegexpPathHandler () {
@@ -61,6 +51,8 @@ class RegexpPathHandler
 
 	}
 
+	// utility methods
+
 	public
 	void add (
 			@NonNull Entry entry) {
@@ -70,29 +62,66 @@ class RegexpPathHandler
 
 	}
 
+	// implementation
+
 	@Override
 	public
 	WebFile processPath (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String path)
-		throws ServletException {
+			@NonNull String path) {
 
-		for (Entry entry
-				: entries) {
+		try (
 
-			Matcher matcher =
-				entry.pattern.matcher (path);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processPath");
 
-			if (matcher.matches ()) {
+		) {
 
-				return entry.handle (
-					matcher);
+			for (
+				Entry entry
+					: entries
+			) {
+
+				Matcher matcher =
+					entry.pattern.matcher (path);
+
+				if (matcher.matches ()) {
+
+					return entry.handle (
+						matcher);
+
+				}
 
 			}
 
+			return null;
+
 		}
 
-		return null;
+	}
+
+	// entry class
+
+	public abstract static
+	class Entry {
+
+		Pattern pattern;
+
+		public
+		Entry (
+				String patternString) {
+
+			pattern =
+				Pattern.compile (
+					patternString);
+
+		}
+
+		protected abstract
+		WebFile handle (
+				Matcher matcher);
 
 	}
 

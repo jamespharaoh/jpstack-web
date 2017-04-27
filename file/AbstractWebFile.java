@@ -2,9 +2,6 @@ package wbs.web.file;
 
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.NonNull;
@@ -28,10 +25,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.sendError (
 			fromJavaInteger (
@@ -43,10 +37,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.sendError (
 			fromJavaInteger (
@@ -58,10 +49,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 	}
 

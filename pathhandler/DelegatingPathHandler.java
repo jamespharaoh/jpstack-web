@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -58,120 +56,126 @@ class DelegatingPathHandler
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		Map <String, String> pathDeclaredByModule =
-			new HashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		Map <String, String> fileDeclaredByModule =
-			new HashMap<> ();
-
-		// for each one...
-
-		for (
-			Map.Entry <String, WebModule> servletModuleEntry
-				: servletModules.entrySet ()
 		) {
 
-			String servletModuleName =
-				servletModuleEntry.getKey ();
+			Map <String, String> pathDeclaredByModule =
+				new HashMap<> ();
 
-			WebModule servletModule =
-				servletModuleEntry.getValue ();
+			Map <String, String> fileDeclaredByModule =
+				new HashMap<> ();
 
-			// import all its paths
+			// for each one...
 
-			Map <String, ? extends PathHandler> modulePaths =
-				servletModule.paths ();
+			for (
+				Map.Entry <String, WebModule> servletModuleEntry
+					: servletModules.entrySet ()
+			) {
 
-			if (modulePaths != null) {
+				String servletModuleName =
+					servletModuleEntry.getKey ();
 
-				for (
-					Map.Entry <String, ? extends PathHandler> modulePathEntry
-						: modulePaths.entrySet ()
-				) {
+				WebModule servletModule =
+					servletModuleEntry.getValue ();
 
-					String modulePathName =
-						modulePathEntry.getKey ();
+				// import all its paths
 
-					PathHandler modulePathHandler =
-						modulePathEntry.getValue ();
+				Map <String, ? extends PathHandler> modulePaths =
+					servletModule.paths ();
 
-					if (
-						pathDeclaredByModule.containsKey (
-							modulePathName)
+				if (modulePaths != null) {
+
+					for (
+						Map.Entry <String, ? extends PathHandler> modulePathEntry
+							: modulePaths.entrySet ()
 					) {
 
-						throw new RuntimeException (
-							stringFormat (
-								"Duplicated path '%s' (in %s and %s)",
-								modulePathName,
-								pathDeclaredByModule.get (
-									modulePathName),
-								servletModuleName));
+						String modulePathName =
+							modulePathEntry.getKey ();
+
+						PathHandler modulePathHandler =
+							modulePathEntry.getValue ();
+
+						if (
+							pathDeclaredByModule.containsKey (
+								modulePathName)
+						) {
+
+							throw new RuntimeException (
+								stringFormat (
+									"Duplicated path '%s' (in %s and %s)",
+									modulePathName,
+									pathDeclaredByModule.get (
+										modulePathName),
+									servletModuleName));
+
+						}
+
+						pathDeclaredByModule.put (
+							modulePathName,
+							servletModuleName);
+
+						taskLogger.debugFormat (
+							"Adding path %s",
+							modulePathName);
+
+						paths.put (
+							modulePathName,
+							modulePathHandler);
 
 					}
-
-					pathDeclaredByModule.put (
-						modulePathName,
-						servletModuleName);
-
-					taskLogger.debugFormat (
-						"Adding path %s",
-						modulePathName);
-
-					paths.put (
-						modulePathName,
-						modulePathHandler);
 
 				}
 
-			}
+				// import all its files
 
-			// import all its files
+				Map <String, ? extends WebFile> moduleFiles =
+					servletModule.files ();
 
-			Map <String, ? extends WebFile> moduleFiles =
-				servletModule.files ();
+				if (moduleFiles != null) {
 
-			if (moduleFiles != null) {
-
-				for (
-					Map.Entry <String, ? extends WebFile> moduleFileEntry
-						: moduleFiles.entrySet ()
-				) {
-
-					String moduleFileName =
-						moduleFileEntry.getKey ();
-
-					if (
-						fileDeclaredByModule.containsKey (
-							moduleFileName)
+					for (
+						Map.Entry <String, ? extends WebFile> moduleFileEntry
+							: moduleFiles.entrySet ()
 					) {
 
-						throw new RuntimeException (
-							stringFormat (
-								"Duplicated file '%s' (in %s and %s)",
-								moduleFileName,
-								fileDeclaredByModule.get (
-									moduleFileName),
-								servletModuleName));
+						String moduleFileName =
+							moduleFileEntry.getKey ();
+
+						if (
+							fileDeclaredByModule.containsKey (
+								moduleFileName)
+						) {
+
+							throw new RuntimeException (
+								stringFormat (
+									"Duplicated file '%s' (in %s and %s)",
+									moduleFileName,
+									fileDeclaredByModule.get (
+										moduleFileName),
+									servletModuleName));
+
+						}
+
+						fileDeclaredByModule.put (
+							moduleFileName,
+							servletModuleName);
+
+						taskLogger.debugFormat (
+							"Adding file %s",
+							moduleFileName);
+
+						files.put (
+							moduleFileName,
+							moduleFileEntry.getValue ());
 
 					}
-
-					fileDeclaredByModule.put (
-						moduleFileName,
-						servletModuleName);
-
-					taskLogger.debugFormat (
-						"Adding file %s",
-						moduleFileName);
-
-					files.put (
-						moduleFileName,
-						moduleFileEntry.getValue ());
 
 				}
 
@@ -185,91 +189,96 @@ class DelegatingPathHandler
 	public
 	WebFile processPath (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String originalPath)
-		throws ServletException {
+			@NonNull String originalPath) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processPath");
+		try (
 
-		taskLogger.debugFormat (
-			"processPath (\"%s\")",
-			originalPath);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processPath");
 
-		// strip any trailing '/'
+		) {
+
+			taskLogger.debugFormat (
+				"processPath (\"%s\")",
+				originalPath);
+
+			// strip any trailing '/'
 
 
-		String currentPath =
-			ifThenElse (
-				stringEndsWithSimple (
-					"/",
-					originalPath),
-				() -> originalPath.substring (
-					0,
-					originalPath.length () - 1),
-				() -> originalPath);
+			String currentPath =
+				ifThenElse (
+					stringEndsWithSimple (
+						"/",
+						originalPath),
+					() -> originalPath.substring (
+						0,
+						originalPath.length () - 1),
+					() -> originalPath);
 
-		// check for a file with the exact path
+			// check for a file with the exact path
 
-		if (files != null) {
+			if (files != null) {
 
-			WebFile webFile =
-				files.get (
-					currentPath);
-
-			if (webFile != null) {
-				return webFile;
-			}
-
-		}
-
-		// ok, look for a handler, and keep stripping off bits until we find one
-
-		if (paths != null) {
-
-			String remain = "";
-
-			while (true) {
-
-				PathHandler pathHandler =
-					paths.get (
+				WebFile webFile =
+					files.get (
 						currentPath);
 
-				if (pathHandler != null) {
+				if (webFile != null) {
+					return webFile;
+				}
 
-					return pathHandler.processPath (
-						taskLogger,
-						remain);
+			}
+
+			// ok, look for a handler, and keep stripping off bits until we find one
+
+			if (paths != null) {
+
+				String remain = "";
+
+				while (true) {
+
+					PathHandler pathHandler =
+						paths.get (
+							currentPath);
+
+					if (pathHandler != null) {
+
+						return pathHandler.processPath (
+							taskLogger,
+							remain);
+
+					}
+
+					int slashPosition =
+						currentPath.lastIndexOf (
+							'/');
+
+					if (slashPosition == 0)
+						return null;
+
+					if (slashPosition == -1)
+						return null;
+
+					remain =
+						joinWithoutSeparator (
+							currentPath.substring (
+								slashPosition),
+							remain);
+
+					currentPath =
+						currentPath.substring (
+							0,
+							slashPosition);
 
 				}
 
-				int slashPosition =
-					currentPath.lastIndexOf (
-						'/');
-
-				if (slashPosition == 0)
-					return null;
-
-				if (slashPosition == -1)
-					return null;
-
-				remain =
-					joinWithoutSeparator (
-						currentPath.substring (
-							slashPosition),
-						remain);
-
-				currentPath =
-					currentPath.substring (
-						0,
-						slashPosition);
-
 			}
 
-		}
+			return null;
 
-		return null;
+		}
 
 	}
 

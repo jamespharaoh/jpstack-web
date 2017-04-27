@@ -1,9 +1,5 @@
 package wbs.web.handler;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import wbs.framework.logging.TaskLogger;
 
 /**
@@ -16,9 +12,6 @@ interface RequestHandler {
 
 	public
 	void handle (
-			TaskLogger taskLogger)
-		throws
-			ServletException,
-			IOException;
+			TaskLogger parentTaskLogger);
 
 }

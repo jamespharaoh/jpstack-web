@@ -1,10 +1,10 @@
 package wbs.web.utils;
 
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
-import java.io.StringWriter;
 import java.util.NoSuchElementException;
 
 import com.google.gson.JsonElement;
@@ -19,7 +19,6 @@ import lombok.experimental.Accessors;
 import org.json.simple.JSONValue;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
 
 public
 class JsonUtils {
@@ -39,19 +38,12 @@ class JsonUtils {
 			@NonNull EscapeOptions escapeOptions,
 			@NonNull String source) {
 
-		StringWriter stringWriter =
-			new StringWriter ();
-
-		FormatWriter formatWriter =
-			new WriterFormatWriter (
-				stringWriter);
-
-		writeEscapedJsonString (
-			formatWriter,
-			escapeOptions,
-			source);
-
-		return stringWriter.toString ();
+		return formatWriterConsumerToString (
+			formatWriter ->
+				writeEscapedJsonString (
+					formatWriter,
+					escapeOptions,
+					source));
 
 	}
 
