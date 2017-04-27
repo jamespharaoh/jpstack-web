@@ -165,26 +165,32 @@ class IdLookupCache <Key, Id, Value>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"create");
+		try (
 
-		Value value =
-			createFunction.apply (
-				taskLogger,
-				key);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"create");
 
-		Id id =
-			getIdFunction.apply (
-				value);
+		) {
 
-		idCache.put (
-			key,
-			optionalOf (
-				id));
+			Value value =
+				createFunction.apply (
+					taskLogger,
+					key);
 
-		return value;
+			Id id =
+				getIdFunction.apply (
+					value);
+
+			idCache.put (
+				key,
+				optionalOf (
+					id));
+
+			return value;
+
+		}
 
 	}
 
@@ -194,28 +200,34 @@ class IdLookupCache <Key, Id, Value>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		Optional <Value> valueOptional =
-			find (
-				key);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		if (
-			optionalIsPresent (
-				valueOptional)
 		) {
 
-			return optionalGetRequired (
-				valueOptional);
+			Optional <Value> valueOptional =
+				find (
+					key);
 
-		} else {
+			if (
+				optionalIsPresent (
+					valueOptional)
+			) {
 
-			return create (
-				taskLogger,
-				key);
+				return optionalGetRequired (
+					valueOptional);
+
+			} else {
+
+				return create (
+					taskLogger,
+					key);
+
+			}
 
 		}
 

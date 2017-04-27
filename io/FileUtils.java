@@ -4,6 +4,7 @@ import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import lombok.NonNull;
@@ -106,11 +107,42 @@ class FileUtils {
 	byte[] fileReadBytes (
 			@NonNull String path) {
 
-		try {
+		try (
+
+			FileInputStream inputStream =
+				new FileInputStream (
+					path);
+
+		) {
 
 			return IOUtils.toByteArray (
-				new FileInputStream (
-					path));
+				inputStream);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public static
+	void fileWriteBytes (
+			@NonNull String path,
+			@NonNull byte[] bytes) {
+
+		try (
+
+			FileOutputStream outputStream =
+				new FileOutputStream (
+					path);
+
+		) {
+
+			IOUtils.write (
+				bytes,
+				outputStream);
 
 		} catch (IOException ioException) {
 

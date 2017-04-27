@@ -76,54 +76,60 @@ class ThreadManagerImplementation
 				@NonNull Throwable throwable,
 				@NonNull GenericExceptionResolution resolution) {
 
-			TaskLogger taskLogger =
-				logContext.createTaskLoggerFormat (
-					"logThrowable (%s, %s)",
-					classNameSimple (
-						throwable.getClass ()),
-					enumNameHyphens (
-						resolution));
+			try (
 
-			if (
-				enumEqualSafe (
-					resolution,
-					GenericExceptionResolution.fatalError)
+				TaskLogger taskLogger =
+					logContext.createTaskLoggerFormat (
+						"logThrowable (%s, %s)",
+						classNameSimple (
+							throwable.getClass ()),
+						enumNameHyphens (
+							resolution));
+
 			) {
 
-				taskLogger.fatalFormatException (
-					throwable,
-					"Unhandled fatal exception in thread %s",
-					getName ());
+				if (
+					enumEqualSafe (
+						resolution,
+						GenericExceptionResolution.fatalError)
+				) {
 
-			} else {
+					taskLogger.fatalFormatException (
+						throwable,
+						"Unhandled fatal exception in thread %s",
+						getName ());
 
-				taskLogger.errorFormatException (
-					throwable,
-					"Unhandled exception in thread %s",
-					getName ());
+				} else {
 
-			}
+					taskLogger.errorFormatException (
+						throwable,
+						"Unhandled exception in thread %s",
+						getName ());
 
-			throwable.printStackTrace ();
+				}
 
-			try {
+				throwable.printStackTrace ();
 
-				exceptionLogger.logThrowable (
-					taskLogger,
-					exceptionTypeCode,
-					stringFormat (
-						"Thread %s",
-						getName ()),
-					throwable,
-					optionalAbsent (),
-					resolution);
+				try {
 
-			} catch (Throwable exception) {
+					exceptionLogger.logThrowable (
+						taskLogger,
+						exceptionTypeCode,
+						stringFormat (
+							"Thread %s",
+							getName ()),
+						throwable,
+						optionalAbsent (),
+						resolution);
 
-				taskLogger.fatalFormatException (
-					exception,
-					"Error logging exception in %s",
-					getName ());
+				} catch (Throwable exception) {
+
+					taskLogger.fatalFormatException (
+						exception,
+						"Error logging exception in %s",
+						getName ());
+
+				}
 
 			}
 
