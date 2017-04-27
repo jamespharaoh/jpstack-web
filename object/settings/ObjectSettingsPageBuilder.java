@@ -141,28 +141,34 @@ class ObjectSettingsPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		buildAction ();
-		buildResponder ();
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildFile (
-				resolvedExtensionPoint);
+			buildAction ();
+			buildResponder ();
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
 
 		}
 
@@ -397,105 +403,111 @@ class ObjectSettingsPageBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			ifNotNullThenElse (
-				spec.objectName (),
-				() -> genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
-						spec.objectName ())),
-				() -> container.consoleHelper ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		name =
-			spec.name ();
+		) {
 
-		shortName =
-			ifNull (
-				spec.shortName (),
-				"settings");
+			consoleHelper =
+				ifNotNullThenElse (
+					spec.objectName (),
+					() -> genericCastUnchecked (
+						objectManager.findConsoleHelperRequired (
+							spec.objectName ())),
+					() -> container.consoleHelper ());
 
-		longName =
-			ifNull (
-				spec.longName (),
-				"settings");
+			name =
+				spec.name ();
 
-		friendlyShortName =
-			ifNull (
-				spec.friendlyShortName (),
-				camelToSpaces (
-					shortName));
+			shortName =
+				ifNull (
+					spec.shortName (),
+					"settings");
 
-		friendlyLongName =
-			ifNull (
-				spec.friendlyLongName (),
-				stringFormat (
-					"%s %s",
-					consoleHelper.friendlyName (),
+			longName =
+				ifNull (
+					spec.longName (),
+					"settings");
+
+			friendlyShortName =
+				ifNull (
+					spec.friendlyShortName (),
 					camelToSpaces (
-						longName)));
+						shortName));
 
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%s%s%s",
-					container.newBeanNamePrefix (),
-					capitalise (shortName),
-					"Responder"));
+			friendlyLongName =
+				ifNull (
+					spec.friendlyLongName (),
+					stringFormat (
+						"%s %s",
+						consoleHelper.friendlyName (),
+						camelToSpaces (
+							longName)));
 
-		fileName =
-			ifNull (
-				spec.fileName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					shortName));
+			responderName =
+				ifNull (
+					spec.responderName (),
+					stringFormat (
+						"%s%s%s",
+						container.newBeanNamePrefix (),
+						capitalise (shortName),
+						"Responder"));
 
-		tabName =
-			ifNull (
-				spec.tabName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					shortName));
+			fileName =
+				ifNull (
+					spec.fileName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						shortName));
 
-		privKey =
-			ifNull (
-				spec.privKey (),
-				stringFormat (
-					"%s.manage",
-					consoleHelper.objectName ()));
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						shortName));
 
-		formFieldSet =
-			ifNotNullThenElse (
-				spec.fieldsName (),
-				() -> consoleModule.formFieldSetRequired (
+			privKey =
+				ifNull (
+					spec.privKey (),
+					stringFormat (
+						"%s.manage",
+						consoleHelper.objectName ()));
+
+			formFieldSet =
+				ifNotNullThenElse (
 					spec.fieldsName (),
-					consoleHelper.objectClass ()),
-				() -> defaultFields (
-					taskLogger));
+					() -> consoleModule.formFieldSetRequired (
+						spec.fieldsName (),
+						consoleHelper.objectClass ()),
+					() -> defaultFields (
+						taskLogger));
 
-		// if a provider name is provided
+			// if a provider name is provided
 
-		if (spec.fieldsProviderName () != null) {
+			if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						parentTaskLogger,
-						spec.fieldsProviderName (),
-						FieldsProvider.class));
+				fieldsProvider =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							parentTaskLogger,
+							spec.fieldsProviderName (),
+							FieldsProvider.class));
 
-		}
+			}
 
-		else {
+			else {
 
-			fieldsProvider =
-				null;
+				fieldsProvider =
+					null;
+
+			}
 
 		}
 
@@ -504,51 +516,57 @@ class ObjectSettingsPageBuilder <
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defaultFields");
+		try (
 
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultFields");
 
-		formFieldSpecs.add (
-			new IdFormFieldSpec ());
-
-		if (consoleHelper.codeExists ()) {
-
-			formFieldSpecs.add (
-				new CodeFormFieldSpec ());
-
-		}
-
-		if (
-			consoleHelper.nameExists ()
-			&& ! consoleHelper.nameIsCode ()
 		) {
 
-			formFieldSpecs.add (
-				new NameFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.descriptionExists ()) {
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
 			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ());
+				new IdFormFieldSpec ());
+
+			if (consoleHelper.codeExists ()) {
+
+				formFieldSpecs.add (
+					new CodeFormFieldSpec ());
+
+			}
+
+			if (
+				consoleHelper.nameExists ()
+				&& ! consoleHelper.nameIsCode ()
+			) {
+
+				formFieldSpecs.add (
+					new NameFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.descriptionExists ()) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ());
+
+			}
+
+			String fieldSetName =
+				stringFormat (
+					"%s.settings",
+					consoleHelper.objectName ());
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				consoleHelper,
+				fieldSetName,
+				formFieldSpecs);
 
 		}
-
-		String fieldSetName =
-			stringFormat (
-				"%s.settings",
-				consoleHelper.objectName ());
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			consoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

@@ -16,7 +16,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -64,14 +64,14 @@ class QueueHooks
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"queueTypeHooks.setup ()",
@@ -123,54 +123,59 @@ class QueueHooks
 			return;
 		}
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSingletons");
+		try (
 
-		Optional <SliceRec> slice =
-			objectManager.getAncestor (
-				SliceRec.class,
-				parent);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSingletons");
 
-		ObjectTypeRec parentType =
-			objectTypeDao.findById (
-				parentHelper.objectTypeId ());
-
-		for (
-			Long queueTypeId
-				: queueTypeIdsByParentTypeId.get (
-					parentHelper.objectTypeId ())
 		) {
 
-			QueueTypeRec queueType =
-				queueTypeDao.findRequired (
-					queueTypeId);
+			Optional <SliceRec> slice =
+				objectManager.getAncestor (
+					SliceRec.class,
+					parent);
 
-			queueHelper.insert (
-				taskLogger,
-				queueHelper.createInstance ()
+			ObjectTypeRec parentType =
+				objectTypeDao.findById (
+					parentHelper.objectTypeId ());
 
-				.setQueueType (
-					queueType)
+			for (
+				Long queueTypeId
+					: queueTypeIdsByParentTypeId.get (
+						parentHelper.objectTypeId ())
+			) {
 
-				.setCode (
-					queueType.getCode ())
+				QueueTypeRec queueType =
+					queueTypeDao.findRequired (
+						queueTypeId);
 
-				.setParentType (
-					parentType)
+				queueHelper.insert (
+					taskLogger,
+					queueHelper.createInstance ()
 
-				.setParentId (
-					parent.getId ())
+					.setQueueType (
+						queueType)
 
-				.setSlice (
-					slice.orNull ())
+					.setCode (
+						queueType.getCode ())
 
-				.setDefaultPriority (
-					queueType.getDefaultPriority ())
+					.setParentType (
+						parentType)
 
-			);
+					.setParentId (
+						parent.getId ())
 
+					.setSlice (
+						slice.orNull ())
+
+					.setDefaultPriority (
+						queueType.getDefaultPriority ())
+
+				);
+
+			}
 
 		}
 

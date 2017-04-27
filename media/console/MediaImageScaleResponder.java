@@ -31,43 +31,49 @@ class MediaImageScaleResponder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getData");
+		try (
 
-		Long maxWidth =
-			requestContext.parameterIntegerRequired (
-				"width");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getData");
 
-		Long maxHeight =
-			requestContext.parameterIntegerRequired (
-				"height");
+		) {
 
-		MediaTypeRec mediaType =
-			media.getMediaType ();
+			Long maxWidth =
+				requestContext.parameterIntegerRequired (
+					"width");
 
-		ContentRec content =
-			media.getContent ();
+			Long maxHeight =
+				requestContext.parameterIntegerRequired (
+					"height");
 
-		BufferedImage fullImage =
-			mediaLogic.readImageRequired (
-				taskLogger,
-				content.getData (),
-				mediaType.getMimeType ());
+			MediaTypeRec mediaType =
+				media.getMediaType ();
 
-		BufferedImage scaledImage =
-			mediaLogic.resampleImageToFit (
-				fullImage,
-				maxWidth,
-				maxHeight);
+			ContentRec content =
+				media.getContent ();
 
-		byte[] scaledImageData =
-			mediaLogic.writeImage (
-				scaledImage,
-				mediaType.getMimeType ());
+			BufferedImage fullImage =
+				mediaLogic.readImageRequired (
+					taskLogger,
+					content.getData (),
+					mediaType.getMimeType ());
 
-		return scaledImageData;
+			BufferedImage scaledImage =
+				mediaLogic.resampleImageToFit (
+					fullImage,
+					maxWidth,
+					maxHeight);
+
+			byte[] scaledImageData =
+				mediaLogic.writeImage (
+					scaledImage,
+					mediaType.getMimeType ());
+
+			return scaledImageData;
+
+		}
 
 	}
 

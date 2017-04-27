@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -44,72 +44,78 @@ class GroupFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		// menu item
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
-
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
-
-			.setCode (
-				"group")
-
-			.setName (
-				"Group")
-
-			.setDescription (
-				"Group")
-
-			.setLabel (
-				"Groups")
-
-			.setTargetPath (
-				"/groups")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
-		// test groups
-
-		for (
-			int index = 0;
-			index < 10;
-			index ++
 		) {
 
-			groupHelper.insert (
-				taskLogger,
-				groupHelper.createInstance ()
+			// menu item
 
-				.setSlice (
-					sliceHelper.findByCodeRequired (
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
+
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
 						GlobalId.root,
-						"test"))
+						"test",
+						"system"))
 
 				.setCode (
-					"test_" + index)
+					"group")
 
 				.setName (
-					"Test " + index)
+					"Group")
 
 				.setDescription (
-					"")
+					"Group")
+
+				.setLabel (
+					"Groups")
+
+				.setTargetPath (
+					"/groups")
+
+				.setTargetFrame (
+					"main")
 
 			);
+
+			// test groups
+
+			for (
+				int index = 0;
+				index < 10;
+				index ++
+			) {
+
+				groupHelper.insert (
+					taskLogger,
+					groupHelper.createInstance ()
+
+					.setSlice (
+						sliceHelper.findByCodeRequired (
+							GlobalId.root,
+							"test"))
+
+					.setCode (
+						"test_" + index)
+
+					.setName (
+						"Test " + index)
+
+					.setDescription (
+						"")
+
+				);
+
+			}
 
 		}
 

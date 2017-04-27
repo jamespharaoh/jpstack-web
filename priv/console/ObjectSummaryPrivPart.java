@@ -89,139 +89,145 @@ class ObjectSummaryPrivPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		ObjectLookup <? extends Record <?>> objectLookup =
-			genericCastUnchecked (
-				requestContext.stuff (
-					"dataObjectLookup"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		object =
-			objectLookup.lookupObject (
-				requestContext.consoleContextStuffRequired ());
-
-		List <PrivRec> privs =
-			objectManager.getChildren (
-				object,
-				PrivRec.class);
-
-		// for each priv
-
-		for (
-			PrivRec priv
-				: privs
 		) {
 
-			// build user priv list
+			ObjectLookup <? extends Record <?>> objectLookup =
+				genericCastUnchecked (
+					requestContext.stuff (
+						"dataObjectLookup"));
+
+			object =
+				objectLookup.lookupObject (
+					requestContext.consoleContextStuffRequired ());
+
+			List <PrivRec> privs =
+				objectManager.getChildren (
+					object,
+					PrivRec.class);
+
+			// for each priv
 
 			for (
-				UserPrivRec userPriv
-					: priv.getUserPrivs ()
+				PrivRec priv
+					: privs
 			) {
 
-				String userPath =
-					objectManager.objectPathMini (
-						userPriv.getUser ());
+				// build user priv list
 
-				UserPrivSets userPrivSets =
-					userPrivs.get (userPath);
+				for (
+					UserPrivRec userPriv
+						: priv.getUserPrivs ()
+				) {
 
-				if (userPrivSets == null) {
+					String userPath =
+						objectManager.objectPathMini (
+							userPriv.getUser ());
 
-					userPrivs.put (
-						userPath,
-						userPrivSets = new UserPrivSets ());
+					UserPrivSets userPrivSets =
+						userPrivs.get (userPath);
+
+					if (userPrivSets == null) {
+
+						userPrivs.put (
+							userPath,
+							userPrivSets = new UserPrivSets ());
+
+					}
+
+					if (userPriv.getCan ()) {
+
+						userPrivSets.canPrivCodes.add (
+							priv.getCode ());
+
+					}
+
+					if (userPriv.getCanGrant ()) {
+
+						userPrivSets.canGrantPrivCodes.add (
+							priv.getCode ());
+
+					}
 
 				}
 
-				if (userPriv.getCan ()) {
+				// build group priv list
 
-					userPrivSets.canPrivCodes.add (
-						priv.getCode ());
+				for (
+					GroupRec group
+						: priv.getGroups ()
+				) {
 
-				}
+					String groupPath =
+						objectManager.objectPathMini (
+							group);
 
-				if (userPriv.getCanGrant ()) {
+					Set<String> privCodes =
+						groupPrivs.get (groupPath);
 
-					userPrivSets.canGrantPrivCodes.add (
+					if (privCodes == null) {
+
+						privCodes =
+							new TreeSet<String>();
+
+						groupPrivs.put (
+							groupPath,
+							privCodes);
+
+					}
+
+					privCodes.add (
 						priv.getCode ());
 
 				}
 
 			}
 
-			// build group priv list
+			for (
+				UserRec user
+					: userHelper.findAll ()
+			) {
+
+				if (
+					! objectManager.canView (
+						taskLogger,
+						user)
+				) {
+					continue;
+				}
+
+				users.put (
+					objectManager.objectPathMini (
+						user),
+					user);
+
+			}
 
 			for (
 				GroupRec group
-					: priv.getGroups ()
+					: groupHelper.findAll ()
 			) {
 
-				String groupPath =
-					objectManager.objectPathMini (
-						group);
-
-				Set<String> privCodes =
-					groupPrivs.get (groupPath);
-
-				if (privCodes == null) {
-
-					privCodes =
-						new TreeSet<String>();
-
-					groupPrivs.put (
-						groupPath,
-						privCodes);
-
+				if (
+					! objectManager.canView (
+						taskLogger,
+						group)
+				) {
+					continue;
 				}
 
-				privCodes.add (
-					priv.getCode ());
+				groups.put (
+					objectManager.objectPathMini (
+						group),
+					group);
 
 			}
-
-		}
-
-		for (
-			UserRec user
-				: userHelper.findAll ()
-		) {
-
-			if (
-				! objectManager.canView (
-					taskLogger,
-					user)
-			) {
-				continue;
-			}
-
-			users.put (
-				objectManager.objectPathMini (
-					user),
-				user);
-
-		}
-
-		for (
-			GroupRec group
-				: groupHelper.findAll ()
-		) {
-
-			if (
-				! objectManager.canView (
-					taskLogger,
-					group)
-			) {
-				continue;
-			}
-
-			groups.put (
-				objectManager.objectPathMini (
-					group),
-				group);
 
 		}
 

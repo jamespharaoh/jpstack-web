@@ -134,148 +134,154 @@ class ObjectLinksPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// form open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/" + localFile));
-
-		// form controls
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// table open
-
-		htmlTableOpenList ();
-
-		// table header
-
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			targetFields);
-
-		htmlTableHeaderCellWrite (
-			"Member");
-
-		htmlTableRowClose ();
-
-		// table content
-
-		for (
-			TargetType targetObject
-				: targetObjects
 		) {
 
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					targetObject,
-					"manage")
-			) {
-				continue;
-			}
+			// form open
 
-			htmlTableRowOpen ();
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/" + localFile));
 
-			formatWriter.increaseIndent ();
+			// form controls
 
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
-				formatWriter,
-				targetFields,
-				targetObject,
-				emptyMap (),
-				true);
-
-			htmlTableCheckWriterProvider.get ()
-
-				.name (
-					"link_" + targetObject.getId ())
-
-				.label (
-					"member")
-
-				.value (
-					contextLinks.contains (
-						targetObject))
-
-				.write (
-					formatWriter);
-
-			formatWriter.decreaseIndent ();
-
-			htmlTableRowClose ();
-
-		}
-
-		// table close
-
-		htmlTableClose ();
-
-		// form controls
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// form hidden fields
-
-		for (
-			Record<?> targetObject
-				: targetObjects
-		) {
-
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					targetObject,
-					"manage")
-			) {
-				continue;
-			}
+			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
 				"<input",
-				" type=\"hidden\"",
-				" name=\"old_link\"",
-				" value=\"%h,%h\"",
-				integerToDecimalString (
-					targetObject.getId ()),
-				booleanToTrueFalse (
-					contextLinks.contains (
-						targetObject)),
+				" type=\"submit\"",
+				" value=\"save changes\"",
 				">");
 
+			htmlParagraphClose ();
+
+			// table open
+
+			htmlTableOpenList ();
+
+			// table header
+
+			htmlTableRowOpen ();
+
+			formFieldLogic.outputTableHeadings (
+				formatWriter,
+				targetFields);
+
+			htmlTableHeaderCellWrite (
+				"Member");
+
+			htmlTableRowClose ();
+
+			// table content
+
+			for (
+				TargetType targetObject
+					: targetObjects
+			) {
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						targetObject,
+						"manage")
+				) {
+					continue;
+				}
+
+				htmlTableRowOpen ();
+
+				formatWriter.increaseIndent ();
+
+				formFieldLogic.outputTableCellsList (
+					taskLogger,
+					formatWriter,
+					targetFields,
+					targetObject,
+					emptyMap (),
+					true);
+
+				htmlTableCheckWriterProvider.get ()
+
+					.name (
+						"link_" + targetObject.getId ())
+
+					.label (
+						"member")
+
+					.value (
+						contextLinks.contains (
+							targetObject))
+
+					.write (
+						formatWriter);
+
+				formatWriter.decreaseIndent ();
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
+
+			// form controls
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form hidden fields
+
+			for (
+				Record<?> targetObject
+					: targetObjects
+			) {
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						targetObject,
+						"manage")
+				) {
+					continue;
+				}
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"old_link\"",
+					" value=\"%h,%h\"",
+					integerToDecimalString (
+						targetObject.getId ()),
+					booleanToTrueFalse (
+						contextLinks.contains (
+							targetObject)),
+					">");
+
+			}
+
+			// form close
+
+			htmlFormClose ();
+
+			// flush scripts
+
+			requestContext.flushScripts ();
+
 		}
-
-		// form close
-
-		htmlFormClose ();
-
-		// flush scripts
-
-		requestContext.flushScripts ();
 
 	}
 

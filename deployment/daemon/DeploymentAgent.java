@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -77,14 +77,14 @@ class DeploymentAgent
 	void runOnce (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"runOnce");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"runOnce ()",
@@ -144,57 +144,63 @@ class DeploymentAgent
 	private
 	void runApiDeployment (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ApiDeploymentRec apiDeployment) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runApiDeployment (%s)",
-				objectToString (
-					apiDeployment));
+		try (
 
-		// update state
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runApiDeployment (%s)",
+					objectToString (
+						apiDeployment));
 
-		try {
+		) {
 
-			apiDeployment
+			// update state
 
-				.setState (
-					getServiceState (
-						taskLogger,
-						apiDeployment.getServiceName ()))
+			try {
 
-				.setStateTimestamp (
-					transaction.now ());
+				apiDeployment
 
-		} catch (Exception exception) {
+					.setState (
+						getServiceState (
+							taskLogger,
+							apiDeployment.getServiceName ()))
 
-			apiDeployment
+					.setStateTimestamp (
+						transaction.now ());
 
-				.setState (
-					DeploymentState.unknown)
+			} catch (Exception exception) {
 
-				.setStateTimestamp (
-					transaction.now ());
+				apiDeployment
 
-		}
+					.setState (
+						DeploymentState.unknown)
 
-		// perform restart
+					.setStateTimestamp (
+						transaction.now ());
 
-		if (apiDeployment.getRestart ()) {
+			}
 
-			taskLogger.noticeFormat (
-				"Restarting API deployment %s",
-				apiDeployment.getServiceName ());
+			// perform restart
 
-			restartService (
-				apiDeployment.getServiceName ());
+			if (apiDeployment.getRestart ()) {
 
-			apiDeployment
+				taskLogger.noticeFormat (
+					"Restarting API deployment %s",
+					apiDeployment.getServiceName ());
 
-				.setRestart (
-					false);
+				restartService (
+					apiDeployment.getServiceName ());
+
+				apiDeployment
+
+					.setRestart (
+						false);
+
+			}
 
 		}
 
@@ -203,57 +209,63 @@ class DeploymentAgent
 	private
 	void runConsoleDeployment (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull ConsoleDeploymentRec consoleDeployment) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runConsoleDeployment (%s)",
-				objectToString (
-					consoleDeployment));
+		try (
 
-		// update state
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runConsoleDeployment (%s)",
+					objectToString (
+						consoleDeployment));
 
-		try {
+		) {
 
-			consoleDeployment
+			// update state
 
-				.setState (
-					getServiceState (
-						taskLogger,
-						consoleDeployment.getServiceName ()))
+			try {
 
-				.setStateTimestamp (
-					transaction.now ());
+				consoleDeployment
 
-		} catch (Exception exception) {
+					.setState (
+						getServiceState (
+							taskLogger,
+							consoleDeployment.getServiceName ()))
 
-			consoleDeployment
+					.setStateTimestamp (
+						transaction.now ());
 
-				.setState (
-					DeploymentState.unknown)
+			} catch (Exception exception) {
 
-				.setStateTimestamp (
-					transaction.now ());
+				consoleDeployment
 
-		}
+					.setState (
+						DeploymentState.unknown)
 
-		// perform restart
+					.setStateTimestamp (
+						transaction.now ());
 
-		if (consoleDeployment.getRestart ()) {
+			}
 
-			taskLogger.noticeFormat (
-				"Restarting console deployment %s",
-				consoleDeployment.getServiceName ());
+			// perform restart
 
-			restartService (
-				consoleDeployment.getServiceName ());
+			if (consoleDeployment.getRestart ()) {
 
-			consoleDeployment
+				taskLogger.noticeFormat (
+					"Restarting console deployment %s",
+					consoleDeployment.getServiceName ());
 
-				.setRestart (
-					false);
+				restartService (
+					consoleDeployment.getServiceName ());
+
+				consoleDeployment
+
+					.setRestart (
+						false);
+
+			}
 
 		}
 
@@ -262,57 +274,63 @@ class DeploymentAgent
 	private
 	void runDaemonDeployment (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull DaemonDeploymentRec daemonDeployment) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"runDaemonDeployment (%s)",
-				objectToString (
-					daemonDeployment));
+		try (
 
-		// update state
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"runDaemonDeployment (%s)",
+					objectToString (
+						daemonDeployment));
 
-		try {
+		) {
 
-			daemonDeployment
+			// update state
 
-				.setState (
-					getServiceState (
-						taskLogger,
-						daemonDeployment.getServiceName ()))
+			try {
 
-				.setStateTimestamp (
-					transaction.now ());
+				daemonDeployment
 
-		} catch (Exception exception) {
+					.setState (
+						getServiceState (
+							taskLogger,
+							daemonDeployment.getServiceName ()))
 
-			daemonDeployment
+					.setStateTimestamp (
+						transaction.now ());
 
-				.setState (
-					DeploymentState.unknown)
+			} catch (Exception exception) {
 
-				.setStateTimestamp (
-					transaction.now ());
+				daemonDeployment
 
-		}
+					.setState (
+						DeploymentState.unknown)
 
-		// perform restart
+					.setStateTimestamp (
+						transaction.now ());
 
-		if (daemonDeployment.getRestart ()) {
+			}
 
-			taskLogger.noticeFormat (
-				"Restarting daemon deployment %s",
-				daemonDeployment.getServiceName ());
+			// perform restart
 
-			restartService (
-				daemonDeployment.getServiceName ());
+			if (daemonDeployment.getRestart ()) {
 
-			daemonDeployment
+				taskLogger.noticeFormat (
+					"Restarting daemon deployment %s",
+					daemonDeployment.getServiceName ());
 
-				.setRestart (
-					false);
+				restartService (
+					daemonDeployment.getServiceName ());
+
+				daemonDeployment
+
+					.setRestart (
+						false);
+
+			}
 
 		}
 
@@ -353,13 +371,15 @@ class DeploymentAgent
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String serviceName) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"getServiceState (%s)",
-				serviceName);
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"getServiceState (%s)",
+					serviceName);
+
+		) {
 
 			DBusConnection dbus =
 				DBusConnection.getConnection (

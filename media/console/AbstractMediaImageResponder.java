@@ -62,18 +62,24 @@ class AbstractMediaImageResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare ()");
+		try (
 
-		media =
-			mediaHelper.findRequired (
-				requestContext.stuffIntegerRequired (
-					"mediaId"));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare ()");
 
-		transform (
-			taskLogger);
+		) {
+
+			media =
+				mediaHelper.findRequired (
+					requestContext.stuffIntegerRequired (
+						"mediaId"));
+
+			transform (
+				taskLogger);
+
+		}
 
 	}
 
@@ -81,77 +87,83 @@ class AbstractMediaImageResponder
 	void transform (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"transform ()");
+		try (
 
-		String rotate =
-			requestContext.parameterOrEmptyString (
-				"rotate");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"transform ()");
 
-		if (
-			stringEqualSafe (
-				rotate,
-				"90")
 		) {
 
-			data =
-				mediaLogic.writeImage (
-					mediaLogic.rotateImage90 (
-						mediaLogic.readImageRequired (
-							taskLogger,
-							getData (
+			String rotate =
+				requestContext.parameterOrEmptyString (
+					"rotate");
+
+			if (
+				stringEqualSafe (
+					rotate,
+					"90")
+			) {
+
+				data =
+					mediaLogic.writeImage (
+						mediaLogic.rotateImage90 (
+							mediaLogic.readImageRequired (
 								taskLogger,
-								media),
-							getMimeType (
-								media))),
-					getMimeType (media));
+								getData (
+									taskLogger,
+									media),
+								getMimeType (
+									media))),
+						getMimeType (media));
 
-		} else if (
-			stringEqualSafe (
-				rotate,
-				"180")
-		) {
+			} else if (
+				stringEqualSafe (
+					rotate,
+					"180")
+			) {
 
-			data =
-				mediaLogic.writeImage (
-					mediaLogic.rotateImage180 (
-						mediaLogic.readImageRequired (
-							taskLogger,
-							getData (
+				data =
+					mediaLogic.writeImage (
+						mediaLogic.rotateImage180 (
+							mediaLogic.readImageRequired (
 								taskLogger,
-								media),
-							getMimeType (
-								media))),
-					getMimeType (
-						media));
+								getData (
+									taskLogger,
+									media),
+								getMimeType (
+									media))),
+						getMimeType (
+							media));
 
-		} else if (
-			stringEqualSafe (
-				rotate,
-				"270")
-		) {
+			} else if (
+				stringEqualSafe (
+					rotate,
+					"270")
+			) {
 
-			data =
-				mediaLogic.writeImage (
-					mediaLogic.rotateImage270 (
-						mediaLogic.readImageRequired (
-							taskLogger,
-							getData (
+				data =
+					mediaLogic.writeImage (
+						mediaLogic.rotateImage270 (
+							mediaLogic.readImageRequired (
 								taskLogger,
-								media),
-							getMimeType (
-								media))),
-					getMimeType (
-						media));
+								getData (
+									taskLogger,
+									media),
+								getMimeType (
+									media))),
+						getMimeType (
+							media));
 
-		} else {
+			} else {
 
-			data =
-				getData (
-					taskLogger,
-					media);
+				data =
+					getData (
+						taskLogger,
+						media);
+
+			}
 
 		}
 
@@ -159,16 +171,28 @@ class AbstractMediaImageResponder
 
 	@Override
 	protected
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			getMimeType (media));
+		try (
 
-		requestContext.setHeader (
-			"Content-Length",
-			Integer.toString (
-				data.length));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				getMimeType (media));
+
+			requestContext.setHeader (
+				"Content-Length",
+				Integer.toString (
+					data.length));
+
+		}
 
 	}
 

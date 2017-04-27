@@ -56,33 +56,38 @@ class TextObjectHelperMethodsImplementation
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		// from and to user id
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		textCache =
-			textCacheBuilderProvider.get ()
+		) {
 
-			.lookupByIdFunction (
-				textHelper::find)
+			// from and to user id
 
-			.lookupByKeyFunction (
-				textValue ->
-					optionalFromNullable (
-						textHelper.findByTextNoFlush (
-							textValue)))
+			textCache =
+				textCacheBuilderProvider.get ()
 
-			.getIdFunction (
-				TextRec::getId)
+				.lookupByIdFunction (
+					textHelper::find)
 
-			.createFunction (
-				this::createReal)
+				.lookupByKeyFunction (
+					textValue ->
+						optionalFromNullable (
+							textHelper.findByTextNoFlush (
+								textValue)))
 
-			.build ();
+				.getIdFunction (
+					TextRec::getId)
+
+				.createFunction (
+					this::createReal)
+
+				.build ();
+
+		}
 
 	}
 
@@ -94,14 +99,20 @@ class TextObjectHelperMethodsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String stringValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		return textCache.findOrCreate (
-			taskLogger,
-			stringValue);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
+
+		) {
+
+			return textCache.findOrCreate (
+				taskLogger,
+				stringValue);
+
+		}
 
 	}
 
@@ -110,19 +121,25 @@ class TextObjectHelperMethodsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String stringValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createReal");
+		try (
 
-		return textHelper.insert (
-			taskLogger,
-			textHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createReal");
 
-			.setText (
-				stringValue)
+		) {
 
-		);
+			return textHelper.insert (
+				taskLogger,
+				textHelper.createInstance ()
+
+				.setText (
+					stringValue)
+
+			);
+
+		}
 
 	}
 

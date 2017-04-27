@@ -36,20 +36,26 @@ class FeatureCheckerImplementation
 			@NonNull UserPrivChecker privChecker,
 			@NonNull String featureCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkFeatureAccess");
+		try (
 
-		FeatureRec feature =
-			featureHelper.findByCodeRequired (
-				GlobalId.root,
-				featureCode);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkFeatureAccess");
 
-		return privChecker.canRecursive (
-			taskLogger,
-			feature,
-			"view");
+		) {
+
+			FeatureRec feature =
+				featureHelper.findByCodeRequired (
+					GlobalId.root,
+					featureCode);
+
+			return privChecker.canRecursive (
+				taskLogger,
+				feature,
+				"view");
+
+		}
 
 	}
 

@@ -46,52 +46,58 @@ class QueueItemConsoleHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"applySearchFilter");
+		try (
 
-		QueueItemSearch search =
-			(QueueItemSearch)
-			searchObject;
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"applySearchFilter");
 
-		search
-
-			.filter (
-				true);
-
-		// queues
-
-		ImmutableList.Builder <Long> queuesBuilder =
-			ImmutableList.builder ();
-
-		for (
-			QueueRec queue
-				: queueHelper.findAll ()
 		) {
 
-			Record <?> queueParent =
-				objectManager.getParentRequired (
-					queue);
+			QueueItemSearch search =
+				(QueueItemSearch)
+				searchObject;
 
-			 if (
-			 	! privChecker.canRecursive (
-			 		taskLogger,
-			 		queueParent,
-			 		"manage")
-			 ) {
-			 	continue;
-			 }
+			search
 
-			queuesBuilder.add (
-				queue.getId ());
+				.filter (
+					true);
+
+			// queues
+
+			ImmutableList.Builder <Long> queuesBuilder =
+				ImmutableList.builder ();
+
+			for (
+				QueueRec queue
+					: queueHelper.findAll ()
+			) {
+
+				Record <?> queueParent =
+					objectManager.getParentRequired (
+						queue);
+
+				 if (
+				 	! privChecker.canRecursive (
+				 		taskLogger,
+				 		queueParent,
+				 		"manage")
+				 ) {
+				 	continue;
+				 }
+
+				queuesBuilder.add (
+					queue.getId ());
+
+			}
+
+			search
+
+				.filterQueueIds (
+					queuesBuilder.build ());
 
 		}
-
-		search
-
-			.filterQueueIds (
-				queuesBuilder.build ());
 
 	}
 

@@ -1,6 +1,7 @@
 package wbs.platform.media.console;
 
 import static wbs.utils.etc.Misc.runFilter;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,15 +57,17 @@ class MediaVideoResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		MediaRec media =
-			mediaHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		try {
+		) {
+
+			MediaRec media =
+				mediaHelper.findFromContextRequired ();
 
 			data =
 				runFilter (
@@ -91,15 +94,28 @@ class MediaVideoResponder
 
 	@Override
 	public
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"video/x-flv");
+		try (
 
-		requestContext.setHeader (
-			"Content-Length",
-			Integer.toString (data.length));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"video/x-flv");
+
+			requestContext.setHeader (
+				"Content-Length",
+				integerToDecimalString (
+					data.length));
+
+		}
 
 	}
 

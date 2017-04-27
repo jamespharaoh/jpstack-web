@@ -84,70 +84,77 @@ class QueueUsersPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		Map <Long, UserData> temp =
-			new HashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		List <QueueItemClaimRec> queueItemClaims =
-			queueItemClaimHelper.findClaimed ();
-
-		for (
-			QueueItemClaimRec queueItemClaim
-				: queueItemClaims
 		) {
 
-			QueueItemRec queueItem =
-				queueItemClaim.getQueueItem ();
+			Map <Long, UserData> temp =
+				new HashMap<> ();
 
-			QueueRec queue =
-				queueItem.getQueue ();
+			List <QueueItemClaimRec> queueItemClaims =
+				queueItemClaimHelper.findClaimed ();
 
-			Record <?> parent =
-				objectManager.getParentRequired (
-					queue);
-
-			if (
-				! privChecker.canRecursive (
-					taskLogger,
-					parent,
-					"manage")
+			for (
+				QueueItemClaimRec queueItemClaim
+					: queueItemClaims
 			) {
-				continue;
+
+				QueueItemRec queueItem =
+					queueItemClaim.getQueueItem ();
+
+				QueueRec queue =
+					queueItem.getQueue ();
+
+				Record <?> parent =
+					objectManager.getParentRequired (
+						queue);
+
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						parent,
+						"manage")
+				) {
+					continue;
+				}
+
+				Instant createdTime =
+					queueItem.getCreatedTime ();
+
+				UserData line =
+					temp.get (queueItemClaim.getUser ().getId ());
+
+				if (line == null) {
+
+					temp.put (
+						queueItemClaim.getUser ().getId (),
+						line = new UserData ()
+							.user (queueItemClaim.getUser ())
+							.oldest (createdTime)
+							.count (0));
+
+				}
+
+				if (createdTime.isBefore (line.oldest))
+					line.oldest = createdTime;
+
+				line.count ++;
+
 			}
 
-			Instant createdTime =
-				queueItem.getCreatedTime ();
+			userDatas =
+				new ArrayList<> (
+					temp.values ());
 
-			UserData line =
-				temp.get (queueItemClaim.getUser ().getId ());
-
-			if (line == null) {
-
-				temp.put (
-					queueItemClaim.getUser ().getId (),
-					line = new UserData ()
-						.user (queueItemClaim.getUser ())
-						.oldest (createdTime)
-						.count (0));
-
-			}
-
-			if (createdTime.isBefore (line.oldest))
-				line.oldest = createdTime;
-
-			line.count ++;
+			Collections.sort (
+				userDatas);
 
 		}
-
-		userDatas =
-			new ArrayList<UserData> (
-				temp.values ());
-
-		Collections.sort (userDatas);
 
 	}
 
@@ -156,60 +163,92 @@ class QueueUsersPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"User",
-			"Items",
-			"Oldest",
-			"Reclaim",
-			"Unclaim");
-
-		for (
-			UserData userData
-				: userDatas
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
-				userData.user);
+			htmlTableHeaderRowWrite (
+				"User",
+				"Items",
+				"Oldest",
+				"Reclaim",
+				"Unclaim");
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					userData.count),
-				htmlAttribute (
-					"align",
-					"right"));
-
-			htmlTableCellWrite (
-				timeFormatter.prettyDuration (
-					userData.oldest,
-					transaction.now ()));
-
-			if (
-				referenceEqualWithClass (
-					UserRec.class,
-					userData.user,
-					userConsoleLogic.userRequired ())
+			for (
+				UserData userData
+					: userDatas
 			) {
 
-				htmlTableCellWrite (
-					"");
+				htmlTableRowOpen ();
 
-			} else {
+				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
+					userData.user);
+
+				htmlTableCellWrite (
+					integerToDecimalString (
+						userData.count),
+					htmlAttribute (
+						"align",
+						"right"));
+
+				htmlTableCellWrite (
+					timeFormatter.prettyDuration (
+						userData.oldest,
+						transaction.now ()));
+
+				if (
+					referenceEqualWithClass (
+						UserRec.class,
+						userData.user,
+						userConsoleLogic.userRequired ())
+				) {
+
+					htmlTableCellWrite (
+						"");
+
+				} else {
+
+					htmlTableCellOpen ();
+
+					htmlFormOpenPostAction (
+						 requestContext.resolveLocalUrl (
+						 	"/queue.users"));
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"hidden\"",
+						" name=\"userId\"",
+						" value=\"%h\"",
+						integerToDecimalString (
+							userData.user.getId ()),
+						">");
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" name=\"reclaim\"",
+						" value=\"reclaim\"",
+						">");
+
+					htmlFormClose ();
+
+					htmlTableCellClose ();
+
+				}
 
 				htmlTableCellOpen ();
 
 				htmlFormOpenPostAction (
-					 requestContext.resolveLocalUrl (
-					 	"/queue.users"));
+					requestContext.resolveLocalUrl (
+						"/queue.users"));
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -223,48 +262,22 @@ class QueueUsersPart
 				formatWriter.writeLineFormat (
 					"<input",
 					" type=\"submit\"",
-					" name=\"reclaim\"",
-					" value=\"reclaim\"",
+					" name=\"unclaim\"",
+					" value=\"unclaim\"",
 					">");
+
 
 				htmlFormClose ();
 
 				htmlTableCellClose ();
 
+				htmlTableRowClose ();
+
 			}
 
-			htmlTableCellOpen ();
-
-			htmlFormOpenPostAction (
-				requestContext.resolveLocalUrl (
-					"/queue.users"));
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"userId\"",
-				" value=\"%h\"",
-				integerToDecimalString (
-					userData.user.getId ()),
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"unclaim\"",
-				" value=\"unclaim\"",
-				">");
-
-
-			htmlFormClose ();
-
-			htmlTableCellClose ();
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

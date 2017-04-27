@@ -48,32 +48,38 @@ class ObjectSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		parts =
-			new ArrayList<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		for (
-			PagePartFactory partFactory
-				: partFactories
 		) {
 
-			PagePart pagePart =
-				partFactory.buildPagePart (
+			parts =
+				new ArrayList<> ();
+
+			for (
+				PagePartFactory partFactory
+					: partFactories
+			) {
+
+				PagePart pagePart =
+					partFactory.buildPagePart (
+						taskLogger);
+
+				pagePart.setup (
+					taskLogger,
+					Collections.emptyMap ());
+
+				pagePart.prepare (
 					taskLogger);
 
-			pagePart.setup (
-				taskLogger,
-				Collections.emptyMap ());
+				parts.add (
+					pagePart);
 
-			pagePart.prepare (
-				taskLogger);
-
-			parts.add (
-				pagePart);
+			}
 
 		}
 
@@ -105,18 +111,24 @@ class ObjectSummaryPart
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContent");
+		try (
 
-		for (
-			PagePart part
-				: parts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContent");
+
 		) {
 
-			part.renderHtmlHeadContent (
-				taskLogger);
+			for (
+				PagePart part
+					: parts
+			) {
+
+				part.renderHtmlHeadContent (
+					taskLogger);
+
+			}
 
 		}
 
@@ -127,18 +139,24 @@ class ObjectSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		for (
-			PagePart part
-				: parts
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
 		) {
 
-			part.renderHtmlBodyContent (
-				taskLogger);
+			for (
+				PagePart part
+					: parts
+			) {
+
+				part.renderHtmlBodyContent (
+					taskLogger);
+
+			}
 
 		}
 

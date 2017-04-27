@@ -7,7 +7,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -42,92 +42,110 @@ class DeploymentFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createConsoleDeployments (
-			taskLogger,
-			transaction);
+		) {
+
+			createMenuItems (
+				taskLogger,
+				transaction);
+
+			createConsoleDeployments (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"internal"))
+		) {
 
-			.setCode (
-				"deployment")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Deployment")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"internal"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"deployment")
 
-			.setLabel (
-				"Deployments")
+				.setName (
+					"Deployment")
 
-			.setTargetPath (
-				"/deployment")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Deployments")
 
-		);
+				.setTargetPath (
+					"/deployment")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+		}
 
 	}
 
 	private
 	void createConsoleDeployments (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createConsoleDeployments");
+		try (
 
-		consoleDeploymentHelper.insert (
-			taskLogger,
-			consoleDeploymentHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createConsoleDeployments");
 
-			.setCode (
-				"test")
+		) {
 
-			.setName (
-				"Test")
+			consoleDeploymentHelper.insert (
+				taskLogger,
+				consoleDeploymentHelper.createInstance ()
 
-			.setDescription (
-				"Console test deployment")
+				.setCode (
+					"test")
 
-			.setHost (
-				runHostname ())
+				.setName (
+					"Test")
 
-		);
+				.setDescription (
+					"Console test deployment")
+
+				.setHost (
+					runHostname ())
+
+			);
+
+		}
 
 	}
 

@@ -64,88 +64,94 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 			@NonNull Optional <Object> objectRef,
 			@NonNull Optional <String> objectType) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"onUpdate");
+		try (
 
-		// determine if it's an admin event
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"onUpdate");
 
-		// TODO this needs to be much better
-
-		String adminPrefix;
-
-		if (
-			container instanceof RootRecord
-			|| container instanceof MajorRecord
-			|| container instanceof MinorRecord
-			|| container instanceof EphemeralRecord
 		) {
 
-			adminPrefix = "admin_";
+			// determine if it's an admin event
 
-		} else if (
-			container instanceof CommonRecord
-			|| container instanceof EventRecord
-		) {
+			// TODO this needs to be much better
 
-			adminPrefix = "";
+			String adminPrefix;
 
-		} else {
+			if (
+				container instanceof RootRecord
+				|| container instanceof MajorRecord
+				|| container instanceof MinorRecord
+				|| container instanceof EphemeralRecord
+			) {
 
-			throw new RuntimeException ();
+				adminPrefix = "admin_";
 
-		}
+			} else if (
+				container instanceof CommonRecord
+				|| container instanceof EventRecord
+			) {
 
-		// create an event
-
-		if (objectRef.isPresent ()) {
-
-			if (updateResult.newNativeValue ().isPresent ()) {
-
-				eventLogic.createEvent (
-					taskLogger,
-					adminPrefix + "object_field_updated_in",
-					userConsoleLogic.userRequired (),
-					fieldName,
-					objectRef.get (),
-					objectType.get (),
-					linkObject,
-					updateResult.newNativeValue ().get ());
+				adminPrefix = "";
 
 			} else {
 
-				eventLogic.createEvent (
-					taskLogger,
-					adminPrefix + "object_field_nulled_in",
-					userConsoleLogic.userRequired (),
-					fieldName,
-					objectRef.get (),
-					objectType.get (),
-					linkObject);
+				throw new RuntimeException ();
 
 			}
 
-		} else {
+			// create an event
 
-			if (updateResult.newNativeValue ().isPresent ()) {
+			if (objectRef.isPresent ()) {
 
-				eventLogic.createEvent (
-					taskLogger,
-					adminPrefix + "object_field_updated",
-					userConsoleLogic.userRequired (),
-					fieldName,
-					linkObject,
-					updateResult.newNativeValue ().get ());
+				if (updateResult.newNativeValue ().isPresent ()) {
+
+					eventLogic.createEvent (
+						taskLogger,
+						adminPrefix + "object_field_updated_in",
+						userConsoleLogic.userRequired (),
+						fieldName,
+						objectRef.get (),
+						objectType.get (),
+						linkObject,
+						updateResult.newNativeValue ().get ());
+
+				} else {
+
+					eventLogic.createEvent (
+						taskLogger,
+						adminPrefix + "object_field_nulled_in",
+						userConsoleLogic.userRequired (),
+						fieldName,
+						objectRef.get (),
+						objectType.get (),
+						linkObject);
+
+				}
 
 			} else {
 
-				eventLogic.createEvent (
-					taskLogger,
-					adminPrefix + "object_field_nulled",
-					userConsoleLogic.userRequired (),
-					fieldName,
-					linkObject);
+				if (updateResult.newNativeValue ().isPresent ()) {
+
+					eventLogic.createEvent (
+						taskLogger,
+						adminPrefix + "object_field_updated",
+						userConsoleLogic.userRequired (),
+						fieldName,
+						linkObject,
+						updateResult.newNativeValue ().get ());
+
+				} else {
+
+					eventLogic.createEvent (
+						taskLogger,
+						adminPrefix + "object_field_nulled",
+						userConsoleLogic.userRequired (),
+						fieldName,
+						linkObject);
+
+				}
 
 			}
 

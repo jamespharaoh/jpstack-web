@@ -133,53 +133,59 @@ class AbstractDaemonService {
 	void startService (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"startService");
+		try (
 
-		// check if we are enabled
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"startService");
 
-		if (! checkEnabled ()) {
+		) {
+
+			// check if we are enabled
+
+			if (! checkEnabled ()) {
+
+				taskLogger.noticeFormat (
+					"Not starting %s (disabled)",
+					classNameSimple (
+						getClass ()));
+
+				return;
+
+			}
+
+			// if already running do nothing
+
+			if (threads != null)
+				return;
 
 			taskLogger.noticeFormat (
-				"Not starting %s (disabled)",
+				"Starting %s",
 				classNameSimple (
 					getClass ()));
 
-			return;
+			// call init
+
+			setupService (
+				taskLogger);
+
+			// start threads
+
+			threads =
+				new ArrayList<> ();
+
+			createThreads (
+				taskLogger);
+
+			// done
+
+			taskLogger.noticeFormat (
+				"Started %s",
+				classNameSimple (
+					getClass ()));
 
 		}
-
-		// if already running do nothing
-
-		if (threads != null)
-			return;
-
-		taskLogger.noticeFormat (
-			"Starting %s",
-			classNameSimple (
-				getClass ()));
-
-		// call init
-
-		setupService (
-			taskLogger);
-
-		// start threads
-
-		threads =
-			new ArrayList<> ();
-
-		createThreads (
-			taskLogger);
-
-		// done
-
-		taskLogger.noticeFormat (
-			"Started %s",
-			classNameSimple (
-				getClass ()));
 
 	}
 
@@ -193,63 +199,69 @@ class AbstractDaemonService {
 	void stopService (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"stopService");
+		try (
 
-		// if we have never started anything, do nothing
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"stopService");
 
-		if (threads == null)
-			return;
+		) {
 
-		taskLogger.noticeFormat (
-			"Stopping %s",
-			getClass ().getSimpleName ());
+			// if we have never started anything, do nothing
 
-		// interrupt all the threads
+			if (threads == null)
+				return;
 
-		for (Thread thread : threads) {
+			taskLogger.noticeFormat (
+				"Stopping %s",
+				getClass ().getSimpleName ());
 
-			if (thread.isAlive ())
-				thread.interrupt ();
+			// interrupt all the threads
 
-		}
+			for (Thread thread : threads) {
 
-		// now wait for them to join us
+				if (thread.isAlive ())
+					thread.interrupt ();
 
-		while (true) {
-
-			try {
-
-				for (Thread thread : threads) {
-
-					if (thread.isAlive ()) {
-						thread.join ();
-					}
-
-				}
-
-				break;
-
-			} catch (InterruptedException exception) {
-				continue;
 			}
 
+			// now wait for them to join us
+
+			while (true) {
+
+				try {
+
+					for (Thread thread : threads) {
+
+						if (thread.isAlive ()) {
+							thread.join ();
+						}
+
+					}
+
+					break;
+
+				} catch (InterruptedException exception) {
+					continue;
+				}
+
+			}
+
+			// call deinit
+
+			serviceTeardown (
+				taskLogger);
+
+			// we're done
+
+			taskLogger.noticeFormat (
+				"Stopped %s",
+				getClass ().getSimpleName ());
+
+			threads = null;
+
 		}
-
-		// call deinit
-
-		serviceTeardown (
-			taskLogger);
-
-		// we're done
-
-		taskLogger.noticeFormat (
-			"Stopped %s",
-			getClass ().getSimpleName ());
-
-		threads = null;
 
 	}
 

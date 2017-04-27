@@ -1,7 +1,7 @@
 package wbs.platform.event.console;
 
-import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
+import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 
 import java.util.Map;
 
@@ -18,8 +18,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.model.EventRec;
-
-import wbs.utils.string.StringFormatWriter;
 
 import fj.data.Either;
 
@@ -46,22 +44,24 @@ class EventDetailsFormFieldInterfaceMapping
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <EventRec> genericValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"genericToInterface");
+		try (
 
-		StringFormatWriter formatWriter =
-			new StringFormatWriter ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToInterface");
 
-		eventConsoleLogic.writeEventHtml (
-			taskLogger,
-			formatWriter,
-			genericValue.get ());
+		) {
 
-		return successResult (
-			optionalOf (
-				formatWriter.toString ()));
+			return successResultPresent (
+				formatWriterConsumerToString (
+					formatWriter ->
+						eventConsoleLogic.writeEventHtml (
+							taskLogger,
+							formatWriter,
+							genericValue.get ())));
+
+		}
 
 	}
 

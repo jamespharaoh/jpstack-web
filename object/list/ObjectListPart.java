@@ -164,24 +164,30 @@ class ObjectListPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		prepareBrowserSpec ();
-		prepareTabSpec ();
-		prepareCurrentObject ();
-		prepareAllObjects ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		prepareSelectedObjects (
-			taskLogger);
+		) {
 
-		prepareTargetContext (
-			taskLogger);
+			prepareBrowserSpec ();
+			prepareTabSpec ();
+			prepareCurrentObject ();
+			prepareAllObjects ();
 
-		prepareFieldSet (
-			taskLogger);
+			prepareSelectedObjects (
+				taskLogger);
+
+			prepareTargetContext (
+				taskLogger);
+
+			prepareFieldSet (
+				taskLogger);
+
+		}
 
 	}
 
@@ -519,87 +525,99 @@ class ObjectListPart <
 	void prepareSelectedObjects (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareSelectedObjects");
+		try (
 
-		// select which objects we want to display
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareSelectedObjects");
 
-		selectedObjects =
-			new ArrayList <ObjectType> ();
-
-	OUTER:
-
-		for (
-			ObjectType object
-				: allObjects
 		) {
 
-			if (
-				! consoleHelper.canView (
-					taskLogger,
-					object)
-			) {
+			// select which objects we want to display
 
-				continue;
+			selectedObjects =
+				new ArrayList <ObjectType> ();
 
-			}
+		OUTER:
 
 			for (
-				CriteriaSpec criteriaSpec
-					: currentListTabSpec.criterias ()
+				ObjectType object
+					: allObjects
 			) {
 
 				if (
-					! criteriaSpec.evaluate (
+					! consoleHelper.canView (
 						taskLogger,
-						consoleHelper,
 						object)
 				) {
 
-					continue OUTER;
+					continue;
 
 				}
 
+				for (
+					CriteriaSpec criteriaSpec
+						: currentListTabSpec.criterias ()
+				) {
+
+					if (
+						! criteriaSpec.evaluate (
+							taskLogger,
+							consoleHelper,
+							object)
+					) {
+
+						continue OUTER;
+
+					}
+
+				}
+
+				selectedObjects.add (
+					object);
+
 			}
 
-			selectedObjects.add (
-				object);
+			// TODO i hate generics
+
+			@SuppressWarnings ("unchecked")
+			List <Comparable <Comparable <?>>> temp =
+				(List <Comparable <Comparable <?>>>)
+				(List <?>)
+				selectedObjects;
+
+			Collections.sort (
+				temp);
 
 		}
-
-		// TODO i hate generics
-
-		@SuppressWarnings ("unchecked")
-		List <Comparable <Comparable <?>>> temp =
-			(List <Comparable <Comparable <?>>>)
-			(List <?>)
-			selectedObjects;
-
-		Collections.sort (
-			temp);
 
 	}
 
 	void prepareTargetContext (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepareTargetContext");
+		try (
 
-		ConsoleContextType targetContextType =
-			consoleManager.contextType (
-				targetContextTypeName,
-				true);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepareTargetContext");
 
-		targetContext =
-			consoleManager.relatedContextRequired (
-				taskLogger,
-				requestContext.consoleContextRequired (),
-				targetContextType);
+		) {
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					targetContextTypeName,
+					true);
+
+			targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					targetContextType);
+
+		}
 
 	}
 
@@ -608,16 +626,22 @@ class ObjectListPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		goBrowser ();
-		goTabs ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		goList (
-			taskLogger);
+		) {
+
+			goBrowser ();
+			goTabs ();
+
+			goList (
+				taskLogger);
+
+		}
 
 	}
 
@@ -717,71 +741,77 @@ class ObjectListPart <
 	void goList (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goList");
+		try (
 
-		htmlTableOpenList ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goList");
 
-		htmlTableRowOpen ();
-
-		formFieldLogic.outputTableHeadings (
-			formatWriter,
-			fields);
-
-		htmlTableRowClose ();
-
-		// render rows
-
-		for (
-			ObjectType object
-				: selectedObjects
 		) {
 
-			htmlTableRowOpen (
+			htmlTableOpenList ();
+
+			htmlTableRowOpen ();
+
+			formFieldLogic.outputTableHeadings (
 				formatWriter,
+				fields);
 
-				htmlClassAttribute (
-					presentInstances (
+			htmlTableRowClose ();
 
-					Optional.of (
-						"magic-table-row"),
+			// render rows
 
-					optionalIf (
-						object == currentObject,
-						() -> "selected")
+			for (
+				ObjectType object
+					: selectedObjects
+			) {
 
-				)),
+				htmlTableRowOpen (
+					formatWriter,
 
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%s",
-							consoleHelper.getPathId (
-								taskLogger,
-								object))))
+					htmlClassAttribute (
+						presentInstances (
 
-			);
+						Optional.of (
+							"magic-table-row"),
 
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
-				formatWriter,
-				fields,
-				object,
-				emptyMap (),
-				false);
+						optionalIf (
+							object == currentObject,
+							() -> "selected")
 
-			htmlTableRowClose (
+					)),
+
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveContextUrl (
+							stringFormat (
+								"%s",
+								targetContext.pathPrefix (),
+								"/%s",
+								consoleHelper.getPathId (
+									taskLogger,
+									object))))
+
+				);
+
+				formFieldLogic.outputTableCellsList (
+					taskLogger,
+					formatWriter,
+					fields,
+					object,
+					emptyMap (),
+					false);
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
+
+			htmlTableClose (
 				formatWriter);
 
 		}
-
-		htmlTableClose (
-			formatWriter);
 
 	}
 

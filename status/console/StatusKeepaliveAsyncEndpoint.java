@@ -48,19 +48,25 @@ class StatusKeepaliveAsyncEndpoint
 			@NonNull Long userId,
 			@NonNull JsonObject jsonObject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"message");
+		try (
 
-		taskLogger.debugFormat (
-			"Keepalive from user: %s",
-			integerToDecimalString (
-				userId));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"message");
 
-		// we do nothing further, since the console async manager will already
-		// verify the user's identity and perform any action necessary to keep
-		// their session alive
+		) {
+
+			taskLogger.debugFormat (
+				"Keepalive from user: %s",
+				integerToDecimalString (
+					userId));
+
+			// we do nothing further, since the console async manager will already
+			// verify the user's identity and perform any action necessary to keep
+			// their session alive
+
+		}
 
 	}
 

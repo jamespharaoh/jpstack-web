@@ -66,18 +66,24 @@ class QueueItemActionsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		queueItem =
-			queueItemHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		canSupervise =
-			queueConsoleLogic.canSupervise (
-				taskLogger,
-				queueItem.getQueue ());
+		) {
+
+			queueItem =
+				queueItemHelper.findFromContextRequired ();
+
+			canSupervise =
+				queueConsoleLogic.canSupervise (
+					taskLogger,
+					queueItem.getQueue ());
+
+		}
 
 	}
 

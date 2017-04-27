@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -69,34 +69,34 @@ class CoreLogoffAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		Optional <Long> userIdOptional =
-			userConsoleLogic.userId ();
-
-		if (
-			optionalIsNotPresent (
-				userIdOptional)
-		) {
-			return null;
-		}
-
-		Long userId =
-			optionalGetRequired (
-				userIdOptional);
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"CoreLogoffAction.goReal ()",
 					this);
 
 		) {
+
+			Optional <Long> userIdOptional =
+				userConsoleLogic.userId ();
+
+			if (
+				optionalIsNotPresent (
+					userIdOptional)
+			) {
+				return null;
+			}
+
+			Long userId =
+				optionalGetRequired (
+					userIdOptional);
 
 			UserRec user =
 				userHelper.findRequired (

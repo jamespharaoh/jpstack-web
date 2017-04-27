@@ -73,79 +73,34 @@ class CoreAuthFilter
 			ServletException,
 			IOException {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"doFilter",
-				true);
+		try (
 
-		String path =
-			requestContext.servletPath ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"doFilter",
+					true);
 
-		// check the user is ok
+		) {
 
-		taskLogger.debugFormat (
-			"Verify user session");
+			String path =
+				requestContext.servletPath ();
 
-		boolean userOk =
-			userSessionLogic.userSessionVerify (
-				taskLogger,
-				requestContext);
-
-		if (userOk) {
+			// check the user is ok
 
 			taskLogger.debugFormat (
-				"User session verified");
+				"Verify user session");
 
-			// and show the page
+			boolean userOk =
+				userSessionLogic.userSessionVerify (
+					taskLogger,
+					requestContext);
 
-			chain.doFilter (
-				request,
-				response);
+			if (userOk) {
 
-		} else {
+				taskLogger.debugFormat (
+					"User session verified");
 
-			taskLogger.debugFormat (
-				"User session not verified");
-
-			// user not ok, either....
-
-			if (path.equals ("/")) {
-
-				// root path, either show logon page or process logon request
-
-				if (requestContext.post ()) {
-
-					chain.doFilter (
-						request,
-						response);
-
-				} else {
-
-					Provider <Responder> logonResponder =
-						consoleManager.responder (
-							"coreLogonResponder",
-							true);
-
-					logonResponder
-						.get ()
-						.execute (
-							taskLogger);
-
-				}
-
-			} else if (
-
-				stringInSafe (
-					path,
-					"/style/basic.css",
-					"/favicon.ico",
-					"/status.update",
-					"/js/login.js",
-					JqueryScriptRef.path)
-
-			) {
-
-				// these paths are available before login
+				// and show the page
 
 				chain.doFilter (
 					request,
@@ -153,11 +108,62 @@ class CoreAuthFilter
 
 			} else {
 
-				// unauthorised access, redirect to the logon page
+				taskLogger.debugFormat (
+					"User session not verified");
 
-				requestContext.sendRedirect (
-					requestContext.resolveApplicationUrl (
-						"/"));
+				// user not ok, either....
+
+				if (path.equals ("/")) {
+
+					// root path, either show logon page or process logon request
+
+					if (requestContext.post ()) {
+
+						chain.doFilter (
+							request,
+							response);
+
+					} else {
+
+						Provider <Responder> logonResponder =
+							consoleManager.responder (
+								"coreLogonResponder",
+								true);
+
+						logonResponder
+							.get ()
+							.execute (
+								taskLogger);
+
+					}
+
+				} else if (
+
+					stringInSafe (
+						path,
+						"/style/basic.css",
+						"/favicon.ico",
+						"/status.update",
+						"/js/login.js",
+						JqueryScriptRef.path)
+
+				) {
+
+					// these paths are available before login
+
+					chain.doFilter (
+						request,
+						response);
+
+				} else {
+
+					// unauthorised access, redirect to the logon page
+
+					requestContext.sendRedirect (
+						requestContext.resolveApplicationUrl (
+							"/"));
+
+				}
 
 			}
 

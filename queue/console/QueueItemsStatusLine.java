@@ -33,7 +33,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -131,21 +131,27 @@ class QueueItemsStatusLine
 	void teardown (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"teardown");
+		try (
 
-		if (
-			isNotNull (
-				backgroundThread)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"teardown");
+
 		) {
 
-			taskLogger.noticeFormat (
-				"Stopping queue item background thread");
+			if (
+				isNotNull (
+					backgroundThread)
+			) {
 
-			threadInterruptAndJoinIgnoreInterrupt (
-				backgroundThread);
+				taskLogger.noticeFormat (
+					"Stopping queue item background thread");
+
+				threadInterruptAndJoinIgnoreInterrupt (
+					backgroundThread);
+
+			}
 
 		}
 
@@ -264,99 +270,105 @@ class QueueItemsStatusLine
 	private
 	void updateAllUsers () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"updateAllUsers");
-
-		Instant startTime =
-			Instant.now ();
-
-		// clean out old users
-
-		Instant idleTime =
-			startTime.minus (
-				idleDuration);
-
 		try (
 
-			HeldLock heldLock =
-				lock.write ();
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"updateAllUsers");
 
 		) {
 
-			userDatas.values ().removeIf (
-				userData ->
-					laterThan (
-						idleTime,
-						userData.lastContact ()));
+			Instant startTime =
+				Instant.now ();
+
+			// clean out old users
+
+			Instant idleTime =
+				startTime.minus (
+					idleDuration);
+
+			try (
+
+				HeldLock heldLock =
+					lock.write ();
+
+			) {
+
+				userDatas.values ().removeIf (
+					userData ->
+						laterThan (
+							idleTime,
+							userData.lastContact ()));
+
+			}
+
+			// begin transaction and create cache
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						stringFormat (
+							"%s.%s ()",
+							getClass ().getSimpleName (),
+							"getLatestData"),
+						this);
+
+			) {
+
+				QueueCache queueCache =
+					masterQueueCacheProvider.get ();
+
+				// update users
+
+				userDatas.values ().forEach (
+					userData -> {
+
+					UserRec user =
+						userHelper.findRequired (
+							userData.userId ());
+
+					SortedQueueSubjects sortedSubjects =
+						queueSubjectSorterProvider.get ()
+
+						.queueCache (
+							queueCache)
+
+						.loggedInUser (
+							user)
+
+						.effectiveUser (
+							user)
+
+						.sort (
+							taskLogger);
+
+					synchronized (userData) {
+
+						userData
+
+							.totalAvailableItems (
+								sortedSubjects.totalAvailableItems ())
+
+							.userClaimedItems (
+								sortedSubjects.userClaimedItems ());
+
+					}
+
+				});
+
+			}
+
+			// tidy up
+
+			forceUpdate =
+				false;
+
+			lastUpdate =
+				startTime;
 
 		}
-
-		// begin transaction and create cache
-
-		try (
-
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"getLatestData"),
-					this);
-
-		) {
-
-			QueueCache queueCache =
-				masterQueueCacheProvider.get ();
-
-			// update users
-
-			userDatas.values ().forEach (
-				userData -> {
-
-				UserRec user =
-					userHelper.findRequired (
-						userData.userId ());
-
-				SortedQueueSubjects sortedSubjects =
-					queueSubjectSorterProvider.get ()
-
-					.queueCache (
-						queueCache)
-
-					.loggedInUser (
-						user)
-
-					.effectiveUser (
-						user)
-
-					.sort (
-						taskLogger);
-
-				synchronized (userData) {
-
-					userData
-
-						.totalAvailableItems (
-							sortedSubjects.totalAvailableItems ())
-
-						.userClaimedItems (
-							sortedSubjects.userClaimedItems ());
-
-				}
-
-			});
-
-		}
-
-		// tidy up
-
-		forceUpdate =
-			false;
-
-		lastUpdate =
-			startTime;
 
 	}
 

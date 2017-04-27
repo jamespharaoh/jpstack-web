@@ -14,7 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -53,42 +53,48 @@ class QueueFilterResponder
 	void execute (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"execute");
-
-		requestContext.setHeader (
-			"Content-Type",
-			"text/plain");
-
-		requestContext.setHeader (
-			"Cache-Control",
-			"no-cache");
-
-		requestContext.setHeader (
-			"Expiry",
-			timeFormatter.httpTimestampString (
-				Instant.now ()));
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"QueueFilterResponder.execute ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
 
 		) {
 
-			String filter =
-				ifNull (
-					userConsoleLogic.sliceRequired ().getFilter (),
-					defaultFilter);
+			requestContext.setHeader (
+				"Content-Type",
+				"text/plain");
 
-			writeBytes (
-				requestContext.outputStream (),
-				filter.getBytes ());
+			requestContext.setHeader (
+				"Cache-Control",
+				"no-cache");
+
+			requestContext.setHeader (
+				"Expiry",
+				timeFormatter.httpTimestampString (
+					Instant.now ()));
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"QueueFilterResponder.execute ()",
+						this);
+
+			) {
+
+				String filter =
+					ifNull (
+						userConsoleLogic.sliceRequired ().getFilter (),
+						defaultFilter);
+
+				writeBytes (
+					requestContext.outputStream (),
+					filter.getBytes ());
+
+			}
 
 		}
 

@@ -14,7 +14,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -41,42 +41,48 @@ class MediaTestImagesFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		ImmutableMap.Builder <String, Long> testMediaIdsByNameBuilder =
-			ImmutableMap.<String, Long> builder ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		for (
-			String testMediaName
-				: testMediaNames
 		) {
 
-			MediaRec testMedia =
-				mediaLogic.createMediaFromImageRequired (
-					taskLogger,
-					fileReadBytes (
+			ImmutableMap.Builder <String, Long> testMediaIdsByNameBuilder =
+				ImmutableMap.<String, Long> builder ();
+
+			for (
+				String testMediaName
+					: testMediaNames
+			) {
+
+				MediaRec testMedia =
+					mediaLogic.createMediaFromImageRequired (
+						taskLogger,
+						fileReadBytes (
+							stringFormat (
+								"binaries/test/%s.jpg",
+								testMediaName)),
+						"image/jpeg",
 						stringFormat (
-							"binaries/test/%s.jpg",
-							testMediaName)),
-					"image/jpeg",
-					stringFormat (
-						"%s.jpg",
-						testMediaName));
+							"%s.jpg",
+							testMediaName));
 
 
-			testMediaIdsByNameBuilder.put (
-				testMediaName,
-				testMedia.getId ());
+				testMediaIdsByNameBuilder.put (
+					testMediaName,
+					testMedia.getId ());
+
+			}
+
+			testMediaIdsByName =
+				testMediaIdsByNameBuilder.build ();
 
 		}
-
-		testMediaIdsByName =
-			testMediaIdsByNameBuilder.build ();
 
 	}
 

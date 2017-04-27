@@ -31,7 +31,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -107,20 +107,26 @@ class ConsoleAsyncSubscription <SubscriberState>
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		taskLogger.noticeFormat (
-			"%s async endpoint starting",
-			helper.endpointName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		backgroundThread =
-			new Thread (
-				this::backgroundThread);
+		) {
 
-		backgroundThread.start ();
+			taskLogger.noticeFormat (
+				"%s async endpoint starting",
+				helper.endpointName ());
+
+			backgroundThread =
+				new Thread (
+					this::backgroundThread);
+
+			backgroundThread.start ();
+
+		}
 
 	}
 
@@ -129,32 +135,38 @@ class ConsoleAsyncSubscription <SubscriberState>
 	void tearDown (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"tearDown");
+		try (
 
-		if (
-			isNull (
-				backgroundThread)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"tearDown");
+
 		) {
-			return;
-		}
 
-		taskLogger.noticeFormat (
-			"%s async endpoint shutting down",
-			helper.endpointName ());
+			if (
+				isNull (
+					backgroundThread)
+			) {
+				return;
+			}
 
-		backgroundThread.interrupt ();
+			taskLogger.noticeFormat (
+				"%s async endpoint shutting down",
+				helper.endpointName ());
 
-		try {
+			backgroundThread.interrupt ();
 
-			backgroundThread.wait ();
+			try {
 
-		} catch (InterruptedException interruptedException) {
+				backgroundThread.wait ();
 
-			taskLogger.fatalFormat (
-				"Interrupted while waiting for shutdown");
+			} catch (InterruptedException interruptedException) {
+
+				taskLogger.fatalFormat (
+					"Interrupted while waiting for shutdown");
+
+			}
 
 		}
 
@@ -170,42 +182,48 @@ class ConsoleAsyncSubscription <SubscriberState>
 			@NonNull Long userId,
 			@NonNull JsonObject jsonObject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"message");
+		try (
 
-		synchronized (this) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"message");
 
-			if (
-				mapContainsKey (
-					subscribersByConnectionId,
-					connectionHandle.connectionId ())
-			) {
+		) {
 
-				taskLogger.errorFormat (
-					"Duplicate subscription for connection id: %s",
-					connectionHandle.connectionId ());
+			synchronized (this) {
 
-				return;
+				if (
+					mapContainsKey (
+						subscribersByConnectionId,
+						connectionHandle.connectionId ())
+				) {
+
+					taskLogger.errorFormat (
+						"Duplicate subscription for connection id: %s",
+						connectionHandle.connectionId ());
+
+					return;
+
+				}
+
+				subscribersByConnectionId.put (
+					connectionHandle.connectionId (),
+					new Subscriber <SubscriberState> ()
+
+					.connectionHandle (
+						connectionHandle)
+
+					.userId (
+						userId)
+
+					.state (
+						helper.newSubscription (
+							taskLogger))
+
+				);
 
 			}
-
-			subscribersByConnectionId.put (
-				connectionHandle.connectionId (),
-				new Subscriber <SubscriberState> ()
-
-				.connectionHandle (
-					connectionHandle)
-
-				.userId (
-					userId)
-
-				.state (
-					helper.newSubscription (
-						taskLogger))
-
-			);
 
 		}
 
@@ -236,68 +254,74 @@ class ConsoleAsyncSubscription <SubscriberState>
 	private
 	void sendUpdates () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"sendUpdates");
+		try (
 
-		synchronized (this) {
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"sendUpdates");
 
-			Set <String> closedConnectionIds =
-				new HashSet<> ();
+		) {
 
-			try (
+			synchronized (this) {
 
-				Transaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"sendUpdates",
-						this);
+				Set <String> closedConnectionIds =
+					new HashSet<> ();
 
-			) {
+				try (
 
-				helper.prepareUpdate (
-					taskLogger);
+					OwnedTransaction transaction =
+						database.beginReadOnly (
+							taskLogger,
+							"sendUpdates",
+							this);
 
-				for (
-					Map.Entry <
-						String,
-						Subscriber <SubscriberState>
-					> subscriberEntry
-						: subscribersByConnectionId.entrySet ()
 				) {
 
-					String connectionId =
-						subscriberEntry.getKey ();
+					helper.prepareUpdate (
+						taskLogger);
 
-					Subscriber <SubscriberState> subscriber =
-						subscriberEntry.getValue ();
+					for (
+						Map.Entry <
+							String,
+							Subscriber <SubscriberState>
+						> subscriberEntry
+							: subscribersByConnectionId.entrySet ()
+					) {
 
-					if (! subscriber.connectionHandle ().isConnected ()) {
+						String connectionId =
+							subscriberEntry.getKey ();
 
-						closedConnectionIds.add (
-							connectionId);
+						Subscriber <SubscriberState> subscriber =
+							subscriberEntry.getValue ();
 
-						continue;
+						if (! subscriber.connectionHandle ().isConnected ()) {
+
+							closedConnectionIds.add (
+								connectionId);
+
+							continue;
+
+						}
+
+						if (! subscriber.connectionHandle ().isFresh ()) {
+
+							continue;
+
+						}
+
+						updateSubscriber (
+							taskLogger,
+							transaction,
+							subscriber);
 
 					}
-
-					if (! subscriber.connectionHandle ().isFresh ()) {
-
-						continue;
-
-					}
-
-					updateSubscriber (
-						taskLogger,
-						transaction,
-						subscriber);
 
 				}
 
-			}
+				closedConnectionIds.forEach (
+					subscribersByConnectionId::remove);
 
-			closedConnectionIds.forEach (
-				subscribersByConnectionId::remove);
+			}
 
 		}
 
@@ -306,43 +330,49 @@ class ConsoleAsyncSubscription <SubscriberState>
 	private
 	void updateSubscriber (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull Subscriber <SubscriberState> subscriber) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateSubscriber");
+		try (
 
-		UserRec user =
-			userHelper.findRequired (
-				subscriber.userId ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateSubscriber");
 
-		UserPrivChecker privChecker =
-			userPrivCheckerBuilderProvider.get ()
+		) {
 
-			.userId (
-				subscriber.userId ())
+			UserRec user =
+				userHelper.findRequired (
+					subscriber.userId ());
 
-			.build (
-				taskLogger);
+			UserPrivChecker privChecker =
+				userPrivCheckerBuilderProvider.get ()
 
-		try {
+				.userId (
+					subscriber.userId ())
 
-			helper.updateSubscriber (
-				taskLogger,
-				subscriber.state (),
-				subscriber.connectionHandle (),
-				transaction,
-				user,
-				privChecker);
+				.build (
+					taskLogger);
 
-		} catch (Exception exception) {
+			try {
 
-			taskLogger.errorFormatException (
-				exception,
-				"%s async endpoint error updating subscriber",
-				helper.endpointName ());
+				helper.updateSubscriber (
+					taskLogger,
+					subscriber.state (),
+					subscriber.connectionHandle (),
+					transaction,
+					user,
+					privChecker);
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"%s async endpoint error updating subscriber",
+					helper.endpointName ());
+
+			}
 
 		}
 
@@ -366,7 +396,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 				TaskLogger parentTaskLogger,
 				SubscriberStateType subscriberState,
 				ConsoleAsyncConnectionHandle connectionHandle,
-				Transaction transaction,
+				OwnedTransaction transaction,
 				UserRec user,
 				UserPrivChecker privChecker);
 

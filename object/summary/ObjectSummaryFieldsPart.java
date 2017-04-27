@@ -75,21 +75,27 @@ class ObjectSummaryFieldsPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		object =
-			consoleHelper.lookupObject (
-				requestContext.consoleContextStuffRequired ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		if (formFieldsProvider != null) {
+		) {
 
-			prepareParent ();
+			object =
+				consoleHelper.lookupObject (
+					requestContext.consoleContextStuffRequired ());
 
-			prepareFieldSet (
-				taskLogger);
+			if (formFieldsProvider != null) {
+
+				prepareParent ();
+
+				prepareFieldSet (
+					taskLogger);
+
+			}
 
 		}
 
@@ -148,21 +154,27 @@ class ObjectSummaryFieldsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlTableOpenDetails ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		formFieldLogic.outputTableRows (
-			taskLogger,
-			formatWriter,
-			formFieldSet,
-			object,
-			ImmutableMap.of ());
+		) {
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
+
+			formFieldLogic.outputTableRows (
+				taskLogger,
+				formatWriter,
+				formFieldSet,
+				object,
+				ImmutableMap.of ());
+
+			htmlTableClose ();
+
+		}
 
 	}
 

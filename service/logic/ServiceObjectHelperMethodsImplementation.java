@@ -53,65 +53,71 @@ class ServiceObjectHelperMethodsImplementation
 			@NonNull String typeCode,
 			@NonNull String code) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		// lookup existing service
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		Optional <ServiceRec> existingService =
-			serviceHelper.findByCode (
-				parent,
-				code);
-
-		if (
-			optionalIsPresent (
-				existingService)
 		) {
-			return existingService.get ();
+
+			// lookup existing service
+
+			Optional <ServiceRec> existingService =
+				serviceHelper.findByCode (
+					parent,
+					code);
+
+			if (
+				optionalIsPresent (
+					existingService)
+			) {
+				return existingService.get ();
+			}
+
+			// create new service
+
+			ObjectTypeRec parentType =
+				objectTypeHelper.findRequired (
+					objectManager.getObjectTypeId (
+						parent));
+
+			ServiceTypeRec serviceType =
+				serviceTypeHelper.findByCodeRequired (
+					parentType,
+					typeCode);
+
+			Optional <SliceRec> parentSlice =
+				objectManager.getAncestor (
+					SliceRec.class,
+					parent);
+
+			ServiceRec newService =
+				serviceHelper.insert (
+					taskLogger,
+					serviceHelper.createInstance ()
+
+				.setCode (
+					code)
+
+				.setServiceType (
+					serviceType)
+
+				.setParentType (
+					parentType)
+
+				.setParentId (
+					parent.getId ())
+
+				.setSlice (
+					parentSlice.orNull ())
+
+			);
+
+			return newService;
+
 		}
-
-		// create new service
-
-		ObjectTypeRec parentType =
-			objectTypeHelper.findRequired (
-				objectManager.getObjectTypeId (
-					parent));
-
-		ServiceTypeRec serviceType =
-			serviceTypeHelper.findByCodeRequired (
-				parentType,
-				typeCode);
-
-		Optional <SliceRec> parentSlice =
-			objectManager.getAncestor (
-				SliceRec.class,
-				parent);
-
-		ServiceRec newService =
-			serviceHelper.insert (
-				taskLogger,
-				serviceHelper.createInstance ()
-
-			.setCode (
-				code)
-
-			.setServiceType (
-				serviceType)
-
-			.setParentType (
-				parentType)
-
-			.setParentId (
-				parent.getId ())
-
-			.setSlice (
-				parentSlice.orNull ())
-
-		);
-
-		return newService;
 
 	}
 

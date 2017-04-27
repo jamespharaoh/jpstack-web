@@ -27,7 +27,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.manager.ComponentMetaData;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -79,115 +79,121 @@ class BackgroundLogicImplementation
 			@NonNull String backgroundProcessName,
 			@NonNull Object component) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerBackgroundProcess");
-
-		List <String> backgroundProcessNameParts =
-			stringSplitFullStop (
-				backgroundProcessName);
-
-		if (
-			! collectionHasTwoElements (
-				backgroundProcessNameParts)
-		) {
-			throw new RuntimeException ();
-		}
-
-		String parentTypeCode =
-			listFirstElementRequired (
-				backgroundProcessNameParts);
-
-		String backgroundProcessCode =
-			listSecondElementRequired (
-				backgroundProcessNameParts);
-
-		Long backgroundProcessId;
-		Boolean backgroundProcessDebugEnabled;
-		Duration backgroundProcessFrequency;
-
 		try (
 
-			Transaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"SleepingDaemonService.setup ()",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerBackgroundProcess");
+
 		) {
 
-			ObjectTypeRec parentType =
-				objectTypeHelper.findByCodeRequired (
-					GlobalId.root,
-					hyphenToUnderscore (
-						parentTypeCode));
+			List <String> backgroundProcessNameParts =
+				stringSplitFullStop (
+					backgroundProcessName);
 
-			BackgroundProcessRec backgroundProcess =
-				backgroundProcessHelper.findByCodeRequired (
-					parentType,
-					hyphenToUnderscore (
-						backgroundProcessCode));
+			if (
+				! collectionHasTwoElements (
+					backgroundProcessNameParts)
+			) {
+				throw new RuntimeException ();
+			}
 
-			backgroundProcessId =
-				backgroundProcess.getId ();
+			String parentTypeCode =
+				listFirstElementRequired (
+					backgroundProcessNameParts);
 
-			backgroundProcessDebugEnabled =
-				backgroundProcess.getDebug ();
+			String backgroundProcessCode =
+				listSecondElementRequired (
+					backgroundProcessNameParts);
 
-			backgroundProcessFrequency =
-				backgroundProcess.getFrequency ();
+			Long backgroundProcessId;
+			Boolean backgroundProcessDebugEnabled;
+			Duration backgroundProcessFrequency;
 
-			taskLogger.noticeFormat (
-				"Found background process %s with id %s",
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						taskLogger,
+						"SleepingDaemonService.setup ()",
+						this);
+			) {
+
+				ObjectTypeRec parentType =
+					objectTypeHelper.findByCodeRequired (
+						GlobalId.root,
+						hyphenToUnderscore (
+							parentTypeCode));
+
+				BackgroundProcessRec backgroundProcess =
+					backgroundProcessHelper.findByCodeRequired (
+						parentType,
+						hyphenToUnderscore (
+							backgroundProcessCode));
+
+				backgroundProcessId =
+					backgroundProcess.getId ();
+
+				backgroundProcessDebugEnabled =
+					backgroundProcess.getDebug ();
+
+				backgroundProcessFrequency =
+					backgroundProcess.getFrequency ();
+
+				taskLogger.noticeFormat (
+					"Found background process %s with id %s",
+					backgroundProcessName,
+					integerToDecimalString (
+						backgroundProcess.getId ()));
+
+			}
+
+			ComponentMetaData componentMetaData =
+				componentManager.componentMetaData (
+					component);
+
+			ComponentDefinition componentDefinition =
+				componentMetaData.definition ();
+
+			if (
+				stringNotEqualSafe (
+					componentDefinition.scope (),
+					"singleton")
+			) {
+				throw new RuntimeException ();
+			}
+
+			if (
+				mapContainsKey (
+					backgroundProcessComponentNames,
+					backgroundProcessName)
+			) {
+				throw new RuntimeException ();
+			}
+
+			backgroundProcessComponentNames.put (
 				backgroundProcessName,
-				integerToDecimalString (
-					backgroundProcess.getId ()));
+				componentDefinition.name ());
+
+			return backgroundProcessHelperImplementationProvider.get ()
+
+				.parentTypeCode (
+					parentTypeCode)
+
+				.backgroundProcessCode (
+					backgroundProcessCode)
+
+				.backgroundProcessId (
+					backgroundProcessId)
+
+				.backgroundProcessFrequency (
+					backgroundProcessFrequency)
+
+				.backgroundProcessDebugEnabled (
+					backgroundProcessDebugEnabled);
 
 		}
-
-		ComponentMetaData componentMetaData =
-			componentManager.componentMetaData (
-				component);
-
-		ComponentDefinition componentDefinition =
-			componentMetaData.definition ();
-
-		if (
-			stringNotEqualSafe (
-				componentDefinition.scope (),
-				"singleton")
-		) {
-			throw new RuntimeException ();
-		}
-
-		if (
-			mapContainsKey (
-				backgroundProcessComponentNames,
-				backgroundProcessName)
-		) {
-			throw new RuntimeException ();
-		}
-
-		backgroundProcessComponentNames.put (
-			backgroundProcessName,
-			componentDefinition.name ());
-
-		return backgroundProcessHelperImplementationProvider.get ()
-
-			.parentTypeCode (
-				parentTypeCode)
-
-			.backgroundProcessCode (
-				backgroundProcessCode)
-
-			.backgroundProcessId (
-				backgroundProcessId)
-
-			.backgroundProcessFrequency (
-				backgroundProcessFrequency)
-
-			.backgroundProcessDebugEnabled (
-				backgroundProcessDebugEnabled);
 
 	}
 

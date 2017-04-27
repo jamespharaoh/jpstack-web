@@ -52,79 +52,85 @@ class NameFormFieldUpdateHook
 			@NonNull Optional <Object> objectRef,
 			@NonNull Optional <String> objectType) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"onUpdate");
+		try (
 
-		// don't create event on initial creation
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"onUpdate");
 
-		if (! updateResult.oldNativeValue ().isPresent ()) {
-			return;
-		}
+		) {
 
-		// derive codes
+			// don't create event on initial creation
 
-		String oldCode =
-			simplifyToCodeRequired (
-				updateResult.oldNativeValue ().get ());
+			if (! updateResult.oldNativeValue ().isPresent ()) {
+				return;
+			}
 
-		String newCode =
-			simplifyToCodeRequired (
-				updateResult.newNativeValue ().get ());
+			// derive codes
 
-		boolean codeChanged =
-			stringNotEqualSafe (
-				oldCode,
-				newCode);
+			String oldCode =
+				simplifyToCodeRequired (
+					updateResult.oldNativeValue ().get ());
 
-		// create an event
+			String newCode =
+				simplifyToCodeRequired (
+					updateResult.newNativeValue ().get ());
 
-		if (objectRef.isPresent ()) {
+			boolean codeChanged =
+				stringNotEqualSafe (
+					oldCode,
+					newCode);
 
-			eventLogic.createEvent (
-				taskLogger,
-				"object_name_changed_in",
-				userConsoleLogic.userRequired (),
-				objectRef.get (),
-				objectType.get (),
-				linkObject,
-				updateResult.oldNativeValue ().get (),
-				updateResult.newNativeValue ().get ());
+			// create an event
 
-			if (codeChanged) {
+			if (objectRef.isPresent ()) {
 
 				eventLogic.createEvent (
 					taskLogger,
-					"object_code_changed_in",
+					"object_name_changed_in",
 					userConsoleLogic.userRequired (),
 					objectRef.get (),
 					objectType.get (),
 					linkObject,
-					oldCode,
-					newCode);
+					updateResult.oldNativeValue ().get (),
+					updateResult.newNativeValue ().get ());
 
-			}
+				if (codeChanged) {
 
-		} else {
+					eventLogic.createEvent (
+						taskLogger,
+						"object_code_changed_in",
+						userConsoleLogic.userRequired (),
+						objectRef.get (),
+						objectType.get (),
+						linkObject,
+						oldCode,
+						newCode);
 
-			eventLogic.createEvent (
-				taskLogger,
-				"object_name_changed",
-				userConsoleLogic.userRequired (),
-				linkObject,
-				updateResult.oldNativeValue ().get (),
-				updateResult.newNativeValue ().get ());
+				}
 
-			if (codeChanged) {
+			} else {
 
 				eventLogic.createEvent (
 					taskLogger,
-					"object_code_changed",
+					"object_name_changed",
 					userConsoleLogic.userRequired (),
 					linkObject,
-					oldCode,
-					newCode);
+					updateResult.oldNativeValue ().get (),
+					updateResult.newNativeValue ().get ());
+
+				if (codeChanged) {
+
+					eventLogic.createEvent (
+						taskLogger,
+						"object_code_changed",
+						userConsoleLogic.userRequired (),
+						linkObject,
+						oldCode,
+						newCode);
+
+				}
 
 			}
 

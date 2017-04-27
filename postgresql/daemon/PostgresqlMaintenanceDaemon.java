@@ -111,164 +111,170 @@ class PostgresqlMaintenanceDaemon
 	void doTasks (
 			@NonNull String frequency) {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLoggerFormat (
-				"doTasks (%s)",
-				frequency);
-
-		String frequencyName =
-			frequencyName (
-				frequency);
-
-		taskLogger.noticeFormat (
-			"%s maintenance starting",
-			frequencyName);
-
 		try (
 
-			Connection connnection =
-				dataSource.getConnection ();
+			TaskLogger taskLogger =
+				logContext.createTaskLoggerFormat (
+					"doTasks (%s)",
+					frequency);
 
 		) {
 
-			connnection.setTransactionIsolation (
-				Connection.TRANSACTION_SERIALIZABLE);
-
-			connnection.setAutoCommit (
-				true);
-
-			// get list of commands
-
-			List <Command> commands =
-				fetchCommands (
-					connnection,
+			String frequencyName =
+				frequencyName (
 					frequency);
 
-			// prepare the update
-
-			String updateQuery =
-				"UPDATE postgresql_maintenance " +
-				"SET last_run = ?, " +
-					"last_duration = ?, " +
-					"last_output = ? " +
-				"WHERE id = ?";
+			taskLogger.noticeFormat (
+				"%s maintenance starting",
+				frequencyName);
 
 			try (
 
-				PreparedStatement updateStatement =
-					connnection.prepareStatement (
-						updateQuery);
+				Connection connnection =
+					dataSource.getConnection ();
 
 			) {
 
-				Statement statement =
-					connnection.createStatement ();
+				connnection.setTransactionIsolation (
+					Connection.TRANSACTION_SERIALIZABLE);
 
-				// for each command...
+				connnection.setAutoCommit (
+					true);
 
-				for (
-					Command command
-						: commands
+				// get list of commands
+
+				List <Command> commands =
+					fetchCommands (
+						connnection,
+						frequency);
+
+				// prepare the update
+
+				String updateQuery =
+					"UPDATE postgresql_maintenance " +
+					"SET last_run = ?, " +
+						"last_duration = ?, " +
+						"last_output = ? " +
+					"WHERE id = ?";
+
+				try (
+
+					PreparedStatement updateStatement =
+						connnection.prepareStatement (
+							updateQuery);
+
+					Statement statement =
+						connnection.createStatement ();
+
 				) {
 
-					// output a pretty message
+					// for each command...
 
-					taskLogger.debugFormat (
-						"executing \"%s\"",
-						command.command);
+					for (
+						Command command
+							: commands
+					) {
 
-					try {
+						// output a pretty message
 
-						// perform (and time) the command
-
-						Instant time1 =
-							Instant.now ();
-
-						statement.execute (
+						taskLogger.debugFormat (
+							"executing \"%s\"",
 							command.command);
 
-						Instant time2 =
-							Instant.now ();
+						try {
 
-						// collect output
+							// perform (and time) the command
 
-						StringBuilder stringBuilder =
-							new StringBuilder ();
+							Instant time1 =
+								Instant.now ();
 
-						SQLWarning warning =
-							statement.getWarnings ();
+							statement.execute (
+								command.command);
 
-						while (warning != null) {
+							Instant time2 =
+								Instant.now ();
 
-							if (warning.toString () != null) {
+							// collect output
 
-								if (stringBuilder.length () > 0)
-									stringBuilder.append ("\n");
+							StringBuilder stringBuilder =
+								new StringBuilder ();
 
-								stringBuilder.append (
-									warning.toString ());
+							SQLWarning warning =
+								statement.getWarnings ();
+
+							while (warning != null) {
+
+								if (warning.toString () != null) {
+
+									if (stringBuilder.length () > 0)
+										stringBuilder.append ("\n");
+
+									stringBuilder.append (
+										warning.toString ());
+
+								}
+
+								warning =
+									warning.getNextWarning ();
 
 							}
 
-							warning =
-								warning.getNextWarning ();
+							statement.clearWarnings ();
+
+							// and update the db
+
+							updateStatement.setTimestamp (
+								1,
+								new Timestamp (
+									time1.getMillis ()));
+
+							updateStatement.setLong (
+								2,
+								time2.getMillis () - time1.getMillis ());
+
+							updateStatement.setString (
+								3,
+								stringBuilder.toString ());
+
+							updateStatement.setInt (
+								4,
+								command.id);
+
+							updateStatement.execute ();
+
+						} catch (Exception exception) {
+
+							exceptionLogger.logThrowable (
+								taskLogger,
+								"daemon",
+								getClass ().getSimpleName (),
+								exception,
+								optionalAbsent (),
+								GenericExceptionResolution.tryAgainLater);
 
 						}
-
-						statement.clearWarnings ();
-
-						// and update the db
-
-						updateStatement.setTimestamp (
-							1,
-							new Timestamp (
-								time1.getMillis ()));
-
-						updateStatement.setLong (
-							2,
-							time2.getMillis () - time1.getMillis ());
-
-						updateStatement.setString (
-							3,
-							stringBuilder.toString ());
-
-						updateStatement.setInt (
-							4,
-							command.id);
-
-						updateStatement.execute ();
-
-					} catch (Exception exception) {
-
-						exceptionLogger.logThrowable (
-							taskLogger,
-							"daemon",
-							getClass ().getSimpleName (),
-							exception,
-							optionalAbsent (),
-							GenericExceptionResolution.tryAgainLater);
 
 					}
 
 				}
 
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"daemon",
+					getClass ().getSimpleName (),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
+
 			}
 
-		} catch (Exception exception) {
-
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"daemon",
-				getClass ().getSimpleName (),
-				exception,
-				optionalAbsent (),
-				GenericExceptionResolution.tryAgainLater);
+			taskLogger.noticeFormat (
+				"%s maintenance complete",
+				frequencyName);
 
 		}
-
-		taskLogger.noticeFormat (
-			"%s maintenance complete",
-			frequencyName);
 
 	}
 

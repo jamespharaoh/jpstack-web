@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -40,93 +40,111 @@ class QueueFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createFeatures (
-			taskLogger,
-			transaction);
+		) {
+
+			createMenuItems (
+				taskLogger,
+				transaction);
+
+			createFeatures (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
+		) {
 
-			.setCode (
-				"queue")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Queue")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"system"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"queue")
 
-			.setLabel (
-				"Queue")
+				.setName (
+					"Queue")
 
-			.setTargetPath (
-				"/queues")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Queue")
 
-		);
+				.setTargetPath (
+					"/queues")
 
-		transaction.flush ();
+				.setTargetFrame (
+					"main")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createFeatures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFeatures");
+		try (
 
-		featureObjectHelper.insert (
-			taskLogger,
-			featureObjectHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFeatures");
 
-			.setCode (
-				"queue_items_status_line")
+		) {
 
-			.setName (
-				"Queue items status line")
+			featureObjectHelper.insert (
+				taskLogger,
+				featureObjectHelper.createInstance ()
 
-			.setDescription (
-				"Queue items status line feature")
+				.setCode (
+					"queue_items_status_line")
 
-		);
+				.setName (
+					"Queue items status line")
 
-		transaction.flush ();
+				.setDescription (
+					"Queue items status line feature")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 

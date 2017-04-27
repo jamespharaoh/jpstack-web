@@ -139,29 +139,35 @@ class ObjectListPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextTab (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildContextFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTab (
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -263,134 +269,146 @@ class ObjectListPageBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			container.consoleHelper ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		typeCode =
-			spec.typeCode ();
+		) {
 
-		// if a provider name is provided
+			consoleHelper =
+				container.consoleHelper ();
 
-		if (spec.fieldsProviderName () != null) {
+			typeCode =
+				spec.typeCode ();
 
-			fieldsProvider =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						taskLogger,
-						spec.fieldsProviderName (),
-						FieldsProvider.class));
+			// if a provider name is provided
 
-		// if a field name is provided
+			if (spec.fieldsProviderName () != null) {
 
-		} else if (spec.fieldsName () != null) {
+				fieldsProvider =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							spec.fieldsProviderName (),
+							FieldsProvider.class));
 
-			fieldsProvider =
-				new StaticFieldsProvider <ObjectType, ParentType> ()
+			// if a field name is provided
 
-				.fields (
-					consoleModule.formFieldSetRequired (
-						spec.fieldsName (),
-						consoleHelper.objectClass ()));
+			} else if (spec.fieldsName () != null) {
 
-		// if nothing is provided
+				fieldsProvider =
+					new StaticFieldsProvider <ObjectType, ParentType> ()
 
-		} else {
+					.fields (
+						consoleModule.formFieldSetRequired (
+							spec.fieldsName (),
+							consoleHelper.objectClass ()));
 
-			fieldsProvider =
-				new StaticFieldsProvider<ObjectType,ParentType> ()
+			// if nothing is provided
 
-				.fields (
-					defaultFields (
-						taskLogger));
+			} else {
+
+				fieldsProvider =
+					new StaticFieldsProvider<ObjectType,ParentType> ()
+
+					.fields (
+						defaultFields (
+							taskLogger));
+
+			}
+
+
+			listBrowsersByFieldName =
+				ifNull (
+					spec.listBrowsersByFieldName (),
+					Collections.emptyMap ());
+
+			listTabsByName =
+				spec.listTabsByName () != null
+				&& ! spec.listTabsByName ().isEmpty ()
+					? spec.listTabsByName ()
+					: defaultListTabSpecs ();
 
 		}
-
-
-		listBrowsersByFieldName =
-			ifNull (
-				spec.listBrowsersByFieldName (),
-				Collections.emptyMap ());
-
-		listTabsByName =
-			spec.listTabsByName () != null
-			&& ! spec.listTabsByName ().isEmpty ()
-				? spec.listTabsByName ()
-				: defaultListTabSpecs ();
 
 	}
 
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defaultFields");
+		try (
 
-		// create spec
-
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
-
-		if (
-
-			consoleHelper.parentTypeIsFixed ()
-
-			&& classEqualSafe (
-				consoleHelper.parentClass (),
-				SliceRec.class)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultFields");
 
 		) {
 
-			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ()
+			// create spec
 
-				.delegate (
-					"slice")
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
-				.label (
-					"Slice")
+			if (
 
-			);
+				consoleHelper.parentTypeIsFixed ()
+
+				&& classEqualSafe (
+					consoleHelper.parentClass (),
+					SliceRec.class)
+
+			) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ()
+
+					.delegate (
+						"slice")
+
+					.label (
+						"Slice")
+
+				);
+
+			}
+
+			if (consoleHelper.nameIsCode ()) {
+
+				formFieldSpecs.add (
+					new CodeFormFieldSpec ());
+
+			} else if (consoleHelper.nameExists ()) {
+
+				formFieldSpecs.add (
+					new NameFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.descriptionExists ()) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ());
+
+			}
+
+			// build
+
+			String fieldSetName =
+				stringFormat (
+					"%s.list",
+					consoleHelper.objectName ());
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				consoleHelper,
+				fieldSetName,
+				formFieldSpecs);
 
 		}
-
-		if (consoleHelper.nameIsCode ()) {
-
-			formFieldSpecs.add (
-				new CodeFormFieldSpec ());
-
-		} else if (consoleHelper.nameExists ()) {
-
-			formFieldSpecs.add (
-				new NameFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.descriptionExists ()) {
-
-			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ());
-
-		}
-
-		// build
-
-		String fieldSetName =
-			stringFormat (
-				"%s.list",
-				consoleHelper.objectName ());
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			consoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

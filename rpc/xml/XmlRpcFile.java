@@ -1,20 +1,18 @@
 package wbs.platform.rpc.xml;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.api.mvc.WebApiAction;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
 import wbs.web.responder.Responder;
@@ -68,10 +66,7 @@ class XmlRpcFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		doHeaders ();
 
@@ -80,10 +75,7 @@ class XmlRpcFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		doHeaders ();
 
@@ -92,24 +84,27 @@ class XmlRpcFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger parentTaskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doPost");
+		try (
 
-		doHeaders ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doPost");
 
-		Responder responder =
-			action.go (
+		) {
+
+			doHeaders ();
+
+			Responder responder =
+				action.go (
+					taskLogger);
+
+			responder.execute (
 				taskLogger);
 
-		responder.execute (
-			taskLogger);
+		}
 
 	}
 

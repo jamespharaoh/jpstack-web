@@ -63,29 +63,35 @@ class MediaConsoleLogicImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"mediaUrl");
+		try (
 
-		if (
-			mediaLogic.isImage (
-				media)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"mediaUrl");
+
 		) {
 
-			return stringFormat (
-				"%s",
-				mediaHelper.getDefaultContextPath (
-					taskLogger,
-					media),
-				"/media.image");
+			if (
+				mediaLogic.isImage (
+					media)
+			) {
 
-		} else {
+				return stringFormat (
+					"%s",
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
+					"/media.image");
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to create media URL for %s",
-					media.getMediaType ().getMimeType ()));
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to create media URL for %s",
+						media.getMediaType ().getMimeType ()));
+
+			}
 
 		}
 
@@ -99,181 +105,187 @@ class MediaConsoleLogicImplementation
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaContent");
+		try (
 
-		String mimeType =
-			media.getMediaType ().getMimeType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaContent");
 
-		if (
-			mediaLogic.isText (
-				mimeType)
 		) {
 
-			formatWriter.writeFormat (
-				"%h",
-				bytesToString (
-					media.getContent ().getData (),
-					media.getEncoding ()));
+			String mimeType =
+				media.getMediaType ().getMimeType ();
 
-		} else if (
-			mediaLogic.isVideo (
-				mimeType)
-		) {
+			if (
+				mediaLogic.isText (
+					mimeType)
+			) {
 
-			Long playerCount =
-				requestContext.requestIntegerRequired (
-					PLAYER_COUNT_KEY);
+				formatWriter.writeFormat (
+					"%h",
+					bytesToString (
+						media.getContent ().getData (),
+						media.getEncoding ()));
 
-			if (playerCount == null) {
+			} else if (
+				mediaLogic.isVideo (
+					mimeType)
+			) {
+
+				Long playerCount =
+					requestContext.requestIntegerRequired (
+						PLAYER_COUNT_KEY);
+
+				if (playerCount == null) {
+
+					formatWriter.writeLineFormat (
+						"<script",
+						" src=\"/flowplayer-3.1.2.min.js\"",
+						"></script>");
+
+					playerCount =
+						0l;
+
+				}
 
 				formatWriter.writeLineFormat (
-					"<script",
-					" src=\"/flowplayer-3.1.2.min.js\"",
-					"></script>");
+					"<a",
 
-				playerCount =
-					0l;
-
-			}
-
-			formatWriter.writeLineFormat (
-				"<a",
-
-				" href=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.video"),
-
-				" style=\"%h\"",
-				joinWithSemicolonAndSpace (
-					"display: block",
-					"width: 300px",
-					"height: 225px;"),
-
-				" id=\"player%h\"",
-				integerToDecimalString (
-					playerCount),
-
-				"></a>");
-
-			formatWriter.writeLineFormat (
-				"<script",
-				" type=\"text/javascript\"",
-				">%s</script>\n",
-				stringFormat (
-					"flowplayer ('%j', '%j', {});\n",
+					" href=\"%h\"",
 					stringFormat (
-						"player%s'",
-						integerToDecimalString (
-							playerCount)),
-					"/flowplayer-3.1.2.swf"));
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.video"),
 
-			requestContext.request (
-				PLAYER_COUNT_KEY,
-				playerCount + 1);
+					" style=\"%h\"",
+					joinWithSemicolonAndSpace (
+						"display: block",
+						"width: 300px",
+						"height: 225px;"),
 
-		} else if (
-			mediaLogic.isAudio (mimeType)
-		) {
+					" id=\"player%h\"",
+					integerToDecimalString (
+						playerCount),
 
-			Long playerCount =
-				requestContext.requestIntegerRequired (
-					PLAYER_COUNT_KEY);
-
-			if (playerCount == null) {
+					"></a>");
 
 				formatWriter.writeLineFormat (
 					"<script",
-					" src=\"/flowplayer-3.1.2.min.js\"",
-					"></script>\n");
+					" type=\"text/javascript\"",
+					">%s</script>\n",
+					stringFormat (
+						"flowplayer ('%j', '%j', {});\n",
+						stringFormat (
+							"player%s'",
+							integerToDecimalString (
+								playerCount)),
+						"/flowplayer-3.1.2.swf"));
 
-				playerCount = 0l;
+				requestContext.request (
+					PLAYER_COUNT_KEY,
+					playerCount + 1);
+
+			} else if (
+				mediaLogic.isAudio (mimeType)
+			) {
+
+				Long playerCount =
+					requestContext.requestIntegerRequired (
+						PLAYER_COUNT_KEY);
+
+				if (playerCount == null) {
+
+					formatWriter.writeLineFormat (
+						"<script",
+						" src=\"/flowplayer-3.1.2.min.js\"",
+						"></script>\n");
+
+					playerCount = 0l;
+
+				}
+
+				formatWriter.writeLineFormat (
+					"<a",
+
+					" href=\"%h\"",
+					stringFormat (
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.audio.mp3"),
+
+					" style=\"%h\"",
+					joinWithSemicolonAndSpace (
+						"display: block",
+						"width: 300px",
+						"height: 60px;"),
+
+					" id=\"player%s\"",
+					integerToDecimalString (
+						playerCount),
+
+					"></a>");
+
+				formatWriter.writeFormat (
+					"<script type=\"text/javascript\">\n",
+					"  flowplayer ('player%s', '/flowplayer-3.1.2.swf', {\n",
+					integerToDecimalString (
+						playerCount),
+					"    plugins: {\n",
+					"      audio: {\n",
+					"        url: '/flowplayer.audio-3.1.2.swf'\n",
+					"      },\n",
+					"      controls: {\n",
+					"        autoHide: false,\n",
+					"      },\n",
+					"    },\n",
+					"    clip: {\n",
+					"      type: 'audio',\n",
+					"    }\n,",
+					"  });\n",
+					"</script>\n");
+
+				requestContext.request (
+					PLAYER_COUNT_KEY,
+					playerCount + 1);
+
+			} else if (
+				mediaLogic.isImage (
+					mimeType)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<img",
+
+					" src=\"%h\"",
+					stringFormat (
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.image",
+						ifThenElse (
+							stringIsEmpty (
+								rotate),
+							() -> "?rotate=" + rotate,
+							() -> "")),
+
+					" alt=\"%h\"",
+					media.getFilename (),
+
+					">");
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"(unable to display %h)",
+					mimeType);
 
 			}
-
-			formatWriter.writeLineFormat (
-				"<a",
-
-				" href=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.audio.mp3"),
-
-				" style=\"%h\"",
-				joinWithSemicolonAndSpace (
-					"display: block",
-					"width: 300px",
-					"height: 60px;"),
-
-				" id=\"player%s\"",
-				integerToDecimalString (
-					playerCount),
-
-				"></a>");
-
-			formatWriter.writeFormat (
-				"<script type=\"text/javascript\">\n",
-				"  flowplayer ('player%s', '/flowplayer-3.1.2.swf', {\n",
-				integerToDecimalString (
-					playerCount),
-				"    plugins: {\n",
-				"      audio: {\n",
-				"        url: '/flowplayer.audio-3.1.2.swf'\n",
-				"      },\n",
-				"      controls: {\n",
-				"        autoHide: false,\n",
-				"      },\n",
-				"    },\n",
-				"    clip: {\n",
-				"      type: 'audio',\n",
-				"    }\n,",
-				"  });\n",
-				"</script>\n");
-
-			requestContext.request (
-				PLAYER_COUNT_KEY,
-				playerCount + 1);
-
-		} else if (
-			mediaLogic.isImage (
-				mimeType)
-		) {
-
-			formatWriter.writeLineFormat (
-				"<img",
-
-				" src=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.image",
-					ifThenElse (
-						stringIsEmpty (
-							rotate),
-						() -> "?rotate=" + rotate,
-						() -> "")),
-
-				" alt=\"%h\"",
-				media.getFilename (),
-
-				">");
-
-		} else {
-
-			formatWriter.writeLineFormat (
-				"(unable to display %h)",
-				mimeType);
 
 		}
 
@@ -287,35 +299,41 @@ class MediaConsoleLogicImplementation
 			@NonNull Integer width,
 			@NonNull Integer height) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"mediaUrlScaled");
+		try (
 
-		MediaTypeRec mediaType =
-			media.getMediaType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"mediaUrlScaled");
 
-		if (! mediaLogic.isImage (media)) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Unable to created scaled url for %s",
-					mediaType.getMimeType ()));
+			MediaTypeRec mediaType =
+				media.getMediaType ();
+
+			if (! mediaLogic.isImage (media)) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unable to created scaled url for %s",
+						mediaType.getMimeType ()));
+
+			}
+
+			return stringFormat (
+				"%s",
+				mediaHelper.getDefaultContextPath (
+					taskLogger,
+					media),
+				"/media.imageScale",
+				"?width=%u",
+				integerToDecimalString (
+					width),
+				"&height=%u",
+				integerToDecimalString (
+					height));
 
 		}
-
-		return stringFormat (
-			"%s",
-			mediaHelper.getDefaultContextPath (
-				taskLogger,
-				media),
-			"/media.imageScale",
-			"?width=%u",
-			integerToDecimalString (
-				width),
-			"&height=%u",
-			integerToDecimalString (
-				height));
 
 	}
 
@@ -328,44 +346,50 @@ class MediaConsoleLogicImplementation
 			@NonNull Integer width,
 			@NonNull Integer height) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaContentScaled");
+		try (
 
-		MediaTypeRec mediaType =
-			media.getMediaType ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaContentScaled");
 
-		if (
-			mediaLogic.isTextual (
-				media)
 		) {
 
-			formatWriter.writeLineFormat (
-				"<pre",
-				" style=\"margin: 0\"",
-				">%h</pre>",
-				utf8ToString (
-					media.getContent ().getData ()));
+			MediaTypeRec mediaType =
+				media.getMediaType ();
 
-		} else if (
-			mediaLogic.isImage (
-				media)
-		) {
+			if (
+				mediaLogic.isTextual (
+					media)
+			) {
 
-			formatWriter.writeLineFormat (
-				"<img src=\"%h\">",
-				mediaUrlScaled (
-					taskLogger,
-					media,
-					width,
-					height));
+				formatWriter.writeLineFormat (
+					"<pre",
+					" style=\"margin: 0\"",
+					">%h</pre>",
+					utf8ToString (
+						media.getContent ().getData ()));
 
-		} else {
+			} else if (
+				mediaLogic.isImage (
+					media)
+			) {
 
-			formatWriter.writeLineFormat (
-				"(unable to display %s)",
-				mediaType.getMimeType ());
+				formatWriter.writeLineFormat (
+					"<img src=\"%h\">",
+					mediaUrlScaled (
+						taskLogger,
+						media,
+						width,
+						height));
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"(unable to display %s)",
+					mediaType.getMimeType ());
+
+			}
 
 		}
 
@@ -379,52 +403,58 @@ class MediaConsoleLogicImplementation
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaThumb100");
+		try (
 
-		if (
-			mediaLogic.isText (
-				media)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaThumb100");
+
 		) {
 
-			formatWriter.writeFormat (
-				"%h",
-				bytesToString (
-					media.getContent ().getData (),
-					media.getEncoding ()));
+			if (
+				mediaLogic.isText (
+					media)
+			) {
 
-		} else if (
-			media.getThumb100Content () == null
-		) {
+				formatWriter.writeFormat (
+					"%h",
+					bytesToString (
+						media.getContent ().getData (),
+						media.getEncoding ()));
 
-			formatWriter.writeFormat (
-				"[%h]",
-				media.getMediaType ().getMimeType ());
+			} else if (
+				media.getThumb100Content () == null
+			) {
 
-		} else {
+				formatWriter.writeFormat (
+					"[%h]",
+					media.getMediaType ().getMimeType ());
 
-			formatWriter.writeFormat (
-				"<img",
+			} else {
 
-				" src=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.thumb100",
-					ifThenElse (
-						stringIsNotEmpty (
-							rotate),
-						() -> "?rotate=" + rotate,
-						() -> "")),
+				formatWriter.writeFormat (
+					"<img",
 
-				" alt=\"%h\"",
-				media.getFilename (),
+					" src=\"%h\"",
+					stringFormat (
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.thumb100",
+						ifThenElse (
+							stringIsNotEmpty (
+								rotate),
+							() -> "?rotate=" + rotate,
+							() -> "")),
 
-				">");
+					" alt=\"%h\"",
+					media.getFilename (),
+
+					">");
+
+			}
 
 		}
 
@@ -437,30 +467,36 @@ class MediaConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaThumb100OrText");
+		try (
 
-		if (
-			stringEqualSafe (
-				media.getMediaType ().getMimeType (),
-				"text/plain")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaThumb100OrText");
+
 		) {
 
-			formatWriter.writeLineFormat (
-				"%h",
-				bytesToString (
-					media.getContent ().getData (),
-					media.getEncoding ()));
+			if (
+				stringEqualSafe (
+					media.getMediaType ().getMimeType (),
+					"text/plain")
+			) {
 
-		} else {
+				formatWriter.writeLineFormat (
+					"%h",
+					bytesToString (
+						media.getContent ().getData (),
+						media.getEncoding ()));
 
-			writeMediaThumb100 (
-				taskLogger,
-				formatWriter,
-				media,
-				"");
+			} else {
+
+				writeMediaThumb100 (
+					taskLogger,
+					formatWriter,
+					media,
+					"");
+
+			}
 
 		}
 
@@ -473,34 +509,40 @@ class MediaConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaThumb100Rot90");
+		try (
 
-		if (media.getThumb100Content () == null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaThumb100Rot90");
 
-			formatWriter.writeLineFormat (
-				"[%h]",
-				media.getMediaType ().getMimeType ());
+		) {
 
-		} else {
+			if (media.getThumb100Content () == null) {
 
-			formatWriter.writeLineFormat (
-				"<img",
+				formatWriter.writeLineFormat (
+					"[%h]",
+					media.getMediaType ().getMimeType ());
 
-				" src=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.thumb100Rot90"),
+			} else {
 
-				" alt=\"%h\"",
-				media.getFilename (),
+				formatWriter.writeLineFormat (
+					"<img",
 
-				">\n");
+					" src=\"%h\"",
+					stringFormat (
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.thumb100Rot90"),
+
+					" alt=\"%h\"",
+					media.getFilename (),
+
+					">\n");
+
+			}
 
 		}
 
@@ -513,34 +555,40 @@ class MediaConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaThumb32");
+		try (
 
-		if (media.getThumb32Content () == null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaThumb32");
 
-			formatWriter.writeLineFormat (
-				"[%h]",
-				media.getMediaType ().getMimeType ());
+		) {
 
-		} else {
+			if (media.getThumb32Content () == null) {
 
-			formatWriter.writeLineFormat (
-				"<img",
+				formatWriter.writeLineFormat (
+					"[%h]",
+					media.getMediaType ().getMimeType ());
 
-				" src=\"%h\"",
-				stringFormat (
-					"%s",
-					mediaHelper.getDefaultContextPath (
-						taskLogger,
-						media),
-					"/media.thumb32"),
+			} else {
 
-				" alt=\"%h\"",
-				media.getFilename (),
+				formatWriter.writeLineFormat (
+					"<img",
 
-				">");
+					" src=\"%h\"",
+					stringFormat (
+						"%s",
+						mediaHelper.getDefaultContextPath (
+							taskLogger,
+							media),
+						"/media.thumb32"),
+
+					" alt=\"%h\"",
+					media.getFilename (),
+
+					">");
+
+			}
 
 		}
 
@@ -553,29 +601,35 @@ class MediaConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"writeMediaThumb32OrText");
+		try (
 
-		if (
-			stringEqualSafe (
-				media.getMediaType ().getMimeType (),
-				"text/plain")
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeMediaThumb32OrText");
+
 		) {
 
-			formatWriter.writeFormat (
-				"%h",
-				bytesToString (
-					media.getContent ().getData (),
-					media.getEncoding ()));
+			if (
+				stringEqualSafe (
+					media.getMediaType ().getMimeType (),
+					"text/plain")
+			) {
 
-		} else {
+				formatWriter.writeFormat (
+					"%h",
+					bytesToString (
+						media.getContent ().getData (),
+						media.getEncoding ()));
 
-			writeMediaThumb32 (
-				taskLogger,
-				formatWriter,
-				media);
+			} else {
+
+				writeMediaThumb32 (
+					taskLogger,
+					formatWriter,
+					media);
+
+			}
 
 		}
 

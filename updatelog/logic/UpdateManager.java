@@ -21,7 +21,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -86,30 +86,36 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getDatabaseVersion");
+		try (
 
-		UpdateLogRec updateLog =
-			updateLogHelper.findByTableAndRef (
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getDatabaseVersion");
+
+		) {
+
+			UpdateLogRec updateLog =
+				updateLogHelper.findByTableAndRef (
+					table,
+					ref);
+
+			long ret =
+				updateLog != null
+					? updateLog.getVersion ()
+					: -1l;
+
+			taskLogger.debugFormat (
+				"getDatabaseVersion (\"%s\", %s) = %s",
 				table,
-				ref);
+				integerToDecimalString (
+					ref),
+				integerToDecimalString (
+					ret));
 
-		long ret =
-			updateLog != null
-				? updateLog.getVersion ()
-				: -1l;
+			return ret;
 
-		taskLogger.debugFormat (
-			"getDatabaseVersion (\"%s\", %s) = %s",
-			table,
-			integerToDecimalString (
-				ref),
-			integerToDecimalString (
-				ret));
-
-		return ret;
+		}
 
 	}
 
@@ -117,61 +123,67 @@ class UpdateManager {
 	void refreshMaster (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"refreshMaster");
+		try (
 
-		// check it is time
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"refreshMaster");
 
-		Instant now =
-			Instant.now ();
-
-		if (
-			earlierThan (
-				now,
-				reloadTime)
-		) {
-			return;
-		}
-
-		reloadTime =
-			instantSumDuration (
-				now,
-				reloadFrequency);
-
-		// hit the db
-
-		long newMasterVersion =
-			getDatabaseVersion (
-				taskLogger,
-				"master",
-				0l);
-
-		// if the version hasn't changed don't bother
-
-		if (
-			integerEqualSafe (
-				masterVersion,
-				newMasterVersion)
-		) {
-			return;
-		}
-
-
-		// remember the new version
-
-		masterVersion =
-			newMasterVersion;
-
-		// markall secondary versions as dirty
-
-		for (
-			UpdateStuff updateStuff
-				: secondaryVersions.values ()
 		) {
 
-			updateStuff.dirty = true;
+			// check it is time
+
+			Instant now =
+				Instant.now ();
+
+			if (
+				earlierThan (
+					now,
+					reloadTime)
+			) {
+				return;
+			}
+
+			reloadTime =
+				instantSumDuration (
+					now,
+					reloadFrequency);
+
+			// hit the db
+
+			long newMasterVersion =
+				getDatabaseVersion (
+					taskLogger,
+					"master",
+					0l);
+
+			// if the version hasn't changed don't bother
+
+			if (
+				integerEqualSafe (
+					masterVersion,
+					newMasterVersion)
+			) {
+				return;
+			}
+
+
+			// remember the new version
+
+			masterVersion =
+				newMasterVersion;
+
+			// markall secondary versions as dirty
+
+			for (
+				UpdateStuff updateStuff
+					: secondaryVersions.values ()
+			) {
+
+				updateStuff.dirty = true;
+
+			}
 
 		}
 
@@ -182,69 +194,75 @@ class UpdateManager {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String table) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"refreshSecondary");
+		try (
 
-		// if it isn't marked dirty don't bother
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"refreshSecondary");
 
-		UpdateStuff stuff1 =
-			secondaryVersions.get (table);
-
-		if (stuff1 == null) {
-
-			stuff1 =
-				new UpdateStuff ();
-
-			stuff1.version = -2;
-			stuff1.dirty = true;
-
-			secondaryVersions.put (
-				table,
-				stuff1);
-
-		}
-
-		if (! stuff1.dirty)
-			return;
-
-		stuff1.dirty = false;
-
-		// hit the db
-
-		long newSecondaryVersion =
-			getDatabaseVersion (
-				taskLogger,
-				table,
-				0l);
-
-		// if the version hasn't changed don't bother
-
-		if (
-			integerEqualSafe (
-				stuff1.version,
-				newSecondaryVersion)
 		) {
-			return;
+
+			// if it isn't marked dirty don't bother
+
+			UpdateStuff stuff1 =
+				secondaryVersions.get (table);
+
+			if (stuff1 == null) {
+
+				stuff1 =
+					new UpdateStuff ();
+
+				stuff1.version = -2;
+				stuff1.dirty = true;
+
+				secondaryVersions.put (
+					table,
+					stuff1);
+
+			}
+
+			if (! stuff1.dirty)
+				return;
+
+			stuff1.dirty = false;
+
+			// hit the db
+
+			long newSecondaryVersion =
+				getDatabaseVersion (
+					taskLogger,
+					table,
+					0l);
+
+			// if the version hasn't changed don't bother
+
+			if (
+				integerEqualSafe (
+					stuff1.version,
+					newSecondaryVersion)
+			) {
+				return;
+			}
+
+			// remember the new version
+
+			stuff1.version =
+				newSecondaryVersion;
+
+			// mark all this table's tertiary versions as dirty
+
+			Map<Long,UpdateStuff> map =
+				tertiaryVersions.get (
+					table);
+
+			if (map == null)
+				return;
+
+			for (UpdateStuff stuff2 : map.values ())
+				stuff2.dirty = true;
+
 		}
-
-		// remember the new version
-
-		stuff1.version =
-			newSecondaryVersion;
-
-		// mark all this table's tertiary versions as dirty
-
-		Map<Long,UpdateStuff> map =
-			tertiaryVersions.get (
-				table);
-
-		if (map == null)
-			return;
-
-		for (UpdateStuff stuff2 : map.values ())
-			stuff2.dirty = true;
 
 	}
 
@@ -254,72 +272,78 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"refreshTertiary");
+		try (
 
-		// if it's not dirty don't bother
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"refreshTertiary");
 
-		Map <Long, UpdateStuff> map =
-			tertiaryVersions.get (
-				table);
-
-		if (map == null) {
-
-			map =
-				new HashMap<Long,UpdateStuff> ();
-
-			tertiaryVersions.put (
-				table,
-				map);
-
-		}
-
-		UpdateStuff stuff =
-			map.get (ref);
-
-		if (stuff == null) {
-
-			stuff =
-				new UpdateStuff ();
-
-			stuff.version = -2;
-			stuff.dirty = true;
-
-			map.put (
-				ref,
-				stuff);
-
-		}
-
-		if (! stuff.dirty)
-			return stuff.version;
-
-		stuff.dirty = false;
-
-		// hit the db
-
-		long newTertiaryVersion =
-			getDatabaseVersion (
-				taskLogger,
-				table,
-				ref);
-
-		// if the version hasn't changed don't bother
-
-		if (
-			integerEqualSafe (
-				stuff.version,
-				newTertiaryVersion)
 		) {
-			return stuff.version;
+
+			// if it's not dirty don't bother
+
+			Map <Long, UpdateStuff> map =
+				tertiaryVersions.get (
+					table);
+
+			if (map == null) {
+
+				map =
+					new HashMap<Long,UpdateStuff> ();
+
+				tertiaryVersions.put (
+					table,
+					map);
+
+			}
+
+			UpdateStuff stuff =
+				map.get (ref);
+
+			if (stuff == null) {
+
+				stuff =
+					new UpdateStuff ();
+
+				stuff.version = -2;
+				stuff.dirty = true;
+
+				map.put (
+					ref,
+					stuff);
+
+			}
+
+			if (! stuff.dirty)
+				return stuff.version;
+
+			stuff.dirty = false;
+
+			// hit the db
+
+			long newTertiaryVersion =
+				getDatabaseVersion (
+					taskLogger,
+					table,
+					ref);
+
+			// if the version hasn't changed don't bother
+
+			if (
+				integerEqualSafe (
+					stuff.version,
+					newTertiaryVersion)
+			) {
+				return stuff.version;
+			}
+
+			// remember the new version
+
+			return stuff.version =
+				newTertiaryVersion;
+
 		}
-
-		// remember the new version
-
-		return stuff.version =
-			newTertiaryVersion;
 
 	}
 
@@ -329,14 +353,14 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getVersionDb");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getVersionDb");
+
+			OwnedTransaction transaction =
 				database.beginReadOnly (
 					taskLogger,
 					"UpdateManager.getVersionDb (table, ref)",
@@ -375,72 +399,78 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getVersion");
+		try (
 
-		// check master
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getVersion");
 
-		Instant now =
-			Instant.now ();
-
-		if (
-			earlierThan (
-				reloadTime,
-				now)
 		) {
 
-			return getVersionDb (
-				taskLogger,
-				table,
-				ref);
+			// check master
+
+			Instant now =
+				Instant.now ();
+
+			if (
+				earlierThan (
+					reloadTime,
+					now)
+			) {
+
+				return getVersionDb (
+					taskLogger,
+					table,
+					ref);
+
+			}
+
+			// check secondary
+
+			UpdateStuff stuff1 =
+				secondaryVersions.get (
+					table);
+
+			if (stuff1 == null || stuff1.dirty) {
+
+				return getVersionDb (
+					taskLogger,
+					table,
+					ref);
+
+			}
+
+			// check tertiary
+
+			Map <Long, UpdateStuff> map =
+				tertiaryVersions.get (
+					table);
+
+			if (map == null) {
+
+				return getVersionDb (
+					taskLogger,
+					table,
+					ref);
+
+			}
+
+			UpdateStuff stuff2 =
+				map.get (ref);
+
+			if (stuff2 == null || stuff2.dirty) {
+
+				return getVersionDb (
+					taskLogger,
+					table,
+					ref);
+
+			}
+
+			return stuff2.version;
 
 		}
-
-		// check secondary
-
-		UpdateStuff stuff1 =
-			secondaryVersions.get (
-				table);
-
-		if (stuff1 == null || stuff1.dirty) {
-
-			return getVersionDb (
-				taskLogger,
-				table,
-				ref);
-
-		}
-
-		// check tertiary
-
-		Map <Long, UpdateStuff> map =
-			tertiaryVersions.get (
-				table);
-
-		if (map == null) {
-
-			return getVersionDb (
-				taskLogger,
-				table,
-				ref);
-
-		}
-
-		UpdateStuff stuff2 =
-			map.get (ref);
-
-		if (stuff2 == null || stuff2.dirty) {
-
-			return getVersionDb (
-				taskLogger,
-				table,
-				ref);
-
-		}
-
-		return stuff2.version;
 
 	}
 
@@ -450,38 +480,44 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"realSignalUpdate");
+		try (
 
-		UpdateLogRec updateLog =
-			updateLogHelper.findByTableAndRef (
-				table,
-				ref);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"realSignalUpdate");
 
-		if (updateLog == null) {
+		) {
 
-			updateLog =
-				updateLogHelper.insert (
-					taskLogger,
-					updateLogHelper.createInstance ()
+			UpdateLogRec updateLog =
+				updateLogHelper.findByTableAndRef (
+					table,
+					ref);
 
-				.setCode (
-					table)
+			if (updateLog == null) {
 
-				.setRef (
-					ref)
+				updateLog =
+					updateLogHelper.insert (
+						taskLogger,
+						updateLogHelper.createInstance ()
 
-				.setVersion (
-					0l)
+					.setCode (
+						table)
 
-			);
+					.setRef (
+						ref)
+
+					.setVersion (
+						0l)
+
+				);
+
+			}
+
+			updateLog.setVersion (
+				updateLog.getVersion () + 1);
 
 		}
-
-		updateLog.setVersion (
-			updateLog.getVersion () + 1);
 
 	}
 
@@ -491,25 +527,31 @@ class UpdateManager {
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"signalUpdate");
+		try (
 
-		realSignalUpdate (
-			taskLogger,
-			table,
-			ref);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"signalUpdate");
 
-		realSignalUpdate (
-			taskLogger,
-			table,
-			0l);
+		) {
 
-		realSignalUpdate (
-			taskLogger,
-			"master",
-			0l);
+			realSignalUpdate (
+				taskLogger,
+				table,
+				ref);
+
+			realSignalUpdate (
+				taskLogger,
+				table,
+				0l);
+
+			realSignalUpdate (
+				taskLogger,
+				"master",
+				0l);
+
+		}
 
 	}
 
@@ -550,38 +592,44 @@ class UpdateManager {
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long ref) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"Watcher (%s).isUpdated (%s)",
-					table,
-					integerToDecimalString (
-						ref));
+			try (
 
-			taskLogger.debugFormat (
-				"Watcher (\"%s" + table + "\").isUpdated (" + ref + ")");
+				TaskLogger taskLogger =
+					logContext.nestTaskLoggerFormat (
+						parentTaskLogger,
+						"Watcher (%s).isUpdated (%s)",
+						table,
+						integerToDecimalString (
+							ref));
 
-			long newVersion =
-				getVersion (
-					taskLogger,
-					table,
-					ref);
+			) {
 
-			if (versions.containsKey (ref)) {
+				taskLogger.debugFormat (
+					"Watcher (\"%s" + table + "\").isUpdated (" + ref + ")");
 
-				long oldVersion =
-					versions.get (ref);
+				long newVersion =
+					getVersion (
+						taskLogger,
+						table,
+						ref);
 
-				if (oldVersion == newVersion)
-					return false;
+				if (versions.containsKey (ref)) {
+
+					long oldVersion =
+						versions.get (ref);
+
+					if (oldVersion == newVersion)
+						return false;
+
+				}
+
+				versions.put (
+					ref,
+					newVersion);
+
+				return true;
 
 			}
-
-			versions.put (
-				ref,
-				newVersion);
-
-			return true;
 
 		}
 
@@ -650,68 +698,74 @@ class UpdateManager {
 		T provide (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"UpdateGetterAdaptor.provide ()");
+			try (
 
-			long now =
-				System.currentTimeMillis ();
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"UpdateGetterAdaptor.provide ()");
 
-			// check for a forced update
+			) {
 
-			if (forceUpdate) {
+				long now =
+					System.currentTimeMillis ();
 
-				value =
-					getter.provide (
-						parentTaskLogger);
+				// check for a forced update
 
-				lastReload = now;
-				forceUpdate = false;
+				if (forceUpdate) {
+
+					value =
+						getter.provide (
+							parentTaskLogger);
+
+					lastReload = now;
+					forceUpdate = false;
+
+					return value;
+
+				}
+
+				// check for an update trigger
+
+				long newVersion =
+					getVersion (
+						taskLogger,
+						table,
+						ref);
+
+				if (oldVersion != newVersion) {
+
+					value =
+						getter.provide (
+							parentTaskLogger);
+
+					lastReload = now;
+					oldVersion = newVersion;
+
+					return value;
+
+				}
+
+				// if not check for a timed update
+
+				if (lastReload + reloadTimeMs < now) {
+
+					value =
+						getter.provide (
+							parentTaskLogger);
+
+					lastReload = now;
+					oldVersion = newVersion;
+
+					return value;
+
+				}
+
+				// or just return the cached value
 
 				return value;
 
 			}
-
-			// check for an update trigger
-
-			long newVersion =
-				getVersion (
-					taskLogger,
-					table,
-					ref);
-
-			if (oldVersion != newVersion) {
-
-				value =
-					getter.provide (
-						parentTaskLogger);
-
-				lastReload = now;
-				oldVersion = newVersion;
-
-				return value;
-
-			}
-
-			// if not check for a timed update
-
-			if (lastReload + reloadTimeMs < now) {
-
-				value =
-					getter.provide (
-						parentTaskLogger);
-
-				lastReload = now;
-				oldVersion = newVersion;
-
-				return value;
-
-			}
-
-			// or just return the cached value
-
-			return value;
 
 		}
 

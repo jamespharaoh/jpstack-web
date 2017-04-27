@@ -1,6 +1,7 @@
 package wbs.platform.text.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import com.google.common.base.Optional;
 
@@ -41,33 +42,39 @@ class TextFormFieldNativeMapping <Container>
 			@NonNull Container container,
 			@NonNull Optional <String> genericValue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"genericToNative");
+		try (
 
-		if (! genericValue.isPresent ()) {
-			return optionalAbsent ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"genericToNative");
+
+		) {
+
+			if (! genericValue.isPresent ()) {
+				return optionalAbsent ();
+			}
+
+			return Optional.of (
+				textHelper.findOrCreate (
+					taskLogger,
+					genericValue.get ()));
+
 		}
-
-		return Optional.of (
-			textHelper.findOrCreate (
-				taskLogger,
-				genericValue.get ()));
 
 	}
 
 	@Override
 	public
-	Optional<String> nativeToGeneric (
+	Optional <String> nativeToGeneric (
 			@NonNull Container container,
 			@NonNull Optional<TextRec> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
-			return Optional.<String>absent ();
+			return optionalAbsent ();
 		}
 
-		return Optional.of (
+		return optionalOf (
 			nativeValue.get ().getText ());
 
 	}

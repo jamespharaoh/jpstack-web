@@ -36,8 +36,8 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -116,53 +116,71 @@ class ObjectSearchCsvResponder <ResultType>
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// set search object
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		searchObject =
-			userSessionLogic.userDataObjectRequired (
-				taskLogger,
-				userConsoleLogic.userRequired (),
-				stringFormat (
-					"object_search_%s_fields",
-					sessionKey));
+		) {
 
-		// get object ids
+			// set search object
 
-		List <Long> objectIdsTemp =
-			iterableMapToList (
-				NumberUtils::parseIntegerRequired,
-				stringSplitComma (
-					userSessionLogic.userDataStringRequired (
-						userConsoleLogic.userRequired (),
-						stringFormat (
-							"object_search_%s_results",
-							sessionKey))));
+			searchObject =
+				userSessionLogic.userDataObjectRequired (
+					taskLogger,
+					userConsoleLogic.userRequired (),
+					stringFormat (
+						"object_search_%s_fields",
+						sessionKey));
 
-		objectIds =
-			objectIdsTemp;
+			// get object ids
+
+			List <Long> objectIdsTemp =
+				iterableMapToList (
+					NumberUtils::parseIntegerRequired,
+					stringSplitComma (
+						userSessionLogic.userDataStringRequired (
+							userConsoleLogic.userRequired (),
+							stringFormat (
+								"object_search_%s_results",
+								sessionKey))));
+
+			objectIds =
+				objectIdsTemp;
+
+		}
 
 	}
 
 
 	@Override
 	protected
-	void setHtmlHeaders () {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"text/csv");
+		try (
 
-		requestContext.setHeader (
-			"Content-Disposition",
-			stringFormat (
-				"attachment;filename=%s-search.csv",
-				camelToHyphen (
-					consoleHelper.objectName ())));
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"text/csv");
+
+			requestContext.setHeader (
+				"Content-Disposition",
+				stringFormat (
+					"attachment;filename=%s-search.csv",
+					camelToHyphen (
+						consoleHelper.objectName ())));
+
+		}
 
 	}
 
@@ -171,104 +189,110 @@ class ObjectSearchCsvResponder <ResultType>
 	void render (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"render ()");
+		try (
 
-		Transaction transaction =
-			database.currentTransaction ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"render ()");
 
-		// form fields
-
-		String resultsModeName =
-			requestContext.parameterOrDefault (
-				"mode",
-				resultsModes.keySet ().iterator ().next ());
-
-		ObjectSearchResultsMode <ResultType> resultsMode =
-			mapItemForKeyRequired (
-				resultsModes,
-				resultsModeName);
-
-		formFieldSets =
-			presentInstancesList (
-				resultsMode.columns,
-				resultsMode.rows);
-
-		// write headers
-
-		formFieldLogic.outputCsvHeadings (
-			formatWriter,
-			formFieldSets);
-
-		// iterate through objects
-
-		int batchesSinceFlush = 0;
-
-		for (
-			List <Long> batch
-				: Lists.partition (
-					objectIds,
-					64)
 		) {
 
-			List <Optional <ResultType>> objects;
+			BorrowedTransaction transaction =
+				database.currentTransaction ();
 
-			if (
-				isNotNull (
-					resultsDaoMethodName)
-			) {
+			// form fields
 
-				Method method =
-					methodGetRequired (
-						consoleHelper.getClass (),
-						resultsDaoMethodName,
-						ImmutableList.<Class<?>> of (
-							searchObject.getClass (),
-							List.class));
+			String resultsModeName =
+				requestContext.parameterOrDefault (
+					"mode",
+					resultsModes.keySet ().iterator ().next ());
 
-				objects =
-					genericCastUnchecked (
-						methodInvoke (
-							method,
-							consoleHelper,
-							searchObject,
-							batch));
+			ObjectSearchResultsMode <ResultType> resultsMode =
+				mapItemForKeyRequired (
+					resultsModes,
+					resultsModeName);
 
-			} else {
+			formFieldSets =
+				presentInstancesList (
+					resultsMode.columns,
+					resultsMode.rows);
 
-				objects =
-					genericCastUnchecked (
-						consoleHelper.findMany (
-							batch));
+			// write headers
 
-			}
+			formFieldLogic.outputCsvHeadings (
+				formatWriter,
+				formFieldSets);
+
+			// iterate through objects
+
+			int batchesSinceFlush = 0;
 
 			for (
-				ResultType object
-					: presentInstances (
-						objects)
+				List <Long> batch
+					: Lists.partition (
+						objectIds,
+						64)
 			) {
 
-				// write object
+				List <Optional <ResultType>> objects;
 
-				formFieldLogic.outputCsvRow (
-					taskLogger,
-					formatWriter,
-					formFieldSets,
-					object,
-					emptyMap ());
+				if (
+					isNotNull (
+						resultsDaoMethodName)
+				) {
 
-			}
+					Method method =
+						methodGetRequired (
+							consoleHelper.getClass (),
+							resultsDaoMethodName,
+							ImmutableList.<Class<?>> of (
+								searchObject.getClass (),
+								List.class));
 
-			// flush regularly
+					objects =
+						genericCastUnchecked (
+							methodInvoke (
+								method,
+								consoleHelper,
+								searchObject,
+								batch));
 
-			if (++ batchesSinceFlush == 64) {
+				} else {
 
-				transaction.flush ();
+					objects =
+						genericCastUnchecked (
+							consoleHelper.findMany (
+								batch));
 
-				batchesSinceFlush = 0;
+				}
+
+				for (
+					ResultType object
+						: presentInstances (
+							objects)
+				) {
+
+					// write object
+
+					formFieldLogic.outputCsvRow (
+						taskLogger,
+						formatWriter,
+						formFieldSets,
+						object,
+						emptyMap ());
+
+				}
+
+				// flush regularly
+
+				if (++ batchesSinceFlush == 64) {
+
+					transaction.flush ();
+
+					batchesSinceFlush = 0;
+
+				}
 
 			}
 

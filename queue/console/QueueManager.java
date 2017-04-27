@@ -68,52 +68,58 @@ class QueueManager {
 	void init (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"init");
+		try (
 
-		// initialise queuePageFactories by querying each factory
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		for (
-			Map.Entry <String, Provider <QueueConsolePlugin>> entry
-				: queueHelpersByBeanName.entrySet ()
 		) {
 
-			String beanName =
-				entry.getKey ();
+			// initialise queuePageFactories by querying each factory
 
-			QueueConsolePlugin queueHelper =
-				entry.getValue ().get ();
+			for (
+				Map.Entry <String, Provider <QueueConsolePlugin>> entry
+					: queueHelpersByBeanName.entrySet ()
+			) {
 
-			for (String queueTypeCode : queueHelper.queueTypeCodes ()) {
+				String beanName =
+					entry.getKey ();
 
-				if (queueHelpers.containsKey (queueTypeCode)) {
+				QueueConsolePlugin queueHelper =
+					entry.getValue ().get ();
 
-					throw new RuntimeException (
-						"Duplicated queue page factory: " + queueTypeCode);
+				for (String queueTypeCode : queueHelper.queueTypeCodes ()) {
+
+					if (queueHelpers.containsKey (queueTypeCode)) {
+
+						throw new RuntimeException (
+							"Duplicated queue page factory: " + queueTypeCode);
+
+					}
+
+					queueHelpers.put (
+						queueTypeCode,
+						queueHelper);
+
+					taskLogger.debugFormat (
+						"Adding queue page factory %s from %s",
+						queueTypeCode,
+						beanName);
 
 				}
 
-				queueHelpers.put (
-					queueTypeCode,
-					queueHelper);
-
-				taskLogger.debugFormat (
-					"Adding queue page factory %s from %s",
-					queueTypeCode,
-					beanName);
-
 			}
 
-		}
+			taskLogger.noticeFormat (
+				"Added %s queue page factories for %s queue types",
+				integerToDecimalString (
+					queueHelpersByBeanName.size ()),
+				integerToDecimalString (
+					queueHelpers.size ()));
 
-		taskLogger.noticeFormat (
-			"Added %s queue page factories for %s queue types",
-			integerToDecimalString (
-				queueHelpersByBeanName.size ()),
-			integerToDecimalString (
-				queueHelpers.size ()));
+		}
 
 	}
 
@@ -125,42 +131,48 @@ class QueueManager {
 			@NonNull ConsoleRequestContext  requestContext,
 			@NonNull QueueItemRec queueItem) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getItemResponder");
+		try (
 
-		QueueSubjectRec queueSubject =
-			queueItem.getQueueSubject ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getItemResponder");
 
-		QueueRec queue =
-			queueSubject.getQueue ();
+		) {
 
-		QueueTypeRec queueType =
-			queue.getQueueType ();
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
 
-		String key =
-			stringFormat (
-				"%s.%s",
-				queueType.getParentType ().getCode (),
-				queueType.getCode ());
+			QueueRec queue =
+				queueSubject.getQueue ();
 
-		QueueConsolePlugin queuePageFactory =
-			queueHelpers.get (
-				key);
+			QueueTypeRec queueType =
+				queue.getQueueType ();
 
-		if (queuePageFactory == null) {
-
-			throw new RuntimeException (
+			String key =
 				stringFormat (
-					"Queue page factory not found: %s",
-					key));
+					"%s.%s",
+					queueType.getParentType ().getCode (),
+					queueType.getCode ());
+
+			QueueConsolePlugin queuePageFactory =
+				queueHelpers.get (
+					key);
+
+			if (queuePageFactory == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Queue page factory not found: %s",
+						key));
+
+			}
+
+			return queuePageFactory.makeResponder (
+				taskLogger,
+				queueItem);
 
 		}
-
-		return queuePageFactory.makeResponder (
-			taskLogger,
-			queueItem);
 
 	}
 

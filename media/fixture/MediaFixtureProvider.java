@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -31,102 +31,126 @@ class MediaFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createTextMediaTypes (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createImageMediaTypes (
-			taskLogger,
-			transaction);
+		) {
 
-		createVideoMediaTypes (
-			taskLogger,
-			transaction);
+			createTextMediaTypes (
+				taskLogger,
+				transaction);
+
+			createImageMediaTypes (
+				taskLogger,
+				transaction);
+
+			createVideoMediaTypes (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createTextMediaTypes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createTextMediaTypes");
+		try (
 
-		createMediaType (
-			taskLogger,
-			"text/plain",
-			"Plain text",
-			"txt");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTextMediaTypes");
+
+		) {
+
+			createMediaType (
+				taskLogger,
+				"text/plain",
+				"Plain text",
+				"txt");
+
+		}
 
 	}
 
 	private
 	void createImageMediaTypes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createImageMediaTypes");
+		try (
 
-		createMediaType (
-			taskLogger,
-			"image/jpeg",
-			"JPEG image",
-			"jpg");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createImageMediaTypes");
 
-		createMediaType (
-			taskLogger,
-			"image/gif",
-			"GIF image",
-			"git");
+		) {
 
-		createMediaType (
-			taskLogger,
-			"image/png",
-			"PNG image",
-			"png");
+			createMediaType (
+				taskLogger,
+				"image/jpeg",
+				"JPEG image",
+				"jpg");
 
-		createMediaType ( // TODO surely this is not right?!?
-			taskLogger,
-			"image/mp4",
-			"MPEG-4 image",
-			"mp4");
+			createMediaType (
+				taskLogger,
+				"image/gif",
+				"GIF image",
+				"git");
+
+			createMediaType (
+				taskLogger,
+				"image/png",
+				"PNG image",
+				"png");
+
+			createMediaType ( // TODO surely this is not right?!?
+				taskLogger,
+				"image/mp4",
+				"MPEG-4 image",
+				"mp4");
+
+		}
 
 	}
 
 	private
 	void createVideoMediaTypes (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createVideoMediaTypes");
+		try (
 
-		createMediaType (
-			taskLogger,
-			"video/3gpp",
-			"3GPP video",
-			"3gp");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createVideoMediaTypes");
 
-		createMediaType (
-			taskLogger,
-			"video/mpeg",
-			"MPEG video",
-			"3gp");
+		) {
+
+			createMediaType (
+				taskLogger,
+				"video/3gpp",
+				"3GPP video",
+				"3gp");
+
+			createMediaType (
+				taskLogger,
+				"video/mpeg",
+				"MPEG video",
+				"3gp");
+
+		}
 
 	}
 
@@ -137,25 +161,31 @@ class MediaFixtureProvider
 			@NonNull String description,
 			@NonNull String extension) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMediaType");
+		try (
 
-		mediaTypeHelper.insert (
-			taskLogger,
-			mediaTypeHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMediaType");
 
-			.setMimeType (
-				mimeType)
+		) {
 
-			.setDescription (
-				description)
+			mediaTypeHelper.insert (
+				taskLogger,
+				mediaTypeHelper.createInstance ()
 
-			.setExtension (
-				extension)
+				.setMimeType (
+					mimeType)
 
-		);
+				.setDescription (
+					description)
+
+				.setExtension (
+					extension)
+
+			);
+
+		}
 
 	}
 

@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -44,138 +44,144 @@ class CurrencyFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
+		) {
 
-			.setCode (
-				"currency")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Currency")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"system"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"currency")
 
-			.setLabel (
-				"Currencies")
+				.setName (
+					"Currency")
 
-			.setTargetPath (
-				"/currencys")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Currencies")
 
-		);
+				.setTargetPath (
+					"/currencys")
 
-		currencyHelper.insert (
-			taskLogger,
-			currencyHelper.createInstance ()
+				.setTargetFrame (
+					"main")
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"gbp")
+			currencyHelper.insert (
+				taskLogger,
+				currencyHelper.createInstance ()
 
-			.setName (
-				"GBP")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Pounds sterling")
+				.setCode (
+					"gbp")
 
-			.setDivisions (
-				100l)
+				.setName (
+					"GBP")
 
-			.setPrefix (
-				"£")
+				.setDescription (
+					"Pounds sterling")
 
-			.setSingularSuffix (
-				"")
+				.setDivisions (
+					100l)
 
-			.setPluralSuffix (
-				"")
+				.setPrefix (
+					"£")
 
-		);
+				.setSingularSuffix (
+					"")
 
-		currencyHelper.insert (
-			taskLogger,
-			currencyHelper.createInstance ()
+				.setPluralSuffix (
+					"")
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"usd")
+			currencyHelper.insert (
+				taskLogger,
+				currencyHelper.createInstance ()
 
-			.setName (
-				"USD")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"US Dollars")
+				.setCode (
+					"usd")
 
-			.setDivisions (
-				100l)
+				.setName (
+					"USD")
 
-			.setPrefix (
-				"$")
+				.setDescription (
+					"US Dollars")
 
-			.setSingularSuffix (
-				"")
+				.setDivisions (
+					100l)
 
-			.setPluralSuffix (
-				"")
+				.setPrefix (
+					"$")
 
-		);
+				.setSingularSuffix (
+					"")
 
-		currencyHelper.insert (
-			taskLogger,
-			currencyHelper.createInstance ()
+				.setPluralSuffix (
+					"")
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"credit")
+			currencyHelper.insert (
+				taskLogger,
+				currencyHelper.createInstance ()
 
-			.setName (
-				"Credits")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"Arbitrary credits")
+				.setCode (
+					"credit")
 
-			.setDivisions (
-				1l)
+				.setName (
+					"Credits")
 
-			.setPrefix (
-				"")
+				.setDescription (
+					"Arbitrary credits")
 
-			.setSingularSuffix (
-				" credit")
+				.setDivisions (
+					1l)
 
-			.setPluralSuffix (
-				" credits")
+				.setPrefix (
+					"")
 
-		);
+				.setSingularSuffix (
+					" credit")
+
+				.setPluralSuffix (
+					" credits")
+
+			);
+
+		}
 
 	}
 

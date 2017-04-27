@@ -79,16 +79,22 @@ class SleepingDaemonService
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		helper =
-			backgroundLogic.registerBackgroundProcess (
-				taskLogger,
-				backgroundProcessName (),
-				this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			helper =
+				backgroundLogic.registerBackgroundProcess (
+					taskLogger,
+					backgroundProcessName (),
+					this);
+
+		}
 
 	}
 
@@ -120,55 +126,61 @@ class SleepingDaemonService
 
 			// run service hook
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"runService ()",
-					helper.debugEnabled ());
+			try (
 
-			try {
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"runService ()",
+						helper.debugEnabled ());
 
-				if (
-					! helper.setBackgroundProcessStart (
-						taskLogger)
-				) {
-					continue;
+			) {
+
+				try {
+
+					if (
+						! helper.setBackgroundProcessStart (
+							taskLogger)
+					) {
+						continue;
+					}
+
+					taskLogger.wrap (
+						this::runOnce);
+
+				} catch (Exception exception) {
+
+					String errorSummary =
+						stringFormat (
+							"Error running background process %s",
+							backgroundProcessName ());
+
+					taskLogger.errorFormatException (
+						exception,
+						"%s",
+						errorSummary);
+
+					exceptionLogger.logThrowableWithSummary (
+						taskLogger,
+						"daemon",
+						backgroundProcessName (),
+						errorSummary,
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				} finally {
+
+					helper.setBackgroundProcessStop (
+						taskLogger);
+
 				}
 
-				taskLogger.wrap (
-					this::runOnce);
+				// work out next delay
 
-			} catch (Exception exception) {
-
-				String errorSummary =
-					stringFormat (
-						"Error running background process %s",
-						backgroundProcessName ());
-
-				taskLogger.errorFormatException (
-					exception,
-					"%s",
-					errorSummary);
-
-				exceptionLogger.logThrowableWithSummary (
-					taskLogger,
-					"daemon",
-					backgroundProcessName (),
-					errorSummary,
-					exception,
-					optionalAbsent (),
-					GenericExceptionResolution.tryAgainLater);
-
-			} finally {
-
-				helper.setBackgroundProcessStop (
-					taskLogger);
+				delay =
+					calculateSubsequentDelay ();
 
 			}
-
-			// work out next delay
-
-			delay =
-				calculateSubsequentDelay ();
 
 		}
 

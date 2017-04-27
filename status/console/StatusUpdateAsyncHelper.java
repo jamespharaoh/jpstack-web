@@ -26,7 +26,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -104,69 +104,75 @@ class StatusUpdateAsyncHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object state,
 			@NonNull ConsoleAsyncConnectionHandle connectionHandle,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull UserRec user,
 			@NonNull UserPrivChecker privChecker) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"updateSubscriber");
+		try (
 
-		List <Pair <String, Future <JsonObject>>> futures =
-			iterableMapToList (
-				statusLine ->
-					Pair.of (
-						statusLine.typeName (),
-						statusLine.getUpdateData (
-							taskLogger,
-							privChecker)),
-				statusLineManager.getStatusLines ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"updateSubscriber");
 
-		JsonObject payload =
-			new JsonObject ();
-
-		JsonArray updates =
-			new JsonArray ();
-
-		addUpdate (
-			updates,
-			"core",
-			buildUpdateCore (
-				taskLogger,
-				transaction,
-				user));
-
-		for (
-			Pair <String, Future <JsonObject>> future
-				: futures
 		) {
 
-			try {
+			List <Pair <String, Future <JsonObject>>> futures =
+				iterableMapToList (
+					statusLine ->
+						Pair.of (
+							statusLine.typeName (),
+							statusLine.getUpdateData (
+								taskLogger,
+								privChecker)),
+					statusLineManager.getStatusLines ());
 
-				addUpdate (
-					updates,
-					future.getKey (),
-					future.getValue ().get ());
+			JsonObject payload =
+				new JsonObject ();
 
-			} catch (Exception exception) {
+			JsonArray updates =
+				new JsonArray ();
 
-				taskLogger.errorFormatException (
-					exception,
-					"Error getting status update for %s",
-					future.getKey ());
+			addUpdate (
+				updates,
+				"core",
+				buildUpdateCore (
+					taskLogger,
+					transaction,
+					user));
+
+			for (
+				Pair <String, Future <JsonObject>> future
+					: futures
+			) {
+
+				try {
+
+					addUpdate (
+						updates,
+						future.getKey (),
+						future.getValue ().get ());
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
+						"Error getting status update for %s",
+						future.getKey ());
+
+				}
 
 			}
 
+			payload.add (
+				"updates",
+				updates);
+
+			connectionHandle.send (
+				taskLogger,
+				payload);
+
 		}
-
-		payload.add (
-			"updates",
-			updates);
-
-		connectionHandle.send (
-			taskLogger,
-			payload);
 
 	}
 
@@ -195,7 +201,7 @@ class StatusUpdateAsyncHelper
 	private
 	JsonObject buildUpdateCore (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull UserRec user) {
 
 		RootRec root =

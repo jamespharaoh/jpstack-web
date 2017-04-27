@@ -3,17 +3,17 @@ package wbs.platform.rpc.xml;
 import static wbs.utils.etc.BinaryUtils.bytesToHex;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.rpc.core.RpcElem;
@@ -22,6 +22,9 @@ import wbs.platform.rpc.core.RpcPrimitive;
 import wbs.platform.rpc.core.RpcStructure;
 import wbs.platform.rpc.core.RpcType;
 
+import wbs.utils.io.BorrowedOutputStream;
+import wbs.utils.io.RuntimeIoException;
+
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
@@ -29,15 +32,21 @@ import wbs.web.context.RequestContext;
 import wbs.web.misc.HttpStatus;
 import wbs.web.responder.Responder;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlResponder")
 public
 class XmlResponder
 	implements Responder {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
+
+	// properties
 
 	@Getter @Setter
 	RpcElem data;
@@ -49,38 +58,66 @@ class XmlResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.status (
-			status);
+		try (
 
-		requestContext.setHeader (
-			"Content-Type",
-			"application/xml");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
 
-		OutputStream out =
-			requestContext.outputStream ();
+		) {
 
-		Element node =
-			toNode (data);
+			requestContext.status (
+				status);
 
-		Document doc =
-			new Document (node);
+			requestContext.setHeader (
+				"Content-Type",
+				"application/xml");
 
-		Serializer serializer =
-			new Serializer (out, "utf-8");
+			try (
 
-		serializer.setIndent (4);
-		serializer.write (doc);
+				BorrowedOutputStream out =
+					requestContext.outputStream ();
 
-		if (log.isDebugEnabled ()) {
+			) {
 
-			serializer =
-				new Serializer (System.out, "utf-8");
+				Element node =
+					toNode (data);
 
-			serializer.setIndent (4);
-			serializer.write (doc);
+				Document doc =
+					new Document (node);
+
+				Serializer serializer =
+					new Serializer (
+						out,
+						"utf-8");
+
+				serializer.setIndent (
+					4);
+
+				serializer.write (
+					doc);
+
+				if (taskLogger.debugEnabled ()) {
+
+					serializer =
+						new Serializer (
+							System.out,
+							"utf-8");
+
+					serializer.setIndent (4);
+					serializer.write (doc);
+
+				}
+
+			}
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 

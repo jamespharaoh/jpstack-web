@@ -58,32 +58,38 @@ class CachedGetter <Type> {
 	Type get (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"get");
+		try (
 
-		// call refresh if necessary
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"get");
 
-		if (
-			earlierThan (
-				lastReload.plus (
-					reloadTimeMs),
-				Instant.now ())
 		) {
 
-			value =
-				refresh (
-					taskLogger);
+			// call refresh if necessary
 
-			lastReload =
-				Instant.now ();
+			if (
+				earlierThan (
+					lastReload.plus (
+						reloadTimeMs),
+					Instant.now ())
+			) {
+
+				value =
+					refresh (
+						taskLogger);
+
+				lastReload =
+					Instant.now ();
+
+			}
+
+			// and return
+
+			return value;
 
 		}
-
-		// and return
-
-		return value;
 
 	}
 

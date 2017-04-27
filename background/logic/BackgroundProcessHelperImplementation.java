@@ -4,6 +4,7 @@ import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanNotEqual;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
@@ -21,7 +22,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogEvent;
 import wbs.framework.logging.TaskLogger;
@@ -31,7 +32,6 @@ import wbs.platform.background.model.BackgroundProcessRec;
 
 import wbs.utils.random.RandomLogic;
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.StringFormatWriter;
 
 @PrototypeComponent ("backgroundProcessHelper")
 @Accessors (fluent = true)
@@ -115,7 +115,7 @@ class BackgroundProcessHelperImplementation
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"SleepingDaemonService.setBackgroundProcessStart",
@@ -192,14 +192,14 @@ class BackgroundProcessHelperImplementation
 			return;
 		}
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setBackgroundProcessStop");
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setBackgroundProcessStop");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"SleepingDaemonService.setBackgroundProcessStop",
@@ -275,14 +275,11 @@ class BackgroundProcessHelperImplementation
 	String taskLog (
 			@NonNull TaskLogEvent taskLogEvent) {
 
-		StringFormatWriter formatWriter =
-			new StringFormatWriter ();
-
-		writeTaskLog (
-			formatWriter,
-			taskLogEvent);
-
-		return formatWriter.toString ();
+		return formatWriterConsumerToString (
+			formatWriter ->
+				writeTaskLog (
+					formatWriter,
+					taskLogEvent));
 
 	}
 

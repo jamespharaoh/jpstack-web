@@ -13,7 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -54,24 +54,30 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logSimple");
+		try (
 
-		return logExceptionWrapped (
-			taskLogger,
-			typeCode,
-			source,
-			userId,
-			nestedTaskLogger -> realLogException (
-				nestedTaskLogger,
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logSimple");
+
+		) {
+
+			return logExceptionWrapped (
+				taskLogger,
 				typeCode,
 				source,
-				summary,
-				dump,
 				userId,
-				resolution));
+				nestedTaskLogger -> realLogException (
+					nestedTaskLogger,
+					typeCode,
+					source,
+					summary,
+					dump,
+					userId,
+					resolution));
+
+		}
 
 	}
 
@@ -85,28 +91,34 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logThrowable");
+		try (
 
-		return logExceptionWrapped (
-			taskLogger,
-			typeCode,
-			source,
-			userId,
-			nestedTaskLogger -> realLogException (
-				nestedTaskLogger,
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logThrowable");
+
+		) {
+
+			return logExceptionWrapped (
+				taskLogger,
 				typeCode,
 				source,
-				exceptionLogic.throwableSummary (
-					taskLogger,
-					throwable),
-				exceptionLogic.throwableDump (
-					taskLogger,
-					throwable),
 				userId,
-				resolution));
+				nestedTaskLogger -> realLogException (
+					nestedTaskLogger,
+					typeCode,
+					source,
+					exceptionLogic.throwableSummary (
+						taskLogger,
+						throwable),
+					exceptionLogic.throwableDump (
+						taskLogger,
+						throwable),
+					userId,
+					resolution));
+
+		}
 
 	}
 
@@ -121,31 +133,37 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logThrowableWithSummary");
+		try (
 
-		return logExceptionWrapped (
-			taskLogger,
-			typeCode,
-			source,
-			userId,
-			nestedTaskLogger -> realLogException (
-				nestedTaskLogger,
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logThrowableWithSummary");
+
+		) {
+
+			return logExceptionWrapped (
+				taskLogger,
 				typeCode,
 				source,
-				stringFormat (
-					"%s\n%s",
-					summary,
-					exceptionLogic.throwableSummary (
-						taskLogger,
-						throwable)),
-				exceptionLogic.throwableDump (
-					taskLogger,
-					throwable),
 				userId,
-				resolution));
+				nestedTaskLogger -> realLogException (
+					nestedTaskLogger,
+					typeCode,
+					source,
+					stringFormat (
+						"%s\n%s",
+						summary,
+						exceptionLogic.throwableSummary (
+							taskLogger,
+							throwable)),
+					exceptionLogic.throwableDump (
+						taskLogger,
+						throwable),
+					userId,
+					resolution));
+
+		}
 
 	}
 
@@ -156,55 +174,61 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull Function <TaskLogger, ExceptionLogRec> target) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"logExceptionWrapped");
+		try (
 
-		try {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"logExceptionWrapped");
 
-			return target.apply (
-				taskLogger);
-
-		} catch (Exception furtherException) {
-
-			taskLogger.fatalFormatException (
-				furtherException,
-				"Error logging exception");
-
-			String furtherSummary =
-				stringFormat (
-					"Threw %s while logging exception from %s",
-					furtherException.getClass ().getSimpleName (),
-					source);
+		) {
 
 			try {
 
-				realLogException (
-					taskLogger,
-					typeCode,
-					"exception log",
-					stringFormat (
-						"%s\n%s",
-						furtherSummary,
-						exceptionLogic.throwableSummary (
-							taskLogger,
-							furtherException)),
-					exceptionLogic.throwableDump (
-						taskLogger,
-						furtherException),
-					optionalAbsent (),
-					GenericExceptionResolution.fatalError);
+				return target.apply (
+					taskLogger);
 
-			} catch (Exception yetAnotherException) {
+			} catch (Exception furtherException) {
 
 				taskLogger.fatalFormatException (
-					yetAnotherException,
-					"Error logging error logging exception");
+					furtherException,
+					"Error logging exception");
+
+				String furtherSummary =
+					stringFormat (
+						"Threw %s while logging exception from %s",
+						furtherException.getClass ().getSimpleName (),
+						source);
+
+				try {
+
+					realLogException (
+						taskLogger,
+						typeCode,
+						"exception log",
+						stringFormat (
+							"%s\n%s",
+							furtherSummary,
+							exceptionLogic.throwableSummary (
+								taskLogger,
+								furtherException)),
+						exceptionLogic.throwableDump (
+							taskLogger,
+							furtherException),
+						optionalAbsent (),
+						GenericExceptionResolution.fatalError);
+
+				} catch (Exception yetAnotherException) {
+
+					taskLogger.fatalFormatException (
+						yetAnotherException,
+						"Error logging error logging exception");
+
+				}
+
+				return null;
 
 			}
-
-			return null;
 
 		}
 
@@ -227,7 +251,7 @@ class PlatformExceptionLogger
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"PlatformExceptionLogger.realLogException (...)",

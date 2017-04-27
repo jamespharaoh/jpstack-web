@@ -126,66 +126,72 @@ class ObjectSearchPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		cleanSearch =
-			instantiateSearch (
-				taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		currentSearch =
-			optionalOrElse (
-				genericCastUnchecked (
-					userSessionLogic.userDataObject (
-						taskLogger,
-						userConsoleLogic.userRequired (),
-						stringFormat (
-							"object_search_%s_fields",
-							sessionKey))),
-				() -> instantiateSearch (
-					taskLogger));
+		) {
 
-		updateResultSet =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"objectSearchUpdateResultSet"));
+			cleanSearch =
+				instantiateSearch (
+					taskLogger);
 
-		ImmutableMap.Builder <String, Object> formHintsBuilder =
-			ImmutableMap.builder ();
+			currentSearch =
+				optionalOrElse (
+					genericCastUnchecked (
+						userSessionLogic.userDataObject (
+							taskLogger,
+							userConsoleLogic.userRequired (),
+							stringFormat (
+								"object_search_%s_fields",
+								sessionKey))),
+					() -> instantiateSearch (
+						taskLogger));
 
-		if (consoleHelper.parentExists ()) {
+			updateResultSet =
+				optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"objectSearchUpdateResultSet"));
 
-			ConsoleHelper <?> parentHelper =
-				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
+			ImmutableMap.Builder <String, Object> formHintsBuilder =
+				ImmutableMap.builder ();
 
-			Optional <Long> parentIdOptional =
-				requestContext.stuffInteger (
-					parentHelper.idKey ());
+			if (consoleHelper.parentExists ()) {
 
-			if (
-				optionalIsPresent (
-					parentIdOptional)
-			) {
+				ConsoleHelper <?> parentHelper =
+					objectManager.findConsoleHelperRequired (
+						consoleHelper.parentClass ());
 
-				Record <?> parent =
-					parentHelper.findRequired (
-						optionalGetRequired (
-							parentIdOptional));
+				Optional <Long> parentIdOptional =
+					requestContext.stuffInteger (
+						parentHelper.idKey ());
 
-				formHintsBuilder.put (
-					consoleHelper.parentFieldName (),
-					parent);
+				if (
+					optionalIsPresent (
+						parentIdOptional)
+				) {
+
+					Record <?> parent =
+						parentHelper.findRequired (
+							optionalGetRequired (
+								parentIdOptional));
+
+					formHintsBuilder.put (
+						consoleHelper.parentFieldName (),
+						parent);
+
+				}
 
 			}
 
-		}
+			formHints =
+				formHintsBuilder.build ();
 
-		formHints =
-			formHintsBuilder.build ();
+		}
 
 	}
 
@@ -193,21 +199,27 @@ class ObjectSearchPart <
 	SearchType instantiateSearch (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"instantiateSearch");
+		try (
 
-		SearchType search =
-			classInstantiate (
-				searchClass);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"instantiateSearch");
 
-		formFieldLogic.setDefaults (
-			taskLogger,
-			fields,
-			search);
+		) {
 
-		return search;
+			SearchType search =
+				classInstantiate (
+					searchClass);
+
+			formFieldLogic.setDefaults (
+				taskLogger,
+				fields,
+				search);
+
+			return search;
+
+		}
 
 	}
 
@@ -216,77 +228,83 @@ class ObjectSearchPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		// form open
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/" + fileName));
+		) {
 
-		// search fields
+			// form open
 
-		htmlTableOpenDetails ();
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/" + fileName));
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			fields,
-			updateResultSet,
-			currentSearch,
-			formHints,
-			FormType.search,
-			"search");
+			// search fields
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
 
-		// form controls
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				fields,
+				updateResultSet,
+				currentSearch,
+				formHints,
+				FormType.search,
+				"search");
 
-		htmlParagraphOpen ();
+			htmlTableClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"search\"",
-			">");
+			// form controls
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"button\"",
-			" value=\"reset form\"",
-			" onclick=\"resetSearchForm (); return false;\"",
-			">");
+			htmlParagraphOpen ();
 
-		htmlParagraphClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"search\"",
+				">");
 
-		// form close
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" value=\"reset form\"",
+				" onclick=\"resetSearchForm (); return false;\"",
+				">");
 
-		htmlFormClose ();
+			htmlParagraphClose ();
 
-		// form field scripts
+			// form close
 
-		htmlScriptBlockOpen ();
+			htmlFormClose ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function resetSearchForm () {");
+			// form field scripts
 
-		formFieldLogic.outputFormReset (
-			taskLogger,
-			formatWriter,
-			fields,
-			FormType.search,
-			cleanSearch,
-			formHints,
-			"search");
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function resetSearchForm () {");
 
-		htmlScriptBlockClose ();
+			formFieldLogic.outputFormReset (
+				taskLogger,
+				formatWriter,
+				fields,
+				FormType.search,
+				cleanSearch,
+				formHints,
+				"search");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			htmlScriptBlockClose ();
+
+		}
 
 	}
 

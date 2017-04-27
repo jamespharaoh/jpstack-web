@@ -69,120 +69,126 @@ class UserPrivsSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		Map <Long, PrivStuff> privStuffsByPrivId =
-			new HashMap<> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		UserRec user =
-			userHelper.findFromContextRequired ();
-
-		// load up some info about the acting user
-
-		for (
-			UserPrivRec userPriv
-				: user.getUserPrivs ()
 		) {
 
-			// check we can see this priv
+			Map <Long, PrivStuff> privStuffsByPrivId =
+				new HashMap<> ();
 
-			if (
-				! privChecker.canGrant (
-					taskLogger,
-					userPriv.getPriv ().getId ())
+			UserRec user =
+				userHelper.findFromContextRequired ();
+
+			// load up some info about the acting user
+
+			for (
+				UserPrivRec userPriv
+					: user.getUserPrivs ()
 			) {
-				continue;
-			}
-
-			PrivRec priv =
-				userPriv.getPriv ();
-
-			// create PrivStuff
-
-			PrivStuff privStuff =
-				new PrivStuff ();
-
-			Record <?> parent =
-				objectManager.getParentRequired (
-					priv);
-
-			privStuff.path =
-				objectManager.objectPath (
-					parent,
-					userConsoleLogic.sliceRequired ());
-
-			privStuff.privCode =
-				priv.getCode ();
-
-			privStuff.userPriv =
-				userPriv;
-
-			privStuffsByPrivId.put (
-				priv.getId (),
-				privStuff);
-
-		}
-
-		for (GroupRec group
-				: user.getGroups ()) {
-
-			for (PrivRec priv
-					: group.getPrivs ()) {
 
 				// check we can see this priv
 
 				if (
 					! privChecker.canGrant (
 						taskLogger,
-						priv.getId ())
+						userPriv.getPriv ().getId ())
 				) {
 					continue;
 				}
 
-				// find or create the priv stuff
+				PrivRec priv =
+					userPriv.getPriv ();
+
+				// create PrivStuff
 
 				PrivStuff privStuff =
-					privStuffsByPrivId.get (
-						priv.getId ());
+					new PrivStuff ();
 
-				if (privStuff == null) {
+				Record <?> parent =
+					objectManager.getParentRequired (
+						priv);
 
-					privStuff =
-						new PrivStuff ();
+				privStuff.path =
+					objectManager.objectPath (
+						parent,
+						userConsoleLogic.sliceRequired ());
 
-					Record <?> parent =
-						objectManager.getParentRequired (
-							priv);
+				privStuff.privCode =
+					priv.getCode ();
 
-					privStuff.path =
-						objectManager.objectPath (
-							parent,
-							userConsoleLogic.sliceRequired ());
+				privStuff.userPriv =
+					userPriv;
 
-					privStuff.privCode =
-						priv.getCode ();
-
-					privStuffsByPrivId.put (
-						priv.getId (),
-						privStuff);
-
-				}
-
-				// and add this group to it
-
-				privStuff.groups.add (
-					group.getCode ());
+				privStuffsByPrivId.put (
+					priv.getId (),
+					privStuff);
 
 			}
 
-		}
+			for (GroupRec group
+					: user.getGroups ()) {
 
-		privStuffs =
-			new TreeSet<PrivStuff> (
-				privStuffsByPrivId.values ());
+				for (PrivRec priv
+						: group.getPrivs ()) {
+
+					// check we can see this priv
+
+					if (
+						! privChecker.canGrant (
+							taskLogger,
+							priv.getId ())
+					) {
+						continue;
+					}
+
+					// find or create the priv stuff
+
+					PrivStuff privStuff =
+						privStuffsByPrivId.get (
+							priv.getId ());
+
+					if (privStuff == null) {
+
+						privStuff =
+							new PrivStuff ();
+
+						Record <?> parent =
+							objectManager.getParentRequired (
+								priv);
+
+						privStuff.path =
+							objectManager.objectPath (
+								parent,
+								userConsoleLogic.sliceRequired ());
+
+						privStuff.privCode =
+							priv.getCode ();
+
+						privStuffsByPrivId.put (
+							priv.getId (),
+							privStuff);
+
+					}
+
+					// and add this group to it
+
+					privStuff.groups.add (
+						group.getCode ());
+
+				}
+
+			}
+
+			privStuffs =
+				new TreeSet<PrivStuff> (
+					privStuffsByPrivId.values ());
+
+		}
 
 	}
 

@@ -12,7 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -85,7 +85,7 @@ class CoreSystemRestartAction
 
 		try (
 
-			Transaction transaction =
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"goReal ()",
@@ -156,171 +156,189 @@ class CoreSystemRestartAction
 	private
 	void restartApi (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull String apiDeploymentCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"restartApi");
+		try (
 
-		ApiDeploymentRec apiDeployment =
-			apiDeploymentHelper.findByCodeRequired (
-				GlobalId.root,
-				apiDeploymentCode);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"restartApi");
 
-		if (
-			! userPrivChecker.canRecursive (
-				taskLogger,
-				apiDeployment,
-				"restart")
 		) {
 
-			requestContext.addError (
-				"Permission denied");
+			ApiDeploymentRec apiDeployment =
+				apiDeploymentHelper.findByCodeRequired (
+					GlobalId.root,
+					apiDeploymentCode);
 
-			return;
+			if (
+				! userPrivChecker.canRecursive (
+					taskLogger,
+					apiDeployment,
+					"restart")
+			) {
+
+				requestContext.addError (
+					"Permission denied");
+
+				return;
+
+			}
+
+			if (apiDeployment.getRestart ()) {
+
+				requestContext.addWarning (
+					"Already restarting");
+
+				return;
+
+			}
+
+			apiDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"api_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				apiDeployment);
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Restart triggered");
 
 		}
-
-		if (apiDeployment.getRestart ()) {
-
-			requestContext.addWarning (
-				"Already restarting");
-
-			return;
-
-		}
-
-		apiDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"api_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			apiDeployment);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Restart triggered");
 
 	}
 
 	private
 	void restartConsole (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull String consoleDeploymentCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"restartConsole");
+		try (
 
-		ConsoleDeploymentRec consoleDeployment =
-			consoleDeploymentHelper.findByCodeRequired (
-				GlobalId.root,
-				consoleDeploymentCode);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"restartConsole");
 
-		if (
-			! userPrivChecker.canRecursive (
-				taskLogger,
-				consoleDeployment,
-				"restart")
 		) {
 
-			requestContext.addError (
-				"Permission denied");
+			ConsoleDeploymentRec consoleDeployment =
+				consoleDeploymentHelper.findByCodeRequired (
+					GlobalId.root,
+					consoleDeploymentCode);
 
-			return;
+			if (
+				! userPrivChecker.canRecursive (
+					taskLogger,
+					consoleDeployment,
+					"restart")
+			) {
+
+				requestContext.addError (
+					"Permission denied");
+
+				return;
+
+			}
+
+			if (consoleDeployment.getRestart ()) {
+
+				requestContext.addWarning (
+					"Already restarting");
+
+				return;
+
+			}
+
+			consoleDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"console_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				consoleDeployment);
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Restart triggered");
 
 		}
-
-		if (consoleDeployment.getRestart ()) {
-
-			requestContext.addWarning (
-				"Already restarting");
-
-			return;
-
-		}
-
-		consoleDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"console_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			consoleDeployment);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Restart triggered");
 
 	}
 
 	private
 	void restartDaemon (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull String daemonDeploymentCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"restartDaemon");
+		try (
 
-		DaemonDeploymentRec daemonDeployment =
-			daemonDeploymentHelper.findByCodeRequired (
-				GlobalId.root,
-				daemonDeploymentCode);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"restartDaemon");
 
-		if (
-			! userPrivChecker.canRecursive (
-				taskLogger,
-				daemonDeployment,
-				"restart")
 		) {
 
-			requestContext.addError (
-				"Permission denied");
+			DaemonDeploymentRec daemonDeployment =
+				daemonDeploymentHelper.findByCodeRequired (
+					GlobalId.root,
+					daemonDeploymentCode);
 
-			return;
+			if (
+				! userPrivChecker.canRecursive (
+					taskLogger,
+					daemonDeployment,
+					"restart")
+			) {
+
+				requestContext.addError (
+					"Permission denied");
+
+				return;
+
+			}
+
+			if (daemonDeployment.getRestart ()) {
+
+				requestContext.addWarning (
+					"Already restarting");
+
+				return;
+
+			}
+
+			daemonDeployment
+
+				.setRestart (
+					true);
+
+			eventLogic.createEvent (
+				taskLogger,
+				"daemon_deployment_restarted",
+				userConsoleLogic.userRequired (),
+				daemonDeployment);
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Restart triggered");
 
 		}
-
-		if (daemonDeployment.getRestart ()) {
-
-			requestContext.addWarning (
-				"Already restarting");
-
-			return;
-
-		}
-
-		daemonDeployment
-
-			.setRestart (
-				true);
-
-		eventLogic.createEvent (
-			taskLogger,
-			"daemon_deployment_restarted",
-			userConsoleLogic.userRequired (),
-			daemonDeployment);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Restart triggered");
 
 	}
 

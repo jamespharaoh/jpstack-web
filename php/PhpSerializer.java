@@ -1,9 +1,9 @@
 package wbs.platform.php;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.stringToBytes;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -29,21 +29,23 @@ class PhpSerializer {
 
 	private
 	void serializeByteArray (
-			OutputStream out,
-			byte[] string)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull byte[] string) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"s:%d:\"",
 					string.length),
 				"iso-8859-1"));
 
-		out.write (
+		writeBytes (
+			out,
 			string);
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				"\";",
 				"iso-8859-1"));
@@ -52,11 +54,11 @@ class PhpSerializer {
 
 	private
 	void serializeBoolean (
-			OutputStream out,
-			Boolean value)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Boolean value) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"b:%d;",
@@ -69,11 +71,11 @@ class PhpSerializer {
 
 	private
 	void serializeInteger (
-			OutputStream out,
-			Integer value)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Integer value) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"i:%d;",
@@ -84,11 +86,11 @@ class PhpSerializer {
 
 	private
 	void serializeLong (
-			OutputStream out,
-			Long value)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Long value) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"i:%d;",
@@ -99,9 +101,8 @@ class PhpSerializer {
 
 	private
 	void serializeString (
-			OutputStream out,
-			String string)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull String string) {
 
 		serialize (
 			out,
@@ -113,11 +114,11 @@ class PhpSerializer {
 
 	private
 	void serializeDouble (
-			OutputStream out,
-			Double value)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Double value) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"d:%s;",
@@ -128,11 +129,11 @@ class PhpSerializer {
 
 	private
 	void serializeFloat (
-			OutputStream out,
-			Float value)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Float value) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"d:%s;",
@@ -143,19 +144,21 @@ class PhpSerializer {
 
 	private
 	void serializeMap (
-			OutputStream out,
-			Map<?,?> map)
-		throws IOException {
+			@NonNull OutputStream out,
+			@NonNull Map <?, ?> map) {
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				String.format (
 					"a:%d:{",
 					map.size ()),
 				"iso-8859-1"));
 
-		for (Map.Entry<?,?> entry
-				: map.entrySet ()) {
+		for (
+			Map.Entry<?,?> entry
+				: map.entrySet ()
+		) {
 
 			serialize (
 				out,
@@ -168,41 +171,94 @@ class PhpSerializer {
 
 		}
 
-		out.write (
+		writeBytes (
+			out,
 			stringToBytes (
 				"}",
 				"iso-8859-1"));
 
 	}
 
-	private void serializeCollection(OutputStream out, Collection<?> collection)
-			throws IOException {
-		out.write(String.format("a:%d:{", collection.size()).getBytes(
-				"iso-8859-1"));
-		int i = 0;
-		for (Object obj : collection) {
-			serialize(out, i++);
-			serialize(out, obj);
+	private
+	void serializeCollection (
+			@NonNull OutputStream out,
+			@NonNull Collection <?> collection) {
+
+		writeBytes (
+			out,
+				stringToBytes (
+					String.format (
+						"a:%d:{",
+						collection.size ()),
+					"iso-8859-1"));
+
+		int index = 0;
+
+		for (
+			Object item
+				: collection
+		) {
+
+			serialize (
+				out,
+				index ++);
+
+			serialize (
+				out,
+				item);
+
 		}
-		out.write("}".getBytes("iso-8859-1"));
+
+		writeBytes (
+			out,
+			stringToBytes (
+				"}",
+				"iso-8859-1"));
+
 	}
 
-	private void serializeArray(OutputStream out, Object[] array)
-			throws IOException {
-		out.write(String.format("a:%d:{", array.length).getBytes("iso-8859-1"));
+	private
+	void serializeArray (
+			OutputStream out,
+			Object[] array) {
+
+		writeBytes (
+			out,
+			stringToBytes (
+				String.format (
+					"a:%d:{",
+					array.length),
+				"iso-8859-1"));
+
 		int i = 0;
-		for (Object obj : array) {
-			serialize(out, i++);
-			serialize(out, obj);
+
+		for (
+			Object obj
+				: array
+		) {
+
+			serialize (
+				out,
+				i ++);
+
+			serialize (
+				out,
+				obj);
+
 		}
-		out.write("}".getBytes("iso-8859-1"));
+
+		writeBytes (
+			out,
+			stringToBytes (
+				"}",
+				"iso-8859-1"));
+
 	}
 
 	public
 	void serialize (
 			@NonNull OutputStream out,
-			Object originalObject)
-		throws IOException {
+			Object originalObject) {
 
 		Object object =
 			ifThenElse (
@@ -212,7 +268,8 @@ class PhpSerializer {
 
 		if (object == null) {
 
-			out.write (
+			writeBytes (
+				out,
 				stringToBytes (
 					"N;",
 					"iso-8859-1"));
@@ -296,8 +353,7 @@ class PhpSerializer {
 	void serialize (
 			OutputStream out,
 			Object object,
-			String charsetName)
-		throws IOException {
+			String charsetName) {
 
 		PhpSerializer phpSerializer =
 			new PhpSerializer (

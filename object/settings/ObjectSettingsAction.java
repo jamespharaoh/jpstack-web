@@ -30,7 +30,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -118,34 +118,34 @@ class ObjectSettingsAction <
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// check access
-
-		if (! requestContext.canContext (editPrivKey)) {
-
-			requestContext.addError (
-				"Access denied");
-
-			return accessDeniedResponder
-				.get ();
-
-		}
-
-		// begin transaction
-
 		try (
 
-			Transaction transaction =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goReal");
+
+			OwnedTransaction transaction =
 				database.beginReadWrite (
 					taskLogger,
 					"ObjectSettingsAction.goReal ()",
 					this);
 
 		) {
+
+			// check access
+
+			if (! requestContext.canContext (editPrivKey)) {
+
+				requestContext.addError (
+					"Access denied");
+
+				return accessDeniedResponder
+					.get ();
+
+			}
+
+			// lookup objects
 
 			object =
 				objectLookup.lookupObject (

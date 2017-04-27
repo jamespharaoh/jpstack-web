@@ -106,29 +106,35 @@ class ObjectBrowsePageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextTab (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildContextFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTab (
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -226,90 +232,102 @@ class ObjectBrowsePageBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			container.consoleHelper ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		typeCode =
-			spec.typeCode ();
+		) {
 
-		formFieldSet =
-			ifNotNullThenElse (
-				spec.fieldsName (),
-				() -> consoleModule.formFieldSetRequired (
+			consoleHelper =
+				container.consoleHelper ();
+
+			typeCode =
+				spec.typeCode ();
+
+			formFieldSet =
+				ifNotNullThenElse (
 					spec.fieldsName (),
-					consoleHelper.objectClass ()),
-				() -> defaultFields (
-					taskLogger));
+					() -> consoleModule.formFieldSetRequired (
+						spec.fieldsName (),
+						consoleHelper.objectClass ()),
+					() -> defaultFields (
+						taskLogger));
+
+		}
 
 	}
 
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defaultFields");
+		try (
 
-		// create spec
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultFields");
 
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
-
-		if (
-			consoleHelper.parentTypeIsFixed ()
-			&& consoleHelper.parentClass () == SliceRec.class
 		) {
 
-			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ()
+			// create spec
 
-				.delegate (
-					"slice")
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
-				.label (
-					"Slice")
+			if (
+				consoleHelper.parentTypeIsFixed ()
+				&& consoleHelper.parentClass () == SliceRec.class
+			) {
 
-			);
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ()
+
+					.delegate (
+						"slice")
+
+					.label (
+						"Slice")
+
+				);
+
+			}
+
+			if (consoleHelper.nameIsCode ()) {
+
+				formFieldSpecs.add (
+					new CodeFormFieldSpec ());
+
+			} else if (consoleHelper.nameExists ()) {
+
+				formFieldSpecs.add (
+					new NameFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.descriptionExists ()) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ());
+
+			}
+
+			// build
+
+			String fieldSetName =
+				stringFormat (
+					"%s.browse",
+					consoleHelper.objectName ());
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				consoleHelper,
+				fieldSetName,
+				formFieldSpecs);
 
 		}
-
-		if (consoleHelper.nameIsCode ()) {
-
-			formFieldSpecs.add (
-				new CodeFormFieldSpec ());
-
-		} else if (consoleHelper.nameExists ()) {
-
-			formFieldSpecs.add (
-				new NameFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.descriptionExists ()) {
-
-			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ());
-
-		}
-
-		// build
-
-		String fieldSetName =
-			stringFormat (
-				"%s.browse",
-				consoleHelper.objectName ());
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			consoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

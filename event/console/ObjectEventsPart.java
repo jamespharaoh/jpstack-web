@@ -11,12 +11,14 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventRec;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -89,15 +91,21 @@ class ObjectEventsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		eventConsoleLogic.writeEventsTable (
-			taskLogger,
-			formatWriter,
-			events);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
+
+		) {
+
+			eventConsoleLogic.writeEventsTable (
+				taskLogger,
+				formatWriter,
+				events);
+
+		}
 
 	}
 

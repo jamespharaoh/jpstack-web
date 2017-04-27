@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -55,120 +55,126 @@ class UserFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		PrivRec rootManagePriv =
-			privHelper.findByCodeRequired (
-				GlobalId.root,
-				"manage");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		PrivRec rootDebugPriv =
-			privHelper.findByCodeRequired (
-				GlobalId.root,
-				"debug");
-
-		SliceRec testSlice =
-			sliceHelper.findByCodeRequired (
-				GlobalId.root,
-				"test");
-
-		for (
-			int index = 0;
-			index < 10;
-			index ++
 		) {
 
-			UserRec testUser =
-				userHelper.insert (
+			PrivRec rootManagePriv =
+				privHelper.findByCodeRequired (
+					GlobalId.root,
+					"manage");
+
+			PrivRec rootDebugPriv =
+				privHelper.findByCodeRequired (
+					GlobalId.root,
+					"debug");
+
+			SliceRec testSlice =
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test");
+
+			for (
+				int index = 0;
+				index < 10;
+				index ++
+			) {
+
+				UserRec testUser =
+					userHelper.insert (
+						taskLogger,
+						userHelper.createInstance ()
+
+					.setUsername (
+						"test" + index)
+
+					.setPassword (
+						"qUqP5cyxm6YcTAhz05Hph5gvu9M=")
+
+					.setFullname (
+						"Test " + index)
+
+					.setDetails (
+						"Test user " + index)
+
+					.setActive (
+						true)
+
+					.setSlice (
+						testSlice)
+
+				);
+
+				userPrivHelper.insert (
 					taskLogger,
-					userHelper.createInstance ()
+					userPrivHelper.createInstance ()
 
-				.setUsername (
-					"test" + index)
+					.setUser (
+						testUser)
 
-				.setPassword (
-					"qUqP5cyxm6YcTAhz05Hph5gvu9M=")
+					.setPriv (
+						rootManagePriv)
 
-				.setFullname (
-					"Test " + index)
+					.setCan (
+						true)
 
-				.setDetails (
-					"Test user " + index)
+				);
 
-				.setActive (
-					true)
+				userPrivHelper.insert (
+					taskLogger,
+					userPrivHelper.createInstance ()
 
-				.setSlice (
-					testSlice)
+					.setUser (
+						testUser)
 
-			);
+					.setPriv (
+						rootDebugPriv)
 
-			userPrivHelper.insert (
+					.setCan (
+						true)
+
+				);
+
+			}
+
+			menuItemHelper.insert (
 				taskLogger,
-				userPrivHelper.createInstance ()
+				menuItemHelper.createInstance ()
 
-				.setUser (
-					testUser)
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"system"))
 
-				.setPriv (
-					rootManagePriv)
+				.setCode (
+					"user")
 
-				.setCan (
-					true)
+				.setName (
+					"User")
 
-			);
+				.setDescription (
+					"")
 
-			userPrivHelper.insert (
-				taskLogger,
-				userPrivHelper.createInstance ()
+				.setLabel (
+					"Users")
 
-				.setUser (
-					testUser)
+				.setTargetPath (
+					"/users")
 
-				.setPriv (
-					rootDebugPriv)
-
-				.setCan (
-					true)
+				.setTargetFrame (
+					"main")
 
 			);
 
 		}
-
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
-
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
-
-			.setCode (
-				"user")
-
-			.setName (
-				"User")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Users")
-
-			.setTargetPath (
-				"/users")
-
-			.setTargetFrame (
-				"main")
-
-		);
 
 	}
 

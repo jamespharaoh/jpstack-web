@@ -118,45 +118,51 @@ class ObjectCreatePart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		prepareParents ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		// if a field provider was provided
-
-		if (formFieldsProvider != null) {
-
-			prepareFieldSet (
-				taskLogger);
-
-		}
-
-		// get update results
-
-		updateResultSet =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"objectCreateUpdateResultSet"));
-
-		// create dummy instance
-
-		object =
-			consoleHelper.createInstance ();
-
-		// set parent
-
-		if (
-			parent != null
-			&& consoleHelper.canGetParent ()
 		) {
 
-			consoleHelper.setParent (
-				object,
-				parent);
+			prepareParents ();
+
+			// if a field provider was provided
+
+			if (formFieldsProvider != null) {
+
+				prepareFieldSet (
+					taskLogger);
+
+			}
+
+			// get update results
+
+			updateResultSet =
+				optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"objectCreateUpdateResultSet"));
+
+			// create dummy instance
+
+			object =
+				consoleHelper.createInstance ();
+
+			// set parent
+
+			if (
+				parent != null
+				&& consoleHelper.canGetParent ()
+			) {
+
+				consoleHelper.setParent (
+					object,
+					parent);
+
+			}
 
 		}
 
@@ -285,31 +291,37 @@ class ObjectCreatePart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlParagraphWriteFormat (
-			"Please enter the details for the new %h",
-			consoleHelper.shortName ());
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		formFieldLogic.outputFormTable (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFieldSet,
-			updateResultSet,
-			object,
-			hints,
-			"post",
-			requestContext.resolveLocalUrl (
-				"/" + localFile),
-			stringFormat (
-				"create %h",
-				consoleHelper.shortName ()),
-			FormType.create,
-			"create");
+		) {
+
+			htmlParagraphWriteFormat (
+				"Please enter the details for the new %h",
+				consoleHelper.shortName ());
+
+			formFieldLogic.outputFormTable (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFieldSet,
+				updateResultSet,
+				object,
+				hints,
+				"post",
+				requestContext.resolveLocalUrl (
+					"/" + localFile),
+				stringFormat (
+					"create %h",
+					consoleHelper.shortName ()),
+				FormType.create,
+				"create");
+
+		}
 
 	}
 

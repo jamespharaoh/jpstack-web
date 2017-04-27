@@ -66,66 +66,71 @@ class CoreSystemSwitchPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlHeadingTwoWrite (
-			"Switch deployment mode");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlParagraphWriteFormat (
-			"Use this control to select which version of the console you are ",
-			"using. This allows you to switch to a newer or older version of ",
-			"the console, in case of problems, and also to test new versions ",
-			"which are not yet ready to be released.");
-
-		htmlParagraphWriteFormat (
-			"The default should be \"current\", and this is what you should ",
-			"select if you are not sure, unless you have been told otherwise.");
-
-		htmlTableOpenDetails ();
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Name",
-			"Description");
-
-		for (
-			Map.Entry <String, String> modeEntry
-				: modes.entrySet ()
 		) {
 
-			String modeName =
-				modeEntry.getKey ();
+			htmlHeadingTwoWrite (
+				"Switch deployment mode");
 
-			String modeDescription =
-				modeEntry.getValue ();
+			htmlParagraphWriteFormat (
+				"Use this control to select which version of the console you are ",
+				"using. This allows you to switch to a newer or older version of ",
+				"the console, in case of problems, and also to test new versions ",
+				"which are not yet ready to be released.");
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"core-system-switch-row"));
+			htmlParagraphWriteFormat (
+				"The default should be \"current\", and this is what you should ",
+				"select if you are not sure, unless you have been told otherwise.");
 
-			htmlTableCellWriteHtml (
-				() -> htmlRadio (
-					"mode",
-					modeName,
-					false),
-				htmlClassAttribute (
-					"core-system-switch-mode"));
+			htmlTableOpenDetails ();
 
-			htmlTableCellWrite (
-				modeName);
+			htmlTableHeaderRowWrite (
+				"",
+				"Name",
+				"Description");
 
-			htmlTableCellWrite (
-				modeDescription);
+			for (
+				Map.Entry <String, String> modeEntry
+					: modes.entrySet ()
+			) {
 
-			htmlTableRowClose ();
+				String modeName =
+					modeEntry.getKey ();
+
+				String modeDescription =
+					modeEntry.getValue ();
+
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"core-system-switch-row"));
+
+				htmlTableCellWriteHtml (
+					() -> htmlRadio (
+						"mode",
+						modeName,
+						false),
+					htmlClassAttribute (
+						"core-system-switch-mode"));
+
+				htmlTableCellWrite (
+					modeName);
+
+				htmlTableCellWrite (
+					modeDescription);
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

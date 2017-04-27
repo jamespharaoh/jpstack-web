@@ -131,29 +131,35 @@ class ObjectCreatePageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
+		try (
 
-		setDefaults (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -292,173 +298,185 @@ class ObjectCreatePageBuilder <
 	void setDefaults (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setDefaults");
+		try (
 
-		consoleHelper =
-			container.consoleHelper ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		name =
-			ifNull (
-				spec.name (),
-				"create");
+		) {
 
-		typeCode =
-			spec.typeCode ();
+			consoleHelper =
+				container.consoleHelper ();
 
-		tabName =
-			ifNull (
-				spec.tabName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			name =
+				ifNull (
+					spec.name (),
+					"create");
 
-		tabLabel =
-			capitalise (
-				name);
+			typeCode =
+				spec.typeCode ();
 
-		localFile =
-			ifNull (
-				spec.localFile (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%s%sResponder",
-					container.newBeanNamePrefix (),
-					capitalise (
-						name)));
+			tabLabel =
+				capitalise (
+					name);
 
-		targetContextTypeName =
-			ifNull (
-				spec.targetContextTypeName (),
-				consoleHelper.objectName () + ":combo");
+			localFile =
+				ifNull (
+					spec.localFile (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		targetResponderName =
-			ifNull (
-				spec.targetResponderName (),
-				stringFormat (
-					"%sSettingsResponder",
-					consoleHelper.objectName ()));
+			responderName =
+				ifNull (
+					spec.responderName (),
+					stringFormat (
+						"%s%sResponder",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)));
 
-		createPrivDelegate =
-			spec.createPrivDelegate ();
+			targetContextTypeName =
+				ifNull (
+					spec.targetContextTypeName (),
+					consoleHelper.objectName () + ":combo");
 
-		createPrivCode =
-			ifNull (
-				spec.createPrivCode (),
-				stringFormat (
-					"%s_create",
-					consoleHelper.objectTypeCode ()));
+			targetResponderName =
+				ifNull (
+					spec.targetResponderName (),
+					stringFormat (
+						"%sSettingsResponder",
+						consoleHelper.objectName ()));
 
-		formFieldSet =
-			ifNotNullThenElse (
-				spec.fieldsName (),
-				() -> consoleModule.formFieldSetRequired (
+			createPrivDelegate =
+				spec.createPrivDelegate ();
+
+			createPrivCode =
+				ifNull (
+					spec.createPrivCode (),
+					stringFormat (
+						"%s_create",
+						consoleHelper.objectTypeCode ()));
+
+			formFieldSet =
+				ifNotNullThenElse (
 					spec.fieldsName (),
-					consoleHelper.objectClass ()),
-				() -> defaultFields (
-					taskLogger));
+					() -> consoleModule.formFieldSetRequired (
+						spec.fieldsName (),
+						consoleHelper.objectClass ()),
+					() -> defaultFields (
+						taskLogger));
 
-		// if a provider name is provided
+			// if a provider name is provided
 
-		if (spec.fieldsProviderName () != null) {
+			if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
-				genericCastUnchecked (
-					componentManager.getComponentRequired (
-						taskLogger,
-						spec.fieldsProviderName (),
-						FieldsProvider.class));
+				fieldsProvider =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							spec.fieldsProviderName (),
+							FieldsProvider.class));
+
+			}
+
+			else {
+
+				fieldsProvider =
+					null;
+
+			}
+
+			createTimeFieldName =
+				spec.createTimeFieldName ();
+
+			createUserFieldName =
+				spec.createUserFieldName ();
+
+			privKey =
+				spec.privKey ();
 
 		}
-
-		else {
-
-			fieldsProvider =
-				null;
-
-		}
-
-		createTimeFieldName =
-			spec.createTimeFieldName ();
-
-		createUserFieldName =
-			spec.createUserFieldName ();
-
-		privKey =
-			spec.privKey ();
 
 	}
 
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"defaultFields");
+		try (
 
-		// parent
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultFields");
 
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
+		) {
 
-		if (consoleHelper.canGetParent ()) {
+			// parent
 
-			formFieldSpecs.add (
-				new ParentFormFieldSpec ()
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
-				.createPrivDelegate (
-					createPrivDelegate)
+			if (consoleHelper.canGetParent ()) {
 
-				.createPrivCode (
-					createPrivCode));
+				formFieldSpecs.add (
+					new ParentFormFieldSpec ()
+
+					.createPrivDelegate (
+						createPrivDelegate)
+
+					.createPrivCode (
+						createPrivCode));
+
+			}
+
+			if (consoleHelper.codeExists ()
+					&& ! consoleHelper.nameExists ()) {
+
+				formFieldSpecs.add (
+					new CodeFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.nameExists ()) {
+
+				formFieldSpecs.add (
+					new NameFormFieldSpec ());
+
+			}
+
+			if (consoleHelper.descriptionExists ()) {
+
+				formFieldSpecs.add (
+					new DescriptionFormFieldSpec ());
+
+			}
+
+			// build
+
+			String fieldSetName =
+				stringFormat (
+					"%s.create",
+					consoleHelper.objectName ());
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				consoleHelper,
+				fieldSetName,
+				formFieldSpecs);
 
 		}
-
-		if (consoleHelper.codeExists ()
-				&& ! consoleHelper.nameExists ()) {
-
-			formFieldSpecs.add (
-				new CodeFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.nameExists ()) {
-
-			formFieldSpecs.add (
-				new NameFormFieldSpec ());
-
-		}
-
-		if (consoleHelper.descriptionExists ()) {
-
-			formFieldSpecs.add (
-				new DescriptionFormFieldSpec ());
-
-		}
-
-		// build
-
-		String fieldSetName =
-			stringFormat (
-				"%s.create",
-				consoleHelper.objectName ());
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			consoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 

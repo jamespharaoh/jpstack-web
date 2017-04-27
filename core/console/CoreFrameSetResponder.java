@@ -3,18 +3,20 @@ package wbs.platform.core.console;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
 
-import java.io.IOException;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsolePrintResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("coreFrameSetResponder")
@@ -24,14 +26,17 @@ class CoreFrameSetResponder
 
 	// singleton dependencies
 
-	@SingletonDependency
-	WbsConfig wbsConfig;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -48,23 +53,35 @@ class CoreFrameSetResponder
 
 	@Override
 	public
-	void setHtmlHeaders ()
-		throws IOException {
+	void setHtmlHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.setHtmlHeaders ();
+		try (
 
-		requestContext.setHeader (
-			"Content-Type",
-			"text/html; charset=utf-8");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setHtmlHeaders");
 
-		requestContext.setHeader (
-			"Cache-Control",
-			"no-cache");
+		) {
 
-		requestContext.setHeader (
-			"Expiry",
-			timeFormatter.httpTimestampString (
-				Instant.now ()));
+			super.setHtmlHeaders (
+				taskLogger);
+
+			requestContext.setHeader (
+				"Content-Type",
+				"text/html; charset=utf-8");
+
+			requestContext.setHeader (
+				"Cache-Control",
+				"no-cache");
+
+			requestContext.setHeader (
+				"Expiry",
+				timeFormatter.httpTimestampString (
+					Instant.now ()));
+
+		}
 
 	}
 

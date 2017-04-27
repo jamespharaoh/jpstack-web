@@ -51,8 +51,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -120,7 +120,7 @@ class QueueSubjectSorter {
 	UserPrivChecker loggedInUserPrivChecker;
 	UserPrivChecker effectiveUserPrivChecker;
 
-	Transaction transaction;
+	BorrowedTransaction transaction;
 
 	Set <SubjectInfo> subjectInfos =
 		new HashSet<> ();
@@ -289,89 +289,95 @@ class QueueSubjectSorter {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueSubjectRec subject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processSubject");
+		try (
 
-		// get queue info
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processSubject");
 
-		QueueInfo queueInfo =
-			queueInfos.computeIfAbsent (
-				subject.getQueue (),
-				queue ->
-					createQueueInfo (
-						taskLogger,
-						queue));
-
-		// check we can see this queue
-
-		if (
-			! queueInfo.canReplyImplicit
-			&& ! queueInfo.canReplyOverflowImplicit
-		) {
-			return;
-		}
-
-		// get subject info
-
-		SubjectInfo subjectInfo =
-			createSubjectInfo (
-				parentTaskLogger,
-				queueInfo,
-				subject);
-
-		subjectInfos.add (
-			subjectInfo);
-
-		queueInfo.subjectInfos.add (
-			subjectInfo);
-
-		// count stuff
-
-		countTotal (
-			queueInfo,
-			subjectInfo);
-
-		countWaiting (
-			queueInfo,
-			subjectInfo);
-
-		// claimed items are not available
-
-		if (
-			enumEqualSafe (
-				subjectInfo.state,
-				QueueItemState.claimed)
 		) {
 
-			countClaimed (
+			// get queue info
+
+			QueueInfo queueInfo =
+				queueInfos.computeIfAbsent (
+					subject.getQueue (),
+					queue ->
+						createQueueInfo (
+							taskLogger,
+							queue));
+
+			// check we can see this queue
+
+			if (
+				! queueInfo.canReplyImplicit
+				&& ! queueInfo.canReplyOverflowImplicit
+			) {
+				return;
+			}
+
+			// get subject info
+
+			SubjectInfo subjectInfo =
+				createSubjectInfo (
+					parentTaskLogger,
+					queueInfo,
+					subject);
+
+			subjectInfos.add (
+				subjectInfo);
+
+			queueInfo.subjectInfos.add (
+				subjectInfo);
+
+			// count stuff
+
+			countTotal (
 				queueInfo,
 				subjectInfo);
 
-			return;
-
-		}
-
-		// update queue
-
-		updateQueueInfo (
-			queueInfo,
-			subjectInfo);
-
-		// count hidden or available items
-
-		if (subjectInfo.available) {
-
-			countAvailable (
+			countWaiting (
 				queueInfo,
 				subjectInfo);
 
-		} else {
+			// claimed items are not available
 
-			countUnavailable (
+			if (
+				enumEqualSafe (
+					subjectInfo.state,
+					QueueItemState.claimed)
+			) {
+
+				countClaimed (
+					queueInfo,
+					subjectInfo);
+
+				return;
+
+			}
+
+			// update queue
+
+			updateQueueInfo (
 				queueInfo,
 				subjectInfo);
+
+			// count hidden or available items
+
+			if (subjectInfo.available) {
+
+				countAvailable (
+					queueInfo,
+					subjectInfo);
+
+			} else {
+
+				countUnavailable (
+					queueInfo,
+					subjectInfo);
+
+			}
 
 		}
 
@@ -383,174 +389,180 @@ class QueueSubjectSorter {
 			@NonNull QueueInfo queueInfo,
 			@NonNull QueueSubjectRec subject) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createSubjectInfo");
+		try (
 
-		// find next item
-
-		QueueItemRec item =
-			getNextItem (
-				subject);
-
-		// create subject info
-
-		SubjectInfo subjectInfo =
-			new SubjectInfo ();
-
-		subjectInfo.subject = subject;
-		subjectInfo.item = item;
-		subjectInfo.createdTime = item.getCreatedTime ();
-		subjectInfo.effectiveTime = item.getCreatedTime ();
-		subjectInfo.priority = item.getPriority ();
-		subjectInfo.state = item.getState ();
-
-		// check preferred user
-
-		subjectInfo.preferredUser =
-			ifNull (
-				subjectInfo.subject.getForcePreferredUser (),
-				subjectInfo.subject.getPreferredUser ());
-
-		subjectInfo.preferred =
-			isNotNull (
-				subjectInfo.preferredUser);
-
-		subjectInfo.preferredByUs =
-			optionalEqualAndPresentWithClass (
-				UserRec.class,
-				optionalFromNullable (
-					subjectInfo.preferredUser),
-				optionalFromNullable (
-					effectiveUser));
-
-		subjectInfo.preferredByOther =
-			optionalNotEqualAndPresentWithClass (
-				UserRec.class,
-				optionalFromNullable (
-					subjectInfo.preferredUser),
-				optionalFromNullable (
-					effectiveUser));
-
-		if (subjectInfo.preferred) {
-
-			UserPrivChecker preferredUserPrivChecker =
-				userPrivCheckerBuilderProvider.get ()
-
-				.userId (
-					subjectInfo.preferredUser.getId ())
-
-				.build (
-					taskLogger);
-
-			subjectInfo.preferredByOverflowOperator = (
-
-				preferredUserPrivChecker.canRecursive (
-					taskLogger,
-					queueInfo.queue,
-					"reply_overflow")
-
-				&& ! preferredUserPrivChecker.canSimple (
-					taskLogger,
-					queueInfo.queue,
-					"reply")
-
-			);
-
-			subjectInfo.preferredByOwnOperator =
-				! subjectInfo.preferredByOverflowOperator;
-
-		} else {
-
-			subjectInfo.preferredByOverflowOperator = false;
-			subjectInfo.preferredByOwnOperator = false;
-
-		}
-
-		// extend effective time due to preferred user
-
-		if (
-
-			subjectInfo.preferredByOther
-
-			&& (
-				queueInfo.isOverflowUser
-				|| subjectInfo.preferredByOwnOperator
-			)
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSubjectInfo");
 
 		) {
 
-			subjectInfo.actualPreferredUserDelay =
-				queueInfo.configuredPreferredUserDelay;
+			// find next item
 
-			subjectInfo.effectiveTime =
-				subjectInfo.effectiveTime.plus (
-					queueInfo.configuredPreferredUserDelay);
+			QueueItemRec item =
+				getNextItem (
+					subject);
 
-		}
+			// create subject info
 
-		// extend effective time due to overflow user
+			SubjectInfo subjectInfo =
+				new SubjectInfo ();
 
-		if (queueInfo.isOverflowUser) {
+			subjectInfo.subject = subject;
+			subjectInfo.item = item;
+			subjectInfo.createdTime = item.getCreatedTime ();
+			subjectInfo.effectiveTime = item.getCreatedTime ();
+			subjectInfo.priority = item.getPriority ();
+			subjectInfo.state = item.getState ();
 
-			if (queueInfo.ownOperatorsActive) {
+			// check preferred user
 
-				subjectInfo.overflowDelay =
-					Duration.standardSeconds (
-						ifNull (
-							queueInfo.slice.getQueueOverflowGraceTime (),
-							0l));
+			subjectInfo.preferredUser =
+				ifNull (
+					subjectInfo.subject.getForcePreferredUser (),
+					subjectInfo.subject.getPreferredUser ());
 
-				subjectInfo.effectiveTime =
-					subjectInfo.effectiveTime.plus (
-						subjectInfo.overflowDelay);
+			subjectInfo.preferred =
+				isNotNull (
+					subjectInfo.preferredUser);
+
+			subjectInfo.preferredByUs =
+				optionalEqualAndPresentWithClass (
+					UserRec.class,
+					optionalFromNullable (
+						subjectInfo.preferredUser),
+					optionalFromNullable (
+						effectiveUser));
+
+			subjectInfo.preferredByOther =
+				optionalNotEqualAndPresentWithClass (
+					UserRec.class,
+					optionalFromNullable (
+						subjectInfo.preferredUser),
+					optionalFromNullable (
+						effectiveUser));
+
+			if (subjectInfo.preferred) {
+
+				UserPrivChecker preferredUserPrivChecker =
+					userPrivCheckerBuilderProvider.get ()
+
+					.userId (
+						subjectInfo.preferredUser.getId ())
+
+					.build (
+						taskLogger);
+
+				subjectInfo.preferredByOverflowOperator = (
+
+					preferredUserPrivChecker.canRecursive (
+						taskLogger,
+						queueInfo.queue,
+						"reply_overflow")
+
+					&& ! preferredUserPrivChecker.canSimple (
+						taskLogger,
+						queueInfo.queue,
+						"reply")
+
+				);
+
+				subjectInfo.preferredByOwnOperator =
+					! subjectInfo.preferredByOverflowOperator;
 
 			} else {
 
-				subjectInfo.overflowDelay =
-					Duration.standardSeconds (
-						ifNull (
-							queueInfo.slice.getQueueOverflowInactivityTime (),
-							0l));
-
-				subjectInfo.effectiveTime =
-					subjectInfo.effectiveTime.plus (
-						subjectInfo.overflowDelay);
+				subjectInfo.preferredByOverflowOperator = false;
+				subjectInfo.preferredByOwnOperator = false;
 
 			}
 
+			// extend effective time due to preferred user
+
+			if (
+
+				subjectInfo.preferredByOther
+
+				&& (
+					queueInfo.isOverflowUser
+					|| subjectInfo.preferredByOwnOperator
+				)
+
+			) {
+
+				subjectInfo.actualPreferredUserDelay =
+					queueInfo.configuredPreferredUserDelay;
+
+				subjectInfo.effectiveTime =
+					subjectInfo.effectiveTime.plus (
+						queueInfo.configuredPreferredUserDelay);
+
+			}
+
+			// extend effective time due to overflow user
+
+			if (queueInfo.isOverflowUser) {
+
+				if (queueInfo.ownOperatorsActive) {
+
+					subjectInfo.overflowDelay =
+						Duration.standardSeconds (
+							ifNull (
+								queueInfo.slice.getQueueOverflowGraceTime (),
+								0l));
+
+					subjectInfo.effectiveTime =
+						subjectInfo.effectiveTime.plus (
+							subjectInfo.overflowDelay);
+
+				} else {
+
+					subjectInfo.overflowDelay =
+						Duration.standardSeconds (
+							ifNull (
+								queueInfo.slice.getQueueOverflowInactivityTime (),
+								0l));
+
+					subjectInfo.effectiveTime =
+						subjectInfo.effectiveTime.plus (
+							subjectInfo.overflowDelay);
+
+				}
+
+			}
+
+			// check claimed user
+
+			if (
+				enumEqualSafe (
+					subjectInfo.state (),
+					QueueItemState.claimed)
+			) {
+
+				subjectInfo.claimed = true;
+
+				subjectInfo.claimedByUser =
+					subjectInfo.item.getQueueItemClaim ().getUser ();
+
+				subjectInfo.available = false;
+
+			} else {
+
+				subjectInfo.claimed = false;
+
+				subjectInfo.available =
+					laterThan (
+						transaction.now (),
+						subjectInfo.effectiveTime);
+
+			}
+
+			// return
+
+			return subjectInfo;
+
 		}
-
-		// check claimed user
-
-		if (
-			enumEqualSafe (
-				subjectInfo.state (),
-				QueueItemState.claimed)
-		) {
-
-			subjectInfo.claimed = true;
-
-			subjectInfo.claimedByUser =
-				subjectInfo.item.getQueueItemClaim ().getUser ();
-
-			subjectInfo.available = false;
-
-		} else {
-
-			subjectInfo.claimed = false;
-
-			subjectInfo.available =
-				laterThan (
-					transaction.now (),
-					subjectInfo.effectiveTime);
-
-		}
-
-		// return
-
-		return subjectInfo;
 
 	}
 
@@ -559,63 +571,69 @@ class QueueSubjectSorter {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createQueueInfo");
+		try (
 
-		QueueInfo queueInfo =
-			new QueueInfo ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createQueueInfo");
 
-		queueInfo.queue =
-			queue;
+		) {
 
-		queueInfo.slice =
-			queue.getSlice ();
+			QueueInfo queueInfo =
+				new QueueInfo ();
 
-		queueInfo.configuredPreferredUserDelay =
-			queueManager.getPreferredUserDelay (
-				queue);
+			queueInfo.queue =
+				queue;
 
-		// check permissions
+			queueInfo.slice =
+				queue.getSlice ();
 
-		queueInfo.canReplyExplicit =
-			checkPrivExplicit (
-				taskLogger,
-				queue,
-				"reply");
+			queueInfo.configuredPreferredUserDelay =
+				queueManager.getPreferredUserDelay (
+					queue);
 
-		queueInfo.canReplyImplicit =
-			checkPrivImplicit (
-				taskLogger,
-				queue,
-				"reply");
+			// check permissions
 
-		queueInfo.canReplyOverflowExplicit =
-			checkPrivExplicit (
-				taskLogger,
-				queue,
-				"reply_overflow");
+			queueInfo.canReplyExplicit =
+				checkPrivExplicit (
+					taskLogger,
+					queue,
+					"reply");
 
-		queueInfo.canReplyOverflowImplicit =
-			checkPrivImplicit (
-				taskLogger,
-				queue,
-				"reply_overflow");
+			queueInfo.canReplyImplicit =
+				checkPrivImplicit (
+					taskLogger,
+					queue,
+					"reply");
 
-		// check special states
+			queueInfo.canReplyOverflowExplicit =
+				checkPrivExplicit (
+					taskLogger,
+					queue,
+					"reply_overflow");
 
-		queueInfo.isOverflowUser =
-			queueInfo.canReplyOverflowImplicit
-			&& ! queueInfo.canReplyExplicit;
+			queueInfo.canReplyOverflowImplicit =
+				checkPrivImplicit (
+					taskLogger,
+					queue,
+					"reply_overflow");
 
-		queueInfo.ownOperatorsActive =
-			queueLogic.sliceHasQueueActivity (
-				queueInfo.slice);
+			// check special states
 
-		// return
+			queueInfo.isOverflowUser =
+				queueInfo.canReplyOverflowImplicit
+				&& ! queueInfo.canReplyExplicit;
 
-		return queueInfo;
+			queueInfo.ownOperatorsActive =
+				queueLogic.sliceHasQueueActivity (
+					queueInfo.slice);
+
+			// return
+
+			return queueInfo;
+
+		}
 
 	}
 
@@ -625,33 +643,39 @@ class QueueSubjectSorter {
 			@NonNull Record <?> parent,
 			@NonNull String privCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkPrivExplicit");
+		try (
 
-		if (
-			! loggedInUserPrivChecker.canRecursive (
-				taskLogger,
-				parent,
-				"reply")
-		) {
-			return false;
-		}
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkPrivExplicit");
 
-		if (
-			isNull (
-				effectiveUser)
 		) {
 
-			return true;
+			if (
+				! loggedInUserPrivChecker.canRecursive (
+					taskLogger,
+					parent,
+					"reply")
+			) {
+				return false;
+			}
 
-		} else {
+			if (
+				isNull (
+					effectiveUser)
+			) {
 
-			return effectiveUserPrivChecker.canSimple (
-				taskLogger,
-				parent,
-				privCode);
+				return true;
+
+			} else {
+
+				return effectiveUserPrivChecker.canSimple (
+					taskLogger,
+					parent,
+					privCode);
+
+			}
 
 		}
 
@@ -663,33 +687,39 @@ class QueueSubjectSorter {
 			@NonNull Record <?> parent,
 			@NonNull String privCode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkPrivImplicit");
+		try (
 
-		if (
-			! loggedInUserPrivChecker.canRecursive (
-				taskLogger,
-				parent,
-				"reply")
-		) {
-			return false;
-		}
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkPrivImplicit");
 
-		if (
-			isNull (
-				effectiveUser)
 		) {
 
-			return true;
+			if (
+				! loggedInUserPrivChecker.canRecursive (
+					taskLogger,
+					parent,
+					"reply")
+			) {
+				return false;
+			}
 
-		} else {
+			if (
+				isNull (
+					effectiveUser)
+			) {
 
-			return effectiveUserPrivChecker.canRecursive (
-				taskLogger,
-				parent,
-				privCode);
+				return true;
+
+			} else {
+
+				return effectiveUserPrivChecker.canRecursive (
+					taskLogger,
+					parent,
+					privCode);
+
+			}
 
 		}
 
