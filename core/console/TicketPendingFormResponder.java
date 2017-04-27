@@ -107,46 +107,52 @@ class TicketPendingFormResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		super.prepare (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		ticket =
-			ticketHelper.findFromContextRequired ();
-
-		ticketState =
-			ticket.getTicketState ();
-
-		summaryUrl =
-			requestContext.resolveApplicationUrlFormat (
-				"/ticket.pending",
-				"/%u",
-				integerToDecimalString (
-					ticket.getId ()),
-				"/ticket.pending.history");
-
-		ImmutableList.Builder <TicketTemplateRec> templatesBuilder =
-			ImmutableList.<TicketTemplateRec> builder ();
-
-		for (
-			TicketTemplateRec template
-				: ticket.getTicketManager ().getTicketTemplates ()
 		) {
 
-			if (template.getDeleted ())
-				continue;
+			super.prepare (
+				taskLogger);
 
-			templatesBuilder.add (
-				template);
+			ticket =
+				ticketHelper.findFromContextRequired ();
+
+			ticketState =
+				ticket.getTicketState ();
+
+			summaryUrl =
+				requestContext.resolveApplicationUrlFormat (
+					"/ticket.pending",
+					"/%u",
+					integerToDecimalString (
+						ticket.getId ()),
+					"/ticket.pending.history");
+
+			ImmutableList.Builder <TicketTemplateRec> templatesBuilder =
+				ImmutableList.<TicketTemplateRec> builder ();
+
+			for (
+				TicketTemplateRec template
+					: ticket.getTicketManager ().getTicketTemplates ()
+			) {
+
+				if (template.getDeleted ())
+					continue;
+
+				templatesBuilder.add (
+					template);
+
+			}
+
+			templates =
+				templatesBuilder.build ();
 
 		}
-
-		templates =
-			templatesBuilder.build ();
 
 	}
 
@@ -155,56 +161,62 @@ class TicketPendingFormResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlHeadContents");
+		try (
 
-		super.renderHtmlHeadContents (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlHeadContents");
 
-		// script block
+		) {
 
-		htmlScriptBlockOpen ();
+			super.renderHtmlHeadContents (
+				taskLogger);
 
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
+			// script block
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = 'about:blank';");
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"window.setTimeout (function () {");
+			formatWriter.writeLineFormat (
+				"top.show_inbox (true);");
 
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j';",
-			summaryUrl);
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = 'about:blank';");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}, 1);");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"window.setTimeout (function () {");
 
-		htmlScriptBlockClose ();
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j';",
+				summaryUrl);
 
-		// style block
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}, 1);");
 
-		htmlStyleBlockOpen ();
+			htmlScriptBlockClose ();
 
-		htmlStyleRuleWrite (
-			".template-chars.error",
-			htmlStyleRuleEntry (
-				"background-color",
-				"darkred"),
-			htmlStyleRuleEntry (
-				"color",
-				"white"),
-			htmlStyleRuleEntry (
-				"padding-left",
-				"10px"),
-			htmlStyleRuleEntry (
-				"padding-right",
-				"10px"));
+			// style block
 
-		htmlStyleBlockClose ();
+			htmlStyleBlockOpen ();
+
+			htmlStyleRuleWrite (
+				".template-chars.error",
+				htmlStyleRuleEntry (
+					"background-color",
+					"darkred"),
+				htmlStyleRuleEntry (
+					"color",
+					"white"),
+				htmlStyleRuleEntry (
+					"padding-left",
+					"10px"),
+				htmlStyleRuleEntry (
+					"padding-right",
+					"10px"));
+
+			htmlStyleBlockClose ();
+
+		}
 
 	}
 

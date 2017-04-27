@@ -102,107 +102,131 @@ class TicketPendingHistoryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		goSummary (
-			taskLogger);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		goStateSummary (
-			taskLogger);
+		) {
 
-		goTicketNotes (
-			taskLogger);
+			goSummary (
+				taskLogger);
+
+			goStateSummary (
+				taskLogger);
+
+			goTicketNotes (
+				taskLogger);
+
+		}
 
 	}
 
 	void goSummary (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goSummary");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Summary");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goSummary");
 
-		htmlTableOpenDetails ();
+		) {
 
-		formFieldLogic.outputTableRows (
-			taskLogger,
-			formatWriter,
-			ticketFields,
-			ticket,
-			emptyMap ());
+			htmlHeadingThreeWrite (
+				"Summary");
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
+
+			formFieldLogic.outputTableRows (
+				taskLogger,
+				formatWriter,
+				ticketFields,
+				ticket,
+				emptyMap ());
+
+			htmlTableClose ();
+
+		}
 
 	}
 
 	void goTicketNotes (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goTicketNotes");
+		try (
 
-		htmlHeadingThreeWrite (
-			"Notes");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goTicketNotes");
 
-		htmlTableOpenDetails ();
-
-		htmlTableHeaderRowWrite (
-			"Index",
-			"Text");
-
-		for (
-			TicketNoteRec ticketNote
-				: ticket.getTicketNotes ()
 		) {
 
-			htmlTableRowOpen ();
+			htmlHeadingThreeWrite (
+				"Notes");
 
-			formFieldLogic.outputTableCellsList (
-				taskLogger,
-				formatWriter,
-				ticketNoteFields,
-				ticketNote,
-				emptyMap (),
-				true);
+			htmlTableOpenDetails ();
 
-			htmlTableRowClose ();
+			htmlTableHeaderRowWrite (
+				"Index",
+				"Text");
+
+			for (
+				TicketNoteRec ticketNote
+					: ticket.getTicketNotes ()
+			) {
+
+				htmlTableRowOpen ();
+
+				formFieldLogic.outputTableCellsList (
+					taskLogger,
+					formatWriter,
+					ticketNoteFields,
+					ticketNote,
+					emptyMap (),
+					true);
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
 	void goStateSummary (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goStateSummary");
+		try (
 
-		htmlHeadingThreeWrite (
-			"State");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"goStateSummary");
 
-		htmlTableOpenDetails ();
+		) {
 
-		formFieldLogic.outputTableRows (
-			taskLogger,
-			formatWriter,
-			ticketStateFields,
-			ticket.getTicketState (),
-			emptyMap ());
+			htmlHeadingThreeWrite (
+				"State");
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
+
+			formFieldLogic.outputTableRows (
+				taskLogger,
+				formatWriter,
+				ticketStateFields,
+				ticket.getTicketState (),
+				emptyMap ());
+
+			htmlTableClose ();
+
+		}
 
 	}
 

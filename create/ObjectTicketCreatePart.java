@@ -2,6 +2,7 @@ package wbs.services.ticket.create;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
@@ -104,116 +105,122 @@ class ObjectTicketCreatePart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"prepare");
+		try (
 
-		// find context object
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"prepare");
 
-		Record <?> contextObject =
-			consoleHelper.findFromContextRequired ();
-
-		ticketManager =
-			(TicketManagerRec)
-			objectManager.dereferenceObsolete (
-				contextObject,
-				ticketManagerPath);
-
-		prepareFieldSet (
-			taskLogger);
-
-		// create dummy instance
-
-		ticket =
-			ticketHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager);
-
-		for (
-			ObjectTicketCreateSetFieldSpec ticketFieldSpec
-				: ticketFieldSpecs
 		) {
 
-			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.findByCodeRequired (
-					ticketManager,
-					ticketFieldSpec.fieldTypeCode ());
+			// find context object
 
-			TicketFieldValueRec ticketFieldValue =
-				ticketFieldValueHelper.createInstance ()
+			Record <?> contextObject =
+				consoleHelper.findFromContextRequired ();
 
-				.setTicket (
-					ticket)
-
-				.setTicketFieldType (
-					ticketFieldType);
-
-			switch (ticketFieldType.getDataType ()) {
-
-			case string:
-
-				ticketFieldValue.setStringValue (
-					(String)
-					objectManager.dereferenceObsolete (
+			ticketManager =
+				genericCastUnchecked (
+					objectManager.dereference (
 						contextObject,
-						ticketFieldSpec.valuePath ()));
+						ticketManagerPath));
 
-				break;
+			prepareFieldSet (
+				taskLogger);
 
-			case number:
+			// create dummy instance
 
-				ticketFieldValue.setIntegerValue (
-					(Long)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ()));
+			ticket =
+				ticketHelper.createInstance ()
 
-				break;
+				.setTicketManager (
+					ticketManager);
 
-			case bool:
+			for (
+				ObjectTicketCreateSetFieldSpec ticketFieldSpec
+					: ticketFieldSpecs
+			) {
 
-				ticketFieldValue.setBooleanValue (
-					(Boolean)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ()));
+				TicketFieldTypeRec ticketFieldType =
+					ticketFieldTypeHelper.findByCodeRequired (
+						ticketManager,
+						ticketFieldSpec.fieldTypeCode ());
 
-				break;
+				TicketFieldValueRec ticketFieldValue =
+					ticketFieldValueHelper.createInstance ()
 
-			case object:
+					.setTicket (
+						ticket)
 
-				Record<?> objectValue =
-					(Record<?>)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ());
+					.setTicketFieldType (
+						ticketFieldType);
 
-				// TODO check type
+				switch (ticketFieldType.getDataType ()) {
 
-				Long objectId =
-					objectValue.getId ();
+				case string:
 
-				ticketFieldValue
+					ticketFieldValue.setStringValue (
+						(String)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
 
-					.setIntegerValue (
-						objectId);
+					break;
 
-				break;
+				case number:
 
-			default:
+					ticketFieldValue.setIntegerValue (
+						(Long)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
 
-				throw new RuntimeException ();
+					break;
+
+				case bool:
+
+					ticketFieldValue.setBooleanValue (
+						(Boolean)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
+
+					break;
+
+				case object:
+
+					Record<?> objectValue =
+						(Record<?>)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ());
+
+					// TODO check type
+
+					Long objectId =
+						objectValue.getId ();
+
+					ticketFieldValue
+
+						.setIntegerValue (
+							objectId);
+
+					break;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
+
+				ticket.setNumFields (
+					ticket.getNumFields () + 1);
+
+				ticket.getTicketFieldValues ().put (
+					ticketFieldType.getId (),
+					ticketFieldValue);
 
 			}
-
-			ticket.setNumFields (
-				ticket.getNumFields () + 1);
-
-			ticket.getTicketFieldValues ().put (
-				ticketFieldType.getId (),
-				ticketFieldValue);
 
 		}
 
@@ -234,44 +241,50 @@ class ObjectTicketCreatePart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderHtmlBodyContent");
+		try (
 
-		htmlParagraphWriteFormat (
-			"Please enter the details for the new ticket");
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"renderHtmlBodyContent");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/" + localFile));
+		) {
 
-		htmlTableOpenDetails ();
+			htmlParagraphWriteFormat (
+				"Please enter the details for the new ticket");
 
-		formFieldLogic.outputFormRows (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFieldSet,
-			optionalAbsent (),
-			ticket,
-			emptyMap (),
-			FormType.create,
-			"create");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/" + localFile));
 
-		htmlTableClose ();
+			htmlTableOpenDetails ();
 
-		htmlParagraphOpen ();
+			formFieldLogic.outputFormRows (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFieldSet,
+				optionalAbsent (),
+				ticket,
+				emptyMap (),
+				FormType.create,
+				"create");
 
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"create ticket\"",
-			">");
+			htmlTableClose ();
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"create ticket\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 

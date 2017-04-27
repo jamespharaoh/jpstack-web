@@ -70,33 +70,39 @@ class TicketHooks
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull TicketRec ticket) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"afterInsert");
+		try (
 
-		// TODO does not belong here
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"afterInsert");
 
-		if (ticket.getTicketState ().getShowInQueue ()) {
+		) {
 
-			// create queue item
+			// TODO does not belong here
 
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
-					taskLogger,
-					ticket.getTicketState (),
-					"default",
-					ticket,
-					ticket,
-					ticket.getCode (),
-					ticket.getTicketState ().toString ());
+			if (ticket.getTicketState ().getShowInQueue ()) {
 
-			// add queue item to ticket
+				// create queue item
 
-			ticket
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						taskLogger,
+						ticket.getTicketState (),
+						"default",
+						ticket,
+						ticket,
+						ticket.getCode (),
+						ticket.getTicketState ().toString ());
 
-				.setQueueItem (
-					queueItem);
+				// add queue item to ticket
+
+				ticket
+
+					.setQueueItem (
+						queueItem);
+
+			}
 
 		}
 

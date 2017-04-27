@@ -81,140 +81,146 @@ class TicketFieldsProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull TicketManagerRec ticketManager) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getFieldsForParent");
+		try (
 
-		// retrieve existing ticket field types
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getFieldsForParent");
 
-		Set <TicketFieldTypeRec> ticketFieldTypes =
-			ticketManager.getTicketFieldTypes ();
-
-		// build form fields
-
-		List <Object> formFieldSpecs =
-			new ArrayList<> ();
-
-		for (
-			TicketFieldTypeRec ticketFieldType
-				: ticketFieldTypes
 		) {
 
-			switch (ticketFieldType.getDataType ()) {
+			// retrieve existing ticket field types
 
-			case string:
+			Set <TicketFieldTypeRec> ticketFieldTypes =
+				ticketManager.getTicketFieldTypes ();
 
-				formFieldSpecs.add (
-					new TextFormFieldSpec ()
+			// build form fields
 
-					.name (
-						ticketFieldType.getCode ())
+			List <Object> formFieldSpecs =
+				new ArrayList<> ();
 
-					.label (
-						ticketFieldType.getName ())
+			for (
+				TicketFieldTypeRec ticketFieldType
+					: ticketFieldTypes
+			) {
 
-					.dynamic (
-						true)
+				switch (ticketFieldType.getDataType ()) {
 
-				);
+				case string:
 
-				break;
+					formFieldSpecs.add (
+						new TextFormFieldSpec ()
 
-			case number:
+						.name (
+							ticketFieldType.getCode ())
 
-				formFieldSpecs.add (
-					new IntegerFormFieldSpec ()
+						.label (
+							ticketFieldType.getName ())
 
-					.name (
-						ticketFieldType.getCode ())
+						.dynamic (
+							true)
 
-					.label (
-						ticketFieldType.getName ())
+					);
 
-					.dynamic (
-						true));
+					break;
 
-				break;
+				case number:
 
-			case bool:
+					formFieldSpecs.add (
+						new IntegerFormFieldSpec ()
 
-				formFieldSpecs.add (
-					new YesNoFormFieldSpec ()
+						.name (
+							ticketFieldType.getCode ())
 
-					.name (
-						ticketFieldType.getCode ())
+						.label (
+							ticketFieldType.getName ())
 
-					.label (
-						ticketFieldType.getName ())
+						.dynamic (
+							true));
 
-					.dynamic (
-						true)
+					break;
 
-				);
+				case bool:
 
-				break;
+					formFieldSpecs.add (
+						new YesNoFormFieldSpec ()
 
-			case object:
+						.name (
+							ticketFieldType.getCode ())
 
-				formFieldSpecs.add (
-					new ObjectFormFieldSpec ()
+						.label (
+							ticketFieldType.getName ())
 
-					.name (
-						ticketFieldType.getCode ())
+						.dynamic (
+							true)
 
-					.label (
-						ticketFieldType.getName ())
+					);
 
-					.objectTypeName (
-						underscoreToCamel (
-						 	ticketFieldType.getObjectType ().getCode ()))
+					break;
 
-					.dynamic (
-						true)
+				case object:
 
-				);
+					formFieldSpecs.add (
+						new ObjectFormFieldSpec ()
 
-				break;
+						.name (
+							ticketFieldType.getCode ())
 
-			default:
+						.label (
+							ticketFieldType.getName ())
 
-				throw new RuntimeException ();
+						.objectTypeName (
+							underscoreToCamel (
+							 	ticketFieldType.getObjectType ().getCode ()))
+
+						.dynamic (
+							true)
+
+					);
+
+					break;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
 
 			}
 
+			// adding the state field
+
+			formFieldSpecs.add (
+				new ObjectFormFieldSpec ()
+
+				.name (
+					"ticketState")
+
+				.label (
+					"State")
+
+				.objectTypeName (
+					"ticketState")
+
+				.dynamic (
+					false)
+
+			);
+
+			String fieldSetName =
+				stringFormat (
+					"%s.%s",
+					ticketConsoleHelper.objectName(),
+					mode);
+
+			return consoleModuleBuilder.buildFormFieldSet (
+				taskLogger,
+				ticketConsoleHelper,
+				fieldSetName,
+				formFieldSpecs);
+
 		}
-
-		// adding the state field
-
-		formFieldSpecs.add (
-			new ObjectFormFieldSpec ()
-
-			.name (
-				"ticketState")
-
-			.label (
-				"State")
-
-			.objectTypeName (
-				"ticketState")
-
-			.dynamic (
-				false)
-
-		);
-
-		String fieldSetName =
-			stringFormat (
-				"%s.%s",
-				ticketConsoleHelper.objectName(),
-				mode);
-
-		return consoleModuleBuilder.buildFormFieldSet (
-			taskLogger,
-			ticketConsoleHelper,
-			fieldSetName,
-			formFieldSpecs);
 
 	}
 
