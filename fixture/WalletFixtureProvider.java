@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -55,75 +55,81 @@ class WalletFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"wallet_service")
-
-			.setName (
-				"Wallet service")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"Wallet Service")
-
-			.setTargetPath (
-				"/walletServices")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
-		WalletServiceRec walletService =
-			walletServiceHelper.insert (
+			menuItemHelper.insert (
 				taskLogger,
-				walletServiceHelper.createInstance ()
+				menuItemHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setCode (
-				"test_wallet_service")
+				.setCode (
+					"wallet_service")
 
-			.setName (
-				"Test wallet service")
+				.setName (
+					"Wallet service")
 
-			.setDescription (
-				"Test wallet service")
+				.setDescription (
+					"")
 
-		);
+				.setLabel (
+					"Wallet Service")
 
-		walletHelper.insert (
-			taskLogger,
-			walletHelper.createInstance ()
+				.setTargetPath (
+					"/walletServices")
 
-			.setWalletService (
-				walletService)
+				.setTargetFrame (
+					"main")
 
-			.setCode (
-				randomLogic.generateNumericNoZero (8))
+			);
 
-		);
+			WalletServiceRec walletService =
+				walletServiceHelper.insert (
+					taskLogger,
+					walletServiceHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					"test_wallet_service")
+
+				.setName (
+					"Test wallet service")
+
+				.setDescription (
+					"Test wallet service")
+
+			);
+
+			walletHelper.insert (
+				taskLogger,
+				walletHelper.createInstance ()
+
+				.setWalletService (
+					walletService)
+
+				.setCode (
+					randomLogic.generateNumericNoZero (8))
+
+			);
+
+		}
 
 	}
 
