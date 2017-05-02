@@ -11,8 +11,9 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeObjectHelper;
@@ -36,16 +37,16 @@ class MessageTemplateFieldTypeObjectHelperMethodsImplementation
 	@Override
 	public
 	MessageTemplateFieldTypeRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateEntryTypeRec messageTemplateEntryType,
 			@NonNull String code,
 			@NonNull Consumer <MessageTemplateFieldTypeRec> consumer) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -53,6 +54,7 @@ class MessageTemplateFieldTypeObjectHelperMethodsImplementation
 			Optional <MessageTemplateFieldTypeRec>
 				existingMessageTemplateFieldType =
 					messageTemplateFieldTypeHelper.findByCode (
+						transaction,
 						messageTemplateEntryType,
 						code);
 
@@ -81,7 +83,7 @@ class MessageTemplateFieldTypeObjectHelperMethodsImplementation
 				newMessageTemplateField);
 
 			messageTemplateFieldTypeHelper.insert (
-				taskLogger,
+				transaction,
 				newMessageTemplateField);
 
 			return newMessageTemplateField;

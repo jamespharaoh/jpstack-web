@@ -2,13 +2,13 @@ package wbs.services.messagetemplate.model;
 
 import java.util.function.Consumer;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface MessageTemplateFieldTypeObjectHelperMethods {
 
 	MessageTemplateFieldTypeRec findOrCreate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			MessageTemplateEntryTypeRec messageTemplateEntryType,
 			String code,
 			Consumer <MessageTemplateFieldTypeRec> consumer);

@@ -4,11 +4,11 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -85,24 +85,24 @@ class MessageTemplateFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -129,11 +129,12 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateDatabaseRec messageTemplateDatabase =
 				messageTemplateDatabaseHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateDatabaseHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -150,7 +151,7 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateEntryTypeRec entryType1 =
 				messageTemplateEntryTypeHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateEntryTypeHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -169,7 +170,7 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateFieldTypeRec fieldType1a =
 				messageTemplateFieldTypeHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateFieldTypeHelper.createInstance ()
 
 				.setMessageTemplateEntryType (
@@ -202,7 +203,7 @@ class MessageTemplateFixtureProvider
 			);
 
 			messageTemplateParameterHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateParameterHelper.createInstance ()
 
 				.setCode (
@@ -224,7 +225,7 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateEntryTypeRec entryType2 =
 				messageTemplateEntryTypeHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateEntryTypeHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -242,7 +243,7 @@ class MessageTemplateFixtureProvider
 			);
 
 			messageTemplateFieldTypeHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateFieldTypeHelper.createInstance ()
 
 				.setMessageTemplateEntryType (
@@ -275,7 +276,7 @@ class MessageTemplateFixtureProvider
 			);
 
 			messageTemplateParameterHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateParameterHelper.createInstance ()
 
 				.setMessageTemplateEntryType (
@@ -299,7 +300,7 @@ class MessageTemplateFixtureProvider
 			);
 
 			messageTemplateParameterHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateParameterHelper.createInstance ()
 
 				.setMessageTemplateEntryType (
@@ -324,7 +325,7 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateSetRec messageTemplateSet =
 				messageTemplateSetHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateSetHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -343,7 +344,7 @@ class MessageTemplateFixtureProvider
 
 			MessageTemplateEntryValueRec entryValue1 =
 				messageTemplateEntryValueHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateEntryValueHelper.createInstance ()
 
 				.setMessageTemplateSet (
@@ -355,7 +356,7 @@ class MessageTemplateFixtureProvider
 			);
 
 			messageTemplateFieldValueHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateFieldValueHelper.createInstance ()
 
 				.setMessageTemplateEntryValue (

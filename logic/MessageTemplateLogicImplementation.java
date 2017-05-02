@@ -1,5 +1,6 @@
 package wbs.services.messagetemplate.logic;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
@@ -10,8 +11,9 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -58,15 +60,15 @@ class MessageTemplateLogicImplementation
 	@Override
 	public
 	MessageTemplateDatabaseRec readMessageTemplateDatabaseFromClasspath (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SliceRec slice,
 			@NonNull String resourceName) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"readMessageTemplateDatabaseFromClasspath");
 
 		) {
@@ -74,16 +76,16 @@ class MessageTemplateLogicImplementation
 			// load data
 
 			MessageTemplateDatabaseSpec databaseSpec =
-				(MessageTemplateDatabaseSpec)
-				dataFromXml.readClasspath (
-					taskLogger,
-					resourceName);
+				genericCastUnchecked (
+					dataFromXml.readClasspath (
+						transaction,
+						resourceName));
 
 			// create database
 
 			MessageTemplateDatabaseRec mtDatabase =
 				messageTemplateDatabaseHelper.insert (
-					taskLogger,
+					transaction,
 					messageTemplateDatabaseHelper.createInstance ()
 
 				.setSlice (
@@ -111,7 +113,7 @@ class MessageTemplateLogicImplementation
 
 				MessageTemplateEntryTypeRec entryType =
 					messageTemplateEntryTypeHelper.insert (
-						taskLogger,
+						transaction,
 						messageTemplateEntryTypeHelper.createInstance ()
 
 					.setMessageTemplateDatabase (
@@ -138,7 +140,7 @@ class MessageTemplateLogicImplementation
 				) {
 
 					messageTemplateFieldTypeHelper.insert (
-						taskLogger,
+						transaction,
 						messageTemplateFieldTypeHelper.createInstance ()
 
 						.setMessageTemplateEntryType (
@@ -176,7 +178,7 @@ class MessageTemplateLogicImplementation
 				) {
 
 					messageTemplateParameterHelper.insert (
-						taskLogger,
+						transaction,
 						messageTemplateParameterHelper.createInstance ()
 
 						.setMessageTemplateEntryType (

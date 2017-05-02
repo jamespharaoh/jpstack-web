@@ -75,20 +75,12 @@ class MessageTemplateMessagesGetAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"MessageTemplateMessagesGetAction.handle ()",
-					this);
+				database.beginReadWrite (
+					logContext,
+					"handle");
 
 		) {
 
@@ -104,11 +96,13 @@ class MessageTemplateMessagesGetAction
 					requestContext.requestStringRequired (
 						"messageTemplateDatabaseCode"));
 
-			Optional<MessageTemplateDatabaseRec> messageTemplateDatabaseOptional =
-				messageTemplateDatabaseHelper.findByCode (
-					GlobalId.root,
-					sliceCode,
-					messageTemplateDatabaseCode);
+			Optional <MessageTemplateDatabaseRec>
+				messageTemplateDatabaseOptional =
+					messageTemplateDatabaseHelper.findByCode (
+						transaction,
+						GlobalId.root,
+						sliceCode,
+						messageTemplateDatabaseCode);
 
 			if (
 				optionalIsNotPresent (
@@ -128,6 +122,7 @@ class MessageTemplateMessagesGetAction
 
 			MessageTemplateSetRec messageTemplateSet =
 				messageTemplateSetHelper.findByCodeRequired (
+					transaction,
 					messageTemplateDatabase,
 					hyphenToUnderscore (
 						requestContext.requestStringRequired (
@@ -135,8 +130,8 @@ class MessageTemplateMessagesGetAction
 
 			// create response
 
-			ImmutableMap.Builder<String,String> messagesBuilder =
-				ImmutableMap.<String,String>builder ();
+			ImmutableMap.Builder <String, String> messagesBuilder =
+				ImmutableMap.<String, String> builder ();
 
 			for (
 				MessageTemplateEntryTypeRec entryType

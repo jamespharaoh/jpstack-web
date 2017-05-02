@@ -1,124 +1,147 @@
 package wbs.services.messagetemplate.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import wbs.console.forms.FormFieldConstraintValidator;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("textAreaFormFieldValueValidator")
 public
-class TextAreaFormFieldConstraintValidator<Container>
-	implements FormFieldConstraintValidator<Container,String> {
+class TextAreaFormFieldConstraintValidator <Container>
+	implements FormFieldConstraintValidator <Container, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
 	Optional <String> validate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
 
-		/*
-		MessageTemplateTypeRec messageTemplateType =
-			(MessageTemplateTypeRec) container;
+		try (
 
-		List<String> messageTemplateUsedParameters =
-			new ArrayList<String>();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"validate");
 
-		String message = nativeValue;
+		) {
 
-		// length of non variable parts
+			/*
+			MessageTemplateTypeRec messageTemplateType =
+				(MessageTemplateTypeRec) container;
 
-		Integer messageLength = 0;
+			List<String> messageTemplateUsedParameters =
+				new ArrayList<String>();
 
-		String[] parts =
-			message.split("\\{(.*?)\\}");
+			String message = nativeValue;
 
-		for (int i = 0; i < parts.length; i++) {
+			// length of non variable parts
 
-			// length of special chars if gsm encoding
+			Integer messageLength = 0;
 
-			if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
+			String[] parts =
+				message.split("\\{(.*?)\\}");
 
-				if (! Gsm.isGsm (parts[i]))
-					throw new RuntimeException ("Message text is invalid");
+			for (int i = 0; i < parts.length; i++) {
 
-				messageLength +=
-					Gsm.length (parts[i]);
+				// length of special chars if gsm encoding
+
+				if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
+
+					if (! Gsm.isGsm (parts[i]))
+						throw new RuntimeException ("Message text is invalid");
+
+					messageLength +=
+						Gsm.length (parts[i]);
+
+				}
+				else {
+					messageLength +=
+							parts[i].length();
+				}
 
 			}
-			else {
-				messageLength +=
-						parts[i].length();
+
+			// length of the parameters
+
+			Pattern regExp = Pattern.compile("\\{(.*?)\\}");
+			Matcher matcher = regExp.matcher(message);
+
+			while (matcher.find()) {
+				String parameterName =
+					matcher.group(1);
+
+				MessageTemplateParameterRec messageTemplateParameter =
+						messageTemplateParameterHelper
+							.findByCode (
+								messageTemplateType, parameterName);
+
+				if (messageTemplateParameter == null) {
+
+					errors.add (
+						stringFormat (
+							"The parameter "+parameterName+" does not exist!"));
+
+				}
+				else {
+
+					if (messageTemplateParameter.getLength() != null) {
+						messageLength +=
+							messageTemplateParameter.getLength();
+					}
+
+					messageTemplateUsedParameters
+						.add(messageTemplateParameter.getName());
+				}
+
 			}
 
-		}
+			// check if the rest of parameters which are not present were required
 
-		// length of the parameters
+			for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {
 
-		Pattern regExp = Pattern.compile("\\{(.*?)\\}");
-		Matcher matcher = regExp.matcher(message);
+				if (
+						! messageTemplateUsedParameters.contains(messageTemplateParameter.getName())
+						&& messageTemplateParameter.getRequired()
+				) {
+					throw new RuntimeException ("Parameter "+messageTemplateParameter.getName()+" required but not present!");
+				}
 
-		while (matcher.find()) {
-			String parameterName =
-				matcher.group(1);
+			}
 
-			MessageTemplateParameterRec messageTemplateParameter =
-					messageTemplateParameterHelper
-						.findByCode (
-							messageTemplateType, parameterName);
+			// check if the length is correct
 
-			if (messageTemplateParameter == null) {
+			if (
+				messageLength < messageTemplateType.getMinLength () ||
+				messageLength > messageTemplateType.getMaxLength ())
+			{
 
 				errors.add (
 					stringFormat (
-						"The parameter "+parameterName+" does not exist!"));
-
-			}
-			else {
-
-				if (messageTemplateParameter.getLength() != null) {
-					messageLength +=
-						messageTemplateParameter.getLength();
-				}
-
-				messageTemplateUsedParameters
-					.add(messageTemplateParameter.getName());
+						"The message length is out of it's template type bounds!"));
 			}
 
-		}
+			*/
 
-		// check if the rest of parameters which are not present were required
-
-		for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {
-
-			if (
-					! messageTemplateUsedParameters.contains(messageTemplateParameter.getName())
-					&& messageTemplateParameter.getRequired()
-			) {
-				throw new RuntimeException ("Parameter "+messageTemplateParameter.getName()+" required but not present!");
-			}
+			return optionalAbsent ();
 
 		}
-
-		// check if the length is correct
-
-		if (
-			messageLength < messageTemplateType.getMinLength () ||
-			messageLength > messageTemplateType.getMaxLength ())
-		{
-
-			errors.add (
-				stringFormat (
-					"The message length is out of it's template type bounds!"));
-		}
-
-		*/
-
-		return Optional.<String>absent ();
 
 	}
 
