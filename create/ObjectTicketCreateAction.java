@@ -2,12 +2,16 @@ package wbs.services.ticket.create;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -175,53 +179,57 @@ class ObjectTicketCreateAction <
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectTicketCreateAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			// find context object
 
 			Record <?> contextObject =
-				consoleHelper.findFromContextRequired ();
+				consoleHelper.findFromContextRequired (
+					transaction);
 
 			// determine ticket
 
-			ticketManager =
+			Optional <TicketManagerRec> ticketManagerOptional =
 				genericCastUnchecked (
-					objectManager.dereferenceObsolete (
+					objectManager.dereference (
+						transaction,
 						contextObject,
 						ticketManagerPath));
 
-			if (ticketManager == null)
+			if (
+				optionalIsNotPresent (
+					ticketManagerOptional)
+			) {
 				return null;
+			}
+
+			ticketManager =
+				optionalGetRequired (
+					ticketManagerOptional);
 
 			// check permissions
 
 			if (createPrivCode != null) {
 
-				Record<?> createDelegate =
+				Record <?> createDelegate =
 					createPrivDelegate != null
-						? (Record<?>) objectManager.dereferenceObsolete (
-								ticketManager,
+						? (Record <?>) objectManager.dereferenceObsolete (
+							transaction,
+							ticketManager,
 							createPrivDelegate)
 						: ticketManager;
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						createDelegate,
 						createPrivCode)
 				) {
@@ -250,6 +258,7 @@ class ObjectTicketCreateAction <
 
 				TicketFieldTypeRec ticketFieldType =
 					ticketFieldTypeHelper.findByCodeRequired (
+						transaction,
 						ticketManager,
 						ticketFieldSpec.fieldTypeCode ());
 
@@ -269,6 +278,7 @@ class ObjectTicketCreateAction <
 					ticketFieldValue.setStringValue (
 						(String)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -279,6 +289,7 @@ class ObjectTicketCreateAction <
 					ticketFieldValue.setIntegerValue (
 						(Long)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -289,6 +300,7 @@ class ObjectTicketCreateAction <
 					ticketFieldValue.setBooleanValue (
 						(Boolean)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -299,6 +311,7 @@ class ObjectTicketCreateAction <
 					Long objectId = (
 						(Record <?>)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ())
 					).getId ();
@@ -343,13 +356,13 @@ class ObjectTicketCreateAction <
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
-					taskLogger);
+					transaction);
 
 			}
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					fields,
 					ticket,
@@ -385,14 +398,15 @@ class ObjectTicketCreateAction <
 				PropertyUtils.propertySetAuto (
 					ticket,
 					createUserFieldName,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			}
 
 			// insert
 
 			ticketHelper.insert (
-				taskLogger,
+				transaction,
 				ticket);
 
 			// create event
@@ -405,9 +419,10 @@ class ObjectTicketCreateAction <
 			if (consoleHelper.ephemeral ()) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_created_in",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					objectRef,
 					consoleHelper.shortName (),
 					ticketManager);
@@ -415,9 +430,10 @@ class ObjectTicketCreateAction <
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_created",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					ticket,
 					ticketManager);
 
@@ -428,7 +444,7 @@ class ObjectTicketCreateAction <
 			if (ticket instanceof PermanentRecord) {
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					fields,
 					updateResultSet,
 					ticket,
@@ -440,7 +456,7 @@ class ObjectTicketCreateAction <
 			} else {
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					fields,
 					updateResultSet,
 					ticket,

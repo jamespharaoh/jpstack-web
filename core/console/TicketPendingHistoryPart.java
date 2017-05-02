@@ -22,8 +22,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketRec;
@@ -71,67 +72,79 @@ class TicketPendingHistoryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// get field sets
+		try (
 
-		ticketFields =
-			ticketPendingConsoleModule.formFieldSetRequired (
-				"ticketFields",
-				TicketRec.class);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		ticketNoteFields =
-			ticketPendingConsoleModule.formFieldSetRequired (
-				"ticketNoteFields",
-				TicketNoteRec.class);
+		) {
 
-		ticketStateFields =
-			ticketPendingConsoleModule.formFieldSetRequired (
-				"ticketStateFields",
-				TicketStateRec.class);
+			// get field sets
 
-		// load data
+			ticketFields =
+				ticketPendingConsoleModule.formFieldSetRequired (
+					"ticketFields",
+					TicketRec.class);
 
-		ticket =
-			ticketHelper.findFromContextRequired ();
+			ticketNoteFields =
+				ticketPendingConsoleModule.formFieldSetRequired (
+					"ticketNoteFields",
+					TicketNoteRec.class);
+
+			ticketStateFields =
+				ticketPendingConsoleModule.formFieldSetRequired (
+					"ticketStateFields",
+					TicketStateRec.class);
+
+			// load data
+
+			ticket =
+				ticketHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			goSummary (
-				taskLogger);
+				transaction);
 
 			goStateSummary (
-				taskLogger);
+				transaction);
 
 			goTicketNotes (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
 	void goSummary (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goSummary");
 
 		) {
@@ -142,7 +155,7 @@ class TicketPendingHistoryPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputTableRows (
-				taskLogger,
+				transaction,
 				formatWriter,
 				ticketFields,
 				ticket,
@@ -154,14 +167,15 @@ class TicketPendingHistoryPart
 
 	}
 
+	private
 	void goTicketNotes (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goTicketNotes");
 
 		) {
@@ -183,7 +197,7 @@ class TicketPendingHistoryPart
 				htmlTableRowOpen ();
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					ticketNoteFields,
 					ticketNote,
@@ -201,13 +215,13 @@ class TicketPendingHistoryPart
 	}
 
 	void goStateSummary (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goStateSummary");
 
 		) {
@@ -218,7 +232,7 @@ class TicketPendingHistoryPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputTableRows (
-				taskLogger,
+				transaction,
 				formatWriter,
 				ticketStateFields,
 				ticket.getTicketState (),

@@ -45,8 +45,9 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 
@@ -105,22 +106,23 @@ class TicketPendingFormResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			ticket =
-				ticketHelper.findFromContextRequired ();
+				ticketHelper.findFromContextRequired (
+					transaction);
 
 			ticketState =
 				ticket.getTicketState ();
@@ -159,19 +161,19 @@ class TicketPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			// script block
 
@@ -223,214 +225,251 @@ class TicketPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.flushNotices (
-			formatWriter);
+		try (
 
-		// links
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
-
-		htmlLinkWrite (
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
-			"Queues");
-
-		htmlLinkWrite (
-			summaryUrl,
-			"Summary",
-			htmlAttribute (
-				"target",
-				"main"));
-
-		htmlLinkWrite (
-			"javascript:top.show_inbox (false);",
-			"Close");
-
-		htmlParagraphClose ();
-
-		// header
-
-		htmlHeadingTwoWrite (
-			"Ticket management");
-
-		// form open
-
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrlFormat (
-				"/ticket.pending",
-				"/%u",
-				integerToDecimalString (
-					ticket.getId ()),
-				"/ticket.pending.form"));
-
-		// table open
-
-		htmlTableOpen (
-			htmlIdAttribute (
-				"templates"),
-			htmlClassAttribute (
-				"list"),
-			htmlStyleRuleEntry (
-				"width",
-				"100%"));
-
-		// table header
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Name",
-			"New State",
-			"Time to queue");
-
-		List <TicketTemplateRec> templatesReversed =
-			Lists.reverse (
-				templates);
-
-		for (
-			TicketTemplateRec template
-				: templatesReversed
 		) {
 
-			doTemplate (
-				template);
+			requestContext.flushNotices (
+				formatWriter);
+
+			// links
+
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
+
+			htmlLinkWrite (
+				requestContext.resolveApplicationUrl (
+					"/queues/queue.home"),
+				"Queues");
+
+			htmlLinkWrite (
+				summaryUrl,
+				"Summary",
+				htmlAttribute (
+					"target",
+					"main"));
+
+			htmlLinkWrite (
+				"javascript:top.show_inbox (false);",
+				"Close");
+
+			htmlParagraphClose ();
+
+			// header
+
+			htmlHeadingTwoWrite (
+				"Ticket management");
+
+			// form open
+
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrlFormat (
+					"/ticket.pending",
+					"/%u",
+					integerToDecimalString (
+						ticket.getId ()),
+					"/ticket.pending.form"));
+
+			// table open
+
+			htmlTableOpen (
+				htmlIdAttribute (
+					"templates"),
+				htmlClassAttribute (
+					"list"),
+				htmlStyleRuleEntry (
+					"width",
+					"100%"));
+
+			// table header
+
+			htmlTableHeaderRowWrite (
+				"",
+				"Name",
+				"New State",
+				"Time to queue");
+
+			List <TicketTemplateRec> templatesReversed =
+				Lists.reverse (
+					templates);
+
+			for (
+				TicketTemplateRec template
+					: templatesReversed
+			) {
+
+				doTemplate (
+					transaction,
+					template);
+			}
+
+			htmlTableClose ();
+
+			addTicketNote (
+				transaction);
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" class=\"template-submit\"",
+				" type=\"submit\"",
+				" name=\"send\"",
+				" value=\"Send\"",
+				">");
+
+			htmlFormClose ();
+
 		}
-
-		htmlTableClose ();
-
-		addTicketNote ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" class=\"template-submit\"",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"Send\"",
-			">");
-
-		htmlFormClose ();
 
 	}
 
-	void addTicketNote () {
+	void addTicketNote (
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingThreeWrite (
-			"Add new note");
+		try (
 
-		formatWriter.writeLineFormat (
-			"<label for=\"note-text\">",
-			"Note text",
-			"</label>");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"addTicketNote");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" id=\"note-text\"",
-			" type=\"textarea\"",
-			" name=\"note-text\"",
-			">");
+		) {
+
+			htmlHeadingThreeWrite (
+				"Add new note");
+
+			formatWriter.writeLineFormat (
+				"<label for=\"note-text\">",
+				"Note text",
+				"</label>");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" id=\"note-text\"",
+				" type=\"textarea\"",
+				" name=\"note-text\"",
+				">");
+
+		}
 
 	}
 
 	void doTemplate (
-			TicketTemplateRec template) {
+			@NonNull Transaction parentTransaction,
+			@NonNull TicketTemplateRec template) {
 
-		htmlTableRowOpen (
-			htmlClassAttribute (
-				"template"),
-			htmlDataAttribute (
-				"template",
-				integerToDecimalString (
-					template.getId ())));
+		try (
 
-		/*
-		if (template.getTicketState()
-				.getState().equals (
-					ticket.getTicketState().getState())) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"doTemplate");
 
-			printFormat (
+		) {
 
-				"<td><input",
-
-				" id=\"radio-template-%h\"",
-				template.getId (),
-
-				" class=\"template-radio\"",
-
-				" type=\"radio\"",
-
-				" name=\"template\"",
-
-				" value=\"%h\"",
-				template.getId (),
-
-				"checked",
-
-				"></td>\n");
-
-		}
-		else {
-
-			printFormat (
-
-				"<td><input",
-
-				" id=\"radio-template-%h\"",
-				template.getId (),
-
-				" class=\"template-radio\"",
-
-				" type=\"radio\"",
-
-				" name=\"template\"",
-
-				" value=\"%h\"",
-				template.getId (),
-
-				"></td>\n");
-
-		}
-		*/
-
-		htmlTableCellWriteHtml (
-			htmlEncodeNonBreakingWhitespace (
-				template.getName ()));
-
-		/*
-		printFormat (
-			"<td>%h</td>\n",
-			template.getTicketState ()
-				.getState ()
-					.toString ());
-		*/
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-
-			" id=\"timestamp-%h\"",
-			integerToDecimalString (
-				template.getId ()),
-
-			" type=\"textarea\"",
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					"template"),
+				htmlDataAttribute (
+					"template",
+					integerToDecimalString (
+						template.getId ())));
 
 			/*
-			" name=\"timestamp-%h\"",
-			template.getTicketState ().getState ().toString (),
+			if (template.getTicketState()
+					.getState().equals (
+						ticket.getTicketState().getState())) {
+
+				printFormat (
+
+					"<td><input",
+
+					" id=\"radio-template-%h\"",
+					template.getId (),
+
+					" class=\"template-radio\"",
+
+					" type=\"radio\"",
+
+					" name=\"template\"",
+
+					" value=\"%h\"",
+					template.getId (),
+
+					"checked",
+
+					"></td>\n");
+
+			}
+			else {
+
+				printFormat (
+
+					"<td><input",
+
+					" id=\"radio-template-%h\"",
+					template.getId (),
+
+					" class=\"template-radio\"",
+
+					" type=\"radio\"",
+
+					" name=\"template\"",
+
+					" value=\"%h\"",
+					template.getId (),
+
+					"></td>\n");
+
+			}
 			*/
 
-			" value=\"%h\"",
-			integerToDecimalString (
-				template.getTicketState ().getMinimum ()),
+			htmlTableCellWriteHtml (
+				htmlEncodeNonBreakingWhitespace (
+					template.getName ()));
 
-			">");
+			/*
+			printFormat (
+				"<td>%h</td>\n",
+				template.getTicketState ()
+					.getState ()
+						.toString ());
+			*/
 
-		htmlTableCellClose ();
+			htmlTableCellOpen ();
 
-		htmlTableRowClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+
+				" id=\"timestamp-%h\"",
+				integerToDecimalString (
+					template.getId ()),
+
+				" type=\"textarea\"",
+
+				/*
+				" name=\"timestamp-%h\"",
+				template.getTicketState ().getState ().toString (),
+				*/
+
+				" value=\"%h\"",
+				integerToDecimalString (
+					template.getTicketState ().getMinimum ()),
+
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
+
+		}
 
 	}
 

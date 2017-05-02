@@ -30,6 +30,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -103,13 +105,13 @@ class ObjectTicketCreatePart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -117,16 +119,18 @@ class ObjectTicketCreatePart <
 			// find context object
 
 			Record <?> contextObject =
-				consoleHelper.findFromContextRequired ();
+				consoleHelper.findFromContextRequired (
+					transaction);
 
 			ticketManager =
 				genericCastUnchecked (
 					objectManager.dereference (
+						transaction,
 						contextObject,
 						ticketManagerPath));
 
 			prepareFieldSet (
-				taskLogger);
+				transaction);
 
 			// create dummy instance
 
@@ -143,6 +147,7 @@ class ObjectTicketCreatePart <
 
 				TicketFieldTypeRec ticketFieldType =
 					ticketFieldTypeHelper.findByCodeRequired (
+						transaction,
 						ticketManager,
 						ticketFieldSpec.fieldTypeCode ());
 
@@ -162,6 +167,7 @@ class ObjectTicketCreatePart <
 					ticketFieldValue.setStringValue (
 						(String)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -172,6 +178,7 @@ class ObjectTicketCreatePart <
 					ticketFieldValue.setIntegerValue (
 						(Long)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -182,6 +189,7 @@ class ObjectTicketCreatePart <
 					ticketFieldValue.setBooleanValue (
 						(Boolean)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ()));
 
@@ -192,6 +200,7 @@ class ObjectTicketCreatePart <
 					Record<?> objectValue =
 						(Record<?>)
 						objectManager.dereferenceObsolete (
+							transaction,
 							contextObject,
 							ticketFieldSpec.valuePath ());
 
@@ -239,13 +248,13 @@ class ObjectTicketCreatePart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -260,7 +269,7 @@ class ObjectTicketCreatePart <
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				formFieldSet,

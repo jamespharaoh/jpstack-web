@@ -1,10 +1,11 @@
 package wbs.services.ticket.core.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.booleanEqual;
+import static wbs.utils.etc.Misc.disabled;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notLessThanZero;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.List;
 
@@ -18,8 +19,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -85,104 +86,80 @@ class TicketStateTimeDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
+					"runOnce");
 
 		) {
 
 			// TODO disabled for now
 
-			if (
-				Boolean.parseBoolean (
-					"true")
-			) {
+			if (disabled ()) {
 				return;
 			}
 
 			taskLogger.debugFormat (
 				"Getting all unqueued tickets");
 
-			// get all the unqueued tickets
+			List <Long> ticketIds =
+				getTicketIds (
+					taskLogger);
 
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadOnly (
+			ticketIds.forEach (
+				ticketId ->
+					doTicket (
 						taskLogger,
-						"TicketStateTimeDaemon.runOnce ()",
-						this);
-
-			) {
-
-				List <TicketRec> tickets =
-					ticketHelper.findUnqueuedTickets ();
-
-				transaction.close ();
-
-				// then call doTicketTimeCheck for each one
-
-				for (
-					TicketRec ticket
-						: tickets
-				) {
-
-					try {
-
-						doTicketTimeCheck (
-							taskLogger,
-							ticket.getId ());
-
-					} catch (Exception exception) {
-
-						exceptionLogger.logThrowable (
-							taskLogger,
-							"daemon",
-							"TicketStateTimeDaemon",
-							exception,
-							optionalAbsent (),
-							GenericExceptionResolution.tryAgainLater);
-
-					}
-
-				}
-
-			}
+						ticketId));
 
 		}
 
 	}
 
 	private
-	void doTicketTimeCheck (
+	List <Long> getTicketIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getTicketIds");
+
+		) {
+
+			return iterableMapToList (
+				TicketRec::getId,
+				ticketHelper.findUnqueuedTickets (
+					transaction));
+
+		}
+
+	}
+
+	private
+	void doTicket (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long ticketId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doTicketTimeCheck");
-
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
-					this);
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"doTicketTImeCheck (%s)",
+					keyEqualsDecimalInteger (
+						"ticketId",
+						ticketId));
 
 		) {
 
-			taskLogger.debugFormat (
-				"Checking timestamp for ticket",
-				integerToDecimalString (
-					ticketId));
-
-			// find the ticket
-
 			TicketRec ticket =
 				ticketHelper.findRequired (
+					transaction,
 					ticketId);
 
 			// check if the ticket is already in a queue
@@ -215,7 +192,7 @@ class TicketStateTimeDaemon
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						taskLogger,
+						transaction,
 						ticket.getTicketState (),
 						"default",
 						ticket,

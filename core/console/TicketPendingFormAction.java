@@ -78,27 +78,21 @@ class TicketPendingFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"TicketPendingFormAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			// find message
 
 			TicketRec ticket =
-				ticketHelper.findFromContextRequired ();
+				ticketHelper.findFromContextRequired (
+					transaction);
 
 			// sanity check
 
@@ -113,15 +107,17 @@ class TicketPendingFormAction
 
 			template =
 				ticketTemplateHelper.findRequired (
+					transaction,
 					requestContext.parameterIntegerRequired (
 						"template"));
 
 			// remove old queue item
 
 			queueLogic.processQueueItem (
-				taskLogger,
+				transaction,
 				ticket.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				userConsoleLogic.userRequired (
+					transaction));
 
 			ticket
 
@@ -178,7 +174,7 @@ class TicketPendingFormAction
 			if (! noteText.isEmpty ()) {
 
 				ticketNoteHelper.insert (
-					taskLogger,
+					transaction,
 					ticketNoteHelper.createInstance ()
 
 					.setTicket (
