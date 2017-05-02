@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -180,16 +182,47 @@ class HtmlFormFieldRenderer <Container>
 	}
 
 	@Override
-	public void renderHtmlTableCellList (
-			Transaction parentTransaction,
-			FormatWriter htmlWriter,
-			Container container,
-			Map <String, Object> hints,
-			Optional <String> interfaceValue,
-			Boolean link,
-			Long colspan) {
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
 
-		// TODO Auto-generated method stub
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
 
 	}
 

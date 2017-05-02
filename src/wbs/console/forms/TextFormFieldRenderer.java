@@ -326,7 +326,8 @@ class TextFormFieldRenderer <Container>
 
 			htmlWriter.writeLineFormat (
 				"%h",
-				interfaceValue.or (""));
+				interfaceValue.or (
+					"—"));
 
 		}
 

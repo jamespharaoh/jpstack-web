@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -342,6 +343,7 @@ class ChatRebillSendPart
 				transaction,
 				formatWriter,
 				billResultsFormFields,
+				optionalAbsent (),
 				billSearchResults.get (),
 				emptyMap (),
 				true);
@@ -392,6 +394,7 @@ class ChatRebillSendPart
 				transaction,
 				formatWriter,
 				nonBillResultsFormFields,
+				optionalAbsent (),
 				nonBillSearchResults.get (),
 				emptyMap (),
 				true);

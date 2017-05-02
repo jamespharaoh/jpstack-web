@@ -988,7 +988,8 @@ class FormFieldLogic {
 	void outputListTable (
 			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull FormFieldSet <Container> columnFields,
+			@NonNull Optional <FormFieldSet <Container>> rowFields,
 			@NonNull List <Container> objects,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
@@ -1014,7 +1015,7 @@ class FormFieldLogic {
 
 			outputTableHeadings (
 				htmlWriter,
-				formFieldSet);
+				columnFields);
 
 			htmlTableRowClose (
 				htmlWriter);
@@ -1033,7 +1034,7 @@ class FormFieldLogic {
 					htmlWriter,
 					"There is no data to display",
 					htmlColumnSpanAttribute (
-						formFieldSet.columns ()));
+						columnFields.columns ()));
 
 				htmlTableRowClose (
 					htmlWriter);
@@ -1051,13 +1052,55 @@ class FormFieldLogic {
 					outputTableCellsList (
 						transaction,
 						htmlWriter,
-						formFieldSet,
+						columnFields,
 						object,
 						hints,
 						links);
 
 					htmlTableRowClose (
 						htmlWriter);
+
+					if (
+						optionalIsPresent (
+							rowFields)
+					) {
+
+						for (
+							FormField rowField
+								: rowFields.get ().formFields ()
+						) {
+
+							htmlTableRowOpen (
+								htmlWriter);
+
+							try {
+
+								rowField.renderTableCellList (
+									transaction,
+									htmlWriter,
+									object,
+									hints,
+									links,
+									columnFields.columns ());
+
+							} catch (Exception exception) {
+
+								throw new RuntimeException (
+									stringFormat (
+										"Error rendering field %s for %s",
+										rowField.name (),
+										objectToString (
+											object)),
+									exception);
+
+							}
+
+							htmlTableRowClose (
+								htmlWriter);
+
+						}
+
+					}
 
 				}
 
@@ -1131,7 +1174,7 @@ class FormFieldLogic {
 	void outputTableCellsList (
 			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull FormFieldSet <Container> columnsFields,
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
@@ -1147,7 +1190,7 @@ class FormFieldLogic {
 
 			for (
 				FormField <Container, ?, ?, ?> formField
-					: formFieldSet.formFields ()
+					: columnsFields.formFields ()
 			) {
 
 				try {

@@ -57,6 +57,10 @@ class Log4jLogTarget
 			Level.INFO)
 
 		.put (
+			LogSeverity.logic,
+			Level.INFO)
+
+		.put (
 			LogSeverity.trace,
 			Level.DEBUG)
 

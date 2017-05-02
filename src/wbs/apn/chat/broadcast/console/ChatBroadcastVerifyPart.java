@@ -418,6 +418,7 @@ class ChatBroadcastVerifyPart
 				transaction,
 				formatWriter,
 				verifyUserFields,
+				optionalAbsent (),
 				chatUsers,
 				emptyMap (),
 				false);

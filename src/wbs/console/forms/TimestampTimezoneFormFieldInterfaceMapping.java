@@ -6,6 +6,8 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -121,17 +123,18 @@ class TimestampTimezoneFormFieldInterfaceMapping <Container>
 
 		) {
 
-			if (! genericValue.isPresent ()) {
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-				return successResult (
-					Optional.<String>absent ());
+				return successResultAbsent ();
 
 			}
 
-			return successResult (
-				Optional.of (
-					timeFormatter.timestampTimezoneString (
-						genericValue.get ())));
+			return successResultPresent (
+				timeFormatter.timestampTimezoneString (
+					genericValue.get ()));
 
 		}
 

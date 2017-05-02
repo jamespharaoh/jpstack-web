@@ -3,6 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.max;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 
@@ -183,6 +184,7 @@ class ImChatCustomerCreditPart
 				transaction,
 				formatWriter,
 				creditHistoryFormFields,
+				optionalAbsent (),
 				Lists.reverse (
 					creditHistory),
 				emptyMap (),

@@ -673,14 +673,14 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			) {
 
 				formatWriter.writeLineFormat (
-					"<td colspan=\"%h\">—</td>",
+					"<td colspan=\"%h\">&mdash;</td>",
 					integerToDecimalString (
 						columnSpan));
 
 			} else {
 
 				formatWriter.writeLineFormat (
-					"<td>—</td>");
+					"<td>&mdash;</td>");
 
 			}
 

@@ -363,7 +363,7 @@ class ObjectManagerImplementation
 		) {
 
 			if (startingObject == null)
-				return "-";
+				return "—";
 
 			Record <?> currentObject =
 				startingObject;

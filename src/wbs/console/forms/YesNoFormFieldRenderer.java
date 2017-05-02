@@ -358,7 +358,33 @@ class YesNoFormFieldRenderer <Container>
 			@NonNull Boolean link,
 			@NonNull Long colspan) {
 
-		// TODO Auto-generated method stub
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellProperties");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					propertiesAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
 
 	}
 

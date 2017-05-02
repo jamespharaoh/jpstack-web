@@ -94,7 +94,7 @@ class QueueFixtureProvider
 					"")
 
 				.setLabel (
-					"Queue")
+					"Queues")
 
 				.setTargetPath (
 					"/queues")

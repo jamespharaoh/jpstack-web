@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
@@ -297,7 +298,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
-			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Optional <Interface> interfaceValueOptional,
 			boolean link) {
 
 		try (
@@ -309,12 +310,14 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 		) {
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"%h",
-				interfaceValue.isPresent ()
-					? enumNameSpaces (
-						interfaceValue.get ())
-					: "");
+				optionalMapRequiredOrDefault (
+					interfaceValue ->
+						enumNameSpaces (
+							interfaceValue),
+					interfaceValueOptional,
+					"—"));
 
 		}
 

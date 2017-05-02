@@ -10,6 +10,7 @@ import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -193,13 +194,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				String privCode =
 					privParts.get (1);
 
-				Record<?> delegate =
-					(Record<?>)
-					objectManager.dereferenceObsolete (
-						transaction,
-						container,
-						delegatePath,
-						hints);
+				Record <?> delegate =
+					genericCastUnchecked (
+						objectManager.dereferenceRequired (
+							transaction,
+							container,
+							delegatePath,
+							hints));
 
 				return privChecker.canRecursive (
 					transaction,

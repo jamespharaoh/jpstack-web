@@ -7,6 +7,8 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -140,9 +142,7 @@ class TimestampFormFieldInterfaceMapping <Container>
 					genericValue)
 			) {
 
-				return successResult (
-					Optional.of (
-						""));
+				return successResultAbsent ();
 
 			}
 
@@ -150,27 +150,24 @@ class TimestampFormFieldInterfaceMapping <Container>
 
 			case timestamp:
 
-				return successResult (
-					Optional.of (
-						preferences.timestampWithTimezoneString (
-							transaction,
-							genericValue.get ())));
+				return successResultPresent (
+					preferences.timestampWithTimezoneString (
+						transaction,
+						genericValue.get ()));
 
 			case date:
 
-				return successResult (
-					Optional.of (
-						preferences.dateStringShort (
-							transaction,
-							genericValue.get ())));
+				return successResultPresent (
+					preferences.dateStringShort (
+						transaction,
+						genericValue.get ()));
 
 			case time:
 
-				return successResult (
-					Optional.of (
-						preferences.timeString (
-							transaction,
-							genericValue.get ())));
+				return successResultPresent (
+					preferences.timeString (
+						transaction,
+						genericValue.get ()));
 
 			default:
 
