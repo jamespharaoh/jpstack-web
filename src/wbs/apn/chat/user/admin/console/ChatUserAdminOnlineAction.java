@@ -72,16 +72,11 @@ class ChatUserAdminOnlineAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminOnlineAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -98,7 +93,8 @@ class ChatUserAdminOnlineAction
 			}
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			String userType =
 				capitalise (
@@ -138,9 +134,10 @@ class ChatUserAdminOnlineAction
 							true);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"chat_user_online",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						chatUser);
 
 					transaction.commit ();
@@ -169,16 +166,17 @@ class ChatUserAdminOnlineAction
 						transaction.now ());
 
 				chatMiscLogic.userJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					null,
 					chatUser.getDeliveryMethod ());
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_online",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser);
 
 				transaction.commit ();
@@ -217,7 +215,7 @@ class ChatUserAdminOnlineAction
 				} else {
 
 					chatMiscLogic.userLogoffWithMessage (
-						taskLogger,
+						transaction,
 						chatUser,
 						null,
 						false);
@@ -225,9 +223,10 @@ class ChatUserAdminOnlineAction
 				}
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_offline",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser);
 
 				transaction.commit ();

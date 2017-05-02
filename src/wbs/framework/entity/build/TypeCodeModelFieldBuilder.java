@@ -6,20 +6,33 @@ import static wbs.utils.string.StringUtils.camelToUnderscore;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.identities.TypeCodeFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("typeCodeModelFieldBuilder")
 @ModelBuilder
 public
-class TypeCodeModelFieldBuilder {
+class TypeCodeModelFieldBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -34,70 +47,83 @@ class TypeCodeModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				"type");
+		try (
 
-		// create model field
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		ModelField modelField =
-			new ModelField ()
+		) {
 
-			.model (
-				target.model ())
+			String fieldName =
+				ifNull (
+					spec.name (),
+					"type");
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.typeCode)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				true)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.valueType (
-				String.class)
+				.type (
+					ModelFieldType.typeCode)
 
-			.nullable (
-				false)
+				.parent (
+					false)
 
-			.columnNames (
-				ImmutableList.<String>of (
-					ifNull (
-						spec.columnName (),
-						camelToUnderscore (
-							fieldName))));
+				.identity (
+					true)
 
-		// store field
+				.valueType (
+					String.class)
 
-		target.fields ().add (
-			modelField);
+				.nullable (
+					false)
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							camelToUnderscore (
+								fieldName))));
 
-		if (target.model ().typeCodeField () != null)
-			throw new RuntimeException ();
+			// store field
 
-		target.model ().typeCodeField (
-			modelField);
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().typeCodeField () != null)
+				throw new RuntimeException ();
+
+			target.model ().typeCodeField (
+				modelField);
+
+		}
 
 	}
 

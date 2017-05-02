@@ -8,8 +8,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
 import wbs.platform.object.core.model.ObjectTypeDao;
@@ -56,30 +57,41 @@ class BroadcastHooks
 	@Override
 	public
 	void beforeInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast) {
 
-		BroadcastConfigRec broadcastConfig =
-			broadcast.getBroadcastConfig ();
+		try (
 
-		// set index
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"beforeInsert");
 
-		broadcast.setIndex (
-			broadcastConfig.getNumTotal ());
+		) {
+
+			BroadcastConfigRec broadcastConfig =
+				broadcast.getBroadcastConfig ();
+
+			// set index
+
+			broadcast.setIndex (
+				broadcastConfig.getNumTotal ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void afterInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"afterInsert");
 
 		) {
@@ -99,19 +111,20 @@ class BroadcastHooks
 
 			BatchSubjectRec batchSubject =
 				batchLogic.batchSubject (
-					taskLogger,
+					transaction,
 					broadcastConfig,
 					"broadcast");
 
 			ObjectTypeRec broadcastObjectType =
 				objectTypeDao.findByCode (
+					transaction,
 					"broadcast");
 
 			if (broadcastObjectType == null)
 				throw new NullPointerException ();
 
 			batchHelper.insert (
-				taskLogger,
+				transaction,
 				batchHelper.createInstance ()
 
 				.setParentType (
@@ -150,7 +163,7 @@ class BroadcastHooks
 				}
 
 				broadcastLogicProvider.addNumbers (
-					taskLogger,
+					transaction,
 					broadcast,
 					numbers,
 					null);

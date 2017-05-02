@@ -2,6 +2,7 @@ package wbs.smsapps.forwarder.api;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcType;

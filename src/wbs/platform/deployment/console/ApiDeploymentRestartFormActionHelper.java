@@ -14,9 +14,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.model.ApiDeploymentRec;
 import wbs.platform.event.logic.EventLogic;
@@ -56,23 +56,24 @@ class ApiDeploymentRestartFormActionHelper
 	@Override
 	public
 	Permissions canBePerformed (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canBePerformed");
 
 		) {
 
 			ApiDeploymentRec apiDeployment =
-				apiDeploymentHelper.findFromContextRequired ();
+				apiDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			boolean show =
 				userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					apiDeployment,
 					"restart");
 
@@ -90,24 +91,36 @@ class ApiDeploymentRestartFormActionHelper
 	@Override
 	public
 	void writePreamble (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
-		ApiDeploymentRec apiDeployment =
-			apiDeploymentHelper.findFromContextRequired ();
+		try (
 
-		if (apiDeployment.getRestart ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writePreamble");
 
-			htmlParagraphWriteFormat (
-				"There is already a restart scheduled for this API ",
-				"deployment, but it has not yet taken place. If this message ",
-				"persists, please contact support.");
+		) {
 
-		} else {
+			ApiDeploymentRec apiDeployment =
+				apiDeploymentHelper.findFromContextRequired (
+					transaction);
 
-			htmlParagraphWriteFormat (
-				"Trigger a restart for this API deployment");
+			if (apiDeployment.getRestart ()) {
+
+				htmlParagraphWriteFormat (
+					"There is already a restart scheduled for this API ",
+					"deployment, but it has not yet taken place. If this message ",
+					"persists, please contact support.");
+
+			} else {
+
+				htmlParagraphWriteFormat (
+					"Trigger a restart for this API deployment");
+
+			}
 
 		}
 
@@ -116,15 +129,14 @@ class ApiDeploymentRestartFormActionHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object formState) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
@@ -132,7 +144,8 @@ class ApiDeploymentRestartFormActionHelper
 			// load data
 
 			ApiDeploymentRec apiDeployment =
-				apiDeploymentHelper.findFromContextRequired ();
+				apiDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			// check state
 
@@ -153,9 +166,10 @@ class ApiDeploymentRestartFormActionHelper
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"api_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				apiDeployment);
 
 			// commit and return

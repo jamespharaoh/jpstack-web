@@ -75,16 +75,11 @@ class ChatUserAdminPrefsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminPrefsAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -114,7 +109,8 @@ class ChatUserAdminPrefsAction
 			// lookup database stuff
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// check changes
 
@@ -155,9 +151,10 @@ class ChatUserAdminPrefsAction
 						newOrient);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_prefs",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser,
 					chatUser.getGender ().toString (),
 					chatUser.getOrient ().toString ());

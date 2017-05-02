@@ -1,8 +1,5 @@
 package wbs.platform.hooks.logic;
 
-import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -15,18 +12,24 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("hooksManager")
 public
 class HooksManager {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	List <HooksProxy> proxies =
@@ -40,45 +43,59 @@ class HooksManager {
 
 	@NormalLifecycleSetup
 	public
-	void afterPropertiesSet ()
-		throws Exception {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
-			"Initialising");
+		try (
 
-		for (HooksProxy proxy
-				: proxies) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			initProxy (
-				proxy);
+		) {
+
+			for (
+				HooksProxy proxy
+					: proxies
+			) {
+
+				initProxy (
+					taskLogger,
+					proxy);
+
+			}
 
 		}
-
-		log.debug (
-			"Ready");
 
 	}
 
 	public
 	void initProxy (
-			HooksProxy proxy) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull HooksProxy proxy) {
 
-		log.debug (
-			stringFormat (
-				"Initialising proxy type %s",
-				classNameSimple (
-					proxy.getClass ())));
+		try (
 
-		Object delegate =
-			createDelegate (
-				proxy.getParentClass (),
-				ImmutableList.copyOf (
-					Iterables.filter (
-						targets,
-						proxy.getTargetClass ())));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initProxy");
 
-		proxy.setDelegate (
-			delegate);
+		) {
+
+			Object delegate =
+				createDelegate (
+					proxy.getParentClass (),
+					ImmutableList.copyOf (
+						Iterables.filter (
+							targets,
+							proxy.getTargetClass ())));
+
+			proxy.setDelegate (
+				delegate);
+
+		}
 
 	}
 

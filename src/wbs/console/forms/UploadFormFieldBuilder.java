@@ -9,26 +9,38 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("uploadFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class UploadFormFieldBuilder {
+class UploadFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManager formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -77,114 +89,127 @@ class UploadFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+		) {
 
-		// accessor
+			String name =
+				spec.name ();
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-			.name (
-				name)
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-			.nativeClass (
-				FileUpload.class);
+			// accessor
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		// value validators
+				.name (
+					name)
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+				.nativeClass (
+					FileUpload.class);
 
-		if (! nullable) {
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+			// value validators
+
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				uploadFormFieldRendererProvider.get ()
+
+				.name (
+					name)
+
+				.label (
+					label);
+
+			// update hook
+
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
+
+			// form field
+
+			formFieldSet.addFormItem (
+				updatableFormFieldProvider.get ()
+
+				.name (
+					name)
+
+				.label (
+					label)
+
+				.accessor (
+					accessor)
+
+				.nativeMapping (
+					nativeMapping)
+
+				.valueValidators (
+					valueValidators)
+
+				.constraintValidator (
+					constraintValidator)
+
+				.interfaceMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+				.updateHook (
+					updateHook)
+
+			);
 
 		}
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
-
-		// interface mapping
-
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			uploadFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// form field
-
-		formFieldSet.addFormItem (
-			updatableFormFieldProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.accessor (
-				accessor)
-
-			.nativeMapping (
-				nativeMapping)
-
-			.valueValidators (
-				valueValidators)
-
-			.constraintValidator (
-				constraintValidator)
-
-			.interfaceMapping (
-				interfaceMapping)
-
-			.renderer (
-				renderer)
-
-			.updateHook (
-				updateHook)
-
-		);
 
 	}
 

@@ -81,22 +81,15 @@ class ForwarderOutAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goApi");
 
 		) {
 
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ForwarderOutAction.goApi ()",
-						this);
-
-			) {
+			try {
 
 				String slice = null, code = null, password = null;
 				String message = null, numfrom = null, numto = null;
@@ -113,7 +106,7 @@ class ForwarderOutAction
 					String paramName =
 						parameterEntry.getKey ();
 
-					List<String> values =
+					List <String> values =
 						parameterEntry.getValue ();
 
 					if (values.size () > 1) {
@@ -239,10 +232,12 @@ class ForwarderOutAction
 				}
 
 				ForwarderRec forwarder;
+
 				try {
 
 					forwarder =
 						forwarderApiLogic.lookupForwarder (
+							transaction,
 							requestContext,
 							slice,
 							code,
@@ -279,6 +274,7 @@ class ForwarderOutAction
 
 					forwarderMessageInOptional =
 						forwarderMessageInHelper.find (
+							transaction,
 							inId);
 
 					if (
@@ -311,7 +307,7 @@ class ForwarderOutAction
 
 					forwarderMessageOut =
 						forwarderLogic.sendMessage (
-							taskLogger,
+							transaction,
 							forwarder,
 							forwarderMessageInOptional.orNull (),
 							message,
@@ -362,7 +358,7 @@ class ForwarderOutAction
 
 			} catch (ReportableException exception) {
 
-				taskLogger.errorFormatException (
+				transaction.errorFormatException (
 					exception,
 					"Error doing 'out'");
 
@@ -382,7 +378,7 @@ class ForwarderOutAction
 							: values
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Param %s: %s",
 							name,
 							value);

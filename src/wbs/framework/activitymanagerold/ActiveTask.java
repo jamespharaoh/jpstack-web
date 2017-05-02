@@ -1,4 +1,4 @@
-package wbs.framework.activitymanager;
+package wbs.framework.activitymanagerold;
 
 public
 interface ActiveTask

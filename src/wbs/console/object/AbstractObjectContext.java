@@ -22,8 +22,11 @@ import wbs.console.request.Cryptor;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.exceptions.HttpNotFoundException;
@@ -71,14 +74,14 @@ class AbstractObjectContext
 	@Override
 	public
 	String localPathForStuff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff stuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"localPathForStuff");
 
 		) {
@@ -86,7 +89,7 @@ class AbstractObjectContext
 			return stringFormat (
 				"/%s",
 				encodeId (
-					taskLogger,
+					transaction,
 					genericCastUnchecked (
 						stuff.get (
 							requestIdKey ()))));
@@ -125,7 +128,7 @@ class AbstractObjectContext
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"decodeId");
@@ -156,7 +159,7 @@ class AbstractObjectContext
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"encodeId");
@@ -183,22 +186,22 @@ class AbstractObjectContext
 	@Override
 	public
 	void initContext (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull PathSupply pathParts,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"initContext");
 
 		) {
 
 			Long localId =
 				decodeId (
-					taskLogger,
+					transaction,
 					pathParts.next ());
 
 			contextStuff.set (
@@ -207,11 +210,12 @@ class AbstractObjectContext
 
 			Object object =
 				objectLookup ().lookupObject (
+					transaction,
 					contextStuff);
 
 			if (object == null) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Can't find object with id %s",
 					integerToDecimalString (
 						localId));
@@ -240,7 +244,7 @@ class AbstractObjectContext
 			if (postProcessorName () != null) {
 
 				consoleManager.runPostProcessors (
-					taskLogger,
+					transaction,
 					postProcessorName (),
 					contextStuff);
 

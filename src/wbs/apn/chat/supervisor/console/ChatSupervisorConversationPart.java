@@ -38,8 +38,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -99,99 +100,115 @@ class ChatSupervisorConversationPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		long chatUserId1 =
-			requestContext.parameterIntegerRequired (
-				"chatUserId1");
-
-		long chatUserId2 =
-			requestContext.parameterIntegerRequired (
-				"chatUserId2");
-
-		userChatUser =
-			chatUserHelper.findRequired (
-				chatUserId1);
-
-		monitorChatUser =
-			chatUserHelper.findRequired (
-				chatUserId2);
-
-		if (anyOf (
-
-			() ->
-				referenceNotEqualWithClass (
-					ChatRec.class,
-					userChatUser.getChat (),
-					chat),
-
-			() ->
-				referenceNotEqualWithClass (
-					ChatRec.class,
-					monitorChatUser.getChat (),
-					chat))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Chat users %s and %s do not match chat %s",
-					integerToDecimalString (
-						userChatUser.getId ()),
-					integerToDecimalString (
-						monitorChatUser.getId ()),
-					integerToDecimalString (
-						chat.getId ())));
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
+
+			long chatUserId1 =
+				requestContext.parameterIntegerRequired (
+					"chatUserId1");
+
+			long chatUserId2 =
+				requestContext.parameterIntegerRequired (
+					"chatUserId2");
+
+			userChatUser =
+				chatUserHelper.findRequired (
+					transaction,
+					chatUserId1);
+
+			monitorChatUser =
+				chatUserHelper.findRequired (
+					transaction,
+					chatUserId2);
+
+			if (anyOf (
+
+				() ->
+					referenceNotEqualWithClass (
+						ChatRec.class,
+						userChatUser.getChat (),
+						chat),
+
+				() ->
+					referenceNotEqualWithClass (
+						ChatRec.class,
+						monitorChatUser.getChat (),
+						chat))
+
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Chat users %s and %s do not match chat %s",
+						integerToDecimalString (
+							userChatUser.getId ()),
+						integerToDecimalString (
+							monitorChatUser.getId ()),
+						integerToDecimalString (
+							chat.getId ())));
+
+			}
+
+			ChatSchemeRec chatScheme =
+				userChatUser.getChatScheme ();
+
+			chatTimezone =
+				timeFormatter.timezone (
+					chatScheme.getTimezone ());
+
+			chatMessages =
+				new ArrayList<> ();
+
+			chatMessages.addAll (
+				chatMessageHelper.findFromTo (
+					transaction,
+					userChatUser,
+					monitorChatUser));
+
+			chatMessages.addAll (
+				chatMessageHelper.findFromTo (
+					transaction,
+					monitorChatUser,
+					userChatUser));
+
+			Collections.sort (
+				chatMessages);
 
 		}
-
-		ChatSchemeRec chatScheme =
-			userChatUser.getChatScheme ();
-
-		chatTimezone =
-			timeFormatter.timezone (
-				chatScheme.getTimezone ());
-
-		chatMessages =
-			new ArrayList<ChatMessageRec> ();
-
-		chatMessages.addAll (
-			chatMessageHelper.findFromTo (
-				userChatUser,
-				monitorChatUser));
-
-		chatMessages.addAll (
-			chatMessageHelper.findFromTo (
-				monitorChatUser,
-				userChatUser));
-
-		Collections.sort (
-			chatMessages);
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			renderDetails (
-				taskLogger);
+				transaction);
 
 			renderHistory (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -199,13 +216,13 @@ class ChatSupervisorConversationPart
 
 	private
 	void renderDetails (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderDetails");
 
 		) {
@@ -225,12 +242,12 @@ class ChatSupervisorConversationPart
 				"User number");
 
 			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				monitorChatUser,
 				chat);
 
 			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				userChatUser,
 				chat);
 
@@ -284,7 +301,7 @@ class ChatSupervisorConversationPart
 					monitorChatUser.getChatUserImageList (),
 
 				() -> mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
+					transaction,
 					formatWriter,
 					monitorChatUser.getChatUserImageList ().get (0)
 						.getMedia ()),
@@ -299,7 +316,7 @@ class ChatSupervisorConversationPart
 					userChatUser.getChatUserImageList (),
 
 				() -> mediaConsoleLogic.writeMediaThumb100 (
-					taskLogger,
+					transaction,
 					formatWriter,
 					userChatUser.getChatUserImageList ().get (0).getMedia ()),
 
@@ -337,13 +354,13 @@ class ChatSupervisorConversationPart
 
 	private
 	void renderHistory (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHistory");
 
 		) {
@@ -364,6 +381,7 @@ class ChatSupervisorConversationPart
 
 			DateTimeZone timezone =
 				chatMiscLogic.timezone (
+					transaction,
 					chat);
 
 			LocalDate previousDate = null;

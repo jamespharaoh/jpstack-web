@@ -15,9 +15,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
@@ -72,39 +72,43 @@ class SendSmsConfigSendFormActionHelper
 
 	@Override
 	public
-	SendSmsConfigSendForm constructFormState () {
-
-		return new SendSmsConfigSendForm ();
-
-	}
-
-	@Override
-	public
 	void updatePassiveFormState (
+			@NonNull Transaction parentTransaction,
 			@NonNull SendSmsConfigSendForm form) {
 
-		SendSmsConfigRec sendSmsConfig =
-			sendSmsConfigHelper.findFromContextRequired ();
+		try (
 
-		form
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"updatePassiveFormState");
 
-			.originator (
-				sendSmsConfig.getOriginator ());
+		) {
+
+			SendSmsConfigRec sendSmsConfig =
+				sendSmsConfigHelper.findFromContextRequired (
+					transaction);
+
+			form
+
+				.originator (
+					sendSmsConfig.getOriginator ());
+
+		}
 
 	}
 
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull SendSmsConfigSendForm form) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
@@ -112,25 +116,28 @@ class SendSmsConfigSendFormActionHelper
 			// send message
 
 			SendSmsConfigRec sendSmsConfig =
-				sendSmsConfigHelper.findFromContextRequired ();
+				sendSmsConfigHelper.findFromContextRequired (
+					transaction);
 
 			NumberRec smsNumber =
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					form.number ());
 
 			TextRec messageBodyText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					form.messageBody ());
 
 			MessageRec smsMessage =
 				smsMessageSenderProvider.get ()
 
 				.routerResolve (
+					transaction,
 					sendSmsConfig.getSmsRouter ())
 
 				.serviceLookup (
+					transaction,
 					sendSmsConfig,
 					"default")
 
@@ -144,13 +151,14 @@ class SendSmsConfigSendFormActionHelper
 					messageBodyText)
 
 				.user (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.send (
-					taskLogger);
+					transaction);
 
 			sendSmsMessageHelper.insert (
-				taskLogger,
+				transaction,
 				sendSmsMessageHelper.createInstance ()
 
 				.setSendSmsConfig (
@@ -169,7 +177,8 @@ class SendSmsConfigSendFormActionHelper
 					messageBodyText)
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setMessage (
 					smsMessage)

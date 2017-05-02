@@ -4,9 +4,12 @@ import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.web.context.RequestContext;
 import wbs.web.responder.PrintResponder;
@@ -18,6 +21,9 @@ class ChatInfoSiteMessageSentResponder
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -26,21 +32,43 @@ class ChatInfoSiteMessageSentResponder
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			"text/html");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				"text/html");
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlParagraphWrite (
-			"Your message has been sent.");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goContent");
+
+		) {
+
+			htmlParagraphWrite (
+				"Your message has been sent.");
+
+		}
 
 	}
 

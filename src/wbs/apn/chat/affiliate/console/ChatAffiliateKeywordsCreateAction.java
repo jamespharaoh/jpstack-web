@@ -84,8 +84,9 @@ class ChatAffiliateKeywordsCreateAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -99,7 +100,11 @@ class ChatAffiliateKeywordsCreateAction
 
 				.toLowerCase ();
 
-			if (! keywordLogic.checkKeyword (keyword)) {
+			if (
+				! keywordLogic.checkKeyword (
+					transaction,
+					keyword)
+			) {
 
 				requestContext.addError (
 					"Keyword can only contain letters and numbers");
@@ -135,83 +140,74 @@ class ChatAffiliateKeywordsCreateAction
 					requestContext.parameterRequired (
 						"orient"));
 
-			try (
+			ChatAffiliateRec chatAffiliate =
+				chatAffiliateHelper.findFromContextRequired (
+					transaction);
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatAffiliateKeywordCreateAction.goReal ()",
-						this);
+			ChatSchemeRec chatScheme =
+				chatAffiliate.getChatScheme ();
 
+			Optional <ChatKeywordRec> chatKeywordOptional =
+				chatKeywordHelper.findByCode (
+					transaction,
+					chatScheme.getChat (),
+					keyword);
+
+			if (
+				optionalIsPresent (
+					chatKeywordOptional)
 			) {
 
-				ChatAffiliateRec chatAffiliate =
-					chatAffiliateHelper.findFromContextRequired ();
+				requestContext.addError (
+					"Global keyword already exists: " + keyword);
 
-				ChatSchemeRec chatScheme =
-					chatAffiliate.getChatScheme ();
-
-				Optional <ChatKeywordRec> chatKeywordOptional =
-					chatKeywordHelper.findByCode (
-						chatScheme.getChat (),
-						keyword);
-
-				if (
-					optionalIsPresent (
-						chatKeywordOptional)
-				) {
-
-					requestContext.addError (
-						"Global keyword already exists: " + keyword);
-
-					return null;
-
-				}
-
-				Optional <ChatSchemeKeywordRec> chatSchemeKeywordOptional =
-					chatSchemeKeywordHelper.findByCode (
-						chatScheme,
-						keyword);
-
-				if (
-					optionalIsPresent (
-						chatSchemeKeywordOptional)
-				) {
-
-					requestContext.addError (
-						"Keyword already exists: " + keyword);
-
-					return null;
-
-				}
-
-				chatSchemeKeywordHelper.insert (
-					taskLogger,
-					chatSchemeKeywordHelper.createInstance ()
-
-					.setChatScheme (
-						chatScheme)
-
-					.setKeyword (
-						keyword)
-
-					.setJoinType (
-						joinType)
-
-					.setJoinGender (
-						gender)
-
-					.setJoinOrient (
-						orient)
-
-					.setJoinChatAffiliate (
-						chatAffiliate)
-
-				);
-
-				transaction.commit ();
+				return null;
 
 			}
+
+			Optional <ChatSchemeKeywordRec> chatSchemeKeywordOptional =
+				chatSchemeKeywordHelper.findByCode (
+					transaction,
+					chatScheme,
+					keyword);
+
+			if (
+				optionalIsPresent (
+					chatSchemeKeywordOptional)
+			) {
+
+				requestContext.addError (
+					"Keyword already exists: " + keyword);
+
+				return null;
+
+			}
+
+			chatSchemeKeywordHelper.insert (
+				transaction,
+				chatSchemeKeywordHelper.createInstance ()
+
+				.setChatScheme (
+					chatScheme)
+
+				.setKeyword (
+					keyword)
+
+				.setJoinType (
+					joinType)
+
+				.setJoinGender (
+					gender)
+
+				.setJoinOrient (
+					orient)
+
+				.setJoinChatAffiliate (
+					chatAffiliate)
+
+			);
+
+			transaction.commit ();
 
 			requestContext.addNotice (
 				"Chat scheme keyword created");

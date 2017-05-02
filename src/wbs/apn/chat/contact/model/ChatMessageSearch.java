@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.joda.time.Instant;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
 
 @Accessors (fluent = true)
 @Data

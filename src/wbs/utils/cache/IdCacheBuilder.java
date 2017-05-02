@@ -1,25 +1,38 @@
 package wbs.utils.cache;
 
+import static wbs.utils.etc.NullUtils.errorIfNull;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.google.common.base.Optional;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsSpecialConfig;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.etc.SafeCloseable;
 
 @Accessors (fluent = true)
 @Data
 @PrototypeComponent ("idCacheBuilder")
 public
-class IdCacheBuilder <Key, Id, Value> {
+class IdCacheBuilder <Context extends SafeCloseable, Key, Id, Value> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	WbsSpecialConfig wbsSpecialConfig;
@@ -29,44 +42,91 @@ class IdCacheBuilder <Key, Id, Value> {
 	Boolean dummy = false;
 	Boolean cacheNegatives = false;
 
-	Function <Key, Optional <Value>> lookupByKeyFunction;
-	Function <Id, Optional <Value>> lookupByIdFunction;
+	BiFunction <Context, Key, Optional <Value>> lookupByKeyFunction;
+	BiFunction <Context, Id, Optional <Value>> lookupByIdFunction;
 	Function <Value, Id> getIdFunction;
-	BiFunction <TaskLogger, Key, Value> createFunction;
+	BiFunction <Context, Key, Value> createFunction;
+	BiFunction <Pair <LogContext, String>, Context, Context> wrapperFunction;
 
 	// implementation
 
 	public
-	AdvancedCache <Key, Value> build () {
+	AdvancedCache <Context, Key, Value> build (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (dummy) {
+		try (
 
-			return new DummyCache <Key, Value> ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-				.lookupByKeyFunction (
+		) {
+
+			if (dummy) {
+
+				errorIfNull (
+					taskLogger,
+					"lookupBykeyFunction",
 					lookupByKeyFunction);
 
-		} else {
+				taskLogger.makeException ();
 
-			return new IdLookupCache <Key, Id, Value> ()
+				return new DummyCache <Context, Key, Value> ()
 
-				.assumeNegatives (
-					wbsSpecialConfig.assumeNegativeCache ())
+					.lookupByKeyFunction (
+						lookupByKeyFunction);
 
-				.cacheNegatives (
-					cacheNegatives)
+			} else {
 
-				.lookupByIdFunction (
-					lookupByIdFunction)
+				errorIfNull (
+					taskLogger,
+					"lookupBykeyFunction",
+					lookupByKeyFunction);
 
-				.lookupByKeyFunction (
-					lookupByKeyFunction)
+				errorIfNull (
+					taskLogger,
+					"lookupByIdFunction",
+					lookupByIdFunction);
 
-				.getIdFunction (
-					getIdFunction)
+				errorIfNull (
+					taskLogger,
+					"getIdFunction",
+					getIdFunction);
 
-				.createFunction (
-					createFunction);
+				errorIfNull (
+					taskLogger,
+					"wrapperFunction",
+					wrapperFunction);
+
+				taskLogger.makeException ();
+
+				return new IdLookupCache <Context, Key, Id, Value> ()
+
+					.assumeNegatives (
+						wbsSpecialConfig.assumeNegativeCache ())
+
+					.cacheNegatives (
+						cacheNegatives)
+
+					.lookupByIdFunction (
+						lookupByIdFunction)
+
+					.lookupByKeyFunction (
+						lookupByKeyFunction)
+
+					.getIdFunction (
+						getIdFunction)
+
+					.createFunction (
+						createFunction)
+
+					.wrapperFunction (
+						wrapperFunction)
+
+				;
+
+			}
 
 		}
 

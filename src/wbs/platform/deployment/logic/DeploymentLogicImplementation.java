@@ -19,8 +19,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.model.ApiDeploymentObjectHelper;
@@ -62,7 +65,7 @@ class DeploymentLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setup");
@@ -183,37 +186,76 @@ class DeploymentLogicImplementation
 
 	@Override
 	public
-	ApiDeploymentRec thisApiDeployment () {
+	ApiDeploymentRec thisApiDeployment (
+			@NonNull Transaction parentTransaction) {
 
-		return apiDeploymentHelper.findByCodeRequired (
-			GlobalId.root,
-			hyphenToUnderscore (
-				System.getenv (
-					"WBS_DEPLOYMENT_NAME")));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"thisApiDeployment");
+
+		) {
+
+			return apiDeploymentHelper.findByCodeRequired (
+				transaction,
+				GlobalId.root,
+				hyphenToUnderscore (
+					System.getenv (
+						"WBS_DEPLOYMENT_NAME")));
+
+		}
 
 	}
 
 	@Override
 	public
-	ConsoleDeploymentRec thisConsoleDeployment () {
+	ConsoleDeploymentRec thisConsoleDeployment (
+			@NonNull Transaction parentTransaction) {
 
-		return consoleDeploymentHelper.findByCodeRequired (
-			GlobalId.root,
-			hyphenToUnderscore (
-				System.getenv (
-					"WBS_DEPLOYMENT_NAME")));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"thisConsoleDeployment");
+
+		) {
+
+			return consoleDeploymentHelper.findByCodeRequired (
+				transaction,
+				GlobalId.root,
+				hyphenToUnderscore (
+					System.getenv (
+						"WBS_DEPLOYMENT_NAME")));
+
+		}
 
 	}
 
 	@Override
 	public
-	DaemonDeploymentRec thisDaemonDeployment () {
+	DaemonDeploymentRec thisDaemonDeployment (
+			@NonNull Transaction parentTransaction) {
 
-		return daemonDeploymentHelper.findByCodeRequired (
-			GlobalId.root,
-			hyphenToUnderscore (
-				System.getenv (
-					"WBS_DEPLOYMENT_NAME")));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"thisDaemonDeployment");
+
+		) {
+
+			return daemonDeploymentHelper.findByCodeRequired (
+				transaction,
+				GlobalId.root,
+				hyphenToUnderscore (
+					System.getenv (
+						"WBS_DEPLOYMENT_NAME")));
+
+		}
 
 	}
 

@@ -6,22 +6,35 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.AdditionStatsResolver;
 import wbs.console.reporting.StatsResolver;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorAdditionStatsResolverBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorAdditionStatsResolverBuilder {
+class SupervisorAdditionStatsResolverBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -41,58 +54,71 @@ class SupervisorAdditionStatsResolverBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		List<SupervisorAdditionOperandSpec> operandSpecs =
-			spec.operandSpecs ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		AdditionStatsResolver additionStatsResolver =
-			this.additionStatsResolverProvider.get ();
-
-		for (
-			SupervisorAdditionOperandSpec operandSpec
-				: operandSpecs
 		) {
 
-			StatsResolver resolver = null;
+			String name =
+				spec.name ();
 
-			if (operandSpec.resolverName () != null) {
+			List<SupervisorAdditionOperandSpec> operandSpecs =
+				spec.operandSpecs ();
 
-				resolver =
-					supervisorConfigBuilder.statsResolversByName ().get (
-						operandSpec.resolverName ());
+			AdditionStatsResolver additionStatsResolver =
+				this.additionStatsResolverProvider.get ();
 
-				if (resolver == null) {
+			for (
+				SupervisorAdditionOperandSpec operandSpec
+					: operandSpecs
+			) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Stats resolver %s does not exist",
-							operandSpec.resolverName ()));
+				StatsResolver resolver = null;
+
+				if (operandSpec.resolverName () != null) {
+
+					resolver =
+						supervisorConfigBuilder.statsResolversByName ().get (
+							operandSpec.resolverName ());
+
+					if (resolver == null) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Stats resolver %s does not exist",
+								operandSpec.resolverName ()));
+
+					}
 
 				}
 
+				additionStatsResolver.operands ().add (
+					new AdditionStatsResolver.Operand ()
+
+					.coefficient (
+						operandSpec.coefficient ())
+
+					.resolver (
+						resolver));
+
 			}
 
-			additionStatsResolver.operands ().add (
-				new AdditionStatsResolver.Operand ()
-
-				.coefficient (
-					operandSpec.coefficient ())
-
-				.resolver (
-					resolver));
+			supervisorConfigBuilder.statsResolversByName ().put (
+				name,
+				additionStatsResolver);
 
 		}
-
-		supervisorConfigBuilder.statsResolversByName ().put (
-			name,
-			additionStatsResolver);
 
 	}
 

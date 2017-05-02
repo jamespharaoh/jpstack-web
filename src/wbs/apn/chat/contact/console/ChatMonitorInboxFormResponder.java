@@ -1,5 +1,6 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -39,8 +40,9 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
@@ -101,19 +103,20 @@ class ChatMonitorInboxFormResponder
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
-				chatMonitorInboxHelper.findFromContext ();
+				chatMonitorInboxHelper.findFromContext (
+					transaction);
 
 			if (
 				optionalIsNotPresent (
@@ -123,7 +126,7 @@ class ChatMonitorInboxFormResponder
 				requestContext.addError (
 					"Chat monitor inbox item not found");
 
-				taskLogger.errorFormat (
+				transaction.errorFormat (
 					"Chat monitor inbox not found: %s",
 					integerToDecimalString (
 						requestContext.stuffIntegerRequired (
@@ -144,6 +147,7 @@ class ChatMonitorInboxFormResponder
 
 			alarm =
 				chatUserAlarmHelper.find (
+					transaction,
 					userChatUser,
 					monitorChatUser);
 
@@ -154,19 +158,19 @@ class ChatMonitorInboxFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			if (chatMonitorInbox == null)
 				return;
@@ -244,172 +248,187 @@ class ChatMonitorInboxFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.flushNotices (
-			formatWriter);
+		try (
 
-		// links
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
+		) {
 
-		htmlLinkWrite (
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
-			"Queues");
+			requestContext.flushNotices (
+				formatWriter);
 
-		htmlLinkWrite (
-			"javascript:top.show_inbox (false)",
-			"Close");
+			// links
 
-		htmlParagraphClose ();
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
 
-		// handle deleted chat monitor inbox
+			htmlLinkWrite (
+				requestContext.resolveApplicationUrl (
+					"/queues/queue.home"),
+				"Queues");
 
-		if (chatMonitorInbox == null)
-			return;
+			htmlLinkWrite (
+				"javascript:top.show_inbox (false)",
+				"Close");
 
-		// send message
+			htmlParagraphClose ();
 
-		htmlHeadingTwoWrite (
-			stringFormat (
-				"Send message as %s",
-				userChatUser.getOperatorLabel ().toString ()));
+			// handle deleted chat monitor inbox
 
-		// form open
+			if (chatMonitorInbox == null)
+				return;
 
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
+			// send message
+
+			htmlHeadingTwoWrite (
 				stringFormat (
-					"%s",
-					consoleManager
-						.context (
-							"chatMonitorInbox",
-							true)
-						.pathPrefix (),
-					"/%u",
-					integerToDecimalString (
-						chatMonitorInbox.getId ()),
-					"/chatMonitorInbox.form")));
+					"Send message as %s",
+					userChatUser.getOperatorLabel ().toString ()));
 
-		// table open
+			// form open
 
-		htmlTableOpenDetails ();
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrl (
+					stringFormat (
+						"%s",
+						consoleManager
+							.context (
+								"chatMonitorInbox",
+								true)
+							.pathPrefix (),
+						"/%u",
+						integerToDecimalString (
+							chatMonitorInbox.getId ()),
+						"/chatMonitorInbox.form")));
 
-		// from
+			// table open
 
-		htmlTableDetailsRowWrite (
-			"From",
-			doName (
-				monitorChatUser));
+			htmlTableOpenDetails ();
 
-		// to
+			// from
 
-		htmlTableDetailsRowWrite (
-			"To",
-			doName (
-				userChatUser));
+			htmlTableDetailsRowWrite (
+				"From",
+				doName (
+					monitorChatUser));
 
-		// message
+			// to
 
-		htmlTableDetailsRowWriteHtml (
-			"Message",
-			() -> formatWriter.writeLineFormat (
-				"<textarea",
-				" name=\"text\"",
-				" cols=\"64\"",
-				" rows=\"4\"",
-				" onkeyup=\"%h\"",
-				stringFormat (
-					"gsmCharCountMultiple2 (this, %s, %s);",
-					"document.getElementById ('chars')",
-					integerToDecimalString (
-						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
-				" onfocus=\"%h\"",
-				stringFormat (
-					"gsmCharCountMultiple2 (this, %s, %s);",
-					"document.getElementById ('chars')",
-					integerToDecimalString (
-						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
-				"></textarea>"));
+			htmlTableDetailsRowWrite (
+				"To",
+				doName (
+					userChatUser));
 
-		// chars
+			// message
 
-		htmlTableDetailsRowWriteHtml (
-			"Chars",
-			() -> {
+			htmlTableDetailsRowWriteHtml (
+				"Message",
+				() -> formatWriter.writeLineFormat (
+					"<textarea",
+					" name=\"text\"",
+					" cols=\"64\"",
+					" rows=\"4\"",
+					" onkeyup=\"%h\"",
+					stringFormat (
+						"gsmCharCountMultiple2 (this, %s, %s);",
+						"document.getElementById ('chars')",
+						integerToDecimalString (
+							ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+							* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
+					" onfocus=\"%h\"",
+					stringFormat (
+						"gsmCharCountMultiple2 (this, %s, %s);",
+						"document.getElementById ('chars')",
+						integerToDecimalString (
+							ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+							* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
+					"></textarea>"));
 
-			htmlSpanWrite (
-				"",
-				htmlIdAttribute (
-					"chars"));
+			// chars
 
-			htmlSpanWrite (
-				"",
-				htmlIdAttribute (
-					"messageCount"));
+			htmlTableDetailsRowWriteHtml (
+				"Chars",
+				() -> {
 
-		});
+				htmlSpanWrite (
+					"",
+					htmlIdAttribute (
+						"chars"));
 
-		// table close
+				htmlSpanWrite (
+					"",
+					htmlIdAttribute (
+						"messageCount"));
 
-		htmlTableClose ();
+			});
 
-		// form controls
+			// table close
 
-		htmlParagraphOpen ();
+			htmlTableClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send message\"",
-			" onclick=\"%h\"",
-			alarm == null
-				? stringFormat (
-					"return confirm ('%j');",
-					"send message with no alarm (please ignore this message " +
-					"if you already set one)")
-				: "",
-			">");
+			// form controls
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"sendAndNote\"",
-			" value=\"send and make note\"",
-			" onclick=\"%h\"",
-			alarm == null
-				? stringFormat (
-					"return confirm ('%j');",
-					"send message with no alarm (please ignore this message " +
-					"if you already set one)")
-				: "",
-			">");
+			htmlParagraphOpen ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"ignore\"",
-			" value=\"don't send anything\"",
-			" onclick=\"%h\"",
-			alarm == null
-				? stringFormat (
-					"return confirm ('%j');",
-					"ignore message with no alarm (please ignore this " +
-					"message if you already set one)")
-				: "",
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"send\"",
+				" value=\"send message\"",
+				" onclick=\"%h\"",
+				alarm == null
+					? stringFormat (
+						"return confirm ('%j');",
+						"send message with no alarm (please ignore this message " +
+						"if you already set one)")
+					: "",
+				">");
 
-		htmlParagraphClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"sendAndNote\"",
+				" value=\"send and make note\"",
+				" onclick=\"%h\"",
+				ifNotNullThenElse (
+					alarm,
+					() -> "",
+					() -> stringFormat (
+						"return confirm ('%j');",
+						stringFormat (
+							"send message with no alarm (please ignore this ",
+							"message if you already set one)"))),
+				">");
 
-		// form close
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"ignore\"",
+				" value=\"don't send anything\"",
+				" onclick=\"%h\"",
+				ifNotNullThenElse (
+					alarm,
+					() -> "",
+					() -> stringFormat (
+						"return confirm ('%j');",
+						stringFormat (
+							"ignore message with no alarm (please ignore this ",
+							"message if you already set one)"))),
+				">");
 
-		htmlFormClose ();
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

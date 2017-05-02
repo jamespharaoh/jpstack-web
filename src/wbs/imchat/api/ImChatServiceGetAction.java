@@ -61,25 +61,19 @@ class ImChatServiceGetAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatServiceGetAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -94,6 +88,7 @@ class ImChatServiceGetAction
 
 				.createDetails (
 					imChatApiLogic.createDetailData (
+						transaction,
 						imChat));
 
 			// return

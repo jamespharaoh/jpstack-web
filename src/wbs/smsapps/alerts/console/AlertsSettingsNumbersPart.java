@@ -19,9 +19,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
@@ -36,6 +39,9 @@ class AlertsSettingsNumbersPart
 	@SingletonDependency
 	AlertsSettingsConsoleHelper alertsSettingsHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	AlertsSettingsRec alertsSettings;
@@ -45,119 +51,203 @@ class AlertsSettingsNumbersPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		alertsSettings =
-			alertsSettingsHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			alertsSettings =
+				alertsSettingsHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// top
+		try (
 
-		htmlFormOpenPost ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		if (
-			requestContext.canContext (
-				"super")
 		) {
 
-			htmlParagraphOpen ();
+			// top
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"save changes\"",
-				">");
+			htmlFormOpenPost ();
 
-			htmlParagraphClose ();
+			if (
+				requestContext.canContext (
+					"super")
+			) {
 
-		}
+				htmlParagraphOpen ();
 
-		// entries
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"save changes\"",
+					">");
 
-		htmlTableOpenList ();
+				htmlParagraphClose ();
 
-		htmlTableHeaderRowWrite (
-			"Name",
-			"Number",
-			"Enabled",
-			"");
+			}
 
-		// rows
+			// entries
 
-		for (
-			AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()
-		) {
+			htmlTableOpenList ();
 
-			htmlTableRowOpen ();
+			htmlTableHeaderRowWrite (
+				"Name",
+				"Number",
+				"Enabled",
+				"");
 
-			// name
+			// rows
 
-			htmlTableCellOpen ();
+			for (
+				AlertsNumberRec alertsNumber
+					: alertsSettings.getAlertsNumbers ()
+			) {
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"%h\"",
-				stringFormat (
-					"name_%s",
-					integerToDecimalString (
-						alertsNumber.getId ())),
-				" value=\"%h\"",
-				requestContext.formOrDefault (
+				htmlTableRowOpen ();
+
+				// name
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"%h\"",
 					stringFormat (
 						"name_%s",
 						integerToDecimalString (
 							alertsNumber.getId ())),
-					alertsNumber.getName ()),
-				">");
+					" value=\"%h\"",
+					requestContext.formOrDefault (
+						stringFormat (
+							"name_%s",
+							integerToDecimalString (
+								alertsNumber.getId ())),
+						alertsNumber.getName ()),
+					">");
 
-			htmlTableCellClose ();
+				htmlTableCellClose ();
 
-			// number
+				// number
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"%h\"",
+					stringFormat (
+						"number_%s",
+						integerToDecimalString (
+							alertsNumber.getId ())),
+					" value=\"%h\"",
+					requestContext.formOrDefault (
+						stringFormat (
+							"number_%s",
+							integerToDecimalString (
+								alertsNumber.getId ())),
+						alertsNumber.getNumber ().getNumber ()),
+					">");
+
+				htmlTableCellClose ();
+
+				htmlTableCellOpen ();
+
+				// enabled
+
+				htmlSelectYesNo (
+					stringFormat (
+						"enabled_%s",
+						integerToDecimalString (
+							alertsNumber.getId ())),
+					requestContext.formOrEmptyString (
+						stringFormat (
+							"enabled_%s",
+							integerToDecimalString (
+								alertsNumber.getId ()))),
+					alertsNumber.getEnabled ());
+
+				htmlTableCellClose ();
+
+				// submit
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"%h\"",
+					stringFormat (
+						"delete_%s",
+						integerToDecimalString (
+							alertsNumber.getId ())),
+					" value=\"delete\"",
+					">");
+
+				htmlTableCellClose ();
+
+				// close row
+
+				htmlTableRowClose ();
+
+			}
+
+			// add new
+
+			htmlTableRowOpen ();
 
 			htmlTableCellOpen ();
 
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
-				" name=\"%h\"",
-				stringFormat (
-					"number_%s",
-					integerToDecimalString (
-						alertsNumber.getId ())),
+				" name=\"name_new\"",
 				" value=\"%h\"",
-				requestContext.formOrDefault (
-					stringFormat (
-						"number_%s",
-						integerToDecimalString (
-							alertsNumber.getId ())),
-					alertsNumber.getNumber ().getNumber ()),
+				requestContext.formOrEmptyString (
+					"name_new"),
 				">");
 
 			htmlTableCellClose ();
 
 			htmlTableCellOpen ();
 
-			// enabled
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"number_new\"",
+				" value=\"%h\"",
+				requestContext.formOrEmptyString (
+					"number_new"),
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
 
 			htmlSelectYesNo (
-				stringFormat (
-					"enabled_%s",
-					integerToDecimalString (
-						alertsNumber.getId ())),
+				"enabled_new",
 				requestContext.formOrEmptyString (
-					stringFormat (
-						"enabled_%s",
-						integerToDecimalString (
-							alertsNumber.getId ()))),
-				alertsNumber.getEnabled ());
+					"enabled_new"),
+				true);
 
 			htmlTableCellClose ();
 
@@ -168,12 +258,8 @@ class AlertsSettingsNumbersPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"%h\"",
-				stringFormat (
-					"delete_%s",
-					integerToDecimalString (
-						alertsNumber.getId ())),
-				" value=\"delete\"",
+				" name=\"add_new\"",
+				" value=\"add new\"",
 				">");
 
 			htmlTableCellClose ();
@@ -182,87 +268,30 @@ class AlertsSettingsNumbersPart
 
 			htmlTableRowClose ();
 
-		}
+			// bottom
 
-		// add new
+			htmlTableClose ();
 
-		htmlTableRowOpen ();
+			if (
+				requestContext.canContext (
+					"alertsSettings.manage")
+			) {
 
-		htmlTableCellOpen ();
+				htmlParagraphOpen ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"name_new\"",
-			" value=\"%h\"",
-			requestContext.formOrEmptyString (
-				"name_new"),
-			">");
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"save changes\"",
+					">");
 
-		htmlTableCellClose ();
+				htmlParagraphClose ();
 
-		htmlTableCellOpen ();
+			}
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"number_new\"",
-			" value=\"%h\"",
-			requestContext.formOrEmptyString (
-				"number_new"),
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		htmlSelectYesNo (
-			"enabled_new",
-			requestContext.formOrEmptyString (
-				"enabled_new"),
-			true);
-
-		htmlTableCellClose ();
-
-		// submit
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"add_new\"",
-			" value=\"add new\"",
-			">");
-
-		htmlTableCellClose ();
-
-		// close row
-
-		htmlTableRowClose ();
-
-		// bottom
-
-		htmlTableClose ();
-
-		if (
-			requestContext.canContext (
-				"alertsSettings.manage")
-		) {
-
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"save changes\"",
-				">");
-
-			htmlParagraphClose ();
+			htmlFormClose ();
 
 		}
-
-		htmlFormClose ();
 
 	}
 

@@ -2,13 +2,13 @@ package wbs.console.forms;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface FormFieldConstraintValidator <Container, Native> {
 
 	Optional <String> validate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Container container,
 			Optional <Native> nativeValue);
 

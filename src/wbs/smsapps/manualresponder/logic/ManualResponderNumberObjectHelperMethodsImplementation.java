@@ -5,8 +5,9 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -37,15 +38,15 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	ManualResponderNumberRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -54,6 +55,7 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 
 			ManualResponderNumberRec manualResponderNumber =
 				manualResponderNumberHelper.find (
+					transaction,
 					manualResponder,
 					number);
 
@@ -61,7 +63,7 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 
 				manualResponderNumber =
 					manualResponderNumberHelper.insert (
-						taskLogger,
+						transaction,
 						manualResponderNumberHelper.createInstance ()
 
 					.setManualResponder (

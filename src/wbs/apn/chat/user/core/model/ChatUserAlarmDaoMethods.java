@@ -4,16 +4,17 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
-import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.database.Transaction;
 
 public
 interface ChatUserAlarmDaoMethods {
 
 	List <ChatUserAlarmRec> findPending (
+			Transaction parentTransaction,
 			Instant now);
 
 	ChatUserAlarmRec find (
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatUserRec monitorChatUser);
 

@@ -6,21 +6,34 @@ import static wbs.utils.string.StringUtils.camelToUnderscore;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.fields.DurationFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.hibernate.DurationUserType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("durationModelFieldBuilder")
 @ModelBuilder
 public
-class DurationModelFieldBuilder {
+class DurationModelFieldBuilder
+	implements BuilderComponent {
+
+	// singleton dependncies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -35,72 +48,85 @@ class DurationModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			spec.name ();
+		try (
 
-		// create model field
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		ModelField modelField =
-			new ModelField ()
+		) {
 
-			.model (
-				target.model ())
+			String fieldName =
+				spec.name ();
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.simple)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				false)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.nullable (
-				ifNull (
-					spec.nullable (),
-					false))
+				.type (
+					ModelFieldType.simple)
 
-			.columnNames (
-				ImmutableList.<String> of (
+				.parent (
+					false)
+
+				.identity (
+					false)
+
+				.nullable (
 					ifNull (
-						spec.columnName (),
-						camelToUnderscore (
-							fieldName))))
+						spec.nullable (),
+						false))
 
-			.hibernateTypeHelper (
-				DurationUserType.class)
+				.columnNames (
+					ImmutableList.<String> of (
+						ifNull (
+							spec.columnName (),
+							camelToUnderscore (
+								fieldName))))
 
-			.sqlType (
-				"interval");
+				.hibernateTypeHelper (
+					DurationUserType.class)
 
-		// store field
+				.sqlType (
+					"interval");
 
-		target.fields ().add (
-			modelField);
+			// store field
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
-
-		if (target.model ().timestampField () == null) {
-
-			target.model ().timestampField (
+			target.fields ().add (
 				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().timestampField () == null) {
+
+				target.model ().timestampField (
+					modelField);
+
+			}
 
 		}
 

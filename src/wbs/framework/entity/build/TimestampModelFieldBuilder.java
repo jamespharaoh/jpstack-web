@@ -8,30 +8,43 @@ import static wbs.utils.string.StringUtils.camelToUnderscore;
 import java.util.Date;
 import java.util.Map;
 
-import org.jadira.usertype.dateandtime.joda.PersistentInstantAsString;
-import org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
+import org.jadira.usertype.dateandtime.joda.PersistentInstantAsString;
+import org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp;
+import org.joda.time.Instant;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.fields.TimestampFieldSpec;
 import wbs.framework.entity.meta.fields.TimestampFieldSpec.ColumnType;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.hibernate.TimestampWithTimezoneUserType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("timestampModelFieldBuilder")
 @ModelBuilder
 public
-class TimestampModelFieldBuilder {
+class TimestampModelFieldBuilder
+	implements BuilderComponent {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -46,80 +59,93 @@ class TimestampModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			spec.name ();
+		try (
 
-		// create model field
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		ModelField modelField =
-			new ModelField ()
+		) {
 
-			.model (
-				target.model ())
+			String fieldName =
+				spec.name ();
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.simple)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				false)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.valueType (
-				valueTypeByColumnType.get (
-					spec.columnType ()))
+				.type (
+					ModelFieldType.simple)
 
-			.nullable (
-				ifNull (
-					spec.nullable (),
-					false))
+				.parent (
+					false)
 
-			.columnNames (
-				ImmutableList.<String>of (
+				.identity (
+					false)
+
+				.valueType (
+					valueTypeByColumnType.get (
+						spec.columnType ()))
+
+				.nullable (
 					ifNull (
-						spec.columnName (),
-						camelToUnderscore (
-							fieldName))))
+						spec.nullable (),
+						false))
 
-			.hibernateTypeHelper (
-				orNull (
-					hibernateTypeHelperByColumnType.get (
-						spec.columnType ())))
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							camelToUnderscore (
+								fieldName))))
 
-			.sqlType (
-				orNull (
-					sqlTypeByColumnType.get (
-						spec.columnType ())));
+				.hibernateTypeHelper (
+					orNull (
+						hibernateTypeHelperByColumnType.get (
+							spec.columnType ())))
 
-		// store field
+				.sqlType (
+					orNull (
+						sqlTypeByColumnType.get (
+							spec.columnType ())));
 
-		target.fields ().add (
-			modelField);
+			// store field
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
-
-		if (target.model ().timestampField () == null) {
-
-			target.model ().timestampField (
+			target.fields ().add (
 				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().timestampField () == null) {
+
+				target.model ().timestampField (
+					modelField);
+
+			}
 
 		}
 

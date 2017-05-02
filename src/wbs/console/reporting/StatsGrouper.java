@@ -3,7 +3,7 @@ package wbs.console.reporting;
 import java.util.List;
 import java.util.Set;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.utils.string.FormatWriter;
 
@@ -14,10 +14,11 @@ interface StatsGrouper {
 			StatsDataSet dataSet);
 
 	List <Object> sortGroups (
+			Transaction parentTransaction,
 			Set <Object> groups);
 
 	void writeTdForGroup (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			FormatWriter formatWriter,
 			Object group);
 

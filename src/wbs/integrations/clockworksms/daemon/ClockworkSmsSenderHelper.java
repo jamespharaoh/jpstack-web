@@ -22,7 +22,10 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -85,199 +88,212 @@ class ClockworkSmsSenderHelper
 	@Override
 	public
 	SetupRequestResult <ClockworkSmsMessageSender> setupRequest (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec smsOutbox) {
 
-		// get stuff
+		try (
 
-		MessageRec smsMessage =
-			smsOutbox.getMessage ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setupRequest");
 
-		RouteRec smsRoute =
-			smsOutbox.getRoute ();
-
-		// lookup route out
-
-		Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
-			clockworkSmsRouteOutHelper.find (
-				smsRoute.getId ());
-
-		if (
-			optionalIsNotPresent (
-				clockworkSmsRouteOutOptional)
 		) {
 
-			return new SetupRequestResult <ClockworkSmsMessageSender> ()
+			// get stuff
 
-				.status (
-					SetupRequestStatus.configError)
+			MessageRec smsMessage =
+				smsOutbox.getMessage ();
 
-				.statusMessage (
-					stringFormat (
-						"Clockwork SMS outbound route not found for %s",
-						smsRoute.getCode ()));
+			RouteRec smsRoute =
+				smsOutbox.getRoute ();
 
-		}
+			// lookup route out
 
-		ClockworkSmsRouteOutRec clockworkSmsRouteOut =
-			clockworkSmsRouteOutOptional.get ();
+			Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
+				clockworkSmsRouteOutHelper.find (
+					transaction,
+					smsRoute.getId ());
 
-		// validate message text
+			if (
+				optionalIsNotPresent (
+					clockworkSmsRouteOutOptional)
+			) {
 
-		if (
-			gsmStringIsNotValid (
-				smsMessage.getText ().getText ())
-		) {
+				return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
-			return new SetupRequestResult <ClockworkSmsMessageSender> ()
+					.status (
+						SetupRequestStatus.configError)
 
-				.status (
-					SetupRequestStatus.validationError)
+					.statusMessage (
+						stringFormat (
+							"Clockwork SMS outbound route not found for %s",
+							smsRoute.getCode ()));
 
-				.statusMessage (
-					"The message text contains non-GSM characters");
+			}
 
-		}
+			ClockworkSmsRouteOutRec clockworkSmsRouteOut =
+				clockworkSmsRouteOutOptional.get ();
 
-		long gsmLength =
-			GsmUtils.gsmStringLength (
-				smsMessage.getText ().getText ());
+			// validate message text
 
-		long gsmParts =
-			GsmUtils.gsmCountMessageParts (
-				gsmLength);
-
-		if (
-			lessThan (
-				clockworkSmsRouteOut.getMaxParts (),
-				gsmParts)
-		) {
-
-			return new SetupRequestResult <ClockworkSmsMessageSender> ()
-
-				.status (
-					SetupRequestStatus.validationError)
-
-				.statusMessage (
-					stringFormat (
-						"Message has length %s ",
-						integerToDecimalString (
-							gsmLength),
-						"and so would be split into %s parts ",
-						integerToDecimalString (
-							gsmParts),
-						"but the maximum configured for this route is %s",
-						integerToDecimalString (
-							clockworkSmsRouteOut.getMaxParts ())));
-
-		}
-
-		// pick a handler
-
-		if (
-			stringEqualSafe (
-				smsMessage.getMessageType ().getCode (),
-				"sms")
-		) {
-
-			// nothing to do
-
-		} else {
-
-			return new SetupRequestResult <ClockworkSmsMessageSender> ()
-
-				.status (
-					SetupRequestStatus.unknownError)
-
-				.statusMessage (
-					stringFormat (
-						"Don't know what to do with a %s",
-						smsMessage.getMessageType ().getCode ()));
-
-		}
-
-		// create request
-
-		ClockworkSmsMessageRequest clockworkRequest =
-			new ClockworkSmsMessageRequest ()
-
-			.key (
-				clockworkSmsRouteOut.getKey ())
-
-			.sms (
-				ImmutableList.of (
-					new ClockworkSmsMessageRequest.Sms ()
-
-				.to (
-					smsMessage.getNumTo ())
-
-				.from (
-					smsMessage.getNumFrom ())
-
-				.content (
+			if (
+				gsmStringIsNotValid (
 					smsMessage.getText ().getText ())
+			) {
 
-				.msgType (
-					"TEXT")
+				return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
-				.concat (
-					clockworkSmsRouteOut.getMaxParts ())
+					.status (
+						SetupRequestStatus.validationError)
 
-				.clientId (
-					smsMessageLogic.mangleMessageId (
-						smsMessage.getId ()))
+					.statusMessage (
+						"The message text contains non-GSM characters");
 
-				.dlrType (
-					4l)
+			}
 
-				.dlrUrl (
-					stringFormat (
-						"%s/clockwork-sms/route/%s/report",
-						wbsConfig.apiUrl (),
-						integerToDecimalString (
-							smsRoute.getId ())))
+			long gsmLength =
+				GsmUtils.gsmStringLength (
+					smsMessage.getText ().getText ());
 
-				.uniqueId (
-					1l)
+			long gsmParts =
+				GsmUtils.gsmCountMessageParts (
+					gsmLength);
 
-				.invalidCharAction (
-					1l)
+			if (
+				lessThan (
+					clockworkSmsRouteOut.getMaxParts (),
+					gsmParts)
+			) {
 
-				.truncate (
-					0l)
+				return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
-			));
+					.status (
+						SetupRequestStatus.validationError)
 
-		// create sender
+					.statusMessage (
+						stringFormat (
+							"Message has length %s ",
+							integerToDecimalString (
+								gsmLength),
+							"and so would be split into %s parts ",
+							integerToDecimalString (
+								gsmParts),
+							"but the maximum configured for this route is %s",
+							integerToDecimalString (
+								clockworkSmsRouteOut.getMaxParts ())));
 
-		ClockworkSmsMessageSender clockworkSender =
-			clockworkSmsMessageSenderProvider.get ()
+			}
 
-			.url (
-				clockworkSmsRouteOut.getUrl ())
+			// pick a handler
 
-			.simulateMultipart (
-				clockworkSmsRouteOut.getSimulateMultipart ())
+			if (
+				stringEqualSafe (
+					smsMessage.getMessageType ().getCode (),
+					"sms")
+			) {
 
-			.request (
-				clockworkRequest);
+				// nothing to do
 
-		// encode request
+			} else {
 
-		clockworkSender.encode ();
+				return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
-		// return
+					.status (
+						SetupRequestStatus.unknownError)
 
-		return new SetupRequestResult <ClockworkSmsMessageSender> ()
+					.statusMessage (
+						stringFormat (
+							"Don't know what to do with a %s",
+							smsMessage.getMessageType ().getCode ()));
 
-			.status (
-				SetupRequestStatus.success)
+			}
 
-			.requestTrace (
-				clockworkSender.requestTrace ())
+			// create request
 
-			.state (
-				clockworkSender);
+			ClockworkSmsMessageRequest clockworkRequest =
+				new ClockworkSmsMessageRequest ()
+
+				.key (
+					clockworkSmsRouteOut.getKey ())
+
+				.sms (
+					ImmutableList.of (
+						new ClockworkSmsMessageRequest.Sms ()
+
+					.to (
+						smsMessage.getNumTo ())
+
+					.from (
+						smsMessage.getNumFrom ())
+
+					.content (
+						smsMessage.getText ().getText ())
+
+					.msgType (
+						"TEXT")
+
+					.concat (
+						clockworkSmsRouteOut.getMaxParts ())
+
+					.clientId (
+						smsMessageLogic.mangleMessageId (
+							transaction,
+							smsMessage.getId ()))
+
+					.dlrType (
+						4l)
+
+					.dlrUrl (
+						stringFormat (
+							"%s/clockwork-sms/route/%s/report",
+							wbsConfig.apiUrl (),
+							integerToDecimalString (
+								smsRoute.getId ())))
+
+					.uniqueId (
+						1l)
+
+					.invalidCharAction (
+						1l)
+
+					.truncate (
+						0l)
+
+				));
+
+			// create sender
+
+			ClockworkSmsMessageSender clockworkSender =
+				clockworkSmsMessageSenderProvider.get ()
+
+				.url (
+					clockworkSmsRouteOut.getUrl ())
+
+				.simulateMultipart (
+					clockworkSmsRouteOut.getSimulateMultipart ())
+
+				.request (
+					clockworkRequest);
+
+			// encode request
+
+			clockworkSender.encode ();
+
+			// return
+
+			return new SetupRequestResult <ClockworkSmsMessageSender> ()
+
+				.status (
+					SetupRequestStatus.success)
+
+				.requestTrace (
+					clockworkSender.requestTrace ())
+
+				.state (
+					clockworkSender);
+
+		}
 
 	}
 
@@ -289,7 +305,7 @@ class ClockworkSmsSenderHelper
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"performSend");
@@ -337,56 +353,67 @@ class ClockworkSmsSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ClockworkSmsMessageSender clockworkSender) {
 
-		ClockworkSmsMessageResponse clockworkResponse =
-			clockworkSender.clockworkResponse ();
+		try (
 
-		// check for general error
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"processSend");
 
-		if (
-			isNotNull (
-				clockworkResponse.errNo ())
 		) {
 
-			return handleGeneralError (
-				clockworkResponse);
+			ClockworkSmsMessageResponse clockworkResponse =
+				clockworkSender.clockworkResponse ();
+
+			// check for general error
+
+			if (
+				isNotNull (
+					clockworkResponse.errNo ())
+			) {
+
+				return handleGeneralError (
+					clockworkResponse);
+
+			}
+
+			// check for individual error
+
+			ClockworkSmsMessageResponse.SmsResp clockworkSmsResponse =
+				clockworkResponse.smsResp ().get (0);
+
+			if (
+				isNotNull (
+					clockworkSmsResponse.errNo ())
+			) {
+
+				return handleSpecificError (
+					clockworkSmsResponse);
+
+			}
+
+			// success response
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.success)
+
+				.otherIds (
+					ImmutableList.of (
+						clockworkSmsResponse.messageId ()))
+
+				.simulateMessageParts (
+					ifThenElse (
+						clockworkSender.simulateMultipart (),
+						() -> gsmCountMessageParts (
+							clockworkSender.request ().sms ().get (0).content ()),
+						() -> null));
 
 		}
-
-		// check for individual error
-
-		ClockworkSmsMessageResponse.SmsResp clockworkSmsResponse =
-			clockworkResponse.smsResp ().get (0);
-
-		if (
-			isNotNull (
-				clockworkSmsResponse.errNo ())
-		) {
-
-			return handleSpecificError (
-				clockworkSmsResponse);
-
-		}
-
-		// success response
-
-		return new ProcessResponseResult ()
-
-			.status (
-				ProcessResponseStatus.success)
-
-			.otherIds (
-				ImmutableList.of (
-					clockworkSmsResponse.messageId ()))
-
-			.simulateMessageParts (
-				ifThenElse (
-					clockworkSender.simulateMultipart (),
-					() -> gsmCountMessageParts (
-						clockworkSender.request ().sms ().get (0).content ()),
-					() -> null));
 
 	}
 

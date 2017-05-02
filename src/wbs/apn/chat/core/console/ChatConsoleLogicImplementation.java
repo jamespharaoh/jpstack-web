@@ -13,11 +13,13 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.SingletonComponent;
+
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("chatConsoleLogic")
 public

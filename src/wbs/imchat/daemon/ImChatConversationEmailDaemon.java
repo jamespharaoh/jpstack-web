@@ -1,8 +1,8 @@
 package wbs.imchat.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -58,38 +59,49 @@ class ImChatConversationEmailDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ImChatConversationEmailDaemon.runOnce ()",
-					this);
 
 		) {
 
 			taskLogger.debugFormat (
 				"Checking for conversations to send an email");
 
-			List <ImChatConversationRec> conversations =
+			List <Long> conversationIds =
+				getConversationIds (
+					taskLogger);
+
+			conversationIds.forEach (
+				conversationId ->
+					doConversation (
+						taskLogger,
+						conversationId));
+
+		}
+
+	}
+
+	private
+	List <Long> getConversationIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			return iterableMapToList (
+				ImChatConversationRec::getId,
 				imChatConversationHelper.findPendingEmailLimit (
-					1000);
-
-			transaction.close ();
-
-			for (
-				ImChatConversationRec conversation
-					: conversations
-			) {
-
-				doConversation (
-					taskLogger,
-					conversation.getId ());
-
-			}
+					transaction,
+					1000l));
 
 		}
 
@@ -101,28 +113,46 @@ class ImChatConversationEmailDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doConversation");
 
-			OwnedTransaction updateTransaction =
-				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s (%s) begin",
-						"ImChatConcersationEmailDaemon",
-						"doConversation",
-						stringFormat (
-							"conversationId = %s",
-							integerToDecimalString (
-								conversationId))),
-					this);
+		) {
+
+			doConversationUpdate (
+				taskLogger,
+				conversationId);
+
+			doConversationEmail (
+				taskLogger,
+				conversationId);
+
+		}
+
+	}
+
+	private
+	void doConversationUpdate (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long conversationId) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"doConversationUpdate (%s)",
+					keyEqualsDecimalInteger (
+						"conversationId",
+						conversationId));
 
 		) {
 
 			ImChatConversationRec conversation =
 				imChatConversationHelper.findRequired (
+					transaction,
 					conversationId);
 
 			if (
@@ -135,36 +165,40 @@ class ImChatConversationEmailDaemon
 			conversation
 
 				.setEmailTime (
-					updateTransaction.now ());
+					transaction.now ());
 
-			updateTransaction.commit ();
+			transaction.commit ();
 
-			try (
+		}
 
-				OwnedTransaction emailTransaction =
-					database.beginReadOnly (
-						taskLogger,
-						stringFormat (
-							"%s.%s (%s) end",
-							"ImChatConversationEmailDaemon",
-							"doConversation",
-							stringFormat (
-								"conversationId = %s",
-								integerToDecimalString (
-									conversationId))),
-						this);
+	}
 
-			) {
+	private
+	void doConversationEmail (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long conversationId) {
 
-				conversation =
-					imChatConversationHelper.findRequired (
-						conversationId);
+		try (
 
-				imChatLogic.conversationEmailSend (
-					taskLogger,
-					conversation);
+			OwnedTransaction transaction =
+				database.beginReadOnlyFormat (
+					logContext,
+					parentTaskLogger,
+					"doConversationEmail (%s)",
+					keyEqualsDecimalInteger (
+						"conversationId",
+						conversationId));
 
-			}
+		) {
+
+			ImChatConversationRec conversation =
+				imChatConversationHelper.findRequired (
+					transaction,
+					conversationId);
+
+			imChatLogic.conversationEmailSend (
+				transaction,
+				conversation);
 
 		}
 

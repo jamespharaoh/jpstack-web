@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -33,7 +33,7 @@ class NameFormFieldAccessor <Container>
 	@Override
 	public
 	Optional <String> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		return optionalFromNullable (
@@ -47,7 +47,7 @@ class NameFormFieldAccessor <Container>
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
 

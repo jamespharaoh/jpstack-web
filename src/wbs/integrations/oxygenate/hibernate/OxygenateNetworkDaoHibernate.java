@@ -6,7 +6,11 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
 
 import wbs.integrations.oxygenate.model.OxygenateConfigRec;
 import wbs.integrations.oxygenate.model.OxygenateNetworkDao;
@@ -19,59 +23,92 @@ class OxygenateNetworkDaoHibernate
 	extends HibernateDao
 	implements OxygenateNetworkDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	Optional <OxygenateNetworkRec> findByChannel (
+			@NonNull Transaction parentTransaction,
 			@NonNull OxygenateConfigRec oxygenateConfig,
 			@NonNull String channel) {
 
-		return findOne (
-				"findByChannel (oxygenateConfig, channel)",
-				OxygenateNetworkRec.class,
+		try (
 
-			createCriteria (
-				OxygenateNetworkRec.class,
-				"_oxygenateNetwork")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByChannel");
 
-			.add (
-				Restrictions.eq (
-					"_oxygenateNetwork.oxygenateConfig",
-					oxygenateConfig))
+		) {
 
-			.add (
-				Restrictions.eq (
-					"_oxygenateNetwork.channel",
-					channel))
+			return findOne (
+					transaction,
+					OxygenateNetworkRec.class,
 
-		);
+				createCriteria (
+					transaction,
+					OxygenateNetworkRec.class,
+					"_oxygenateNetwork")
+
+				.add (
+					Restrictions.eq (
+						"_oxygenateNetwork.oxygenateConfig",
+						oxygenateConfig))
+
+				.add (
+					Restrictions.eq (
+						"_oxygenateNetwork.channel",
+						channel))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	Optional <OxygenateNetworkRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull OxygenateConfigRec oxygenateConfig,
 			@NonNull NetworkRec network) {
 
-		return findOne (
-			"find (oxygenateConfig, network)",
-			OxygenateNetworkRec.class,
+		try (
 
-			createCriteria  (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOne (
+				transaction,
 				OxygenateNetworkRec.class,
-				"_oxygenateNetwork")
 
-			.add (
-				Restrictions.eq (
-					"_oxygenateNetwork.oxygenateConfig",
-					oxygenateConfig))
+				createCriteria  (
+					transaction,
+					OxygenateNetworkRec.class,
+					"_oxygenateNetwork")
 
-			.add (
-				Restrictions.eq (
-					"_oxygenateNetwork.network",
-					network))
+				.add (
+					Restrictions.eq (
+						"_oxygenateNetwork.oxygenateConfig",
+						oxygenateConfig))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_oxygenateNetwork.network",
+						network))
+
+			);
+
+		}
 
 	}
 

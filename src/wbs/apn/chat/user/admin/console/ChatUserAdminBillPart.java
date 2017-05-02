@@ -28,10 +28,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -89,22 +89,20 @@ class ChatUserAdminBillPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			if (
 				enumEqualSafe (
@@ -137,6 +135,7 @@ class ChatUserAdminBillPart
 
 			todayBillLogs =
 				chatUserBillLogHelper.findByTimestamp (
+					transaction,
 					chatUser,
 					new Interval (
 						startTime,
@@ -144,6 +143,7 @@ class ChatUserAdminBillPart
 
 			allBillLogs =
 				chatUserBillLogHelper.findByTimestamp (
+					transaction,
 					chatUser,
 					new Interval (
 						millisToInstant (0),
@@ -151,6 +151,7 @@ class ChatUserAdminBillPart
 
 			billLimitReached =
 				chatCreditLogic.userBillLimitApplies (
+					transaction,
 					chatUser);
 
 		}
@@ -160,13 +161,13 @@ class ChatUserAdminBillPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -262,7 +263,7 @@ class ChatUserAdminBillPart
 						billLog.getTimestamp ()));
 
 				consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					billLog.getUser ());
 
 				htmlTableRowClose ();

@@ -83,9 +83,12 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -192,13 +195,13 @@ class ObjectSearchResultsPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -242,6 +245,7 @@ class ObjectSearchResultsPart <
 
 					currentObject =
 						consoleHelper.findRequired (
+							transaction,
 							optionalGetRequired (
 								currentObjectIdOptional));
 
@@ -253,8 +257,9 @@ class ObjectSearchResultsPart <
 
 			Object searchObject =
 				userSessionLogic.userDataObjectRequired (
-					taskLogger,
-					userConsoleLogic.userRequired (),
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction),
 					stringFormat (
 						"object_search_%s_fields",
 						sessionKey));
@@ -266,7 +271,9 @@ class ObjectSearchResultsPart <
 					NumberUtils::parseIntegerRequired,
 					stringSplitComma (
 						userSessionLogic.userDataStringRequired (
-							userConsoleLogic.userRequired (),
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
 							stringFormat (
 								"object_search_%s_results",
 								sessionKey))));
@@ -332,7 +339,7 @@ class ObjectSearchResultsPart <
 						methodInvoke (
 							method,
 							consoleHelper,
-							taskLogger,
+							transaction,
 							searchObject,
 							pageObjectIds));
 
@@ -341,7 +348,10 @@ class ObjectSearchResultsPart <
 				objects =
 					genericCastUnchecked (
 						iterableMapToList (
-							consoleHelper::find,
+							pageObjectId ->
+								consoleHelper.find (
+									transaction,
+									pageObjectId),
 							pageObjectIds));
 
 			}
@@ -349,7 +359,7 @@ class ObjectSearchResultsPart <
 			// other stuff
 
 			prepareTargetContext (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -360,7 +370,7 @@ class ObjectSearchResultsPart <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"prepareTargetContext");
@@ -385,34 +395,34 @@ class ObjectSearchResultsPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			renderNewSearch (
-				taskLogger);
+				transaction);
 
 			renderTotalObjects (
-				taskLogger);
+				transaction);
 
 			renderPageNumbers (
-				taskLogger);
+				transaction);
 
 			renderModeTabs (
-				taskLogger);
+				transaction);
 
 			renderSearchResults (
-				taskLogger);
+				transaction);
 
 			renderPageNumbers (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -563,14 +573,14 @@ class ObjectSearchResultsPart <
 	}
 
 	void renderSearchResults (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goSearchResults");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderSearchResults");
 
 		) {
 
@@ -619,7 +629,7 @@ class ObjectSearchResultsPart <
 					result instanceof Record
 
 					&& ! consoleHelper.canView (
-						taskLogger,
+						transaction,
 						genericCastUnchecked (
 							result))
 
@@ -677,6 +687,7 @@ class ObjectSearchResultsPart <
 
 						htmlTableCellWrite (
 							userConsoleLogic.dateStringLong (
+								transaction,
 								rowTimestamp),
 							htmlColumnSpanAttribute (
 								collectionSize (
@@ -718,6 +729,7 @@ class ObjectSearchResultsPart <
 								() -> "selected"),
 
 							getListClass (
+								transaction,
 								result)
 
 						)),
@@ -732,7 +744,7 @@ class ObjectSearchResultsPart <
 						htmlDataAttribute (
 							"target-href",
 							objectUrl (
-								taskLogger,
+								transaction,
 								genericCastUnchecked (
 									result)))
 
@@ -745,7 +757,7 @@ class ObjectSearchResultsPart <
 				}
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					columnsFormFieldSet,
 					result,
@@ -780,6 +792,7 @@ class ObjectSearchResultsPart <
 								() -> "selected"),
 
 							getListClass (
+								transaction,
 								result)
 
 						))),
@@ -796,14 +809,14 @@ class ObjectSearchResultsPart <
 							() -> htmlDataAttribute (
 								"target-href",
 								objectUrl (
-									taskLogger,
+									transaction,
 									genericCastUnchecked (
 										result))))
 
 					));
 
 					formFieldLogic.outputTableRowsList (
-						taskLogger,
+						transaction,
 						formatWriter,
 						rowsFormFieldSet,
 						result,
@@ -824,14 +837,14 @@ class ObjectSearchResultsPart <
 
 	private
 	String objectUrl (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"objectUrl");
 
 		) {
@@ -847,14 +860,14 @@ class ObjectSearchResultsPart <
 						targetContext.get ().pathPrefix (),
 						"/%s",
 						consoleHelper.getPathIdGeneric (
-							taskLogger,
+							transaction,
 							object)));
 
 			} else {
 
 				return requestContext.resolveLocalUrl (
 					consoleHelper.getDefaultLocalPathGeneric (
-						taskLogger,
+						transaction,
 						object));
 
 			}
@@ -865,22 +878,35 @@ class ObjectSearchResultsPart <
 
 	private
 	Optional <String> getListClass (
+			@NonNull Transaction parentTransaction,
 			@NonNull IdObject object) {
 
-		if (
-			isNotInstanceOf (
-				Record.class,
-				object)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getListClass");
+
 		) {
-			return Optional.absent ();
+
+			if (
+				isNotInstanceOf (
+					Record.class,
+					object)
+			) {
+				return Optional.absent ();
+			}
+
+			ConsoleHooks <ObjectType> consoleHooks =
+				consoleHelper.consoleHooks ();
+
+			return consoleHooks.getListClass (
+				transaction,
+				genericCastUnchecked (
+					object));
+
 		}
-
-		ConsoleHooks <ObjectType> consoleHooks =
-			consoleHelper.consoleHooks ();
-
-		return consoleHooks.getListClass (
-			genericCastUnchecked (
-				object));
 
 	}
 

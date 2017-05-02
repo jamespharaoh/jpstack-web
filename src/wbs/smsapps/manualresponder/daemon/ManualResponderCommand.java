@@ -31,11 +31,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -157,8 +157,6 @@ class ManualResponderCommand
 
 	// state
 
-	BorrowedTransaction transaction;
-
 	ManualResponderRec manualResponder;
 	ManualResponderAffiliateRec manualResponderAffiliate;
 	MessageRec message;
@@ -173,22 +171,20 @@ class ManualResponderCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
-			transaction =
-				database.currentTransaction ();
-
 			Record <?> commandParent =
 				objectManager.getParentRequired (
+					transaction,
 					command);
 
 			if (commandParent instanceof ManualResponderRec) {
@@ -217,12 +213,13 @@ class ManualResponderCommand
 
 			manualResponderNumber =
 				manualResponderNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					manualResponder,
 					message.getNumber ());
 
 			defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					manualResponder,
 					"default");
 
@@ -234,7 +231,7 @@ class ManualResponderCommand
 			) {
 
 				numberListLogic.removeDueToMessage (
-					taskLogger,
+					transaction,
 					manualResponder.getUnblockNumberList (),
 					message.getNumber (),
 					message,
@@ -250,9 +247,9 @@ class ManualResponderCommand
 			) {
 
 				smsCustomer =
-					Optional.of (
+					optionalOf (
 						smsCustomerHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							manualResponder.getSmsCustomerManager (),
 							message.getNumber ()));
 
@@ -295,7 +292,7 @@ class ManualResponderCommand
 				}
 
 				smsCustomerLogic.customerAffiliateUpdate (
-					taskLogger,
+					transaction,
 					smsCustomer.get (),
 					manualResponderAffiliate.getSmsCustomerAffiliate (),
 					message);
@@ -306,7 +303,7 @@ class ManualResponderCommand
 
 			request =
 				manualResponderRequestHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderRequestHelper.createInstance ()
 
 				.setManualResponderNumber (
@@ -350,20 +347,20 @@ class ManualResponderCommand
 			// handle message as appropriate
 
 			return handleGeneral (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
 	InboxAttemptRec handleExpectDateOfBirth (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleExpectDateOfBirth");
 
 		) {
@@ -381,13 +378,13 @@ class ManualResponderCommand
 						false);
 
 				return handleGeneral (
-					taskLogger);
+					transaction);
 
 			}
 
 			// interpret date of birth
 
-			Optional<LocalDate> dateOfBirth =
+			Optional <LocalDate> dateOfBirth =
 				DateFinder.find (
 					rest,
 					1915);
@@ -440,7 +437,7 @@ class ManualResponderCommand
 						rest));
 
 				return handleDateOfBirthError (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -457,26 +454,27 @@ class ManualResponderCommand
 					false);
 
 			return handleGeneral (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
+	private
 	InboxAttemptRec handleNeedDateOfBirth (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleNeedDateOfBirth");
 
 		) {
 
 			manualResponderLogic.sendTemplateAutomatically (
-				taskLogger,
+				transaction,
 				request,
 				manualResponder.getDateOfBirthTemplate ());
 
@@ -486,11 +484,12 @@ class ManualResponderCommand
 					true);
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
 				manualResponderLogic.customerAffiliate (
+					transaction,
 					manualResponderNumber),
 				command);
 
@@ -499,19 +498,19 @@ class ManualResponderCommand
 	}
 
 	InboxAttemptRec handleDateOfBirthError (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleDateOfBirthError");
 
 		) {
 
 			manualResponderLogic.sendTemplateAutomatically (
-				taskLogger,
+				transaction,
 				request,
 				manualResponder.getDateOfBirthErrorTemplate ());
 
@@ -521,11 +520,12 @@ class ManualResponderCommand
 					true);
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
 				manualResponderLogic.customerAffiliate (
+					transaction,
 					manualResponderNumber),
 				command);
 
@@ -533,29 +533,31 @@ class ManualResponderCommand
 
 	}
 
+	private
 	InboxAttemptRec handleTooYoungError (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleTooYoungError");
 
 		) {
 
 			manualResponderLogic.sendTemplateAutomatically (
-				taskLogger,
+				transaction,
 				request,
 				manualResponder.getTooYoungTemplate ());
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
 				manualResponderLogic.customerAffiliate (
+					transaction,
 					manualResponderNumber),
 				command);
 
@@ -563,14 +565,15 @@ class ManualResponderCommand
 
 	}
 
+	private
 	InboxAttemptRec handleGeneral (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleGeneral");
 
 		) {
@@ -580,7 +583,7 @@ class ManualResponderCommand
 			if (manualResponderNumber.getExpectDateOfBirth ()) {
 
 				return handleExpectDateOfBirth (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -613,7 +616,7 @@ class ManualResponderCommand
 				) {
 
 					return handleNeedDateOfBirth (
-						taskLogger);
+						transaction);
 
 				}
 
@@ -638,7 +641,7 @@ class ManualResponderCommand
 					) {
 
 						return handleTooYoungError (
-							taskLogger);
+							transaction);
 
 					}
 
@@ -647,20 +650,21 @@ class ManualResponderCommand
 			}
 
 			return handleNormal (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
+	private
 	InboxAttemptRec handleNormal (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleNormal");
 
 		) {
@@ -673,7 +677,7 @@ class ManualResponderCommand
 			) {
 
 				smsCustomerLogic.sessionStart (
-					taskLogger,
+					transaction,
 					smsCustomer.get (),
 					optionalOf (
 						message.getThreadId ()));
@@ -684,7 +688,7 @@ class ManualResponderCommand
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					taskLogger,
+					transaction,
 					manualResponder,
 					"default",
 					manualResponderNumber,
@@ -703,11 +707,12 @@ class ManualResponderCommand
 			// return
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
 				manualResponderLogic.customerAffiliate (
+					transaction,
 					manualResponderNumber),
 				command);
 

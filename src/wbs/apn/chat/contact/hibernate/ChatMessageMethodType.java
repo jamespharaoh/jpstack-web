@@ -2,8 +2,9 @@ package wbs.apn.chat.contact.hibernate;
 
 import java.sql.Types;
 
-import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.contact.model.ChatMessageMethod;
 
 public
 class ChatMessageMethodType

@@ -8,22 +8,31 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("consoleMetaModuleBuilder")
 public
 class ConsoleMetaModuleBuilder
-	implements Builder {
+	implements Builder <TaskLogger> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ConsoleMetaModuleBuilderHandler
@@ -31,30 +40,40 @@ class ConsoleMetaModuleBuilder
 
 	// state
 
-	Builder builder;
+	Builder <TaskLogger> builder;
 
 	// init
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		BuilderFactory builderFactory =
-			builderFactoryProvider.get ();
+		try (
 
-		for (
-			Map.Entry <Class <?>, Provider <Object>> entry
-				: consoleMetaModuleBuilders.entrySet ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
+
 		) {
 
-			builderFactory.addBuilder (
-				entry.getKey (),
-				entry.getValue ());
+			builder =
+				builderFactoryProvider.get ()
+
+				.contextClass (
+					TaskLogger.class)
+
+				.addBuilders (
+					taskLogger,
+					consoleMetaModuleBuilders)
+
+				.create (
+					taskLogger)
+
+			;
 
 		}
-
-		builder =
-			builderFactory.create ();
 
 	}
 

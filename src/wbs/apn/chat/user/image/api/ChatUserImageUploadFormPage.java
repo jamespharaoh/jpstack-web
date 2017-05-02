@@ -1,12 +1,14 @@
 package wbs.apn.chat.user.image.api;
 
-import com.google.common.collect.ImmutableMap;
+import static wbs.utils.collection.MapUtils.emptyMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -54,43 +56,58 @@ class ChatUserImageUploadFormPage
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		imageUploadToken =
-			chatUserImageUploadTokenHelper.findByToken (
-				requestContext.requestStringRequired (
-					"chatUserImageUploadToken"));
+		try (
 
-		chatUser =
-			imageUploadToken.getChatUser ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		titleText =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_form_title",
-				ImmutableMap.<String,String> of ());
+		) {
 
-		introHtml =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_form_intro",
-				ImmutableMap.<String,String> of ());
+			imageUploadToken =
+				chatUserImageUploadTokenHelper.findByToken (
+					transaction,
+					requestContext.requestStringRequired (
+						"chatUserImageUploadToken"));
 
-		submitLabel =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_form_submit",
-				ImmutableMap.<String,String> of ());
+			chatUser =
+				imageUploadToken.getChatUser ();
+
+			titleText =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_form_title",
+					emptyMap ());
+
+			introHtml =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_form_intro",
+					emptyMap ());
+
+			submitLabel =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_form_submit",
+					emptyMap ());
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		requestContext.addHeader (
 			"Content-Type",
@@ -101,13 +118,13 @@ class ChatUserImageUploadFormPage
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goContent");
 
 		) {
@@ -119,10 +136,10 @@ class ChatUserImageUploadFormPage
 				"<html>");
 
 			goHead (
-				taskLogger);
+				transaction);
 
 			goBody (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -133,13 +150,13 @@ class ChatUserImageUploadFormPage
 
 	protected
 	void goHead (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goHead");
 
 		) {

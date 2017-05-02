@@ -41,8 +41,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -132,78 +133,88 @@ class ChatBroadcastVerifyPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		searchFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-search",
-				ChatBroadcastSendForm.class);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		numbersFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-numbers",
-				ChatBroadcastSendForm.class);
+		) {
 
-		commonFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-common",
-				ChatBroadcastSendForm.class);
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
 
-		messageUserFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-message-user",
-				ChatBroadcastSendForm.class);
+			searchFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-search",
+					ChatBroadcastSendForm.class);
 
-		messageMessageFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-message-message",
-				ChatBroadcastSendForm.class);
+			numbersFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-numbers",
+					ChatBroadcastSendForm.class);
 
-		verifyUserFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"verify-user",
-				ChatUserRec.class);
+			commonFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-common",
+					ChatBroadcastSendForm.class);
 
-		form =
-			(ChatBroadcastSendForm)
-			requestContext.requestRequired (
-				"chatBroadcastForm");
+			messageUserFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-message-user",
+					ChatBroadcastSendForm.class);
 
-		formHints =
-			ImmutableMap.<String, Object> builder ()
+			messageMessageFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-message-message",
+					ChatBroadcastSendForm.class);
 
-			.put (
+			verifyUserFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"verify-user",
+					ChatUserRec.class);
+
+			form =
+				(ChatBroadcastSendForm)
+				requestContext.requestRequired (
+					"chatBroadcastForm");
+
+			formHints =
+				ImmutableMap.of (
 				"chat",
-				chatHelper.findFromContextRequired ())
+				chatHelper.findFromContextRequired (
+					transaction));
 
-			.build ();
+			updateResults =
+				optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"chatBroadcastUpdates"));
 
-		updateResults =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"chatBroadcastUpdates"));
+			fromUser =
+				chatUserHelper.findByCodeRequired (
+					transaction,
+					chat,
+					form.fromUser ());
 
-		fromUser =
-			chatUserHelper.findByCodeRequired (
-				chat,
-				form.fromUser ());
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -215,7 +226,7 @@ class ChatBroadcastVerifyPart
 			// always hidden
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -226,7 +237,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				numbersFields,
@@ -237,7 +248,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				commonFields,
@@ -248,7 +259,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageUserFields,
@@ -259,7 +270,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageMessageFields,
@@ -272,7 +283,7 @@ class ChatBroadcastVerifyPart
 			// temporarily hidden
 
 			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -282,7 +293,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				numbersFields,
@@ -292,7 +303,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				commonFields,
@@ -302,7 +313,7 @@ class ChatBroadcastVerifyPart
 				"send");
 
 			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageUserFields,
@@ -333,7 +344,7 @@ class ChatBroadcastVerifyPart
 					() -> fromUser.getInfoText ().getText ()));
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageMessageFields,
@@ -400,10 +411,11 @@ class ChatBroadcastVerifyPart
 
 			List <ChatUserRec> chatUsers =
 				chatUserHelper.findManyRequired (
+					transaction,
 					chatUserIds);
 
 			formFieldLogic.outputListTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				verifyUserFields,
 				chatUsers,

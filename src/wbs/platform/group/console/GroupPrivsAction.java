@@ -84,26 +84,22 @@ class GroupPrivsAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		long numRevoked = 0;
-		long numGranted = 0;
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"GroupPrivsAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			long numRevoked = 0;
+			long numGranted = 0;
+
 			GroupRec group =
-				groupHelper.findFromContextRequired ();
+				groupHelper.findFromContextRequired (
+					transaction);
 
 			Matcher matcher =
 				privDataPattern.matcher (
@@ -121,6 +117,7 @@ class GroupPrivsAction
 
 				PrivRec priv =
 					privHelper.findRequired (
+						transaction,
 						privId);
 
 				boolean oldCan =
@@ -130,7 +127,7 @@ class GroupPrivsAction
 
 				if (
 					! privChecker.canGrant (
-						taskLogger,
+						transaction,
 						priv.getId ())
 				) {
 					continue;
@@ -142,9 +139,10 @@ class GroupPrivsAction
 						priv);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"group_grant",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						priv,
 						group);
 
@@ -156,9 +154,10 @@ class GroupPrivsAction
 						priv);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"group_revoke",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						priv,
 						group);
 
@@ -174,7 +173,7 @@ class GroupPrivsAction
 			) {
 
 				updateManager.signalUpdate (
-					taskLogger,
+					transaction,
 					"user_privs",
 					user.getId ());
 

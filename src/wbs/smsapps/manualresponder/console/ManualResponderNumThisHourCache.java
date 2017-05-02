@@ -10,25 +10,29 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
-import wbs.framework.database.Database;
+import wbs.framework.database.DatabaseCachedGetter;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.platform.misc.CachedGetter;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
 
+import wbs.utils.cache.CachedGetter;
 import wbs.utils.time.TextualInterval;
 import wbs.utils.time.TimeFormatter;
 
@@ -36,12 +40,9 @@ import wbs.utils.time.TimeFormatter;
 @Accessors (fluent = true)
 public
 class ManualResponderNumThisHourCache
-	extends CachedGetter <Long> {
+	implements CachedGetter <Transaction, Long> {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	Database database;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -63,34 +64,68 @@ class ManualResponderNumThisHourCache
 	@Getter @Setter
 	Long userId;
 
-	// constructors
+	// state
 
+	private
+	CachedGetter <Transaction, Long> delegate;
+
+	// life cycle
+
+	@NormalLifecycleSetup
 	public
-	ManualResponderNumThisHourCache () {
-		super (5000l);
-	}
-
-	// implementation
-
-	@Override
-	public
-	Long refresh (
+	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
+					"setup");
+
+		) {
+
+			delegate =
+				new DatabaseCachedGetter<> (
+					logContext,
+					this::refresh,
+					Duration.standardSeconds (
+						5l));
+
+		}
+
+	}
+
+	// public implementation
+
+	@Override
+	public
+	Long get (
+			@NonNull Transaction context) {
+
+		return delegate.get (
+			context);
+
+	}
+
+	// private implementation
+
+	private
+	Long refresh (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"refresh");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			UserRec user =
 				userHelper.findRequired (
+					transaction,
 					userId);
 
 			Integer hourOfDay =
@@ -108,7 +143,7 @@ class ManualResponderNumThisHourCache
 
 			List <ManualResponderOperatorReport> reports =
 				manualResponderRequestHelper.searchOperatorReports (
-					taskLogger,
+					transaction,
 					new ManualResponderRequestSearch ()
 
 				.processedByUserId (

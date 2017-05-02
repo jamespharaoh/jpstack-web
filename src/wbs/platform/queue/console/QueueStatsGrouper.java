@@ -15,8 +15,9 @@ import wbs.console.reporting.StatsGrouper;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueRec;
 
@@ -53,26 +54,27 @@ class QueueStatsGrouper
 	@Override
 	public
 	void writeTdForGroup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeTdForGroup");
 
 		) {
 
 			QueueRec queue =
 				queueHelper.findRequired (
+					transaction,
 					(Long)
 					group);
 
 			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				queue);
 
 		}
@@ -82,38 +84,58 @@ class QueueStatsGrouper
 	@Override
 	public
 	List <Object> sortGroups (
-			Set <Object> groups) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Set <Object> groups) {
 
-		List <QueueRec> queues =
-			new ArrayList<> (
-				groups.size ());
+		try (
 
-		for (
-			Object group
-				: groups
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sortGroups");
+
 		) {
 
-			Long queueId =
-				(Long)
-				group;
+			List <QueueRec> queues =
+				new ArrayList<> (
+					groups.size ());
 
-			queues.add (
-				queueHelper.findRequired (
-					queueId));
+			for (
+				Object group
+					: groups
+			) {
+
+				Long queueId =
+					(Long)
+					group;
+
+				queues.add (
+					queueHelper.findRequired (
+						transaction,
+						queueId));
+
+			}
+
+			Collections.sort (
+				queues);
+
+			ArrayList <Object> queueIds =
+				new ArrayList<> (
+					queues.size ());
+
+			for (
+				QueueRec queue
+					: queues
+			) {
+
+				queueIds.add (
+					queue.getId ());
+
+			}
+
+			return queueIds;
 
 		}
-
-		Collections.sort (
-			queues);
-
-		ArrayList<Object> queueIds =
-			new ArrayList<Object> (
-				queues.size ());
-
-		for (QueueRec queue : queues)
-			queueIds.add (queue.getId ());
-
-		return queueIds;
 
 	}
 

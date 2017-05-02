@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.sms.number.format.model.NumberFormatRec;
+
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 

@@ -1,6 +1,9 @@
 package wbs.framework.component.manager;
 
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
@@ -9,6 +12,7 @@ import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
@@ -25,16 +29,19 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -61,9 +68,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.activitymanager.RuntimeExceptionWithTask;
 import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
 import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
@@ -78,10 +82,11 @@ import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.NoSuchComponentException;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
-import wbs.utils.exception.RuntimeInvocationTargetException;
 
 @Accessors (fluent = true)
 public
@@ -97,9 +102,6 @@ class ComponentManagerImplementation
 
 	@Getter @Setter
 	ComponentRegistry registry;
-
-	@Getter @Setter
-	ActivityManager activityManager;
 
 	// state
 
@@ -385,12 +387,12 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponent");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponent");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -430,13 +432,11 @@ class ComponentManagerImplementation
 						componentDefinition.name ())
 				) {
 
-					throw new RuntimeExceptionWithTask (
-						activityManager.currentTask (),
-						stringFormat (
-							"Singleton component %s already in creation (%s)",
-							componentDefinition.name (),
-							joinWithCommaAndSpace (
-								singletonComponentsInCreation)));
+					throw taskLogger.fatalFormat (
+						"Singleton component %s already in creation (%s)",
+						componentDefinition.name (),
+						joinWithCommaAndSpace (
+							singletonComponentsInCreation));
 
 				}
 
@@ -445,11 +445,9 @@ class ComponentManagerImplementation
 						componentDefinition.name ())
 				) {
 
-					throw new RuntimeExceptionWithTask (
-						activityManager.currentTask (),
-						stringFormat (
-							"Singleton component %s already failed",
-							componentDefinition.name ()));
+					throw taskLogger.fatalFormat (
+						"Singleton component %s already failed",
+						componentDefinition.name ());
 
 				}
 
@@ -486,12 +484,10 @@ class ComponentManagerImplementation
 
 			} else {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Unrecognised scope %s for component %s",
-						componentDefinition.scope (),
-						componentDefinition.name ()));
+				throw taskLogger.fatalFormat (
+					"Unrecognised scope %s for component %s",
+					componentDefinition.scope (),
+					componentDefinition.name ());
 
 			}
 
@@ -505,30 +501,18 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"instantiateComponent");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"instantiateComponent (%s)",
+					componentDefinition.name ());
 
 			HeldLock heldlock =
 				lock.read ();
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"application-context",
-					stringFormat (
-						"instantiateComponent (%s)",
-						componentDefinition.name ()),
-					this);
-
 		) {
-
-			taskLogger.debugFormat (
-				"Instantiating %s (%s)",
-				componentDefinition.name (),
-				componentDefinition.scope ());
 
 			// instantiate
 
@@ -578,11 +562,9 @@ class ComponentManagerImplementation
 						component)
 				) {
 
-					throw new RuntimeExceptionWithTask (
-						activityManager.currentTask (),
-						stringFormat (
-							"Factory component returned null for %s",
-							componentDefinition.name ()));
+					throw taskLogger.fatalFormat (
+						"Factory component returned null for %s",
+						componentDefinition.name ());
 
 				}
 
@@ -644,7 +626,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initializeComponent");
@@ -670,50 +652,11 @@ class ComponentManagerImplementation
 
 				try {
 
-					// run eager lifecycle setup
-
-					for (
-						Method method
-							: component.getClass ().getMethods ()
-					) {
-
-						NormalLifecycleSetup eagerLifecycleSetupAnnotation =
-							method.getAnnotation (
-								NormalLifecycleSetup.class);
-
-						if (
-							isNull (
-								eagerLifecycleSetupAnnotation)
-						) {
-							continue;
-						}
-
-						taskLogger.debugFormat (
-							stringFormat (
-								"Running eager lifecycle setup method %s.%s",
-								componentDefinition.name (),
-								method.getName ()));
-
-						if (method.getParameterCount () == 0) {
-
-							methodInvoke (
-								method,
-								component);
-
-						} else if (method.getParameterCount () == 1) {
-
-							methodInvoke (
-								method,
-								component,
-								taskLogger);
-
-						} else {
-
-							throw new RuntimeException ();
-
-						}
-
-					}
+					invokeLifecycleMethods (
+						taskLogger,
+						NormalLifecycleSetup.class,
+						"Eager lifecycle setup",
+						component);
 
 					componentMetaData.state =
 						ComponentState.active;
@@ -779,7 +722,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setComponentValueProperties");
@@ -818,7 +761,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setComponentReferenceProperties");
@@ -863,7 +806,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setComponentInjectedProperties");
@@ -917,7 +860,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"injectProperty");
@@ -1054,16 +997,14 @@ class ComponentManagerImplementation
 
 					if (targetComponents.size () != 1) {
 
-						throw new RuntimeExceptionWithTask (
-							activityManager.currentTask (),
-							stringFormat (
-								"Trying to inject %s ",
-								integerToDecimalString (
-									targetComponents.size ()),
-								"components into a single field %s.%s",
-								classNameSimple (
-									injectedProperty.field ().getDeclaringClass ()),
-								injectedProperty.field ().getName ()));
+						throw taskLogger.fatalFormat (
+							"Trying to inject %s ",
+							integerToDecimalString (
+								targetComponents.size ()),
+							"components into a single field %s.%s",
+							classNameSimple (
+								injectedProperty.field ().getDeclaringClass ()),
+							injectedProperty.field ().getName ());
 
 					}
 
@@ -1073,8 +1014,8 @@ class ComponentManagerImplementation
 
 			} else {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask ());
+				throw new LoggedErrorsException (
+					taskLogger);
 
 			}
 
@@ -1142,7 +1083,7 @@ class ComponentManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"performInjection");
@@ -1298,97 +1239,21 @@ class ComponentManagerImplementation
 
 			// run late setup
 
-			for (
-				Object component
-					: singletonComponents.values ()
-			) {
-
-				for (
-					Method method
-						: component.getClass ().getMethods ()
-				) {
-
-					LateLifecycleSetup lateLifecycleSetupAnnotation =
-						method.getDeclaredAnnotation (
-							LateLifecycleSetup.class);
-
-					if (
-						isNull (
-							lateLifecycleSetupAnnotation)
-					) {
-						continue;
-					}
-
-					if (
-						notEqualToOne (
-							method.getParameterCount ())
-					) {
-
-						taskLogger.errorFormat (
-							"Late lifecycle setup method %s.%s ",
-							classNameSimple (
-								component.getClass ()),
-							method.getName (),
-							"must have exactly one parameter");
-
-					}
-
-					methodInvoke (
-						method,
-						component,
-						taskLogger);
-
-				}
-
-			}
+			invokeLifecycleMethods (
+				taskLogger,
+				LateLifecycleSetup.class,
+				"Late lifecycle setup",
+				singletonComponents.values ());
 
 			taskLogger.makeException ();
 
 			// run startup complete
 
-			for (
-				Object component
-					: singletonComponents.values ()
-			) {
-
-				for (
-					Method method
-						: component.getClass ().getMethods ()
-				) {
-
-					ComponentManagerStartupComplete startupCompleteAnnotation =
-						method.getDeclaredAnnotation (
-							ComponentManagerStartupComplete.class);
-
-					if (
-						isNull (
-							startupCompleteAnnotation)
-					) {
-						continue;
-					}
-
-					if (
-						notEqualToOne (
-							method.getParameterCount ())
-					) {
-
-						taskLogger.errorFormat (
-							"Startup complete method %s.%s ",
-							classNameSimple (
-								component.getClass ()),
-							method.getName (),
-							"must have exactly one parameter");
-
-					}
-
-					methodInvoke (
-						method,
-						component,
-						taskLogger);
-
-				}
-
-			}
+			invokeLifecycleMethods (
+				taskLogger,
+				ComponentManagerStartupComplete.class,
+				"Component manager startup complete",
+				singletonComponents.values ());
 
 			taskLogger.makeException ();
 
@@ -1403,13 +1268,132 @@ class ComponentManagerImplementation
 
 	}
 
+	private <AnnotationType extends Annotation>
+	void invokeLifecycleMethods (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <AnnotationType> annotationClass,
+			@NonNull String name,
+			@NonNull Iterable <Object> components) {
+
+		for (
+			Object component
+				: components
+		) {
+
+			invokeLifecycleMethods (
+				parentTaskLogger,
+				annotationClass,
+				name,
+				component);
+
+		}
+
+	}
+
+	private <AnnotationType extends Annotation>
+	void invokeLifecycleMethods (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <AnnotationType> annotationClass,
+			@NonNull String name,
+			@NonNull Object component) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"invokeLifecycleMethods");
+
+		) {
+
+			for (
+				Method method
+					: component.getClass ().getMethods ()
+			) {
+
+				AnnotationType annotation =
+					method.getDeclaredAnnotation (
+						annotationClass);
+
+				if (
+					isNull (
+						annotation)
+				) {
+					continue;
+				}
+
+				List <Class <?>> methodParameterTypes =
+					Arrays.asList (
+						method.getParameterTypes ());
+
+				if (
+
+					collectionDoesNotHaveOneElement (
+						methodParameterTypes)
+
+					|| classNotEqual (
+						listFirstElementRequired (
+							methodParameterTypes),
+						TaskLogger.class)
+
+				) {
+
+					taskLogger.errorFormat (
+						"Build method %s.%s ",
+						fullClassName (
+							component.getClass ()),
+						method.getName (),
+						"has invalid type signature (%s)",
+						joinWithCommaAndSpace (
+							iterableMap (
+								parameterType ->
+									classNameSimple (
+										parameterType),
+								methodParameterTypes)));
+
+					continue;
+
+				}
+
+
+				if (
+
+					notEqualToOne (
+						method.getParameterCount ())
+
+				) {
+
+					taskLogger.errorFormat (
+						"%s ",
+						name,
+						"method %s.%s ",
+						classNameSimple (
+							component.getClass ()),
+						method.getName (),
+						"must have exactly one parameter");
+
+					return;
+
+				}
+
+				methodInvoke (
+					method,
+					component,
+					taskLogger);
+
+			}
+
+		}
+
+	}
+
 	@Override
 	public
 	void close () {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"close ()");
 
@@ -1441,61 +1425,11 @@ class ComponentManagerImplementation
 
 			// run shutdown begun
 
-			for (
-				Object component
-					: singletonComponents.values ()
-			) {
-
-				for (
-					Method method
-						: component.getClass ().getMethods ()
-				) {
-
-					ComponentManagerShutdownBegun shutdownBegunAnnotation =
-						method.getDeclaredAnnotation (
-							ComponentManagerShutdownBegun.class);
-
-					if (
-						isNull (
-							shutdownBegunAnnotation)
-					) {
-						continue;
-					}
-
-					if (
-						notEqualToOne (
-							method.getParameterCount ())
-					) {
-						throw new RuntimeException (
-							stringFormat (
-								"Shutdown begun method %s.%s ",
-								classNameSimple (
-									component.getClass ()),
-								method.getName (),
-								"must have exactly one parameter"));
-					}
-
-					try {
-
-						methodInvoke (
-							method,
-							component,
-							taskLogger);
-
-					} catch (RuntimeInvocationTargetException exception) {
-
-						taskLogger.errorFormatException (
-							exception,
-							"Error invoking %s.%s",
-							classNameSimple (
-								component.getClass ()),
-							method.getName ());
-
-					}
-
-				}
-
-			}
+			invokeLifecycleMethods (
+				taskLogger,
+				ComponentManagerShutdownBegun.class,
+				"Component manager shutdown begun",
+				singletonComponents.values ());
 
 			// run tear down
 
@@ -1581,26 +1515,20 @@ class ComponentManagerImplementation
 
 		) {
 
-			return new Provider <Object> () {
+			return () -> {
 
-				@Override
-				public
-				Object get () {
+				try (
 
-					try (
+					OwnedTaskLogger taskLogger =
+						logContext.createTaskLogger (
+							"getComponentProvider.get");
 
-						TaskLogger taskLogger =
-							logContext.createTaskLogger (
-								"getComponentProvider.Provider.get");
+				) {
 
-					) {
-
-						return getComponent (
-							taskLogger,
-							componentDefinition,
-							initialized);
-
-					}
+					return getComponent (
+						taskLogger,
+						componentDefinition,
+						initialized);
 
 				}
 

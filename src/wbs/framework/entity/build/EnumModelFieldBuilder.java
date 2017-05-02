@@ -9,11 +9,15 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
@@ -23,13 +27,20 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.fields.EnumFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("enumModelFieldBuilder")
 @ModelBuilder
 public
-class EnumModelFieldBuilder {
+class EnumModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -47,109 +58,122 @@ class EnumModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldTypePackageName;
+		try (
 
-		PluginEnumTypeSpec fieldTypePluginEnumType =
-			pluginManager.pluginEnumTypesByName ().get (
-				spec.typeName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginCustomTypeSpec fieldTypePluginCustomType =
-			pluginManager.pluginCustomTypesByName ().get (
-				spec.typeName ());
+		) {
 
-		if (fieldTypePluginEnumType != null) {
+			String fieldTypePackageName;
 
-			PluginSpec fieldTypePlugin =
-				fieldTypePluginEnumType.plugin ();
+			PluginEnumTypeSpec fieldTypePluginEnumType =
+				pluginManager.pluginEnumTypesByName ().get (
+					spec.typeName ());
 
-			fieldTypePackageName =
-				fieldTypePlugin.packageName ();
+			PluginCustomTypeSpec fieldTypePluginCustomType =
+				pluginManager.pluginCustomTypesByName ().get (
+					spec.typeName ());
 
-		} else if (fieldTypePluginCustomType != null) {
+			if (fieldTypePluginEnumType != null) {
 
-			PluginSpec fieldTypePlugin =
-				fieldTypePluginCustomType.plugin ();
+				PluginSpec fieldTypePlugin =
+					fieldTypePluginEnumType.plugin ();
 
-			fieldTypePackageName =
-				fieldTypePlugin.packageName ();
+				fieldTypePackageName =
+					fieldTypePlugin.packageName ();
 
-		} else {
+			} else if (fieldTypePluginCustomType != null) {
 
-			throw new RuntimeException (
+				PluginSpec fieldTypePlugin =
+					fieldTypePluginCustomType.plugin ();
+
+				fieldTypePackageName =
+					fieldTypePlugin.packageName ();
+
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"No such enum or custom type: %s",
+						spec.typeName ()));
+
+			}
+
+			String fieldName =
+				ifNull (
+					spec.name (),
+					spec.typeName ());
+
+			String fullFieldTypeName =
 				stringFormat (
-					"No such enum or custom type: %s",
-					spec.typeName ()));
+					"%s.model.%s",
+					fieldTypePackageName,
+					capitalise (
+						spec.typeName ()));
+
+			// create model field
+
+			ModelField modelField =
+				new ModelField ()
+
+				.model (
+					target.model ())
+
+				.parentField (
+					context.parentModelField ())
+
+				.name (
+					fieldName)
+
+				.label (
+					camelToSpaces (
+						fieldName))
+
+				.type (
+					ModelFieldType.simple)
+
+				.parent (
+					false)
+
+				.identity (
+					false)
+
+				.valueType (
+					classForNameRequired (
+						fullFieldTypeName))
+
+				.nullable (
+					ifNull (
+						spec.nullable (),
+						false))
+
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							camelToUnderscore (
+								fieldName))));
+
+			// store field
+
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
 
 		}
-
-		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%s",
-				fieldTypePackageName,
-				capitalise (
-					spec.typeName ()));
-
-		// create model field
-
-		ModelField modelField =
-			new ModelField ()
-
-			.model (
-				target.model ())
-
-			.parentField (
-				context.parentModelField ())
-
-			.name (
-				fieldName)
-
-			.label (
-				camelToSpaces (
-					fieldName))
-
-			.type (
-				ModelFieldType.simple)
-
-			.parent (
-				false)
-
-			.identity (
-				false)
-
-			.valueType (
-				classForNameRequired (
-					fullFieldTypeName))
-
-			.nullable (
-				ifNull (
-					spec.nullable (),
-					false))
-
-			.columnNames (
-				ImmutableList.<String>of (
-					ifNull (
-						spec.columnName (),
-						camelToUnderscore (
-							fieldName))));
-
-		// store field
-
-		target.fields ().add (
-			modelField);
-
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
 
 	}
 

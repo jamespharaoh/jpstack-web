@@ -5,11 +5,11 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -82,24 +82,21 @@ class ManualResponderFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			createMenuItem (
-				taskLogger,
 				transaction);
 
 			createManualResponder (
-				taskLogger,
 				transaction);
 
 		}
@@ -108,24 +105,24 @@ class ManualResponderFixtureProvider
 
 	private
 	void createMenuItem (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenuItem");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -158,25 +155,25 @@ class ManualResponderFixtureProvider
 
 	private
 	void createManualResponder (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createManualResponder");
 
 		) {
 
 			ManualResponderRec manualResponder =
 				manualResponderHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -191,18 +188,21 @@ class ManualResponderFixtureProvider
 
 				.setCurrency (
 					currencyHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"gbp"))
 
 				.setSmsSpendLimiter (
 					smsSpendLimiterHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test_sms_spend_limiter"))
 
 				.setSmsCustomerManager (
 					smsCustomerManagerHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"customer_manager"))
@@ -215,11 +215,12 @@ class ManualResponderFixtureProvider
 			transaction.flush ();
 
 			keywordHelper.insert (
-				taskLogger,
+				transaction,
 				keywordHelper.createInstance ()
 
 				.setKeywordSet (
 					keywordSetHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"inbound"))
@@ -232,13 +233,14 @@ class ManualResponderFixtureProvider
 
 				.setCommand (
 					commandHelper.findByCodeRequired (
+						transaction,
 						manualResponder,
 						"default"))
 
 			);
 
 			createManualResponderTemplates (
-				taskLogger,
+				transaction,
 				manualResponder);
 
 			transaction.flush ();
@@ -249,20 +251,20 @@ class ManualResponderFixtureProvider
 
 	private
 	void createManualResponderTemplates (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRec manualResponder) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createManualResponderTemplates");
 
 		) {
 
 			manualResponderTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -294,7 +296,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -303,7 +307,7 @@ class ManualResponderFixtureProvider
 			);
 
 			manualResponderTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -350,7 +354,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"bill"),
@@ -359,7 +365,7 @@ class ManualResponderFixtureProvider
 			);
 
 			manualResponderTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -406,7 +412,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"bill"),
@@ -415,7 +423,7 @@ class ManualResponderFixtureProvider
 			);
 
 			manualResponderTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -462,7 +470,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"bill"),
@@ -471,7 +481,7 @@ class ManualResponderFixtureProvider
 			);
 
 			manualResponderTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -503,7 +513,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -513,7 +525,7 @@ class ManualResponderFixtureProvider
 
 			manualResponder.setDateOfBirthTemplate (
 				manualResponderTemplateHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -545,7 +557,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -553,6 +567,7 @@ class ManualResponderFixtureProvider
 
 				.setReplyKeywordSet (
 					keywordSetHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"inbound"))
@@ -561,7 +576,7 @@ class ManualResponderFixtureProvider
 
 			manualResponder.setDateOfBirthErrorTemplate (
 				manualResponderTemplateHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -596,7 +611,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -604,6 +621,7 @@ class ManualResponderFixtureProvider
 
 				.setReplyKeywordSet (
 					keywordSetHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"inbound"))
@@ -612,7 +630,7 @@ class ManualResponderFixtureProvider
 
 			manualResponder.setTooYoungTemplate (
 				manualResponderTemplateHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderTemplateHelper.createInstance ()
 
 				.setManualResponder (
@@ -647,7 +665,9 @@ class ManualResponderFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -655,6 +675,7 @@ class ManualResponderFixtureProvider
 
 				.setReplyKeywordSet (
 					keywordSetHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"inbound"))

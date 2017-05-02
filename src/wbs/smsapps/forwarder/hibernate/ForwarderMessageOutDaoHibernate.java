@@ -4,11 +4,17 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import lombok.NonNull;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageOutDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
@@ -18,70 +24,103 @@ class ForwarderMessageOutDaoHibernate
 	extends HibernateDao
 	implements ForwarderMessageOutDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	ForwarderMessageOutRec findByOtherId (
+			@NonNull Transaction parentTransaction,
 			@NonNull ForwarderRec forwarder,
 			@NonNull String otherId) {
 
-		return findOneOrNull (
-			"findByOtherId (forwarder, otherId)",
-			ForwarderMessageOutRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByOtherId");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ForwarderMessageOutRec.class,
-				"_forwarderMessageOut")
 
-			.add (
-				Restrictions.eq (
-					"_forwarderMessageOut.forwarder",
-					forwarder))
+				createCriteria (
+					transaction,
+					ForwarderMessageOutRec.class,
+					"_forwarderMessageOut")
 
-			.add (
-				Restrictions.eq (
-					"_forwarderMessageOut.otherId",
-					otherId))
+				.add (
+					Restrictions.eq (
+						"_forwarderMessageOut.forwarder",
+						forwarder))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_forwarderMessageOut.otherId",
+						otherId))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ForwarderMessageOutRec> findPendingLimit (
+			@NonNull Transaction parentTransaction,
 			@NonNull ForwarderRec forwarder,
 			@NonNull Long maxResults) {
 
-		return findMany (
-			"findPendingLimit (forwarder, maxResults)",
-			ForwarderMessageOutRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findPendingLimit");
+
+		) {
+
+			return findMany (
+				transaction,
 				ForwarderMessageOutRec.class,
-				"_forwarderMessageOut")
 
-			.add (
-				Restrictions.eq (
-					"_forwarderMessageOut.forwarder",
-					forwarder))
+				createCriteria (
+					transaction,
+					ForwarderMessageOutRec.class,
+					"_forwarderMessageOut")
 
-			.add (
-				Restrictions.isNotNull (
-					"_forwarderMessageOut.reportIndexPending"))
+				.add (
+					Restrictions.eq (
+						"_forwarderMessageOut.forwarder",
+						forwarder))
 
-			.addOrder (
-				Order.asc (
-					"_forwarderMessageOut.forwarder"))
+				.add (
+					Restrictions.isNotNull (
+						"_forwarderMessageOut.reportIndexPending"))
 
-			.addOrder (
-				Order.asc (
-					"_forwarderMessageOut.id"))
+				.addOrder (
+					Order.asc (
+						"_forwarderMessageOut.forwarder"))
 
-			.setMaxResults (
-				toJavaIntegerRequired (
-					maxResults))
+				.addOrder (
+					Order.asc (
+						"_forwarderMessageOut.id"))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 

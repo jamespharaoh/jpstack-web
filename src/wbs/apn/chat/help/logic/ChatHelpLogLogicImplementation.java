@@ -9,10 +9,10 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -52,7 +52,7 @@ class ChatHelpLogLogicImplementation
 	@Override
 	public
 	ChatHelpLogRec createChatHelpLogIn (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull String text,
@@ -61,15 +61,12 @@ class ChatHelpLogLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatHelpLogIn");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -78,7 +75,7 @@ class ChatHelpLogLogicImplementation
 
 			ChatHelpLogRec chatHelpLog =
 				chatHelpLogHelper.insert (
-					taskLogger,
+					transaction,
 					chatHelpLogHelper.createInstance ()
 
 				.setChatUser (
@@ -111,7 +108,7 @@ class ChatHelpLogLogicImplementation
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						taskLogger,
+						transaction,
 						chat,
 						"help",
 						chatUser,
@@ -135,29 +132,26 @@ class ChatHelpLogLogicImplementation
 	@Override
 	public
 	ChatHelpLogRec createChatHelpLogOut (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<ChatHelpLogRec> replyTo,
-			@NonNull Optional<UserRec> user,
+			@NonNull Optional <ChatHelpLogRec> replyTo,
+			@NonNull Optional <UserRec> user,
 			@NonNull MessageRec message,
-			@NonNull Optional<ChatMessageRec> chatMessage,
+			@NonNull Optional <ChatMessageRec> chatMessage,
 			@NonNull String text,
 			@NonNull Optional <CommandRec> command) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatHelpLogOut");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			return chatHelpLogHelper.insert (
-				taskLogger,
+				transaction,
 				chatHelpLogHelper.createInstance ()
 
 				.setChatUser (

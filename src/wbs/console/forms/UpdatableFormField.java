@@ -50,10 +50,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -159,15 +160,15 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canView");
 
 		) {
@@ -180,7 +181,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					featureCode)
 
 				&& ! featureChecker.checkFeatureAccess (
-					taskLogger,
+					transaction,
 					privChecker,
 					featureCode)
 
@@ -210,7 +211,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					privParts.get (0);
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					(Record<?>) container,
 					privCode);
 
@@ -228,12 +229,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				Record <?> delegate =
 					genericCastUnchecked (
 						objectManager.dereference (
+							transaction,
 							container,
 							delegatePath,
 							hints));
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					delegate,
 					privCode);
 
@@ -257,14 +259,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void setDefault (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setDefault");
 
 		) {
@@ -276,12 +278,12 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 				Optional <Native> nativeValue =
 					nativeMapping.genericToNative (
-						taskLogger,
+						transaction,
 						container,
 						defaultValueSupplier.get ());
 
 				accessor.write (
-					taskLogger,
+					transaction,
 					container,
 					nativeValue);
 
@@ -294,7 +296,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -303,9 +305,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderTableCellList");
 
 		) {
@@ -313,12 +315,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -326,13 +329,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
 
 			renderer.renderHtmlTableCellList (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				container,
 				hints,
@@ -347,16 +350,16 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderTableCellProperties");
 
 		) {
@@ -364,12 +367,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -377,13 +381,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
 
 			renderer.renderHtmlTableCellProperties (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				container,
 				hints,
@@ -398,7 +402,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormTemporarilyHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -408,9 +412,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormTemporarilyHidden");
 
 		) {
@@ -418,12 +422,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -431,7 +436,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
@@ -452,7 +457,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
@@ -463,9 +468,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormRow");
 
 		) {
@@ -473,12 +478,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -486,7 +492,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
@@ -506,7 +512,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						renderer.propertiesAlign ().name ())));
 
 			renderer.renderFormInput (
-				taskLogger,
+				transaction,
 				submission,
 				formatWriter,
 				container,
@@ -542,7 +548,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -551,9 +557,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -575,13 +581,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					requiredValue (
 						eitherGetLeft (
 							interfaceMapping.genericToInterface (
-								taskLogger,
+								transaction,
 								container,
 								hints,
 								defaultValueSupplier.get ())));
 
 				renderer.renderFormReset (
-					taskLogger,
+					transaction,
 					javascriptWriter,
 					container,
 					interfaceValue,
@@ -592,12 +598,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				Optional <Native> nativeValue =
 					requiredValue (
 						accessor.read (
-							taskLogger,
+							transaction,
 							container));
 
 				Optional <Generic> genericValue =
 					requiredValue (
 						nativeMapping.nativeToGeneric (
+							transaction,
 							container,
 							nativeValue));
 
@@ -605,14 +612,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					requiredValue (
 						eitherGetLeft (
 							interfaceMapping.genericToInterface (
-								taskLogger,
+								transaction,
 								container,
 								hints,
 								genericValue)));
 
 
 				renderer.renderFormReset (
-					taskLogger,
+					transaction,
 					javascriptWriter,
 					container,
 					interfaceValue,
@@ -627,16 +634,16 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderCsvRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderCsvRow");
 
 		) {
@@ -644,12 +651,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -657,7 +665,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				optionalOr (
 					eitherGetLeft (
 						csvMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)),
@@ -674,7 +682,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	UpdateResult <Generic, Native> update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -682,9 +690,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"update");
 
 		) {
@@ -712,7 +720,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Either <Optional <Interface>, String> newInterfaceValue =
 				requiredValue (
 					renderer.formToInterface (
-						taskLogger,
+						transaction,
 						submission,
 						formName));
 
@@ -737,6 +745,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			Either <Optional <Generic>, String> interfaceToGenericResult =
 				interfaceMapping.interfaceToGeneric (
+					transaction,
 					container,
 					hints,
 					resultValueRequired (
@@ -795,7 +804,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> newNativeValue =
 				requiredValue (
 					nativeMapping.genericToNative (
-						taskLogger,
+						transaction,
 						container,
 						newGenericValue));
 
@@ -803,7 +812,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			Optional <String> constraintError =
 				constraintValidator.validate (
-					taskLogger,
+					transaction,
 					container,
 					newNativeValue);
 
@@ -827,12 +836,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			Optional <Native> oldNativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> oldGenericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						oldNativeValue));
 
@@ -856,7 +866,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			// set the new value
 
 			accessor.write (
-				taskLogger,
+				transaction,
 				container,
 				newNativeValue);
 
@@ -887,7 +897,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void runUpdateHook (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull PermanentRecord <?> linkObject,
@@ -895,7 +905,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Optional <String> objectType) {
 
 		updateHook.onUpdate (
-			parentTaskLogger,
+			parentTransaction,
 			updateResult,
 			container,
 			linkObject,

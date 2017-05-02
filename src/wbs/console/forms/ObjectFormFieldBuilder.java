@@ -17,29 +17,40 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("objectFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectFormFieldBuilder {
+class ObjectFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -101,213 +112,189 @@ class ObjectFormFieldBuilder {
 	@BuilderTarget
 	FormFieldSet formFieldSet;
 
-	// state
-
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String fieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name.endsWith ("Id")
-							? name.substring (
-								0,
-								name.length () - 2)
-							: name)));
-
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
-
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
-
-		/*
-		Boolean dynamic =
-			ifNull (
-				spec.dynamic(),
-				false);
-		*/
-
-		Optional <ConsoleHelper <?>> consoleHelper;
-
-		if (
-			isNotNull (
-				spec.objectTypeName ())
 		) {
 
-			consoleHelper =
-				optionalOf (
-					objectManager.findConsoleHelperRequired (
-						spec.objectTypeName ()));
+			String name =
+				spec.name ();
+
+			String fieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
+
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name.endsWith ("Id")
+								? name.substring (
+									0,
+									name.length () - 2)
+								: name)));
+
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
+
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
+
+			/*
+			Boolean dynamic =
+				ifNull (
+					spec.dynamic(),
+					false);
+			*/
+
+			Optional <ConsoleHelper <?>> consoleHelper;
 
 			if (
-				optionalIsNotPresent (
-					consoleHelper)
+				isNotNull (
+					spec.objectTypeName ())
 			) {
 
-				throw new RuntimeException (
-					stringFormat (
-						"Console helper does not exist: %s",
-						spec.objectTypeName ()));
+				consoleHelper =
+					optionalOf (
+						objectManager.findConsoleHelperRequired (
+							spec.objectTypeName ()));
+
+				if (
+					optionalIsNotPresent (
+						consoleHelper)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Console helper does not exist: %s",
+							spec.objectTypeName ()));
+
+				}
+
+			} else {
+
+				consoleHelper =
+					optionalAbsent ();
 
 			}
 
-		} else {
+			String rootFieldName =
+				spec.rootFieldName ();
 
-			consoleHelper =
-				optionalAbsent ();
+			// field type
 
-		}
+			Optional <Class <?>> propertyClassOptional =
+				objectManager.dereferenceType (
+					taskLogger,
+					optionalOf (
+						context.containerClass ()),
+					optionalOf (
+						fieldName));
 
-		String rootFieldName =
-			spec.rootFieldName ();
+			// accessor
 
-		// field type
+			FormFieldAccessor accessor;
 
-		Optional <Class <?>> propertyClassOptional =
-			objectManager.dereferenceType (
-				optionalOf (
-					context.containerClass ()),
-				optionalOf (
-					fieldName));
-
-		// accessor
-
-		FormFieldAccessor accessor;
-
-		if (
-			isNotNull (
-				spec.fieldName ())
-		) {
-
-			accessor =
-				dereferenceFormFieldAccessorProvider.get ()
-
-				.path (
-					spec.fieldName ());
-
-		} else {
-
-			accessor =
-				simpleFormFieldAccessorProvider.get ()
-
-				.name (
-					name)
-
-				.nativeClass (
-					propertyClassOptional.get ());
-
-		}
-
-		// native mapping
-
-		FormFieldNativeMapping nativeMapping;
-
-		if (
-			optionalValueEqualSafe (
-				propertyClassOptional,
-				Long.class)
-		) {
-
-			nativeMapping =
-				objectIdFormFieldNativeMappingProvider.get ()
-
-				.consoleHelper (
-					consoleHelper.orNull ());
-
-		} else {
-
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
-
-		}
-
-		// value validator
-
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
-
-		if (! nullable) {
-
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
-
-		}
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			objectFormFieldConstraintValidatorProvider.get ();
-
-		// interface mapping
-
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// csv mapping
-
-		FormFieldInterfaceMapping csvMapping =
-			objectCsvFormFieldInterfaceMappingProvider.get ()
-
-			.rootFieldName (
-				rootFieldName);
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			objectFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				nullable)
-
-			.rootFieldName (
-				rootFieldName)
-
-			.entityFinder (
-				consoleHelper.orNull ())
-
-			.mini (
+			if (
 				isNotNull (
-					spec.objectTypeName ()));
+					spec.fieldName ())
+			) {
 
-		// update hook
+				accessor =
+					dereferenceFormFieldAccessorProvider.get ()
 
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
+					.path (
+						spec.fieldName ());
 
-		// field
+			} else {
 
-		if (! readOnly) {
+				accessor =
+					simpleFormFieldAccessorProvider.get ()
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+					.name (
+						name)
+
+					.nativeClass (
+						propertyClassOptional.get ());
+
+			}
+
+			// native mapping
+
+			FormFieldNativeMapping nativeMapping;
+
+			if (
+				optionalValueEqualSafe (
+					propertyClassOptional,
+					Long.class)
+			) {
+
+				nativeMapping =
+					objectIdFormFieldNativeMappingProvider.get ()
+
+					.consoleHelper (
+						consoleHelper.orNull ());
+
+			} else {
+
+				nativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
+
+			}
+
+			// value validator
+
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				objectFormFieldConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// csv mapping
+
+			FormFieldInterfaceMapping csvMapping =
+				objectCsvFormFieldInterfaceMappingProvider.get ()
+
+				.rootFieldName (
+					rootFieldName);
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				objectFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -315,71 +302,107 @@ class ObjectFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					nullable)
 
-				.nativeMapping (
-					nativeMapping)
+				.rootFieldName (
+					rootFieldName)
 
-				.valueValidators (
-					valueValidators)
+				.entityFinder (
+					consoleHelper.orNull ())
 
-				.constraintValidator (
-					constraintValidator)
+				.mini (
+					isNotNull (
+						spec.objectTypeName ()));
 
-				.interfaceMapping (
-					interfaceMapping)
+			// update hook
 
-				.csvMapping (
-					csvMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.renderer (
-					renderer)
+			// field
 
-				.updateHook (
-					updateHook)
+			if (! readOnly) {
 
-				.viewPriv (
-					spec.viewPrivCode ())
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-				.featureCode (
-					spec.featureCode ())
+					.name (
+						name)
 
-			);
+					.label (
+						label)
 
-		} else {
+					.accessor (
+						accessor)
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+					.nativeMapping (
+						nativeMapping)
 
-				.name (
-					name)
+					.valueValidators (
+						valueValidators)
 
-				.label (
-					label)
+					.constraintValidator (
+						constraintValidator)
 
-				.accessor (
-					accessor)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.nativeMapping (
-					nativeMapping)
+					.csvMapping (
+						csvMapping)
 
-				.interfaceMapping (
-					interfaceMapping)
+					.renderer (
+						renderer)
 
-				.csvMapping (
-					csvMapping)
+					.updateHook (
+						updateHook)
 
-				.renderer (
-					renderer)
+					.viewPriv (
+						spec.viewPrivCode ())
 
-				.viewPriv (
-					spec.viewPrivCode ())
+					.featureCode (
+						spec.featureCode ())
 
-				.featureCode (
-					spec.featureCode ())
+				);
 
-			);
+			} else {
+
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+					.viewPriv (
+						spec.viewPrivCode ())
+
+					.featureCode (
+						spec.featureCode ())
+
+				);
+
+			}
 
 		}
 

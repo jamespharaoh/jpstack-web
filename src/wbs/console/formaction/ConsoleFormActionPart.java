@@ -24,8 +24,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFormActionPart")
@@ -85,37 +86,52 @@ class ConsoleFormActionPart <FormState, History>
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formState =
-			formActionHelper.constructFormState ();
+		try (
 
-		formActionHelper.updatePassiveFormState (
-			formState);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		formHints =
-			formActionHelper.formHints ();
+		) {
 
-		updateResultSet =
-			genericCastUnchecked (
-				requestContext.request (
-					"console-form-action-update-result-set"));
+			formState =
+				formActionHelper.constructFormState (
+					transaction);
 
-		history =
-			formActionHelper.history ();
+			formActionHelper.updatePassiveFormState (
+				transaction,
+				formState);
+
+			formHints =
+				formActionHelper.formHints (
+					transaction);
+
+			updateResultSet =
+				genericCastUnchecked (
+					requestContext.request (
+						"console-form-action-update-result-set"));
+
+			history =
+				formActionHelper.history (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -140,7 +156,7 @@ class ConsoleFormActionPart <FormState, History>
 			// write preamble
 
 			formActionHelper.writePreamble (
-				taskLogger,
+				transaction,
 				formatWriter,
 				isNotNull (
 					submitLabel));
@@ -153,7 +169,7 @@ class ConsoleFormActionPart <FormState, History>
 			) {
 
 				formFieldLogic.outputFormTable (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					formFields,
@@ -180,7 +196,7 @@ class ConsoleFormActionPart <FormState, History>
 					historyHeading);
 
 				formFieldLogic.outputListTable (
-					taskLogger,
+					transaction,
 					formatWriter,
 					historyFields,
 					history,

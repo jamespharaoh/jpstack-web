@@ -14,9 +14,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.model.DaemonDeploymentRec;
 import wbs.platform.event.logic.EventLogic;
@@ -56,23 +56,24 @@ class DaemonDeploymentRestartFormActionHelper
 	@Override
 	public
 	Permissions canBePerformed (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canBePerformed");
 
 		) {
 
 			DaemonDeploymentRec daemonDeployment =
-				daemonDeploymentHelper.findFromContextRequired ();
+				daemonDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			boolean show =
 				userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					daemonDeployment,
 					"restart");
 
@@ -90,21 +91,22 @@ class DaemonDeploymentRestartFormActionHelper
 	@Override
 	public
 	void writePreamble (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writePreamble");
 
 		) {
 
 			DaemonDeploymentRec daemonDeployment =
-				daemonDeploymentHelper.findFromContextRequired ();
+				daemonDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			if (daemonDeployment.getRestart ()) {
 
@@ -127,15 +129,14 @@ class DaemonDeploymentRestartFormActionHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object formState) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
@@ -143,7 +144,8 @@ class DaemonDeploymentRestartFormActionHelper
 			// load data
 
 			DaemonDeploymentRec daemonDeployment =
-				daemonDeploymentHelper.findFromContextRequired ();
+				daemonDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			// check state
 
@@ -164,9 +166,10 @@ class DaemonDeploymentRestartFormActionHelper
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"daemon_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				daemonDeployment);
 
 			// commit and return

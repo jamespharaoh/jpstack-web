@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -53,11 +54,11 @@ class SupervisorSimplePartBuilder
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");

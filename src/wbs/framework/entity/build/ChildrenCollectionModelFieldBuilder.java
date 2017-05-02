@@ -9,13 +9,17 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Set;
 
+import lombok.NonNull;
+
 import org.apache.commons.lang3.reflect.TypeUtils;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
@@ -24,13 +28,20 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.collections.ChildrenCollectionSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("childrenCollectionModelFieldBuilder")
 @ModelBuilder
 public
-class ChildrenCollectionModelFieldBuilder {
+class ChildrenCollectionModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -48,93 +59,106 @@ class ChildrenCollectionModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				naivePluralise (
-					spec.typeName ()));
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		) {
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+			String fieldName =
+				ifNull (
+					spec.name (),
+					naivePluralise (
+						spec.typeName ()));
 
-		Class<?> fieldTypeClass =
-			classForNameRequired (
-				fullFieldTypeName);
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
 
-		// create model field
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
 
-		ModelField modelField =
-			new ModelField ()
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
 
-			.model (
-				target.model ())
+			Class<?> fieldTypeClass =
+				classForNameRequired (
+					fullFieldTypeName);
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.collection)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				false)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.valueType (
-				Set.class)
+				.type (
+					ModelFieldType.collection)
 
-			.parameterizedType (
-				TypeUtils.parameterize (
-					Set.class,
-					fieldTypeClass))
+				.parent (
+					false)
 
-			.collectionKeyType (
-				fieldTypeClass)
+				.identity (
+					false)
 
-			.collectionValueType (
-				fieldTypeClass)
+				.valueType (
+					Set.class)
 
-			.joinColumnName (
-				spec.joinColumnName ())
+				.parameterizedType (
+					TypeUtils.parameterize (
+						Set.class,
+						fieldTypeClass))
 
-			.whereSql (
-				spec.whereSql ())
+				.collectionKeyType (
+					fieldTypeClass)
 
-			.orderSql (
-				spec.orderSql ());
+				.collectionValueType (
+					fieldTypeClass)
 
-		// store field
+				.joinColumnName (
+					spec.joinColumnName ())
 
-		target.fields ().add (
-			modelField);
+				.whereSql (
+					spec.whereSql ())
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.orderSql (
+					spec.orderSql ());
+
+			// store field
+
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+		}
 
 	}
 

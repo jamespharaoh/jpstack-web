@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -17,7 +17,7 @@ public
 interface ChatDateLogic {
 
 	void userDateStuff (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <UserRec> user,
 			Optional <MessageRec> message,
@@ -30,7 +30,7 @@ interface ChatDateLogic {
 
 	default
 	void userDateStuff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <UserRec> user,
 			@NonNull Optional <MessageRec> message,
@@ -38,7 +38,7 @@ interface ChatDateLogic {
 			boolean sendMessage) {
 
 		userDateStuff (
-			parentTaskLogger,
+			parentTransaction,
 			chatUser,
 			user,
 			message,
@@ -52,11 +52,11 @@ interface ChatDateLogic {
 	}
 
 	void chatUserDateJoinHint (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void chatUserDateUpgradeHint (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 }

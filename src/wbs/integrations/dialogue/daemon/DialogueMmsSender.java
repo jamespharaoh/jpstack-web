@@ -36,7 +36,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
@@ -83,43 +86,57 @@ class DialogueMmsSender
 	@Override
 	protected
 	DialogueMmsOutbox getMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec outbox)
 		throws SendFailureException {
 
-		DialogueMmsOutbox dialogueMmsOutbox =
-			new DialogueMmsOutbox ();
+		try (
 
-		dialogueMmsOutbox.outbox =
-			outbox;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getMessage");
 
-		dialogueMmsOutbox.dialogueMmsRoute =
-			dialogueMmsRouteHelper.findOrThrow (
-				outbox.getRoute ().getId (),
-				() -> tempFailure (
-					stringFormat (
-						"No Dialogue MMS route for message %s",
-						integerToDecimalString (
-							outbox.getMessage ().getId ()))));
+		) {
 
-		// initialise any lazy proxies
+			DialogueMmsOutbox dialogueMmsOutbox =
+				new DialogueMmsOutbox ();
 
-		dialogueMmsOutbox.outbox.getMessage ().getNumTo ();
+			dialogueMmsOutbox.outbox =
+				outbox;
 
-		dialogueMmsOutbox.outbox.getMessage ().getText ().getText ();
+			dialogueMmsOutbox.dialogueMmsRoute =
+				dialogueMmsRouteHelper.findOrThrow (
+					transaction,
+					outbox.getRoute ().getId (),
+					() -> tempFailure (
+						stringFormat (
+							"No Dialogue MMS route for message %s",
+							integerToDecimalString (
+								outbox.getMessage ().getId ()))));
 
-		dialogueMmsOutbox.outbox.getMessage ().getSubjectText ().getText ();
+			// initialise any lazy proxies
 
-		for (MediaRec media
-				: dialogueMmsOutbox.outbox.getMessage ().getMedias ()) {
+			dialogueMmsOutbox.outbox.getMessage ().getNumTo ();
 
-			media.getMediaType ().getMimeType ();
+			dialogueMmsOutbox.outbox.getMessage ().getText ().getText ();
 
-			media.getContent ().getData ();
+			dialogueMmsOutbox.outbox.getMessage ().getSubjectText ().getText ();
+
+			for (
+				MediaRec media
+					: dialogueMmsOutbox.outbox.getMessage ().getMedias ()
+			) {
+
+				media.getMediaType ().getMimeType ();
+
+				media.getContent ().getData ();
+
+			}
+
+			return dialogueMmsOutbox;
 
 		}
-
-		return dialogueMmsOutbox;
 
 	}
 
@@ -132,7 +149,7 @@ class DialogueMmsSender
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"sendMessage");
@@ -326,7 +343,7 @@ class DialogueMmsSender
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doResponse");

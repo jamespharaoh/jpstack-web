@@ -9,8 +9,9 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -37,16 +38,27 @@ class ConsolePrintResponder
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter =
-			requestContext.formatWriter ()
+		try (
 
-			.indentString (
-				"  ");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
 
-		setCurrentFormatWriter (
-			formatWriter);
+		) {
+
+			formatWriter =
+				requestContext.formatWriter ()
+
+				.indentString (
+					"  ");
+
+			setCurrentFormatWriter (
+				formatWriter);
+
+		}
 
 	}
 

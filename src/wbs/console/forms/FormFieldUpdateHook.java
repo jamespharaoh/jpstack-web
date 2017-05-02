@@ -4,14 +4,14 @@ import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.UpdateResult;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface FormFieldUpdateHook <Container, Generic, Native> {
 
 	void onUpdate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UpdateResult <Generic, Native> updateResult,
 			Container container,
 			Record <?> linkObject,

@@ -59,10 +59,13 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
@@ -107,47 +110,60 @@ class ObjectManagerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// index object helpers
+		try (
 
-		objectHelpers =
-			ImmutableList.copyOf (
-				objectHelpersByComponentName.values ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-		objectHelpersByName =
-			mapWithDerivedKey (
-				objectHelpers,
-				ObjectHelper::objectName);
+		) {
 
-		objectHelpersByTypeId =
-			mapWithDerivedKey (
-				objectHelpers,
-				ObjectHelper::objectTypeId);
+			// index object helpers
 
-		objectHelpersByTypeCode =
-			mapWithDerivedKey (
-				objectHelpers,
-				ObjectHelper::objectTypeCode);
+			objectHelpers =
+				ImmutableList.copyOf (
+					objectHelpersByComponentName.values ());
 
-		objectHelpersByClass =
-			mapWithDerivedKey (
-				objectHelpers,
-				ObjectHelper::objectClass);
+			objectHelpersByName =
+				mapWithDerivedKey (
+					objectHelpers,
+					ObjectHelper::objectName);
 
-		// inject us back into the object helpers
+			objectHelpersByTypeId =
+				mapWithDerivedKey (
+					objectHelpers,
+					ObjectHelper::objectTypeId);
 
-		objectHelpers.forEach (
-			objectHelper -> {
+			objectHelpersByTypeCode =
+				mapWithDerivedKey (
+					objectHelpers,
+					ObjectHelper::objectTypeCode);
 
-			ObjectHelperImplementation <?> objectHelperImplementation =
-				(ObjectHelperImplementation <?>)
-				objectHelper;
+			objectHelpersByClass =
+				mapWithDerivedKey (
+					objectHelpers,
+					ObjectHelper::objectClass);
 
-			objectHelperImplementation.objectManager (
-				this);
+			// inject us back into the object helpers
 
-		});
+			objectHelpers.forEach (
+				objectHelper -> {
+
+				ObjectHelperImplementation <?> objectHelperImplementation =
+					(ObjectHelperImplementation <?>)
+					objectHelper;
+
+				objectHelperImplementation.objectManager (
+					taskLogger,
+					this);
+
+			});
+
+		}
 
 	}
 
@@ -195,31 +211,57 @@ class ObjectManagerImplementation
 	@Override
 	public <ChildType extends Record <ChildType>>
 	List <ChildType> getChildren (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Class <ChildType> childClass) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (
-				object);
+		try (
 
-		return objectHelper.getChildrenGeneric (
-			object,
-			childClass);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getChildren");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.getChildrenGeneric (
+				transaction,
+				object,
+				childClass);
+
+		}
 
 	}
 
 	@Override
 	public
 	Either <Optional <Record <?>>, String> getParentOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
-		ObjectHelper <?> objectHelper =
-			objectHelperForClassRequired (
-				object.getClass ());
+		try (
 
-		return objectHelper.getParentOrError (
-			genericCastUnchecked (
-				object));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getParentOrError");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForClassRequired (
+					object.getClass ());
+
+			return objectHelper.getParentOrError (
+				transaction,
+				genericCastUnchecked (
+					object));
+
+		}
 
 	}
 
@@ -305,69 +347,108 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
+			@NonNull Transaction parentTransaction,
 			Record <?> startingObject,
 			@NonNull Optional <Record <?>> assumedRoot,
 			boolean startingMini,
 			boolean preload) {
 
-		if (startingObject == null)
-			return "-";
+		try (
 
-		Record <?> currentObject =
-			startingObject;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"objectPath");
 
-		ObjectHelper <?> objectHelper =
-			objectHelperForObjectRequired (
-				currentObject);
+		) {
 
-		if (objectHelper.isRoot ())
-			return "root";
+			if (startingObject == null)
+				return "-";
 
-		List <String> partsToReturn =
-			new ArrayList<> ();
+			Record <?> currentObject =
+				startingObject;
 
-		ObjectHelper <?> specificObjectHelper = null;
-
-		Boolean currentMini =
-			startingMini;
-
-		do {
-
-			// get some stuff
-
-			Record <?> parent =
-				objectHelper.getParentRequired (
-					genericCastUnchecked (
-						currentObject));
-
-			ObjectHelper <?> parentHelper =
+			ObjectHelper <?> objectHelper =
 				objectHelperForObjectRequired (
-					parent);
+					currentObject);
 
-			// work out this part
+			if (objectHelper.isRoot ())
+				return "root";
 
-			if (objectHelper.parentTypeIsFixed ()) {
+			List <String> partsToReturn =
+				new ArrayList<> ();
 
-				if (specificObjectHelper == null) {
+			ObjectHelper <?> specificObjectHelper = null;
 
-					specificObjectHelper =
-						objectHelper;
+			Boolean currentMini =
+				startingMini;
+
+			do {
+
+				// get some stuff
+
+				Record <?> parent =
+					objectHelper.getParentRequired (
+						transaction,
+						genericCastUnchecked (
+							currentObject));
+
+				ObjectHelper <?> parentHelper =
+					objectHelperForObjectRequired (
+						parent);
+
+				// work out this part
+
+				if (objectHelper.parentTypeIsFixed ()) {
+
+					if (specificObjectHelper == null) {
+
+						specificObjectHelper =
+							objectHelper;
+
+						if (partsToReturn.size () > 0)
+							partsToReturn.add ("/");
+
+					} else {
+
+						partsToReturn.add (".");
+
+					}
+
+					partsToReturn.add (
+						getCode (
+							transaction,
+							currentObject));
+
+				} else {
+
+					if (specificObjectHelper != null) {
+
+						if (currentMini) {
+
+							currentMini = false;
+
+						} else {
+
+							partsToReturn.add (
+								":");
+
+							partsToReturn.add (
+								specificObjectHelper.objectTypeCode ());
+
+						}
+
+						specificObjectHelper = null;
+
+					}
 
 					if (partsToReturn.size () > 0)
 						partsToReturn.add ("/");
 
-				} else {
-
-					partsToReturn.add (".");
-
-				}
-
-				partsToReturn.add (
-					getCode (currentObject));
-
-			} else {
-
-				if (specificObjectHelper != null) {
+					partsToReturn.add (
+						getCode (
+							transaction,
+							currentObject));
 
 					if (currentMini) {
 
@@ -379,82 +460,59 @@ class ObjectManagerImplementation
 							":");
 
 						partsToReturn.add (
-							specificObjectHelper.objectTypeCode ());
+							objectHelper.objectTypeCode ());
 
 					}
 
-					specificObjectHelper = null;
-
 				}
 
-				if (partsToReturn.size () > 0)
-					partsToReturn.add ("/");
+				// then move onto the parent
+
+				currentObject =
+					parent;
+
+				objectHelper =
+					parentHelper;
+
+			} while (
+				! objectHelper.isRoot ()
+				&& currentObject != assumedRoot.orNull ()
+			);
+
+			if (
+				specificObjectHelper != null
+				&& ! currentMini
+			) {
 
 				partsToReturn.add (
-					getCode (
-						currentObject));
+					":");
 
-				if (currentMini) {
-
-					currentMini = false;
-
-				} else {
-
-					partsToReturn.add (
-						":");
-
-					partsToReturn.add (
-						objectHelper.objectTypeCode ());
-
-				}
+				partsToReturn.add (
+					specificObjectHelper.objectTypeCode ());
 
 			}
 
-			// then move onto the parent
+			// reverse and assemble the result
 
-			currentObject =
-				parent;
+			StringBuilder stringBuilder =
+				new StringBuilder ();
 
-			objectHelper =
-				parentHelper;
+			Collections.reverse (
+				partsToReturn);
 
-		} while (
-			! objectHelper.isRoot ()
-			&& currentObject != assumedRoot.orNull ()
-		);
+			for (
+				String string
+					: partsToReturn
+			) {
 
-		if (
-			specificObjectHelper != null
-			&& ! currentMini
-		) {
+				stringBuilder.append (
+					string);
 
-			partsToReturn.add (
-				":");
+			}
 
-			partsToReturn.add (
-				specificObjectHelper.objectTypeCode ());
+			return stringBuilder.toString ();
 
 		}
-
-		// reverse and assemble the result
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		Collections.reverse (
-			partsToReturn);
-
-		for (
-			String string
-				: partsToReturn
-		) {
-
-			stringBuilder.append (
-				string);
-
-		}
-
-		return stringBuilder.toString ();
 
 	}
 
@@ -477,74 +535,113 @@ class ObjectManagerImplementation
 	@Override
 	public
 	GlobalId getGlobalId (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
-		ObjectHelper <?> objectHelper =
-			objectHelperForObjectRequired (
-				object);
+		try (
 
-		return objectHelper.getGlobalId (
-			genericCastUnchecked (
-				object));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getGlobalId");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.getGlobalId (
+				genericCastUnchecked (
+					object));
+
+		}
 
 	}
 
 	@Override
 	public
 	GlobalId getParentGlobalId (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
-		ObjectHelper <?> objectHelper =
-			objectHelperForObjectRequired (
-				object);
+		try (
 
-		return objectHelper.getParentGlobalId (
-			genericCastUnchecked (
-				object));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getParentGlobalId");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.getParentGlobalId (
+				transaction,
+				genericCastUnchecked (
+					object));
+
+		}
 
 	}
 
 	@Override
 	public <RecordType extends Record <?>>
 	SortedMap <String, RecordType> pathMap (
+			@NonNull Transaction parentTransaction,
 			@NonNull Collection <RecordType> objects,
 			Record <?> root,
 			boolean mini) {
 
-		SortedMap<String,RecordType> ret =
-			new TreeMap<String,RecordType> ();
+		try (
 
-		for (
-			RecordType object
-				: objects
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"pathMap");
+
 		) {
 
-			ret.put (
-				objectPath (
-					object,
-					optionalFromNullable (
-						root),
-					mini,
-					false),
-				object);
+			SortedMap <String, RecordType> ret =
+				new TreeMap<> ();
+
+			for (
+				RecordType object
+					: objects
+			) {
+
+				ret.put (
+					objectPath (
+						transaction,
+						object,
+						optionalFromNullable (
+							root),
+						mini,
+						false),
+					object);
+
+			}
+
+			return ret;
 
 		}
-
-		return ret;
 
 	}
 
 	@Override
 	public <RecordType extends Record <?>>
 	RecordType update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		ObjectHelper <?> objectHelper =
-			objectHelperForClassRequired (object.getClass ());
+			objectHelperForClassRequired (
+				object.getClass ());
 
 		return objectHelper.update (
-			parentTaskLogger,
+			parentTransaction,
 			object);
 
 	}
@@ -552,55 +649,97 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String getCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
-		ObjectHelper <?> objectHelper =
-			objectHelperForClassRequired (
-				object.getClass ());
+		try (
 
-		return objectHelper.getCode (
-			genericCastUnchecked (
-				object));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getCode");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForClassRequired (
+					object.getClass ());
+
+			return objectHelper.getCode (
+				genericCastUnchecked (
+					object));
+
+		}
 
 	}
 
 	@Override
 	public
-	Record<?> findObject (
+	Record <?> findObject (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId objectGlobalId) {
 
-		ObjectHelper <?> objectHelper =
-			objectHelpersByTypeId.get (
-				objectGlobalId.typeId ());
+		try (
 
-		return optionalOrNull (
-			objectHelper.find (
-				objectGlobalId.objectId ()));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findObject");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelpersByTypeId.get (
+					objectGlobalId.typeId ());
+
+			return optionalOrNull (
+				objectHelper.find (
+					transaction,
+					objectGlobalId.objectId ()));
+
+		}
 
 	}
 
 	@Override
 	public
-	List<Record<?>> getMinorChildren (
+	List <Record <?>> getMinorChildren (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (parent);
+		try (
 
-		return objectHelper.getMinorChildrenGeneric (
-			parent);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getMinorChildren");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					parent);
+
+			return objectHelper.getMinorChildrenGeneric (
+				transaction,
+				parent);
+
+		}
 
 	}
 
 	@Override
 	public <ItemType extends EphemeralRecord<?>>
 	ItemType remove (
+			@NonNull Transaction parentTransaction,
 			@NonNull ItemType object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		ObjectHelper <?> objectHelper =
+			objectHelperForObjectRequired (
+				object);
 
 		return objectHelper.remove (
+			parentTransaction,
 			object);
 
 	}
@@ -608,24 +747,50 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String getObjectTypeCode (
-			@NonNull Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		try (
 
-		return objectHelper.objectTypeCode ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getObjectTypeCode");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.objectTypeCode ();
+
+		}
 
 	}
 
 	@Override
 	public
 	Long getObjectTypeId (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record<?> object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		try (
 
-		return objectHelper.objectTypeId ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getObjectTypeId");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.objectTypeId ();
+
+		}
 
 	}
 
@@ -692,54 +857,81 @@ class ObjectManagerImplementation
 	@Override
 	public
 	boolean isParent (
-			Record<?> object,
-			Record<?> parent) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Record <?> parent) {
 
-		Record<?> foundParent =
-			firstParent (
-				object,
-				Collections.singleton (parent));
+		try (
 
-		return foundParent != null;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"isParent");
+
+		) {
+
+			Record <?> foundParent =
+				firstParent (
+					transaction,
+					object,
+					Collections.singleton (
+						parent));
+
+			return foundParent != null;
+
+		}
 
 	}
 
 	@Override
 	public <ParentType extends Record <?>>
 	ParentType firstParent (
-			Record <?> object,
-			Set <ParentType> parents) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Set <ParentType> parents) {
 
-		Record <?> current =
-			object;
+		try (
 
-		ObjectHelper <?> currentHelper =
-			objectHelperForObjectRequired (
-				current);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"firstParent");
 
-		for (;;) {
+		) {
 
-			if (parents.contains (current)) {
+			Record <?> current =
+				object;
 
-				ParentType temp =
-					genericCastUnchecked (
-						current);
-
-				return temp;
-
-			}
-
-			if (currentHelper.isRoot ())
-				return null;
-
-			current =
-				currentHelper.getParentRequired (
-					genericCastUnchecked (
-						current));
-
-			currentHelper =
+			ObjectHelper <?> currentHelper =
 				objectHelperForObjectRequired (
 					current);
+
+			for (;;) {
+
+				if (parents.contains (current)) {
+
+					ParentType temp =
+						genericCastUnchecked (
+							current);
+
+					return temp;
+
+				}
+
+				if (currentHelper.isRoot ())
+					return null;
+
+				current =
+					currentHelper.getParentRequired (
+						transaction,
+						genericCastUnchecked (
+							current));
+
+				currentHelper =
+					objectHelperForObjectRequired (
+						current);
+
+			}
 
 		}
 
@@ -748,239 +940,255 @@ class ObjectManagerImplementation
 	@Override
 	public
 	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object startingObject,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
 
-		Object currentObject =
-			startingObject;
+		try (
 
-		List <String> pathParts =
-			stringSplitFullStop (
-				path);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"dereferenceOrError");
 
-		// check hints
-
-		for (
-			long numParts = 1l;
-			notMoreThan (
-				numParts,
-				collectionSize (
-					pathParts));
-			numParts ++
 		) {
 
-			String pathPrefix =
-				joinWithFullStop (
-					listSlice (
-						pathParts,
-						0,
-						numParts));
+			Object currentObject =
+				startingObject;
 
-			if (
-				mapContainsKey (
-					hints,
-					pathPrefix)
+			List <String> pathParts =
+				stringSplitFullStop (
+					path);
+
+			// check hints
+
+			for (
+				long numParts = 1l;
+				notMoreThan (
+					numParts,
+					collectionSize (
+						pathParts));
+				numParts ++
 			) {
 
-				// found in hints
-
-				currentObject =
-					mapItemForKeyRequired (
-						hints,
-						pathPrefix);
-
-				pathParts =
-					listSlice (
-						pathParts,
-						numParts,
-						collectionSize (
-							pathParts));
-
-			}
-
-		}
-
-		// check global values
-
-		if (
-			collectionIsNotEmpty (
-				pathParts)
-		) {
-
-			String firstPathPart =
-				listFirstElementRequired (
-					pathParts);
-
-			if (
-				stringEqualSafe (
-					firstPathPart,
-					"root")
-			) {
-
-				// root
-
-				currentObject =
-					rootObjectHelper.findRequired (
-						0l);
-
-				pathParts =
-					listSliceAllButFirstItemRequired (
-						pathParts);
-
-			} else if (
-				stringEqualSafe (
-					firstPathPart,
-					"this")
-			) {
-
-				// same object
-
-				pathParts =
-					listSliceAllButFirstItemRequired (
-						pathParts);
-
-			}
-
-		}
-
-		// iterate through path
-
-		for (
-			String pathPart
-				: pathParts
-		) {
-
-			if (
-				stringInSafe (
-					pathPart,
-					"parent",
-					"grandparent",
-					"greatgrandparent")
-			) {
-
-				// parent
-
-				Either <Record <?>, String> parentOrError =
-					getParentRequiredOrError (
-						genericCastUnchecked (
-							currentObject));
+				String pathPrefix =
+					joinWithFullStop (
+						listSlice (
+							pathParts,
+							0,
+							numParts));
 
 				if (
-					isError (
-						parentOrError)
+					mapContainsKey (
+						hints,
+						pathPrefix)
 				) {
 
-					return errorResultFormat (
-						"Error getting parent of %s: %s",
-						currentObject.toString (),
-						getError (
-							parentOrError));
+					// found in hints
+
+					currentObject =
+						mapItemForKeyRequired (
+							hints,
+							pathPrefix);
+
+					pathParts =
+						listSlice (
+							pathParts,
+							numParts,
+							collectionSize (
+								pathParts));
 
 				}
 
-				currentObject =
-					resultValueRequired (
-						parentOrError);
+			}
 
-				// grandparent
+			// check global values
+
+			if (
+				collectionIsNotEmpty (
+					pathParts)
+			) {
+
+				String firstPathPart =
+					listFirstElementRequired (
+						pathParts);
+
+				if (
+					stringEqualSafe (
+						firstPathPart,
+						"root")
+				) {
+
+					// root
+
+					currentObject =
+						rootObjectHelper.findRequired (
+							transaction,
+							0l);
+
+					pathParts =
+						listSliceAllButFirstItemRequired (
+							pathParts);
+
+				} else if (
+					stringEqualSafe (
+						firstPathPart,
+						"this")
+				) {
+
+					// same object
+
+					pathParts =
+						listSliceAllButFirstItemRequired (
+							pathParts);
+
+				}
+
+			}
+
+			// iterate through path
+
+			for (
+				String pathPart
+					: pathParts
+			) {
 
 				if (
 					stringInSafe (
 						pathPart,
+						"parent",
 						"grandparent",
 						"greatgrandparent")
 				) {
 
-					Either <Record <?>, String> grandparentOrError =
+					// parent
+
+					Either <Record <?>, String> parentOrError =
 						getParentRequiredOrError (
+							transaction,
 							genericCastUnchecked (
 								currentObject));
 
 					if (
 						isError (
-							grandparentOrError)
+							parentOrError)
 					) {
 
 						return errorResultFormat (
 							"Error getting parent of %s: %s",
 							currentObject.toString (),
 							getError (
-								grandparentOrError));
+								parentOrError));
 
 					}
 
 					currentObject =
 						resultValueRequired (
-							grandparentOrError);
+							parentOrError);
 
-				}
-
-				// great-grandparent
-
-				if (
-					stringInSafe (
-						pathPart,
-						"greatgrandparent")
-				) {
-
-					Either <Record <?>, String> greatGrandparentOrError =
-						getParentRequiredOrError (
-							genericCastUnchecked (
-								currentObject));
+					// grandparent
 
 					if (
-						isError (
-							greatGrandparentOrError)
+						stringInSafe (
+							pathPart,
+							"grandparent",
+							"greatgrandparent")
 					) {
 
-						return errorResultFormat (
-							"Error getting parent of %s: %s",
-							currentObject.toString (),
-							getError (
-								greatGrandparentOrError));
+						Either <Record <?>, String> grandparentOrError =
+							getParentRequiredOrError (
+								transaction,
+								genericCastUnchecked (
+									currentObject));
+
+						if (
+							isError (
+								grandparentOrError)
+						) {
+
+							return errorResultFormat (
+								"Error getting parent of %s: %s",
+								currentObject.toString (),
+								getError (
+									grandparentOrError));
+
+						}
+
+						currentObject =
+							resultValueRequired (
+								grandparentOrError);
 
 					}
 
-					currentObject =
-						resultValueRequired (
-							greatGrandparentOrError);
+					// great-grandparent
 
-				}
+					if (
+						stringInSafe (
+							pathPart,
+							"greatgrandparent")
+					) {
 
-			} else {
+						Either <Record <?>, String> greatGrandparentOrError =
+							getParentRequiredOrError (
+								transaction,
+								genericCastUnchecked (
+									currentObject));
 
-				try {
+						if (
+							isError (
+								greatGrandparentOrError)
+						) {
 
-					currentObject =
-						propertyGetAuto (
-							currentObject,
-							pathPart);
+							return errorResultFormat (
+								"Error getting parent of %s: %s",
+								currentObject.toString (),
+								getError (
+									greatGrandparentOrError));
 
-				} catch (RuntimeException runtimeException) {
+						}
 
-					return errorResultFormat (
-						"Error getting field '%s' of %s",
-						pathPart,
-						currentObject.toString ());
+						currentObject =
+							resultValueRequired (
+								greatGrandparentOrError);
 
-				}
+					}
 
-				if (
-					isNull (
-						currentObject)
-				) {
-					return successResult (
-						optionalAbsent ());
+				} else {
+
+					try {
+
+						currentObject =
+							propertyGetAuto (
+								currentObject,
+								pathPart);
+
+					} catch (RuntimeException runtimeException) {
+
+						return errorResultFormat (
+							"Error getting field '%s' of %s",
+							pathPart,
+							currentObject.toString ());
+
+					}
+
+					if (
+						isNull (
+							currentObject)
+					) {
+						return successResult (
+							optionalAbsent ());
+					}
+
 				}
 
 			}
 
-		}
+			return successResult (
+				optionalOf (
+					currentObject));
 
-		return successResult (
-			optionalOf (
-				currentObject));
+		}
 
 	}
 
@@ -1005,91 +1213,103 @@ class ObjectManagerImplementation
 	@Override
 	public
 	Optional <Class <?>> dereferenceType (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Optional <Class <?>> startingObjectClass,
 			@NonNull Optional <String> path) {
 
-		if (! path.isPresent ())
-			return startingObjectClass;
+		try (
 
-		Optional <Class <?>> currentObjectClass =
-			startingObjectClass;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"dereferenceType");
 
-		List <String> pathParts =
-			stringSplitFullStop (
-				path.get ());
-
-		for (
-			String pathPart
-				: pathParts
 		) {
 
-			if (! currentObjectClass.isPresent ())
-				return Optional.absent ();
+			if (! path.isPresent ())
+				return startingObjectClass;
 
-			if (
-				stringEqualSafe (
-					pathPart,
-					"this")
+			Optional <Class <?>> currentObjectClass =
+				startingObjectClass;
+
+			List <String> pathParts =
+				stringSplitFullStop (
+					path.get ());
+
+			for (
+				String pathPart
+					: pathParts
 			) {
 
-				doNothing ();
+				if (! currentObjectClass.isPresent ())
+					return Optional.absent ();
 
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"parent")
-			) {
+				if (
+					stringEqualSafe (
+						pathPart,
+						"this")
+				) {
 
-				currentObjectClass =
-					parentType (
-						currentObjectClass);
+					doNothing ();
 
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"grandparent")
-			) {
+				} else if (
+					stringEqualSafe (
+						pathPart,
+						"parent")
+				) {
 
-				currentObjectClass =
-					parentType (
-					parentType (
-						currentObjectClass));
+					currentObjectClass =
+						parentType (
+							currentObjectClass);
 
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"greatgrandparent")
-			) {
+				} else if (
+					stringEqualSafe (
+						pathPart,
+						"grandparent")
+				) {
 
-				currentObjectClass =
-					parentType (
-					parentType (
-					parentType (
-						currentObjectClass)));
+					currentObjectClass =
+						parentType (
+						parentType (
+							currentObjectClass));
 
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"root")
-			) {
+				} else if (
+					stringEqualSafe (
+						pathPart,
+						"greatgrandparent")
+				) {
 
-				currentObjectClass =
-					Optional.of (
-						rootObjectHelper.objectClass ());
+					currentObjectClass =
+						parentType (
+						parentType (
+						parentType (
+							currentObjectClass)));
 
-			} else {
+				} else if (
+					stringEqualSafe (
+						pathPart,
+						"root")
+				) {
 
-				currentObjectClass =
-					Optional.of (
-						PropertyUtils.propertyClassForClass (
-							currentObjectClass.get (),
-							pathPart));
+					currentObjectClass =
+						Optional.of (
+							rootObjectHelper.objectClass ());
+
+				} else {
+
+					currentObjectClass =
+						Optional.of (
+							PropertyUtils.propertyClassForClass (
+								currentObjectClass.get (),
+								pathPart));
+
+				}
 
 			}
 
-		}
+			return currentObjectClass;
 
-		return currentObjectClass;
+		}
 
 	}
 
@@ -1097,43 +1317,56 @@ class ObjectManagerImplementation
 	public
 	<ObjectType extends Record <ObjectType>>
 	Optional <ObjectType> getAncestor (
+			@NonNull Transaction parentTransaction,
 			@NonNull Class <ObjectType> ancestorClass,
 			@NonNull Record <?> startingObject) {
 
-		Record <?> currentObject =
-			startingObject;
+		try (
 
-		for (;;) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getAncestor");
 
-			// return if we found it
+		) {
 
-			if (
-				ancestorClass.isInstance (
-					currentObject)
-			) {
+			Record <?> currentObject =
+				startingObject;
 
-				return optionalOf (
-					ancestorClass.cast (
-						currentObject));
+			for (;;) {
+
+				// return if we found it
+
+				if (
+					ancestorClass.isInstance (
+						currentObject)
+				) {
+
+					return optionalOf (
+						ancestorClass.cast (
+							currentObject));
+
+				}
+
+				// stop at root
+
+				if (
+					rootObjectHelper.objectClass ().isInstance (
+						currentObject)
+				) {
+
+					return optionalAbsent ();
+
+				}
+
+				// iterate via parent
+
+				currentObject =
+					getParentRequired (
+						transaction,
+						currentObject);
 
 			}
-
-			// stop at root
-
-			if (
-				rootObjectHelper.objectClass ().isInstance (
-					currentObject)
-			) {
-
-				return optionalAbsent ();
-
-			}
-
-			// iterate via parent
-
-			currentObject =
-				getParentRequired (
-					currentObject);
 
 		}
 

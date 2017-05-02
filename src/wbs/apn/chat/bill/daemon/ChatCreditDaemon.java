@@ -17,6 +17,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -72,42 +73,50 @@ class ChatCreditDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
+					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
-				"Checking for all users with negative credit");
-
-			List <Long> chatIds;
-
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"ChatCreditDaemon.runOnce ()",
-						this);
-
-			) {
-
-				chatIds =
-					iterableMapToList (
-						ChatRec::getId,
-						chatHelper.findNotDeleted ());
-
-				transaction.close ();
-
-			}
+			List <Long> chatIds =
+				getChatIds (
+					parentTaskLogger);
 
 			chatIds.forEach (
 				chatId ->
 					doChat (
 						taskLogger,
 						chatId));
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	List <Long> getChatIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			transaction.debugFormat (
+				"Checking for all users with negative credit");
+
+			return iterableMapToList (
+				ChatRec::getId,
+				chatHelper.findNotDeleted (
+					transaction));
 
 		}
 
@@ -120,50 +129,17 @@ class ChatCreditDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"doChat (%s)",
-					integerToDecimalString (
-						chatId));
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					stringFormat (
-						"%s.%s (%s)",
-						"ChatCreditDaemon",
-						"doChat",
-						stringFormat (
-							"chatId = %s",
-							integerToDecimalString (
-								chatId))),
-					this);
+					"doChat");
 
 		) {
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					chatId);
-
-			Instant cutoffTime =
-				transaction.now ().minus (
-					Duration.standardSeconds (
-						chat.getBillTimeLimit ()));
-
-			taskLogger.debugFormat (
-				"Chat billing after %s",
-				timeFormatter.timestampSecondStringIso (
-					cutoffTime));
-
 			List <Long> chatUserIds =
-				iterableMapToList (
-					ChatUserRec::getId,
-					chatUserHelper.findWantingBill (
-						chat,
-						cutoffTime));
-
-			transaction.close ();
+				getChatUserIds (
+					taskLogger,
+					chatId);
 
 			taskLogger.debugFormat (
 				"Found %s users",
@@ -172,7 +148,7 @@ class ChatCreditDaemon
 
 			chatUserIds.forEach (
 				chatUserId ->
-					doUserCredit (
+					doChatUser (
 						taskLogger,
 						chatUserId));
 
@@ -181,40 +157,78 @@ class ChatCreditDaemon
 	}
 
 	private
-	void doUserCredit (
+	List <Long> getChatUserIds (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long chatId) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					stringFormat (
+						"doChat (%s)",
+						stringFormat (
+							"chatId = %s",
+							integerToDecimalString (
+								chatId))));
+
+		) {
+
+			ChatRec chat =
+				chatHelper.findRequired (
+					transaction,
+					chatId);
+
+			Instant cutoffTime =
+				transaction.now ().minus (
+					Duration.standardSeconds (
+						chat.getBillTimeLimit ()));
+
+			transaction.debugFormat (
+				"Chat billing after %s",
+				timeFormatter.timestampSecondStringIso (
+					cutoffTime));
+
+			return iterableMapToList (
+				ChatUserRec::getId,
+				chatUserHelper.findWantingBill (
+					transaction,
+					chat,
+					cutoffTime));
+
+		}
+
+	}
+
+	private
+	void doChatUser (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"doUserCredit (%s)",
-					integerToDecimalString (
-						chatUserId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
+					logContext,
+					parentTaskLogger,
 					stringFormat (
-						"%s.%s (%s)",
-						"ChatCreditDaemon",
-						"doUserCredit",
+						"doChatUser (%s)",
 						stringFormat (
 							"chatUserId = %s",
 							integerToDecimalString (
-								chatUserId))),
-					this);
+								chatUserId))));
 
 		) {
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			chatCreditLogic.userBill (
-				taskLogger,
+				transaction,
 				chatUser,
 				new BillCheckOptions ());
 

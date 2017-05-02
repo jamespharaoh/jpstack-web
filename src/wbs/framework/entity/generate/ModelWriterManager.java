@@ -10,11 +10,14 @@ import lombok.NonNull;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("modelWriterManager")
@@ -24,7 +27,10 @@ class ModelWriterManager {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@PrototypeDependency
 	@ModelWriter
@@ -32,30 +38,38 @@ class ModelWriterManager {
 
 	// state
 
-	Builder modelWriter;
+	Builder <TaskLogger> modelWriter;
 
 	// lifecycle
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		BuilderFactory builderFactory =
-			builderFactoryProvider.get ();
+		try (
 
-		for (
-			Map.Entry <Class <?>, Provider <Object>> modelWriterEntry
-				: modelWriterProviders.entrySet ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
 		) {
 
-			builderFactory.addBuilder (
-				modelWriterEntry.getKey (),
-				modelWriterEntry.getValue ());
+			modelWriter =
+				builderFactoryProvider.get ()
+
+				.contextClass (
+					TaskLogger.class)
+
+				.addBuilders (
+					taskLogger,
+					modelWriterProviders)
+
+				.create (
+					taskLogger);
 
 		}
-
-		modelWriter =
-			builderFactory.create ();
 
 	}
 
@@ -68,12 +82,23 @@ class ModelWriterManager {
 			@NonNull List <?> sourceItems,
 			@NonNull ModelFieldWriterTarget target) {
 
-		modelWriter.descend (
-			parentTaskLogger,
-			context,
-			sourceItems,
-			target,
-			MissingBuilderBehaviour.error);
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"write");
+
+		) {
+
+			modelWriter.descend (
+				parentTaskLogger,
+				context,
+				sourceItems,
+				target,
+				MissingBuilderBehaviour.error);
+
+		}
 
 	}
 

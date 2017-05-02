@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.entity.record.IdObject;
 
 @Accessors (fluent = true)

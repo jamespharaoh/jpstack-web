@@ -26,9 +26,10 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.web.file.WebFile;
 
@@ -114,14 +115,14 @@ class SimpleConsoleContext
 	@Override
 	public
 	String localPathForStuff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff stuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"localPathForStuff");
 
 		) {
@@ -129,13 +130,13 @@ class SimpleConsoleContext
 			if (parentContext () != null) {
 
 				return parentContext ().localPathForStuff (
-					taskLogger,
+					transaction,
 					stuff);
 
 			} else {
 
 				return super.localPathForStuff (
-					taskLogger,
+					transaction,
 					stuff);
 
 			}
@@ -147,15 +148,15 @@ class SimpleConsoleContext
 	@Override
 	public
 	void initContext (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull PathSupply pathParts,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"initContext");
 
 		) {
@@ -187,7 +188,7 @@ class SimpleConsoleContext
 
 					if (
 						privChecker.canRecursive (
-							taskLogger,
+							transaction,
 							GlobalId.root,
 							listSecondElementRequired (
 								privCodeParts))
@@ -234,7 +235,7 @@ class SimpleConsoleContext
 			if (parentContext != null) {
 
 				parentContext.initContext (
-					taskLogger,
+					transaction,
 					pathParts,
 					contextStuff);
 
@@ -245,7 +246,7 @@ class SimpleConsoleContext
 			if (postProcessorName () != null) {
 
 				consoleManager.runPostProcessors (
-					taskLogger,
+					transaction,
 					postProcessorName (),
 					contextStuff);
 

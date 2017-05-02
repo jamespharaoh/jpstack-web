@@ -77,8 +77,9 @@ class ChatUserAdminCreditModeAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -113,55 +114,47 @@ class ChatUserAdminCreditModeAction
 
 			}
 
-			try (
+			// lookup objects
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatUserAdminCreditModeAction.goReal ()",
-						this);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			ChatUserCreditMode oldCreditMode =
+				chatUser.getCreditMode ();
 
-				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+			// if it changed
 
-				ChatUserCreditMode oldCreditMode =
-					chatUser.getCreditMode ();
+			if (newCreditMode != oldCreditMode) {
 
-				// if it changed
+				// update chat user
 
-				if (newCreditMode != oldCreditMode) {
+				chatUserLogic.creditModeChange (
+					transaction,
+					chatUser,
+					newCreditMode);
 
-					// update chat user
+				// and log event
 
-					chatUserLogic.creditModeChange (
-						taskLogger,
-						chatUser,
-						newCreditMode);
-
-					// and log event
-
-					eventLogic.createEvent (
-						taskLogger,
-						"chat_user_credit_mode",
-						userConsoleLogic.userRequired (),
-						chatUser,
-						oldCreditMode.toString (),
-						newCreditMode.toString ());
-
-				}
-
-				transaction.commit ();
-
-				// we're done
-
-				requestContext.addNotice (
-					"Credit mode updated");
-
-				return null;
+				eventLogic.createEvent (
+					transaction,
+					"chat_user_credit_mode",
+					userConsoleLogic.userRequired (
+						transaction),
+					chatUser,
+					oldCreditMode.toString (),
+					newCreditMode.toString ());
 
 			}
+
+			transaction.commit ();
+
+			// we're done
+
+			requestContext.addNotice (
+				"Credit mode updated");
+
+			return null;
 
 		}
 

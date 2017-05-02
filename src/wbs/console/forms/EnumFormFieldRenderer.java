@@ -7,12 +7,18 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.util.Map;
 
@@ -27,8 +33,9 @@ import wbs.console.helper.enums.EnumConsoleHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -90,7 +97,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -101,9 +108,9 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormInput");
 
 		) {
@@ -114,7 +121,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 						formName)
 					? resultValueRequired (
 						formToInterface (
-							taskLogger,
+							transaction,
 							submission,
 							formName))
 					: interfaceValue;
@@ -188,7 +195,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Interface> interfaceValue,
@@ -196,9 +203,9 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -235,38 +242,49 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	Either <Optional <Interface>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		String parameterValue =
-			submission.parameter (
-				stringFormat (
-					"%s.%s",
-					formName,
-					name ()));
+		try (
 
-		if (
-			stringEqualSafe (
-				parameterValue,
-				"none")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formToInterface");
+
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			String parameterValue =
+				submission.parameter (
+					stringFormat (
+						"%s.%s",
+						formName,
+						name ()));
 
-		} else {
+			if (
+				stringEqualSafe (
+					parameterValue,
+					"none")
+			) {
 
-			return successResult (
-				optionalOf (
-					toEnum (
-						enumConsoleHelper.enumClass (),
-						hyphenToCamel (
-							submission.parameter (
-								stringFormat (
-									"%s.%s",
-									formName,
-									name ()))))));
+				return successResult (
+					optionalAbsent ());
+
+			} else {
+
+				return successResult (
+					optionalOf (
+						toEnum (
+							enumConsoleHelper.enumClass (),
+							hyphenToCamel (
+								submission.parameter (
+									stringFormat (
+										"%s.%s",
+										formName,
+										name ()))))));
+
+			}
 
 		}
 
@@ -275,19 +293,30 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
 			boolean link) {
 
-		htmlWriter.writeFormat (
-			"%h",
-			interfaceValue.isPresent ()
-				? enumNameSpaces (
-					interfaceValue.get ())
-				: "");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlSimple");
+
+		) {
+
+			htmlWriter.writeFormat (
+				"%h",
+				interfaceValue.isPresent ()
+					? enumNameSpaces (
+						interfaceValue.get ())
+					: "");
+
+		}
 
 	}
 
@@ -299,6 +328,92 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		return optionalMapOptional (
 			interfaceValueOptional,
 			enumConsoleHelper::htmlClass);
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellProperties");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					propertiesAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
 
 	}
 

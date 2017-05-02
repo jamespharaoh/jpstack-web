@@ -24,6 +24,7 @@ import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("componentModelFieldBuilder")
@@ -61,11 +62,11 @@ class ComponentModelFieldBuilder
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");

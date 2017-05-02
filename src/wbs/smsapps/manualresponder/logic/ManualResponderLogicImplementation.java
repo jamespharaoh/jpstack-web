@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.logic;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Collections;
@@ -20,10 +21,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -86,128 +87,138 @@ class ManualResponderLogicImplementation
 
 	@Override
 	public
-	Pair<List<String>,Long> splitMessage (
+	Pair <List <String>, Long> splitMessage (
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderTemplateRec template,
 			@NonNull Long maxLengthPerMultipartMessage,
 			@NonNull String messageString) {
 
-		// split message and apply templates
+		try (
 
-		List<String> messageParts;
-		long effectiveParts;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"splitMessage");
 
-		if (
-			template.getSplitLong ()
 		) {
 
-			// split message
+			// split message and apply templates
 
-			MessageSplitter.Templates messageSplitterTemplates;
+			List <String> messageParts;
+
+			long effectiveParts;
 
 			if (
-				template.getApplyTemplates ()
+				template.getSplitLong ()
 			) {
 
-				// use configured templates
+				// split message
 
-				messageSplitterTemplates =
-					new MessageSplitter.Templates (
-						template.getSingleTemplate (),
-						template.getFirstTemplate (),
-						template.getMiddleTemplate (),
-						template.getLastTemplate ());
+				MessageSplitter.Templates messageSplitterTemplates;
 
-			} else {
+				if (
+					template.getApplyTemplates ()
+				) {
 
-				// just split message
+					// use configured templates
 
-				messageSplitterTemplates =
-					new MessageSplitter.Templates (
-						"{message}",
-						"{message}",
-						"{message}",
-						"{message}");
+					messageSplitterTemplates =
+						new MessageSplitter.Templates (
+							template.getSingleTemplate (),
+							template.getFirstTemplate (),
+							template.getMiddleTemplate (),
+							template.getLastTemplate ());
 
-			}
+				} else {
 
-			messageParts =
-				MessageSplitter.split (
-					messageString,
-					messageSplitterTemplates);
+					// just split message
 
-			effectiveParts =
-				messageParts.size ();
+					messageSplitterTemplates =
+						new MessageSplitter.Templates (
+							"{message}",
+							"{message}",
+							"{message}",
+							"{message}");
 
-		} else {
+				}
 
-			// don't split message, apply template if enabled
+				messageParts =
+					MessageSplitter.split (
+						messageString,
+						messageSplitterTemplates);
 
-			String singleMessage;
-
-			if (template.getApplyTemplates ()) {
-
-				singleMessage =
-					template.getSingleTemplate ().replaceAll (
-						Pattern.quote ("{message}"),
-						messageString);
+				effectiveParts =
+					messageParts.size ();
 
 			} else {
 
-				singleMessage =
-					messageString;
+				// don't split message, apply template if enabled
+
+				String singleMessage;
+
+				if (template.getApplyTemplates ()) {
+
+					singleMessage =
+						template.getSingleTemplate ().replaceAll (
+							Pattern.quote ("{message}"),
+							messageString);
+
+				} else {
+
+					singleMessage =
+						messageString;
+
+				}
+
+				long singleMessageLength =
+					GsmUtils.gsmStringLength (
+						singleMessage);
+
+				messageParts =
+					Collections.singletonList (
+						singleMessage);
+
+				// work out effective parts
+
+				if (singleMessageLength <= 160l) {
+
+					effectiveParts = 1l;
+
+				} else {
+
+					effectiveParts = (
+						singleMessageLength - 1l
+					) / maxLengthPerMultipartMessage + 1l;
+
+				}
 
 			}
 
-			long singleMessageLength =
-				GsmUtils.gsmStringLength (
-					singleMessage);
+			// return
 
-			messageParts =
-				Collections.singletonList (
-					singleMessage);
-
-			// work out effective parts
-
-			if (singleMessageLength <= 160l) {
-
-				effectiveParts = 1l;
-
-			} else {
-
-				effectiveParts = (
-					singleMessageLength - 1l
-				) / maxLengthPerMultipartMessage + 1l;
-
-			}
+			return Pair.of (
+				messageParts,
+				effectiveParts);
 
 		}
-
-		// return
-
-		return Pair.of (
-			messageParts,
-			effectiveParts);
 
 	}
 
 	@Override
 	public
 	void sendTemplateAutomatically (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestRec request,
 			@NonNull ManualResponderTemplateRec template) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendTemplateAutomatically");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ManualResponderNumberRec manualResponderNumber =
 				request.getManualResponderNumber ();
@@ -228,8 +239,9 @@ class ManualResponderLogicImplementation
 					? 134l
 					: 153l;
 
-			Pair<List<String>,Long> splitResult =
+			Pair <List <String>, Long> splitResult =
 				splitMessage (
+					transaction,
 					template,
 					maxLengthPerMultipartMessage,
 					template.getDefaultText ());
@@ -242,20 +254,21 @@ class ManualResponderLogicImplementation
 
 			TextRec messageText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					template.getDefaultText ());
 
 			// resolve route
 
 			RouteRec route =
 				routerLogic.resolveRouter (
+					transaction,
 					template.getRouter ());
 
 			// create reply
 
 			ManualResponderReplyRec reply =
 				manualResponderReplyHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderReplyHelper.createInstance ()
 
 				.setManualResponderRequest (
@@ -298,25 +311,29 @@ class ManualResponderLogicImplementation
 						request.getNumber ())
 
 					.messageString (
-						taskLogger,
+						transaction,
 						messagePart)
 
 					.numFrom (
 						template.getNumber ())
 
 					.routerResolve (
+						transaction,
 						template.getRouter ())
 
 					.serviceLookup (
+						transaction,
 						manualResponder,
 						"default")
 
 					.affiliate (
 						optionalOrNull (
 							customerAffiliate (
+								transaction,
 								manualResponderNumber)))
 
 					.deliveryTypeCode (
+						transaction,
 						"manual_responder")
 
 					.ref (
@@ -327,7 +344,7 @@ class ManualResponderLogicImplementation
 						|| ! template.getSequenceParts ())
 
 					.send (
-						taskLogger)
+						transaction)
 
 				);
 
@@ -344,11 +361,12 @@ class ManualResponderLogicImplementation
 
 				CommandRec command =
 					commandHelper.findByCodeRequired (
+						transaction,
 						manualResponder,
 						"default");
 
 				keywordLogic.createOrUpdateKeywordSetFallback (
-					taskLogger,
+					transaction,
 					template.getReplyKeywordSet (),
 					request.getNumber (),
 					command);
@@ -362,18 +380,31 @@ class ManualResponderLogicImplementation
 	@Override
 	public
 	Optional <AffiliateRec> customerAffiliate (
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderNumberRec number) {
 
-		return ifThenElse (
-			isNotNull (
-				number.getSmsCustomer ()),
+		try (
 
-			() -> smsCustomerLogic.customerAffiliate (
-				number.getSmsCustomer ()),
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"customerAffiliate");
 
-			() -> Optional.absent ()
+		) {
 
-		);
+			return ifThenElse (
+				isNotNull (
+					number.getSmsCustomer ()),
+
+				() -> smsCustomerLogic.customerAffiliate (
+					transaction,
+					number.getSmsCustomer ()),
+
+				() -> optionalAbsent ()
+
+			);
+
+		}
 
 	}
 

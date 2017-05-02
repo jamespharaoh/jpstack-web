@@ -18,9 +18,10 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
@@ -42,85 +43,97 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	Criteria searchCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatMessageSearch search) {
 
-		Criteria criteria =
-			createCriteria (
-				ImChatMessageRec.class,
-				"_imChatMessage")
+		try (
 
-			.createAlias (
-				"_imChatMessage.imChatConversation",
-				"_imChatConversation")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchCriteria");
 
-			.createAlias (
-				"_imChatConversation.imChatCustomer",
-				"_imChatCustomer")
-
-			.createAlias (
-				"_imChatCustomer.imChat",
-				"_imChat")
-
-			.createAlias (
-				"_imChatMessage.senderUser",
-				"_senderUser")
-
-			.createAlias (
-				"_senderUser.slice",
-				"_senderUserSlice");
-
-		if (
-			isNotNull (
-				search.imChatId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_imChat.id",
-					search.imChatId ()));
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ImChatMessageRec.class,
+					"_imChatMessage")
+
+				.createAlias (
+					"_imChatMessage.imChatConversation",
+					"_imChatConversation")
+
+				.createAlias (
+					"_imChatConversation.imChatCustomer",
+					"_imChatCustomer")
+
+				.createAlias (
+					"_imChatCustomer.imChat",
+					"_imChat")
+
+				.createAlias (
+					"_imChatMessage.senderUser",
+					"_senderUser")
+
+				.createAlias (
+					"_senderUser.slice",
+					"_senderUserSlice");
+
+			if (
+				isNotNull (
+					search.imChatId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_imChat.id",
+						search.imChatId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_imChatMessage.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_imChatMessage.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			return criteria;
 
 		}
-
-		if (
-			isNotNull (
-				search.timestamp ())
-		) {
-
-			criteria.add (
-				Restrictions.ge (
-					"_imChatMessage.timestamp",
-					search.timestamp ().start ()));
-
-			criteria.add (
-				Restrictions.lt (
-					"_imChatMessage.timestamp",
-					search.timestamp ().end ()));
-
-		}
-
-		return criteria;
 
 	}
 
 	@Override
 	public
 	Criteria searchOperatorReportCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatMessageSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReportCriteria");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -176,21 +189,21 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	List <Long> searchOperatorReportIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatMessageSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReportIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -233,22 +246,22 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatMessageSearch search,
 			@NonNull List <Long> ids) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOperatorReports");
 
 		) {
 
 			Criteria criteria =
 				searchOperatorReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -257,7 +270,7 @@ class ImChatMessageDaoHibernate
 					ids));
 
 			return findOrdered (
-				taskLogger,
+				transaction,
 				ImChatOperatorReport.class,
 				ids,
 				criteria.list ());

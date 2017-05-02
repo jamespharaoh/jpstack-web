@@ -18,7 +18,10 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -76,193 +79,206 @@ class OxygenateSmsSenderServiceHelper
 	@Override
 	public
 	SetupRequestResult <OxygenateSmsSender> setupRequest (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec smsOutbox) {
 
-		// get stuff
+		try (
 
-		MessageRec smsMessage =
-			smsOutbox.getMessage ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setupRequest");
 
-		RouteRec smsRoute =
-			smsMessage.getRoute ();
-
-		// lookup route out
-
-		Optional <OxygenateRouteOutRec> oxygenateRouteOutOptional =
-			oxygenateRouteOutHelper.find (
-				smsRoute.getId ());
-
-		if (
-			optionalIsNotPresent (
-				oxygenateRouteOutOptional)
 		) {
 
-			return new SetupRequestResult <OxygenateSmsSender> ()
+			// get stuff
 
-				.status (
-					SetupRequestStatus.configError)
+			MessageRec smsMessage =
+				smsOutbox.getMessage ();
 
-				.statusMessageFormat (
-					"Oxygen8 outbound route not found for %s",
-					smsRoute.getCode ());
+			RouteRec smsRoute =
+				smsMessage.getRoute ();
 
-		}
+			// lookup route out
 
-		OxygenateRouteOutRec oxygenateRouteOut =
-			oxygenateRouteOutOptional.get ();
+			Optional <OxygenateRouteOutRec> oxygenateRouteOutOptional =
+				oxygenateRouteOutHelper.find (
+					transaction,
+					smsRoute.getId ());
 
-		// lookup network
+			if (
+				optionalIsNotPresent (
+					oxygenateRouteOutOptional)
+			) {
 
-		Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
-			oxygenateNetworkHelper.find (
-				oxygenateRouteOut.getOxygenateConfig (),
-				smsMessage.getNumber ().getNetwork ());
+				return new SetupRequestResult <OxygenateSmsSender> ()
 
-		if (
-			optionalIsNotPresent (
-				oxygenateNetworkOptional)
-		) {
+					.status (
+						SetupRequestStatus.configError)
 
-			return new SetupRequestResult <OxygenateSmsSender> ()
+					.statusMessageFormat (
+						"Oxygen8 outbound route not found for %s",
+						smsRoute.getCode ());
 
-				.status (
-					SetupRequestStatus.configError)
+			}
 
-				.statusMessageFormat (
-					"Oxygen8 network not found for %s",
-					smsMessage.getNumber ().getNetwork ().getCode ());
+			OxygenateRouteOutRec oxygenateRouteOut =
+				oxygenateRouteOutOptional.get ();
 
-		}
+			// lookup network
 
-		OxygenateNetworkRec oxygenateNetwork =
-			oxygenateNetworkOptional.get ();
+			Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
+				oxygenateNetworkHelper.find (
+					transaction,
+					oxygenateRouteOut.getOxygenateConfig (),
+					smsMessage.getNumber ().getNetwork ());
 
-		// validate message text
+			if (
+				optionalIsNotPresent (
+					oxygenateNetworkOptional)
+			) {
 
-		if (
-			! GsmUtils.gsmStringIsValid (
-				smsMessage.getText ().getText ())
-		) {
+				return new SetupRequestResult <OxygenateSmsSender> ()
 
-			return new SetupRequestResult <OxygenateSmsSender> ()
+					.status (
+						SetupRequestStatus.configError)
 
-				.status (
-					SetupRequestStatus.validationError)
+					.statusMessageFormat (
+						"Oxygen8 network not found for %s",
+						smsMessage.getNumber ().getNetwork ().getCode ());
 
-				.statusMessage (
-					"The message text contains non-GSM characters");
+			}
 
-		}
+			OxygenateNetworkRec oxygenateNetwork =
+				oxygenateNetworkOptional.get ();
 
-		long gsmLength =
-			GsmUtils.gsmStringLength (
-				smsMessage.getText ().getText ());
+			// validate message text
 
-		boolean needMultipart =
-			gsmLength > 160;
+			if (
+				! GsmUtils.gsmStringIsValid (
+					smsMessage.getText ().getText ())
+			) {
 
-		boolean allowMultipart =
-			oxygenateRouteOut.getMultipart ();
+				return new SetupRequestResult <OxygenateSmsSender> ()
 
-		if (
-			needMultipart
-			&& ! allowMultipart
-		) {
+					.status (
+						SetupRequestStatus.validationError)
 
-			return new SetupRequestResult <OxygenateSmsSender> ()
+					.statusMessage (
+						"The message text contains non-GSM characters");
 
-				.status (
-					SetupRequestStatus.validationError)
+			}
 
-				.statusMessageFormat (
-					"Length is %s but multipart not enabled",
+			long gsmLength =
+				GsmUtils.gsmStringLength (
+					smsMessage.getText ().getText ());
+
+			boolean needMultipart =
+				gsmLength > 160;
+
+			boolean allowMultipart =
+				oxygenateRouteOut.getMultipart ();
+
+			if (
+				needMultipart
+				&& ! allowMultipart
+			) {
+
+				return new SetupRequestResult <OxygenateSmsSender> ()
+
+					.status (
+						SetupRequestStatus.validationError)
+
+					.statusMessageFormat (
+						"Length is %s but multipart not enabled",
+						integerToDecimalString (
+							gsmLength));
+
+			}
+
+			// create request
+
+			OxygenateSmsSendRequest request =
+				new OxygenateSmsSendRequest ()
+
+				.relayUrl (
+					oxygenateRouteOut.getRelayUrl ())
+
+				.reference (
 					integerToDecimalString (
-						gsmLength));
+						smsMessage.getId ()))
+
+				.campaignId (
+					oxygenateRouteOut.getCampaignId ())
+
+				.username (
+					oxygenateRouteOut.getUsername ())
+
+				.password (
+					oxygenateRouteOut.getPassword ())
+
+				.multipart (
+					booleanToOneZero (
+						needMultipart))
+
+				.shortcode (
+					ifThenElse (
+						oxygenateRouteOut.getPremium (),
+						() -> oxygenateRouteOut.getShortcode (),
+						() -> null))
+
+				.mask (
+					ifThenElse (
+						! oxygenateRouteOut.getPremium (),
+						() -> smsMessage.getNumFrom (),
+						() -> null))
+
+				.channel (
+					ifThenElse (
+						oxygenateRouteOut.getPremium (),
+						() -> oxygenateNetwork.getChannel (),
+						() -> "BULK"))
+
+				.msisdn (
+					smsMessage.getNumTo ())
+
+				.content (
+					smsMessage.getText ().getText ())
+
+				.premium (
+					booleanToOneZero (
+						oxygenateRouteOut.getPremium ()))
+
+			;
+
+			// create sender
+
+			OxygenateSmsSender sender =
+				oxygenateSmsSenderProvider.get ()
+
+				.request (
+					request)
+
+			;
+
+			// encode request
+
+			sender.encode ();
+
+			// return
+
+			return new SetupRequestResult <OxygenateSmsSender> ()
+
+				.status (
+					SetupRequestStatus.success)
+
+				.requestTrace (
+					sender.requestTrace ())
+
+				.state (
+					sender);
 
 		}
-
-		// create request
-
-		OxygenateSmsSendRequest request =
-			new OxygenateSmsSendRequest ()
-
-			.relayUrl (
-				oxygenateRouteOut.getRelayUrl ())
-
-			.reference (
-				integerToDecimalString (
-					smsMessage.getId ()))
-
-			.campaignId (
-				oxygenateRouteOut.getCampaignId ())
-
-			.username (
-				oxygenateRouteOut.getUsername ())
-
-			.password (
-				oxygenateRouteOut.getPassword ())
-
-			.multipart (
-				booleanToOneZero (
-					needMultipart))
-
-			.shortcode (
-				ifThenElse (
-					oxygenateRouteOut.getPremium (),
-					() -> oxygenateRouteOut.getShortcode (),
-					() -> null))
-
-			.mask (
-				ifThenElse (
-					! oxygenateRouteOut.getPremium (),
-					() -> smsMessage.getNumFrom (),
-					() -> null))
-
-			.channel (
-				ifThenElse (
-					oxygenateRouteOut.getPremium (),
-					() -> oxygenateNetwork.getChannel (),
-					() -> "BULK"))
-
-			.msisdn (
-				smsMessage.getNumTo ())
-
-			.content (
-				smsMessage.getText ().getText ())
-
-			.premium (
-				booleanToOneZero (
-					oxygenateRouteOut.getPremium ()))
-
-		;
-
-		// create sender
-
-		OxygenateSmsSender sender =
-			oxygenateSmsSenderProvider.get ()
-
-			.request (
-				request)
-
-		;
-
-		// encode request
-
-		sender.encode ();
-
-		// return
-
-		return new SetupRequestResult <OxygenateSmsSender> ()
-
-			.status (
-				SetupRequestStatus.success)
-
-			.requestTrace (
-				sender.requestTrace ())
-
-			.state (
-				sender);
 
 	}
 
@@ -274,7 +290,7 @@ class OxygenateSmsSenderServiceHelper
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"performSend");
@@ -322,37 +338,48 @@ class OxygenateSmsSenderServiceHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OxygenateSmsSender sender) {
 
-		OxygenateSmsSendResponse response =
-			sender.response ();
+		try (
 
-		if (
-			stringNotEqualSafe (
-				response.statusCode (),
-				"101")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"processSend");
+
 		) {
+
+			OxygenateSmsSendResponse response =
+				sender.response ();
+
+			if (
+				stringNotEqualSafe (
+					response.statusCode (),
+					"101")
+			) {
+
+				return new ProcessResponseResult ()
+
+					.status (
+						ProcessResponseStatus.remoteError)
+
+					.statusMessageFormat (
+						"Unrecognised response code: %s",
+						response.statusCode ());
+
+			}
 
 			return new ProcessResponseResult ()
 
 				.status (
-					ProcessResponseStatus.remoteError)
+					ProcessResponseStatus.success)
 
-				.statusMessageFormat (
-					"Unrecognised response code: %s",
-					response.statusCode ());
+				.otherIds (
+					stringSplitComma (
+						response.messageReferences ()));
 
 		}
-
-		return new ProcessResponseResult ()
-
-			.status (
-				ProcessResponseStatus.success)
-
-			.otherIds (
-				stringSplitComma (
-					response.messageReferences ()));
 
 	}
 

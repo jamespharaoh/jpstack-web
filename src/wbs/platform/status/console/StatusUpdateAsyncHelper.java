@@ -26,7 +26,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -92,7 +93,7 @@ class StatusUpdateAsyncHelper
 	@Override
 	public
 	void prepareUpdate (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -101,18 +102,17 @@ class StatusUpdateAsyncHelper
 	@Override
 	public
 	void updateSubscriber (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object state,
 			@NonNull ConsoleAsyncConnectionHandle connectionHandle,
-			@NonNull OwnedTransaction transaction,
 			@NonNull UserRec user,
 			@NonNull UserPrivChecker privChecker) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateSubscriber");
 
 		) {
@@ -123,7 +123,7 @@ class StatusUpdateAsyncHelper
 						Pair.of (
 							statusLine.typeName (),
 							statusLine.getUpdateData (
-								taskLogger,
+								transaction,
 								privChecker)),
 					statusLineManager.getStatusLines ());
 
@@ -137,7 +137,6 @@ class StatusUpdateAsyncHelper
 				updates,
 				"core",
 				buildUpdateCore (
-					taskLogger,
 					transaction,
 					user));
 
@@ -155,7 +154,7 @@ class StatusUpdateAsyncHelper
 
 				} catch (Exception exception) {
 
-					taskLogger.errorFormatException (
+					transaction.errorFormatException (
 						exception,
 						"Error getting status update for %s",
 						future.getKey ());
@@ -169,7 +168,7 @@ class StatusUpdateAsyncHelper
 				updates);
 
 			connectionHandle.send (
-				taskLogger,
+				transaction,
 				payload);
 
 		}
@@ -200,47 +199,60 @@ class StatusUpdateAsyncHelper
 
 	private
 	JsonObject buildUpdateCore (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user) {
 
-		RootRec root =
-			rootHelper.findRequired (0l);
+		try (
 
-		ConsoleDeploymentRec consoleDeployment =
-			deploymentLogic.thisConsoleDeployment ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"buildUpdateCore");
 
-		JsonObject update =
-			new JsonObject ();
+		) {
 
-		update.addProperty (
-			"header",
-			joinWithSeparator (
-				" – ",
-				presentInstances (
-					optionalOf (
-						"Status"),
-					optionalFromNullable (
-						consoleDeployment.getStatusLabel ()),
+			RootRec root =
+				rootHelper.findRequired (
+					transaction,
+					0l);
+
+			ConsoleDeploymentRec consoleDeployment =
+				deploymentLogic.thisConsoleDeployment (
+					transaction);
+
+			JsonObject update =
+				new JsonObject ();
+
+			update.addProperty (
+				"header",
+				joinWithSeparator (
+					" – ",
+					presentInstances (
 						optionalOf (
-						deploymentLogic.gitVersion ()))));
+							"Status"),
+						optionalFromNullable (
+							consoleDeployment.getStatusLabel ()),
+							optionalOf (
+							deploymentLogic.gitVersion ()))));
 
-		update.addProperty (
-			"timestamp",
-			timeFormatter.timestampTimezoneString (
-				timeFormatter.timezone (
-					ifNull (
-						user.getDefaultTimezone (),
-						user.getSlice ().getDefaultTimezone (),
-						wbsConfig.defaultTimezone ())),
-				transaction.now ()));
+			update.addProperty (
+				"timestamp",
+				timeFormatter.timestampTimezoneString (
+					timeFormatter.timezone (
+						ifNull (
+							user.getDefaultTimezone (),
+							user.getSlice ().getDefaultTimezone (),
+							wbsConfig.defaultTimezone ())),
+					transaction.now ()));
 
-		update.addProperty (
-			"notice",
-			emptyStringIfNull (
-				root.getNotice ()));
+			update.addProperty (
+				"notice",
+				emptyStringIfNull (
+					root.getNotice ()));
 
-		return update;
+			return update;
+
+		}
 
 	}
 

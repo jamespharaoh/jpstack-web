@@ -15,10 +15,13 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.integrations.oxygenate.model.OxygenateRouteOutObjectHelper;
 import wbs.integrations.oxygenate.model.OxygenateRouteOutRec;
@@ -32,6 +35,9 @@ class OxygenateRouteSummaryAdditionalPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	OxygenateRouteOutObjectHelper oxygen8RouteOutHelper;
@@ -52,97 +58,121 @@ class OxygenateRouteSummaryAdditionalPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		route =
-			routeHelper.findFromContextRequired ();
+		try (
 
-		oxygen8RouteOut =
-			oxygen8RouteOutHelper.findRequired (
-				route.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			route =
+				routeHelper.findFromContextRequired (
+					transaction);
+
+			oxygen8RouteOut =
+				oxygen8RouteOutHelper.findRequired (
+					transaction,
+					route.getId ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Oxygen8 route information");
+		try (
 
-		htmlTableOpenDetails ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		if (
-			isNotNull (
-				oxygen8RouteOut)
 		) {
 
-			htmlTableDetailsRowWrite (
-				"Relay URL",
-				oxygen8RouteOut.getRelayUrl ());
+			htmlHeadingTwoWrite (
+				"Oxygen8 route information");
 
-			htmlTableDetailsRowWrite (
-				"Shortcode",
-				oxygen8RouteOut.getShortcode ());
+			htmlTableOpenDetails ();
 
-			htmlTableDetailsRowWrite (
-				"Premium",
-				booleanToYesNo (
-					oxygen8RouteOut.getPremium ()));
+			if (
+				isNotNull (
+					oxygen8RouteOut)
+			) {
 
-			htmlTableDetailsRowWrite (
-				"Username",
-				oxygen8RouteOut.getUsername ());
+				htmlTableDetailsRowWrite (
+					"Relay URL",
+					oxygen8RouteOut.getRelayUrl ());
 
-			htmlTableDetailsRowWrite (
-				"Password",
-				ifThenElse (
-					requestContext.canContext ("route.manage"),
-					() -> oxygen8RouteOut.getPassword (),
-					() -> "**********"));
+				htmlTableDetailsRowWrite (
+					"Shortcode",
+					oxygen8RouteOut.getShortcode ());
 
-			htmlTableRowClose ();
+				htmlTableDetailsRowWrite (
+					"Premium",
+					booleanToYesNo (
+						oxygen8RouteOut.getPremium ()));
+
+				htmlTableDetailsRowWrite (
+					"Username",
+					oxygen8RouteOut.getUsername ());
+
+				htmlTableDetailsRowWrite (
+					"Password",
+					ifThenElse (
+						requestContext.canContext ("route.manage"),
+						() -> oxygen8RouteOut.getPassword (),
+						() -> "**********"));
+
+				htmlTableRowClose ();
+
+			}
+
+			if (route.getCanReceive ()) {
+
+				htmlTableDetailsRowWrite (
+					"Inbound URL",
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/oxygen8",
+						"/route",
+						"/%u",
+						integerToDecimalString (
+							route.getId ()),
+						"/in"));
+
+			}
+
+			if (
+				oxygen8RouteOut != null
+				&& route.getCanSend ()
+				&& route.getDeliveryReports ()
+			) {
+
+				htmlTableDetailsRowWrite (
+					"Delivery reports URL",
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/oxygen8",
+						"/route",
+						"/%u",
+						integerToDecimalString (
+							route.getId ()),
+						"/report"));
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		if (route.getCanReceive ()) {
-
-			htmlTableDetailsRowWrite (
-				"Inbound URL",
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/oxygen8",
-					"/route",
-					"/%u",
-					integerToDecimalString (
-						route.getId ()),
-					"/in"));
-
-		}
-
-		if (
-			oxygen8RouteOut != null
-			&& route.getCanSend ()
-			&& route.getDeliveryReports ()
-		) {
-
-			htmlTableDetailsRowWrite (
-				"Delivery reports URL",
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/oxygen8",
-					"/route",
-					"/%u",
-					integerToDecimalString (
-						route.getId ()),
-					"/report"));
-
-		}
-
-		htmlTableClose ();
 
 	}
 

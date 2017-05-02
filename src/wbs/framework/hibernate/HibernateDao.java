@@ -9,7 +9,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -27,21 +26,19 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 public abstract
 class HibernateDao {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@SingletonDependency
 	HibernateDatabase database;
@@ -51,21 +48,15 @@ class HibernateDao {
 
 	// implementation
 
-	protected
-	Session session () {
-
-		return database.currentSession ();
-
-	}
-
 	@SuppressWarnings ("resource")
 	protected <Record>
 	Record get (
-			@NonNull Class<Record> theClass,
+			@NonNull Transaction transaction,
+			@NonNull Class <Record> theClass,
 			@NonNull Long id) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return theClass.cast (
 			session.get (
@@ -77,12 +68,13 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected <Record>
 	Record get (
-			Class <Record> theClass,
-			int id,
-			LockOptions lockOptions) {
+			@NonNull Transaction transaction,
+			@NonNull Class <Record> theClass,
+			@NonNull Long id,
+			@NonNull LockOptions lockOptions) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return theClass.cast (
 			session.get (
@@ -95,11 +87,12 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected <Record>
 	Record load (
-			Class <Record> theClass,
-			int id) {
+			@NonNull Transaction transaction,
+			@NonNull Class <Record> theClass,
+			@NonNull Long id) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return theClass.cast (
 			session.load (
@@ -111,10 +104,11 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected <Record>
 	Record save (
-			Record object) {
+			@NonNull Transaction transaction,
+			@NonNull Record object) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		session.save (
 			object);
@@ -126,25 +120,16 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected <Record>
 	Record delete (
-			Record object) {
+			@NonNull Transaction transaction,
+			@NonNull Record object) {
 
-		Session sess =
-			database.currentSession ();
+		Session session =
+			transaction.hibernateSession ();
 
-		sess.delete (object);
+		session.delete (
+			object);
 
 		return object;
-
-	}
-
-	protected
-	void flush () {
-
-		@SuppressWarnings ("resource")
-		Session sess =
-			database.currentSession ();
-
-		sess.flush ();
 
 	}
 
@@ -152,10 +137,11 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected
 	Query createQuery (
+			@NonNull Transaction transaction,
 			@NonNull String query) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return session.createQuery (
 			query);
@@ -165,10 +151,11 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected
 	Criteria createCriteria (
+			@NonNull Transaction transaction,
 			@NonNull Class <?> theClass) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return session.createCriteria (
 			theClass);
@@ -178,11 +165,12 @@ class HibernateDao {
 	@SuppressWarnings ("resource")
 	protected
 	Criteria createCriteria (
+			@NonNull Transaction transaction,
 			@NonNull Class <?> theClass,
 			@NonNull String name) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		return session.createCriteria (
 			theClass,
@@ -194,10 +182,11 @@ class HibernateDao {
 	protected
 	<Record>
 	Record refresh (
+			@NonNull Transaction transaction,
 			@NonNull Record object) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		session.flush ();
 
@@ -212,11 +201,12 @@ class HibernateDao {
 	protected
 	<Record>
 	Record refresh (
-			Record object,
-			LockOptions lockOptions) {
+			@NonNull Transaction transaction,
+			@NonNull Record object,
+			@NonNull LockOptions lockOptions) {
 
 		Session session =
-			database.currentSession ();
+			transaction.hibernateSession ();
 
 		session.flush ();
 
@@ -231,7 +221,7 @@ class HibernateDao {
 	@Deprecated
 	protected <Record>
 	Record findOne (
-			@NonNull Class<Record> theClass,
+			@NonNull Class <Record> theClass,
 			@NonNull List<?> list) {
 
 		if (list.isEmpty ())
@@ -244,20 +234,16 @@ class HibernateDao {
 
 	protected <Record>
 	Optional <Record> findOne (
-			@NonNull String methodName,
+			@NonNull Transaction parentTransaction,
 			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"hibernate",
-					stringFormat (
-						"%s.%s",
-						getClass ().getSimpleName (),
-						methodName),
-					this);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findOne");
 
 		) {
 
@@ -284,11 +270,7 @@ class HibernateDao {
 
 				throw new RuntimeException (
 					stringFormat (
-						"%s.%s (...) ",
-						classNameSimple (
-							getClass ()),
-						methodName,
-						"should only find zero or one results but found %s",
+						"Expected exactly zero or one results but found %s",
 						integerToDecimalString (
 							objectList.size ())));
 
@@ -316,13 +298,13 @@ class HibernateDao {
 
 	protected <Record>
 	Record findOneOrNull (
-			@NonNull String methodName,
+			@NonNull Transaction transaction,
 			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
 		return optionalOrNull (
 			findOne (
-				methodName,
+				transaction,
 				theClass,
 				criteria));
 
@@ -359,20 +341,16 @@ class HibernateDao {
 
 	protected <Record>
 	List <Record> findMany (
-			@NonNull String methodName,
+			@NonNull Transaction parentTransaction,
 			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"hibernate",
-					stringFormat (
-						"%s.%s",
-						getClass ().getSimpleName (),
-						methodName),
-					this);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findMany");
 
 		) {
 
@@ -447,7 +425,7 @@ class HibernateDao {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"findOrdered");

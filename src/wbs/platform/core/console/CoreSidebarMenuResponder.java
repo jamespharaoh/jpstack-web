@@ -33,9 +33,10 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
@@ -106,61 +107,77 @@ class CoreSidebarMenuResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		UserRec currentUser =
-			userConsoleLogic.userRequired ();
+		try (
 
-		SliceRec apnSlice =
-			optionalOrNull (
-				sliceHelper.findByCode (
-					GlobalId.root,
-					"apn"));
-
-		if (
-
-			apnSlice != null
-
-			&& stringNotEqualSafe (
-				currentUser.getUsername (),
-				"stuart_test")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
 		) {
 
-			menuGroups =
-				menuGroupHelper.findByParent (
-					sliceHelper.findByCodeRequired (
+			UserRec currentUser =
+				userConsoleLogic.userRequired (
+					transaction);
+
+			SliceRec apnSlice =
+				optionalOrNull (
+					sliceHelper.findByCode (
+						transaction,
 						GlobalId.root,
 						"apn"));
 
-		} else {
+			if (
 
-			menuGroups =
-				menuGroupHelper.findByParent (
-					currentUser.getSlice ());
+				apnSlice != null
+
+				&& stringNotEqualSafe (
+					currentUser.getUsername (),
+					"stuart_test")
+
+			) {
+
+				menuGroups =
+					menuGroupHelper.findByParent (
+						transaction,
+						sliceHelper.findByCodeRequired (
+							transaction,
+							GlobalId.root,
+							"apn"));
+
+			} else {
+
+				menuGroups =
+					menuGroupHelper.findByParent (
+						transaction,
+						currentUser.getSlice ());
+
+			}
+
+			Collections.sort (
+				menuGroups,
+				Ordering.natural ().onResultOf (
+					menuGroup ->
+						Pair.of (
+							menuGroup.getOrder (),
+							menuGroup.getCode ())));
 
 		}
-
-		Collections.sort (
-			menuGroups,
-			Ordering.natural ().onResultOf (
-				menuGroup ->
-					Pair.of (
-						menuGroup.getOrder (),
-						menuGroup.getCode ())));
 
 	}
 
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -192,7 +209,7 @@ class CoreSidebarMenuResponder
 
 					if (
 						! objectManager.canView (
-							taskLogger,
+							transaction,
 							menu)
 					) {
 						continue;

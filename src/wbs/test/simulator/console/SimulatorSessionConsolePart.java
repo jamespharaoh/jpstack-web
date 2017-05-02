@@ -32,9 +32,12 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
@@ -50,6 +53,9 @@ class SimulatorSessionConsolePart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NetworkConsoleHelper networkHelper;
@@ -115,27 +121,40 @@ class SimulatorSessionConsolePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		for (
-			RouteRec route
-				: routeHelper.findAll ()
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
 		) {
 
-			routeOptions.put (
-				route.getId ().toString (),
-				route.getCode ());
+			for (
+				RouteRec route
+					: routeHelper.findAll (
+						transaction)
+			) {
 
-		}
+				routeOptions.put (
+					route.getId ().toString (),
+					route.getCode ());
 
-		for (
-			NetworkRec network
-				: networkHelper.findAll ()
-		) {
+			}
 
-			networkOptions.put (
-				network.getId ().toString (),
-				network.getCode ());
+			for (
+				NetworkRec network
+					: networkHelper.findAll (
+						transaction)
+			) {
+
+				networkOptions.put (
+					network.getId ().toString (),
+					network.getCode ());
+
+			}
 
 		}
 
@@ -144,135 +163,182 @@ class SimulatorSessionConsolePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlDivOpen (
-			htmlClassAttribute (
-				"simulator"),
-			htmlDataAttribute (
-				"create-event-url",
-				requestContext.resolveLocalUrl (
-					"/simulatorSession.createEvent")),
-			htmlDataAttribute (
-				"poll-url",
-				requestContext.resolveLocalUrl (
-					"/simulatorSession.poll")));
+		try (
 
-		controls ();
-		eventsList ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlDivClose ();
+		) {
 
-	}
-
-	void controls () {
-
-		htmlTableOpenDetails ();
-
-		/*
-		pf ("<tr>\n",
-
-			"<th>Route</th>\n",
-
-			"<td>%s</td>\n",
-			selectBuilder.get ()
-				.htmlClass ("routeSelect")
-				.options (routeOptions)
-				.selectedValue ((String)
-					requestContext.getSession ("simulatorRouteId"))
-				.build (),
-
-			"</tr>\n");
-		*/
-
-		htmlTableDetailsRowWriteHtml (
-			"Network",
-			() -> htmlSelect (
-				"network",
-				networkOptions,
-				optionalOrEmptyString (
-					userSessionLogic.userDataString (
-						userConsoleLogic.userRequired (),
-						"simulator_network_id")),
+			htmlDivOpen (
 				htmlClassAttribute (
-					"networkSelect")));
+					"simulator"),
+				htmlDataAttribute (
+					"create-event-url",
+					requestContext.resolveLocalUrl (
+						"/simulatorSession.createEvent")),
+				htmlDataAttribute (
+					"poll-url",
+					requestContext.resolveLocalUrl (
+						"/simulatorSession.poll")));
 
-		htmlTableDetailsRowWriteHtml (
-			"Num from",
-			() -> formatWriter.writeLineFormat (
-				"<input",
-				" class=\"numFromText\"",
-				" type=\"text\"",
-				" value=\"%h\"",
-				optionalOrEmptyString (
-					userSessionLogic.userDataString (
-						userConsoleLogic.userRequired (),
-						"simulator_num_from")),
-				">"));
+			controls (
+				transaction);
 
-		htmlTableDetailsRowWriteHtml (
-			"Num to",
-			() -> formatWriter.writeLineFormat (
-				"<input",
-				" class=\"numToText\"",
-				" type=\"text\"",
-				" value=\"%h\"",
-				optionalOrEmptyString (
-					userSessionLogic.userDataString (
-						userConsoleLogic.userRequired (),
-						"simulator_num_to")),
-				">"));
+			eventsList (
+				transaction);
 
-		htmlTableDetailsRowWriteHtml (
-			"Message",
-			() -> formatWriter.writeLineFormat (
-				"<input",
-				" class=\"messageText\"",
-				" type=\"text\"",
-				" value=\"%h\"",
-				optionalOrEmptyString (
-					userSessionLogic.userDataString (
-						userConsoleLogic.userRequired (),
-						"simulator_message")),
-				">"));
+			htmlDivClose ();
 
-		htmlTableClose ();
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<button",
-			" class=\"sendButton\"",
-			" type=\"submit\"",
-			">send message</button>");
-
-		htmlParagraphClose ();
+		}
 
 	}
 
-	void eventsList () {
+	private
+	void controls (
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpen (
-			htmlClassAttribute (
-				"list",
-				"events"));
+		try (
 
-		htmlTableHeadOpen ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"controls");
 
-		htmlTableHeaderRowHtml (
-			"Date",
-			"Time",
-			"Type",
-			"Details",
-			"Actions");
+		) {
 
-		htmlTableHeadClose ();
+			htmlTableOpenDetails ();
 
-		htmlTableBodyOpen ();
+			/*
+			pf ("<tr>\n",
 
-		htmlTableBodyClose ();
+				"<th>Route</th>\n",
 
-		htmlTableClose ();
+				"<td>%s</td>\n",
+				selectBuilder.get ()
+					.htmlClass ("routeSelect")
+					.options (routeOptions)
+					.selectedValue ((String)
+						requestContext.getSession ("simulatorRouteId"))
+					.build (),
+
+				"</tr>\n");
+			*/
+
+			htmlTableDetailsRowWriteHtml (
+				"Network",
+				() -> htmlSelect (
+					"network",
+					networkOptions,
+					optionalOrEmptyString (
+						userSessionLogic.userDataString (
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
+							"simulator_network_id")),
+					htmlClassAttribute (
+						"networkSelect")));
+
+			htmlTableDetailsRowWriteHtml (
+				"Num from",
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" class=\"numFromText\"",
+					" type=\"text\"",
+					" value=\"%h\"",
+					optionalOrEmptyString (
+						userSessionLogic.userDataString (
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
+							"simulator_num_from")),
+					">"));
+
+			htmlTableDetailsRowWriteHtml (
+				"Num to",
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" class=\"numToText\"",
+					" type=\"text\"",
+					" value=\"%h\"",
+					optionalOrEmptyString (
+						userSessionLogic.userDataString (
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
+							"simulator_num_to")),
+					">"));
+
+			htmlTableDetailsRowWriteHtml (
+				"Message",
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" class=\"messageText\"",
+					" type=\"text\"",
+					" value=\"%h\"",
+					optionalOrEmptyString (
+						userSessionLogic.userDataString (
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
+							"simulator_message")),
+					">"));
+
+			htmlTableClose ();
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<button",
+				" class=\"sendButton\"",
+				" type=\"submit\"",
+				">send message</button>");
+
+			htmlParagraphClose ();
+
+		}
+
+	}
+
+	void eventsList (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"eventsList");
+
+		) {
+
+			htmlTableOpen (
+				htmlClassAttribute (
+					"list",
+					"events"));
+
+			htmlTableHeadOpen ();
+
+			htmlTableHeaderRowHtml (
+				"Date",
+				"Time",
+				"Type",
+				"Details",
+				"Actions");
+
+			htmlTableHeadClose ();
+
+			htmlTableBodyOpen ();
+
+			htmlTableBodyClose ();
+
+			htmlTableClose ();
+
+		}
 
 	}
 

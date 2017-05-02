@@ -25,8 +25,9 @@ import wbs.console.part.PagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFormActionsPart")
@@ -61,20 +62,20 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void setup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, Object> parameters) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setup");
 
 		) {
 
 			super.setup (
-				taskLogger,
+				transaction,
 				parameters);
 
 			pageParts =
@@ -84,7 +85,7 @@ class ConsoleFormActionsPart
 					formAction ->
 						Pair.of (
 							formAction.helper ().canBePerformed (
-								taskLogger),
+								transaction),
 							formAction))
 
 				.filter (
@@ -115,7 +116,8 @@ class ConsoleFormActionsPart
 					.submitLabel (
 						ifThenElse (
 							showSubmitFormAction.getLeft ().canPerform (),
-							() -> showSubmitFormAction.getRight ().submitLabel (),
+							() -> showSubmitFormAction.getRight ()
+								.submitLabel (),
 							() -> null))
 
 					.localFile (
@@ -129,7 +131,7 @@ class ConsoleFormActionsPart
 			pageParts.forEach (
 				pagePart ->
 					pagePart.setup (
-						taskLogger,
+						transaction,
 						parameters));
 
 		}
@@ -139,13 +141,13 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -153,7 +155,7 @@ class ConsoleFormActionsPart
 			pageParts.forEach (
 				pagePart ->
 					pagePart.prepare (
-						taskLogger));
+						transaction));
 
 		}
 
@@ -162,13 +164,13 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContent");
 
 		) {
@@ -176,7 +178,7 @@ class ConsoleFormActionsPart
 			pageParts.forEach (
 				pagePart ->
 					pagePart.renderHtmlHeadContent (
-						taskLogger));
+						transaction));
 
 		}
 
@@ -185,13 +187,13 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -204,7 +206,7 @@ class ConsoleFormActionsPart
 				pageParts.forEach (
 					pagePart ->
 						pagePart.renderHtmlBodyContent (
-							taskLogger));
+							transaction));
 
 			} else {
 

@@ -27,9 +27,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -234,14 +235,14 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	boolean sendTemplateCheck (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SendTemplate template) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendTemplateCheck");
 
 		) {
@@ -260,14 +261,16 @@ class ForwarderLogicImplementation
 
 			// lookup forwarderMessageIn
 
-			sendTemplateCheckFmIn (work);
+			sendTemplateCheckFmIn (
+				transaction,
+				work);
 
 			// check reply to message id
 
 			if (! work.template.forwarder.getAllowNewSends ()
 					&& template.fmIn == null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"no reply-to on template: %s",
 					template.toString ());
 
@@ -284,12 +287,14 @@ class ForwarderLogicImplementation
 			// check parts
 
 			sendTemplateCheckParts (
-				taskLogger,
+				transaction,
 				work);
 
 			// match against existing message
 
-			sendTemplateCheckExisting (work);
+			sendTemplateCheckExisting (
+				transaction,
+				work);
 
 			// check counters (if necessary)
 
@@ -352,44 +357,57 @@ class ForwarderLogicImplementation
 
 	private
 	void sendTemplateCheckFmIn (
-			SendTemplateCheckWork work) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SendTemplateCheckWork work) {
 
-		int i =
-			+ (work.template.fmInId != null ? 1 : 0)
-			+ (work.template.fmIn != null ? 1 : 0);
+		try (
 
-		if (i > 1)
-			throw new RuntimeException (
-				"Specified both forwarderMessageIn and fmInId");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sendTemplateCheckFmIn");
 
-		if (work.template.fmInId != null) {
+		) {
 
-			Optional<ForwarderMessageInRec> messageInOptional =
-				forwarderMessageInHelper.find (
-					work.template.fmInId);
+			int i =
+				+ (work.template.fmInId != null ? 1 : 0)
+				+ (work.template.fmIn != null ? 1 : 0);
 
-			if (
-				optionalIsNotPresent (
-					messageInOptional)
-			) {
+			if (i > 1)
+				throw new RuntimeException (
+					"Specified both forwarderMessageIn and fmInId");
 
-				work.template.errors.add (
-					"Reply-to-message-id is invalid: " +
-					work.template.fmInId);
+			if (work.template.fmInId != null) {
 
-				if (work.template.sendError == null) {
+				Optional <ForwarderMessageInRec> messageInOptional =
+					forwarderMessageInHelper.find (
+						transaction,
+						work.template.fmInId);
 
-					work.template.sendError =
-						SendError.invalidReplyToMessageId;
+				if (
+					optionalIsNotPresent (
+						messageInOptional)
+				) {
+
+					work.template.errors.add (
+						"Reply-to-message-id is invalid: " +
+						work.template.fmInId);
+
+					if (work.template.sendError == null) {
+
+						work.template.sendError =
+							SendError.invalidReplyToMessageId;
+
+					}
+
+					work.ret = false;
 
 				}
 
-				work.ret = false;
+				work.template.fmIn =
+					messageInOptional.get ();
 
 			}
-
-			work.template.fmIn =
-				messageInOptional.get ();
 
 		}
 
@@ -397,14 +415,14 @@ class ForwarderLogicImplementation
 
 	private
 	void sendTemplateCheckParts (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SendTemplateCheckWork work) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendTemplateCheckParts");
 
 		) {
@@ -423,8 +441,9 @@ class ForwarderLogicImplementation
 
 				} else if (part.routeCode != null) {
 
-					Optional<ForwarderRouteRec> forwarderRouteOptional =
+					Optional <ForwarderRouteRec> forwarderRouteOptional =
 						forwarderRouteHelper.findByCode (
+							transaction,
 							work.template.forwarder,
 							part.routeCode);
 
@@ -506,7 +525,7 @@ class ForwarderLogicImplementation
 
 					part.service =
 						serviceHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							work.template.forwarder,
 							"default",
 							part.serviceCode);
@@ -539,8 +558,9 @@ class ForwarderLogicImplementation
 
 					}
 
-					Optional<NetworkRec> networkOptional =
+					Optional <NetworkRec> networkOptional =
 						networkHelper.find (
+							transaction,
 							part.networkId);
 
 					if (
@@ -580,12 +600,12 @@ class ForwarderLogicImplementation
 
 					part.numToNumber =
 						numberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							part.numTo);
 
 					if (
 						! smsTrackerManager.canSend (
-							taskLogger,
+							transaction,
 							work.template.forwarder.getSmsTracker (),
 							part.numToNumber,
 							optionalAbsent ())
@@ -607,6 +627,7 @@ class ForwarderLogicImplementation
 
 					RouteRec route =
 						routerLogic.resolveRouter (
+							transaction,
 							part.forwarderRoute.getRouter ());
 
 					if (route.getOutCharge () > 0) {
@@ -652,84 +673,97 @@ class ForwarderLogicImplementation
 
 	private
 	void sendTemplateCheckExisting (
-			SendTemplateCheckWork work) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SendTemplateCheckWork work) {
 
-		// check if any unqueueExMessages have already been sent
+		try (
 
-		for (
-			SendPart sendPart
-				: work.template.parts
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sendTemplateCheckExisting");
+
 		) {
 
-			sendPart.forwarderMessageOut =
-				findExistingForwarderMessageOut (
-					work.template.forwarder,
-					work.template.fmIn,
-					sendPart.message,
-					sendPart.url,
-					sendPart.numFrom,
-					sendPart.numTo,
-					sendPart.forwarderRoute,
-					sendPart.clientId,
-					sendPart.pri);
+			// check if any unqueueExMessages have already been sent
 
-			if (sendPart.forwarderMessageOut != null) {
+			for (
+				SendPart sendPart
+					: work.template.parts
+			) {
 
-				work.sentSome = true;
+				sendPart.forwarderMessageOut =
+					findExistingForwarderMessageOut (
+						transaction,
+						work.template.forwarder,
+						work.template.fmIn,
+						sendPart.message,
+						sendPart.url,
+						sendPart.numFrom,
+						sendPart.numTo,
+						sendPart.forwarderRoute,
+						sendPart.clientId,
+						sendPart.pri);
 
-			} else {
+				if (sendPart.forwarderMessageOut != null) {
 
-				work.notSentSome = true;
+					work.sentSome = true;
 
-			}
+				} else {
 
-		}
+					work.notSentSome = true;
 
-		// if some of these unqueueExMessages already exist but some don't then
-		// stop
-
-		if (work.sentSome && work.notSentSome) {
-
-			work.template.errors.add (
-				stringFormat (
-					"Previously sent unqueueExMessages being resent in ",
-					"different groups (very strange!)"));
-
-			if (work.template.sendError == null) {
-
-				work.template.sendError =
-					SendError.reusedClientId;
+				}
 
 			}
 
-			work.ret = false;
+			// if some of these unqueueExMessages already exist but some don't then
+			// stop
 
-		}
+			if (work.sentSome && work.notSentSome) {
 
-		// if all of them are previously sent, check the group is the same and
-		// if so return the old result
+				work.template.errors.add (
+					stringFormat (
+						"Previously sent unqueueExMessages being resent in ",
+						"different groups (very strange!)"));
 
-		if (work.sentSome && !work.notSentSome) {
+				if (work.template.sendError == null) {
 
-			for (int i = 0; i < work.template.parts.size() - 1; i++) {
+					work.template.sendError =
+						SendError.reusedClientId;
 
-				if (work.template.parts.get(i).forwarderMessageOut
-						.getNextForwarderMessageOut() != work.template.parts
-						.get(i + 1).forwarderMessageOut) {
+				}
 
-					work.template.errors.add (
-						stringFormat (
-							"Previously sent unqueueExMessages being resent ",
-							"in different groups (very strange!)"));
+				work.ret = false;
 
-					if (work.template.sendError == null) {
+			}
 
-						work.template.sendError =
-							SendError.reusedClientId;
+			// if all of them are previously sent, check the group is the same and
+			// if so return the old result
+
+			if (work.sentSome && !work.notSentSome) {
+
+				for (int i = 0; i < work.template.parts.size() - 1; i++) {
+
+					if (work.template.parts.get(i).forwarderMessageOut
+							.getNextForwarderMessageOut() != work.template.parts
+							.get(i + 1).forwarderMessageOut) {
+
+						work.template.errors.add (
+							stringFormat (
+								"Previously sent unqueueExMessages being resent ",
+								"in different groups (very strange!)"));
+
+						if (work.template.sendError == null) {
+
+							work.template.sendError =
+								SendError.reusedClientId;
+
+						}
+
+						work.ret = false;
 
 					}
-
-					work.ret = false;
 
 				}
 
@@ -742,14 +776,14 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	void sendTemplateSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SendTemplate sendTemplate) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendTemplateSend");
 
 		) {
@@ -777,7 +811,7 @@ class ForwarderLogicImplementation
 
 				sendPart.forwarderMessageOut =
 					createMessage (
-						taskLogger,
+						transaction,
 						sendTemplate.forwarder,
 						sendTemplate.fmIn,
 						sendPart.message,
@@ -832,7 +866,7 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	ForwarderMessageOutRec sendMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,
@@ -846,9 +880,9 @@ class ForwarderLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendMessage");
 
 		) {
@@ -877,7 +911,7 @@ class ForwarderLogicImplementation
 
 			if (
 				! sendTemplateCheck (
-					taskLogger,
+					transaction,
 					sendTemplate)
 			) {
 
@@ -904,7 +938,7 @@ class ForwarderLogicImplementation
 			}
 
 			sendTemplateSend (
-				taskLogger,
+				transaction,
 				sendTemplate);
 
 			return sendTemplate.parts.get (0).forwarderMessageOut;
@@ -915,6 +949,7 @@ class ForwarderLogicImplementation
 
 	private
 	ForwarderMessageOutRec findExistingForwarderMessageOut (
+			@NonNull Transaction parentTransaction,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec forwarderMessageIn,
 			String messageText,
@@ -925,115 +960,128 @@ class ForwarderLogicImplementation
 			String otherId,
 			Long priority) {
 
-		// if there is no client id, skip this check
+		try (
 
-		if (otherId == null)
-			return null;
-
-		// look up any existing message
-
-		ForwarderMessageOutRec forwarderMessaeOut =
-			forwarderMessageOutHelper.findByOtherId (
-				forwarder,
-				otherId);
-
-		if (forwarderMessaeOut == null)
-			return null;
-
-		// make sure the message matches
-
-		MessageRec message =
-			forwarderMessaeOut.getMessage ();
-
-		WapPushMessageRec wapPushMessage =
-			ifThenElse (
-				isNotNull (
-					url),
-				() -> wapPushMessageHelper.findRequired (
-					message.getId ()),
-				() -> null);
-
-		if (
-
-			optionalNotEqualOrNotPresentWithClass (
-				ForwarderMessageInRec.class,
-				optionalFromNullable (
-					forwarderMessaeOut.getForwarderMessageIn ()),
-				optionalFromNullable (
-					forwarderMessageIn))
-
-			|| stringNotEqualSafe (
-				message.getNumFrom (),
-				numFrom)
-
-			|| stringNotEqualSafe (
-				message.getNumTo (),
-				numTo)
-
-			|| referenceNotEqualWithClass (
-				ForwarderRouteRec.class,
-				forwarderMessaeOut.getForwarderRoute (),
-				route)
-
-			|| integerNotEqualSafe (
-				message.getPri (),
-				priority)
-
-			|| (
-
-				url == null
-
-				&& (
-
-					stringNotEqualSafe (
-						message.getMessageType ().getCode (),
-						"sms")
-
-					|| stringNotEqualSafe (
-						message.getText ().getText (),
-						messageText)
-
-				)
-
-			) || (
-
-				url != null
-
-				&& (
-
-					stringNotEqualSafe (
-						message.getMessageType ().getCode (),
-						"wap_push")
-
-					|| stringNotEqualSafe (
-						wapPushMessage.getTextText ().getText (),
-						messageText)
-
-					|| stringNotEqualSafe (
-						wapPushMessage.getUrlText ().getText (),
-						url)
-
-				)
-
-			)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findExistingForwarderMessageOut");
 
 		) {
 
-			throw new ForwarderSendClientIdException (
-				"Client message ID reused: " + otherId + " forwarder "
-				+ forwarder.getId ());
+			// if there is no client id, skip this check
+
+			if (otherId == null)
+				return null;
+
+			// look up any existing message
+
+			ForwarderMessageOutRec forwarderMessaeOut =
+				forwarderMessageOutHelper.findByOtherId (
+					transaction,
+					forwarder,
+					otherId);
+
+			if (forwarderMessaeOut == null)
+				return null;
+
+			// make sure the message matches
+
+			MessageRec message =
+				forwarderMessaeOut.getMessage ();
+
+			WapPushMessageRec wapPushMessage =
+				ifThenElse (
+					isNotNull (
+						url),
+					() -> wapPushMessageHelper.findRequired (
+						transaction,
+						message.getId ()),
+					() -> null);
+
+			if (
+
+				optionalNotEqualOrNotPresentWithClass (
+					ForwarderMessageInRec.class,
+					optionalFromNullable (
+						forwarderMessaeOut.getForwarderMessageIn ()),
+					optionalFromNullable (
+						forwarderMessageIn))
+
+				|| stringNotEqualSafe (
+					message.getNumFrom (),
+					numFrom)
+
+				|| stringNotEqualSafe (
+					message.getNumTo (),
+					numTo)
+
+				|| referenceNotEqualWithClass (
+					ForwarderRouteRec.class,
+					forwarderMessaeOut.getForwarderRoute (),
+					route)
+
+				|| integerNotEqualSafe (
+					message.getPri (),
+					priority)
+
+				|| (
+
+					url == null
+
+					&& (
+
+						stringNotEqualSafe (
+							message.getMessageType ().getCode (),
+							"sms")
+
+						|| stringNotEqualSafe (
+							message.getText ().getText (),
+							messageText)
+
+					)
+
+				) || (
+
+					url != null
+
+					&& (
+
+						stringNotEqualSafe (
+							message.getMessageType ().getCode (),
+							"wap_push")
+
+						|| stringNotEqualSafe (
+							wapPushMessage.getTextText ().getText (),
+							messageText)
+
+						|| stringNotEqualSafe (
+							wapPushMessage.getUrlText ().getText (),
+							url)
+
+					)
+
+				)
+
+			) {
+
+				throw new ForwarderSendClientIdException (
+					"Client message ID reused: " + otherId + " forwarder "
+					+ forwarder.getId ());
+
+			}
+
+			// return
+
+			return forwarderMessaeOut;
 
 		}
-
-		// return
-
-		return forwarderMessaeOut;
 
 	}
 
 	private
 	ForwarderMessageOutRec createMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,
@@ -1053,9 +1101,9 @@ class ForwarderLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMessage");
 
 		) {
@@ -1064,7 +1112,7 @@ class ForwarderLogicImplementation
 
 			NumberRec number =
 				numberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					numto);
 
 			if (threadId == null && fmIn != null) {
@@ -1078,7 +1126,7 @@ class ForwarderLogicImplementation
 
 			ForwarderMessageOutRec forwarderMessageOut =
 				forwarderMessageOutHelper.insert (
-					taskLogger,
+					transaction,
 					forwarderMessageOutHelper.createInstance ()
 
 				.setForwarder (
@@ -1117,26 +1165,28 @@ class ForwarderLogicImplementation
 						number)
 
 					.messageString (
-						taskLogger,
+						transaction,
 						message)
 
 					.numFrom (
 						numfrom)
 
 					.routerResolve (
+						transaction,
 						forwarderRoute.getRouter ())
 
 					.service (
 						service)
 
 					.deliveryTypeCode (
+						transaction,
 						"forwarder")
 
 					.ref (
 						forwarderMessageOut.getId ())
 
 					.subjectString (
-						taskLogger,
+						transaction,
 						optionalFromNullable (
 							subject))
 
@@ -1153,27 +1203,28 @@ class ForwarderLogicImplementation
 						network)
 
 					.send (
-						taskLogger);
+						transaction);
 
 			} else {
 
 				messageOut =
 					wapPushLogic.wapPushSend (
-						taskLogger,
+						transaction,
 						threadId,
 						number,
 						numfrom,
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							message),
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							url),
 						forwarderRoute.getRouter (),
 						service,
 						null,
 						null,
 						deliveryTypeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"forwarder"),
 						forwarderMessageOut.getId (),

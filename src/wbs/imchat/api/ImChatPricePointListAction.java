@@ -1,17 +1,19 @@
 package wbs.imchat.api;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Provider;
 
+import com.google.common.collect.Ordering;
+
 import lombok.NonNull;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -73,79 +75,50 @@ class ImChatPricePointListAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatPricePointListAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
 
 			// retrieve price points
 
-			List<ImChatPricePointRec> pricePoints =
-				imChatPricePointHelper.findByParent (
-					imChat);
+			List <ImChatPricePointRec> pricePoints =
+				iterableFilterToList (
+					pricePoint ->
+						! pricePoint.getDeleted (),
+					imChatPricePointHelper.findByParent (
+						transaction,
+						imChat));
 
 			Collections.sort (
 				pricePoints,
-				new Comparator<ImChatPricePointRec> () {
-
-				@Override
-				public
-				int compare (
-						ImChatPricePointRec left,
-						ImChatPricePointRec right) {
-
-					return new CompareToBuilder ()
-
-						.append (
-							left.getOrder (),
-							right.getOrder ())
-
-						.append (
-							left.getCode (),
-							right.getCode ())
-
-						.toComparison ();
-
-				}
-
-			});
+				Ordering.natural ().onResultOf (
+					pricePoint ->
+						Pair.of (
+							pricePoint.getOrder (),
+							pricePoint.getCode ())));
 
 			// create response
 
-			List<ImChatPricePointData> pricePointDatas =
-				new ArrayList<ImChatPricePointData> ();
-
-			for (
-				ImChatPricePointRec pricePoint
-					: pricePoints
-			) {
-
-				if (pricePoint.getDeleted ())
-					continue;
-
-				pricePointDatas.add (
-					imChatApiLogic.pricePointData (
-						pricePoint));
-
-			}
+			List <ImChatPricePointData> pricePointDatas =
+				iterableMapToList (
+					pricePoint ->
+						imChatApiLogic.pricePointData (
+							transaction,
+							pricePoint),
+					pricePoints);
 
 			return jsonResponderProvider.get ()
 

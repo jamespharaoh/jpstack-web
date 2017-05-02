@@ -7,12 +7,14 @@ import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
@@ -47,19 +49,20 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 import wbs.platform.media.model.MediaTypeRec;
@@ -162,6 +165,9 @@ class ChatUserLogicImplementation
 	RandomLogic randomLogic;
 
 	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
+
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	@SingletonDependency
@@ -178,61 +184,85 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	AffiliateRec getAffiliate (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		if (chatUser.getChatAffiliate () != null) {
+		try (
 
-			return affiliateHelper.findByCodeRequired (
-				chatUser.getChatAffiliate (),
-				"default");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getAffiliate");
+
+		) {
+
+			if (chatUser.getChatAffiliate () != null) {
+
+				return affiliateHelper.findByCodeRequired (
+					transaction,
+					chatUser.getChatAffiliate (),
+					"default");
+
+			}
+
+			if (chatUser.getChatScheme () != null) {
+
+				return affiliateHelper.findByCodeRequired (
+					transaction,
+					chatUser.getChatScheme (),
+					"default");
+
+			}
+
+			return null;
 
 		}
-
-		if (chatUser.getChatScheme () != null) {
-
-			return affiliateHelper.findByCodeRequired (
-				chatUser.getChatScheme (),
-				"default");
-
-		}
-
-		return null;
 
 	}
 
 	@Override
 	public
 	Long getAffiliateId (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		AffiliateRec affiliate =
-			getAffiliate (
-				chatUser);
+		try (
 
-		return affiliate != null
-			? affiliate.getId ()
-			: null;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getAffiliateId");
+
+		) {
+
+			AffiliateRec affiliate =
+				getAffiliate (
+					transaction,
+					chatUser);
+
+			return affiliate != null
+				? affiliate.getId ()
+				: null;
+
+		}
 
 	}
 
 	@Override
 	public
 	void logoff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean automatic) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"logoff");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// log the user off
 
@@ -285,30 +315,47 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean deleted (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		return chatUser.getNumber () == null
-			&& chatUser.getDeliveryMethod () == ChatMessageMethod.sms;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"deleted");
+
+		) {
+
+			return (
+
+				isNull (
+					chatUser.getNumber ())
+
+				&& enumEqualSafe (
+					chatUser.getDeliveryMethod (),
+					ChatMessageMethod.sms)
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	void scheduleAd (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"scheduleAd");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -433,56 +480,68 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean compatible (
+			@NonNull Transaction parentTransaction,
 			@NonNull Gender thisGender,
 			@NonNull Orient thisOrient,
-			@NonNull Optional<Long> thisCategoryId,
+			@NonNull Optional <Long> thisCategoryId,
 			@NonNull Gender thatGender,
 			@NonNull Orient thatOrient,
 			@NonNull Optional <Long> thatCategoryId) {
 
-		if (
+		try (
 
-			optionalIsPresent (
-				thisCategoryId)
-
-			&& (
-
-				optionalIsNotPresent (
-					thatCategoryId)
-
-				|| integerNotEqualSafe (
-					thisCategoryId.get (),
-					thatCategoryId.get ())
-
-			)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"compatible");
 
 		) {
 
-			// category mismatch
+			if (
 
-			return false;
+				optionalIsPresent (
+					thisCategoryId)
 
-		} else if (
-			enumEqualSafe (
-				thisGender,
-				thatGender)
-		) {
+				&& (
 
-			// same gender match
+					optionalIsNotPresent (
+						thatCategoryId)
 
-			return (
-				thisOrient.doesSame ()
-				&& thatOrient.doesSame ()
-			);
+					|| integerNotEqualSafe (
+						thisCategoryId.get (),
+						thatCategoryId.get ())
 
-		} else {
+				)
 
-			// different gender match
+			) {
 
-			return (
-				thisOrient.doesDifferent ()
-				&& thatOrient.doesDifferent ()
-			);
+				// category mismatch
+
+				return false;
+
+			} else if (
+				enumEqualSafe (
+					thisGender,
+					thatGender)
+			) {
+
+				// same gender match
+
+				return (
+					thisOrient.doesSame ()
+					&& thatOrient.doesSame ()
+				);
+
+			} else {
+
+				// different gender match
+
+				return (
+					thisOrient.doesDifferent ()
+					&& thatOrient.doesDifferent ()
+				);
+
+			}
 
 		}
 
@@ -491,42 +550,55 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean compatible (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec thatUser) {
 
-		if (
+		try (
 
-			isNull (
-				thisUser.getGender ())
-
-			|| isNull (
-				thisUser.getOrient ())
-
-			|| isNull (
-				thatUser.getGender ())
-
-			|| isNull (
-				thatUser.getOrient ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"compatible");
 
 		) {
 
-			return false;
+			if (
 
-		} else {
+				isNull (
+					thisUser.getGender ())
 
-			return compatible (
-				thisUser.getGender (),
-				thisUser.getOrient (),
-				thisUser.getCategory () != null
-					? Optional.of (
-						thisUser.getCategory ().getId ())
-					: Optional.absent (),
-				thatUser.getGender (),
-				thatUser.getOrient (),
-				thatUser.getCategory () != null
-					? Optional.of (
-						thatUser.getCategory ().getId ())
-					: Optional.absent ());
+				|| isNull (
+					thisUser.getOrient ())
+
+				|| isNull (
+					thatUser.getGender ())
+
+				|| isNull (
+					thatUser.getOrient ())
+
+			) {
+
+				return false;
+
+			} else {
+
+				return compatible (
+					transaction,
+					thisUser.getGender (),
+					thisUser.getOrient (),
+					optionalMapRequired (
+						optionalFromNullable (
+							thisUser.getCategory ()),
+						ChatCategoryRec::getId),
+					thatUser.getGender (),
+					thatUser.getOrient (),
+					optionalMapRequired (
+						optionalFromNullable (
+							thatUser.getCategory ()),
+						ChatCategoryRec::getId));
+
+			}
 
 		}
 
@@ -539,28 +611,50 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	Collection <ChatUserRec> getNearestUsers (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> thoseUsers,
 			@NonNull Long numToFind) {
 
-		Collection <UserDistance> userDistances =
-			getUserDistances (
-				thisUser,
-				thoseUsers);
+		try (
 
-		Set <ChatUserRec> ret =
-			new HashSet<> ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getNearestUsers");
 
-		for (UserDistance userDistance
-				: userDistances) {
+		) {
 
-			ret.add (userDistance.user);
+			Collection <UserDistance> userDistances =
+				getUserDistances (
+					transaction,
+					thisUser,
+					thoseUsers);
 
-			if (ret.size () == numToFind)
-				return ret;
+			Set <ChatUserRec> ret =
+				new HashSet<> ();
+
+			for (
+				UserDistance userDistance
+					: userDistances
+			) {
+
+				ret.add (
+					userDistance.user);
+
+				if (
+					integerEqualSafe (
+						ret.size (),
+						numToFind)
+				) {
+					return ret;
+				}
+
+			}
+
+			return ret;
+
 		}
-
-		return ret;
 
 	}
 
@@ -571,122 +665,139 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	List <UserDistance> getUserDistances (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> otherUsers) {
 
-		// process the list
+		try (
 
-		List <UserDistance> userDistances =
-			new ArrayList<> ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getUserDistances");
 
-		for (
-			ChatUserRec thatUser
-				: otherUsers
 		) {
 
-			if (thisUser.getLocationLongLat () == null)
-				break;
+			// process the list
 
-			if (thatUser.getLocationLongLat () == null)
-				continue;
+			List <UserDistance> userDistances =
+				new ArrayList<> ();
 
-			// work out the distance
+			for (
+				ChatUserRec thatUser
+					: otherUsers
+			) {
 
-			double miles =
-				locatorLogic.distanceMiles (
-					thisUser.getLocationLongLat (),
-					thatUser.getLocationLongLat ());
+				if (thisUser.getLocationLongLat () == null)
+					break;
 
-			// and add them to the list
+				if (thatUser.getLocationLongLat () == null)
+					continue;
 
-			UserDistance userDistance =
-				new UserDistance ()
+				// work out the distance
 
-				.user (
-					thatUser)
+				double miles =
+					locatorLogic.distanceMiles (
+						thisUser.getLocationLongLat (),
+						thatUser.getLocationLongLat ());
 
-				.miles (
-					miles);
+				// and add them to the list
 
-			userDistances.add (
-				userDistance);
+				UserDistance userDistance =
+					new UserDistance ()
+
+					.user (
+						thatUser)
+
+					.miles (
+						miles);
+
+				userDistances.add (
+					userDistance);
+
+			}
+
+			// then sort the list
+
+			Collections.sort (
+				userDistances);
+
+			return userDistances;
 
 		}
-
-		// then sort the list
-
-		Collections.sort (
-			userDistances);
-
-		return userDistances;
 
 	}
 
 	@Override
 	public
 	void adultVerify (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		ChatRec chat =
-			chatUser.getChat ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"adultVerify");
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+		) {
 
-		// work out times
+			ChatRec chat =
+				chatUser.getChat ();
 
-		Instant nextAdultAdTime =
-			transaction.now ().plus (
-				Duration.standardSeconds (
-					chat.getAdultAdsTime ()));
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		Instant adultExpiryTime =
-			ifNotNullThenElse (
-				chatScheme.getAdultExpirySeconds (),
-				() -> transaction.now ().plus (
+			// work out times
+
+			Instant nextAdultAdTime =
+				transaction.now ().plus (
 					Duration.standardSeconds (
-						chatScheme.getAdultExpirySeconds ())),
-				() -> null);
+						chat.getAdultAdsTime ()));
 
-		// update chat user
+			Instant adultExpiryTime =
+				ifNotNullThenElse (
+					chatScheme.getAdultExpirySeconds (),
+					() -> transaction.now ().plus (
+						Duration.standardSeconds (
+							chatScheme.getAdultExpirySeconds ())),
+					() -> null);
 
-		chatUser
+			// update chat user
 
-			.setAdultVerified (
-				true)
+			chatUser
 
-			.setNextAdultAd (
-				nextAdultAdTime)
+				.setAdultVerified (
+					true)
 
-			.setAdultExpiry (
-				adultExpiryTime);
+				.setNextAdultAd (
+					nextAdultAdTime)
+
+				.setAdultExpiry (
+					adultExpiryTime);
+
+		}
 
 	}
 
 	@Override
 	public
 	ChatUserRec createChatMonitor (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatMonitor");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			return chatUserHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserHelper.createInstance ()
 
 				.setChat (
@@ -715,20 +826,24 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void creditModeChange (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserCreditMode newMode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"creditModeChange");
 
 		) {
 
-			if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
+			if (
+				enumEqualSafe (
+					chatUser.getCreditMode (),
+					ChatUserCreditMode.prePay)
+			) {
 
 				chatUser
 
@@ -739,14 +854,22 @@ class ChatUserLogicImplementation
 			}
 
 			chatUser
-				.setCreditMode (newMode);
 
-			if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
+				.setCreditMode (
+					newMode)
+
+			;
+
+			if (
+				enumEqualSafe (
+					chatUser.getCreditMode (),
+					ChatUserCreditMode.prePay)
+			) {
 
 				chatUser
 
 					.setCredit (
-						chatUser.getCredit ()
+						+ chatUser.getCredit ()
 						+ chatUser.getCreditRevoked ());
 
 			}
@@ -758,25 +881,22 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setImage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type,
 			@NonNull MediaRec smallMedia,
 			@NonNull MediaRec fullMedia,
 			@NonNull Optional<MessageRec> message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setImage");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -785,7 +905,7 @@ class ChatUserLogicImplementation
 
 			ChatUserImageRec chatUserImage =
 				chatUserImageHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserImageHelper.createInstance ()
 
 				.setChatUser (
@@ -818,7 +938,7 @@ class ChatUserLogicImplementation
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						taskLogger,
+						transaction,
 						chat,
 						"user",
 						chatUser,
@@ -843,17 +963,17 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setPhoto (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
-			@NonNull Optional<MessageRec> message,
-			boolean append) {
+			@NonNull Optional <MessageRec> message,
+			@NonNull Boolean append) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setPhoto");
 
 		) {
@@ -867,15 +987,15 @@ class ChatUserLogicImplementation
 				fullMedia.getMediaType ().getMimeType ();
 
 			BufferedImage fullImage =
-				mediaLogic.readImageRequired (
-					taskLogger,
+				rawMediaLogic.readImageRequired (
+					transaction,
 					fullData,
 					fullMimeType);
 
 			// resample
 
 			BufferedImage smallImage =
-				mediaLogic.resampleImageToFit (
+				rawMediaLogic.resampleImageToFit (
 					fullImage,
 					320l,
 					240l);
@@ -883,13 +1003,13 @@ class ChatUserLogicImplementation
 			// save
 
 			byte[] smallData =
-				mediaLogic.writeJpeg (
+				rawMediaLogic.writeJpeg (
 					smallImage,
 					0.6f);
 
 			MediaRec smallMedia =
 				mediaLogic.createMediaFromImageRequired (
-					taskLogger,
+					transaction,
 					smallData,
 					"image/jpeg",
 					chatUser.getCode () + ".jpg");
@@ -897,7 +1017,7 @@ class ChatUserLogicImplementation
 			// and delegate
 
 			return setImage (
-				taskLogger,
+				transaction,
 				chatUser,
 				ChatUserImageType.image,
 				smallMedia,
@@ -912,7 +1032,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setPhoto (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull Optional <String> filenameOptional,
@@ -922,9 +1042,9 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setPhoto");
 
 		) {
@@ -937,7 +1057,7 @@ class ChatUserLogicImplementation
 
 			MediaRec fullMedia =
 				mediaLogic.createMediaFromImageRequired (
-					taskLogger,
+					transaction,
 					data,
 					mimeType.or (
 						"image/jpeg"),
@@ -946,7 +1066,7 @@ class ChatUserLogicImplementation
 			// and delegate
 
 			return setPhoto (
-				taskLogger,
+				transaction,
 				chatUser,
 				fullMedia,
 				message,
@@ -959,16 +1079,16 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	Optional <ChatUserImageRec> setPhotoFromMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setPhotoFromMessage");
 
 		) {
@@ -976,11 +1096,12 @@ class ChatUserLogicImplementation
 			return optionalMapRequired (
 
 				findPhoto (
+					transaction,
 					message),
 
 				media ->
 					setPhoto (
-						taskLogger,
+						transaction,
 						chatUser,
 						media,
 						optionalOf (
@@ -996,28 +1117,40 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	Optional <MediaRec> findPhoto (
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageRec message) {
 
-		return optionalFromJava (
-			message.getMedias ().stream ()
+		try (
 
-			.filter (
-				media ->
-					stringInSafe (
-						media.getMediaType ().getMimeType (),
-						"image/jpeg",
-						"image/gif"))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findPhoto");
 
-			.findFirst ()
+		) {
 
-		);
+			return optionalFromJava (
+				message.getMedias ().stream ()
+
+				.filter (
+					media ->
+						stringInSafe (
+							media.getMediaType ().getMimeType (),
+							"image/jpeg",
+							"image/gif"))
+
+				.findFirst ()
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	void setVideo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
 			@NonNull MessageRec message,
@@ -1025,9 +1158,9 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setVideo");
 
 		) {
@@ -1036,9 +1169,9 @@ class ChatUserLogicImplementation
 
 			MediaRec newMedia =
 				mediaLogic.createMediaFromVideoRequired (
-					taskLogger,
-					mediaLogic.videoConvertRequired (
-						taskLogger,
+					transaction,
+					rawMediaLogic.videoConvertRequired (
+						transaction,
 						"3gpp",
 						fullMedia.getContent ().getData ()),
 					"video/3gpp",
@@ -1047,7 +1180,7 @@ class ChatUserLogicImplementation
 			// and delegate
 
 			setImage (
-				taskLogger,
+				transaction,
 				chatUser,
 				ChatUserImageType.video,
 				newMedia,
@@ -1063,7 +1196,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setVideo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull Optional <String> filenameOptional,
@@ -1073,9 +1206,9 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setVideo");
 
 		) {
@@ -1099,6 +1232,7 @@ class ChatUserLogicImplementation
 
 				MediaTypeRec mediaType =
 					mediaTypeHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						mimeType);
 
@@ -1114,7 +1248,7 @@ class ChatUserLogicImplementation
 
 			MediaRec fullMedia =
 				mediaLogic.createMediaFromVideoRequired (
-					taskLogger,
+					transaction,
 					data,
 					mimeType,
 					filename);
@@ -1123,9 +1257,9 @@ class ChatUserLogicImplementation
 
 			MediaRec newMedia =
 				mediaLogic.createMediaFromVideoRequired (
-					taskLogger,
-					mediaLogic.videoConvertRequired (
-						taskLogger,
+					transaction,
+					rawMediaLogic.videoConvertRequired (
+						transaction,
 						"3gpp",
 						data),
 					"video/3gpp",
@@ -1134,7 +1268,7 @@ class ChatUserLogicImplementation
 			// and delegate
 
 			setImage (
-				taskLogger,
+				transaction,
 				chatUser,
 				ChatUserImageType.video,
 				newMedia,
@@ -1150,7 +1284,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setAudio (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull MessageRec message,
@@ -1158,9 +1292,9 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setAudio");
 
 		) {
@@ -1169,9 +1303,9 @@ class ChatUserLogicImplementation
 
 			MediaRec newMedia =
 				mediaLogic.createMediaFromAudio (
-					taskLogger,
-					mediaLogic.videoConvertRequired (
-						taskLogger,
+					transaction,
+					rawMediaLogic.videoConvertRequired (
+						transaction,
 						"mp3",
 						data),
 					"audio/mpeg",
@@ -1180,7 +1314,7 @@ class ChatUserLogicImplementation
 			// and delegate
 
 			setImage (
-				taskLogger,
+				transaction,
 				chatUser,
 				ChatUserImageType.audio,
 				newMedia,
@@ -1196,7 +1330,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setImage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type,
 			@NonNull byte[] data,
@@ -1207,9 +1341,9 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setImage");
 
 		) {
@@ -1219,7 +1353,7 @@ class ChatUserLogicImplementation
 			case image:
 
 				setPhoto (
-					taskLogger,
+					transaction,
 					chatUser,
 					data,
 					optionalOf (
@@ -1234,7 +1368,7 @@ class ChatUserLogicImplementation
 			case video:
 
 				setVideo (
-					taskLogger,
+					transaction,
 					chatUser,
 					data,
 					optionalOf (
@@ -1249,7 +1383,7 @@ class ChatUserLogicImplementation
 			case audio:
 
 				setAudio (
-					taskLogger,
+					transaction,
 					chatUser,
 					data,
 					null,
@@ -1275,16 +1409,16 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean setVideo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setVideo");
 
 		) {
@@ -1302,7 +1436,7 @@ class ChatUserLogicImplementation
 				}
 
 				setVideo (
-					taskLogger,
+					transaction,
 					chatUser,
 					media,
 					message,
@@ -1321,7 +1455,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean setPlace (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String place,
 			@NonNull Optional <MessageRec> message,
@@ -1329,15 +1463,12 @@ class ChatUserLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setPlace");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			if (
 				message.isPresent ()
@@ -1361,6 +1492,7 @@ class ChatUserLogicImplementation
 
 				gazetteerEntryOptional =
 					gazetteerEntryHelper.findByCode (
+						transaction,
 						chat.getGazetteer (),
 						match.simpleKeyword ());
 
@@ -1382,6 +1514,7 @@ class ChatUserLogicImplementation
 					chat.getSlice ().getAdminEmail () != null
 						? chat.getSlice ()
 						: sliceHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							wbsConfig.defaultSlice ());
 
@@ -1431,7 +1564,7 @@ class ChatUserLogicImplementation
 					} catch (Exception exception) {
 
 						exceptionLogger.logThrowable (
-							taskLogger,
+							transaction,
 							"logic",
 							"ChatUserLogic.setPlace",
 							exception,
@@ -1494,7 +1627,7 @@ class ChatUserLogicImplementation
 			if (message.isPresent ()) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_place_message",
 					chatUser,
 					gazetteerEntry,
@@ -1505,7 +1638,7 @@ class ChatUserLogicImplementation
 			} else if (user.isPresent ()) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_place_user",
 					chatUser,
 					gazetteerEntry,
@@ -1516,7 +1649,7 @@ class ChatUserLogicImplementation
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_place_api",
 					chatUser,
 					gazetteerEntry,
@@ -1531,143 +1664,131 @@ class ChatUserLogicImplementation
 
 	}
 
-	/**
-	 * Checks if a given user has attempted one of the three methods of age
-	 * verification:
-	 *
-	 * <ul>
-	 * <li>responding "yes" to a message asking them (the old method)</li>
-	 * <li>sending in their date of birth</li>
-	 * <li>going through adult verfication</li>
-	 * </ul>
-	 *
-	 * Note that in the case of DOB they may not be over 18, use the
-	 * chatUserDobOk method for that.
-	 *
-	 * @param chatUser
-	 *            ChatUserRec of the chat user to check
-	 * @return true if they meet any of the criteria
-	 * @see #chatUserDobOk
-	 */
 	@Override
 	public
 	boolean gotDob (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		return /*chatUser.getAdultVerified ()
-			|| chatUser.getAgeChecked ()
-			||*/ chatUser.getDob () != null;
+		return isNotNull (
+			chatUser.getDob ());
 
 	}
 
-	/**
-	 * Checks if a given chat user has given adequate evidence they are over 18:
-	 *
-	 * <ul>
-	 *   <li>
-	 *     responding "yes" to a message asking them (the old method)
-	 *   </li>
-	 *   <li>
-	 *     sending in their date of birth which shows them to be at least 18
-	 *   </li>
-	 *   <li>
-	 *     going through adult verfication
-	 *   </li>
-	 * </ul>
-	 *
-	 * @param chatUser
-	 * @return
-	 */
 	@Override
 	public
 	boolean dobOk (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		if (chatUser.getAgeChecked ())
-			return true;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"dobOk");
 
-		if (chatUser.getDob () == null)
-			return true;
+		) {
 
-		return notLessThan (
-			getAgeInYears (
-				chatUser,
-				transaction.now ()),
-			18l);
+			return (
+
+				chatUser.getAgeChecked ()
+
+				|| isNull (
+					chatUser.getDob ())
+
+				|| notLessThan (
+					getAgeInYears (
+						chatUser,
+						transaction.now ()),
+					18l)
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	void setScheme (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatSchemeRec requestedChatScheme) {
 
-		// do nothing if already set
+		try (
 
-		if (
-			isNotNull (
-				chatUser.getChatScheme ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setScheme");
+
 		) {
-			return;
-		}
 
-		// check for mappings
+			// do nothing if already set
 
-		Set <ChatSchemeMapRec> chatSchemeMaps =
-			requestedChatScheme.getChatSchemeMaps ();
-
-		ChatSchemeRec mappedChatScheme =
-			requestedChatScheme;
-
-		if (! chatSchemeMaps.isEmpty ()) {
-
-			String number =
-				chatUser.getNumber ().getNumber ();
-
-			for (
-				ChatSchemeMapRec chatSchemeMap
-					: chatSchemeMaps
+			if (
+				isNotNull (
+					chatUser.getChatScheme ())
 			) {
+				return;
+			}
 
-				String prefix =
-					chatSchemeMap.getPrefix ();
+			// check for mappings
 
-				if (
-					stringNotEqualSafe (
-						prefix,
-						number.subSequence (
-							0,
-							prefix.length ()))
+			Set <ChatSchemeMapRec> chatSchemeMaps =
+				requestedChatScheme.getChatSchemeMaps ();
+
+			ChatSchemeRec mappedChatScheme =
+				requestedChatScheme;
+
+			if (! chatSchemeMaps.isEmpty ()) {
+
+				String number =
+					chatUser.getNumber ().getNumber ();
+
+				for (
+					ChatSchemeMapRec chatSchemeMap
+						: chatSchemeMaps
 				) {
-					continue;
+
+					String prefix =
+						chatSchemeMap.getPrefix ();
+
+					if (
+						stringNotEqualSafe (
+							prefix,
+							number.subSequence (
+								0,
+								prefix.length ()))
+					) {
+						continue;
+					}
+
+					mappedChatScheme =
+						chatSchemeMap.getTargetChatScheme ();
+
+					break;
+
 				}
-
-				mappedChatScheme =
-					chatSchemeMap.getTargetChatScheme ();
-
-				break;
 
 			}
 
+			// just set it
+
+			chatUser
+
+				.setChatScheme (
+					mappedChatScheme)
+
+				.setOperatorLabel (
+					mappedChatScheme.getOperatorLabel ())
+
+				.setCredit (
+					chatUser.getCredit ()
+					+ mappedChatScheme.getInitialCredit ());
+
 		}
-
-		// just set it
-
-		chatUser
-
-			.setChatScheme (
-				mappedChatScheme)
-
-			.setOperatorLabel (
-				mappedChatScheme.getOperatorLabel ())
-
-			.setCredit (
-				chatUser.getCredit ()
-				+ mappedChatScheme.getInitialCredit ());
 
 	}
 
@@ -1675,16 +1796,16 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setAffiliate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatAffiliateRec chatAffiliate,
 			@NonNull Optional <MessageRec> message) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setAffiliate");
 
 		) {
@@ -1724,7 +1845,7 @@ class ChatUserLogicImplementation
 				) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"chat_user_category_message",
 						chatUser,
 						chatUser.getCategory (),
@@ -1733,7 +1854,7 @@ class ChatUserLogicImplementation
 				} else {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"chat_user_category_api",
 						chatUser,
 						chatUser.getCategory ());
@@ -1794,63 +1915,89 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean valid (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		if (
-			chatUser.getType () == ChatUserType.user
-			&& chatUser.getNumber () == null
-		) {
-			return false;
-		}
+		try (
 
-		return true;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"valid");
+
+		) {
+
+			return (
+
+				enumNotEqualSafe (
+					chatUser.getType (),
+					ChatUserType.user)
+
+				|| isNotNull (
+					chatUser.getNumber ())
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	ChatUserImageRec chatUserPendingImage (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type) {
 
-		ChatUserImageRec ret = null;
+		try (
 
-		for (
-			ChatUserImageRec chatUserImage
-				: chatUser.getChatUserImages ()
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"chatUserPendingImage");
+
 		) {
 
-			if (
-				enumNotEqualSafe (
-					chatUserImage.getType (),
-					type)
-			) {
-				continue;
-			}
+			ChatUserImageRec ret = null;
 
-			if (chatUserImage.getStatus ()
-					!= ChatUserInfoStatus.moderatorPending)
-				continue;
-
-			if (
-
-				isNull (
-					ret)
-
-				|| earlierThan (
-					ret.getTimestamp (),
-					chatUserImage.getTimestamp ())
-
+			for (
+				ChatUserImageRec chatUserImage
+					: chatUser.getChatUserImages ()
 			) {
 
-				ret =
-					chatUserImage;
+				if (
+					enumNotEqualSafe (
+						chatUserImage.getType (),
+						type)
+				) {
+					continue;
+				}
+
+				if (chatUserImage.getStatus ()
+						!= ChatUserInfoStatus.moderatorPending)
+					continue;
+
+				if (
+
+					isNull (
+						ret)
+
+					|| earlierThan (
+						ret.getTimestamp (),
+						chatUserImage.getTimestamp ())
+
+				) {
+
+					ret =
+						chatUserImage;
+
+				}
 
 			}
+
+			return ret;
 
 		}
-
-		return ret;
 
 	}
 

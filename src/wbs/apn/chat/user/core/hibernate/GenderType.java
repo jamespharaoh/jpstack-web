@@ -5,8 +5,9 @@ import java.sql.Types;
 import org.hibernate.type.CustomType;
 import org.hibernate.type.Type;
 
-import wbs.apn.chat.user.core.model.Gender;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.user.core.model.Gender;
 
 public
 class GenderType

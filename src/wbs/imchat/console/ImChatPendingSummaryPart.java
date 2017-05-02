@@ -25,6 +25,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlUtils.encodeNewlineToBr;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerDetailTypeRec;
@@ -63,7 +65,6 @@ import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatRec;
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("imChatPendingSummaryPart")
 public
@@ -141,13 +142,13 @@ class ImChatPendingSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -172,7 +173,8 @@ class ImChatPendingSummaryPart
 			// load data
 
 			message =
-				imChatMessageHelper.findFromContextRequired ();
+				imChatMessageHelper.findFromContextRequired (
+					transaction);
 
 			conversation =
 				message.getImChatConversation ();
@@ -190,7 +192,7 @@ class ImChatPendingSummaryPart
 
 			canSupervise =
 				privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					imChat,
 					"supervisor");
 
@@ -201,13 +203,13 @@ class ImChatPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -229,7 +231,7 @@ class ImChatPendingSummaryPart
 						"50%")));
 
 			goCustomerSummary (
-				taskLogger);
+				transaction);
 
 			goCustomerDetails ();
 
@@ -242,9 +244,10 @@ class ImChatPendingSummaryPart
 						"50%")));
 
 			goProfileSummary (
-				taskLogger);
+				transaction);
 
-			goCustomerNotes ();
+			goCustomerNotes (
+				transaction);
 
 			htmlTableCellClose ();
 
@@ -255,7 +258,7 @@ class ImChatPendingSummaryPart
 			htmlDivClose ();
 
 			goHistory (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -300,13 +303,13 @@ class ImChatPendingSummaryPart
 	}
 
 	void goCustomerSummary (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goCustomerSummary");
 
 		) {
@@ -315,7 +318,7 @@ class ImChatPendingSummaryPart
 				"Customer summary");
 
 			formFieldLogic.outputDetailsTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				customerFields,
 				customer,
@@ -325,14 +328,15 @@ class ImChatPendingSummaryPart
 
 	}
 
+	private
 	void goProfileSummary (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goProfileSummary");
 
 		) {
@@ -341,7 +345,7 @@ class ImChatPendingSummaryPart
 				"Profile summary");
 
 			formFieldLogic.outputDetailsTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				profileFields,
 				profile,
@@ -351,35 +355,48 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goCustomerNotes () {
-
-		htmlHeadingThreeWrite (
-			"Notes");
-
-		htmlParagraphWriteHtml (
-			HtmlUtils.newlineToBr (
-				HtmlUtils.htmlEncode (
-					customer.getNotesText () != null
-						? customer.getNotesText ().getText ()
-						: "")),
-			htmlIdAttribute (
-				stringFormat (
-					"im-chat-customer-note-%s",
-					integerToDecimalString (
-						customer.getId ()))),
-			htmlClassAttribute (
-				"im-chat-customer-note-editable"));
-
-	}
-
-	void goHistory (
-			@NonNull TaskLogger parentTaskLogger) {
+	private
+	void goCustomerNotes (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goCustomerNotes");
+
+		) {
+
+			htmlHeadingThreeWrite (
+				"Notes");
+
+			htmlParagraphWriteHtml (
+				encodeNewlineToBr (
+					customer.getNotesText () != null
+						? customer.getNotesText ().getText ()
+						: ""),
+				htmlIdAttribute (
+					stringFormat (
+						"im-chat-customer-note-%s",
+						integerToDecimalString (
+							customer.getId ()))),
+				htmlClassAttribute (
+					"im-chat-customer-note-editable"));
+
+
+		}
+	}
+
+	private
+	void goHistory (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goHistory");
 
 		) {
@@ -432,7 +449,7 @@ class ImChatPendingSummaryPart
 								historyReply)));
 
 					formFieldLogic.outputTableCellsList (
-						taskLogger,
+						transaction,
 						formatWriter,
 						messageFields,
 						historyReply,
@@ -461,7 +478,7 @@ class ImChatPendingSummaryPart
 				)));
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					messageFields,
 					historyRequest,

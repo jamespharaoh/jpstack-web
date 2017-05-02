@@ -1,5 +1,6 @@
 package wbs.apn.chat.broadcast.logic;
 
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -18,10 +19,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -147,62 +148,138 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	List<ChatBroadcastRec> findSendingJobs () {
+	List <ChatBroadcastRec> findSendingJobs (
+			@NonNull Transaction parentTransaction) {
 
-		return chatBroadcastHelper.findSending ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSendingJobs");
+
+		) {
+
+			return chatBroadcastHelper.findSending (
+				transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ChatBroadcastRec> findScheduledJobs (
+			@NonNull Transaction parentTransaction,
 			@NonNull Instant now) {
 
-		return chatBroadcastHelper.findScheduled (
-			now);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findScheduledJobs");
+
+		) {
+
+			return chatBroadcastHelper.findScheduled (
+				transaction,
+				now);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ChatBroadcastNumberRec> findItemsLimit (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
-		return chatBroadcastNumberHelper.findAcceptedLimit (
-			chatBroadcast,
-			maxResults);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findItemsLimit");
+
+		) {
+
+			return chatBroadcastNumberHelper.findAcceptedLimit (
+				transaction,
+				chatBroadcast,
+				maxResults);
+
+		}
 
 	}
 
 	@Override
 	public
 	ChatRec getService (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		return chatBroadcast.getChat ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getService");
+
+		) {
+
+			return chatBroadcast.getChat ();
+
+		}
 
 	}
 
 	@Override
 	public
 	Instant getScheduledTime (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		return chatBroadcast.getScheduledTime ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getScheduledTime");
+
+		) {
+
+			return chatBroadcast.getScheduledTime ();
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobScheduled (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		return chatBroadcast.getState ()
-			== ChatBroadcastState.scheduled;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobScheduled");
+
+		) {
+
+			return enumEqualSafe (
+				chatBroadcast.getState (),
+				ChatBroadcastState.scheduled);
+
+		}
 
 	}
 
@@ -210,38 +287,63 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean jobSending (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		return chatBroadcast.getState ()
-			== ChatBroadcastState.sending;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobSending");
+
+		) {
+
+			return enumEqualSafe (
+				chatBroadcast.getState (),
+				ChatBroadcastState.sending);
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobConfigured (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		// TODO something useful here
+		try (
 
-		return true;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobConfigured");
+
+		) {
+
+			// TODO something useful here
+
+			return true;
+
+		}
 
 	}
 
 	@Override
 	public
 	void sendStart (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendStart");
 
 		) {
@@ -273,7 +375,7 @@ class ChatBroadcastSendHelper
 			// create event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"chat_broadcast_send_begun",
 				chatBroadcast);
 
@@ -284,16 +386,16 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"verifyItem");
 
 		) {
@@ -302,7 +404,7 @@ class ChatBroadcastSendHelper
 				chatBroadcastNumber.getChatUser ();
 
 			return chatBroadcastLogic.canSendToUser (
-				taskLogger,
+				transaction,
 				chatUser,
 				chatBroadcast.getIncludeBlocked (),
 				chatBroadcast.getIncludeOptedOut ());
@@ -314,55 +416,64 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void rejectItem (
-			@NonNull ChatRec chat,
-			@NonNull ChatBroadcastRec chatBroadcast,
-			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
-
-		// sanity check
-
-		if (
-			chatBroadcastNumber.getState ()
-				!= ChatBroadcastNumberState.accepted
-		) {
-			throw new IllegalStateException ();
-		}
-
-		// update number
-
-		chatBroadcastNumber
-
-			.setState (
-				ChatBroadcastNumberState.rejected);
-
-		chatBroadcast
-
-			.setNumAccepted (
-				chatBroadcast.getNumAccepted () - 1)
-
-			.setNumRejected (
-				chatBroadcast.getNumRejected () + 1);
-
-	}
-
-	@Override
-	public
-	void sendItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"sendItem");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"rejectItem");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
+			// sanity check
+
+			if (
+				chatBroadcastNumber.getState ()
+					!= ChatBroadcastNumberState.accepted
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// update number
+
+			chatBroadcastNumber
+
+				.setState (
+					ChatBroadcastNumberState.rejected);
+
+			chatBroadcast
+
+				.setNumAccepted (
+					chatBroadcast.getNumAccepted () - 1)
+
+				.setNumRejected (
+					chatBroadcast.getNumRejected () + 1);
+
+		}
+
+	}
+
+	@Override
+	public
+	void sendItem (
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast,
+			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sendItem");
+
+		) {
 
 			// sanity check
 
@@ -387,28 +498,32 @@ class ChatBroadcastSendHelper
 			ServiceRec broadcastService =
 				requiredValue (
 					serviceHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"broadcast"));
 
 			BatchRec batch =
 				requiredValue (
 					batchHelper.findByCodeRequired (
+						transaction,
 						chatBroadcast,
 						"broadcast"));
 
 			AffiliateRec affiliate =
 				requiredValue (
 					chatUserLogic.getAffiliate (
+						transaction,
 						toChatUser));
 
 			// send message
 
 			MessageRec message =
 				magicNumberLogic.sendMessage (
-					taskLogger,
+					transaction,
 					chatScheme.getMagicNumberSet (),
 					toChatUser.getNumber (),
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"chat"),
 					fromChatUser.getId (),
@@ -425,7 +540,7 @@ class ChatBroadcastSendHelper
 			// create chat message
 
 			chatMessageHelper.insert (
-				taskLogger,
+				transaction,
 				chatMessageHelper.createInstance ()
 
 				.setChat (
@@ -479,21 +594,18 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendComplete (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendComplete");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// sanity check
 
@@ -533,7 +645,7 @@ class ChatBroadcastSendHelper
 			// create event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"chat_broadcast_send_completed",
 				chatBroadcast);
 

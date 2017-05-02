@@ -1,6 +1,7 @@
 package wbs.apn.chat.adult.daemon;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
@@ -76,21 +77,17 @@ class ChatAdultDeliveryHandler
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatAdultDeliveryHandler.handle (deliveryId, ref)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			MessageRec message =
@@ -101,6 +98,7 @@ class ChatAdultDeliveryHandler
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					delivery.getMessage ().getRef ());
 
 			// work out if it is a join
@@ -138,6 +136,7 @@ class ChatAdultDeliveryHandler
 			) {
 
 				deliveryHelper.remove (
+					transaction,
 					delivery);
 
 				transaction.commit ();
@@ -149,15 +148,22 @@ class ChatAdultDeliveryHandler
 			// find and update the chat user
 
 			chatUserLogic.adultVerify (
-				taskLogger,
+				transaction,
 				chatUser);
 
 			// stop now if we are joining but there is no join type saved
 
-			if (join
-					&& chatUser.getNextJoinType () == null) {
+			if (
+
+				join
+
+				&& isNull (
+					chatUser.getNextJoinType ())
+
+			) {
 
 				deliveryHelper.remove (
+					transaction,
 					delivery);
 
 				transaction.commit ();
@@ -171,7 +177,7 @@ class ChatAdultDeliveryHandler
 			if (! join) {
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						delivery.getMessage ().getThreadId ()),
@@ -180,6 +186,7 @@ class ChatAdultDeliveryHandler
 					emptyMap ());
 
 				deliveryHelper.remove (
+					transaction,
 					delivery);
 
 				transaction.commit ();
@@ -203,9 +210,10 @@ class ChatAdultDeliveryHandler
 					joinType)
 
 				.handleSimple (
-					taskLogger);
+					transaction);
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			transaction.commit ();

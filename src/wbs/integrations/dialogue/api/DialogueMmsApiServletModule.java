@@ -139,21 +139,16 @@ class DialogueMmsApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"inFile.doPost");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"DialogueMmsApiServletModule.inFile.doPost ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"doPost");
 
 			) {
 
 				requestContext.debugDump (
-					taskLogger);
+					transaction);
 
 				// process attachments
 
@@ -189,7 +184,7 @@ class DialogueMmsApiServletModule
 
 					medias.add (
 						mediaLogic.createMediaRequired (
-							taskLogger,
+							transaction,
 							item.get (),
 							type,
 							item.getName (),
@@ -231,6 +226,7 @@ class DialogueMmsApiServletModule
 
 				RouteRec route =
 					routeHelper.findRequired (
+						transaction,
 						requestContext.requestIntegerRequired (
 							"routeId"));
 
@@ -258,14 +254,14 @@ class DialogueMmsApiServletModule
 				// insert into inbox
 
 				smsInboxLogic.inboxInsert (
-					taskLogger,
+					transaction,
 					optionalOf (
 						mmsMessageId),
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						text),
 					smsNumberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						mmsSenderAddress),
 					mmsRecipientAddress,
 					route,
@@ -308,16 +304,11 @@ class DialogueMmsApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"reportFile.doPost");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"DialogueMmsApiServletModule.reportFile.doPost ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"reportFile.doPost");
 
 			) {
 
@@ -327,7 +318,7 @@ class DialogueMmsApiServletModule
 
 				// temporary, output all parameters
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Parameter count %s",
 					integerToDecimalString (
 						requestContext.parameterMap ().size ()));
@@ -342,7 +333,7 @@ class DialogueMmsApiServletModule
 							: entry.getValue ()
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"%s = %s",
 							entry.getKey (),
 							value);
@@ -377,6 +368,7 @@ class DialogueMmsApiServletModule
 
 				MessageRec message =
 					messageHelper.findRequired (
+						transaction,
 						messageId);
 
 				if (
@@ -414,7 +406,7 @@ class DialogueMmsApiServletModule
 				}
 
 				reportLogic.deliveryReport (
-					taskLogger,
+					transaction,
 					message,
 					newMessageStatus,
 					optionalOf (

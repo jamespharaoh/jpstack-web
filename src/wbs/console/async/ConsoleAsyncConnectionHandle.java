@@ -2,7 +2,7 @@ package wbs.console.async;
 
 import com.google.gson.JsonObject;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface ConsoleAsyncConnectionHandle {
@@ -13,7 +13,7 @@ interface ConsoleAsyncConnectionHandle {
 	Boolean isFresh ();
 
 	void send (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			JsonObject payload);
 
 }

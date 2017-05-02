@@ -79,43 +79,37 @@ class ImChatPurchaseHistoryAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatPurchaseHistoryRequest purchaseHistoryRequest =
-			dataFromJson.fromJson (
-					ImChatPurchaseHistoryRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatPurchaseHistoryAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
+
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatPurchaseHistoryRequest purchaseHistoryRequest =
+				dataFromJson.fromJson (
+					ImChatPurchaseHistoryRequest.class,
+					jsonValue);
 
 			// lookup session and customer
 
 			ImChatSessionRec session =
-					imChatSessionHelper.findBySecret (
-							purchaseHistoryRequest.sessionSecret ());
+				imChatSessionHelper.findBySecret (
+					transaction,
+					purchaseHistoryRequest.sessionSecret ());
 
 			if (
 				session == null
@@ -155,6 +149,7 @@ class ImChatPurchaseHistoryAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer));
 
 			for (
@@ -171,6 +166,7 @@ class ImChatPurchaseHistoryAction
 
 				purchaseHistoryResponse.purchases.add (
 					imChatApiLogic.purchaseHistoryData (
+						transaction,
 						purchase));
 
 			}

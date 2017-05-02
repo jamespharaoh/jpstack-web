@@ -2,8 +2,9 @@ package wbs.apn.chat.keyword.hibernate;
 
 import java.sql.Types;
 
-import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 
 public
 class ChatKeywordJoinTypeType

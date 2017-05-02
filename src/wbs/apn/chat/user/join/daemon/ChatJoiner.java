@@ -32,11 +32,11 @@ import org.joda.time.LocalDate;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -229,19 +229,19 @@ class ChatJoiner {
 
 	public
 	void handleSimple (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleSimple");
 
 		) {
 
 			handleWithState (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -249,32 +249,34 @@ class ChatJoiner {
 
 	public
 	InboxAttemptRec handleInbox (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull CommandRec command) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handleSimple");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"handleInbox");
 
 		) {
 
 			handleWithState (
-				taskLogger);
+				transaction);
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
@@ -394,19 +396,16 @@ class ChatJoiner {
 
 	private
 	void updateUserDob (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateUserDob");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			Optional <LocalDate> dateOfBirth =
 				DateFinder.find (
@@ -426,7 +425,7 @@ class ChatJoiner {
 			} else {
 
 				chatUserDobFailureHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserDobFailureHelper.createInstance ()
 
 					.setChatUser (
@@ -440,7 +439,7 @@ class ChatJoiner {
 
 					.setFailingText (
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							rest))
 
 				);
@@ -492,20 +491,20 @@ class ChatJoiner {
 
 	private
 	boolean updateUserPhoto (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateUserPhoto");
 
 		) {
 
 			Optional <ChatUserImageRec> chatUserImageOptional =
 				chatUserLogic.setPhotoFromMessage (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					false);
@@ -516,12 +515,13 @@ class ChatJoiner {
 			) {
 
 				chatSendLogic.sendSystemMmsFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"photo_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatAffiliate (),
 						"date_set_photo"),
 					TemplateMissing.error);
@@ -538,13 +538,13 @@ class ChatJoiner {
 
 	private
 	void setAffiliateAndScheme (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setAffiliateAndScheme");
 
 		) {
@@ -554,9 +554,10 @@ class ChatJoiner {
 			if (chatAffiliateId != null) {
 
 				chatUserLogic.setAffiliate (
-					taskLogger,
+					transaction,
 					chatUser,
 					chatAffiliateHelper.findRequired (
+						transaction,
 						chatAffiliateId),
 					optionalFromNullable (
 						message));
@@ -568,8 +569,10 @@ class ChatJoiner {
 			if (chatSchemeId != null) {
 
 				chatUserLogic.setScheme (
+					transaction,
 					chatUser,
 					chatSchemeHelper.findRequired (
+						transaction,
 						chatSchemeId));
 
 			}
@@ -583,13 +586,13 @@ class ChatJoiner {
 	 */
 	private
 	boolean updateUser (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateUser");
 
 		) {
@@ -612,7 +615,7 @@ class ChatJoiner {
 			) {
 
 				chatUserLogic.adultVerify (
-					taskLogger,
+					transaction,
 					chatUser);
 
 				return true;
@@ -669,7 +672,7 @@ class ChatJoiner {
 			)) {
 
 				chatInfoLogic.chatUserSetInfo (
-					taskLogger,
+					transaction,
 					chatUser,
 					rest,
 					optionalOf (
@@ -735,7 +738,7 @@ class ChatJoiner {
 			) {
 
 				updateUserDob (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -750,7 +753,7 @@ class ChatJoiner {
 
 				gotPlace =
 					chatUserLogic.setPlace (
-						taskLogger,
+						transaction,
 						chatUser,
 						rest,
 						optionalOf (
@@ -769,7 +772,7 @@ class ChatJoiner {
 
 				if (
 					! updateUserPhoto (
-						taskLogger)
+						transaction)
 				) {
 					return false;
 				}
@@ -793,13 +796,13 @@ class ChatJoiner {
 	 */
 	private
 	boolean checkBeforeJoin (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"checkBeforeJoin");
 
 		) {
@@ -809,7 +812,7 @@ class ChatJoiner {
 			if (chatUser.getNumber ().getNetwork ().getId () == 0) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -817,17 +820,18 @@ class ChatJoiner {
 					true);
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					Optional.of (
 						message.getThreadId ()),
 					"join_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"help"),
 					0l,
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 				return false;
 
@@ -837,7 +841,7 @@ class ChatJoiner {
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -846,7 +850,7 @@ class ChatJoiner {
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -859,12 +863,16 @@ class ChatJoiner {
 
 			// check age
 
-			if (! chatUserLogic.gotDob (chatUser)) {
+			if (
+				! chatUserLogic.gotDob (
+					transaction,
+					chatUser)
+			) {
 
 				if (chat.getSendDobRequestFromShortcode ()) {
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
@@ -882,12 +890,13 @@ class ChatJoiner {
 				} else {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"dob_request",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chatUser.getChatScheme (),
 							joinTypeIsChat (joinType)
 								? "chat_dob"
@@ -902,15 +911,20 @@ class ChatJoiner {
 
 			}
 
-			if (! chatUserLogic.dobOk (chatUser)) {
+			if (
+				! chatUserLogic.dobOk (
+					transaction,
+					chatUser)
+			) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"dob_too_young",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"help"),
 					0l,
@@ -931,7 +945,7 @@ class ChatJoiner {
 				if (chat.getSendWarningFromShortcode ()) {
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
@@ -940,7 +954,7 @@ class ChatJoiner {
 						emptyMap ());
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
@@ -951,12 +965,13 @@ class ChatJoiner {
 				} else {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"join_warning",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -964,12 +979,13 @@ class ChatJoiner {
 						emptyMap ());
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"join_warning_2",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -981,7 +997,7 @@ class ChatJoiner {
 				if (chat.getBillDuringJoin ()) {
 
 					chatCreditLogic.userBillReal (
-						taskLogger,
+						transaction,
 						chatUser,
 						false);
 
@@ -1002,12 +1018,13 @@ class ChatJoiner {
 			) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"charges_request",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
 							? "chat_charges"
@@ -1034,12 +1051,13 @@ class ChatJoiner {
 			) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"location_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatScheme (),
 						ifThenElse (
 							joinTypeIsChat (
@@ -1059,12 +1077,13 @@ class ChatJoiner {
 			if (chatUser.getGender () == null) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"gender_request",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
 							? "chat_gender"
@@ -1082,12 +1101,13 @@ class ChatJoiner {
 			if (chatUser.getOrient () == null) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"gender_other_request",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
 							? "chat_gender_other"
@@ -1108,12 +1128,13 @@ class ChatJoiner {
 			) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"info_request",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
 							? "chat_info"
@@ -1134,13 +1155,13 @@ class ChatJoiner {
 
 	private
 	boolean checkLocation (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"checkLocation");
 
 		) {
@@ -1153,12 +1174,13 @@ class ChatJoiner {
 			// otherwise, send an error
 
 			chatSendLogic.sendSystemMagic (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
 					message.getThreadId ()),
 				"location_request",
 				commandHelper.findByCodeRequired (
+					transaction,
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_location"
@@ -1175,26 +1197,26 @@ class ChatJoiner {
 
 	private
 	void handleReal (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleReal");
 
 		) {
 
 			if (
 				! joinPart1 (
-					taskLogger)
+					transaction)
 			) {
 				return;
 			}
 
 			joinPart2 (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -1202,13 +1224,13 @@ class ChatJoiner {
 
 	private
 	void handleWithState (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleWithState");
 
 		) {
@@ -1225,7 +1247,7 @@ class ChatJoiner {
 				state = State.inProgress;
 
 				handleReal (
-					taskLogger);
+					transaction);
 
 				state = State.completed;
 
@@ -1243,19 +1265,16 @@ class ChatJoiner {
 
 	private
 	boolean joinPart1 (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"joinPart1");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// lookup stuff
 
@@ -1266,24 +1285,25 @@ class ChatJoiner {
 
 			chat =
 				chatHelper.findRequired (
+					transaction,
 					chatId);
 
 			// create chat user
 
 			chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			setAffiliateAndScheme (
-				taskLogger);
+				transaction);
 
 			// make sure the user can join
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -1292,7 +1312,7 @@ class ChatJoiner {
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -1328,14 +1348,14 @@ class ChatJoiner {
 					transaction.now ());
 
 			chatUserLogic.scheduleAd (
-				taskLogger,
+				transaction,
 				chatUser);
 
 			// update the user as appropriate
 
 			if (
 				! updateUser (
-					taskLogger)
+					transaction)
 			) {
 				return false;
 			}
@@ -1344,7 +1364,7 @@ class ChatJoiner {
 
 			if (
 				! checkBeforeJoin (
-					taskLogger)
+					transaction)
 			) {
 				return false;
 			}
@@ -1357,37 +1377,36 @@ class ChatJoiner {
 
 	private
 	boolean joinPart2 (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"joinPart2");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Checking location for chat user %s",
 				objectManager.objectPathMini (
+					transaction,
 					chatUser));
 
 			// check we have a location of some sort
 
 			if (
 				! checkLocation (
-					taskLogger)
+					transaction)
 			) {
 				return false;
 			}
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Location ok for chat user %s (%s)",
 				objectManager.objectPathMini (
+					transaction,
 					chatUser),
 				chatUser.getLocationLongLat ().toString ());
 
@@ -1396,10 +1415,11 @@ class ChatJoiner {
 			if (joinTypeIsChat (joinType)) {
 
 				chatMiscLogic.userJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
-					message.getThreadId (),
+					optionalOf (
+						message.getThreadId ()),
 					ChatMessageMethod.sms);
 
 			}
@@ -1440,12 +1460,13 @@ class ChatJoiner {
 				if (chatUser.getDateMode () == ChatUserDateMode.none) {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"date_joined",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -1455,7 +1476,7 @@ class ChatJoiner {
 				}
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalAbsent (),
 					optionalOf (
@@ -1500,7 +1521,7 @@ class ChatJoiner {
 				if (
 					equalToZero (
 						chatInfoLogic.sendUserPics (
-							taskLogger,
+							transaction,
 							chatUser,
 							3l,
 							optionalOf (
@@ -1508,12 +1529,13 @@ class ChatJoiner {
 				) {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"more_photos_error",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -1529,7 +1551,7 @@ class ChatJoiner {
 				if (
 					equalToZero (
 						chatInfoLogic.sendUserVideos (
-							taskLogger,
+							transaction,
 							chatUser,
 							3l,
 							optionalOf (
@@ -1537,12 +1559,13 @@ class ChatJoiner {
 				) {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"more_videos_error",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -1557,7 +1580,7 @@ class ChatJoiner {
 
 				long numSent =
 					chatInfoLogic.sendUserInfos (
-						taskLogger,
+						transaction,
 						chatUser,
 						2l,
 						optionalOf (
@@ -1577,12 +1600,13 @@ class ChatJoiner {
 				} else {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						Optional.of (
 							message.getThreadId ()),
 						"more_error",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -1603,12 +1627,13 @@ class ChatJoiner {
 
 			ChatMessageRec oldMessage =
 				chatMessageHelper.findSignup (
+					transaction,
 					chatUser);
 
 			if (oldMessage != null) {
 
 				chatMessageLogic.chatMessageSendFromUserPartTwo (
-					taskLogger,
+					transaction,
 					oldMessage);
 
 			}
@@ -1616,7 +1641,7 @@ class ChatJoiner {
 			// auto join chat and dating
 
 			chatMiscLogic.userAutoJoin (
-				taskLogger,
+				transaction,
 				chatUser,
 				message,
 				false);

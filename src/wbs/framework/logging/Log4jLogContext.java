@@ -1,6 +1,7 @@
 package wbs.framework.logging;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 
 import com.google.common.base.Optional;
@@ -41,11 +42,11 @@ class Log4jLogContext
 
 	@Override
 	public
-	TaskLogger createTaskLogger (
+	OwnedTaskLogger createTaskLogger (
 			@NonNull String dynamicContext,
 			@NonNull Optional <Boolean> debugEnabled) {
 
-		return new TaskLogger (
+		return new TaskLoggerImplementation (
 			optionalAbsent (),
 			logTarget,
 			staticContext,
@@ -56,13 +57,15 @@ class Log4jLogContext
 
 	@Override
 	public
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			@NonNull Optional <TaskLogger> parent,
 			@NonNull String dynamicContext,
 			@NonNull Optional <Boolean> debugEnabled) {
 
-		return new TaskLogger (
-			parent,
+		return new TaskLoggerImplementation (
+			optionalMapRequired (
+				parent,
+				TaskLogger::taskLoggerImplementation),
 			logTarget,
 			staticContext,
 			dynamicContext,

@@ -22,7 +22,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -109,16 +111,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ManualResponderRequestPendingNumberNoteUpdateAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -147,17 +144,19 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 						"value"));
 
 			manualResponder =
-				manualResponderHelper.findFromContextRequired ();
+				manualResponderHelper.findFromContextRequired (
+					transaction);
 
 			number =
 				numberHelper.findRequired (
+					transaction,
 					numberId);
 
 			// find or create number
 
 			manualResponderNumber =
 				manualResponderNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					manualResponder,
 					number);
 
@@ -175,13 +174,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			) {
 
 				return updateNumber (
-					taskLogger,
 					transaction);
 
 			} else {
 
 				return updateCustomer (
-					taskLogger,
 					transaction);
 
 			}
@@ -191,14 +188,13 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	}
 
 	Responder updateNumber (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateNumber");
 
 		) {
@@ -212,7 +208,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 				valueParam.isEmpty ()
 					? null
 					: textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						valueParam);
 
 			if (
@@ -246,9 +242,10 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			if (newValue != null) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_updated",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					manualResponderNumber,
 					newValue);
@@ -256,9 +253,10 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_nulled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					manualResponderNumber);
 
@@ -281,15 +279,15 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	}
 
 	Responder updateCustomer (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateCustomer");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"updateCussstomer");
+
 
 		) {
 
@@ -302,7 +300,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 				valueParam.isEmpty ()
 					? null
 					: textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						valueParam);
 
 			if (
@@ -336,9 +334,10 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			if (newValue != null) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_updated",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					customer,
 					newValue);
@@ -346,9 +345,10 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_nulled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					customer);
 

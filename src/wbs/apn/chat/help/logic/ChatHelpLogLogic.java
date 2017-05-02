@@ -2,7 +2,7 @@ package wbs.apn.chat.help.logic;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -17,7 +17,7 @@ public
 interface ChatHelpLogLogic {
 
 	ChatHelpLogRec createChatHelpLogIn (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MessageRec message,
 			String text,
@@ -25,7 +25,7 @@ interface ChatHelpLogLogic {
 			Boolean queue);
 
 	ChatHelpLogRec createChatHelpLogOut (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <ChatHelpLogRec> replyTo,
 			Optional <UserRec> user,

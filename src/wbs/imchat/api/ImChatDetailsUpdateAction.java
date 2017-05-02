@@ -83,40 +83,36 @@ class ImChatDetailsUpdateAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatDetailsUpdateRequest detailsUpdateRequest =
-			dataFromJson.fromJson (
-				ImChatDetailsUpdateRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatDetailsUpdateAction.handler ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handler");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatDetailsUpdateRequest detailsUpdateRequest =
+				dataFromJson.fromJson (
+					ImChatDetailsUpdateRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -125,6 +121,7 @@ class ImChatDetailsUpdateAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
+					transaction,
 					detailsUpdateRequest.sessionSecret ());
 
 			ImChatCustomerRec customer =
@@ -208,7 +205,7 @@ class ImChatDetailsUpdateAction
 
 					detailValue =
 						imChatCustomerDetailValueHelper.insert (
-							taskLogger,
+							transaction,
 							imChatCustomerDetailValueHelper.createInstance ()
 
 						.setImChatCustomer (
@@ -229,7 +226,7 @@ class ImChatDetailsUpdateAction
 				}
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"im_chat_customer_detail_updated",
 					customer,
 					detailType,
@@ -249,6 +246,7 @@ class ImChatDetailsUpdateAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer));
 
 			// commit and return

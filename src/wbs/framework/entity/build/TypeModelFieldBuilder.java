@@ -9,11 +9,15 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
@@ -22,13 +26,20 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.identities.TypeFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("typeModelFieldBuilder")
 @ModelBuilder
 public
-class TypeModelFieldBuilder {
+class TypeModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -46,94 +57,107 @@ class TypeModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldTypeName =
-			ifNull (
-				spec.typeName (),
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			String fieldTypeName =
+				ifNull (
+					spec.typeName (),
+					stringFormat (
+						"%sType",
+						context.modelMeta ().name ()));
+
+			String fieldName =
+				ifNull (
+					spec.name (),
+					fieldTypeName);
+
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					fieldTypeName);
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			String fullFieldTypeName =
 				stringFormat (
-					"%sType",
-					context.modelMeta ().name ()));
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						fieldTypeName));
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				fieldTypeName);
+			// create model field
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				fieldTypeName);
+			ModelField modelField =
+				new ModelField ()
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+				.model (
+					target.model ())
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					fieldTypeName));
+				.parentField (
+					context.parentModelField ())
 
-		// create model field
+				.name (
+					fieldName)
 
-		ModelField modelField =
-			new ModelField ()
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.model (
-				target.model ())
+				.type (
+					ModelFieldType.type)
 
-			.parentField (
-				context.parentModelField ())
+				.parent (
+					false)
 
-			.name (
-				fieldName)
+				.identity (
+					false)
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.valueType (
+					classForNameRequired (
+						fullFieldTypeName))
 
-			.type (
-				ModelFieldType.type)
+				.nullable (
+					false)
 
-			.parent (
-				false)
+				.columnNames (
+					ImmutableList.of (
+						ifNull (
+							spec.columnName (),
+							stringFormat (
+								"%s_id",
+								camelToUnderscore (
+									fieldName)))));
 
-			.identity (
-				false)
+			// store field
 
-			.valueType (
-				classForNameRequired (
-					fullFieldTypeName))
+			target.fields ().add (
+				modelField);
 
-			.nullable (
-				false)
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
 
-			.columnNames (
-				ImmutableList.of (
-					ifNull (
-						spec.columnName (),
-						stringFormat (
-							"%s_id",
-							camelToUnderscore (
-								fieldName)))));
+			if (target.model ().typeField () != null)
+				throw new RuntimeException ();
 
-		// store field
+			target.model ().typeField (
+				modelField);
 
-		target.fields ().add (
-			modelField);
-
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
-
-		if (target.model ().typeField () != null)
-			throw new RuntimeException ();
-
-		target.model ().typeField (
-			modelField);
+		}
 
 	}
 

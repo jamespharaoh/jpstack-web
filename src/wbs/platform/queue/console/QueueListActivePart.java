@@ -35,8 +35,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;
@@ -105,13 +106,13 @@ class QueueListActivePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -123,10 +124,11 @@ class QueueListActivePart
 					dummyQueueCache)
 
 				.loggedInUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.sort (
-					taskLogger)
+					transaction)
 
 				.availableQueues ();
 
@@ -140,7 +142,7 @@ class QueueListActivePart
 
 				if (
 					! objectManager.canView (
-						taskLogger,
+						transaction,
 						queueInfo.queue ())
 				) {
 					continue;
@@ -158,13 +160,13 @@ class QueueListActivePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -178,7 +180,7 @@ class QueueListActivePart
 
 			ConsoleContext queueContext =
 				consoleManager.relatedContextRequired (
-					taskLogger,
+					transaction,
 					requestContext.consoleContextRequired (),
 					queueContextType);
 
@@ -222,7 +224,9 @@ class QueueListActivePart
 
 				htmlTableCellWrite (
 					objectManager.objectPath (
+						transaction,
 						objectManager.getParentRequired (
+							transaction,
 							queue)));
 
 				htmlTableCellWrite (

@@ -1,6 +1,6 @@
 package wbs.platform.event.logic;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.event.model.EventRec;
 
@@ -8,13 +8,13 @@ public
 interface EventLogic {
 
 	EventRec createEvent (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			String typeCode);
 
 	EventRec createEvent (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			String typeCode,
-			Object... objects);
+			Object ... objects);
 
 	public final static
 	long integerEventLinkType = -1l;

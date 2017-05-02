@@ -19,9 +19,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
@@ -59,118 +60,144 @@ class ImChatCustomerSettingsPasswordPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// get customer
+		try (
 
-		customer =
-			imChatCustomerHelper.findFromContextRequired ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		// get recent password change events
+		) {
 
-		GlobalId customerId =
-			imChatCustomerHelper.getGlobalId (
-				customer);
+			// get customer
 
-		events =
-			eventLinkHelper.findByTypeAndRef (
-				customerId.typeId (),
-				customerId.objectId ())
+			customer =
+				imChatCustomerHelper.findFromContextRequired (
+					transaction);
 
-			.stream ()
+			// get recent password change events
 
-			.map (
-				EventLinkRec::getEvent)
+			GlobalId customerId =
+				imChatCustomerHelper.getGlobalId (
+					customer);
 
-			.filter (
-				event ->
-					stringInSafe (
-						event.getEventType ().getCode (),
-						"im_chat_customer_forgotten_password",
-						"im_chat_customer_generated_password_from_console"))
+			events =
+				eventLinkHelper.findByTypeAndRef (
+					transaction,
+					customerId.typeId (),
+					customerId.objectId ())
 
-			.distinct ()
+				.stream ()
 
-			.sorted ()
+				.map (
+					EventLinkRec::getEvent)
 
-			.collect (
-				Collectors.toList ());
+				.filter (
+					event ->
+						stringInSafe (
+							event.getEventType ().getCode (),
+							"im_chat_customer_forgotten_password",
+							"im_chat_customer_generated_password_from_console"))
+
+				.distinct ()
+
+				.sorted ()
+
+				.collect (
+					Collectors.toList ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			requestContext.flushNotices ();
 
-			renderRequestNewPasswordForm ();
+			renderRequestNewPasswordForm (
+				transaction);
 
 			renderRecentPasswordEvents (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
 	private
-	void renderRequestNewPasswordForm () {
+	void renderRequestNewPasswordForm (
+			@NonNull Transaction parentTransaction) {
 
-		// heading
+		try (
 
-		htmlHeadingTwoWrite (
-			"Request new password");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderRequestNewPasswordForm");
 
-		// information
+		) {
 
-		htmlParagraphWriteFormat (
-			"This will generate a new password for the customer, and send it ",
-			"it to them via email as usual. It will also display it on the ",
-			"screen.");
+			// heading
 
-		// form open
+			htmlHeadingTwoWrite (
+				"Request new password");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/imChatCustomer.settings.password"));
+			// information
 
-		// form controls
+			htmlParagraphWriteFormat (
+				"This will generate a new password for the customer, and send it ",
+				"it to them via email as usual. It will also display it on the ",
+				"screen.");
 
-		htmlParagraphOpen ();
+			// form open
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"generate new password\"",
-			">");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/imChatCustomer.settings.password"));
 
-		htmlParagraphClose ();
+			// form controls
 
-		// form close
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"generate new password\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 
 	private
 	void renderRecentPasswordEvents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderRecentPasswordEvents");
 
 		) {
@@ -190,7 +217,7 @@ class ImChatCustomerSettingsPasswordPart
 			} else {
 
 				eventConsoleLogic.writeEventsTable (
-					taskLogger,
+					transaction,
 					formatWriter,
 					events);
 

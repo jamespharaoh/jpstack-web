@@ -16,8 +16,9 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -56,54 +57,78 @@ class ChatInfoSiteViewResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		infoSite =
-			chatInfoSiteHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"chatInfoSiteId"));
+		try (
 
-		if (
-			stringNotEqualSafe (
-				infoSite.getToken (),
-				requestContext.requestStringRequired (
-					"chatInfoSiteToken"))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
 		) {
 
-			throw new RuntimeException (
-				"Token mismatch");
+			infoSite =
+				chatInfoSiteHelper.findRequired (
+					transaction,
+					requestContext.requestIntegerRequired (
+						"chatInfoSiteId"));
+
+			if (
+				stringNotEqualSafe (
+					infoSite.getToken (),
+					requestContext.requestStringRequired (
+						"chatInfoSiteToken"))
+			) {
+
+				throw new RuntimeException (
+					"Token mismatch");
+
+			}
+
+			infoSiteHelpTemplate =
+				chatHelpTemplateHelper.findByTypeAndCode (
+					transaction,
+					infoSite.getChatUser ().getChat (),
+					"system",
+					"info_site_help");
 
 		}
-
-		infoSiteHelpTemplate =
-			chatHelpTemplateHelper.findByTypeAndCode (
-				infoSite.getChatUser ().getChat (),
-				"system",
-				"info_site_help");
 
 	}
 
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.addHeader (
-			"Content-Type",
-			"text/html");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.addHeader (
+				"Content-Type",
+				"text/html");
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goContent");
 
 		) {
@@ -115,10 +140,10 @@ class ChatInfoSiteViewResponder
 				"<html>");
 
 			goHead (
-				taskLogger);
+				transaction);
 
 			goBody (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -129,13 +154,13 @@ class ChatInfoSiteViewResponder
 
 	protected
 	void goHead (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goHead");
 
 		) {
@@ -156,102 +181,113 @@ class ChatInfoSiteViewResponder
 
 	protected
 	void goBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<body>");
+		try (
 
-		for (
-			int index = 0;
-			index < infoSite.getOtherChatUsers ().size ();
-			index ++
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goBody");
+
 		) {
 
-			int currentIndex = index;
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<body>");
 
-			ChatUserRec otherUser =
-				infoSite.getOtherChatUsers ().get (
-					index);
+			for (
+				int index = 0;
+				index < infoSite.getOtherChatUsers ().size ();
+				index ++
+			) {
 
-			if (index > 0) {
+				int currentIndex = index;
 
-				formatWriter.writeLineFormat (
-					"<hr>");
+				ChatUserRec otherUser =
+					infoSite.getOtherChatUsers ().get (
+						index);
 
-			}
+				if (index > 0) {
 
-			htmlParagraphWriteHtml (
-				() -> htmlLinkWriteHtml (
-					stringFormat (
-						"%u/%u/full",
-						infoSite.getToken (),
-						integerToDecimalString (
-							currentIndex)),
-					() -> formatWriter.writeLineFormat (
-						"<img src=\"%h\">",
+					formatWriter.writeLineFormat (
+						"<hr>");
+
+				}
+
+				htmlParagraphWriteHtml (
+					() -> htmlLinkWriteHtml (
 						stringFormat (
-							"%u/%u/normal",
+							"%u/%u/full",
 							infoSite.getToken (),
 							integerToDecimalString (
-								currentIndex)))));
-
-			htmlParagraphWriteFormat (
-				"User: %h",
-				otherUser.getCode ());
-
-			if (otherUser.getName () != null) {
+								currentIndex)),
+						() -> formatWriter.writeLineFormat (
+							"<img src=\"%h\">",
+							stringFormat (
+								"%u/%u/normal",
+								infoSite.getToken (),
+								integerToDecimalString (
+									currentIndex)))));
 
 				htmlParagraphWriteFormat (
-					"Name: %h",
-					otherUser.getName ());
+					"User: %h",
+					otherUser.getCode ());
+
+				if (otherUser.getName () != null) {
+
+					htmlParagraphWriteFormat (
+						"Name: %h",
+						otherUser.getName ());
+
+				}
+
+				if (otherUser.getInfoText () != null) {
+
+					htmlParagraphWriteFormat (
+						"Info: %h",
+						otherUser.getInfoText ().getText ());
+
+				}
+
+				htmlFormOpenPost ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"otherUserId\"",
+					" value=\"%h\"",
+					integerToDecimalString (
+						otherUser.getId ()),
+					">\n");
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"text\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"send\"",
+					">");
+
+				htmlParagraphClose ();
+
+				htmlFormClose ();
 
 			}
 
-			if (otherUser.getInfoText () != null) {
-
-				htmlParagraphWriteFormat (
-					"Info: %h",
-					otherUser.getInfoText ().getText ());
-
-			}
-
-			htmlFormOpenPost ();
-
 			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"otherUserId\"",
-				" value=\"%h\"",
-				integerToDecimalString (
-					otherUser.getId ()),
-				">\n");
+				"%s",
+				infoSiteHelpTemplate.getText ());
 
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"text\"",
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"send\"",
-				">");
-
-			htmlParagraphClose ();
-
-			htmlFormClose ();
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</body>");
 
 		}
-
-		formatWriter.writeLineFormat (
-			"%s",
-			infoSiteHelpTemplate.getText ());
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"</body>");
 
 	}
 

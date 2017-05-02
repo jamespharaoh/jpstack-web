@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.oxygenate.model.OxygenateRouteInObjectHelper;
@@ -66,7 +67,7 @@ class OxygenateRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goApi");
@@ -90,23 +91,19 @@ class OxygenateRouteInAction
 	Action chooseAction (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"chooseAction");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"OxygenateRouteInAction.chooseAction (...)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"chooseAction");
 
 		) {
 
 			OxygenateRouteInRec oxygen8RouteIn =
 				oxygenateRouteInHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"smsRouteId")));

@@ -19,6 +19,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -79,16 +80,11 @@ class DeploymentAgent
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"runOnce");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
@@ -96,12 +92,13 @@ class DeploymentAgent
 
 			List <ApiDeploymentRec> apiDeployments =
 				apiDeploymentHelper.findByHostNotDeleted (
+					transaction,
 					hostname);
 
 			apiDeployments.forEach (
 				apiDeployment ->
 					runApiDeployment (
-						taskLogger,
+						transaction,
 						transaction,
 						apiDeployment));
 
@@ -109,12 +106,13 @@ class DeploymentAgent
 
 			List <ConsoleDeploymentRec> consoleDeployments =
 				consoleDeploymentHelper.findByHostNotDeleted (
+					transaction,
 					hostname);
 
 			consoleDeployments.forEach (
 				consoleDeployment ->
 					runConsoleDeployment (
-						taskLogger,
+						transaction,
 						transaction,
 						consoleDeployment));
 
@@ -122,12 +120,13 @@ class DeploymentAgent
 
 			List <DaemonDeploymentRec> daemonDeployments =
 				daemonDeploymentHelper.findByHostNotDeleted (
+					transaction,
 					hostname);
 
 			daemonDeployments.forEach (
 				daemonDeployment ->
 					runDaemonDeployment (
-						taskLogger,
+						transaction,
 						transaction,
 						daemonDeployment));
 
@@ -149,7 +148,7 @@ class DeploymentAgent
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
 					"runApiDeployment (%s)",
@@ -214,7 +213,7 @@ class DeploymentAgent
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
 					"runConsoleDeployment (%s)",
@@ -279,7 +278,7 @@ class DeploymentAgent
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
 					"runDaemonDeployment (%s)",
@@ -373,7 +372,7 @@ class DeploymentAgent
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
 					"getServiceState (%s)",

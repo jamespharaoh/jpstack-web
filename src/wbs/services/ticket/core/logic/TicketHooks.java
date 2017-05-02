@@ -12,9 +12,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
@@ -67,14 +68,14 @@ class TicketHooks
 	@Override
 	public
 	void afterInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull TicketRec ticket) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"afterInsert");
 
 		) {
@@ -87,7 +88,7 @@ class TicketHooks
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						taskLogger,
+						transaction,
 						ticket.getTicketState (),
 						"default",
 						ticket,
@@ -111,17 +112,26 @@ class TicketHooks
 	@Override
 	public
 	Object getDynamic (
-			TicketRec ticket,
-			String name) {
+			@NonNull Transaction parentTransaction,
+			@NonNull TicketRec ticket,
+			@NonNull String name) {
 
-		// find the ticket field type
+		try (
 
-		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.findByCodeRequired (
-				ticket.getTicketManager (),
-				name);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getDynamic");
 
-		try {
+		) {
+
+			// find the ticket field type
+
+			TicketFieldTypeRec ticketFieldType =
+				ticketFieldTypeHelper.findByCodeRequired (
+					transaction,
+					ticket.getTicketManager (),
+					name);
 
 			// find the ticket field value
 
@@ -156,11 +166,12 @@ class TicketHooks
 					ticketFieldValue.getIntegerValue ();
 
 				ObjectHelper <?> objectHelper =
-					objectManager.objectHelperForTypeIdOrNull (
+					objectManager.objectHelperForTypeIdRequired (
 						objectType.getId ());
 
 				Object object =
 					objectHelper.findRequired (
+						transaction,
 						objectId);
 
 				return object;
@@ -184,109 +195,121 @@ class TicketHooks
 	@Override
 	public
 	void setDynamic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull TicketRec ticket,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
-		// find the ticket field type
+		try (
 
-		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.findByCodeRequired (
-				ticket.getTicketManager (),
-				name);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setDynamic");
 
-		TicketFieldValueRec ticketFieldValue;
+		) {
 
-		try {
+			// find the ticket field type
 
-			 ticketFieldValue =
-				ticket.getTicketFieldValues ().get (
-					ticketFieldType.getId ());
+			TicketFieldTypeRec ticketFieldType =
+				ticketFieldTypeHelper.findByCodeRequired (
+					transaction,
+					ticket.getTicketManager (),
+					name);
 
-		} catch (Exception exception) {
+			TicketFieldValueRec ticketFieldValue;
 
-			ticketFieldValue =
-				null;
+			try {
+
+				 ticketFieldValue =
+					ticket.getTicketFieldValues ().get (
+						ticketFieldType.getId ());
+
+			} catch (Exception exception) {
+
+				ticketFieldValue =
+					null;
+
+			}
+
+			// if the value object does not exist, a new one is created
+
+			if (ticketFieldValue == null) {
+
+				ticketFieldValue =
+					ticketFieldValueHelper.createInstance ()
+
+					.setTicket (
+						ticket)
+
+					.setTicketFieldType (
+						ticketFieldType);
+
+			}
+
+			switch (ticketFieldType.getDataType ()) {
+
+			case string:
+
+				ticketFieldValue
+
+					.setStringValue (
+						(String)
+						optionalOrNull (
+							valueOptional));
+
+				break;
+
+			case number:
+
+				ticketFieldValue
+
+					.setIntegerValue (
+						(Long)
+						optionalOrNull (
+							valueOptional));
+
+				break;
+
+			case bool:
+
+				ticketFieldValue
+
+					.setBooleanValue (
+						(Boolean)
+						optionalOrNull (
+							valueOptional));
+
+				break;
+
+			case object:
+
+				Record<?> record =
+					(Record<?>)
+					optionalOrNull (
+						valueOptional);
+
+				ticketFieldValue.setIntegerValue (
+					record.getId ());
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
+
+			ticket
+
+				.setNumFields (
+					ticket.getNumFields () + 1);
+
+			ticket.getTicketFieldValues ().put (
+				ticketFieldType.getId (),
+				ticketFieldValue);
 
 		}
-
-		// if the value object does not exist, a new one is created
-
-		if (ticketFieldValue == null) {
-
-			ticketFieldValue =
-				ticketFieldValueHelper.createInstance ()
-
-				.setTicket (
-					ticket)
-
-				.setTicketFieldType (
-					ticketFieldType);
-
-		}
-
-		switch (ticketFieldType.getDataType ()) {
-
-		case string:
-
-			ticketFieldValue
-
-				.setStringValue (
-					(String)
-					optionalOrNull (
-						valueOptional));
-
-			break;
-
-		case number:
-
-			ticketFieldValue
-
-				.setIntegerValue (
-					(Long)
-					optionalOrNull (
-						valueOptional));
-
-			break;
-
-		case bool:
-
-			ticketFieldValue
-
-				.setBooleanValue (
-					(Boolean)
-					optionalOrNull (
-						valueOptional));
-
-			break;
-
-		case object:
-
-			Record<?> record =
-				(Record<?>)
-				optionalOrNull (
-					valueOptional);
-
-			ticketFieldValue.setIntegerValue (
-				record.getId ());
-
-			break;
-
-		default:
-
-			throw new RuntimeException ();
-
-		}
-
-		ticket
-
-			.setNumFields (
-				ticket.getNumFields () + 1);
-
-		ticket.getTicketFieldValues ().put (
-			ticketFieldType.getId (),
-			ticketFieldValue);
 
 	}
 

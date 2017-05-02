@@ -2,12 +2,13 @@ package wbs.imchat.model;
 
 import java.util.List;
 
-import wbs.imchat.model.ImChatConversationRec;
+import wbs.framework.database.Transaction;
 
 public
 interface ImChatConversationDaoMethods {
 
-	List<ImChatConversationRec> findPendingEmailLimit (
-			int maxResults);
+	List <ImChatConversationRec> findPendingEmailLimit (
+			Transaction parentTransaction,
+			Long maxResults);
 
 }

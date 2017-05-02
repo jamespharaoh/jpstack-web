@@ -2,8 +2,6 @@ package wbs.utils.string;
 
 import static wbs.utils.etc.Misc.doNothing;
 
-import java.io.StringWriter;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -24,17 +22,17 @@ class StringFormatWriter
 
 	// state
 
-	StringWriter stringWriter =
-		new StringWriter ();
+	StringBuilder stringBuilder =
+		new StringBuilder ();
 
 	// implementation
 
 	@Override
 	public
 	void writeString (
-			@NonNull String string) {
+			@NonNull CharSequence string) {
 
-		stringWriter.write (
+		stringBuilder.append (
 			string);
 
 	}
@@ -44,7 +42,7 @@ class StringFormatWriter
 	void writeCharacter (
 			int character) {
 
-		stringWriter.write (
+		stringBuilder.appendCodePoint (
 			character);
 
 	}
@@ -53,7 +51,7 @@ class StringFormatWriter
 	public
 	String toString () {
 
-		return stringWriter.toString ();
+		return stringBuilder.toString ();
 
 	}
 

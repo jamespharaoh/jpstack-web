@@ -12,9 +12,9 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.codegen.DoNotDelegate;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -59,31 +59,38 @@ interface ObjectHelperPropertyMethods <
 			RecordType object);
 
 	Long getParentId (
+			Transaction parentTransaction,
 			RecordType object);
 
 	GlobalId getParentGlobalId (
+			Transaction parentTransaction,
 			RecordType object);
 
 	Either <Optional <Record <?>>, String> getParentOrError (
+			Transaction parentTransaction,
 			RecordType object);
 
 	default
 	Optional <Record <?>> getParent (
+			Transaction parentTransaction,
 			RecordType object) {
 
 		return successOrThrowRuntimeException (
 			getParentOrError (
+				parentTransaction,
 				object));
 
 	}
 
 	default
 	Record <?> getParentRequired (
-			RecordType object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
 
 		return optionalGetRequired (
 			successOrThrowRuntimeException (
 				getParentOrError (
+					parentTransaction,
 					object)));
 
 	}
@@ -91,26 +98,31 @@ interface ObjectHelperPropertyMethods <
 	@Deprecated
 	default
 	Record <?> getParentOrNull (
-			RecordType object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
 
 		return optionalOrNull (
 			successOrThrowRuntimeException (
 				getParentOrError (
+					parentTransaction,
 					object)));
 
 	}
 
 	Either <Boolean, String> getDeletedOrError (
+			Transaction parentTransaction,
 			RecordType object,
 			Boolean checkParents);
 
 	default
 	Boolean getDeleted (
+			@NonNull Transaction parentTransaction,
 			@Nonnull RecordType object,
 			@NonNull Boolean checkParents) {
 
 		return successOrThrowRuntimeException (
 			getDeletedOrError (
+				parentTransaction,
 				object,
 				checkParents));
 
@@ -123,12 +135,12 @@ interface ObjectHelperPropertyMethods <
 			Record <?> parent);
 
 	Object getDynamic (
+			Transaction parentTransaction,
 			RecordType object,
 			String name);
 
-
 	void setDynamic (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object,
 			String name,
 			Optional <?> value);

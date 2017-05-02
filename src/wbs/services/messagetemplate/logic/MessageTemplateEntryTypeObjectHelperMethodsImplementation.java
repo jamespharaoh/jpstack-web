@@ -11,8 +11,9 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeObjectHelper;
@@ -36,16 +37,16 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 	@Override
 	public
 	MessageTemplateEntryTypeRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateDatabaseRec messageTemplateDatabase,
 			@NonNull String code,
 			@NonNull Consumer <MessageTemplateEntryTypeRec> consumer) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -53,6 +54,7 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 			Optional <MessageTemplateEntryTypeRec>
 				existingMessageTemplateEntryType =
 					messageTemplateEntryTypeHelper.findByCode (
+						transaction,
 						messageTemplateDatabase,
 						code);
 
@@ -79,7 +81,7 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 				newMessageTemplateEntry);
 
 			return messageTemplateEntryTypeHelper.insert (
-				taskLogger,
+				transaction,
 				newMessageTemplateEntry);
 
 		}

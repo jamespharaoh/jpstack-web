@@ -20,8 +20,9 @@ import wbs.console.reporting.StatsResolver;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableStatsGroupPart")
@@ -59,36 +60,47 @@ class SupervisorTableStatsGroupPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		statsPeriod =
-			genericCastUnchecked (
-				parameters.get (
-					"statsPeriod"));
+		try (
 
-		statsDataSetsByName =
-			genericCastUnchecked (
-				parameters.get (
-					"statsDataSetsByName"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			statsPeriod =
+				genericCastUnchecked (
+					parameters.get (
+						"statsPeriod"));
+
+			statsDataSetsByName =
+				genericCastUnchecked (
+					parameters.get (
+						"statsDataSetsByName"));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			statsConsoleLogic.writeGroup (
-				taskLogger,
+				transaction,
 				formatWriter,
 				statsDataSetsByName,
 				statsPeriod,

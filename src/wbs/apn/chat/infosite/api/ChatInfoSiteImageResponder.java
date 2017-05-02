@@ -7,9 +7,12 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.model.MediaRec;
 
@@ -31,6 +34,9 @@ class ChatInfoSiteImageResponder
 	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -45,88 +51,116 @@ class ChatInfoSiteImageResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		infoSite =
-			chatInfoSiteHelper.findRequired (
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			infoSite =
+				chatInfoSiteHelper.findRequired (
+					transaction,
+					requestContext.requestIntegerRequired (
+						"chatInfoSiteId"));
+
+			if (
+				stringNotEqualSafe (
+					infoSite.getToken (),
+					requestContext.requestStringRequired (
+						"chatInfoSiteToken"))
+			) {
+
+				throw new RuntimeException (
+					"Token mismatch");
+
+			}
+
+			Long index =
 				requestContext.requestIntegerRequired (
-					"chatInfoSiteId"));
+					"chatInfoSiteIndex");
 
-		if (
-			stringNotEqualSafe (
-				infoSite.getToken (),
+			ChatUserRec chatUser =
+				infoSite.getOtherChatUsers ().get (
+					toJavaIntegerRequired (
+						index));
+
+			if (chatUser == null) {
+
+				throw new RuntimeException (
+					"Index out of bounds");
+
+			}
+
+			String mode =
 				requestContext.requestStringRequired (
-					"chatInfoSiteToken"))
-		) {
+					"chatInfoSiteMode");
 
-			throw new RuntimeException (
-				"Token mismatch");
+			if (
+				stringEqualSafe (
+					mode,
+					"full")
+			) {
 
-		}
+				media =
+					chatUser.getMainChatUserImage ().getFullMedia ();
 
-		Long index =
-			requestContext.requestIntegerRequired (
-				"chatInfoSiteIndex");
+			} else {
 
-		ChatUserRec chatUser =
-			infoSite.getOtherChatUsers ().get (
-				toJavaIntegerRequired (
-					index));
+				media =
+					chatUser.getMainChatUserImage ().getMedia ();
 
-		if (chatUser == null) {
+			}
 
-			throw new RuntimeException (
-				"Index out of bounds");
-
-		}
-
-		String mode =
-			requestContext.requestStringRequired (
-				"chatInfoSiteMode");
-
-		if (
-			stringEqualSafe (
-				mode,
-				"full")
-		) {
-
-			media =
-				chatUser.getMainChatUserImage ().getFullMedia ();
-
-		} else {
-
-			media =
-				chatUser.getMainChatUserImage ().getMedia ();
+			data =
+				media.getContent ().getData ();
 
 		}
-
-		data =
-			media.getContent ().getData ();
 
 	}
 
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			media.getMediaType ().getMimeType ());
+		try (
 
-		requestContext.setHeader (
-			"Content-Length",
-			Integer.toString (
-				data.length));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				media.getMediaType ().getMimeType ());
+
+			requestContext.setHeader (
+				"Content-Length",
+				Integer.toString (
+					data.length));
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goContent");
 
 			BorrowedOutputStream out =
 				requestContext.outputStream ();

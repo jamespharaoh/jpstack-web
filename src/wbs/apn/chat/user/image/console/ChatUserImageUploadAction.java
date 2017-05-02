@@ -33,6 +33,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -79,6 +80,9 @@ class ChatUserImageUploadAction
 	MediaLogic mediaLogic;
 
 	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
@@ -116,16 +120,11 @@ class ChatUserImageUploadAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserImageUploadAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -145,7 +144,7 @@ class ChatUserImageUploadAction
 				new ChatUserImageUploadForm ();
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				fields,
 				uploadForm,
@@ -164,8 +163,8 @@ class ChatUserImageUploadAction
 				// resample the video
 
 				resampledData =
-					mediaLogic.videoConvertRequired (
-						taskLogger,
+					rawMediaLogic.videoConvertRequired (
+						transaction,
 						"3gpp",
 						uploadForm.upload ().data ());
 
@@ -184,8 +183,8 @@ class ChatUserImageUploadAction
 				// read the image
 
 				Optional <BufferedImage> imageOptional =
-					mediaLogic.readImage (
-						taskLogger,
+					rawMediaLogic.readImage (
+						transaction,
 						uploadForm.upload ().data (),
 						"image/jpeg");
 
@@ -211,13 +210,13 @@ class ChatUserImageUploadAction
 				// resample image
 
 				image =
-					mediaLogic.resampleImageToFit (
+					rawMediaLogic.resampleImageToFit (
 						image,
 						320l,
 						240l);
 
 				resampledData =
-					mediaLogic.writeImage (
+					rawMediaLogic.writeImage (
 						image,
 						"image/jpeg");
 
@@ -238,13 +237,14 @@ class ChatUserImageUploadAction
 			}
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// create media
 
 			MediaRec media =
 				mediaLogic.createMediaRequired (
-					taskLogger,
+					transaction,
 					resampledData,
 					resultType,
 					chatUser.getCode () + "." + extension,
@@ -259,7 +259,7 @@ class ChatUserImageUploadAction
 
 			ChatUserImageRec chatUserImage =
 				chatUserImageHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserImageHelper.createInstance ()
 
 				.setChatUser (
@@ -278,7 +278,8 @@ class ChatUserImageUploadAction
 					transaction.now ())
 
 				.setModerator (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setModerationTime (
 					transaction.now ())

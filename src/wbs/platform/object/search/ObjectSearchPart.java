@@ -42,9 +42,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
@@ -124,32 +125,33 @@ class ObjectSearchPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			cleanSearch =
 				instantiateSearch (
-					taskLogger);
+					transaction);
 
 			currentSearch =
 				optionalOrElse (
 					genericCastUnchecked (
 						userSessionLogic.userDataObject (
-							taskLogger,
-							userConsoleLogic.userRequired (),
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
 							stringFormat (
 								"object_search_%s_fields",
 								sessionKey))),
 					() -> instantiateSearch (
-						taskLogger));
+						transaction));
 
 			updateResultSet =
 				optionalCast (
@@ -177,6 +179,7 @@ class ObjectSearchPart <
 
 					Record <?> parent =
 						parentHelper.findRequired (
+							transaction,
 							optionalGetRequired (
 								parentIdOptional));
 
@@ -197,13 +200,13 @@ class ObjectSearchPart <
 
 	private
 	SearchType instantiateSearch (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"instantiateSearch");
 
 		) {
@@ -213,7 +216,7 @@ class ObjectSearchPart <
 					searchClass);
 
 			formFieldLogic.setDefaults (
-				taskLogger,
+				transaction,
 				fields,
 				search);
 
@@ -226,13 +229,13 @@ class ObjectSearchPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -248,7 +251,7 @@ class ObjectSearchPart <
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				fields,
@@ -291,7 +294,7 @@ class ObjectSearchPart <
 				"function resetSearchForm () {");
 
 			formFieldLogic.outputFormReset (
-				taskLogger,
+				transaction,
 				formatWriter,
 				fields,
 				FormType.search,

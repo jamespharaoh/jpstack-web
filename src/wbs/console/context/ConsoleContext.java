@@ -17,7 +17,7 @@ import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.web.file.WebFile;
 
@@ -58,15 +58,15 @@ class ConsoleContext
 	Map<String,ConsoleContextTab> contextTabs ();
 
 	public abstract
-	Map<String,WebFile> files ();
+	Map <String, WebFile> files ();
 
 	public abstract
 	ConsoleContext files (
-		Map<String,WebFile> files);
+		Map <String, WebFile> files);
 
 	public abstract
 	ConsoleContext contextTabs (
-		Map<String,ConsoleContextTab> tabs);
+		Map <String, ConsoleContextTab> tabs);
 
 	@Getter @Setter
 	ConsoleContextType contextType;
@@ -79,13 +79,13 @@ class ConsoleContext
 
 	public abstract
 	void initContext (
-			TaskLogger taskLogger,
+			Transaction parentTransaction,
 			PathSupply pathParts,
 			ConsoleContextStuff contextStuff);
 
 	public
 	String localPathForStuff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		return "";

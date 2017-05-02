@@ -61,22 +61,18 @@ class ChatJoinTimeoutDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"runOnce");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatJoinTimeoutDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
 			for (
 				ChatRec chat
-					: chatHelper.findNotDeleted ()
+					: chatHelper.findNotDeleted (
+						transaction)
 			) {
 
 				Instant createdTime =
@@ -88,8 +84,9 @@ class ChatJoinTimeoutDaemon
 
 					.toInstant ();
 
-				List<ChatMessageRec> messages =
+				List <ChatMessageRec> messages =
 					chatMessageHelper.findSignupTimeout (
+						transaction,
 						chat,
 						createdTime);
 

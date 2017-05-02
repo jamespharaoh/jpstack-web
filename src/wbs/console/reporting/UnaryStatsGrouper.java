@@ -1,5 +1,6 @@
 package wbs.console.reporting;
 
+import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 
 import java.util.Collections;
@@ -11,8 +12,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.string.FormatWriter;
 
@@ -22,8 +26,17 @@ public
 class UnaryStatsGrouper
 	implements StatsGrouper {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
+
 	@Getter @Setter
 	String label;
+
+	// implementation
 
 	@Override
 	public
@@ -38,29 +51,58 @@ class UnaryStatsGrouper
 	@Override
 	public
 	void writeTdForGroup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 
-		htmlTableCellWrite (
-			formatWriter,
-			label);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writeTdForGroup");
+
+		) {
+
+			htmlTableCellWrite (
+				formatWriter,
+				label);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<Object> sortGroups (
-			Set<Object> groups) {
+	List <Object> sortGroups (
+			@NonNull Transaction parentTransaction,
+			@NonNull Set <Object> groups) {
 
-		if (groups.size () != 1)
-			throw new IllegalArgumentException ();
+		try (
 
-		if (! groups.contains (StatsDatum.UNARY))
-			throw new IllegalArgumentException ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sortGroups");
 
-		return Collections.singletonList (
-			StatsDatum.UNARY);
+		) {
+
+			if (groups.size () != 1) {
+				throw new IllegalArgumentException ();
+			}
+
+			if (
+				doesNotContain (
+					groups,
+					StatsDatum.UNARY)
+			) {
+				throw new IllegalArgumentException ();
+			}
+
+			return Collections.singletonList (
+				StatsDatum.UNARY);
+
+		}
 
 	}
 

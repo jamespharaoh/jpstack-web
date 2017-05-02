@@ -3,19 +3,21 @@ package wbs.console.object;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
 
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.lookup.StringLookup;
 import wbs.console.request.Cryptor;
 import wbs.console.tab.ConsoleContextTab;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+
 import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)

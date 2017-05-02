@@ -43,6 +43,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectHelperImplementation;
@@ -121,7 +122,7 @@ class ObjectHelperGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"generateHelper");
@@ -317,7 +318,7 @@ class ObjectHelperGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeClass");
@@ -817,6 +818,11 @@ class ObjectHelperGenerator {
 			"void objectManager (");
 
 		formatWriter.writeLineFormat (
+			"\t\t%s parentTaskLogger,",
+			imports.register (
+				TaskLogger.class));
+
+		formatWriter.writeLineFormat (
 			"\t\t%s objectManager) {",
 			imports.register (
 				ObjectManager.class));
@@ -824,6 +830,30 @@ class ObjectHelperGenerator {
 		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"try (");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormat (
+			"%s taskLogger =",
+			imports.register (
+				OwnedTaskLogger.class));
+
+		formatWriter.writeLineFormat (
+			"\tlogContext.nestTaskLogger (");
+
+		formatWriter.writeLineFormat (
+			"\t\tparentTaskLogger,");
+
+		formatWriter.writeLineFormat (
+			"\t\t\"objectManager\");");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			") {");
 
 		// initialise components
 
@@ -844,8 +874,11 @@ class ObjectHelperGenerator {
 */
 
 			formatWriter.writeLineFormat (
-				"%sImplementation.setup ();",
+				"%sImplementation.setup (",
 				componentName);
+
+			formatWriter.writeLineFormat (
+				"\ttaskLogger);");
 
 			formatWriter.writeNewline ();
 
@@ -853,9 +886,12 @@ class ObjectHelperGenerator {
 
 		// close method
 
-		formatWriter.decreaseIndent ();
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
 
-		formatWriter.writeLineFormat (
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormatDecreaseIndent (
 			"}");
 
 		formatWriter.writeNewline ();

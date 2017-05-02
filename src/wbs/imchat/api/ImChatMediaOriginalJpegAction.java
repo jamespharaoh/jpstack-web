@@ -1,6 +1,7 @@
 package wbs.imchat.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -69,20 +70,13 @@ class ImChatMediaOriginalJpegAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatMediaOriginalJpecAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
@@ -90,7 +84,8 @@ class ImChatMediaOriginalJpegAction
 
 			MediaRec media =
 				mediaHelper.findOrThrow (
-					Long.parseLong (
+					transaction,
+					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"mediaId")),
 					() -> new HttpNotFoundException (

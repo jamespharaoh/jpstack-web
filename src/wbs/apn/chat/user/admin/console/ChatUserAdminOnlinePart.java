@@ -11,9 +11,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -29,6 +32,9 @@ class ChatUserAdminOnlinePart
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	ChatUserRec chatUser;
@@ -36,68 +42,91 @@ class ChatUserAdminOnlinePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.online"));
+		try (
 
-		if (chatUser.getOnline ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-			htmlParagraphWrite (
-				"This user is online");
+		) {
 
-			htmlParagraphOpen ();
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.online"));
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"offline\"",
-				" value=\"take offline\"",
-				">");
+			if (chatUser.getOnline ()) {
 
-			htmlParagraphClose ();
+				htmlParagraphWrite (
+					"This user is online");
 
-		} else {
+				htmlParagraphOpen ();
 
-			htmlParagraphWrite (
-				"This user is offline");
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"offline\"",
+					" value=\"take offline\"",
+					">");
 
-			if (
-				chatUser.getType () == ChatUserType.user
-				&& chatUser.getFirstJoin () == null
-			) {
+				htmlParagraphClose ();
 
-				htmlParagraphWriteFormat (
-					"This user has never been online before, please don't ",
-					"bring them online unless you are sure!");
+			} else {
+
+				htmlParagraphWrite (
+					"This user is offline");
+
+				if (
+					chatUser.getType () == ChatUserType.user
+					&& chatUser.getFirstJoin () == null
+				) {
+
+					htmlParagraphWriteFormat (
+						"This user has never been online before, please don't ",
+						"bring them online unless you are sure!");
+
+				}
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"online\"",
+					" value=\"bring online\"",
+					">");
+
+				htmlParagraphClose ();
 
 			}
 
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"online\"",
-				" value=\"bring online\"",
-				">");
-
-			htmlParagraphClose ();
+			htmlFormClose ();
 
 		}
-
-		htmlFormClose ();
 
 	}
 

@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
@@ -9,27 +12,28 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public
-class Utf8StringFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,String,byte[]> {
+class Utf8StringFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <Container, String, byte[]> {
 
 	@Override
 	public
-	Optional<String> nativeToGeneric (
+	Optional <String> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<byte[]> nativeValue) {
+			@NonNull Optional <byte[]> nativeValue) {
 
 		if (
 			optionalIsNotPresent (
 				nativeValue)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
-		return Optional.of (
+		return optionalOfFormat (
 			utf8ToString (
 				nativeValue.get ()));
 
@@ -38,7 +42,7 @@ class Utf8StringFormFieldNativeMapping<Container>
 	@Override
 	public
 	Optional <byte[]> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> genericValue) {
 
@@ -46,10 +50,10 @@ class Utf8StringFormFieldNativeMapping<Container>
 			optionalIsNotPresent (
 				genericValue)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
-		return Optional.of (
+		return optionalOf (
 			stringToUtf8 (
 				genericValue.get ()));
 

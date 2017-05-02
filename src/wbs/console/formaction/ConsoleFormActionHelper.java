@@ -18,8 +18,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.framework.database.OwnedTransaction;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.utils.string.FormatWriter;
 
@@ -30,7 +29,7 @@ interface ConsoleFormActionHelper <FormState, History> {
 
 	default
 	Permissions canBePerformed (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		return new Permissions ()
 			.canView (true)
@@ -40,7 +39,7 @@ interface ConsoleFormActionHelper <FormState, History> {
 
 	default
 	void writePreamble (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
@@ -56,7 +55,8 @@ interface ConsoleFormActionHelper <FormState, History> {
 	}
 
 	default
-	FormState constructFormState () {
+	FormState constructFormState (
+			@NonNull Transaction parentTransaction) {
 
 		Class <?> formStateClass =
 			Arrays.stream (
@@ -92,7 +92,8 @@ interface ConsoleFormActionHelper <FormState, History> {
 	}
 
 	default
-	Map <String, Object> formHints () {
+	Map <String, Object> formHints (
+			@NonNull Transaction parentTransaction) {
 
 		return emptyMap ();
 
@@ -100,6 +101,7 @@ interface ConsoleFormActionHelper <FormState, History> {
 
 	default
 	void updatePassiveFormState (
+			@NonNull Transaction parentTransaction,
 			@NonNull FormState formState) {
 
 		doNothing ();
@@ -107,12 +109,12 @@ interface ConsoleFormActionHelper <FormState, History> {
 	}
 
 	Optional <Responder> processFormSubmission (
-			TaskLogger parentTaskLogger,
-			OwnedTransaction transaction,
+			Transaction parentTransaction,
 			FormState formState);
 
 	default
-	List <History> history () {
+	List <History> history (
+			@NonNull Transaction parentTransaction) {
 
 		return emptyList ();
 

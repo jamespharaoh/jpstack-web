@@ -1,5 +1,7 @@
 package wbs.smsapps.broadcast.logic;
 
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+
 import java.util.List;
 
 import javax.inject.Provider;
@@ -12,10 +14,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.platform.event.logic.EventLogic;
@@ -114,60 +116,138 @@ class BroadcastSendHelper
 
 	@Override
 	public
-	List <BroadcastRec> findSendingJobs () {
-		return broadcastHelper.findSending ();
+	List <BroadcastRec> findSendingJobs (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSendingJobs");
+
+		) {
+
+			return broadcastHelper.findSending (
+				transaction);
+
+		}
+
 	}
 
 	@Override
 	public
 	List <BroadcastRec> findScheduledJobs (
-			Instant now) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Instant now) {
 
-		return broadcastHelper.findScheduled (
-			now);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findScheduledJobs");
+
+		) {
+
+			return broadcastHelper.findScheduled (
+				transaction,
+				now);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <BroadcastNumberRec> findItemsLimit (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast,
-			int maxResults) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast,
+			@NonNull Long maxResults) {
 
-		return broadcastNumberHelper.findAcceptedLimit (
-			broadcast,
-			maxResults);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findItemsLimit");
+
+		) {
+
+			return broadcastNumberHelper.findAcceptedLimit (
+				transaction,
+				broadcast,
+				maxResults);
+
+		}
 
 	}
 
 	@Override
 	public
 	BroadcastConfigRec getService (
-			BroadcastRec broadcast) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastRec broadcast) {
 
-		return broadcast.getBroadcastConfig ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getService");
+
+		) {
+
+			return broadcast.getBroadcastConfig ();
+
+		}
 
 	}
 
 	@Override
 	public
 	Instant getScheduledTime (
-			BroadcastConfigRec service,
-			BroadcastRec job) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec service,
+			@NonNull BroadcastRec job) {
 
-		return job.getScheduledTime ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getScheduledTime");
+
+		) {
+
+			return job.getScheduledTime ();
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobScheduled (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast) {
 
-		return broadcast.getState ()
-			== BroadcastState.scheduled;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobScheduled");
+
+		) {
+
+			return enumEqualSafe (
+				broadcast.getState (),
+				BroadcastState.scheduled);
+
+		}
 
 	}
 
@@ -175,39 +255,64 @@ class BroadcastSendHelper
 	@Override
 	public
 	boolean jobSending (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast) {
 
-		return broadcast.getState ()
-			== BroadcastState.sending;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobSending");
+
+		) {
+
+			return enumEqualSafe (
+				broadcast.getState (),
+				BroadcastState.sending);
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobConfigured (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast) {
 
-		if (broadcastConfig.getRouter () == null)
-			return false;
+		try (
 
-		return true;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobConfigured");
+
+		) {
+
+			if (broadcastConfig.getRouter () == null)
+				return false;
+
+			return true;
+
+		}
 
 	}
 
 	@Override
 	public
 	void sendStart (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendStart");
 
 		) {
@@ -239,7 +344,7 @@ class BroadcastSendHelper
 			// create event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"broadcast_send_begun",
 				broadcast);
 
@@ -250,38 +355,51 @@ class BroadcastSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast,
 			@NonNull BroadcastNumberRec broadcastNumber) {
 
-		// check if block list configured
+		try (
 
-		if (broadcastConfig.getBlockNumberLookup () == null)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"verifyItem");
+
+		) {
+
+			// check if block list configured
+
+			if (broadcastConfig.getBlockNumberLookup () == null)
+				return true;
+
+			// reject numbers on block list
+
+			if (
+				numberLookupManager.lookupNumber (
+					transaction,
+					broadcastConfig.getBlockNumberLookup (),
+					broadcastNumber.getNumber ())
+			) {
+				return false;
+			}
+
+			// accept otherwise
+
 			return true;
 
-		// reject numbers on block list
-
-		if (
-			numberLookupManager.lookupNumber (
-				broadcastConfig.getBlockNumberLookup (),
-				broadcastNumber.getNumber ())
-		) {
-			return false;
 		}
-
-		// accept otherwise
-
-		return true;
 
 	}
 
 	@Override
 	public
 	void rejectItem (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast,
-			BroadcastNumberRec broadcastNumber) {
+			@NonNull Transaction parentTransaction,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast,
+			@NonNull BroadcastNumberRec broadcastNumber) {
 
 		// sanity check
 
@@ -315,16 +433,16 @@ class BroadcastSendHelper
 	@Override
 	public
 	void sendItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast,
 			@NonNull BroadcastNumberRec broadcastNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendItem");
 
 		) {
@@ -342,11 +460,13 @@ class BroadcastSendHelper
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					broadcastConfig,
 					"default");
 
 			BatchRec broadcastBatch =
 				batchHelper.findByCodeRequired (
+					transaction,
 					broadcast,
 					"broadcast");
 
@@ -357,7 +477,7 @@ class BroadcastSendHelper
 					broadcastBatch)
 
 				.messageString (
-					taskLogger,
+					transaction,
 					broadcast.getMessageText ())
 
 				.number (
@@ -367,6 +487,7 @@ class BroadcastSendHelper
 					broadcast.getMessageOriginator ())
 
 				.routerResolve (
+					transaction,
 					broadcastConfig.getRouter ())
 
 				.service (
@@ -376,7 +497,7 @@ class BroadcastSendHelper
 					broadcast.getSentUser ())
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// mark the number as sent
 
@@ -403,21 +524,18 @@ class BroadcastSendHelper
 	@Override
 	public
 	void sendComplete (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastConfigRec broadcastConfig,
 			@NonNull BroadcastRec broadcast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendComplete");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// sanity check
 
@@ -446,7 +564,7 @@ class BroadcastSendHelper
 			// create event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"broadcast_send_completed",
 				broadcast);
 

@@ -21,7 +21,11 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.responder.Responder;
@@ -39,6 +43,9 @@ class TabContextResponder
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@SingletonDependency
+	Database database;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -72,48 +79,41 @@ class TabContextResponder
 			String pagePartName) {
 
 		PagePartFactory factory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
 
-				try (
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildPagePart");
 
-					TaskLogger taskLogger =
-						logContext.nestTaskLogger (
-							parentTaskLogger,
-							"buildPagePart");
+			) {
 
-				) {
+				Object bean =
+					componentManager.getComponentRequired (
+						transaction,
+						pagePartName,
+						Object.class);
 
-					Object bean =
-						componentManager.getComponentRequired (
-							taskLogger,
-							pagePartName,
-							Object.class);
+				if (bean instanceof PagePart) {
+					return (PagePart) bean;
+				}
 
-					if (bean instanceof PagePart) {
-						return (PagePart) bean;
-					}
+				if (bean instanceof Provider) {
 
-					if (bean instanceof Provider) {
+					Provider<?> provider =
+						(Provider<?>) bean;
 
-						Provider<?> provider =
-							(Provider<?>) bean;
-
-						return (PagePart)
-							provider.get ();
-
-					}
-
-					throw new ClassCastException (
-						stringFormat (
-							"Cannot cast %s to PagePart or Provider<PagePart>",
-							bean.getClass ().getName ()));
+					return (PagePart)
+						provider.get ();
 
 				}
+
+				throw new ClassCastException (
+					stringFormat (
+						"Cannot cast %s to PagePart or Provider<PagePart>",
+						bean.getClass ().getName ()));
 
 			}
 
@@ -141,8 +141,43 @@ class TabContextResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"execute");
+
+		) {
+
+			Responder responder =
+				makeResponder (
+					taskLogger);
+
+			responder.execute (
+				taskLogger);
+
+		}
+
+	}
+
+	@Override
+	public
+	Responder get () {
+
+		return this;
+
+	}
+
+	// private implementation
+
+	private
+	Responder makeResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					parentTaskLogger,
 					"execute");
 
@@ -158,7 +193,7 @@ class TabContextResponder
 
 			}
 
-			tabbedPageProvider.get ()
+			return tabbedPageProvider.get ()
 
 				.tab (
 					requestContext.consoleContextStuffRequired ().getTab (
@@ -170,20 +205,11 @@ class TabContextResponder
 
 				.pagePart (
 					pagePartFactory.buildPagePart (
-						taskLogger))
+						transaction))
 
-				.execute (
-					taskLogger);
+			;
 
 		}
-
-	}
-
-	@Override
-	public
-	Responder get () {
-
-		return this;
 
 	}
 

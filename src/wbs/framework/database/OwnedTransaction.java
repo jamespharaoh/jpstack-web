@@ -1,12 +1,11 @@
 package wbs.framework.database;
 
+import wbs.framework.logging.OwnedTaskLogger;
+
 public
 interface OwnedTransaction
 	extends
-		AutoCloseable,
-		Transaction {
-
-	@Override
-	void close ();
+		Transaction,
+		OwnedTaskLogger {
 
 }

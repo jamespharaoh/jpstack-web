@@ -8,6 +8,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("genericConfigLoader")
@@ -27,16 +28,28 @@ class GenericConfigLoader {
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		dataFromXml =
-			new DataFromXmlBuilder ()
+		try (
 
-			.registerBuilderClasses (
-				GenericConfigSpec.class,
-				GenericConfigItemSpec.class)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			.build ();
+		) {
+
+			dataFromXml =
+				new DataFromXmlBuilder ()
+
+				.registerBuilderClasses (
+					GenericConfigSpec.class,
+					GenericConfigItemSpec.class)
+
+				.build ();
+
+		}
 
 	}
 
@@ -49,7 +62,7 @@ class GenericConfigLoader {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"load");

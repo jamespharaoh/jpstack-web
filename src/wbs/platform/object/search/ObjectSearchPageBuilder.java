@@ -35,22 +35,26 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
@@ -62,7 +66,7 @@ class ObjectSearchPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	SearchType extends Serializable,
 	ResultType extends IdObject
-> {
+> implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -71,6 +75,9 @@ class ObjectSearchPageBuilder <
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -144,30 +151,43 @@ class ObjectSearchPageBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
-	void buildConsoleModule (
-			@NonNull Builder builder) {
+	void build (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		setDefaults ();
+		try (
 
-		buildGetAction ();
-		buildPostAction ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildConsoleModule");
 
-		buildSearchResponder ();
-		buildResultsResponder ();
-
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
 		) {
 
-			buildContextTab (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildContextFile (
-				resolvedExtensionPoint);
+			buildGetAction ();
+			buildPostAction ();
+
+			buildSearchResponder ();
+			buildResultsResponder ();
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTab (
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					resolvedExtensionPoint);
+
+			}
 
 		}
 
@@ -284,12 +304,16 @@ class ObjectSearchPageBuilder <
 	void buildSearchResponder () {
 
 		PagePartFactory searchPartFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildPagePart");
+
+			) {
 
 				return objectSearchPart.get ()
 
@@ -336,15 +360,17 @@ class ObjectSearchPageBuilder <
 
 	void buildResultsResponder () {
 
-		// search results responder
-
 		PagePartFactory searchResultsPartFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildPagePart");
+
+			) {
 
 				return objectSearchResultsPartProvider.get ()
 

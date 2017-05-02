@@ -2,7 +2,9 @@ package wbs.imchat.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.entity.record.IdObject;
+
 import wbs.platform.user.model.UserRec;
 
 @Accessors (fluent = true)

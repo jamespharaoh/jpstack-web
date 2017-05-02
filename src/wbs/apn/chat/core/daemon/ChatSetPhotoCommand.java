@@ -16,9 +16,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -121,13 +122,13 @@ class ChatSetPhotoCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -137,6 +138,7 @@ class ChatSetPhotoCommand
 
 			Object parent =
 				objectManager.getParentRequired (
+					transaction,
 					command);
 
 			if (parent instanceof ChatRec) {
@@ -157,6 +159,7 @@ class ChatSetPhotoCommand
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -165,12 +168,13 @@ class ChatSetPhotoCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// set chat scheme
@@ -178,6 +182,7 @@ class ChatSetPhotoCommand
 			if (chatScheme != null) {
 
 				chatUserLogic.setScheme (
+					transaction,
 					chatUser,
 					chatScheme);
 
@@ -187,7 +192,7 @@ class ChatSetPhotoCommand
 
 			Optional <ChatUserImageRec> chatUserImageOptional =
 				chatUserLogic.setPhotoFromMessage (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					false);
@@ -200,15 +205,17 @@ class ChatSetPhotoCommand
 				// send confirmation
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalAbsent (),
 					"photo_confirm",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help")),
 					TemplateMissing.error,
@@ -217,7 +224,7 @@ class ChatSetPhotoCommand
 				// auto join
 
 				chatMiscLogic.userAutoJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					true);
@@ -226,7 +233,7 @@ class ChatSetPhotoCommand
 
 			} else if (
 				chatUserLogic.setVideo (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					false)
@@ -235,7 +242,7 @@ class ChatSetPhotoCommand
 				// send confirmation
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
@@ -246,7 +253,7 @@ class ChatSetPhotoCommand
 				// auto join
 
 				chatMiscLogic.userAutoJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					true);
@@ -256,12 +263,13 @@ class ChatSetPhotoCommand
 				// send error
 
 				chatSendLogic.sendSystemMmsFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"photo_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"set_photo"),
 					TemplateMissing.error);
@@ -271,7 +279,7 @@ class ChatSetPhotoCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

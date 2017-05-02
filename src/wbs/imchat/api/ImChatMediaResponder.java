@@ -9,9 +9,12 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.web.context.RequestContext;
 import wbs.web.responder.AbstractResponder;
@@ -23,6 +26,9 @@ class ImChatMediaResponder
 	extends AbstractResponder {
 
 	// dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -40,28 +46,50 @@ class ImChatMediaResponder
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.setHeader (
-			"Content-Type",
-			contentType);
+		try (
 
-		requestContext.setHeader (
-			"Content-Length",
-			integerToDecimalString (
-				arrayLength (
-					data)));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.setHeader (
+				"Content-Type",
+				contentType);
+
+			requestContext.setHeader (
+				"Content-Length",
+				integerToDecimalString (
+					arrayLength (
+						data)));
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		writeBytes (
-			requestContext.outputStream (),
-			data);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goContent");
+
+		) {
+
+			writeBytes (
+				requestContext.outputStream (),
+				data);
+
+		}
 
 	}
 

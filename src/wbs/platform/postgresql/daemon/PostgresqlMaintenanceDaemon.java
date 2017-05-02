@@ -21,8 +21,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
@@ -32,10 +30,11 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.LoggingDataSource;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.OwnedTaskLogger;
 
 import wbs.platform.daemon.AbstractDaemonService;
 
@@ -49,7 +48,7 @@ class PostgresqlMaintenanceDaemon
 	// singleton dependencies
 
 	@SingletonDependency
-	DataSource dataSource;
+	LoggingDataSource dataSource;
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
@@ -113,7 +112,7 @@ class PostgresqlMaintenanceDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLoggerFormat (
 					"doTasks (%s)",
 					frequency);
@@ -131,7 +130,8 @@ class PostgresqlMaintenanceDaemon
 			try (
 
 				Connection connnection =
-					dataSource.getConnection ();
+					dataSource.getConnection (
+						taskLogger);
 
 			) {
 

@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.html.ScriptRef;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)

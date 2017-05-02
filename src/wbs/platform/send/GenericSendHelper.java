@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 public
@@ -23,59 +23,68 @@ interface GenericSendHelper <
 	ObjectHelper <Job> jobHelper ();
 	ObjectHelper <Item> itemHelper ();
 
-	List <Job> findSendingJobs ();
+	List <Job> findSendingJobs (
+			Transaction parentTransaction);
 
 	List <Job> findScheduledJobs (
+			Transaction parentTransaction,
 			Instant now);
 
 	List <Item> findItemsLimit (
+			Transaction parentTransaction,
 			Service service,
 			Job job,
-			int maxResults);
+			Long maxResults);
 
 	Service getService (
+			Transaction parentTransaction,
 			Job job);
 
 	Instant getScheduledTime (
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 
 	boolean jobScheduled (
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 
 	boolean jobSending (
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 
 	boolean jobConfigured (
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 
 	void sendStart (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 
 	boolean verifyItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Service service,
 			Job job,
 			Item item);
 
 	void rejectItem (
+			Transaction parentTransaction,
 			Service service,
 			Job job,
 			Item item);
 
 	void sendItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Service service,
 			Job job,
 			Item item);
 
 	void sendComplete (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Service service,
 			Job job);
 

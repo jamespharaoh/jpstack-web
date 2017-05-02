@@ -15,10 +15,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
@@ -141,139 +141,238 @@ class SubscriptionSendHelper
 
 	@Override
 	public
-	ObjectHelper<SubscriptionSendRec> jobHelper () {
+	ObjectHelper <SubscriptionSendRec> jobHelper () {
 		return subscriptionSendHelper;
 	}
 
 	@Override
 	public
-	ObjectHelper<SubscriptionSendNumberRec> itemHelper () {
+	ObjectHelper <SubscriptionSendNumberRec> itemHelper () {
 		return subscriptionSendNumberHelper;
 	}
 
 	@Override
 	public
-	List<SubscriptionSendRec> findSendingJobs () {
-		return subscriptionSendHelper.findSending ();
+	List <SubscriptionSendRec> findSendingJobs (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSendingJobs");
+
+		) {
+
+			return subscriptionSendHelper.findSending (
+				transaction);
+
+		}
+
 	}
 
 	@Override
 	public
-	List<SubscriptionSendRec> findScheduledJobs (
-			Instant now) {
+	List <SubscriptionSendRec> findScheduledJobs (
+			@NonNull Transaction parentTransaction,
+			@NonNull Instant now) {
 
-		return subscriptionSendHelper.findScheduled (
-			now);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findScheduledJobs");
+
+		) {
+
+			return subscriptionSendHelper.findScheduled (
+				transaction,
+				now);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<SubscriptionSendNumberRec> findItemsLimit (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend,
-			int maxResults) {
+	List <SubscriptionSendNumberRec> findItemsLimit (
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull Long maxResults) {
 
-		return subscriptionSendNumberHelper.findQueuedLimit (
-			subscriptionSend,
-			maxResults);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findItemsLimit");
+
+		) {
+
+			return subscriptionSendNumberHelper.findQueuedLimit (
+				transaction,
+				subscriptionSend,
+				maxResults);
+
+		}
 
 	}
 
 	@Override
 	public
 	SubscriptionRec getService (
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		return subscriptionSend.getSubscription ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getService");
+
+		) {
+
+			return subscriptionSend.getSubscription ();
+
+		}
 
 	}
 
 	@Override
 	public
 	Instant getScheduledTime (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		return subscriptionSend.getScheduledForTime ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getScheduledTime");
+
+		) {
+
+			return subscriptionSend.getScheduledForTime ();
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobScheduled (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		return enumEqualSafe (
-			subscriptionSend.getState (),
-			SubscriptionSendState.scheduled);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobScheduled");
+
+		) {
+
+			return enumEqualSafe (
+				subscriptionSend.getState (),
+				SubscriptionSendState.scheduled);
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobSending (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		return enumEqualSafe (
-			subscriptionSend.getState (),
-			SubscriptionSendState.sending);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobSending");
+
+		) {
+
+			return enumEqualSafe (
+				subscriptionSend.getState (),
+				SubscriptionSendState.sending);
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean jobConfigured (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		if (
-			isNull (
-				subscription.getBilledRoute ())
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"jobConfigured");
+
 		) {
-			return false;
-		}
 
-		return true;
+			if (
+				isNull (
+					subscription.getBilledRoute ())
+			) {
+				return false;
+			}
+
+			return true;
+
+		}
 
 	}
 
 	@Override
 	public
 	void sendStart (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionRec subscription,
 			@NonNull SubscriptionSendRec subscriptionSend) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendStart");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// create a batch
 
 			BatchSubjectRec batchSubject =
 				batchLogic.batchSubject (
-					taskLogger,
+					transaction,
 					subscription,
 					"send");
 
 			BatchRec batch =
 				batchHelper.insert (
-					taskLogger,
+					transaction,
 					batchHelper.createInstance ()
 
 				.setParentType (
 					objectTypeHelper.findRequired (
+						transaction,
 						subscriptionSendHelper.objectTypeId ()))
 
 				.setParentId (
@@ -321,7 +420,7 @@ class SubscriptionSendHelper
 					continue;
 
 				subscriptionSendNumberHelper.insert (
-					taskLogger,
+					transaction,
 					subscriptionSendNumberHelper.createInstance ()
 
 					.setSubscriptionSend (
@@ -347,7 +446,7 @@ class SubscriptionSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionRec subscription,
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
@@ -359,9 +458,10 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void rejectItem (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend,
-			SubscriptionSendNumberRec subscriptionSendNumber) {
+			@NonNull Transaction parentTransaction,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
 		throw new UnsupportedOperationException ();
 
@@ -370,16 +470,16 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void sendItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionRec subscription,
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendItem");
 
 		) {
@@ -398,13 +498,13 @@ class SubscriptionSendHelper
 			) {
 
 				subscriptionLogic.sendNow (
-					taskLogger,
+					transaction,
 					subscriptionSendNumber);
 
 			} else {
 
 				subscriptionLogic.sendLater (
-					taskLogger,
+					transaction,
 					subscriptionSendNumber);
 
 			}
@@ -416,14 +516,25 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void sendComplete (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionRec subscription,
 			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		subscriptionSend
+		try (
 
-			.setState (
-				SubscriptionSendState.sent);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sendComplete");
+
+		) {
+
+			subscriptionSend
+
+				.setState (
+					SubscriptionSendState.sent);
+
+		}
 
 	}
 

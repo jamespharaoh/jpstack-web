@@ -2,14 +2,14 @@ package wbs.apn.chat.broadcast.model;
 
 import java.util.List;
 
-import wbs.apn.chat.broadcast.model.ChatBroadcastNumberRec;
-import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.framework.database.Transaction;
 
 public
 interface ChatBroadcastNumberDaoMethods {
 
-	List<ChatBroadcastNumberRec> findAcceptedLimit (
+	List <ChatBroadcastNumberRec> findAcceptedLimit (
+			Transaction parentTransaction,
 			ChatBroadcastRec chatBroadcast,
-			int limit);
+			Long limit);
 
 }

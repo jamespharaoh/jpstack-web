@@ -18,7 +18,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -74,21 +76,32 @@ class SimulatorSenderHelper
 	@Override
 	public
 	SetupRequestResult <State> setupRequest (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec outbox) {
 
-		return new SetupRequestResult <State> ()
+		try (
 
-			.status (
-				SetupRequestStatus.success)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setupRequest");
 
-			.state (
-				new State ()
+		) {
 
-				.messageId (
-					outbox.getId ())
+			return new SetupRequestResult <State> ()
 
-			);
+				.status (
+					SetupRequestStatus.success)
+
+				.state (
+					new State ()
+
+					.messageId (
+						outbox.getId ())
+
+				);
+
+		}
 
 	}
 
@@ -98,23 +111,19 @@ class SimulatorSenderHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"performSend");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SimulatorSender.sendMessage (messageId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"performSend");
 
 		) {
 
 			MessageRec message =
 				messageHelper.findRequired (
+					transaction,
 					state.messageId);
 
 			RouteRec route =
@@ -156,9 +165,11 @@ class SimulatorSenderHelper
 
 			// lookup session
 
-			Optional<SimulatorSessionNumberRec> simulatorSessionNumberOptional =
-				simulatorSessionNumberHelper.find (
-					message.getNumber ().getId ());
+			Optional <SimulatorSessionNumberRec>
+				simulatorSessionNumberOptional =
+					simulatorSessionNumberHelper.find (
+						transaction,
+						message.getNumber ().getId ());
 
 			if (
 				optionalIsNotPresent (
@@ -182,7 +193,7 @@ class SimulatorSenderHelper
 
 			SimulatorEventRec event =
 				simulatorEventHelper.insert (
-					taskLogger,
+					transaction,
 					simulatorEventHelper.createInstance ()
 
 				.setSimulatorSession (
@@ -221,16 +232,27 @@ class SimulatorSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull State state) {
 
-		return new ProcessResponseResult ()
+		try (
 
-			.status (
-				ProcessResponseStatus.success)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"processSend");
 
-			.otherIds (
-				state.otherIds);
+		) {
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.success)
+
+				.otherIds (
+					state.otherIds);
+
+		}
 
 	}
 

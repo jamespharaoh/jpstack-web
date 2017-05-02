@@ -6,25 +6,25 @@ import com.google.common.base.Optional;
 
 import org.hibernate.Criteria;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface ImChatMessageDaoMethods {
 
 	Criteria searchCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatMessageSearch search);
 
 	Criteria searchOperatorReportCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatMessageSearch search);
 
 	List <Long> searchOperatorReportIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatMessageSearch search);
 
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatMessageSearch search,
 			List <Long> ids);
 

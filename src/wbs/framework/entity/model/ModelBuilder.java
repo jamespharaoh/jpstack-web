@@ -26,6 +26,7 @@ import wbs.framework.entity.build.ModelFieldBuilderTarget;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.schema.helper.SchemaNamesHelper;
@@ -78,7 +79,7 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");
@@ -106,7 +107,7 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"buildReal");

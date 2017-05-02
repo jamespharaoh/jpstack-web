@@ -6,6 +6,9 @@ import static wbs.utils.etc.ResultUtils.mapSuccess;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.NonNull;
+
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 
 import fj.data.Either;
@@ -18,17 +21,26 @@ interface EntityFinder <
 	Class <EntityType> entityClass ();
 
 	EntityType findEntity (
+			Transaction parentTransaction,
 			Long id);
 
-	List <EntityType> findAllEntities ();
+	List <EntityType> findAllEntities (
+			Transaction parentTransaction);
 
 	default
-	List <EntityType> findAllNotDeletedEntities () {
+	List <EntityType> findAllNotDeletedEntities (
+			Transaction parentTransaction) {
 
-		return findAllEntities ().stream ()
+		return findAllEntities (
+			parentTransaction)
+
+			.stream ()
 
 			.filter (
-				this::getNotDeletedCheckParents)
+				entity ->
+					getNotDeletedCheckParents (
+						parentTransaction,
+						entity))
 
 			.collect (
 				Collectors.toList ());
@@ -36,14 +48,17 @@ interface EntityFinder <
 	}
 
 	Either <Boolean, String> getDeletedOrError (
+			Transaction parentTransaction,
 			EntityType entity,
 			boolean checkParents);
 
 	default
 	Either <Boolean, String> getDeletedOrErrorCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return getDeletedOrError (
+			parentTransaction,
 			entity,
 			true);
 
@@ -51,9 +66,11 @@ interface EntityFinder <
 
 	default
 	Either <Boolean, String> getDeletedOrErrorNoCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return getDeletedOrError (
+			parentTransaction,
 			entity,
 			false);
 
@@ -61,10 +78,12 @@ interface EntityFinder <
 
 	default
 	Either <Boolean, String> getNotDeletedOrErrorCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return mapSuccess (
 			getDeletedOrError (
+				parentTransaction,
 				entity,
 				true),
 			booleanInverseFunction ());
@@ -73,10 +92,12 @@ interface EntityFinder <
 
 	default
 	Either <Boolean, String> getNotDeletedOrErrorNoCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return mapSuccess (
 			getDeletedOrError (
+				parentTransaction,
 				entity,
 				false),
 			booleanInverseFunction ());
@@ -84,14 +105,17 @@ interface EntityFinder <
 	}
 
 	Boolean getDeleted (
+			Transaction parentTransaction,
 			EntityType entity,
 			boolean checkParents);
 
 	default
 	Boolean getDeletedCheckParents (
+			Transaction parentTransaction,
 			EntityType entity) {
 
 		return getDeleted (
+			parentTransaction,
 			entity,
 			true);
 
@@ -99,9 +123,11 @@ interface EntityFinder <
 
 	default
 	Boolean getDeletedNoCheckParents (
+			Transaction parentTransaction,
 			EntityType entity) {
 
 		return getDeleted (
+			parentTransaction,
 			entity,
 			false);
 
@@ -109,10 +135,12 @@ interface EntityFinder <
 
 	default
 	Boolean getNotDeleted (
-			EntityType entity,
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity,
 			boolean checkParents) {
 
 		return ! getDeleted (
+			parentTransaction,
 			entity,
 			checkParents);
 
@@ -120,9 +148,11 @@ interface EntityFinder <
 
 	default
 	Boolean getNotDeletedCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return ! getDeleted (
+			parentTransaction,
 			entity,
 			true);
 
@@ -130,9 +160,11 @@ interface EntityFinder <
 
 	default
 	Boolean getNotDeletedNoCheckParents (
-			EntityType entity) {
+			@NonNull Transaction parentTransaction,
+			@NonNull EntityType entity) {
 
 		return ! getDeleted (
+			parentTransaction,
 			entity,
 			false);
 

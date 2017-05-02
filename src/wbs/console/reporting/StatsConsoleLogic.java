@@ -20,8 +20,9 @@ import org.joda.time.ReadableInstant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -38,7 +39,7 @@ class StatsConsoleLogic {
 
 	public
 	void writeGroup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Map <String, StatsDataSet> dataSetsByName,
 			@NonNull StatsPeriod period,
@@ -48,9 +49,9 @@ class StatsConsoleLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeGroup");
 
 		) {
@@ -70,6 +71,7 @@ class StatsConsoleLogic {
 
 			List <Object> sortedGroups =
 				grouper.sortGroups (
+					transaction,
 					groups);
 
 			// output
@@ -82,7 +84,7 @@ class StatsConsoleLogic {
 				htmlTableRowOpen ();
 
 				grouper.writeTdForGroup (
-					taskLogger,
+					transaction,
 					formatWriter,
 					group);
 

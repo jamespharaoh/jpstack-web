@@ -39,8 +39,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -144,22 +145,20 @@ class ChatUserOnlinePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			transaction =
-				database.currentTransaction ();
-
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			users =
 				new TreeSet<> (
@@ -167,6 +166,7 @@ class ChatUserOnlinePart
 
 			users.addAll (
 				chatUserHelper.findOnline (
+					transaction,
 					chat));
 
 			targetContextType =
@@ -176,7 +176,7 @@ class ChatUserOnlinePart
 
 			targetContext =
 				consoleManager.relatedContextRequired (
-					taskLogger,
+					transaction,
 					requestContext.consoleContextRequired (),
 					targetContextType);
 
@@ -187,13 +187,13 @@ class ChatUserOnlinePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -251,7 +251,7 @@ class ChatUserOnlinePart
 					htmlTableCellOpen ();
 
 					mediaConsoleLogic.writeMediaThumb32 (
-						taskLogger,
+						transaction,
 						chatUser.getChatUserImageList ().get (0).getMedia ());
 
 					htmlTableCellClose ();

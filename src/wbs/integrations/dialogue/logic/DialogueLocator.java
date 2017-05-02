@@ -28,6 +28,7 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -81,7 +82,7 @@ class DialogueLocator
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"lookup");
@@ -100,15 +101,19 @@ class DialogueLocator
 				locatorId);
 
 			createContent (
+				taskLogger,
 				locatorInfo);
 
 			openConnection (
+				taskLogger,
 				locatorInfo);
 
 			sendRequest (
+				taskLogger,
 				locatorInfo);
 
 			return readResponse (
+				taskLogger,
 				locatorInfo);
 
 		}
@@ -122,26 +127,23 @@ class DialogueLocator
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"lookupDialogueLocator");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"DialogueLocator.lookupDialogueLocator (...)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"lookupDialogueLocator");
 
 		) {
 
 			LocatorRec locator =
 				locatorHelper.findRequired (
+					transaction,
 					locatorId);
 
 			DialogueLocatorRec dialogueLocator =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						locator));
 
 			locatorInfo.url =
@@ -161,9 +163,17 @@ class DialogueLocator
 	}
 
 	void openConnection (
-			LocatorInfo locatorInfo) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull LocatorInfo locatorInfo) {
 
-		try {
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"openConnection");
+
+		) {
 
 			try {
 
@@ -214,9 +224,15 @@ class DialogueLocator
 	}
 
 	void sendRequest (
-			LocatorInfo locatorInfo) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull LocatorInfo locatorInfo) {
 
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendRequest");
 
 			OutputStream outputStream =
 				locatorInfo.urlConn.getOutputStream ();
@@ -239,10 +255,18 @@ class DialogueLocator
 	}
 
 	void createContent (
-			LocatorInfo locatorInfo)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull LocatorInfo locatorInfo)
 		throws LocatorException {
 
-		try {
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createContent");
+
+		) {
 
 			Element lbsElement =
 				new Element ("LBS");
@@ -305,9 +329,17 @@ class DialogueLocator
 	}
 
 	LongLat readResponse (
-			LocatorInfo locatorInfo) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull LocatorInfo locatorInfo) {
 
-		try {
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readResponse");
+
+		) {
 
 			SAXBuilder builder =
 				new SAXBuilder ();

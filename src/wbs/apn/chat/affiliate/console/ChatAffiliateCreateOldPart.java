@@ -38,8 +38,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
@@ -86,19 +87,20 @@ class ChatAffiliateCreateOldPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			chatSchemes =
 				chat.getChatSchemes ().stream ()
@@ -106,7 +108,7 @@ class ChatAffiliateCreateOldPart
 				.filter (
 					chatScheme ->
 						privChecker.canRecursive (
-							taskLogger,
+							transaction,
 							chatScheme,
 							"affiliate_create"))
 
@@ -114,6 +116,7 @@ class ChatAffiliateCreateOldPart
 					Collectors.toMap (
 						chatScheme ->
 							objectManager.objectPathMini (
+								transaction,
 								chatScheme,
 								chat),
 						ChatSchemeRec::getId));
@@ -125,19 +128,30 @@ class ChatAffiliateCreateOldPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		if (chatSchemes.size () == 0) {
+		try (
 
-			formatWriter.writeFormat (
-				"<p>There are no schemes in which you have permission to ",
-				"create new affiliates.</p>");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-			return;
+		) {
+
+			if (chatSchemes.size () == 0) {
+
+				formatWriter.writeFormat (
+					"<p>There are no schemes in which you have permission to ",
+					"create new affiliates.</p>");
+
+				return;
+
+			}
+
+			renderForm ();
 
 		}
-
-		renderForm ();
 
 	}
 

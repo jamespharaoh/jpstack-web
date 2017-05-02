@@ -21,8 +21,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
 public
@@ -52,13 +53,13 @@ class SubscriptionNumberAddRemovePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -72,7 +73,7 @@ class SubscriptionNumberAddRemovePart
 				new SubscriptionNumberAddRemoveForm ();
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				addRemoveFormFieldSet,
 				addRemoveForm,
@@ -86,13 +87,13 @@ class SubscriptionNumberAddRemovePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -104,7 +105,7 @@ class SubscriptionNumberAddRemovePart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				addRemoveFormFieldSet,

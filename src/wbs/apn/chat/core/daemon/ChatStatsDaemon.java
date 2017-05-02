@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.AbstractDaemonService;
@@ -81,7 +82,7 @@ class ChatStatsDaemon
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
 						"runService ()");
 
@@ -142,90 +143,88 @@ class ChatStatsDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doStats");
 
 		) {
 
-			// get list of chats
+			List <Long> chatIds =
+				getChatIds (
+					taskLogger);
 
-			List <Long> chatIds;
-
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadOnly (
+			chatIds.forEach (
+				chatId ->
+					doChat (
 						taskLogger,
-						"ChatStatsDaemon.doStats (timestamp)",
-						this);
-
-			) {
-
-				chatIds =
-					iterableMapToList (
-						ChatRec::getId,
-						chatHelper.findAll ());
-
-				transaction.close ();
-
-			}
-
-			for (
-				Long chatId
-					: chatIds
-			) {
-
-				doStats (
-					taskLogger,
-					timestamp,
-					chatId);
-
-			}
+						timestamp,
+						chatId));
 
 		}
 
 	}
 
-	void doStats (
+	private
+	List <Long> getChatIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getChatIds");
+
+		) {
+
+			return iterableMapToList (
+				ChatRec::getId,
+				chatHelper.findAll (
+					transaction));
+
+		}
+
+	}
+
+	private
+	void doChat (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Instant timestamp,
 			@NonNull Long chatId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doStats");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatStatsDaemon.doStats (timestamp, chatId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doChat");
 
 		) {
 
 			ChatRec chat =
 				chatHelper.findRequired (
+					transaction,
 					chatId);
 
 			long numUsers =
 				chatUserHelper.countOnline (
+					transaction,
 					chat,
 					ChatUserType.user);
 
 			long numMonitors =
 				chatUserHelper.countOnline (
+					transaction,
 					chat,
 					ChatUserType.monitor);
 
 			// insert stats
 
 			chatStatsHelper.insert (
-				taskLogger,
+				transaction,
 				chatStatsHelper.createInstance ()
 
 				.setChat (

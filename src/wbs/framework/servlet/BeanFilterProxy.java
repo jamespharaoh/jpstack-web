@@ -17,7 +17,7 @@ import lombok.NonNull;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.OwnedTaskLogger;
 
 public
 class BeanFilterProxy
@@ -61,7 +61,7 @@ class BeanFilterProxy
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"init");
 

@@ -45,6 +45,8 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -104,13 +106,13 @@ class CoreSystemRestartPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -119,10 +121,11 @@ class CoreSystemRestartPart
 				iterableFilterToList (
 					apiDeployment ->
 						userPrivChecker.canRecursive (
-							taskLogger,
+							transaction,
 							apiDeployment,
 							"restart"),
-					apiDeploymentHelper.findAllNotDeletedEntities ());
+					apiDeploymentHelper.findAllNotDeletedEntities (
+						transaction));
 
 			Collections.sort (
 				apiDeployments);
@@ -131,10 +134,11 @@ class CoreSystemRestartPart
 				iterableFilterToList (
 					consoleDeployment ->
 						userPrivChecker.canRecursive (
-							taskLogger,
+							transaction,
 							consoleDeployment,
 							"restart"),
-					consoleDeploymentHelper.findAllNotDeletedEntities ());
+					consoleDeploymentHelper.findAllNotDeletedEntities (
+						transaction));
 
 			Collections.sort (
 				consoleDeployments);
@@ -143,10 +147,11 @@ class CoreSystemRestartPart
 				iterableFilterToList (
 					daemonDeployment ->
 						userPrivChecker.canRecursive (
-							taskLogger,
+							transaction,
 							daemonDeployment,
 							"restart"),
-					daemonDeploymentHelper.findAllNotDeletedEntities ());
+					daemonDeploymentHelper.findAllNotDeletedEntities (
+						transaction));
 
 			Collections.sort (
 				daemonDeployments);
@@ -158,13 +163,13 @@ class CoreSystemRestartPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -190,17 +195,17 @@ class CoreSystemRestartPart
 			htmlTableRowSeparatorWrite ();
 
 			renderApiDeployments (
-				taskLogger);
+				transaction);
 
 			htmlTableRowSeparatorWrite ();
 
 			renderDaemonDeployments (
-				taskLogger);
+				transaction);
 
 			htmlTableRowSeparatorWrite ();
 
 			renderConsoleDeployments (
-				taskLogger);
+				transaction);
 
 			htmlTableClose ();
 

@@ -9,8 +9,8 @@ import lombok.NonNull;
 import wbs.console.helper.provider.ConsoleHelperProvider;
 
 import wbs.framework.codegen.DoNotDelegate;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -26,16 +26,16 @@ interface ConsoleHelperMethods <
 	String idKey ();
 
 	String getPathId (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	default
 	String getPathIdGeneric (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Record <?> object) {
 
 		return getPathId (
-			parentTaskLogger,
+			parentTransaction,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -43,20 +43,20 @@ interface ConsoleHelperMethods <
 	}
 
 	String getPathId (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Long objectId);
 
 	String getDefaultContextPath (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	default
 	String getDefaultContextPathGeneric (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return getDefaultContextPath (
-			parentTaskLogger,
+			parentTransaction,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -64,16 +64,16 @@ interface ConsoleHelperMethods <
 	}
 
 	String getDefaultLocalPath (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	default
 	String getDefaultLocalPathGeneric (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return getDefaultLocalPath (
-			parentTaskLogger,
+			parentTransaction,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -81,15 +81,17 @@ interface ConsoleHelperMethods <
 	}
 
 	boolean canView (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
-	Optional <RecordType> findFromContext ();
+	Optional <RecordType> findFromContext (
+			Transaction parentTransaction);
 
-	RecordType findFromContextRequired ();
+	RecordType findFromContextRequired (
+			Transaction parentTransaction);
 
 	void writeHtml (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			FormatWriter formatWriter,
 			RecordType object,
 			Optional <Record <?>> assumedRoot,
@@ -97,14 +99,14 @@ interface ConsoleHelperMethods <
 
 	default
 	void writeHtmlGeneric (
-			TaskLogger parentTaskLogger,
-			FormatWriter formatWriter,
-			Record <?> object,
-			Optional <Record <?>> assumedRoot,
-			Boolean mini) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> assumedRoot,
+			@NonNull Boolean mini) {
 
 		writeHtml (
-			parentTaskLogger,
+			parentTransaction,
 			formatWriter,
 			dynamicCast (
 				objectHelper ().objectClass (),

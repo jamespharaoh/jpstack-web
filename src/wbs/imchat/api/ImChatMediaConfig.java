@@ -5,6 +5,7 @@ import javax.inject.Provider;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.UninitializedDependency;
+
 import wbs.web.action.Action;
 
 @SingletonComponent ("imChatMediaConfig")

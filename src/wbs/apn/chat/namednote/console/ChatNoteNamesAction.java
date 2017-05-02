@@ -10,12 +10,12 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
+import wbs.console.notice.ConsoleNotices;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -72,31 +72,26 @@ class ChatNoteNamesAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		List <String> notices =
-			new ArrayList<> ();
-
-		// setup transaction etc
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatNoteNamesAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			ConsoleNotices notices =
+				new ConsoleNotices ();
+
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			List <ChatNoteNameRec> chatNoteNames =
 				chatNoteNameHelper.findNotDeleted (
+					transaction,
 					chat);
 
 			if (
@@ -146,14 +141,14 @@ class ChatNoteNamesAction
 
 				if (numUpdated == 1) {
 
-					notices.add (
+					notices.noticeFormat (
 						"Note name updated");
 
 				}
 
 				if (numUpdated > 1) {
 
-					notices.add (
+					notices.noticeFormat (
 						stringFormat (
 							"%s note names updated",
 							integerToDecimalString (
@@ -170,7 +165,7 @@ class ChatNoteNamesAction
 				) {
 
 					chatNoteNameHelper.insert (
-						taskLogger,
+						transaction,
 						chatNoteNameHelper.createInstance ()
 
 						.setChat (
@@ -192,7 +187,8 @@ class ChatNoteNamesAction
 
 					);
 
-					notices.add ("New name added");
+					notices.noticeFormat (
+						"New name added");
 
 					requestContext.setEmptyFormData ();
 
@@ -247,7 +243,7 @@ class ChatNoteNamesAction
 
 					// done
 
-					notices.add (
+					notices.noticeFormat (
 						"Note moved up");
 
 					break;
@@ -293,7 +289,7 @@ class ChatNoteNamesAction
 					otherNote.setIndex (
 						index);
 
-					notices.add (
+					notices.noticeFormat (
 						"Note moved down");
 
 					break;
@@ -338,7 +334,7 @@ class ChatNoteNamesAction
 
 					}
 
-					notices.add (
+					notices.noticeFormat (
 						"Note deleted");
 
 					break;

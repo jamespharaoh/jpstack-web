@@ -20,8 +20,9 @@ import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @DataClass ("context-tab")
@@ -124,8 +125,8 @@ class ConsoleContextTab {
 
 		private
 		RealTab (
-				ConsoleContextStuff newContextStuff,
-				ConsoleContext newContext) {
+				@NonNull ConsoleContextStuff newContextStuff,
+				@NonNull ConsoleContext newContext) {
 
 			super (defaultLabel);
 
@@ -137,19 +138,19 @@ class ConsoleContextTab {
 		@Override
 		public
 		String getUrl (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"RealTab.getUrl");
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"getUrl");
 
 			) {
 
 				return consoleManager.resolveLocalFile (
-					taskLogger,
+					transaction,
 					contextStuff,
 					consoleContext,
 					localFile);

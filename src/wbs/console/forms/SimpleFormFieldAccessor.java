@@ -12,9 +12,12 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -29,6 +32,9 @@ class SimpleFormFieldAccessor <Container, Native>
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
 
 	@Getter @Setter
@@ -42,84 +48,106 @@ class SimpleFormFieldAccessor <Container, Native>
 	@Override
 	public
 	Optional <Native> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
-		// get native object
+		try (
 
-		Object nativeObject;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"read");
 
-		nativeObject =
-			PropertyUtils.propertyGetAuto (
-				container,
-				name);
-
-		// special case for null
-
-		if (nativeObject == null) {
-			return Optional.<Native>absent ();
-		}
-
-		// sanity check native type
-
-		if (
-			! nativeClass.isInstance (
-				nativeObject)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Field '%s' is %s, expected %s",
-					name,
-					nativeObject.getClass ().getSimpleName (),
-					nativeClass.getSimpleName ()));
+			// get native object
+
+			Object nativeObject;
+
+			nativeObject =
+				PropertyUtils.propertyGetAuto (
+					container,
+					name);
+
+			// special case for null
+
+			if (nativeObject == null) {
+				return Optional.<Native>absent ();
+			}
+
+			// sanity check native type
+
+			if (
+				! nativeClass.isInstance (
+					nativeObject)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field '%s' is %s, expected %s",
+						name,
+						nativeObject.getClass ().getSimpleName (),
+						nativeClass.getSimpleName ()));
+
+			}
+
+			// cast and return
+
+			return optionalOf (
+				nativeClass.cast (
+					nativeObject));
 
 		}
-
-		// cast and return
-
-		return optionalOf (
-			nativeClass.cast (
-				nativeObject));
 
 	}
 
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 
-		// sanity check native type
+		try (
 
-		if (
-
-			nativeValue.isPresent ()
-
-			&& ! nativeClass.isInstance (
-				nativeValue.get ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"write");
 
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Field %s.%s ",
-					container.getClass ().getSimpleName (),
-					name,
-					"is %s, ",
-					nativeClass.getSimpleName (),
-					"attempted to write %s",
-					nativeValue.get ().getClass ().getSimpleName ()));
+			// sanity check native type
+
+			if (
+
+				nativeValue.isPresent ()
+
+				&& ! nativeClass.isInstance (
+					nativeValue.get ())
+
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field %s.%s ",
+						container.getClass ().getSimpleName (),
+						name,
+						"is %s, ",
+						nativeClass.getSimpleName (),
+						"attempted to write %s",
+						nativeValue.get ().getClass ().getSimpleName ()));
+
+			}
+
+			// set property
+
+			PropertyUtils.propertySetAuto (
+				container,
+				name,
+				nativeValue.orNull ());
 
 		}
-
-		// set property
-
-		PropertyUtils.propertySetAuto (
-			container,
-			name,
-			nativeValue.orNull ());
 
 	}
 

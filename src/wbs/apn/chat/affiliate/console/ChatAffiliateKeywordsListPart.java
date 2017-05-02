@@ -16,9 +16,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeKeywordObjectHelper;
@@ -37,6 +40,9 @@ class ChatAffiliateKeywordsListPart
 	@SingletonDependency
 	ChatSchemeKeywordObjectHelper chatSchemeKeywordHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	List <ChatSchemeKeywordRec> chatSchemeKeywords;
@@ -44,73 +50,96 @@ class ChatAffiliateKeywordsListPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findFromContextRequired ();
+		try (
 
-		chatSchemeKeywords =
-			new ArrayList<> (
-				chatAffiliate.getChatSchemeKeywords ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		Collections.sort (
-			chatSchemeKeywords);
+		) {
+
+			ChatAffiliateRec chatAffiliate =
+				chatAffiliateHelper.findFromContextRequired (
+					transaction);
+
+			chatSchemeKeywords =
+				new ArrayList<> (
+					chatAffiliate.getChatSchemeKeywords ());
+
+			Collections.sort (
+				chatSchemeKeywords);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// table open
+		try (
 
-		htmlTableOpenList ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlTableHeaderRowWrite (
-			"Scheme",
-			"Keyword",
-			"Join type",
-			"Gender",
-			"Orient");
-
-		// table rows
-
-		for (
-			ChatSchemeKeywordRec chatSchemeKeyword
-				: chatSchemeKeywords
 		) {
 
-			htmlTableRowOpen ();
+			// table open
 
-			htmlTableCellWrite (
-				chatSchemeKeyword.getChatScheme ().getCode ());
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatSchemeKeyword.getKeyword ());
+			htmlTableHeaderRowWrite (
+				"Scheme",
+				"Keyword",
+				"Join type",
+				"Gender",
+				"Orient");
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatSchemeKeyword.getJoinType (),
-					() -> chatSchemeKeyword.getJoinType ().name ()));
+			// table rows
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatSchemeKeyword.getJoinGender (),
-					() -> chatSchemeKeyword.getJoinGender ().name ()));
+			for (
+				ChatSchemeKeywordRec chatSchemeKeyword
+					: chatSchemeKeywords
+			) {
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatSchemeKeyword.getJoinOrient (),
-					() -> chatSchemeKeyword.getJoinOrient ().name ()));
+				htmlTableRowOpen ();
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					chatSchemeKeyword.getChatScheme ().getCode ());
+
+				htmlTableCellWrite (
+					chatSchemeKeyword.getKeyword ());
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatSchemeKeyword.getJoinType (),
+						() -> chatSchemeKeyword.getJoinType ().name ()));
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatSchemeKeyword.getJoinGender (),
+						() -> chatSchemeKeyword.getJoinGender ().name ()));
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatSchemeKeyword.getJoinOrient (),
+						() -> chatSchemeKeyword.getJoinOrient ().name ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

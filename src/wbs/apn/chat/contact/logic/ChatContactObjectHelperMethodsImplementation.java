@@ -16,8 +16,12 @@ import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.CloseableTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.cache.AdvancedCache;
@@ -50,12 +54,17 @@ class ChatContactObjectHelperMethodsImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <Pair <Long, Long>, Long, ChatContactRec>>
-	idCacheBuilderProvider;
+	Provider <IdCacheBuilder <
+		CloseableTransaction,
+		Pair <Long, Long>,
+		Long,
+		ChatContactRec
+	>> idCacheBuilderProvider;
 
 	// state
 
-	AdvancedCache <Pair <Long, Long>, ChatContactRec> fromAndToUserCache;
+	AdvancedCache <CloseableTransaction, Pair <Long, Long>, ChatContactRec>
+		fromAndToUserCache;
 
 	// life cycle
 
@@ -66,7 +75,7 @@ class ChatContactObjectHelperMethodsImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setup");
@@ -82,13 +91,15 @@ class ChatContactObjectHelperMethodsImplementation
 					chatContactHelper::find)
 
 				.lookupByKeyFunction (
-					key ->
-
-					chatContactHelper.findNoCache (
-						chatUserHelper.findRequired (
-							key.getLeft ()),
-						chatUserHelper.findRequired (
-							key.getRight ())))
+					(context, key) ->
+						chatContactHelper.findNoCache (
+							context,
+							chatUserHelper.findRequired (
+								context,
+								key.getLeft ()),
+							chatUserHelper.findRequired (
+								context,
+								key.getRight ())))
 
 				.getIdFunction (
 					ChatContactRec::getId)
@@ -96,7 +107,11 @@ class ChatContactObjectHelperMethodsImplementation
 				.createFunction (
 					this::findOrCreateReal)
 
-				.build ();
+				.wrapperFunction (
+					CloseableTransaction::genericWrapper)
+
+				.build (
+					taskLogger);
 
 		}
 
@@ -107,34 +122,47 @@ class ChatContactObjectHelperMethodsImplementation
 	@Override
 	public
 	Optional <ChatContactRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
-		return fromAndToUserCache.find (
-			Pair.of (
-				fromUser.getId (),
-				toUser.getId ()));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return fromAndToUserCache.find (
+				transaction,
+				Pair.of (
+					fromUser.getId (),
+					toUser.getId ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	ChatContactRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
 
 			return fromAndToUserCache.findOrCreate (
-				taskLogger,
+				transaction,
 				Pair.of (
 					fromUser.getId (),
 					toUser.getId ()));
@@ -145,15 +173,15 @@ class ChatContactObjectHelperMethodsImplementation
 
 	private
 	ChatContactRec findOrCreateReal (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreateReal");
 
 		) {
@@ -162,6 +190,7 @@ class ChatContactObjectHelperMethodsImplementation
 
 			Optional <ChatContactRec> chatContactOptional =
 				chatContactHelper.find (
+					transaction,
 					fromUser,
 					toUser);
 
@@ -178,6 +207,7 @@ class ChatContactObjectHelperMethodsImplementation
 
 			Optional <ChatContactRec> chatContactInverseOptional =
 				chatContactHelper.find (
+					transaction,
 					toUser,
 					fromUser);
 
@@ -185,7 +215,7 @@ class ChatContactObjectHelperMethodsImplementation
 
 			ChatContactRec chatContact =
 				chatContactHelper.insert (
-					taskLogger,
+					transaction,
 					chatContactHelper.createInstance ()
 
 				.setFromUser (
@@ -229,15 +259,28 @@ class ChatContactObjectHelperMethodsImplementation
 
 	private
 	ChatContactRec findOrCreateReal (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Pair <Long, Long> userIds) {
 
-		return findOrCreateReal (
-			parentTaskLogger,
-			chatUserHelper.findRequired (
-				userIds.getLeft ()),
-			chatUserHelper.findRequired (
-				userIds.getRight ()));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findOrCreateReal");
+
+		) {
+
+			return findOrCreateReal (
+				transaction,
+				chatUserHelper.findRequired (
+					transaction,
+					userIds.getLeft ()),
+				chatUserHelper.findRequired (
+					transaction,
+					userIds.getRight ()));
+
+		}
 
 	}
 

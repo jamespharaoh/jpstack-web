@@ -1,19 +1,20 @@
 package wbs.apn.chat.user.core.console;
 
-import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-
-import java.util.Map;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import lombok.NonNull;
 
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.event.logic.EventLogic;
 
@@ -29,7 +30,7 @@ import wbs.apn.chat.user.core.model.ChatUserType;
 @SingletonComponent ("chatUserConsoleHooks")
 public
 class ChatUserConsoleHooks
-	implements ConsoleHooks<ChatUserRec> {
+	implements ConsoleHooks <ChatUserRec> {
 
 	// singleton dependencies
 
@@ -38,6 +39,9 @@ class ChatUserConsoleHooks
 
 	@WeakSingletonDependency
 	GazetteerEntryObjectHelper gazetteerEntryHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RandomLogic randomLogic;
@@ -52,18 +56,21 @@ class ChatUserConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object searchObject) {
 
-		if (searchObject instanceof Map) {
+		try (
 
-			doNothing ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"applySearchFilter");
 
-		} else if (searchObject instanceof ChatUserSearch) {
+		) {
 
 			ChatUserSearch search =
-				(ChatUserSearch)
-				searchObject;
+				genericCastUnchecked (
+					searchObject);
 
 			search
 
@@ -74,10 +81,6 @@ class ChatUserConsoleHooks
 
 			;
 
-		} else {
-
-			throw new RuntimeException ();
-
 		}
 
 	}
@@ -85,26 +88,39 @@ class ChatUserConsoleHooks
 	@Override
 	public
 	void beforeCreate (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		GazetteerEntryRec gazetteerEntry =
-			gazetteerEntryHelper.findByCodeRequired (
-				chatUser.getChat ().getGazetteer (),
-				chatUser.getLocationPlace ());
+		try (
 
-		chatUser
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"beforeCreate");
 
-			.setCode (
-				randomLogic.generateNumericNoZero (6))
+		) {
 
-			.setType (
-				ChatUserType.monitor)
+			GazetteerEntryRec gazetteerEntry =
+				gazetteerEntryHelper.findByCodeRequired (
+					transaction,
+					chatUser.getChat ().getGazetteer (),
+					chatUser.getLocationPlace ());
 
-			.setLocationPlaceLongLat (
-				gazetteerEntry.getLongLat ())
+			chatUser
 
-			.setLocationLongLat (
-				gazetteerEntry.getLongLat ());
+				.setCode (
+					randomLogic.generateNumericNoZero (6))
+
+				.setType (
+					ChatUserType.monitor)
+
+				.setLocationPlaceLongLat (
+					gazetteerEntry.getLongLat ())
+
+				.setLocationLongLat (
+					gazetteerEntry.getLongLat ());
+
+		}
 
 	}
 

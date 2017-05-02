@@ -43,23 +43,19 @@ class ChatUserImageUploadViewAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserImageUploadViewAction.goApi ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
 			ChatUserImageUploadTokenRec imageUploadToken =
 				chatUserImageUploadTokenHelper.findByToken (
+					transaction,
 					requestContext.requestStringRequired (
 						"chatUserImageUploadToken"));
 
@@ -91,7 +87,7 @@ class ChatUserImageUploadViewAction
 				transaction.commit ();
 
 				return responder (
-					taskLogger,
+					transaction,
 					"chatUserImageUploadExpiredPage");
 
 			} else {
@@ -114,7 +110,7 @@ class ChatUserImageUploadViewAction
 				transaction.commit ();
 
 				return responder (
-					taskLogger,
+					transaction,
 					"chatUserImageUploadFormPage");
 
 			}

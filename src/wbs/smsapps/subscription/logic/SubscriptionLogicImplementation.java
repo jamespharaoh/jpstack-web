@@ -14,10 +14,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.event.logic.EventLogic;
@@ -84,14 +84,14 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void sendNow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendNow");
 
 		) {
@@ -104,6 +104,7 @@ class SubscriptionLogicImplementation
 
 			SubscriptionNumberRec subscriptionNumber =
 				subscriptionNumberHelper.find (
+					transaction,
 					subscription,
 					subscriptionSendNumber.getNumber ());
 
@@ -118,6 +119,7 @@ class SubscriptionLogicImplementation
 
 			SubscriptionSendPartRec subscriptionSendPart =
 				subscriptionSendPartHelper.find (
+					transaction,
 					subscriptionSend,
 					subscriptionList);
 
@@ -154,10 +156,12 @@ class SubscriptionLogicImplementation
 					subscription.getFreeNumber ())
 
 				.routerResolve (
+					transaction,
 					subscription.getFreeRouter ())
 
 				.service (
 					serviceHelper.findByCodeRequired (
+						transaction,
 						subscriptionList,
 						"default"))
 
@@ -166,11 +170,12 @@ class SubscriptionLogicImplementation
 
 				.affiliate (
 					affiliateHelper.findByCodeRequired (
+						transaction,
 						subscriptionAffiliate,
 						"default"))
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// update state
 
@@ -195,20 +200,17 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void sendLater (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendLater");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			SubscriptionSendRec subscriptionSend =
 				subscriptionSendNumber.getSubscriptionSend ();
@@ -218,6 +220,7 @@ class SubscriptionLogicImplementation
 
 			SubscriptionNumberRec subscriptionNumber =
 				subscriptionNumberHelper.find (
+					transaction,
 					subscription,
 					subscriptionSendNumber.getNumber ());
 
@@ -285,7 +288,7 @@ class SubscriptionLogicImplementation
 
 				SubscriptionBillRec subscriptionBill =
 					subscriptionBillHelper.insert (
-						taskLogger,
+						transaction,
 						subscriptionBillHelper.createInstance ()
 
 					.setSubscriptionNumber (
@@ -319,6 +322,7 @@ class SubscriptionLogicImplementation
 
 					.service (
 						serviceHelper.findByCodeRequired (
+							transaction,
 							ifNull (
 								subscriptionList,
 								subscription),
@@ -326,19 +330,21 @@ class SubscriptionLogicImplementation
 
 					.affiliate (
 						affiliateHelper.findByCodeRequired (
+							transaction,
 							ifNull (
 								subscriptionAffiliate,
 								subscription),
 							"default"))
 
 					.deliveryTypeCode (
+						transaction,
 						"subscription")
 
 					.ref (
 						subscriptionBill.getId ())
 
 					.send (
-						taskLogger);
+						transaction);
 
 				subscriptionBill
 
@@ -364,22 +370,19 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void scheduleSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull Instant scheduleForTime,
 			@NonNull UserRec user) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"scheduleSend");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// sanity check
 
@@ -416,7 +419,7 @@ class SubscriptionLogicImplementation
 			// create event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"subscription_send_scheduled",
 				user,
 				subscriptionSend,

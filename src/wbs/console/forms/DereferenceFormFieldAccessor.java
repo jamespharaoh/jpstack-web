@@ -14,9 +14,12 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -27,6 +30,9 @@ class DereferenceFormFieldAccessor <Container, Native>
 	implements FormFieldAccessor <Container, Native> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -44,11 +50,12 @@ class DereferenceFormFieldAccessor <Container, Native>
 	@Override
 	public
 	Optional <Native> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		return genericCastUnchecked (
 			objectManager.dereference (
+				parentTransaction,
 				container,
 				path));
 
@@ -57,60 +64,71 @@ class DereferenceFormFieldAccessor <Container, Native>
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 
-		if (
+		try (
 
-			path.indexOf ('.') >= 0
-
-			|| stringInSafe (
-				path,
-				"this",
-				"parent",
-				"grandparent",
-				"greatgrandparent",
-				"root")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"write");
 
 		) {
 
-			throw new RuntimeException ();
+			if (
 
-		}
+				path.indexOf ('.') >= 0
 
-		// sanity check native type
-
-		if (
-
-			nativeValue.isPresent ()
-
-			&& isNotNull (
-				nativeClass)
-
-			&& ! nativeClass.isInstance (
-				nativeValue.get ())
-
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Field %s.%s ",
-					container.getClass ().getSimpleName (),
+				|| stringInSafe (
 					path,
-					"is %s, ",
-					nativeClass.getSimpleName (),
-					"attempted to write %s",
-					nativeValue.get ().getClass ().getSimpleName ()));
+					"this",
+					"parent",
+					"grandparent",
+					"greatgrandparent",
+					"root")
+
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			// sanity check native type
+
+			if (
+
+				nativeValue.isPresent ()
+
+				&& isNotNull (
+					nativeClass)
+
+				&& ! nativeClass.isInstance (
+					nativeValue.get ())
+
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field %s.%s ",
+						container.getClass ().getSimpleName (),
+						path,
+						"is %s, ",
+						nativeClass.getSimpleName (),
+						"attempted to write %s",
+						nativeValue.get ().getClass ().getSimpleName ()));
+
+			}
+
+			// set property
+
+			PropertyUtils.propertySetAuto (
+				container,
+				path,
+				nativeValue.orNull ());
 
 		}
-
-		// set property
-
-		PropertyUtils.propertySetAuto (
-			container,
-			path,
-			nativeValue.orNull ());
 
 	}
 

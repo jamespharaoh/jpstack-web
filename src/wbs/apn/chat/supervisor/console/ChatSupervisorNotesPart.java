@@ -20,8 +20,9 @@ import wbs.console.reporting.StatsPeriod;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -70,35 +71,48 @@ class ChatSupervisorNotesPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		statsPeriod =
-			genericCastUnchecked (
-				parameters.get (
-					"statsPeriod"));
+		try (
 
-		chat =
-			chatHelper.findFromContextRequired ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		// get notes
+		) {
 
-		chatContactNotes =
-			chatContactNoteHelper.findByTimestamp (
-				chat,
-				statsPeriod.toInterval ());
+			statsPeriod =
+				genericCastUnchecked (
+					parameters.get (
+						"statsPeriod"));
+
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
+
+			// get notes
+
+			chatContactNotes =
+				chatContactNoteHelper.findByTimestamp (
+					transaction,
+					chat,
+					statsPeriod.toInterval ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -123,22 +137,23 @@ class ChatSupervisorNotesPart
 					chatContactNote.getNotes ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatContactNote.getUser (),
 					chatContactNote.getUser ().getChat ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatContactNote.getMonitor (),
 					chatContactNote.getMonitor ().getChat ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatContactNote.getConsoleUser ());
 
 				htmlTableCellWrite (
 					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
+							transaction,
 							chat),
 						chatContactNote.getTimestamp ()));
 

@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 
 import com.google.common.base.Optional;
 
@@ -10,7 +13,7 @@ import lombok.experimental.Accessors;
 import org.json.simple.JSONValue;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("jsonFormFieldNativeMapping")
@@ -20,18 +23,19 @@ class JsonFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<Object> nativeToGeneric (
+	Optional <Object> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<String> nativeValue) {
+			@NonNull Optional <String> nativeValue) {
 
 		if (
 			optionalIsNotPresent (
 				nativeValue)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
-		return Optional.of (
+		return optionalOf (
 			JSONValue.parse (
 				nativeValue.get ()));
 
@@ -40,7 +44,7 @@ class JsonFormFieldNativeMapping<Container>
 	@Override
 	public
 	Optional <String> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Object> genericValue) {
 
@@ -48,10 +52,10 @@ class JsonFormFieldNativeMapping<Container>
 			optionalIsNotPresent (
 				genericValue)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
-		return Optional.of (
+		return optionalOfFormat (
 			JSONValue.toJSONString (
 				genericValue.get ()));
 

@@ -16,9 +16,12 @@ import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -29,6 +32,9 @@ class ChatGraphsUsersPart
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	TimeFormatter timeFormatter;
 
@@ -37,128 +43,139 @@ class ChatGraphsUsersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		LocalDate date;
-		String dateString;
+		try (
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"date"))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
+
 		) {
 
-			dateString =
-				requestContext.parameterRequired (
-					"date");
+			LocalDate date;
+			String dateString;
 
-			try {
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"date"))
+			) {
+
+				dateString =
+					requestContext.parameterRequired (
+						"date");
+
+				try {
+
+					date =
+						timeFormatter.dateStringToLocalDateRequired (
+							dateString);
+
+				} catch (IllegalArgumentException exception) {
+
+					date = null;
+
+				}
+
+			} else {
 
 				date =
-					timeFormatter.dateStringToLocalDateRequired (
-						dateString);
+					LocalDate.now ();
 
-			} catch (IllegalArgumentException exception) {
-
-				date = null;
+				dateString =
+					timeFormatter.dateString (
+						date);
 
 			}
 
-		} else {
-
-			date =
-				LocalDate.now ();
-
-			dateString =
-				timeFormatter.dateString (
-					date);
-
-		}
-
-		htmlFormOpenGetAction (
-			requestContext.resolveLocalUrl (
-				"/chat.graphs.users"));
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"Date<br>");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"date\"",
-			" value=\"%h\"",
-			dateString,
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"ok\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
-
-		if (
-			isNotNull (
-				date)
-		) {
-
-			// write date browser
-
-			htmlParagraphOpen (
-				htmlClassAttribute (
-					"links"));
-
-			htmlLinkWrite (
-				stringFormat (
-					"?date=%u",
-					timeFormatter.dateString (
-						date.minusWeeks (1))),
-				"Prev week");
-
-			htmlLinkWrite (
-				stringFormat (
-					"?date=%h",
-					timeFormatter.dateString (
-						date.minusDays (1))),
-				"Prev day");
-
-			htmlLinkWrite (
-				stringFormat (
-					"?date=%u",
-					timeFormatter.dateString (
-						date.plusDays (1))),
-					"Next day");
-
-			htmlLinkWrite (
-				stringFormat (
-					"?date=%u",
-					timeFormatter.dateString (
-						date.plusWeeks (1))),
-				"Next week");
-
-			htmlParagraphClose ();
-
-			// write graph image
+			htmlFormOpenGetAction (
+				requestContext.resolveLocalUrl (
+					"/chat.graphs.users"));
 
 			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
-				"<img",
-				" style=\"graph\"",
-				" src=\"%h\"",
-				requestContext.resolveLocalUrl (
-					stringFormat (
-						"/chat.graphs.usersImage",
-						"?date=%u",
-						dateString)),
+				"Date<br>");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"date\"",
+				" value=\"%h\"",
+				dateString,
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"ok\"",
 				">");
 
 			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+			if (
+				isNotNull (
+					date)
+			) {
+
+				// write date browser
+
+				htmlParagraphOpen (
+					htmlClassAttribute (
+						"links"));
+
+				htmlLinkWrite (
+					stringFormat (
+						"?date=%u",
+						timeFormatter.dateString (
+							date.minusWeeks (1))),
+					"Prev week");
+
+				htmlLinkWrite (
+					stringFormat (
+						"?date=%h",
+						timeFormatter.dateString (
+							date.minusDays (1))),
+					"Prev day");
+
+				htmlLinkWrite (
+					stringFormat (
+						"?date=%u",
+						timeFormatter.dateString (
+							date.plusDays (1))),
+						"Next day");
+
+				htmlLinkWrite (
+					stringFormat (
+						"?date=%u",
+						timeFormatter.dateString (
+							date.plusWeeks (1))),
+					"Next week");
+
+				htmlParagraphClose ();
+
+				// write graph image
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<img",
+					" style=\"graph\"",
+					" src=\"%h\"",
+					requestContext.resolveLocalUrl (
+						stringFormat (
+							"/chat.graphs.usersImage",
+							"?date=%u",
+							dateString)),
+					">");
+
+				htmlParagraphClose ();
+
+			}
 
 		}
 

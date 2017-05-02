@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.lookup.BooleanLookup;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)

@@ -48,12 +48,13 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("tabbedResponder")
@@ -138,24 +139,24 @@ class TabbedResponder
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setup");
 
 		) {
 
 			super.setup (
-				taskLogger);
+				transaction);
 
 			if (pagePart != null) {
 
 				pagePart.setup (
-					taskLogger,
+					transaction,
 					Collections.emptyMap ());
 
 			}
@@ -167,19 +168,19 @@ class TabbedResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			TabContext tabContext =
 				requestContext.tabContextRequired ();
@@ -219,7 +220,7 @@ class TabbedResponder
 				try {
 
 					pagePart.prepare (
-						taskLogger);
+						transaction);
 
 				} catch (RuntimeException exception) {
 
@@ -231,7 +232,7 @@ class TabbedResponder
 
 					// log the exception
 
-					taskLogger.warningFormatException (
+					transaction.warningFormatException (
 						exception,
 						"Exception while reponding to: %s",
 						path);
@@ -239,7 +240,7 @@ class TabbedResponder
 					// record the exception
 
 					exceptionLogger.logThrowable (
-						taskLogger,
+						transaction,
 						"console",
 						path,
 						exception,
@@ -265,19 +266,19 @@ class TabbedResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			if (
 
@@ -290,7 +291,7 @@ class TabbedResponder
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -339,13 +340,13 @@ class TabbedResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -354,13 +355,13 @@ class TabbedResponder
 				title);
 
 			renderTabs (
-				taskLogger);
+				transaction);
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			renderPagePart (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -370,13 +371,13 @@ class TabbedResponder
 
 	private
 	void renderTabs (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderTabs");
 
 		) {
@@ -421,7 +422,7 @@ class TabbedResponder
 						htmlLinkWrite (
 							formatWriter,
 							tabRef.getTab ().getUrl (
-								taskLogger),
+								transaction),
 							tabRef.getLabel (),
 							htmlClassAttribute (
 								"selected"));
@@ -431,7 +432,7 @@ class TabbedResponder
 						htmlLinkWrite (
 							formatWriter,
 							tabRef.getTab ().getUrl (
-								taskLogger),
+								transaction),
 							tabRef.getLabel ());
 
 					}
@@ -469,13 +470,13 @@ class TabbedResponder
 
 	private
 	void renderPagePart (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderPagePart");
 
 		) {
@@ -490,7 +491,7 @@ class TabbedResponder
 
 				if (
 					privChecker.canSimple (
-						taskLogger,
+						transaction,
 						GlobalId.root,
 						"debug")
 				) {
@@ -500,7 +501,7 @@ class TabbedResponder
 						stringFormat (
 							"<pre>%h</pre>",
 							exceptionLogic.throwableDump (
-								taskLogger,
+								transaction,
 								pagePartThrew)));
 
 				}
@@ -511,7 +512,7 @@ class TabbedResponder
 			) {
 
 				pagePart.renderHtmlBodyContent (
-					taskLogger);
+					transaction);
 
 			}
 

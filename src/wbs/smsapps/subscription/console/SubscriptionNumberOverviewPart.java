@@ -9,9 +9,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.subscription.model.SubscriptionRec;
 
@@ -21,6 +24,9 @@ class SubscriptionNumberOverviewPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SubscriptionConsoleHelper subscriptionHelper;
@@ -34,26 +40,49 @@ class SubscriptionNumberOverviewPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		subscription =
-			subscriptionHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			subscription =
+				subscriptionHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenDetails ();
+		try (
 
-		htmlTableDetailsRowWrite (
-			"Subscribers",
-			integerToDecimalString (
-				subscription.getNumSubscribers ()));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlTableClose ();
+		) {
+
+			htmlTableOpenDetails ();
+
+			htmlTableDetailsRowWrite (
+				"Subscribers",
+				integerToDecimalString (
+					subscription.getNumSubscribers ()));
+
+			htmlTableClose ();
+
+		}
 
 	}
 

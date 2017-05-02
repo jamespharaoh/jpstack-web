@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("consoleWebSocketApplication")
@@ -86,7 +87,7 @@ class ConsoleWebSocketApplication
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
 						"WebSocketImplementation.onClose");
 
@@ -110,7 +111,7 @@ class ConsoleWebSocketApplication
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
 						"WebSocketImplementation.onMessage");
 
@@ -136,7 +137,7 @@ class ConsoleWebSocketApplication
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
 						"WebSocketImplementation.onMessage");
 
@@ -163,7 +164,7 @@ class ConsoleWebSocketApplication
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
 						"sendMessage");

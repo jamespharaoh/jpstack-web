@@ -12,8 +12,11 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -22,32 +25,51 @@ public
 class FloatingPointFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Double,String> {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	Either<Optional<Double>,String> interfaceToGeneric (
+	Either <Optional <Double>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				interfaceValue.get ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			if (
 
-		} else {
+				optionalIsNotPresent (
+					interfaceValue)
 
-			return successResult (
-				optionalOf (
-					Double.parseDouble (
-						interfaceValue.get ())));
+				|| stringIsEmpty (
+					interfaceValue.get ())
+
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			} else {
+
+				return successResult (
+					optionalOf (
+						Double.parseDouble (
+							interfaceValue.get ())));
+
+			}
 
 		}
 
@@ -56,26 +78,37 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Double> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				Optional.<String>of (
-					""));
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else {
+				return successResult (
+					Optional.<String>of (
+						""));
 
-			return successResult (
-				Optional.of (
-					Double.toString (
-						genericValue.get ())));
+			} else {
+
+				return successResult (
+					Optional.of (
+						Double.toString (
+							genericValue.get ())));
+
+			}
 
 		}
 

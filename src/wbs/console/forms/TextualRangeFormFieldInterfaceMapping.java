@@ -30,8 +30,9 @@ import org.apache.commons.lang3.Range;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -63,16 +64,16 @@ class TextualRangeFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"genericToInterface");
 
 		) {
@@ -90,7 +91,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 			Either <Optional <String>, String> leftResult =
 				itemMapping.genericToInterface (
-					taskLogger,
+					transaction,
 					container,
 					hints,
 					optionalOf (
@@ -122,7 +123,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 			Either <Optional <String>, String> rightResult =
 				itemMapping.genericToInterface (
-					taskLogger,
+					transaction,
 					container,
 					hints,
 					Optional.of (
@@ -170,116 +171,130 @@ class TextualRangeFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <Range <Generic>>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		if (
-			optionalIsNotPresent (
-				interfaceValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
+
 		) {
+
+			if (
+				optionalIsNotPresent (
+					interfaceValue)
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// split minimum and maximum
+
+			List <String> interfaceParts =
+				stringSplitSimple (
+					" to ",
+					interfaceValue.get ());
+
+			if (
+				collectionDoesNotHaveTwoElements (
+					interfaceParts)
+			) {
+
+				return errorResult (
+					"Please enter a valid range, eg \"min to max\"");
+
+			}
+
+			// get minimum
+
+			Either <Optional <Generic>, String> leftResult =
+				itemMapping.interfaceToGeneric (
+					transaction,
+					container,
+					hints,
+					optionalOf (
+						listFirstElementRequired (
+							interfaceParts)));
+
+			if (
+				isError (
+					leftResult)
+			) {
+
+				return errorResult (
+					getError (
+						leftResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						leftResult))
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// get maximum
+
+			Either <Optional <Generic>, String> rightResult =
+				itemMapping.interfaceToGeneric (
+					transaction,
+					container,
+					hints,
+					optionalOf (
+						listSecondElementRequired (
+							interfaceParts)));
+
+			if (
+				isError (
+					rightResult)
+			) {
+
+				return errorResult (
+					getError (
+						rightResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						rightResult))
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// return
 
 			return successResult (
-				Optional.absent ());
-
-		}
-
-		// split minimum and maximum
-
-		List <String> interfaceParts =
-			stringSplitSimple (
-				" to ",
-				interfaceValue.get ());
-
-		if (
-			collectionDoesNotHaveTwoElements (
-				interfaceParts)
-		) {
-
-			return errorResult (
-				"Please enter a valid range, eg \"min to max\"");
-
-		}
-
-		// get minimum
-
-		Either <Optional <Generic>, String> leftResult =
-			itemMapping.interfaceToGeneric (
-				container,
-				hints,
 				optionalOf (
-					listFirstElementRequired (
-						interfaceParts)));
+					Range.between (
 
-		if (
-			isError (
-				leftResult)
-		) {
+				optionalGetRequired (
+					resultValueRequired (
+						leftResult)),
 
-			return errorResult (
-				getError (
-					leftResult));
+				optionalGetRequired (
+					resultValueRequired (
+						rightResult))
 
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					leftResult))
-		) {
-
-			return successResult (
-				optionalAbsent ());
+			)));
 
 		}
-
-		// get maximum
-
-		Either <Optional <Generic>, String> rightResult =
-			itemMapping.interfaceToGeneric (
-				container,
-				hints,
-				optionalOf (
-					listSecondElementRequired (
-						interfaceParts)));
-
-		if (
-			isError (
-				rightResult)
-		) {
-
-			return errorResult (
-				getError (
-					rightResult));
-
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					rightResult))
-		) {
-
-			return successResult (
-				optionalAbsent ());
-
-		}
-
-		// return
-
-		return successResult (
-			optionalOf (
-				Range.between (
-
-			optionalGetRequired (
-				resultValueRequired (
-					leftResult)),
-
-			optionalGetRequired (
-				resultValueRequired (
-					rightResult))
-
-		)));
 
 	}
 

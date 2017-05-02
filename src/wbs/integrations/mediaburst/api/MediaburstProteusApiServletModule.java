@@ -2,6 +2,9 @@ package wbs.integrations.mediaburst.api;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -10,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -114,8 +116,9 @@ class MediaburstProteusApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						logContext,
 						parentTaskLogger,
 						"reportFile.doPost");
 
@@ -123,8 +126,7 @@ class MediaburstProteusApiServletModule
 
 				ReportRequestResult reportRequestResult =
 					processReportRequest (
-
-						taskLogger,
+						transaction,
 						requestContext.inputStream ());
 
 				if (
@@ -134,42 +136,33 @@ class MediaburstProteusApiServletModule
 					return;
 				}
 
-				try (
+				// lookup objects
 
-					OwnedTransaction transaction =
-						database.beginReadWrite (
-							taskLogger,
-							"MediaburstProteusApiServletModule.reportFile.doPost ()",
-							this);
+				RouteRec route =
+					routeHelper.findRequired (
+						transaction,
+						requestContext.requestIntegerRequired (
+							"routeId"));
 
-				) {
+				reportLogic.deliveryReport (
+					transaction,
+					route,
+					reportRequestResult.otherId,
+					reportRequestResult.status,
+					optionalOfFormat (
+						reportRequestResult.statusString),
+					optionalAbsent (),
+					optionalOf (
+						joinWithSpace (
+							stringFormat (
+								"status=%s",
+								reportRequestResult.statusString),
+							stringFormat (
+								"errCode=%s",
+								reportRequestResult.errCode))),
+					optionalAbsent ());
 
-					RouteRec route =
-						routeHelper.findRequired (
-							requestContext.requestIntegerRequired (
-								"routeId"));
-
-					reportLogic.deliveryReport (
-						taskLogger,
-						route,
-						reportRequestResult.otherId,
-						reportRequestResult.status,
-						Optional.of (
-							reportRequestResult.statusString),
-						Optional.absent (),
-						Optional.of (
-							joinWithSpace (
-								stringFormat (
-									"status=%s",
-									reportRequestResult.statusString),
-								stringFormat (
-									"errCode=%s",
-									reportRequestResult.errCode))),
-						Optional.absent ());
-
-					transaction.commit ();
-
-				}
+				transaction.commit ();
 
 			}
 

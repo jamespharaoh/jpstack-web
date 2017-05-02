@@ -5,20 +5,33 @@ import static wbs.utils.etc.TypeUtils.classForNameRequired;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.identities.ParentTypeFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("parentTypeModelFieldBuilder")
 @ModelBuilder
 public
-class ParentTypeModelFieldBuilder {
+class ParentTypeModelFieldBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -33,66 +46,79 @@ class ParentTypeModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		// create model field
+		try (
 
-		ModelField modelField =
-			new ModelField ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.model (
-				target.model ())
+		) {
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				"parentType")
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				"parent type")
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.parentType)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				true)
+				.name (
+					"parentType")
 
-			.identity (
-				false)
+				.label (
+					"parent type")
 
-			// TODO this should noe be hard-coded
+				.type (
+					ModelFieldType.parentType)
 
-			.valueType (
-				classForNameRequired (
-					"wbs.platform.object.core.model.ObjectTypeRec"))
+				.parent (
+					true)
 
-			.nullable (
-				false)
+				.identity (
+					false)
 
-			.columnNames (
-				ImmutableList.of (
-					ifNull (
-						spec.columnName (),
-						"parent_type_id")));
+				// TODO this should noe be hard-coded
 
-		// store field
+				.valueType (
+					classForNameRequired (
+						"wbs.platform.object.core.model.ObjectTypeRec"))
 
-		target.fields ().add (
-			modelField);
+				.nullable (
+					false)
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.columnNames (
+					ImmutableList.of (
+						ifNull (
+							spec.columnName (),
+							"parent_type_id")));
 
-		if (target.model ().parentTypeField () != null)
-			throw new RuntimeException ();
+			// store field
 
-		target.model ().parentTypeField (
-			modelField);
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().parentTypeField () != null)
+				throw new RuntimeException ();
+
+			target.model ().parentTypeField (
+				modelField);
+
+		}
 
 	}
 

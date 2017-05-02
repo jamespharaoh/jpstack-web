@@ -18,7 +18,8 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.graph.console.GraphScale;
 
@@ -78,79 +79,104 @@ class ChatGraphsUsersImageResponder
 	@Override
 	protected
 	void prepareData (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		timezone =
-			chatMiscLogic.timezone (
-				chat);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareData");
 
-		try {
+		) {
 
-			date =
-				timeFormatter
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
 
-				.dateStringToLocalDateRequired (
-					requestContext.parameterRequired (
-						"date"));
+			timezone =
+				chatMiscLogic.timezone (
+					transaction,
+					chat);
 
-			minTime =
-				date
-					.toDateTimeAtStartOfDay (timezone)
-					.toInstant ();
+			try {
 
-			maxTime =
-				date
-					.plusDays (1)
-					.toDateTimeAtStartOfDay (timezone)
-					.toInstant ();
+				date =
+					timeFormatter
 
-		} catch (Exception exception) {
+					.dateStringToLocalDateRequired (
+						requestContext.parameterRequired (
+							"date"));
 
-			throw new RuntimeException (
-				"Invalid date");
+				minTime =
+					date
+						.toDateTimeAtStartOfDay (timezone)
+						.toInstant ();
+
+				maxTime =
+					date
+						.plusDays (1)
+						.toDateTimeAtStartOfDay (timezone)
+						.toInstant ();
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					"Invalid date");
+
+			}
+
+			allChatStats =
+				chatStatsHelper.findByTimestamp (
+					transaction,
+					chat,
+					new Interval (
+						minTime,
+						maxTime));
+
+			Collections.sort (
+				allChatStats);
 
 		}
-
-		allChatStats =
-			chatStatsHelper.findByTimestamp (
-				chat,
-				new Interval (
-					minTime,
-					maxTime));
-
-		Collections.sort (
-			allChatStats);
 
 	}
 
 	@Override
 	protected
 	void prepareVerticalScale (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		long realMax = 0;
+		try (
 
-		for (
-			ChatStatsRec chatStats
-				: allChatStats
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareVerticalScale");
+
 		) {
 
-			if (chatStats.getNumUsers() > realMax) {
+			long realMax = 0;
 
-				realMax =
-					chatStats.getNumUsers ();
+			for (
+				ChatStatsRec chatStats
+					: allChatStats
+			) {
+
+				if (chatStats.getNumUsers() > realMax) {
+
+					realMax =
+						chatStats.getNumUsers ();
+
+				}
 
 			}
 
-		}
+			verticalScale =
+				GraphScale.setScale (
+					realMax,
+					0);
 
-		verticalScale =
-			GraphScale.setScale (
-				realMax,
-				0);
+		}
 
 	}
 

@@ -13,7 +13,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
@@ -54,7 +54,7 @@ class SubscriptionNumberLinkProvider
 	@Override
 	public
 	List <Link> findLinks (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull NumberRec number,
 			boolean active) {
 

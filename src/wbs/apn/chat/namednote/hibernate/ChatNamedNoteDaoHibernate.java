@@ -6,12 +6,17 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.apn.chat.namednote.model.ChatNamedNoteDao;
 import wbs.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.hibernate.HibernateDao;
 
 @SingletonComponent ("chatNamedNoteDaoHibernate")
 public
@@ -19,65 +24,98 @@ public
 	extends HibernateDao
 	implements ChatNamedNoteDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	ChatNamedNoteRec find (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisChatUser,
 			@NonNull ChatUserRec otherChatUser,
 			@NonNull ChatNoteNameRec chatNoteName) {
 
-		return findOneOrNull (
-			"find (thisChatUser, otherChatUser, chatNoteName",
-			ChatNamedNoteRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ChatNamedNoteRec.class,
-				"_chatNamedNote")
 
-			.add (
-				Restrictions.eq (
-					"_chatNamedNote.thisUser",
-					thisChatUser))
+				createCriteria (
+					transaction,
+					ChatNamedNoteRec.class,
+					"_chatNamedNote")
 
-			.add (
-				Restrictions.eq (
-					"_chatNamedNote.otherUser",
-					otherChatUser))
+				.add (
+					Restrictions.eq (
+						"_chatNamedNote.thisUser",
+						thisChatUser))
 
-			.add (
-				Restrictions.eq (
-					"_chatNamedNote.chatNoteName",
-					chatNoteName))
+				.add (
+					Restrictions.eq (
+						"_chatNamedNote.otherUser",
+						otherChatUser))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_chatNamedNote.chatNoteName",
+						chatNoteName))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatNamedNoteRec> find (
+	List <ChatNamedNoteRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisChatUser,
 			@NonNull ChatUserRec otherChatUser) {
 
-		return findMany (
-			"find (thisChatUser, otherChatUser)",
-			ChatNamedNoteRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatNamedNoteRec.class,
-				"_chatNamedNote")
 
-			.add (
-				Restrictions.eq (
-					"_chatNamedNote.thisUser",
-					thisChatUser))
+				createCriteria (
+					transaction,
+					ChatNamedNoteRec.class,
+					"_chatNamedNote")
 
-			.add (
-				Restrictions.eq (
-					"_chatNamedNote.otherUser",
-					otherChatUser))
+				.add (
+					Restrictions.eq (
+						"_chatNamedNote.thisUser",
+						thisChatUser))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_chatNamedNote.otherUser",
+						otherChatUser))
+
+			);
+
+		}
 
 	}
 

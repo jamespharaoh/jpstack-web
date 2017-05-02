@@ -8,6 +8,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -27,6 +28,7 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 
 import wbs.utils.etc.OptionalUtils;
@@ -62,10 +64,12 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	Optional <RecordType> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
-		return Optional.fromNullable (
+		return optionalFromNullable (
 			objectDatabaseHelper.find (
+				parentTransaction,
 				id));
 
 	}
@@ -73,10 +77,12 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	RecordType findRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
 		RecordType record =
 			objectDatabaseHelper.find (
+				parentTransaction,
 				id);
 
 		if (
@@ -102,9 +108,11 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	RecordType findOrNull (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
 		return objectDatabaseHelper.find (
+			parentTransaction,
 			id);
 
 	}
@@ -112,11 +120,13 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	RecordType findOrThrow (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id,
 			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
 		RecordType object =
 			objectDatabaseHelper.find (
+				parentTransaction,
 				id);
 
 		if (
@@ -138,11 +148,13 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	List <Optional <RecordType>> findMany (
+			@NonNull Transaction parentTransaction,
 			@NonNull List <Long> ids) {
 
 		return iterableMapToList (
 			OptionalUtils::optionalFromNullable,
 			objectDatabaseHelper.findMany (
+				parentTransaction,
 				ids));
 
 	}
@@ -150,10 +162,12 @@ class ObjectHelperIdImplementation <
 	@Override
 	public
 	List <RecordType> findManyRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull List <Long> ids) {
 
 		List <RecordType> objects =
 			objectDatabaseHelper.findMany (
+				parentTransaction,
 				ids);
 
 		List <Long> missingIds =

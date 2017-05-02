@@ -3,6 +3,7 @@ package wbs.console.responder;
 import static wbs.utils.collection.CollectionUtils.listSorted;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
@@ -13,16 +14,17 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import org.joda.time.Instant;
-
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogEvent;
 import wbs.framework.logging.TaskLogger;
 
@@ -103,19 +105,19 @@ class ConsoleHtmlResponder
 	@Override
 	protected
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
 
 			super.setHtmlHeaders (
-				taskLogger);
+				transaction);
 
 			requestContext.setHeader (
 				"Content-Type",
@@ -128,7 +130,7 @@ class ConsoleHtmlResponder
 			requestContext.setHeader (
 				"Expiry",
 				timeFormatter.httpTimestampString (
-					Instant.now ()));
+					transaction.now ()));
 
 		}
 
@@ -220,67 +222,83 @@ class ConsoleHtmlResponder
 
 	protected
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		renderHtmlTitle ();
+		try (
 
-		renderHtmlScriptRefs ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHeadContents");
 
-		renderHtmlLinks ();
+		) {
 
-		goMeta ();
+			renderHtmlTitle ();
+
+			renderHtmlScriptRefs ();
+
+			renderHtmlLinks ();
+
+			goMeta ();
+
+		}
 
 	}
 
 	protected
 	void renderHtmlHead (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<head>");
+		try (
 
-		formatWriter.increaseIndent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHead");
 
-		renderHtmlHeadContents (
-				parentTaskLogger);
+		) {
 
-		formatWriter.decreaseIndent ();
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<head>");
 
-		formatWriter.writeLineFormat (
-			"</head>");
+			renderHtmlHeadContents (
+				transaction);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</head>");
+
+		}
 
 	}
 
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
 
 	}
 
 	protected
 	void renderHtmlBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBody");
 
 		) {
 
-			formatWriter.writeLineFormat (
+			formatWriter.writeLineFormatIncreaseIndent (
 				"<body>");
 
-			formatWriter.increaseIndent ();
-
 			renderHtmlBodyContents (
-				taskLogger);
+				transaction);
 
-			formatWriter.decreaseIndent ();
-
-			formatWriter.writeLineFormat (
+			formatWriter.writeLineFormatDecreaseIndent (
 				"</body>");
 
 		}
@@ -290,13 +308,13 @@ class ConsoleHtmlResponder
 	@Override
 	protected
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"render");
 
 		) {
@@ -307,16 +325,16 @@ class ConsoleHtmlResponder
 				"<html>");
 
 			renderHtmlHead (
-				taskLogger);
+				transaction);
 
 			renderHtmlBody (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormat (
 				"</html>");
 
 			renderDebugInformation (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -328,7 +346,7 @@ class ConsoleHtmlResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"renderDebugInformation");

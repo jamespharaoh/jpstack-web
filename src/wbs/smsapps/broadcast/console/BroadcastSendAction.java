@@ -81,23 +81,19 @@ class BroadcastSendAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"BroadcastSendAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			BroadcastRec broadcast =
-				broadcastHelper.findFromContextRequired ();
+				broadcastHelper.findFromContextRequired (
+					transaction);
 
 			BroadcastConfigRec broadcastConfig =
 				broadcast.getBroadcastConfig ();
@@ -126,7 +122,8 @@ class BroadcastSendAction
 				broadcast
 
 					.setSentUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setScheduledTime (
 						transaction.now ())
@@ -143,14 +140,15 @@ class BroadcastSendAction
 						broadcastConfig.getNumSending () + 1);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_scheduled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					broadcast,
 					transaction.now ());
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_send_begun",
 					broadcast);
 
@@ -186,7 +184,8 @@ class BroadcastSendAction
 
 					scheduledTime =
 						timeFormatter.timestampStringToInstant (
-							userConsoleLogic.timezone (),
+							userConsoleLogic.timezone (
+								transaction),
 							requestContext.parameterRequired (
 								"timestamp"));
 
@@ -202,7 +201,8 @@ class BroadcastSendAction
 				broadcast
 
 					.setSentUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setScheduledTime (
 						scheduledTime)
@@ -219,9 +219,10 @@ class BroadcastSendAction
 						broadcastConfig.getNumScheduled () + 1);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_scheduled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					broadcast,
 					scheduledTime);
 
@@ -265,9 +266,10 @@ class BroadcastSendAction
 						broadcastConfig.getNumUnsent () + 1);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_unscheduled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					broadcast);
 
 				transaction.commit ();
@@ -316,9 +318,10 @@ class BroadcastSendAction
 						BroadcastState.cancelled);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"broadcast_cancelled",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						broadcast);
 
 					transaction.commit ();
@@ -340,9 +343,10 @@ class BroadcastSendAction
 						BroadcastState.partiallySent);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"broadcast_cancelled",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						broadcast);
 
 					transaction.commit ();

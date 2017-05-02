@@ -72,29 +72,26 @@ class ChatMonitorInboxUpdateNoteAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatMonitorInboxUpdateNodeAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			ChatMonitorInboxRec chatMonitorInbox =
-				chatMonitorInboxHelper.findFromContextRequired ();
+				chatMonitorInboxHelper.findFromContextRequired (
+					transaction);
 
 			ChatUserRec monitorChatUser =
 				chatMonitorInbox.getMonitorChatUser ();
 
 			ChatContactNoteRec note =
 				chatContactNoteHelper.findRequired (
+					transaction,
 					requestContext.parameterIntegerRequired (
 						"id"));
 
@@ -103,11 +100,12 @@ class ChatMonitorInboxUpdateNoteAction
 					"deleteNote")
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"deleting note from %s",
 					monitorChatUser.getName ());
 
 				objectManager.remove (
+					transaction,
 					note);
 
 				transaction.commit ();
@@ -125,7 +123,7 @@ class ChatMonitorInboxUpdateNoteAction
 
 				transaction.commit ();
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"User %s pegged chat user contact note %s",
 					integerToDecimalString (
 						userConsoleLogic.userIdRequired ()),
@@ -144,7 +142,7 @@ class ChatMonitorInboxUpdateNoteAction
 
 				transaction.commit ();
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"User %s unpegged chat user contact note %s",
 					integerToDecimalString (
 						userConsoleLogic.userIdRequired ()),

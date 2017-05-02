@@ -19,9 +19,12 @@ import lombok.NonNull;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
@@ -35,6 +38,9 @@ class ChatUserHelpFormResponder
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -47,84 +53,107 @@ class ChatUserHelpFormResponder
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Send help message");
+		try (
 
-		requestContext.flushNotices (
-			formatWriter);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.helpForm"));
+		) {
 
-		htmlTableOpenDetails ();
+			htmlHeadingTwoWrite (
+				"Send help message");
 
-		String userInfo =
-			chatUser.getName () == null
-				? chatUser.getCode ()
-				: chatUser.getCode () + " " + chatUser.getName ();
+			requestContext.flushNotices (
+				formatWriter);
 
-		htmlTableDetailsRowWrite (
-			"User",
-			userInfo);
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.helpForm"));
 
-		String charCountScript =
-			stringFormat (
-				"gsmCharCount (%s, %s, 149)",
-				"document.getElementById ('text')",
-				"document.getElementById ('chars')");
+			htmlTableOpenDetails ();
 
-		htmlTableDetailsRowWriteHtml (
-			"Message",
-			() -> formatWriter.writeLineFormat (
-				"<textarea",
-				" id=\"text\"",
-				" cols=\"64\"",
-				" rows=\"4\"",
-				" name=\"text\"",
-				" onkeyup=\"%h\"",
-				charCountScript,
-				" onfocus=\"%h\"",
-				charCountScript,
-				"></textarea>"));
+			String userInfo =
+				chatUser.getName () == null
+					? chatUser.getCode ()
+					: chatUser.getCode () + " " + chatUser.getName ();
 
-		htmlTableDetailsRowWriteHtml (
-			"Chars",
-			() -> htmlSpanWrite (
-				"",
-				htmlIdAttribute (
-					"chars")));
+			htmlTableDetailsRowWrite (
+				"User",
+				userInfo);
 
-		htmlTableClose ();
+			String charCountScript =
+				stringFormat (
+					"gsmCharCount (%s, %s, 149)",
+					"document.getElementById ('text')",
+					"document.getElementById ('chars')");
 
-		htmlParagraphOpen ();
+			htmlTableDetailsRowWriteHtml (
+				"Message",
+				() -> formatWriter.writeLineFormat (
+					"<textarea",
+					" id=\"text\"",
+					" cols=\"64\"",
+					" rows=\"4\"",
+					" name=\"text\"",
+					" onkeyup=\"%h\"",
+					charCountScript,
+					" onfocus=\"%h\"",
+					charCountScript,
+					"></textarea>"));
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"send message\"",
-			">");
+			htmlTableDetailsRowWriteHtml (
+				"Chars",
+				() -> htmlSpanWrite (
+					"",
+					htmlIdAttribute (
+						"chars")));
 
-		htmlParagraphClose ();
+			htmlTableClose ();
 
-		htmlFormClose ();
+			htmlParagraphOpen ();
 
-		htmlScriptBlockWrite (
-			stringFormat (
-				"%s;",
-				charCountScript));
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"send message\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+			htmlScriptBlockWrite (
+				stringFormat (
+					"%s;",
+					charCountScript));
+
+		}
 
 	}
 

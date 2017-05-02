@@ -20,9 +20,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -41,6 +44,9 @@ class ChatNoteNamesPart
 	@SingletonDependency
 	ChatNoteNameConsoleHelper chatNoteNameHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	List <ChatNoteNameRec> noteNames;
@@ -50,54 +56,134 @@ class ChatNoteNamesPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		ChatRec chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		noteNames =
-			chatNoteNameHelper.findNotDeleted (
-				chat);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			ChatRec chat =
+				chatHelper.findFromContextRequired (
+					transaction);
+
+			noteNames =
+				chatNoteNameHelper.findNotDeleted (
+					transaction,
+					chat);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// form open
+		try (
 
-		htmlFormOpenPostAction (
-			"chat.settings.noteNames");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// form controls
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"saveChanges\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// table open
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Name",
-			"Options");
-
-		// table contents
-
-		for (
-			ChatNoteNameRec noteName
-				: noteNames
 		) {
+
+			// form open
+
+			htmlFormOpenPostAction (
+				"chat.settings.noteNames");
+
+			// form controls
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"saveChanges\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// table open
+
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Name",
+				"Options");
+
+			// table contents
+
+			for (
+				ChatNoteNameRec noteName
+					: noteNames
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"noteName%s\"",
+					integerToDecimalString (
+						noteName.getId ()),
+					" value=\"%h\"",
+					requestContext.formOrDefault (
+						stringFormat (
+							"noteName%s",
+							integerToDecimalString (
+								noteName.getId ())),
+						noteName.getName ()),
+					">");
+
+				htmlTableCellClose ();
+
+				htmlTableCellOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"noteMoveUp%s\"",
+					integerToDecimalString (
+						noteName.getId ()),
+					" value=\"&uarr;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"noteMoveDown%s\"",
+					integerToDecimalString (
+						noteName.getId ()),
+					" value=\"&darr;\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"noteDelete%s\"",
+					integerToDecimalString (
+						noteName.getId ()),
+					" value=\"&times;\"",
+					">");
+
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
+
+			}
+
+			// new note
 
 			htmlTableRowOpen ();
 
@@ -106,16 +192,10 @@ class ChatNoteNamesPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
-				" name=\"noteName%s\"",
-				integerToDecimalString (
-					noteName.getId ()),
+				" name=\"noteNameNew\"",
 				" value=\"%h\"",
-				requestContext.formOrDefault (
-					stringFormat (
-						"noteName%s",
-						integerToDecimalString (
-							noteName.getId ())),
-					noteName.getName ()),
+				requestContext.formOrEmptyString (
+					"noteNameNew"),
 				">");
 
 			htmlTableCellClose ();
@@ -125,86 +205,36 @@ class ChatNoteNamesPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"noteMoveUp%s\"",
-				integerToDecimalString (
-					noteName.getId ()),
-				" value=\"&uarr;\"",
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"noteMoveDown%s\"",
-				integerToDecimalString (
-					noteName.getId ()),
-				" value=\"&darr;\"",
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"noteDelete%s\"",
-				integerToDecimalString (
-					noteName.getId ()),
-				" value=\"&times;\"",
+				" name=\"saveChanges\"",
+				" value=\"add new\"",
 				">");
 
 			htmlTableCellClose ();
 
 			htmlTableRowClose ();
 
+			// table close
+
+			htmlTableClose ();
+
+			// form controls again
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"saveChanges\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
 		}
-
-		// new note
-
-		htmlTableRowOpen ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"noteNameNew\"",
-			" value=\"%h\"",
-			requestContext.formOrEmptyString (
-				"noteNameNew"),
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"saveChanges\"",
-			" value=\"add new\"",
-			">");
-
-		htmlTableCellClose ();
-
-		htmlTableRowClose ();
-
-		// table close
-
-		htmlTableClose ();
-
-		// form controls again
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"saveChanges\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// form close
-
-		htmlFormClose ();
 
 	}
 

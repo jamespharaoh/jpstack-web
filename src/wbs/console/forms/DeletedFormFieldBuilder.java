@@ -8,24 +8,36 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.core.ConsoleHelper;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("deletedFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class DeletedFormFieldBuilder {
+class DeletedFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -81,116 +93,97 @@ class DeletedFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		ConsoleHelper consoleHelper =
-			context.consoleHelper ();
+		try (
 
-		String name =
-			ifNull (
-				spec.name (),
-				consoleHelper.deletedFieldName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					consoleHelper.deletedLabel ()));
+		) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			ConsoleHelper consoleHelper =
+				context.consoleHelper ();
 
-		String yesLabel =
-			ifNull (
-				spec.yesLabel (),
-				"yes");
+			String name =
+				ifNull (
+					spec.name (),
+					consoleHelper.deletedFieldName ());
 
-		String noLabel =
-			ifNull (
-				spec.noLabel (),
-				"no");
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						consoleHelper.deletedLabel ()));
 
-		// accessor
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			String yesLabel =
+				ifNull (
+					spec.yesLabel (),
+					"yes");
 
-			.name (
-				name)
+			String noLabel =
+				ifNull (
+					spec.noLabel (),
+					"no");
 
-			.nativeClass (
-				Boolean.class);
+			// accessor
 
-		// native mapping
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+				.name (
+					name)
 
-		// value validators
+				.nativeClass (
+					Boolean.class);
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+			// native mapping
 
-		valueValidators.add (
-			requiredFormFieldValueValidatorProvider.get ());
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
-		// constraint validator
+			// value validators
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-		// interface mapping
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
 
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			// constraint validator
 
-		// csv mapping
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
 
-		FormFieldInterfaceMapping csvMapping =
-			yesNoCsvFormFieldInterfaceMappingProvider.get ()
+			// interface mapping
 
-			.nullable (
-				false);
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
 
-		// render
+			// csv mapping
 
-		FormFieldRenderer renderer =
-			yesNoFormFieldRendererProvider.get ()
+			FormFieldInterfaceMapping csvMapping =
+				yesNoCsvFormFieldInterfaceMappingProvider.get ()
 
-			.name (
-				name)
+				.nullable (
+					false);
 
-			.label (
-				label)
+			// render
 
-			.nullable (
-				false)
-
-			.yesLabel (
-				yesLabel)
-
-			.noLabel (
-				noLabel);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// field
-
-		if (! readOnly) {
-
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				yesNoFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -198,59 +191,91 @@ class DeletedFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					false)
 
-				.nativeMapping (
-					nativeMapping)
+				.yesLabel (
+					yesLabel)
 
-				.valueValidators (
-					valueValidators)
+				.noLabel (
+					noLabel);
 
-				.constraintValidator (
-					constraintValidator)
+			// update hook
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.csvMapping (
-					csvMapping)
+			// field
 
-				.renderer (
-					renderer)
+			if (! readOnly) {
 
-				.updateHook (
-					updateHook)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-			);
+					.name (
+						name)
 
-		} else {
+					.label (
+						label)
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+					.accessor (
+						accessor)
 
-				.name (
-					name)
+					.nativeMapping (
+						nativeMapping)
 
-				.label (
-					label)
+					.valueValidators (
+						valueValidators)
 
-				.accessor (
-					accessor)
+					.constraintValidator (
+						constraintValidator)
 
-				.nativeMapping (
-					nativeMapping)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.interfaceMapping (
-					interfaceMapping)
+					.csvMapping (
+						csvMapping)
 
-				.csvMapping (
-					csvMapping)
+					.renderer (
+						renderer)
 
-				.renderer (
-					renderer)
+					.updateHook (
+						updateHook)
 
-			);
+				);
+
+			} else {
+
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			}
 
 		}
 

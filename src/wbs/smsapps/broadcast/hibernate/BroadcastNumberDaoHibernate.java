@@ -5,6 +5,7 @@ import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,11 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -29,109 +34,157 @@ class BroadcastNumberDaoHibernate
 	extends HibernateDao
 	implements BroadcastNumberDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	BroadcastNumberRec find (
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
 			@NonNull NumberRec number) {
 
-		return findOneOrNull (
-			"find (broadcast, number)",
-			BroadcastNumberRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				BroadcastNumberRec.class,
-				"_broadcastNumber")
 
-			.add (
-				Restrictions.eq (
-					"_broadcastNumber.broadcast",
-					broadcast))
+				createCriteria (
+					transaction,
+					BroadcastNumberRec.class,
+					"_broadcastNumber")
 
-			.add (
-				Restrictions.eq (
-					"_broadcastNumber.number",
-					number))
+				.add (
+					Restrictions.eq (
+						"_broadcastNumber.broadcast",
+						broadcast))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_broadcastNumber.number",
+						number))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <Optional <BroadcastNumberRec>> findMany (
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <NumberRec> numbers) {
 
-		if (
-			collectionIsEmpty (
-				numbers)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findMany");
+
 		) {
-			return emptyList ();
+
+			if (
+				collectionIsEmpty (
+					numbers)
+			) {
+				return emptyList ();
+			}
+
+			List <BroadcastNumberRec> broadcastNumbers =
+				findMany (
+					transaction,
+					BroadcastNumberRec.class,
+
+				createCriteria (
+					transaction,
+					BroadcastNumberRec.class,
+					"_broadcastNumber")
+
+				.add (
+					Restrictions.eq (
+						"_broadcastNumber.broadcast",
+						broadcast))
+
+				.add (
+					Restrictions.in (
+						"_broadcastNumber.number",
+						numbers))
+
+			);
+
+			Map <NumberRec, BroadcastNumberRec> broadcastNumbersMap =
+				mapWithDerivedKey (
+					broadcastNumbers,
+					BroadcastNumberRec::getNumber);
+
+			return iterableMapToList (
+				number ->
+					mapItemForKey (
+						broadcastNumbersMap,
+						number),
+				numbers);
+
+
 		}
-
-		List <BroadcastNumberRec> broadcastNumbers =
-			findMany (
-				"find (broadcast, number)",
-				BroadcastNumberRec.class,
-
-			createCriteria (
-				BroadcastNumberRec.class,
-				"_broadcastNumber")
-
-			.add (
-				Restrictions.eq (
-					"_broadcastNumber.broadcast",
-					broadcast))
-
-			.add (
-				Restrictions.in (
-					"_broadcastNumber.number",
-					numbers))
-
-		);
-
-		Map <NumberRec, BroadcastNumberRec> broadcastNumbersMap =
-			mapWithDerivedKey (
-				broadcastNumbers,
-				BroadcastNumberRec::getNumber);
-
-		return iterableMapToList (
-			number -> mapItemForKey (
-				broadcastNumbersMap,
-				number),
-			numbers);
-
 	}
 
 	@Override
 	public
 	List <BroadcastNumberRec> findAcceptedLimit (
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
-		return findMany (
-			"findAcceptedByBroadcastLimit (broadcastId, limit)",
-			BroadcastNumberRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findAcceptedLimit");
+
+		) {
+
+			return findMany (
+				transaction,
 				BroadcastNumberRec.class,
-				"_broadcastNumber")
 
-			.add (
-				Restrictions.eq (
-					"_broadcastNumber.broadcast",
-					broadcast))
+				createCriteria (
+					transaction,
+					BroadcastNumberRec.class,
+					"_broadcastNumber")
 
-			.add (
-				Restrictions.eq (
-					"_broadcastNumber.state",
-					BroadcastNumberState.accepted))
+				.add (
+					Restrictions.eq (
+						"_broadcastNumber.broadcast",
+						broadcast))
 
-			.setMaxResults (
-				maxResults)
+				.add (
+					Restrictions.eq (
+						"_broadcastNumber.state",
+						BroadcastNumberState.accepted))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 

@@ -5,6 +5,7 @@ import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -28,11 +29,18 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.CloseableTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.cache.AdvancedCache;
 import wbs.utils.cache.IdCacheBuilder;
@@ -47,14 +55,21 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	ObjectManager objectManager;
 
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <Pair <Long, String>, Long, RecordType>>
-	idCacheBuilderProvider;
+	Provider <IdCacheBuilder <
+		CloseableTransaction,
+		Pair <Long, String>,
+		Long,
+		RecordType
+	>> idCacheBuilderProvider;
 
 	// properties
 
@@ -69,58 +84,74 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 	// state
 
-	AdvancedCache <Pair <Long, String>, RecordType> parentIdAndCodeCache;
+	AdvancedCache <CloseableTransaction, Pair <Long, String>, RecordType>
+		parentIdAndCodeCache;
 
 	// life cycle
 
 	@Override
 	public
-	ObjectHelperCodeImplementation <RecordType> setup () {
+	ObjectHelperCodeImplementation <RecordType> setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// parent id and code
+		try (
 
-		if (allOf (
-			() -> isNotNull (objectModel.parentField ()),
-			() -> isNotNull (objectModel.codeField ())
-		)) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			parentIdAndCodeCache =
-				idCacheBuilderProvider.get ()
+		) {
 
-				.dummy (! allOf (
-					() -> objectModel.parentField ().cacheable (),
-					() -> objectModel.codeField ().cacheable ()
-				))
+			// parent id and code
 
-				.cacheNegatives (
-					false)
+			if (allOf (
+				() -> isNotNull (objectModel.parentField ()),
+				() -> isNotNull (objectModel.codeField ())
+			)) {
 
-				.lookupByIdFunction (
-					objectId ->
-						Optional.fromNullable (
-							objectDatabaseHelper.find (
-								objectId)))
+				parentIdAndCodeCache =
+					idCacheBuilderProvider.get ()
 
-				.lookupByKeyFunction (
-					key ->
-						Optional.fromNullable (
-							objectDatabaseHelper.findByParentAndCode (
-								new GlobalId (
-									objectModel.parentTypeId (),
-									key.getLeft ()),
-								key.getRight ())))
+					.dummy (! allOf (
+						() -> objectModel.parentField ().cacheable (),
+						() -> objectModel.codeField ().cacheable ()
+					))
 
-				.getIdFunction (
-					record ->
-						record.getId ())
+					.cacheNegatives (
+						false)
 
-				.build ();
+					.lookupByIdFunction (
+						(innerTransaction, objectId) ->
+							optionalFromNullable (
+								objectDatabaseHelper.find (
+									innerTransaction,
+									objectId)))
+
+					.lookupByKeyFunction (
+						(innerTransaction, key) ->
+							optionalFromNullable (
+								objectDatabaseHelper.findByParentAndCode (
+									innerTransaction,
+									new GlobalId (
+										objectModel.parentTypeId (),
+										key.getLeft ()),
+									key.getRight ())))
+
+					.getIdFunction (
+						record ->
+							record.getId ())
+
+					.build (
+						taskLogger);
+
+			}
+
+			// return
+
+			return this;
 
 		}
-
-		// return
-
-		return this;
 
 	}
 
@@ -129,111 +160,156 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	Optional <RecordType> findByCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String ... codes) {
 
-		if (codes.length == 1) {
+		try (
 
-			return Optional.fromNullable (
-				objectDatabaseHelper.findByParentAndCode (
-					ancestorGlobalId,
-					codes [0]));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCode");
+
+		) {
+
+			if (codes.length == 1) {
+
+				return Optional.fromNullable (
+					objectDatabaseHelper.findByParentAndCode (
+						transaction,
+						ancestorGlobalId,
+						codes [0]));
+
+			}
+
+			if (codes.length > 1) {
+
+				ObjectHelper <?> parentHelper =
+					objectManager.objectHelperForClassRequired (
+						objectModel.parentClass ());
+
+				Record <?> parent =
+					parentHelper.findByCodeRequired (
+						transaction,
+						ancestorGlobalId,
+						Arrays.copyOfRange (
+							codes,
+							0,
+							codes.length - 1));
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parent.getId ());
+
+				return Optional.fromNullable (
+					objectDatabaseHelper.findByParentAndCode (
+						transaction,
+						parentGlobalId,
+						codes [1]));
+
+			}
+
+			throw new IllegalArgumentException (
+				"codes");
 
 		}
-
-		if (codes.length > 1) {
-
-			ObjectHelper <?> parentHelper =
-				objectManager.objectHelperForClassRequired (
-					objectModel.parentClass ());
-
-			Record <?> parent =
-				parentHelper.findByCodeRequired (
-					ancestorGlobalId,
-					Arrays.copyOfRange (
-						codes,
-						0,
-						codes.length - 1));
-
-			GlobalId parentGlobalId =
-				new GlobalId (
-					parentHelper.objectTypeId (),
-					parent.getId ());
-
-			return Optional.fromNullable (
-				objectDatabaseHelper.findByParentAndCode (
-					parentGlobalId,
-					codes [1]));
-
-		}
-
-		throw new IllegalArgumentException (
-			"codes");
 
 	}
 
 	@Override
 	public
 	List <Optional <RecordType>> findManyByCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull List <String> codes) {
 
-		Map <String, RecordType> recordsByCode =
-			mapWithDerivedKey (
-				objectDatabaseHelper.findManyByParentAndCode (
-					parentGlobalId,
-					codes),
-				objectModel::getCode);
+		try (
 
-		return iterableMapToList (
-			code -> mapItemForKey (
-				recordsByCode,
-				code),
-			codes);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findManyByCode");
+
+		) {
+
+			Map <String, RecordType> recordsByCode =
+				mapWithDerivedKey (
+					objectDatabaseHelper.findManyByParentAndCode (
+						transaction,
+						parentGlobalId,
+						codes),
+					objectModel::getCode);
+
+			return iterableMapToList (
+				code -> mapItemForKey (
+					recordsByCode,
+					code),
+				codes);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByCodeRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String ... codes) {
 
-		Optional <RecordType> recordOptional =
-			findByCode (
-				ancestorGlobalId,
-				codes);
+		try (
 
-		if (
-			optionalIsNotPresent (
-				recordOptional)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCodeRequired");
+
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"No such %s with parent %s and code %s",
-					objectModel.objectName (),
-					objectManager.objectPath (
-						objectManager.findObject (
-							ancestorGlobalId)),
-					joinWithFullStop (
-						codes)));
+			Optional <RecordType> recordOptional =
+				findByCode (
+					transaction,
+					ancestorGlobalId,
+					codes);
+
+			if (
+				optionalIsNotPresent (
+					recordOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"No such %s with parent %s and code %s",
+						objectModel.objectName (),
+						objectManager.objectPath (
+							transaction,
+							objectManager.findObject (
+								transaction,
+								ancestorGlobalId)),
+						joinWithFullStop (
+							codes)));
+
+			}
+
+			return optionalGetRequired (
+				recordOptional);
 
 		}
-
-		return optionalGetRequired (
-			recordOptional);
 
 	}
 
 	@Override
 	public
 	RecordType findByCodeOrNull (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String ... codes) {
 
 		return optionalOrNull (
 			findByCode (
+				parentTransaction,
 				ancestorGlobalId,
 				codes));
 
@@ -242,12 +318,14 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String code,
 			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
 		Optional <RecordType> recordOptional =
 			findByCode (
+				parentTransaction,
 				ancestorGlobalId,
 				code);
 
@@ -270,12 +348,14 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> ancestor,
 			@NonNull String code,
 			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByCode (
+				parentTransaction,
 				ancestor,
 				code);
 
@@ -297,6 +377,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String code0,
 			@NonNull String code1,
@@ -304,6 +385,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 		Optional <RecordType> recordOptional =
 			findByCode (
+				parentTransaction,
 				ancestorGlobalId,
 				code0,
 				code1);
@@ -326,6 +408,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> ancestor,
 			@NonNull String code0,
 			@NonNull String code1,
@@ -333,6 +416,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 		Optional <RecordType> recordOptional =
 			findByCode (
+				parentTransaction,
 				ancestor,
 				code0,
 				code1);
@@ -355,101 +439,158 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	Optional <RecordType> findByCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull String ... codes) {
 
-		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForClassRequired (
-				parent.getClass ());
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCode");
 
-		return findByCode (
-			parentGlobalId,
-			codes);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForClassRequired (
+					parent.getClass ());
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return findByCode (
+				transaction,
+				parentGlobalId,
+				codes);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByCodeRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull String ... codes) {
 
-		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForClassRequired (
-				parent.getClass ());
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCodeRequired");
 
-		return findByCodeRequired (
-			parentGlobalId,
-			codes);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForClassRequired (
+					parent.getClass ());
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return findByCodeRequired (
+				transaction,
+				parentGlobalId,
+				codes);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByCodeOrNull (
-			@NonNull Record<?> parent,
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parent,
 			@NonNull String... codes) {
 
-		ObjectHelper<?> parentHelper =
-			objectManager.objectHelperForObjectRequired (
-				parent);
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCodeOrNull");
 
-		return findByCodeOrNull (
-			parentGlobalId,
-			codes);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForObjectRequired (
+					parent);
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return findByCodeOrNull (
+				transaction,
+				parentGlobalId,
+				codes);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByTypeAndCode (
-			@NonNull Record<?> parent,
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parent,
 			@NonNull String typeCode,
-			@NonNull String... codes) {
+			@NonNull String ... codes) {
 
-		ObjectHelper<?> parentHelper =
-			objectManager.objectHelperForObjectRequired (
-				parent);
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByTypeAndCode");
 
-		return findByTypeAndCode (
-			parentGlobalId,
-			typeCode,
-			codes);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForObjectRequired (
+					parent);
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return findByTypeAndCode (
+				transaction,
+				parentGlobalId,
+				typeCode,
+				codes);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByTypeAndCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode,
-			@NonNull String... codes) {
+			@NonNull String ... codes) {
 
-		if (codes.length != 1)
+		if (codes.length != 1) {
+
 			throw new IllegalArgumentException (
 				"codes");
 
+		}
+
 		return objectDatabaseHelper.findByParentAndTypeAndCode (
+			parentTransaction,
 			parentGlobalId,
 			typeCode,
 			codes [0]);

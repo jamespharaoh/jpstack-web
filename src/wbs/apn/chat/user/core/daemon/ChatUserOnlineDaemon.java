@@ -2,6 +2,7 @@ package wbs.apn.chat.user.core.daemon;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -23,6 +24,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -82,64 +84,72 @@ class ChatUserOnlineDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatUserOnlineDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
+			taskLogger.logicFormat (
 				"Checking online users for action needed");
 
-			List <ChatUserRec> onlineUsers =
-				chatUserHelper.findOnline (
-					ChatUserType.user);
+			List <Long> chatUserIds =
+				getChatUsers (
+					taskLogger);
 
-			transaction.close ();
-
-			for (
-				ChatUserRec chatUser
-					: onlineUsers
-			) {
-
-				doUser (
-					taskLogger,
-					chatUser.getId ());
-
-			}
+			chatUserIds.forEach (
+				chatUserId ->
+					doChatUser (
+						taskLogger,
+						chatUserId));
 
 		}
 
 	}
 
-	void doUser (
+	private
+	List <Long> getChatUsers (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getChatUsers");
+
+		) {
+
+			return iterableMapToList (
+				ChatUserRec::getId,
+				chatUserHelper.findOnline (
+					transaction,
+					ChatUserType.user));
+
+		}
+
+	}
+
+	private
+	void doChatUser (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doUser");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserOnlineDaemon.doUser (chatUserId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doChatUser");
 
 		) {
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			ChatRec chat =
@@ -174,12 +184,12 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.logicFormat (
 					"Automatically logging off user %s",
 					chatUser.getCode ());
 
 				chatMiscLogic.userLogoffWithMessage (
-					taskLogger,
+					transaction,
 					chatUser,
 					null,
 					true);
@@ -208,14 +218,14 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Automatically logging off %s user %s",
 					enumName (
 						chatUser.getDeliveryMethod ()),
 					chatUser.getCode ());
 
 				chatUserLogic.logoff (
-					taskLogger,
+					transaction,
 					chatUser,
 					true);
 
@@ -232,14 +242,14 @@ class ChatUserOnlineDaemon
 				&& chatUser.getSessionInfoRemain () <= 0
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Logging off %s user %s due to session info limit",
 					enumName (
 						chatUser.getDeliveryMethod ()),
 					chatUser.getCode ());
 
 				chatUserLogic.logoff (
-					taskLogger,
+					transaction,
 					chatUser,
 					true);
 
@@ -258,9 +268,10 @@ class ChatUserOnlineDaemon
 
 			if (chatUser.getNumber () == null) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Logging off %s: no number",
 					objectManager.objectPath (
+						transaction,
 						chatUser));
 
 				chatUser
@@ -331,14 +342,15 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Sending info to user %s",
 					objectManager.objectPathMini (
+						transaction,
 						chatUser));
 
 				long numSent =
 					chatInfoLogic.sendUserInfos (
-						taskLogger,
+						transaction,
 						chatUser,
 						1l,
 						optionalAbsent ());
@@ -381,12 +393,12 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Sending name hint to user %s",
 					chatUser.getCode ());
 
 				chatInfoLogic.sendNameHint (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			}
@@ -456,12 +468,12 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Sending pic hint to user %s",
 					chatUser.getCode ());
 
 				chatInfoLogic.sendPicHint (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			}
@@ -503,12 +515,12 @@ class ChatUserOnlineDaemon
 
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Sending pic hint 2 to user %s",
 					chatUser.getCode ());
 
 				chatInfoLogic.sendPicHint2 (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			}

@@ -40,9 +40,11 @@ interface ComponentRegistry {
 	// component registration
 
 	ComponentRegistry registerDefinition (
+			TaskLogger parentTaskLogger,
 			ComponentDefinition componentDefinition);
 
 	ComponentRegistry registerUnmanagedSingleton (
+			TaskLogger parentTaskLogger,
 			String key,
 			Object value);
 

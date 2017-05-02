@@ -76,8 +76,9 @@ class ConsoleFormActionsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -96,45 +97,34 @@ class ConsoleFormActionsAction
 					formActions);
 
 			Object formState =
-				formAction.helper ().constructFormState ();
+				formAction.helper ().constructFormState (
+					transaction);
 
-			try (
+			formAction.helper ().updatePassiveFormState (
+				transaction,
+				genericCastUnchecked (
+					formState));
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ContextFormActionAction.goReal ()",
-						this);
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					transaction,
+					requestContext,
+					formAction.formFields (),
+					formState,
+					ImmutableMap.of (),
+					formName);
 
-			) {
+			if (updateResultSet.errorCount () > 0) {
+				return null;
+			}
 
-				formAction.helper ().updatePassiveFormState (
+			Optional <Responder> responder =
+				formAction.helper ().processFormSubmission (
+					transaction,
 					genericCastUnchecked (
 						formState));
 
-				UpdateResultSet updateResultSet =
-					formFieldLogic.update (
-						taskLogger,
-						requestContext,
-						formAction.formFields (),
-						formState,
-						ImmutableMap.of (),
-						formName);
-
-				if (updateResultSet.errorCount () > 0) {
-					return null;
-				}
-
-				Optional <Responder> responder =
-					formAction.helper ().processFormSubmission (
-						taskLogger,
-						transaction,
-						genericCastUnchecked (
-							formState));
-
-				return responder.orNull ();
-
-			}
+			return responder.orNull ();
 
 		}
 

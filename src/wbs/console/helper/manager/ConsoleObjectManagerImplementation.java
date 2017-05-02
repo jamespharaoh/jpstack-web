@@ -29,10 +29,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
@@ -76,17 +79,29 @@ class ConsoleObjectManagerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleHelpersByObjectClass =
-			mapWithDerivedKey (
-				consoleHelpers,
-				ConsoleHelper::objectClass);
+		try (
 
-		consoleHelpersByObjectName =
-			mapWithDerivedKey (
-				consoleHelpers,
-				ConsoleHelper::objectName);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			consoleHelpersByObjectClass =
+				mapWithDerivedKey (
+					consoleHelpers,
+					ConsoleHelper::objectClass);
+
+			consoleHelpersByObjectName =
+				mapWithDerivedKey (
+					consoleHelpers,
+					ConsoleHelper::objectName);
+
+		}
 
 	}
 
@@ -154,7 +169,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void writeTdForObject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> assumedRootOptional,
@@ -164,9 +179,9 @@ class ConsoleObjectManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeTdForObject");
 
 		) {
@@ -177,6 +192,7 @@ class ConsoleObjectManagerImplementation
 
 			String path =
 				objectManager.objectPathMini (
+					transaction,
 					object,
 					assumedRootOptional);
 
@@ -185,7 +201,7 @@ class ConsoleObjectManagerImplementation
 				link
 
 				&& canView (
-					taskLogger,
+					transaction,
 					object)
 
 			) {
@@ -195,7 +211,7 @@ class ConsoleObjectManagerImplementation
 					.href (
 						requestContext.resolveLocalUrl (
 							objectHelper.getDefaultLocalPathGeneric (
-								taskLogger,
+								transaction,
 								object)))
 
 					.target (
@@ -226,7 +242,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void writeHtmlForObject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> assumedRootOptional,
@@ -234,22 +250,26 @@ class ConsoleObjectManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeHtmlForObject");
 
 		) {
 
-			if (taskLogger.debugEnabled ()) {
+			if (transaction.debugEnabled ()) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"%s.htmlForObject (%s, %s, %s)",
 					getClass ().getName (),
 					objectManager.objectPath (
+						transaction,
 						object),
 					optionalMapRequiredOrDefault (
-						objectManager::objectPath,
+						assumedRoot ->
+							objectManager.objectPath (
+								transaction,
+								assumedRoot),
 						assumedRootOptional,
 						"—"),
 					Boolean.toString (
@@ -262,7 +282,7 @@ class ConsoleObjectManagerImplementation
 					object);
 
 			objectHelper.writeHtmlGeneric (
-				taskLogger,
+				transaction,
 				formatWriter,
 				object,
 				assumedRootOptional,
@@ -275,7 +295,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void objectToSimpleHtml (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			Object object,
 			Record <?> assumedRoot,
@@ -283,9 +303,9 @@ class ConsoleObjectManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"objectToSimpleHtml");
 
 		) {
@@ -305,7 +325,7 @@ class ConsoleObjectManagerImplementation
 					(Record <?>) object;
 
 				writeHtmlForObject (
-					taskLogger,
+					transaction,
 					formatWriter,
 					dataObject,
 					optionalFromNullable (
@@ -317,7 +337,7 @@ class ConsoleObjectManagerImplementation
 					object)
 			) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Null object is deprecated");
 
 				formatWriter.writeFormat (
@@ -336,16 +356,15 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"canView (%s)",
-					object.toString ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"canView");
 
 		) {
 
@@ -354,7 +373,7 @@ class ConsoleObjectManagerImplementation
 					object);
 
 			return objectHelper.canView (
-				taskLogger,
+				transaction,
 				genericCastUnchecked (
 					object));
 
@@ -365,7 +384,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextName (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		ConsoleHelper<?> objectHelper =
@@ -392,14 +411,14 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextLink (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"contextLink");
 
 		) {
@@ -410,7 +429,7 @@ class ConsoleObjectManagerImplementation
 
 			return requestContext.resolveContextUrl (
 				objectHelper.getDefaultContextPathGeneric (
-					taskLogger,
+					transaction,
 					object));
 
 		}
@@ -420,14 +439,14 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String localLink (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"localLink");
 
 		) {
@@ -438,7 +457,7 @@ class ConsoleObjectManagerImplementation
 
 			return requestContext.resolveLocalUrl (
 				objectHelper.getDefaultLocalPathGeneric (
-					taskLogger,
+					transaction,
 					object));
 
 		}
@@ -470,10 +489,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public <ObjectType extends Record <ObjectType>>
 	List <ObjectType> getChildren (
-			Record<?> object,
-			Class <ObjectType> childClass) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Class <ObjectType> childClass) {
 
 		return objectManager.getChildren (
+			parentTransaction,
 			object,
 			childClass);
 
@@ -482,9 +503,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	Either <Optional <Record <?>>, String> getParentOrError (
-			Record <?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return objectManager.getParentOrError (
+			parentTransaction,
 			object);
 
 	}
@@ -502,9 +525,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record <?> dataObject) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> dataObject) {
 
 		return objectManager.objectPath (
+			parentTransaction,
 			dataObject);
 
 	}
@@ -512,10 +537,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record <?> dataObject,
-			Optional <Record <?>> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> dataObject,
+			@NonNull Optional <Record <?>> root) {
 
 		return objectManager.objectPath (
+			parentTransaction,
 			dataObject,
 			root);
 
@@ -524,10 +551,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			@NonNull Record<?> dataObject,
-			@NonNull Record<?> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> dataObject,
+			@NonNull Record <?> root) {
 
 		return objectManager.objectPath (
+			parentTransaction,
 			dataObject,
 			root);
 
@@ -536,12 +565,14 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record<?> dataObject,
 			@NonNull Optional<Record<?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 
 		return objectManager.objectPath (
+			parentTransaction,
 			dataObject,
 			assumedRoot,
 			mini,
@@ -560,13 +591,15 @@ class ConsoleObjectManagerImplementation
 	}
 
 	@Override
-	public <ObjectType extends Record<?>>
-	SortedMap<String,ObjectType> pathMap (
-			Collection<ObjectType> objects,
-			Record<?> assumedRoot,
+	public <ObjectType extends Record <?>>
+	SortedMap <String, ObjectType> pathMap (
+			@NonNull Transaction parentTransaction,
+			Collection <ObjectType> objects,
+			Record <?> assumedRoot,
 			boolean mini) {
 
 		return objectManager.pathMap (
+			parentTransaction,
 			objects,
 			assumedRoot,
 			mini);
@@ -576,11 +609,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public <ObjectType extends Record <?>>
 	ObjectType update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectType object) {
 
 		return objectManager.update (
-			parentTaskLogger,
+			parentTransaction,
 			object);
 
 	}
@@ -588,9 +621,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String getCode (
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return objectManager.getCode (
+			parentTransaction,
 			object);
 
 	}
@@ -608,9 +643,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	GlobalId getGlobalId (
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return objectManager.getGlobalId (
+			parentTransaction,
 			object);
 
 	}
@@ -618,29 +655,35 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	GlobalId getParentGlobalId (
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return objectManager.getParentGlobalId (
+			parentTransaction,
 			object);
 
 	}
 
 	@Override
 	public
-	Record<?> findObject (
-			GlobalId objectGlobalId) {
+	Record <?> findObject (
+			@NonNull Transaction parentTransaction,
+			@NonNull GlobalId objectGlobalId) {
 
 		return objectManager.findObject (
+			parentTransaction,
 			objectGlobalId);
 
 	}
 
 	@Override
 	public
-	List<Record<?>> getMinorChildren (
-			Record<?> parent) {
+	List <Record <?>> getMinorChildren (
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parent) {
 
 		return objectManager.getMinorChildren (
+			parentTransaction,
 			parent);
 
 	}
@@ -648,29 +691,35 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public <ObjectType extends EphemeralRecord<?>>
 	ObjectType remove (
+			@NonNull Transaction parentTransaction,
 			ObjectType object) {
 
-		return objectManager
-			.remove (object);
+		return objectManager.remove (
+			parentTransaction,
+			object);
 
 	}
 
 	@Override
 	public
 	String getObjectTypeCode (
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
-		return objectManager
-			.getObjectTypeCode (object);
+		return objectManager.getObjectTypeCode (
+			parentTransaction,
+			object);
 
 	}
 
 	@Override
 	public
 	Long getObjectTypeId (
-			Record<?> parentObject) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parentObject) {
 
 		return objectManager.getObjectTypeId (
+			parentTransaction,
 			parentObject);
 
 	}
@@ -728,32 +777,34 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	boolean isParent (
-			Record<?> object,
-			Record<?> parent) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Record <?> parent) {
 
-		return objectManager
-			.isParent (
-				object,
-				parent);
+		return objectManager.isParent (
+			parentTransaction,
+			object,
+			parent);
 
 	}
 
 	@Override
-	public <ObjectType extends Record<?>>
+	public <ObjectType extends Record <?>>
 	ObjectType firstParent (
-			Record<?> object,
-			Set<ObjectType> parents) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Set <ObjectType> parents) {
 
-		return objectManager
-			.firstParent (
-				object,
-				parents);
+		return objectManager.firstParent (
+			parentTransaction,
+			object,
+			parents);
 
 	}
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForObjectNameRequired (
+	ObjectHelper <?> objectHelperForObjectNameRequired (
 			String objectName) {
 
 		return objectManager.objectHelperForObjectNameRequired (
@@ -764,11 +815,13 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
 
 		return objectManager.dereferenceOrError (
+			parentTransaction,
 			object,
 			path,
 			hints);
@@ -777,11 +830,13 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Optional<Class<?>> dereferenceType (
-			Optional<Class<?>> objectClass,
-			Optional<String> path) {
+	Optional <Class <?>> dereferenceType (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Optional <Class <?>> objectClass,
+			@NonNull Optional <String> path) {
 
 		return objectManager.dereferenceType (
+			parentTaskLogger,
 			objectClass,
 			path);
 
@@ -790,9 +845,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPathMini (
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return objectManager.objectPathMini (
+			parentTransaction,
 			object);
 
 	}
@@ -800,10 +857,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPathMini (
-			Record<?> object,
-			Optional<Record<?>> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> root) {
 
 		return objectManager.objectPathMini (
+			parentTransaction,
 			object,
 			root);
 
@@ -812,10 +871,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPathMini (
-			Record<?> object,
-			Record<?> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Record <?> root) {
 
 		return objectManager.objectPathMini (
+			parentTransaction,
 			object,
 			root);
 
@@ -824,10 +885,12 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPathMiniPreload (
-			Record<?> object,
-			Optional<Record<?>> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> root) {
 
 		return objectManager.objectPathMiniPreload (
+			parentTransaction,
 			object,
 			root);
 
@@ -836,23 +899,26 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPathMiniPreload (
-			Record<?> object,
-			Record<?> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Record <?> root) {
 
 		return objectManager.objectPathMiniPreload (
+			parentTransaction,
 			object,
 			root);
 
 	}
 
 	@Override
-	public
-	<ObjectType extends Record<ObjectType>>
-	Optional<ObjectType> getAncestor (
-			Class<ObjectType> ancestorClass,
-			Record<?> object) {
+	public <ObjectType extends Record <ObjectType>>
+	Optional <ObjectType> getAncestor (
+			@NonNull Transaction parentTransaction,
+			@NonNull Class <ObjectType> ancestorClass,
+			@NonNull Record <?> object) {
 
 		return objectManager.getAncestor (
+			parentTransaction,
 			ancestorClass,
 			object);
 

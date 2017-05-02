@@ -8,6 +8,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -34,7 +35,7 @@ class ConsoleResponder
 
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -42,7 +43,7 @@ class ConsoleResponder
 
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -50,7 +51,7 @@ class ConsoleResponder
 
 	protected
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -58,7 +59,7 @@ class ConsoleResponder
 
 	protected
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -76,16 +77,11 @@ class ConsoleResponder
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"execute");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ConsoleResponder.execute ()",
-					this)
+					logContext,
+					parentTaskLogger,
+					"execute");
 
 		) {
 
@@ -93,16 +89,16 @@ class ConsoleResponder
 				transaction;
 
 			setup (
-				taskLogger);
+				transaction);
 
 			prepare (
-				taskLogger);
+				transaction);
 
 			setHtmlHeaders (
-				taskLogger);
+				transaction);
 
 			render (
-				taskLogger);
+				transaction);
 
 		} finally {
 

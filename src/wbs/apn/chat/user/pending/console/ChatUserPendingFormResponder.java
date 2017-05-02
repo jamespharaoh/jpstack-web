@@ -50,9 +50,10 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -129,70 +130,86 @@ class ChatUserPendingFormResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		if (
-			isNotNull (
-				chatUser.getNewChatUserName ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
 		) {
 
-			mode =
-				PendingMode.name;
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-		} else if (
-			isNotNull (
-				chatUser.getNewChatUserInfo ())
-		) {
+			if (
+				isNotNull (
+					chatUser.getNewChatUserName ())
+			) {
 
-			mode =
-				PendingMode.info;
+				mode =
+					PendingMode.name;
 
-		} else if (
-			isNotNull (
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					ChatUserImageType.image))
-		) {
+			} else if (
+				isNotNull (
+					chatUser.getNewChatUserInfo ())
+			) {
 
-			mode =
-				PendingMode.image;
+				mode =
+					PendingMode.info;
 
-		} else if (
-			isNotNull (
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					ChatUserImageType.video))
-		) {
+			} else if (
+				isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.image))
+			) {
 
-			mode =
-				PendingMode.video;
+				mode =
+					PendingMode.image;
 
-		} else if (
-			isNotNull (
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					ChatUserImageType.audio))
-		) {
+			} else if (
+				isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.video))
+			) {
 
-			mode =
-				PendingMode.audio;
+				mode =
+					PendingMode.video;
 
-		} else {
+			} else if (
+				isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.audio))
+			) {
 
-			mode =
-				PendingMode.none;
+				mode =
+					PendingMode.audio;
 
-		}
+			} else {
 
-		if (mode.rejectType () != null) {
+				mode =
+					PendingMode.none;
 
-			chatHelpTemplates =
-				chatHelpTemplateHelper.findByParentAndType (
-					chatUser.getChat (),
-					mode.rejectType ());
+			}
+
+			if (mode.rejectType () != null) {
+
+				chatHelpTemplates =
+					chatHelpTemplateHelper.findByParentAndType (
+						transaction,
+						chatUser.getChat (),
+						mode.rejectType ());
+
+			}
 
 		}
 
@@ -201,73 +218,86 @@ class ChatUserPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
-			renderScriptBlock ();
+			renderScriptBlock (
+				transaction);
 
 		}
 
 	}
 
 	private
-	void renderScriptBlock () {
+	void renderScriptBlock (
+			@NonNull Transaction parentTransaction) {
 
-		htmlScriptBlockOpen ();
+		try (
 
-		formatWriter.writeLineFormat (
-			"var chatHelpTemplates = new Array ();");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderScriptBlock");
 
-		for (
-			ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates
 		) {
 
+			htmlScriptBlockOpen ();
+
 			formatWriter.writeLineFormat (
-				"chatHelpTemplates [%s] = '%j';",
-				integerToDecimalString (
-					chatHelpTemplate.getId ()),
-				chatHelpTemplate.getText ());
+				"var chatHelpTemplates = new Array ();");
+
+			for (
+				ChatHelpTemplateRec chatHelpTemplate
+					: chatHelpTemplates
+			) {
+
+				formatWriter.writeLineFormat (
+					"chatHelpTemplates [%s] = '%j';",
+					integerToDecimalString (
+						chatHelpTemplate.getId ()),
+					chatHelpTemplate.getText ());
+
+			}
+
+			formatWriter.writeLineFormat (
+				"top.show_inbox (true);");
+
+			formatWriter.writeLineFormat (
+				"top.frames ['main'].location = '%j';",
+				requestContext.resolveApplicationUrlFormat (
+					"/chatUser.pending",
+					"/%u",
+					integerToDecimalString (
+						chatUser.getId ()),
+					"/chatUser.pending.summary"));
+
+			htmlScriptBlockClose ();
 
 		}
-
-		formatWriter.writeLineFormat (
-			"top.show_inbox (true);");
-
-		formatWriter.writeLineFormat (
-			"top.frames ['main'].location = '%j';",
-			requestContext.resolveApplicationUrlFormat (
-				"/chatUser.pending",
-				"/%u",
-				integerToDecimalString (
-					chatUser.getId ()),
-				"/chatUser.pending.summary"));
-
-		htmlScriptBlockClose ();
 
 	}
 
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -295,7 +325,7 @@ class ChatUserPendingFormResponder
 
 				if (
 					privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						GlobalId.root,
 						"manage")
 				) {
@@ -387,6 +417,7 @@ class ChatUserPendingFormResponder
 
 					ChatUserImageRec image =
 						chatUserLogic.chatUserPendingImage (
+							transaction,
 							chatUser,
 							ChatUserImageType.image);
 
@@ -400,7 +431,7 @@ class ChatUserPendingFormResponder
 					htmlTableCellOpen ();
 
 					mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						image.getMedia ());
 
 					htmlTableCellClose ();
@@ -413,6 +444,7 @@ class ChatUserPendingFormResponder
 
 					ChatUserImageRec video =
 						chatUserLogic.chatUserPendingImage (
+							transaction,
 							chatUser,
 							ChatUserImageType.video);
 
@@ -426,7 +458,7 @@ class ChatUserPendingFormResponder
 					htmlTableCellOpen ();
 
 					mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						video.getMedia ());
 
 					htmlTableCellClose ();
@@ -469,6 +501,7 @@ class ChatUserPendingFormResponder
 
 					ChatUserImageRec chatUserImage =
 						chatUserLogic.chatUserPendingImage (
+							transaction,
 							chatUser,
 							chatUserLogic.imageTypeForMode (mode));
 

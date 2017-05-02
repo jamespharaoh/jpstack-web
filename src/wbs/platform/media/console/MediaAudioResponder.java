@@ -1,8 +1,8 @@
 package wbs.platform.media.console;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import lombok.NonNull;
@@ -13,12 +13,11 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
-
-import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("mediaAudioResponder")
 public
@@ -42,36 +41,59 @@ class MediaAudioResponder
 	@Override
 	public
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		out =
-			requestContext.outputStream ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
+
+		) {
+
+			out =
+				requestContext.outputStream ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		MediaRec media =
-			mediaHelper.findFromContextRequired ();
+		try (
 
-		data =
-			media.getContent ().getData ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			MediaRec media =
+				mediaHelper.findFromContextRequired (
+					transaction);
+
+			data =
+				media.getContent ().getData ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -92,17 +114,20 @@ class MediaAudioResponder
 	@Override
 	public
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		try {
+		try (
 
-			out.write (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
+
+			writeBytes (
+				out,
 				data);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
 
 		}
 

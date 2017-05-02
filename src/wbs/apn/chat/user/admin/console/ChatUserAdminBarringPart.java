@@ -24,10 +24,13 @@ import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -42,6 +45,9 @@ class ChatUserAdminBarringPart
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -78,122 +84,145 @@ class ChatUserAdminBarringPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		if (
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.monitor)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
+
 		) {
 
-			htmlParagraphWrite (
-				"This is a monitor and cannot be barred.");
+			if (
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.monitor)
+			) {
 
-			return;
+				htmlParagraphWrite (
+					"This is a monitor and cannot be barred.");
+
+				return;
+
+			}
+
+			// form open
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.barring"));
+
+			// table open
+
+			htmlTableOpenDetails ();
+
+			// table content
+
+			htmlTableDetailsRowWrite (
+				"Status",
+				booleanToString (
+					chatUser.getBarred (),
+					"barred",
+					"not barred"));
+
+			if (requestContext.canContext ("chat.userAdmin")) {
+
+				htmlTableDetailsRowWriteRaw (
+					"Action",
+					() -> {
+
+					if (chatUser.getBarred ()) {
+
+						htmlTableCheckWriterProvider.get ()
+
+							.name (
+								"bar_off")
+
+							.label (
+								"remove bar")
+
+							.value (
+								false)
+
+							.write (
+								formatWriter);
+
+					} else {
+
+						htmlTableCheckWriterProvider.get ()
+
+							.name (
+								"bar_on")
+
+							.label (
+								"bar user")
+
+							.value (
+								false)
+
+							.write (
+								formatWriter);
+
+					}
+
+				});
+
+				htmlTableDetailsRowWriteHtml (
+					"Reason",
+					() -> formatWriter.writeFormat (
+						"<textarea",
+						" rows=\"4\"",
+						" cols=\"48\"",
+						" name=\"reason\"",
+						"></textarea>"));
+
+				htmlTableDetailsRowWriteHtml (
+					"Action",
+					() -> formatWriter.writeFormat (
+						"<input",
+						" type=\"submit\"",
+						" value=\"save changes\"",
+						">"));
+
+			}
+
+			// table close
+
+			htmlTableClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+			// flush scripts
+
+			requestContext.flushScripts ();
 
 		}
-
-		// form open
-
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.barring"));
-
-		// table open
-
-		htmlTableOpenDetails ();
-
-		// table content
-
-		htmlTableDetailsRowWrite (
-			"Status",
-			booleanToString (
-				chatUser.getBarred (),
-				"barred",
-				"not barred"));
-
-		if (requestContext.canContext ("chat.userAdmin")) {
-
-			htmlTableDetailsRowWriteRaw (
-				"Action",
-				() -> {
-
-				if (chatUser.getBarred ()) {
-
-					htmlTableCheckWriterProvider.get ()
-
-						.name (
-							"bar_off")
-
-						.label (
-							"remove bar")
-
-						.value (
-							false)
-
-						.write (
-							formatWriter);
-
-				} else {
-
-					htmlTableCheckWriterProvider.get ()
-
-						.name (
-							"bar_on")
-
-						.label (
-							"bar user")
-
-						.value (
-							false)
-
-						.write (
-							formatWriter);
-
-				}
-
-			});
-
-			htmlTableDetailsRowWriteHtml (
-				"Reason",
-				() -> formatWriter.writeFormat (
-					"<textarea",
-					" rows=\"4\"",
-					" cols=\"48\"",
-					" name=\"reason\"",
-					"></textarea>"));
-
-			htmlTableDetailsRowWriteHtml (
-				"Action",
-				() -> formatWriter.writeFormat (
-					"<input",
-					" type=\"submit\"",
-					" value=\"save changes\"",
-					">"));
-
-		}
-
-		// table close
-
-		htmlTableClose ();
-
-		// form close
-
-		htmlFormClose ();
-
-		// flush scripts
-
-		requestContext.flushScripts ();
 
 	}
 

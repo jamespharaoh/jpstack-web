@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.core.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -16,6 +17,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -75,52 +77,83 @@ class ChatUserAlarmDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatUserAlarmDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
-			List <ChatUserAlarmRec> alarms =
+			List <Long> chatUserAlarmIds =
+				getPendingAlarms (
+					taskLogger);
+
+			chatUserAlarmIds.forEach (
+				chatUserAlarmId ->
+					doAlarm (
+						taskLogger,
+						chatUserAlarmId));
+
+		}
+
+	}
+
+	private
+	List <Long> getPendingAlarms (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getPendingAlarms");
+
+		) {
+
+			return iterableMapToList (
+				ChatUserAlarmRec::getId,
 				chatUserAlarmHelper.findPending (
-					transaction.now ());
+					transaction,
+					transaction.now ()));
 
-			transaction.close ();
+		}
 
-			// then do each one
+	}
 
-			for (
-				ChatUserAlarmRec alarm
-					: alarms
-			) {
+	private
+	void doAlarm (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long chatUserAlarmId) {
 
-				try {
+		try (
 
-					doOneAlarm (
-						taskLogger,
-						alarm.getId ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doAlarm");
 
-				} catch (Exception exception) {
+		) {
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						stringFormat (
-							"chatUserAlarm %s",
-							integerToDecimalString (
-								alarm.getId ())),
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.tryAgainLater);
+			try {
 
-				}
+				doAlarmReal (
+					taskLogger,
+					chatUserAlarmId);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"daemon",
+					stringFormat (
+						"chatUserAlarm %s",
+						integerToDecimalString (
+							chatUserAlarmId)),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
@@ -128,29 +161,26 @@ class ChatUserAlarmDaemon
 
 	}
 
-	void doOneAlarm (
+	void doAlarmReal (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Long alarmId) {
+			@NonNull Long chatUserAlarmId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doOneAlarm");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAlarmDaemon.doOneAlarm (alarmId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doAlarmReal");
+
 		) {
 
 			// find the alarm and stuff
 
 			ChatUserAlarmRec alarm =
 				chatUserAlarmHelper.findRequired (
-					alarmId);
+					transaction,
+					chatUserAlarmId);
 
 			ChatUserRec user =
 				alarm.getChatUser ();
@@ -161,13 +191,14 @@ class ChatUserAlarmDaemon
 			// delete the alarm
 
 			chatUserAlarmHelper.remove (
+				transaction,
 				alarm);
 
 			// check whether to ignore this alarm
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					user,
 					false,
 					optionalAbsent ());
@@ -186,7 +217,7 @@ class ChatUserAlarmDaemon
 
 				ChatMonitorInboxRec chatMonitorInbox =
 					chatMessageLogic.findOrCreateChatMonitorInbox (
-						taskLogger,
+						transaction,
 						monitor,
 						user,
 						true);
@@ -201,7 +232,7 @@ class ChatUserAlarmDaemon
 			// create a log
 
 			chatUserInitiationLogHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (

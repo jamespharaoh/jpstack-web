@@ -79,8 +79,9 @@ class ChatHelpLogPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -128,58 +129,49 @@ class ChatHelpLogPendingFormAction
 
 			}
 
-			try (
+			// load objects from database
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatHelpLogPendingFormAction.goReal ()",
-						this);
+			ChatHelpLogRec helpRequest =
+				chatHelpLogHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			ChatUserRec chatUser =
+				helpRequest.getChatUser ();
 
-				// load objects from database
+			// send message
 
-				ChatHelpLogRec helpRequest =
-					chatHelpLogHelper.findFromContextRequired ();
+			if (! ignore) {
 
-				ChatUserRec chatUser =
-					helpRequest.getChatUser ();
-
-				// send message
-
-				if (! ignore) {
-
-					chatHelpLogic.sendHelpMessage (
-						taskLogger,
-						userConsoleLogic.userRequired (),
-						chatUser,
-						text,
-						optionalOf (
-							helpRequest.getMessage ().getThreadId ()),
-						optionalOf (
-							helpRequest));
-
-				}
-
-				// unqueue the request
-
-				queueLogic.processQueueItem (
-					taskLogger,
-					helpRequest.getQueueItem (),
-					userConsoleLogic.userRequired ());
-
-				transaction.commit ();
-
-				requestContext.addNotice (
-					ignore
-						? "Request ignored"
-						: "Reply sent");
-
-				return responder (
-					"queueHomeResponder");
+				chatHelpLogic.sendHelpMessage (
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction),
+					chatUser,
+					text,
+					optionalOf (
+						helpRequest.getMessage ().getThreadId ()),
+					optionalOf (
+						helpRequest));
 
 			}
+
+			// unqueue the request
+
+			queueLogic.processQueueItem (
+				transaction,
+				helpRequest.getQueueItem (),
+				userConsoleLogic.userRequired (
+					transaction));
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				ignore
+					? "Request ignored"
+					: "Reply sent");
+
+			return responder (
+				"queueHomeResponder");
 
 		}
 

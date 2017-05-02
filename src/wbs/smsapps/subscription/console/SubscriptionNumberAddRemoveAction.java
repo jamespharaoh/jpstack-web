@@ -105,23 +105,19 @@ class SubscriptionNumberAddRemoveAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SubscriptionNumberAddRemoveAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			SubscriptionRec subscription =
-				subscriptionHelper.findFromContextRequired ();
+				subscriptionHelper.findFromContextRequired (
+					transaction);
 
 			// process form
 
@@ -135,7 +131,7 @@ class SubscriptionNumberAddRemoveAction
 				new SubscriptionNumberAddRemoveForm ();
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				addRemoveFormFieldSet,
 				addRemoveForm,
@@ -174,7 +170,7 @@ class SubscriptionNumberAddRemoveAction
 
 				NumberRec number =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						numberString);
 
 				numbers.add (
@@ -200,7 +196,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionNumberRec subscriptionNumber =
 						subscriptionNumberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							subscription,
 							number);
 
@@ -225,7 +221,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionSubRec subscriptionSub =
 						subscriptionSubHelper.insert (
-							taskLogger,
+							transaction,
 							subscriptionSubHelper.createInstance ()
 
 						.setSubscriptionNumber (
@@ -244,7 +240,8 @@ class SubscriptionNumberAddRemoveAction
 							transaction.now ())
 
 						.setStartedBy (
-							userConsoleLogic.userRequired ())
+							userConsoleLogic.userRequired (
+								transaction))
 
 						.setActive (
 							true)
@@ -339,7 +336,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionNumberRec subscriptionNumber =
 						subscriptionNumberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							subscription,
 							number);
 
@@ -369,7 +366,8 @@ class SubscriptionNumberAddRemoveAction
 							transaction.now ())
 
 						.setEndedBy (
-							userConsoleLogic.userRequired ())
+							userConsoleLogic.userRequired (
+								transaction))
 
 						.setActive (
 							false);
@@ -390,12 +388,14 @@ class SubscriptionNumberAddRemoveAction
 					activeSubscriptionAffiliate
 
 						.setNumSubscribers (
-							activeSubscriptionAffiliate.getNumSubscribers () - 1);
+							+ activeSubscriptionAffiliate.getNumSubscribers ()
+							- 1);
 
 					activeSubscriptionList
 
 						.setNumSubscribers (
-							activeSubscriptionList.getNumSubscribers () - 1);
+							+ activeSubscriptionList.getNumSubscribers ()
+							- 1);
 
 					numRemoved ++;
 

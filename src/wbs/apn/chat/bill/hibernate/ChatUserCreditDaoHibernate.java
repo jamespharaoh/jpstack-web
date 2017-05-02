@@ -12,8 +12,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.bill.model.ChatUserCreditDao;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
@@ -25,117 +28,149 @@ class ChatUserCreditDaoHibernate
 	extends HibernateDao
 	implements ChatUserCreditDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<ChatUserCreditRec> findByTimestamp (
+	List <ChatUserCreditRec> findByTimestamp (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull Interval timestamp) {
 
-		return findMany (
-			"findByTimestamp (chat, timestamp)",
-			ChatUserCreditRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByTimestamp");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatUserCreditRec.class,
-				"_chatUserCredit")
 
-			.createAlias (
-				"_chatUserCredit.chatUser",
-				"_chatUser")
+				createCriteria (
+					transaction,
+					ChatUserCreditRec.class,
+					"_chatUserCredit")
 
-			.add (
-				Restrictions.eq (
-					"_chatUser.chat",
-					chat))
+				.createAlias (
+					"_chatUserCredit.chatUser",
+					"_chatUser")
 
-			.add (
-				Restrictions.ge (
-					"_chatUserCredit.timestamp",
-					timestamp.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_chatUser.chat",
+						chat))
 
-			.add (
-				Restrictions.lt (
-					"_chatUserCredit.timestamp",
-					timestamp.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_chatUserCredit.timestamp",
+						timestamp.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_chatUserCredit.timestamp",
+						timestamp.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserCreditSearch search) {
 
-		Criteria criteria =
+		try (
 
-			createCriteria (
-				ChatUserCreditRec.class,
-				"_chatUserCredit")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchIds");
 
-			.createAlias (
-				"_chatUserCredit.chatUser",
-				"_chatUser")
-
-			.createAlias (
-				"_chatUser.chat",
-				"_chat");
-
-		if (
-			isNotNull (
-				search.chatId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_chat.id",
-					search.chatId ()));
+			Criteria criteria =
 
-		}
+				createCriteria (
+					transaction,
+					ChatUserCreditRec.class,
+					"_chatUserCredit")
 
-		if (
-			isNotNull (
-				search.timestamp ())
-		) {
+				.createAlias (
+					"_chatUserCredit.chatUser",
+					"_chatUser")
 
-			criteria.add (
-				Restrictions.ge (
-					"_chatUserCredit.timestamp",
-					search.timestamp ().start ()));
+				.createAlias (
+					"_chatUser.chat",
+					"_chat");
 
-			criteria.add (
-				Restrictions.lt (
-					"_chatUserCredit.timestamp",
-					search.timestamp ().end ()));
+			if (
+				isNotNull (
+					search.chatId ())
+			) {
 
-		}
-
-		if (search.filter ()) {
-
-			criteria.add (
-				Restrictions.or (
-					Restrictions.in (
+				criteria.add (
+					Restrictions.eq (
 						"_chat.id",
-						search.filterChatIds ())));
+						search.chatId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_chatUserCredit.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_chatUserCredit.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			if (search.filter ()) {
+
+				criteria.add (
+					Restrictions.or (
+						Restrictions.in (
+							"_chat.id",
+							search.filterChatIds ())));
+
+			}
+
+			criteria.addOrder (
+				Order.desc (
+					"_chatUserCredit.timestamp"));
+
+			criteria.addOrder (
+				Order.desc (
+					"_chatUserCredit.id"));
+
+			criteria.setProjection (
+				Projections.id ());
+
+			return findMany (
+				transaction,
+				Long.class,
+				criteria);
 
 		}
-
-		criteria.addOrder (
-			Order.desc (
-				"_chatUserCredit.timestamp"));
-
-		criteria.addOrder (
-			Order.desc (
-				"_chatUserCredit.id"));
-
-		criteria.setProjection (
-			Projections.id ());
-
-		return findMany (
-			"search (search)",
-			Long.class,
-			criteria);
 
 	}
 

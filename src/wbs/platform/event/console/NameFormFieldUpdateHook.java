@@ -14,9 +14,10 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -45,7 +46,7 @@ class NameFormFieldUpdateHook
 	@Override
 	public
 	void onUpdate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UpdateResult <String, String> updateResult,
 			@NonNull Record <?> container,
 			@NonNull Record <?> linkObject,
@@ -54,9 +55,9 @@ class NameFormFieldUpdateHook
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"onUpdate");
 
 		) {
@@ -87,9 +88,10 @@ class NameFormFieldUpdateHook
 			if (objectRef.isPresent ()) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_name_changed_in",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					objectRef.get (),
 					objectType.get (),
 					linkObject,
@@ -99,9 +101,10 @@ class NameFormFieldUpdateHook
 				if (codeChanged) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"object_code_changed_in",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						objectRef.get (),
 						objectType.get (),
 						linkObject,
@@ -113,9 +116,10 @@ class NameFormFieldUpdateHook
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_name_changed",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					linkObject,
 					updateResult.oldNativeValue ().get (),
 					updateResult.newNativeValue ().get ());
@@ -123,9 +127,10 @@ class NameFormFieldUpdateHook
 				if (codeChanged) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"object_code_changed",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						linkObject,
 						oldCode,
 						newCode);

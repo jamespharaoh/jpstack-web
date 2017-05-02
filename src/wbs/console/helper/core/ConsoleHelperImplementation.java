@@ -22,9 +22,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -77,112 +78,70 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	String getPathId (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		try (
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getPathId");
-
-		) {
-
-			return consoleHelperProvider.getPathId (
-				taskLogger,
-				object.getId ());
-
-		}
+		return consoleHelperProvider.getPathId (
+			parentTransaction,
+			object.getId ());
 
 	}
 
 	@Override
 	public
 	String getPathId (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Long objectId) {
 
-		try (
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getPathId");
-
-		) {
-
-			return consoleHelperProvider.getPathId (
-				taskLogger,
-				objectId);
-
-		}
+		return consoleHelperProvider.getPathId (
+			parentTransaction,
+			objectId);
 
 	}
 
 	@Override
 	public
 	String getDefaultContextPath (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		try (
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getDefaultContextPath");
-
-		) {
-
-			return consoleHelperProvider.getDefaultContextPath (
-				taskLogger,
-				object);
-
-		}
-
-	}
-
-	@Override
-	public
-	String getDefaultLocalPath (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RecordType object) {
-
-		try (
-
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getDefaultLocalPath");
-
-		) {
-
-			return consoleHelperProvider.localPath (
-				taskLogger,
-				object);
-
-		}
-
-	}
-
-	@Override
-	public
-	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull RecordType object) {
-
-		return consoleHelperProvider.canView (
-			parentTaskLogger,
+		return consoleHelperProvider.getDefaultContextPath (
+			parentTransaction,
 			object);
 
 	}
 
 	@Override
 	public
-	Optional <RecordType> findFromContext () {
+	String getDefaultLocalPath (
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
+
+		return consoleHelperProvider.localPath (
+			parentTransaction,
+			object);
+
+	}
+
+	@Override
+	public
+	boolean canView (
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
+
+		return consoleHelperProvider.canView (
+			parentTransaction,
+			object);
+
+	}
+
+	@Override
+	public
+	Optional <RecordType> findFromContext (
+			@NonNull Transaction parentTransaction) {
 
 		return objectHelper.find (
+			parentTransaction,
 			requestContext.stuffIntegerRequired (
 				idKey ()));
 
@@ -190,9 +149,11 @@ class ConsoleHelperImplementation <
 
 	@Override
 	public
-	RecordType findFromContextRequired () {
+	RecordType findFromContextRequired (
+			@NonNull Transaction parentTransaction) {
 
 		return objectHelper.findRequired (
+			parentTransaction,
 			requestContext.stuffIntegerRequired (
 				idKey ()));
 
@@ -201,7 +162,7 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	void writeHtml (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull RecordType object,
 			@NonNull Optional <Record <?>> assumedRoot,
@@ -209,15 +170,16 @@ class ConsoleHelperImplementation <
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeHtml");
 
 		) {
 
 			Optional <String> optionalHtml =
 				consoleHooks.getHtml (
+					transaction,
 					object,
 					mini);
 
@@ -231,6 +193,7 @@ class ConsoleHelperImplementation <
 
 				String path =
 					objectManager.objectPath (
+						transaction,
 						object,
 						assumedRoot,
 						false,
@@ -240,7 +203,7 @@ class ConsoleHelperImplementation <
 					"<a href=\"%h\">%h</a>",
 					requestContext.resolveLocalUrl (
 						getDefaultLocalPath (
-							taskLogger,
+							transaction,
 							object)),
 					path);
 
@@ -270,29 +233,35 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	RecordType findEntity (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
 		return optionalOrNull (
 			objectHelper.find (
+				parentTransaction,
 				id));
 
 	}
 
 	@Override
 	public
-	List <RecordType> findAllEntities () {
+	List <RecordType> findAllEntities (
+			@NonNull Transaction parentTransaction) {
 
-		return objectHelper.findAll ();
+		return objectHelper.findAll (
+			parentTransaction);
 
 	}
 
 	@Override
 	public
 	Either <Boolean, String> getDeletedOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType entity,
 			boolean checkParents) {
 
 		return objectHelper.getDeletedOrError (
+			parentTransaction,
 			entity,
 			checkParents);
 
@@ -301,10 +270,12 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	Boolean getDeleted (
-			RecordType entity,
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType entity,
 			boolean checkParents) {
 
 		return objectHelper.getDeleted (
+			parentTransaction,
 			entity,
 			checkParents);
 
@@ -313,10 +284,12 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	RecordType lookupObject (
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		return optionalOrNull (
 			objectHelper.find (
+				parentTransaction,
 				(Long)
 				contextStuff.get (
 					consoleHelperProvider ().idKey ())));

@@ -7,46 +7,71 @@ import lombok.NonNull;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.core.model.ChatStatsDao;
 import wbs.apn.chat.core.model.ChatStatsRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatStatsDaoHibernate
 	extends HibernateDao
 	implements ChatStatsDao {
 
+	// singeton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<ChatStatsRec> findByTimestamp (
+	List <ChatStatsRec> findByTimestamp (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull Interval timestamp) {
 
-		return findMany (
-			"findByTimestamp (chat, timestamp)",
-			ChatStatsRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByTimestamp");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatStatsRec.class,
-				"_chatStats")
 
-			.add (
-				Restrictions.eq (
-					"_chatStats.chat",
-					chat))
+				createCriteria (
+					transaction,
+					ChatStatsRec.class,
+					"_chatStats")
 
-			.add (
-				Restrictions.ge (
-					"_chatStats.timestamp",
-					timestamp.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_chatStats.chat",
+						chat))
 
-			.add (
-				Restrictions.lt (
-					"_chatStats.timestamp",
-					timestamp.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_chatStats.timestamp",
+						timestamp.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_chatStats.timestamp",
+						timestamp.getEnd ()))
+
+			);
+
+		}
 
 	}
 

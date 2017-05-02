@@ -22,10 +22,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -174,19 +174,20 @@ class ChatChatCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
 			chat =
 				chatHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			message =
@@ -194,23 +195,25 @@ class ChatChatCommand
 
 			fromChatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					fromChatUser);
 
 			toChatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					commandRef.get ());
 
 			// treat as join if the user has no affiliate
 
 			Optional <InboxAttemptRec> joinInboxAttempt =
 				tryJoin (
-					taskLogger);
+					transaction);
 
 			if (joinInboxAttempt.isPresent ())
 				return joinInboxAttempt.get ();
@@ -228,7 +231,7 @@ class ChatChatCommand
 
 				Optional <InboxAttemptRec> keywordInboxAttempt =
 					checkKeyword (
-						taskLogger,
+						transaction,
 						match.simpleKeyword (),
 						"");
 
@@ -240,29 +243,28 @@ class ChatChatCommand
 			// send the message to the other user
 
 			return doChat (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
+	private
 	InboxAttemptRec doBlock (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"doBlock");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -270,13 +272,14 @@ class ChatChatCommand
 
 			ChatBlockRec chatBlock =
 				chatBlockHelper.find (
+					transaction,
 					fromChatUser,
 					toChatUser);
 
 			if (chatBlock == null) {
 
 				chatBlockHelper.insert (
-					taskLogger,
+					transaction,
 					chatBlockHelper.createInstance ()
 
 					.setChatUser (
@@ -296,27 +299,30 @@ class ChatChatCommand
 
 			TextRec text =
 				textHelper.findOrCreateFormat (
-					taskLogger,
+					transaction,
 					"User %s has now been blocked",
 					toChatUser.getCode ());
 
 			CommandRec magicCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"magic");
 
 			CommandRec helpCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"help");
 
 			ServiceRec systemService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"system");
 
 			chatSendLogic.sendMessageMagic (
-				taskLogger,
+				transaction,
 				fromChatUser,
 				optionalOf (
 					message.getThreadId ()),
@@ -328,7 +334,7 @@ class ChatChatCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
@@ -348,26 +354,28 @@ class ChatChatCommand
 
 	}
 
+	private
 	InboxAttemptRec doChat (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"doChat");
 
 		) {
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
 			if (toChatUser == null) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Message %d ",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -377,7 +385,7 @@ class ChatChatCommand
 					"does not exist");
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -391,7 +399,7 @@ class ChatChatCommand
 
 			String rejectedReason =
 				chatMessageLogic.chatMessageSendFromUser (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					toChatUser,
 					rest,
@@ -403,7 +411,7 @@ class ChatChatCommand
 			if (rejectedReason != null) {
 
 				failedMessageHelper.insert (
-					taskLogger,
+					transaction,
 					failedMessageHelper.createInstance ()
 
 					.setMessage (
@@ -419,7 +427,7 @@ class ChatChatCommand
 			if (chat.getAutoJoinOnSend ()) {
 
 				chatMiscLogic.userAutoJoin (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					message,
 					true);
@@ -429,7 +437,7 @@ class ChatChatCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),
@@ -441,22 +449,24 @@ class ChatChatCommand
 
 	}
 
+	private
 	Optional <InboxAttemptRec> checkKeyword (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String keyword,
 			@NonNull String rest) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"checkKeyword");
 
 		) {
 
 			Optional <ChatKeywordRec> chatKeywordOptional =
 				chatKeywordHelper.findByCode (
+					transaction,
 					chat,
 					gsmStringSimplifyAllowNonGsm (
 						keyword));
@@ -475,7 +485,7 @@ class ChatChatCommand
 
 				return optionalOf (
 					doBlock (
-						taskLogger));
+						transaction));
 
 			}
 
@@ -493,7 +503,7 @@ class ChatChatCommand
 
 				return optionalOf (
 					commandManager.handle (
-						taskLogger,
+						transaction,
 						inbox,
 						chatKeyword.getCommand (),
 						optionalAbsent (),
@@ -507,14 +517,15 @@ class ChatChatCommand
 
 	}
 
+	private
 	Optional <InboxAttemptRec> tryJoin (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"tryJoin");
 
 		) {
@@ -522,6 +533,7 @@ class ChatChatCommand
 			if (
 				isNotNull (
 					chatUserLogic.getAffiliateId (
+						transaction,
 						fromChatUser))
 			) {
 				return optionalAbsent ();
@@ -533,7 +545,7 @@ class ChatChatCommand
 			// joined then how can they be replying to a magic number from a
 			// user. maybe from a broadcast, but that is all a bit fucked up.
 
-			taskLogger.warningFormat (
+			transaction.warningFormat (
 				"Chat request from unjoined user %s",
 				integerToDecimalString (
 					fromChatUser.getId ()));
@@ -560,7 +572,7 @@ class ChatChatCommand
 					rest)
 
 				.handleInbox (
-					taskLogger,
+					transaction,
 					command)
 
 			);

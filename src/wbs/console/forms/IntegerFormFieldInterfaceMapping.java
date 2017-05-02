@@ -1,11 +1,14 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -17,8 +20,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -27,6 +33,11 @@ import fj.data.Either;
 public
 class IntegerFormFieldInterfaceMapping <Container>
 	implements FormFieldInterfaceMapping <Container, Long, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -38,41 +49,53 @@ class IntegerFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <Long>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		// handle not present or empty
+		try (
 
-		if (
-
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			// handle not present or empty
 
-		}
+			if (
 
-		// parse integer
+				optionalIsNotPresent (
+					interfaceValue)
 
-		try {
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
 
-			return successResult (
-				Optional.of (
-					Long.parseLong (
-						interfaceValue.get ())));
+			) {
 
-		} catch (NumberFormatException exception) {
+				return successResult (
+					optionalAbsent ());
 
-			return errorResultFormat (
-				"You must enter a whole number using digits");
+			}
+
+			// parse integer
+
+			try {
+
+				return successResult (
+					Optional.of (
+						Long.parseLong (
+							interfaceValue.get ())));
+
+			} catch (NumberFormatException exception) {
+
+				return errorResultFormat (
+					"You must enter a whole number using digits");
+
+			}
 
 		}
 
@@ -81,36 +104,45 @@ class IntegerFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Long> genericValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				genericValue)
-
-			|| (
-
-				blankIfZero
-
-				&& equalToZero (
-					genericValue.get ())
-
-			)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
 
 		) {
 
-			return successResult (
-				Optional.absent ());
+			if (
 
-		} else {
+				optionalIsNotPresent (
+					genericValue)
 
-			return successResult (
-				Optional.of (
-					Long.toString (
-						genericValue.get ())));
+				|| (
+
+					blankIfZero
+
+					&& equalToZero (
+						genericValue.get ())
+
+				)
+
+			) {
+
+				return successResultAbsent ();
+
+			} else {
+
+				return successResultPresent (
+					integerToDecimalString (
+						genericValue.get ()));
+
+			}
 
 		}
 

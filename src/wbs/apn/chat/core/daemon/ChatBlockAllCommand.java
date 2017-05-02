@@ -14,8 +14,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -106,23 +107,25 @@ class ChatBlockAllCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
 			ChatRec chat =
 				chatHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -131,12 +134,13 @@ class ChatBlockAllCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// send barred users to help
@@ -163,7 +167,7 @@ class ChatBlockAllCommand
 			// call the block all function
 
 			chatMiscLogic.blockAll (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
 					message));
@@ -171,7 +175,7 @@ class ChatBlockAllCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

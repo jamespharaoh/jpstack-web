@@ -2,6 +2,7 @@ package wbs.apn.chat.bill.daemon;
 
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.Arrays;
@@ -167,25 +168,27 @@ class ChatBillDeliveryHandler
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			HeldLock lock =
 				chatUserDeliveryLocks.easy (
 					ref);
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatBillDeliveryHandler.handle (deliveryId, ref)",
-					this);
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"handle (%s, %s)",
+					keyEqualsDecimalInteger (
+						"deliveryId",
+						deliveryId),
+					keyEqualsDecimalInteger (
+						"ref",
+						ref));
 
 		) {
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			MessageRec message =
@@ -196,6 +199,7 @@ class ChatBillDeliveryHandler
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					message.getRef ());
 
 			// work out strict mode
@@ -275,6 +279,7 @@ class ChatBillDeliveryHandler
 			// and remove the delivery
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			// and rebill if appropriate
@@ -282,7 +287,7 @@ class ChatBillDeliveryHandler
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 				chatCreditLogic.userBill (
-					taskLogger,
+					transaction,
 					chatUser,
 					new BillCheckOptions ()
 						.retry (true));
@@ -294,12 +299,12 @@ class ChatBillDeliveryHandler
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 				chatCreditLogic.creditLimitUpdate (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			}
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Delivery report processed for message %s ",
 				integerToDecimalString (
 					message.getId ()),
@@ -310,6 +315,7 @@ class ChatBillDeliveryHandler
 				integerToDecimalString (
 					chatUser.getId ()),
 				chatCreditLogic.userCreditDebug (
+					transaction,
 					chatUser));
 
 			transaction.commit ();

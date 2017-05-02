@@ -66,35 +66,32 @@ class QueueClaimAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		Long queueId =
-			Long.parseLong (
-				requestContext.parameterRequired (
-					"queue_id"));
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"QueueClaimAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			Long queueId =
+				Long.parseLong (
+					requestContext.parameterRequired (
+						"queue_id"));
+
 			QueueRec queue =
 				queueHelper.findRequired (
+					transaction,
 					queueId);
 
 			QueueItemRec queueItem =
 				queueConsoleLogic.claimQueueItem (
-					taskLogger,
+					transaction,
 					queue,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			if (queueItem == null) {
 
@@ -107,7 +104,7 @@ class QueueClaimAction
 
 			Responder responder =
 				queuePageFactoryManager.getItemResponder (
-					taskLogger,
+					transaction,
 					requestContext,
 					queueItem);
 

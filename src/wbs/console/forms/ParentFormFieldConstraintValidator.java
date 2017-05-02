@@ -17,9 +17,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldConstraintValidator")
@@ -54,15 +55,15 @@ class ParentFormFieldConstraintValidator <
 	@Override
 	public
 	Optional <String> validate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"validate");
 
 		) {
@@ -71,13 +72,14 @@ class ParentFormFieldConstraintValidator <
 				createPrivDelegate != null
 					? (Record <?>)
 						objectManager.dereferenceObsolete (
+							transaction,
 							nativeValue.get (),
 							createPrivDelegate)
 					: nativeValue.get ();
 
 			if (
 				! privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					privDelegate,
 					createPrivCode)
 			) {

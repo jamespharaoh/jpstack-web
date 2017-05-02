@@ -26,6 +26,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -65,6 +66,9 @@ class ImChatMediaJpegAction
 	MediaLogic mediaLogic;
 
 	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
+
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
@@ -90,20 +94,13 @@ class ImChatMediaJpegAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle ()");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatMediaJpegAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
@@ -111,6 +108,7 @@ class ImChatMediaJpegAction
 
 			MediaRec media =
 				mediaHelper.findOrThrow (
+					transaction,
 					Long.parseLong (
 						requestContext.requestStringRequired (
 							"mediaId")),
@@ -143,8 +141,8 @@ class ImChatMediaJpegAction
 			// resize image
 
 			BufferedImage originalImage =
-				mediaLogic.readImageRequired (
-					taskLogger,
+				rawMediaLogic.readImageRequired (
+					transaction,
 					content.getData (),
 					media.getMediaType ().getMimeType ());
 
@@ -161,7 +159,7 @@ class ImChatMediaJpegAction
 			) {
 
 				resizedImage =
-					mediaLogic.cropAndResampleImage (
+					rawMediaLogic.cropAndResampleImage (
 						originalImage,
 						targetWidth,
 						targetHeight);
@@ -169,7 +167,7 @@ class ImChatMediaJpegAction
 			} else {
 
 				resizedImage =
-					mediaLogic.resampleImageToFit (
+					rawMediaLogic.resampleImageToFit (
 						originalImage,
 						ifNull (
 							targetWidth,
@@ -183,7 +181,7 @@ class ImChatMediaJpegAction
 			// create jpeg
 
 			byte[] resizedImageJpeg =
-				mediaLogic.writeJpeg (
+				rawMediaLogic.writeJpeg (
 					resizedImage,
 					0.8f);
 

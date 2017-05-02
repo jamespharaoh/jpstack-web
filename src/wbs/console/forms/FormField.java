@@ -10,8 +10,8 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -28,7 +28,7 @@ interface FormField <Container, Generic, Native, Interface>
 	@Override
 	default
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
@@ -38,7 +38,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderTableCellList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -51,7 +51,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
@@ -62,7 +62,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormAlwaysHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -76,7 +76,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormTemporarilyHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -90,7 +90,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -105,7 +105,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -118,7 +118,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderCsvRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
@@ -129,7 +129,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void implicit (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		doNothing ();
@@ -138,7 +138,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void setDefault (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		doNothing ();
@@ -147,7 +147,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	UpdateResult <Generic, Native> update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -159,7 +159,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void runUpdateHook (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull PermanentRecord <?> linkObject,

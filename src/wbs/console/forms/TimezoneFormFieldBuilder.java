@@ -20,24 +20,33 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("timezoneFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TimezoneFormFieldBuilder {
+class TimezoneFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -95,193 +104,159 @@ class TimezoneFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String fieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
-
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
-
-		Boolean hidden =
-			ifNull (
-				spec.hidden (),
-				false);
-
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
-
-		Boolean dynamic =
-			ifNull (
-				spec.dynamic (),
-				false);
-
-		// field type
-
-		Class <?> propertyClass;
-
-		if (! dynamic) {
-
-			propertyClass =
-				optionalGetRequired (
-					objectManager.dereferenceType (
-						optionalOf (
-							context.containerClass ()),
-						optionalOf (
-							fieldName)));
-
-		} else {
-
-			propertyClass =
-				String.class;
-
-		}
-
-		// accessor
-
-		FormFieldAccessor accessor;
-
-		if (dynamic) {
-
-			accessor =
-				dynamicFormFieldAccessorProvider.get ()
-
-				.name (
-					name)
-
-				.nativeClass (
-					propertyClass);
-
-		} else if (
-			isNotNull (
-				spec.fieldName ())
 		) {
 
-			accessor =
-				dereferenceFormFieldAccessorProvider.get ()
+			String name =
+				spec.name ();
 
-				.path (
-					fieldName);
+			String fieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
 
-		} else {
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-			accessor =
-				simpleFormFieldAccessorProvider.get ()
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-				.name (
-					fieldName)
+			Boolean hidden =
+				ifNull (
+					spec.hidden (),
+					false);
 
-				.nativeClass (
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
+
+			Boolean dynamic =
+				ifNull (
+					spec.dynamic (),
+					false);
+
+			// field type
+
+			Class <?> propertyClass;
+
+			if (! dynamic) {
+
+				propertyClass =
+					optionalGetRequired (
+						objectManager.dereferenceType (
+							taskLogger,
+							optionalOf (
+								context.containerClass ()),
+							optionalOf (
+								fieldName)));
+
+			} else {
+
+				propertyClass =
+					String.class;
+
+			}
+
+			// accessor
+
+			FormFieldAccessor accessor;
+
+			if (dynamic) {
+
+				accessor =
+					dynamicFormFieldAccessorProvider.get ()
+
+					.name (
+						name)
+
+					.nativeClass (
+						propertyClass);
+
+			} else if (
+				isNotNull (
+					spec.fieldName ())
+			) {
+
+				accessor =
+					dereferenceFormFieldAccessorProvider.get ()
+
+					.path (
+						fieldName);
+
+			} else {
+
+				accessor =
+					simpleFormFieldAccessorProvider.get ()
+
+					.name (
+						fieldName)
+
+					.nativeClass (
+						propertyClass);
+
+			}
+
+			// TODO dynamic
+
+			// native mapping
+
+			FormFieldNativeMapping nativeMapping =
+				formFieldPluginManager.getNativeMappingRequired (
+					context,
+					context.containerClass (),
+					name,
+					String.class,
 					propertyClass);
 
-		}
+			// value validator
 
-		// TODO dynamic
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-		// native mapping
+			if (! nullable) {
 
-		FormFieldNativeMapping nativeMapping =
-			formFieldPluginManager.getNativeMappingRequired (
-				context,
-				context.containerClass (),
-				name,
-				String.class,
-				propertyClass);
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
 
-		// value validator
-
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
-
-		if (! nullable) {
+			}
 
 			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+				timezoneFormFieldValueValidatorProvider.get ());
 
-		}
+			// constraint validator
 
-		valueValidators.add (
-			timezoneFormFieldValueValidatorProvider.get ());
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
 
-		// constraint validator
+			// interface mapping
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
 
-		// interface mapping
+			// renderer
 
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				nullable);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// form field
-
-		if (hidden) {
-
-			formFieldSet.addFormItem (
-				hiddenFormFieldProvider.get ()
-
-				.name (
-					name)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.implicitValue (
-					Optional.absent ())
-
-			);
-
-		} else if (readOnly) {
-
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -289,59 +264,107 @@ class TimezoneFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					nullable);
 
-				.nativeMapping (
-					nativeMapping)
+			// update hook
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.csvMapping (
-					interfaceMapping)
+			// form field
 
-				.renderer (
-					renderer)
+			if (hidden) {
 
-			);
+				formFieldSet.addFormItem (
+					hiddenFormFieldProvider.get ()
 
-		} else {
+					.name (
+						name)
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+					.accessor (
+						accessor)
 
-				.name (
-					name)
+					.nativeMapping (
+						nativeMapping)
 
-				.label (
-					label)
+					.csvMapping (
+						interfaceMapping)
 
-				.accessor (
-					accessor)
+					.implicitValue (
+						Optional.absent ())
 
-				.nativeMapping (
-					nativeMapping)
+				);
 
-				.valueValidators (
-					valueValidators)
+			} else if (readOnly) {
 
-				.constraintValidator (
-					constraintValidator)
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-				.interfaceMapping (
-					interfaceMapping)
+					.name (
+						name)
 
-				.csvMapping (
-					interfaceMapping)
+					.label (
+						label)
 
-				.renderer (
-					renderer)
+					.accessor (
+						accessor)
 
-				.updateHook (
-					updateHook)
+					.nativeMapping (
+						nativeMapping)
 
-			);
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			} else {
+
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

@@ -31,6 +31,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -134,7 +135,7 @@ class SimulatorSessionCreateEventAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goReal");
@@ -230,26 +231,23 @@ class SimulatorSessionCreateEventAction
 	Responder sendMessage (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sendMessage");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SimulatorSessionCreateEventAction.sendMessage ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"sendMessage");
 
 		) {
 
 			UserRec user =
-				userConsoleLogic.userRequired ();
+				userConsoleLogic.userRequired (
+					transaction);
 
 			SimulatorSessionRec simulatorSession =
-				simulatorSessionHelper.findFromContextRequired ();
+				simulatorSessionHelper.findFromContextRequired (
+					transaction);
 
 			SimulatorRec simulator =
 				simulatorSession.getSimulator ();
@@ -268,6 +266,7 @@ class SimulatorSessionCreateEventAction
 
 			NetworkRec network =
 				networkHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.formRequired (
 							"networkId")));
@@ -275,25 +274,25 @@ class SimulatorSessionCreateEventAction
 			// store in session
 
 			userSessionLogic.userDataStringStore (
-				taskLogger,
+				transaction,
 				user,
 				"simulator_num_from",
 				numFrom);
 
 			userSessionLogic.userDataStringStore (
-				taskLogger,
+				transaction,
 				user,
 				"simulator_num_to",
 				numTo);
 
 			userSessionLogic.userDataStringStore (
-				taskLogger,
+				transaction,
 				user,
 				"simulator_message",
 				messageText);
 
 			userSessionLogic.userDataStringStore (
-				taskLogger,
+				transaction,
 				user,
 				"simulator_network_id",
 				network.getId ().toString ());
@@ -319,13 +318,13 @@ class SimulatorSessionCreateEventAction
 
 			MessageRec message =
 				smsInboxLogic.inboxInsert (
-					taskLogger,
+					transaction,
 					optionalAbsent (),
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						messageText),
 					smsNumberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						numFrom),
 					numTo,
 					route,
@@ -359,7 +358,7 @@ class SimulatorSessionCreateEventAction
 			// create event
 
 			simulatorEventHelper.insert (
-				taskLogger,
+				transaction,
 				simulatorEventHelper.createInstance ()
 
 				.setSimulatorSession (
@@ -382,12 +381,12 @@ class SimulatorSessionCreateEventAction
 
 			NumberRec number =
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					numFrom);
 
 			SimulatorSessionNumberRec simulatorSessionNumber =
 				simulatorSessionNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					number);
 
 			simulatorSessionNumber
@@ -412,23 +411,19 @@ class SimulatorSessionCreateEventAction
 	Responder deliveryReport (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"deliveryReport");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SimulatorSessionCreateEventAction.deliveryReport ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"deliveryReport");
 
 		) {
 
 			SimulatorSessionRec simulatorSession =
-				simulatorSessionHelper.findFromContextRequired ();
+				simulatorSessionHelper.findFromContextRequired (
+					transaction);
 
 			Long messageId =
 				parseIntegerRequired (
@@ -443,7 +438,7 @@ class SimulatorSessionCreateEventAction
 			// submit delivery report
 
 			reportLogic.deliveryReport (
-				taskLogger,
+				transaction,
 				messageId,
 				ifThenElse (
 					success,
@@ -480,7 +475,7 @@ class SimulatorSessionCreateEventAction
 			// create event
 
 			simulatorEventHelper.insert (
-				taskLogger,
+				transaction,
 				simulatorEventHelper.createInstance ()
 
 				.setSimulatorSession (

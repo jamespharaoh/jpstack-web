@@ -24,8 +24,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -75,23 +76,24 @@ class ChatSettingsMonitorsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			List <Long> onlineMonitorIds =
 				chatUserHelper.searchIds (
-					taskLogger,
+					transaction,
 					new ChatUserSearch ()
 
 				.chatId (
@@ -105,7 +107,7 @@ class ChatSettingsMonitorsPart
 
 			);
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Got %s",
 				integerToDecimalString (
 					onlineMonitorIds.size ()));
@@ -117,9 +119,10 @@ class ChatSettingsMonitorsPart
 
 				ChatUserRec monitor =
 					chatUserHelper.findRequired (
+						transaction,
 						monitorId);
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Orient %s, gender %s",
 					enumName (
 						monitor.getOrient ()),
@@ -189,163 +192,174 @@ class ChatSettingsMonitorsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// form open
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chat.settings.monitors"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// table open
+		) {
 
-		htmlTableOpenList ();
+			// form open
 
-		htmlTableHeaderRowWrite (
-			"Orient",
-			"Male",
-			"Female");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chat.settings.monitors"));
 
-		// gay row
+			// table open
 
-		htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-		htmlTableCellWrite (
-			"Gay");
+			htmlTableHeaderRowWrite (
+				"Orient",
+				"Male",
+				"Female");
 
-		htmlTableCellOpen ();
+			// gay row
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"gayMale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"gayMale",
-				() -> integerToDecimalString (
-					gayMale)),
-			">");
+			htmlTableRowOpen ();
 
-		htmlTableCellClose ();
+			htmlTableCellWrite (
+				"Gay");
 
-		htmlTableCellOpen ();
+			htmlTableCellOpen ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"gayFemale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"gayFemale",
-				() -> integerToDecimalString (
-					gayFemale)),
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"gayMale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"gayMale",
+					() -> integerToDecimalString (
+						gayMale)),
+				">");
 
-		htmlTableRowClose ();
+			htmlTableCellClose ();
 
-		// bi row
+			htmlTableCellOpen ();
 
-		htmlTableRowOpen ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"gayFemale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"gayFemale",
+					() -> integerToDecimalString (
+						gayFemale)),
+				">");
 
-		htmlTableCellWrite (
-			"Bi");
+			htmlTableRowClose ();
 
-		htmlTableCellOpen ();
+			// bi row
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"biMale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"biMale",
-				() -> integerToDecimalString (
-					biMale)),
-			">");
+			htmlTableRowOpen ();
 
-		htmlTableCellClose ();
+			htmlTableCellWrite (
+				"Bi");
 
-		htmlTableCellOpen ();
+			htmlTableCellOpen ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"biFemale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"biFemale",
-				() -> integerToDecimalString (
-					biFemale)),
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"biMale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"biMale",
+					() -> integerToDecimalString (
+						biMale)),
+				">");
 
-		htmlTableCellClose ();
+			htmlTableCellClose ();
 
-		htmlTableRowClose ();
+			htmlTableCellOpen ();
 
-		// straight row
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"biFemale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"biFemale",
+					() -> integerToDecimalString (
+						biFemale)),
+				">");
 
-		htmlTableRowOpen ();
+			htmlTableCellClose ();
 
-		htmlTableCellWrite (
-			"Straight");
+			htmlTableRowClose ();
 
-		htmlTableCellOpen ();
+			// straight row
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"straightMale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"straightMale",
-				() -> integerToDecimalString (
-					straightMale)),
-			">");
+			htmlTableRowOpen ();
 
-		htmlTableCellClose ();
+			htmlTableCellWrite (
+				"Straight");
 
-		htmlTableCellOpen ();
+			htmlTableCellOpen ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"straightFemale\"",
-			" size=\"6\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"straightFemale",
-				() -> integerToDecimalString (
-					straightFemale)),
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"straightMale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"straightMale",
+					() -> integerToDecimalString (
+						straightMale)),
+				">");
 
-		htmlTableCellClose ();
+			htmlTableCellClose ();
 
-		htmlTableRowClose ();
+			htmlTableCellOpen ();
 
-		// table close
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"straightFemale\"",
+				" size=\"6\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"straightFemale",
+					() -> integerToDecimalString (
+						straightFemale)),
+				">");
 
-		htmlTableClose ();
+			htmlTableCellClose ();
 
-		// form controls
+			htmlTableRowClose ();
 
-		htmlParagraphOpen ();
+			// table close
 
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
+			htmlTableClose ();
 
-		htmlParagraphClose ();
+			// form controls
 
-		// form close
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

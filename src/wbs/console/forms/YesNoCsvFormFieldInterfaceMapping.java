@@ -17,8 +17,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -27,6 +30,11 @@ import fj.data.Either;
 public
 class YesNoCsvFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Boolean,String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -38,63 +46,75 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 	@Override
 	public
 	Either <Optional <Boolean>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceOptional) {
 
-		String interfaceValue =
-			optionalGetRequired (
-				interfaceOptional);
+		try (
 
-		if (
-			stringEqualSafe (
-				interfaceValue,
-				"yes")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
+
 		) {
 
-			return successResult (
-				optionalOf (
-					true));
+			String interfaceValue =
+				optionalGetRequired (
+					interfaceOptional);
 
-		} else if (
-			stringEqualSafe (
-				interfaceValue,
-				"no")
-		) {
-
-			return successResult (
-				Optional.of (
-					false));
-
-		} else if (
-			stringEqualSafe (
-				interfaceValue,
-				"")
-		) {
-
-			if (nullable ()) {
+			if (
+				stringEqualSafe (
+					interfaceValue,
+					"yes")
+			) {
 
 				return successResult (
-					Optional.absent ());
+					optionalOf (
+						true));
+
+			} else if (
+				stringEqualSafe (
+					interfaceValue,
+					"no")
+			) {
+
+				return successResult (
+					Optional.of (
+						false));
+
+			} else if (
+				stringEqualSafe (
+					interfaceValue,
+					"")
+			) {
+
+				if (nullable ()) {
+
+					return successResult (
+						Optional.absent ());
+
+				} else {
+
+					return errorResultFormat (
+						"This is a required field");
+
+				}
 
 			} else {
 
-				return errorResultFormat (
-					"This is a required field");
+				if (nullable ()) {
 
-			}
+					return errorResultFormat (
+						"This field must contain 'yes' or 'no', or be empty");
 
-		} else {
+				} else {
 
-			if (nullable ()) {
+					return errorResultFormat (
+						"This field must contain 'yes' or 'no'");
 
-				return errorResultFormat (
-					"This field must contain 'yes' or 'no', or be empty");
-
-			} else {
-
-				return errorResultFormat (
-					"This field must contain 'yes' or 'no'");
+				}
 
 			}
 
@@ -105,45 +125,56 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Boolean> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				Optional.of (
-					""));
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else if (
-			booleanEqual (
-				optionalGetRequired (
-					genericValue),
-				true)
-		) {
+				return successResult (
+					Optional.of (
+						""));
 
-			return successResult (
-				Optional.of (
-					"yes"));
+			} else if (
+				booleanEqual (
+					optionalGetRequired (
+						genericValue),
+					true)
+			) {
 
-		} else if (
-			booleanEqual (
-				optionalGetRequired (
-					genericValue),
-				false)
-		) {
+				return successResult (
+					Optional.of (
+						"yes"));
 
-			return successResult (
-				Optional.of (
-					"no"));
+			} else if (
+				booleanEqual (
+					optionalGetRequired (
+						genericValue),
+					false)
+			) {
 
-		} else {
+				return successResult (
+					Optional.of (
+						"no"));
 
-			throw new IllegalArgumentException ();
+			} else {
+
+				throw new IllegalArgumentException ();
+
+			}
 
 		}
 

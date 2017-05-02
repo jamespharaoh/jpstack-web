@@ -11,23 +11,34 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("jsonFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class JsonFormFieldBuilder {
+class JsonFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -75,112 +86,125 @@ class JsonFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// field type
+		) {
 
-		Class<?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+			String name =
+				spec.name ();
 
-		// accessor
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			// field type
 
-			.name (
-				name)
+			Class<?> propertyClass =
+				PropertyUtils.propertyClassForClass (
+					context.containerClass (),
+					name);
 
-			.nativeClass (
-				propertyClass);
+			// accessor
 
-		// native mapping
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping nativeMapping =
-			ifThenElse (
-				classEqualSafe (
-					propertyClass,
-					byte[].class),
+				.name (
+					name)
 
-			() ->
-				chainedFormFieldNativeMappingProvider.get ()
+				.nativeClass (
+					propertyClass);
 
-				.previousMapping (
-					jsonFormFieldNativeMappingProvider.get ())
+			// native mapping
 
-				.nextMapping (
-					utf8StringFormFieldNativeMappingProvider.get ()),
+			FormFieldNativeMapping nativeMapping =
+				ifThenElse (
+					classEqualSafe (
+						propertyClass,
+						byte[].class),
 
-			() ->
-				chainedFormFieldNativeMappingProvider.get ()
+				() ->
+					chainedFormFieldNativeMappingProvider.get ()
 
-				.previousMapping (
-					jsonFormFieldNativeMappingProvider.get ())
+					.previousMapping (
+						jsonFormFieldNativeMappingProvider.get ())
 
-				.nextMapping (
-					formFieldPluginManager.getNativeMappingRequired (
-						context,
-						context.containerClass (),
-						name,
-						String.class,
-						propertyClass))
+					.nextMapping (
+						utf8StringFormFieldNativeMappingProvider.get ()),
 
-		);
+				() ->
+					chainedFormFieldNativeMappingProvider.get ()
 
-		// interface mapping
+					.previousMapping (
+						jsonFormFieldNativeMappingProvider.get ())
 
-		FormFieldInterfaceMapping interfaceMapping =
-			jsonFormFieldInterfaceMappingProvider.get ();
+					.nextMapping (
+						formFieldPluginManager.getNativeMappingRequired (
+							context,
+							context.containerClass (),
+							name,
+							String.class,
+							propertyClass))
 
-		// renderer
+			);
 
-		FormFieldRenderer renderer =
-			htmlFormFieldRendererProvider.get ()
+			// interface mapping
 
-			.name (
-				name)
+			FormFieldInterfaceMapping interfaceMapping =
+				jsonFormFieldInterfaceMappingProvider.get ();
 
-			.label (
-				label);
+			// renderer
 
-		// form field
+			FormFieldRenderer renderer =
+				htmlFormFieldRendererProvider.get ()
 
-		formFieldSet.addFormItem (
-			readOnlyFormFieldProvider.get ()
+				.name (
+					name)
 
-			.name (
-				name)
+				.label (
+					label);
 
-			.label (
-				label)
+			// form field
 
-			.accessor (
-				accessor)
+			formFieldSet.addFormItem (
+				readOnlyFormFieldProvider.get ()
 
-			.nativeMapping (
-				nativeMapping)
+				.name (
+					name)
 
-			.interfaceMapping (
-				interfaceMapping)
+				.label (
+					label)
 
-			.renderer (
-				renderer)
+				.accessor (
+					accessor)
 
-		);
+				.nativeMapping (
+					nativeMapping)
+
+				.interfaceMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+			);
+
+		}
 
 	}
 

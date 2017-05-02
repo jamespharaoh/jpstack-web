@@ -4,22 +4,35 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.SimpleStatsResolver;
 import wbs.console.reporting.StatsAggregator;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorSimpleStatsResolverBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorSimpleStatsResolverBuilder {
+class SupervisorSimpleStatsResolverBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -39,70 +52,83 @@ class SupervisorSimpleStatsResolverBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String aggregatorName =
-			spec.aggregatorName ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String indexName =
-			spec.indexName ();
+		) {
 
-		String valueName =
-			spec.valueName ();
+			String name =
+				spec.name ();
 
-		String dataSetName =
-			spec.dataSetName();
+			String aggregatorName =
+				spec.aggregatorName ();
 
-		/*
-		StatsDataSet dataSet =
-			spec.statsDataSetsByName ().get (
-				dataSetName);
+			String indexName =
+				spec.indexName ();
 
-		if (dataSetName != null && dataSet == null) {
+			String valueName =
+				spec.valueName ();
 
-			throw new RuntimeException (sf (
-				"Stats data set %s does not exist",
-				dataSetName));
+			String dataSetName =
+				spec.dataSetName();
+
+			/*
+			StatsDataSet dataSet =
+				spec.statsDataSetsByName ().get (
+					dataSetName);
+
+			if (dataSetName != null && dataSet == null) {
+
+				throw new RuntimeException (sf (
+					"Stats data set %s does not exist",
+					dataSetName));
+
+			}
+			*/
+
+			StatsAggregator statsAggregator =
+				supervisorConfigBuilder.statsAggregatorsByName.get (
+					aggregatorName);
+
+			if (statsAggregator == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Stats aggregator %s does not exist",
+						aggregatorName));
+
+			}
+
+			supervisorConfigBuilder.statsResolversByName.put (
+
+				name,
+
+				simpleStatsResolverProvider.get ()
+
+					.indexName (
+						indexName)
+
+					.valueName (
+						valueName)
+
+					.dataSetName (
+						dataSetName)
+
+					.aggregator (
+						statsAggregator));
 
 		}
-		*/
-
-		StatsAggregator statsAggregator =
-			supervisorConfigBuilder.statsAggregatorsByName.get (
-				aggregatorName);
-
-		if (statsAggregator == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Stats aggregator %s does not exist",
-					aggregatorName));
-
-		}
-
-		supervisorConfigBuilder.statsResolversByName.put (
-
-			name,
-
-			simpleStatsResolverProvider.get ()
-
-				.indexName (
-					indexName)
-
-				.valueName (
-					valueName)
-
-				.dataSetName (
-					dataSetName)
-
-				.aggregator (
-					statsAggregator));
 
 	}
 

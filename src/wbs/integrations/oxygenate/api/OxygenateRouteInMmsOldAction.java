@@ -29,9 +29,12 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.oxygenate.model.OxygenateNetworkObjectHelper;
@@ -129,29 +132,24 @@ class OxygenateRouteInMmsOldAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"Oxygen8InboundMmsAction.goApi ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
 			processRequestHeaders (
-				taskLogger);
+				transaction);
 
 			processRequestBody (
-				taskLogger);
+				transaction);
 
 			updateDatabase (
-				taskLogger);
+				transaction);
 
 			transaction.commit ();
 
@@ -166,7 +164,7 @@ class OxygenateRouteInMmsOldAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"processRequestHeaders");
@@ -286,14 +284,15 @@ class OxygenateRouteInMmsOldAction
 
 	}
 
+	private
 	void processRequestBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processRequestBody");
 
 		) {
@@ -309,7 +308,7 @@ class OxygenateRouteInMmsOldAction
 
 				if (! matcher.matches ()) {
 
-					taskLogger.errorFormat (
+					transaction.errorFormat (
 						"Invalid content type: %s",
 						fileItem.getContentType ());
 
@@ -325,7 +324,7 @@ class OxygenateRouteInMmsOldAction
 
 				medias.add (
 					mediaLogic.createMediaRequired (
-						taskLogger,
+						transaction,
 						fileItem.get (),
 						type,
 						fileItem.getName (),
@@ -356,20 +355,21 @@ class OxygenateRouteInMmsOldAction
 				messageString = "";
 			}
 
-			taskLogger.makeException ();
+			transaction.makeException ();
 
 		}
 
 	}
 
+	private
 	void updateDatabase (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateDatabase");
 
 		) {
@@ -378,6 +378,7 @@ class OxygenateRouteInMmsOldAction
 
 			OxygenateRouteInRec oxygenateRouteIn =
 				oxygenateRouteInHelper.findRequired (
+					transaction,
 					routeId);
 
 			RouteRec route =
@@ -390,6 +391,7 @@ class OxygenateRouteInMmsOldAction
 
 			MessageTypeRec mmsMessageType =
 				messageTypeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					"mms");
 
@@ -420,22 +422,23 @@ class OxygenateRouteInMmsOldAction
 
 			NetworkRec network =
 				networkHelper.findRequired (
+					transaction,
 					0l);
 
 			// insert message
 
 			TextRec messageText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					messageString);
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalOf (
 					mmsMessageId),
 				messageText,
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					mmsSenderAddress),
 				mmsRecipientAddress,
 				route,

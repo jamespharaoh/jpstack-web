@@ -28,8 +28,9 @@ import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("coreSystemSwitchPart")
 public
@@ -64,13 +65,13 @@ class CoreSystemSwitchPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -79,14 +80,15 @@ class CoreSystemSwitchPart
 				"Switch deployment mode");
 
 			htmlParagraphWriteFormat (
-				"Use this control to select which version of the console you are ",
-				"using. This allows you to switch to a newer or older version of ",
-				"the console, in case of problems, and also to test new versions ",
-				"which are not yet ready to be released.");
+				"Use this control to select which version of the console you ",
+				"are using. This allows you to switch to a newer or older ",
+				"version of the console, in case of problems, and also to ",
+				"test new versions which are not yet ready to be released.");
 
 			htmlParagraphWriteFormat (
-				"The default should be \"current\", and this is what you should ",
-				"select if you are not sure, unless you have been told otherwise.");
+				"The default should be \"current\", and this is what you ",
+				"should select if you are not sure, unless you have been told ",
+				"otherwise.");
 
 			htmlTableOpenDetails ();
 

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextRec;
@@ -22,14 +22,14 @@ public
 interface ChatSendLogic {
 
 	MessageRec sendMessageRbFree (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			ServiceRec service,
 			String message);
 
 	Optional <MessageRec> sendSystem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			String templateCode,
@@ -42,7 +42,7 @@ interface ChatSendLogic {
 			Map <String, String> params);
 
 	Optional <MessageRec> sendSystemRbFree (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			String templateCode,
@@ -50,7 +50,7 @@ interface ChatSendLogic {
 			Map<String,String> params);
 
 	MessageRec sendMessageMmsFree (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional<Long> threadId,
 			String message,
@@ -58,7 +58,7 @@ interface ChatSendLogic {
 			ServiceRec service);
 
 	Optional <MessageRec> sendSystemMmsFree (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			String templateCode,
@@ -66,7 +66,7 @@ interface ChatSendLogic {
 			TemplateMissing templateMissing);
 
 	MessageRec sendMessageMagic (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			TextRec message,
@@ -75,7 +75,7 @@ interface ChatSendLogic {
 			Long magicRef);
 
 	Long sendMessageMagic (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			Collection <TextRec> parts,
@@ -85,7 +85,7 @@ interface ChatSendLogic {
 			Optional <UserRec> user);
 
 	Optional <MessageRec> sendSystemMagic (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId,
 			String templateCode,
@@ -95,10 +95,12 @@ interface ChatSendLogic {
 			Map <String, String> params);
 
 	Map <String, String> addDefaultParams (
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Map <String, String> params);
 
 	String renderTemplate (
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			String templateTypeCode,
 			String templateCode,

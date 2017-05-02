@@ -113,24 +113,17 @@ class OxygenateRouteReportAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"updateDatabase"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
 			OxygenateRouteOutRec routeOut =
 				oxygenateRouteOutCodeHelper.findRequired (
+					transaction,
 					smsRouteId);
 
 			if (! routeOut.getRoute ().getDeliveryReports ()) {
@@ -145,15 +138,17 @@ class OxygenateRouteReportAction
 
 			OxygenateReportCodeRec reportCode =
 				oxygenateReportCodeHelper.findByCodeRequired (
+					transaction,
 					routeOut.getOxygenateConfig (),
 					status);
 
 			RouteRec route =
 				smsRouteHelper.findRequired (
+					transaction,
 					smsRouteId);
 
 			reportLogic.deliveryReport (
-				taskLogger,
+				transaction,
 				route,
 				reference,
 				reportCode.getMessageStatus (),
@@ -213,28 +208,21 @@ class OxygenateRouteReportAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"storeLog"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			oxygenateInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				oxygenateInboundLogHelper.createInstance ()
 
 				.setRoute (
 					smsRouteHelper.findRequired (
+						transaction,
 						smsRouteId))
 
 				.setType (

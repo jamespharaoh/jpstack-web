@@ -49,8 +49,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
@@ -115,30 +116,36 @@ class SupervisorPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			prepareSupervisorConfig ();
-			prepareDate ();
+			prepareSupervisorConfig (
+				transaction);
+
+			prepareDate (
+				transaction);
 
 			if (supervisorConfig != null) {
 
-				createStatsPeriod ();
-				createStatsConditions ();
+				createStatsPeriod (
+					transaction);
+
+				createStatsConditions (
+					transaction);
 
 				createStatsDataSets (
-					taskLogger);
+					transaction);
 
 				createPageParts (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -146,204 +153,257 @@ class SupervisorPart
 
 	}
 
-	void prepareSupervisorConfig () {
+	void prepareSupervisorConfig (
+			@NonNull Transaction parentTransaction) {
 
-		if (fixedSupervisorConfigName != null) {
+		try (
 
-			selectedSupervisorConfigName =
-				fixedSupervisorConfigName;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareSupervisorConfig");
 
-			supervisorConfigNames =
-				Collections.singletonList (
-					fixedSupervisorConfigName);
+		) {
 
-		} else {
+			if (fixedSupervisorConfigName != null) {
 
-			supervisorConfigNames =
-				supervisorHelper.getSupervisorConfigNames ();
+				selectedSupervisorConfigName =
+					fixedSupervisorConfigName;
 
-			ImmutableList.Builder <SupervisorConfig> supervisorConfigsBuilder =
-				ImmutableList.builder ();
+				supervisorConfigNames =
+					Collections.singletonList (
+						fixedSupervisorConfigName);
 
-			for (
-				String supervisorConfigName
-					: supervisorConfigNames
-			) {
+			} else {
 
-				SupervisorConfig supervisorConfig =
+				supervisorConfigNames =
+					supervisorHelper.getSupervisorConfigNames (
+						transaction);
+
+				ImmutableList.Builder <SupervisorConfig>
+					supervisorConfigsBuilder =
+						ImmutableList.builder ();
+
+				for (
+					String supervisorConfigName
+						: supervisorConfigNames
+				) {
+
+					SupervisorConfig supervisorConfig =
+						consoleManager.supervisorConfig (
+							supervisorConfigName);
+
+					if (supervisorConfig == null) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"No such supervisor config: %s",
+								supervisorConfigName));
+
+					}
+
+					supervisorConfigsBuilder.add (
+						supervisorConfig);
+
+				}
+
+				supervisorConfigs =
+					supervisorConfigsBuilder.build ();
+
+				selectedSupervisorConfigName =
+					requestContext.parameterOrDefault (
+						"config",
+						supervisorConfigNames.isEmpty ()
+							? null
+							: supervisorConfigNames.get (0));
+
+				if (
+
+					selectedSupervisorConfigName != null
+
+					&& ! supervisorConfigNames.contains (
+						selectedSupervisorConfigName)
+
+				) {
+					throw new RuntimeException ();
+				}
+
+			}
+
+			if (selectedSupervisorConfigName != null) {
+
+				supervisorConfig =
 					consoleManager.supervisorConfig (
-						supervisorConfigName);
+						selectedSupervisorConfigName);
 
 				if (supervisorConfig == null) {
 
 					throw new RuntimeException (
 						stringFormat (
-							"No such supervisor config: %s",
-							supervisorConfigName));
+							"Supervisor config not found: %s",
+							selectedSupervisorConfigName));
 
 				}
 
-				supervisorConfigsBuilder.add (
-					supervisorConfig);
-
-			}
-
-			supervisorConfigs =
-				supervisorConfigsBuilder.build ();
-
-			selectedSupervisorConfigName =
-				requestContext.parameterOrDefault (
-					"config",
-					supervisorConfigNames.isEmpty ()
-						? null
-						: supervisorConfigNames.get (0));
-
-			if (
-
-				selectedSupervisorConfigName != null
-
-				&& ! supervisorConfigNames.contains (
-					selectedSupervisorConfigName)
-
-			) {
-				throw new RuntimeException ();
-			}
-
-		}
-
-		if (selectedSupervisorConfigName != null) {
-
-			supervisorConfig =
-				consoleManager.supervisorConfig (
-					selectedSupervisorConfigName);
-
-			if (supervisorConfig == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Supervisor config not found: %s",
-						selectedSupervisorConfigName));
-
 			}
 
 		}
 
 	}
 
-	void prepareDate () {
-
-		dateField =
-			ObsoleteDateField.parse (
-				requestContext.parameterOrNull ("date"));
-
-		if (dateField.date == null) {
-
-			requestContext.addError (
-				"Invalid date");
-
-			return;
-
-		}
-
-		startTime =
-			dateField.date
-
-			.toDateTime (
-				localTime (
-					ifNull (
-						supervisorConfig.spec ().offsetHours (),
-						0l)),
-				consoleUserHelper.timezone ());
-
-		endTime =
-			dateField.date
-
-			.plusDays (1)
-
-			.toDateTime (
-				localTime (
-					ifNull (
-						supervisorConfig.spec ().offsetHours (),
-						0l)),
-				consoleUserHelper.timezone ());
-
-	}
-
-	void createStatsPeriod () {
-
-		statsPeriod =
-			statsConsoleLogic.createStatsPeriod (
-				StatsGranularity.hour,
-				startTime,
-				endTime,
-				ifNull (
-					supervisorConfig.spec ().offsetHours (),
-					0l));
-
-	}
-
-	void createStatsConditions () {
-
-		ImmutableMap.Builder <String, Object> conditionsBuilder =
-			ImmutableMap.builder ();
-
-		for (
-			Object object
-				: supervisorConfig.spec ().builders ()
-		) {
-
-			if (object instanceof SupervisorConditionSpec) {
-
-				SupervisorConditionSpec supervisorConditionSpec =
-					(SupervisorConditionSpec)
-					object;
-
-				conditionsBuilder.put (
-					supervisorConditionSpec.name (),
-					requestContext.stuff (
-						supervisorConditionSpec.stuffKey ()));
-
-			}
-
-			if (object instanceof SupervisorIntegerConditionSpec) {
-
-				SupervisorIntegerConditionSpec integerConditionSpec =
-					(SupervisorIntegerConditionSpec)
-					object;
-
-				conditionsBuilder.put (
-					integerConditionSpec.name (),
-					integerConditionSpec.value ());
-
-			}
-
-			if (object instanceof SupervisorIntegerInConditionSpec) {
-
-				SupervisorIntegerInConditionSpec integerInConditionSpec =
-					(SupervisorIntegerInConditionSpec) object;
-
-				conditionsBuilder.put (
-					integerInConditionSpec.name (),
-					ImmutableSet.copyOf (
-						integerInConditionSpec.values ()));
-
-			}
-
-		}
-
-		statsConditions =
-			conditionsBuilder.build ();
-
-	}
-
-	void createStatsDataSets (
-			@NonNull TaskLogger parentTaskLogger) {
+	void prepareDate (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareDate");
+
+		) {
+
+			dateField =
+				ObsoleteDateField.parse (
+					requestContext.parameterOrNull ("date"));
+
+			if (dateField.date == null) {
+
+				requestContext.addError (
+					"Invalid date");
+
+				return;
+
+			}
+
+			startTime =
+				dateField.date
+
+				.toDateTime (
+					localTime (
+						ifNull (
+							supervisorConfig.spec ().offsetHours (),
+							0l)),
+					consoleUserHelper.timezone (
+						transaction));
+
+			endTime =
+				dateField.date
+
+				.plusDays (1)
+
+				.toDateTime (
+					localTime (
+						ifNull (
+							supervisorConfig.spec ().offsetHours (),
+							0l)),
+					consoleUserHelper.timezone (
+						transaction));
+
+		}
+
+	}
+
+	void createStatsPeriod (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createStatsPeriod");
+
+		) {
+
+			statsPeriod =
+				statsConsoleLogic.createStatsPeriod (
+					StatsGranularity.hour,
+					startTime,
+					endTime,
+					ifNull (
+						supervisorConfig.spec ().offsetHours (),
+						0l));
+
+		}
+
+	}
+
+	void createStatsConditions (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createStatsConditions");
+
+		) {
+
+			ImmutableMap.Builder <String, Object> conditionsBuilder =
+				ImmutableMap.builder ();
+
+			for (
+				Object object
+					: supervisorConfig.spec ().builders ()
+			) {
+
+				if (object instanceof SupervisorConditionSpec) {
+
+					SupervisorConditionSpec supervisorConditionSpec =
+						(SupervisorConditionSpec)
+						object;
+
+					conditionsBuilder.put (
+						supervisorConditionSpec.name (),
+						requestContext.stuff (
+							supervisorConditionSpec.stuffKey ()));
+
+				}
+
+				if (object instanceof SupervisorIntegerConditionSpec) {
+
+					SupervisorIntegerConditionSpec integerConditionSpec =
+						(SupervisorIntegerConditionSpec)
+						object;
+
+					conditionsBuilder.put (
+						integerConditionSpec.name (),
+						integerConditionSpec.value ());
+
+				}
+
+				if (object instanceof SupervisorIntegerInConditionSpec) {
+
+					SupervisorIntegerInConditionSpec integerInConditionSpec =
+						(SupervisorIntegerInConditionSpec) object;
+
+					conditionsBuilder.put (
+						integerInConditionSpec.name (),
+						ImmutableSet.copyOf (
+							integerInConditionSpec.values ()));
+
+				}
+
+			}
+
+			statsConditions =
+				conditionsBuilder.build ();
+
+		}
+
+	}
+
+	private
+	void createStatsDataSets (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createStatsDataSets");
 
 		) {
@@ -365,13 +425,13 @@ class SupervisorPart
 
 				StatsProvider statsProvider =
 					componentManager.getComponentRequired (
-						taskLogger,
+						transaction,
 						supervisorDataSetSpec.providerBeanName (),
 						StatsProvider.class);
 
 				StatsDataSet statsDataSet =
 					statsProvider.getStats (
-						taskLogger,
+						transaction,
 						statsPeriod,
 						statsConditions);
 
@@ -388,14 +448,15 @@ class SupervisorPart
 
 	}
 
+	private
 	void createPageParts (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createPageParts");
 
 		) {
@@ -423,14 +484,14 @@ class SupervisorPart
 
 				PagePart pagePart =
 					pagePartFactory.buildPagePart (
-						taskLogger);
+						transaction);
 
 				pagePart.setup (
-					taskLogger,
+					transaction,
 					partParameters);
 
 				pagePart.prepare (
-					taskLogger);
+					transaction);
 
 				pagePartsBuilder.add (
 					pagePart);
@@ -447,13 +508,13 @@ class SupervisorPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContent");
 
 		) {
@@ -464,7 +525,7 @@ class SupervisorPart
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -475,13 +536,13 @@ class SupervisorPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -582,9 +643,11 @@ class SupervisorPart
 						hoursInDay),
 					"hours due to a time change from %h ",
 					consoleUserHelper.timezoneString (
+						transaction,
 						startTime),
 					"to %h",
 					consoleUserHelper.timezoneString (
+						transaction,
 						endTime));
 
 				htmlParagraphClose ();
@@ -599,7 +662,7 @@ class SupervisorPart
 			) {
 
 				pagePart.renderHtmlBodyContent (
-					taskLogger);
+					transaction);
 
 			}
 

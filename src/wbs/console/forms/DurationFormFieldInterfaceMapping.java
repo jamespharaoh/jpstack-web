@@ -18,9 +18,12 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.DurationFormatter;
 
@@ -37,6 +40,9 @@ class DurationFormFieldInterfaceMapping <Container>
 	@SingletonDependency
 	DurationFormatter durationFormatter;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
 
 	@Getter @Setter
@@ -50,43 +56,55 @@ class DurationFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <Duration>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResultAbsent ();
-
-		} else {
-
-			Optional <Duration> genericValue =
-				durationFormatter.stringToDuration (
-					optionalGetRequired (
-						interfaceValue));
-
 			if (
+
 				optionalIsNotPresent (
-					genericValue)
+					interfaceValue)
+
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
+
 			) {
 
-				return errorResultFormat (
-					"Please enter a valid interval for '%s'",
-					label);
+				return successResultAbsent ();
+
+			} else {
+
+				Optional <Duration> genericValue =
+					durationFormatter.stringToDuration (
+						optionalGetRequired (
+							interfaceValue));
+
+				if (
+					optionalIsNotPresent (
+						genericValue)
+				) {
+
+					return errorResultFormat (
+						"Please enter a valid interval for '%s'",
+						label);
+
+				}
+
+				return successResultPresent (
+					genericValue.get ());
 
 			}
-
-			return successResultPresent (
-				genericValue.get ());
 
 		}
 
@@ -95,39 +113,50 @@ class DurationFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Duration> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResultAbsent ();
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else {
+				return successResultAbsent ();
 
-			switch (format) {
+			} else {
 
-			case textual:
+				switch (format) {
 
-				return successResultPresent (
-					durationFormatter.durationToStringTextual (
-						optionalGetRequired (
-							genericValue)));
+				case textual:
 
-			case numeric:
+					return successResultPresent (
+						durationFormatter.durationToStringTextual (
+							optionalGetRequired (
+								genericValue)));
 
-				return successResultPresent (
-					durationFormatter.durationToStringNumeric (
-						optionalGetRequired (
-							genericValue)));
+				case numeric:
 
-			default:
+					return successResultPresent (
+						durationFormatter.durationToStringNumeric (
+							optionalGetRequired (
+								genericValue)));
 
-				throw new RuntimeException ();
+				default:
+
+					throw new RuntimeException ();
+
+				}
 
 			}
 

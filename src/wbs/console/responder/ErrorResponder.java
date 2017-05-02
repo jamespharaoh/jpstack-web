@@ -16,9 +16,10 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtils;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("errorResponder")
@@ -53,13 +54,13 @@ class ErrorResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -80,7 +81,7 @@ class ErrorResponder
 			if (
 				exception != null
 				&& privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					GlobalId.root,
 					"debug")
 			) {
@@ -89,7 +90,7 @@ class ErrorResponder
 					stringFormat (
 						"<pre>%h</pre>",
 						exceptionLogic.throwableDump (
-							taskLogger,
+							transaction,
 							exception)));
 
 			}

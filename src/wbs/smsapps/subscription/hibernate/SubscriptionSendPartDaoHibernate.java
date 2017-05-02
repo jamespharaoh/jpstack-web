@@ -4,7 +4,12 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionSendPartDao;
 import wbs.smsapps.subscription.model.SubscriptionSendPartRec;
@@ -15,31 +20,51 @@ class SubscriptionSendPartDaoHibernate
 	extends HibernateDao
 	implements SubscriptionSendPartDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	SubscriptionSendPartRec find (
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull SubscriptionListRec subscriptionList) {
 
-		return findOneOrNull (
-			"find (subscriptionSend, subscriptionList)",
-			SubscriptionSendPartRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				SubscriptionSendPartRec.class,
-				"_subscriptionSendPart")
 
-			.add (
-				Restrictions.eq (
-					"_subscriptionSendPart.subscriptionSend",
-					subscriptionSend))
+				createCriteria (
+					transaction,
+					SubscriptionSendPartRec.class,
+					"_subscriptionSendPart")
 
-			.add (
-				Restrictions.eq (
-					"_subscriptionSendPart.subscriptionList",
-					subscriptionList))
+				.add (
+					Restrictions.eq (
+						"_subscriptionSendPart.subscriptionSend",
+						subscriptionSend))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_subscriptionSendPart.subscriptionList",
+						subscriptionList))
+
+			);
+
+		}
 
 	}
 

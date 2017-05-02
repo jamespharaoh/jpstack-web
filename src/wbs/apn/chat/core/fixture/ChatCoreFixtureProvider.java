@@ -24,11 +24,11 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.model.CurrencyObjectHelper;
@@ -174,50 +174,44 @@ class ChatCoreFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			networks =
-				networkHelper.findAll ();
+				networkHelper.findAll (
+					transaction);
 
 			users =
-				userHelper.findAll ();
+				userHelper.findAll (
+					transaction);
 
 			createMenuItems (
-				taskLogger,
 				transaction);
 
 			createRoutes (
-				taskLogger,
 				transaction);
 
 			createChatServices (
-				taskLogger,
 				transaction);
 
 			createChatTemplates (
-				taskLogger,
 				transaction);
 
 			createChatSchemes (
-				taskLogger,
 				transaction);
 
 			createChatUsers (
-				taskLogger,
 				transaction);
 
 			createChatMessages (
-				taskLogger,
 				transaction);
 
 		}
@@ -226,24 +220,24 @@ class ChatCoreFixtureProvider
 
 	private
 	void createMenuItems (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenuItems");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -274,24 +268,24 @@ class ChatCoreFixtureProvider
 
 	private
 	void createRoutes (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createRoutes");
 
 		) {
 
 			routeHelper.insert (
-				taskLogger,
+				transaction,
 				routeHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -321,17 +315,19 @@ class ChatCoreFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"simulator"))
 
 			);
 
 			routeHelper.insert (
-				taskLogger,
+				transaction,
 				routeHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -352,17 +348,19 @@ class ChatCoreFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"simulator"))
 
 			);
 
 			routeHelper.insert (
-				taskLogger,
+				transaction,
 				routeHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -380,6 +378,7 @@ class ChatCoreFixtureProvider
 
 				.setCommand (
 					commandHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"magic_number"))
 
@@ -393,24 +392,24 @@ class ChatCoreFixtureProvider
 
 	private
 	void createChatServices (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatServices");
 
 		) {
 
 			chatHelper.insert (
-				taskLogger,
+				transaction,
 				chatHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -425,12 +424,14 @@ class ChatCoreFixtureProvider
 
 				.setCurrency (
 					currencyHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"gbp"))
 
 				.setGazetteer (
 					gazetteerHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -451,24 +452,24 @@ class ChatCoreFixtureProvider
 
 	private
 	void createChatTemplates (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatTemplates");
 
 		) {
 
 			chatHelpTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				chatHelpTemplateHelper.createInstance ()
 
 				.setChat (
 					chatHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -488,11 +489,12 @@ class ChatCoreFixtureProvider
 			);
 
 			chatHelpTemplateHelper.insert (
-				taskLogger,
+				transaction,
 				chatHelpTemplateHelper.createInstance ()
 
 				.setChat (
 					chatHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -519,24 +521,24 @@ class ChatCoreFixtureProvider
 
 	private
 	void createChatSchemes (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatSchemes");
 
 		) {
 
 			chatSchemeHelper.insert (
-				taskLogger,
+				transaction,
 				chatSchemeHelper.createInstance ()
 
 				.setChat (
 					chatHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -552,13 +554,16 @@ class ChatCoreFixtureProvider
 
 				.setRbBillRoute (
 					routeHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"chat_5_00"))
 
 				.setRbFreeRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -566,7 +571,9 @@ class ChatCoreFixtureProvider
 
 				.setMagicRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -574,7 +581,9 @@ class ChatCoreFixtureProvider
 
 				.setWapRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -583,11 +592,12 @@ class ChatCoreFixtureProvider
 			);
 
 			chatSchemeHelper.insert (
-				taskLogger,
+				transaction,
 				chatSchemeHelper.createInstance ()
 
 				.setChat (
 					chatHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -603,13 +613,16 @@ class ChatCoreFixtureProvider
 
 				.setRbBillRoute (
 					routeHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"chat_5_00"))
 
 				.setRbFreeRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -617,7 +630,9 @@ class ChatCoreFixtureProvider
 
 				.setMagicRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -625,7 +640,9 @@ class ChatCoreFixtureProvider
 
 				.setWapRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"chat_free"),
@@ -636,7 +653,8 @@ class ChatCoreFixtureProvider
 			transaction.flush ();
 
 			chatSchemes =
-				chatSchemeHelper.findAll ();
+				chatSchemeHelper.findAll (
+					transaction);
 
 		}
 
@@ -644,14 +662,13 @@ class ChatCoreFixtureProvider
 
 	private
 	void createChatUsers (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatUsers");
 
 		) {
@@ -664,6 +681,7 @@ class ChatCoreFixtureProvider
 						mediaId ->
 							optionalOf (
 								mediaHelper.findRequired (
+									transaction,
 									mediaId)),
 						MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
 
@@ -691,7 +709,7 @@ class ChatCoreFixtureProvider
 
 				NumberRec number =
 					numberHelper.insert (
-						taskLogger,
+						transaction,
 						numberHelper.createInstance ()
 
 					.setNumber (
@@ -714,11 +732,12 @@ class ChatCoreFixtureProvider
 
 				ChatUserRec chatUser =
 					chatUserHelper.insert (
-						taskLogger,
+						transaction,
 						chatUserHelper.createInstance ()
 
 					.setChat (
 						chatHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"test"))
@@ -754,7 +773,7 @@ class ChatCoreFixtureProvider
 
 					.setInfoText (
 						textHelper.findOrCreateFormat (
-							taskLogger,
+							transaction,
 							"Info for %s",
 							name))
 
@@ -764,7 +783,6 @@ class ChatCoreFixtureProvider
 				);
 
 				chatUserAddImage (
-					taskLogger,
 					transaction,
 					chatUser,
 					imageMedias);
@@ -794,11 +812,12 @@ class ChatCoreFixtureProvider
 
 				ChatUserRec chatUser =
 					chatUserHelper.insert (
-						taskLogger,
+						transaction,
 						chatUserHelper.createInstance ()
 
 					.setChat (
 						chatHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"test"))
@@ -824,7 +843,7 @@ class ChatCoreFixtureProvider
 
 					.setInfoText (
 						textHelper.findOrCreateFormat (
-							taskLogger,
+							transaction,
 							"Info for %s",
 							name))
 
@@ -834,7 +853,6 @@ class ChatCoreFixtureProvider
 				);
 
 				chatUserAddImage (
-					taskLogger,
 					transaction,
 					chatUser,
 					imageMedias);
@@ -877,16 +895,15 @@ class ChatCoreFixtureProvider
 
 	private
 	void chatUserAddImage (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull List <Optional <MediaRec>> imageMedias) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"chatUserAddImage");
 
 		) {
@@ -904,7 +921,7 @@ class ChatCoreFixtureProvider
 
 			ChatUserImageRec chatUserImage =
 				chatUserImageHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserImageHelper.createInstance ()
 
 				.setChatUser (
@@ -945,14 +962,13 @@ class ChatCoreFixtureProvider
 
 	private
 	void createChatMessages (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createChatMessages");
 
 		) {
@@ -967,17 +983,18 @@ class ChatCoreFixtureProvider
 
 				TextRec messageText =
 					textHelper.findOrCreateFormat (
-						taskLogger,
+						transaction,
 						"Chat message user to user %s",
 						integerToDecimalString (
 							index));
 
 				chatMessageHelper.insert (
-					taskLogger,
+					transaction,
 					chatMessageHelper.createInstance ()
 
 					.setChat (
 						chatHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"test"))
@@ -1029,17 +1046,18 @@ class ChatCoreFixtureProvider
 
 				TextRec messageText =
 					textHelper.findOrCreateFormat (
-						taskLogger,
+						transaction,
 						"Chat message to monitor %s",
 						integerToDecimalString (
 							index));
 
 				chatMessageHelper.insert (
-					taskLogger,
+					transaction,
 					chatMessageHelper.createInstance ()
 
 					.setChat (
 						chatHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"test"))
@@ -1088,17 +1106,18 @@ class ChatCoreFixtureProvider
 
 				TextRec messageText =
 					textHelper.findOrCreateFormat (
-						taskLogger,
+						transaction,
 						"Chat message from monitor %s",
 						integerToDecimalString (
 							index));
 
 				chatMessageHelper.insert (
-					taskLogger,
+					transaction,
 					chatMessageHelper.createInstance ()
 
 					.setChat (
 						chatHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"test"))

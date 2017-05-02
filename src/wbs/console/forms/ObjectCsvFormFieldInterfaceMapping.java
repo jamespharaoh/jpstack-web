@@ -18,10 +18,13 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -36,6 +39,9 @@ class ObjectCsvFormFieldInterfaceMapping <
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
@@ -49,48 +55,61 @@ class ObjectCsvFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Generic> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				optionalOf (
-					""));
-
-		} else {
-
-			Optional <Record <?>> root;
-
 			if (
-				isNotNull (
-					rootFieldName)
+				optionalIsNotPresent (
+					genericValue)
 			) {
 
-				root =
+				return successResult (
 					optionalOf (
-						genericCastUnchecked (
-							objectManager.dereferenceObsolete (
-								container,
-								rootFieldName)));
+						""));
 
 			} else {
 
-				root =
-					optionalAbsent ();
+				Optional <Record <?>> root;
+
+				if (
+					isNotNull (
+						rootFieldName)
+				) {
+
+					root =
+						optionalOf (
+							genericCastUnchecked (
+								objectManager.dereferenceObsolete (
+									transaction,
+									container,
+									rootFieldName)));
+
+				} else {
+
+					root =
+						optionalAbsent ();
+
+				}
+
+				return successResult (
+					optionalOf (
+						objectManager.objectPathMini (
+							transaction,
+							genericValue.get (),
+							root)));
 
 			}
-
-			return successResult (
-				optionalOf (
-					objectManager.objectPathMini (
-						genericValue.get (),
-						root)));
 
 		}
 

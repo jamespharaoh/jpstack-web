@@ -13,9 +13,12 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.user.model.UserRec;
 
@@ -32,437 +35,560 @@ class ChatMessageDaoHibernate
 	extends HibernateDao
 	implements ChatMessageDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	ChatMessageRec findSignup (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		return findOneOrNull (
-			"findSignup (chatUser)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSignup");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.fromUser",
-					chatUser))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.status",
-					ChatMessageStatus.signup))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.fromUser",
+						chatUser))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_chatMessage.status",
+						ChatMessageStatus.signup))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatMessageRec> findSignupTimeout (
+	List <ChatMessageRec> findSignupTimeout (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull Instant timestamp) {
 
-		return findMany (
-			"findSignupTimeout (chat, timestamp)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSignupTimeout");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.chat",
-					chat))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.status",
-					ChatMessageStatus.signup))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.chat",
+						chat))
 
-			.add (
-				Restrictions.lt (
-					"_chatMessage.timestamp",
-					timestamp))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.status",
+						ChatMessageStatus.signup))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_chatMessage.timestamp",
+						timestamp))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ChatMessageRec> findLimit (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec fromChatUser,
 			@NonNull ChatUserRec toChatUser,
-			Long maxResults) {
+			@NonNull Long maxResults) {
 
-		return findMany (
-			"findLimit (fromChatUser, toChatUser)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findLimit");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.fromUser",
-					fromChatUser))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.toUser",
-					toChatUser))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.fromUser",
+						fromChatUser))
 
-			.addOrder (
-				Order.desc (
-					"_chatMessage.timestamp"))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.toUser",
+						toChatUser))
 
-			.setMaxResults (
-				toJavaIntegerRequired (
-					maxResults))
+				.addOrder (
+					Order.desc (
+						"_chatMessage.timestamp"))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatMessageRec> findBySenderAndTimestamp (
+	List <ChatMessageRec> findBySenderAndTimestamp (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull UserRec senderUser,
 			@NonNull Interval timestamp) {
 
-		return findMany (
-			"findBySenderAndTimestamp (chat, senderUser, timestampInterval)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findBySenderAndTimestamp");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.chat",
-					chat))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.sender",
-					senderUser))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.chat",
+						chat))
 
-			.add (
-				Restrictions.ge (
-					"_chatMessage.timestamp",
-					timestamp.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.sender",
+						senderUser))
 
-			.add (
-				Restrictions.lt (
-					"_chatMessage.timestamp",
-					timestamp.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_chatMessage.timestamp",
+						timestamp.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_chatMessage.timestamp",
+						timestamp.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatMessageRec> find (
+	List <ChatMessageRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		return findMany (
-			"find (chatUser)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.or (
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-				Restrictions.eq (
-					"_chatMessage.fromUser",
-					chatUser),
+				.add (
+					Restrictions.or (
 
-				Restrictions.eq (
-					"_chatMessage.toUser",
-					chatUser)
+					Restrictions.eq (
+						"_chatMessage.fromUser",
+						chatUser),
 
-			))
+					Restrictions.eq (
+						"_chatMessage.toUser",
+						chatUser)
 
-			.addOrder (
-				Order.desc (
-					"_chatMessage.timestamp"))
+				))
 
-		);
+				.addOrder (
+					Order.desc (
+						"_chatMessage.timestamp"))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatMessageRec> findFromTo (
+	List <ChatMessageRec> findFromTo (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec fromChatUser,
 			@NonNull ChatUserRec toChatUser) {
 
-		return findMany (
-			"findFromTo (fromChatUser, toChatUser)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findFromTo");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.fromUser",
-					fromChatUser))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.add (
-				Restrictions.eq (
-					"_chatMessage.toUser",
-					toChatUser))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.fromUser",
+						fromChatUser))
 
-			.addOrder (
-				Order.desc (
-					"_chatMessage.timestamp"))
+				.add (
+					Restrictions.eq (
+						"_chatMessage.toUser",
+						toChatUser))
 
-		);
+				.addOrder (
+					Order.desc (
+						"_chatMessage.timestamp"))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ChatMessageRec> search (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatMessageSearch search) {
 
-		Criteria criteria =
-			createCriteria (
-				ChatMessageRec.class)
+		try (
 
-			.createAlias (
-				"chat",
-				"_chat")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"search");
 
-			.createAlias (
-				"fromUser",
-				"_fromUser")
-
-			.createAlias (
-				"toUser",
-				"_toUser")
-
-			.createAlias (
-				"originalText",
-				"_originalText");
-
-		if (search.chatId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_chat.id",
-					search.chatId ()));
-
-		}
-
-		if (search.fromUserId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_fromUser.id",
-					search.fromUserId ()));
-
-		}
-
-		if (search.toUserId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_toUser.id",
-					search.toUserId ()));
-
-		}
-
-		if (search.originalTextId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_originalText.id",
-					search.originalTextId ()));
-
-		}
-
-		if (search.timestampAfter () != null) {
-
-			criteria.add (
-				Restrictions.ge (
-					"timestamp",
-					search.timestampAfter ()));
-
-		}
-
-		if (search.timestampBefore () != null) {
-
-			criteria.add (
-				Restrictions.lt (
-					"timestamp",
-					search.timestampBefore ()));
-
-		}
-
-		if (search.hasSender () != null) {
-
-			if (search.hasSender ()) {
-
-				criteria.add (
-					Restrictions.isNotNull (
-						"sender.id"));
-
-			} else {
-
-				criteria.add (
-					Restrictions.isNull (
-						"sender.id"));
-
-			}
-
-		}
-
-		if (search.idGreaterThan () != null) {
-
-			criteria.add (
-				Restrictions.gt (
-					"id",
-					search.idGreaterThan ()));
-
-		}
-
-		if (search.deliveryId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"deliveryId",
-					search.deliveryId ()));
-
-		}
-
-		if (search.deliveryIdGreaterThan () != null) {
-
-			criteria.add (
-				Restrictions.gt (
-					"deliveryId",
-					search.deliveryIdGreaterThan ()));
-
-		}
-
-		if (search.method () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"method",
-					search.method ()));
-
-		}
-
-		if (
-			search.statusIn () != null
-			&& ! search.statusIn ().isEmpty ()
 		) {
 
-			criteria.add (
-				Restrictions.in (
-					"status",
-					search.statusIn ()));
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ChatMessageRec.class)
 
-		}
+				.createAlias (
+					"chat",
+					"_chat")
 
-		if (search.orderBy () != null) {
+				.createAlias (
+					"fromUser",
+					"_fromUser")
 
-			switch (search.orderBy ()) {
+				.createAlias (
+					"toUser",
+					"_toUser")
 
-			case deliveryId:
+				.createAlias (
+					"originalText",
+					"_originalText");
 
-				criteria.addOrder (
-					Order.asc ("deliveryId"));
+			if (search.chatId () != null) {
 
-				break;
+				criteria.add (
+					Restrictions.eq (
+						"_chat.id",
+						search.chatId ()));
 
 			}
 
-		}
+			if (search.fromUserId () != null) {
 
-		return findMany (
-			"search (search)",
-			ChatMessageRec.class,
-			criteria);
+				criteria.add (
+					Restrictions.eq (
+						"_fromUser.id",
+						search.fromUserId ()));
+
+			}
+
+			if (search.toUserId () != null) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_toUser.id",
+						search.toUserId ()));
+
+			}
+
+			if (search.originalTextId () != null) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_originalText.id",
+						search.originalTextId ()));
+
+			}
+
+			if (search.timestampAfter () != null) {
+
+				criteria.add (
+					Restrictions.ge (
+						"timestamp",
+						search.timestampAfter ()));
+
+			}
+
+			if (search.timestampBefore () != null) {
+
+				criteria.add (
+					Restrictions.lt (
+						"timestamp",
+						search.timestampBefore ()));
+
+			}
+
+			if (search.hasSender () != null) {
+
+				if (search.hasSender ()) {
+
+					criteria.add (
+						Restrictions.isNotNull (
+							"sender.id"));
+
+				} else {
+
+					criteria.add (
+						Restrictions.isNull (
+							"sender.id"));
+
+				}
+
+			}
+
+			if (search.idGreaterThan () != null) {
+
+				criteria.add (
+					Restrictions.gt (
+						"id",
+						search.idGreaterThan ()));
+
+			}
+
+			if (search.deliveryId () != null) {
+
+				criteria.add (
+					Restrictions.eq (
+						"deliveryId",
+						search.deliveryId ()));
+
+			}
+
+			if (search.deliveryIdGreaterThan () != null) {
+
+				criteria.add (
+					Restrictions.gt (
+						"deliveryId",
+						search.deliveryIdGreaterThan ()));
+
+			}
+
+			if (search.method () != null) {
+
+				criteria.add (
+					Restrictions.eq (
+						"method",
+						search.method ()));
+
+			}
+
+			if (
+				search.statusIn () != null
+				&& ! search.statusIn ().isEmpty ()
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"status",
+						search.statusIn ()));
+
+			}
+
+			if (search.orderBy () != null) {
+
+				switch (search.orderBy ()) {
+
+				case deliveryId:
+
+					criteria.addOrder (
+						Order.asc ("deliveryId"));
+
+					break;
+
+				}
+
+			}
+
+			return findMany (
+				transaction,
+				ChatMessageRec.class,
+				criteria);
+
+		}
 
 	}
 
 	@Override
 	public
 	Long count (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
-		return findOneOrNull (
-			"count (chatUser)",
-			Long.class,
+		try (
 
-			createCriteria (
-				ChatMessageRec.class,
-				"_chatMessage")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"count");
 
-			.add (
-				Restrictions.or (
-					Restrictions.eq (
-						"_chatMessage.fromUser",
-						chatUser),
-					Restrictions.eq (
-						"_chatMessage.toUser",
-						chatUser)))
+		) {
 
-			.setProjection (
-				Projections.rowCount ())
+			return findOneOrNull (
+				transaction,
+				Long.class,
 
-		);
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
+
+				.add (
+					Restrictions.or (
+						Restrictions.eq (
+							"_chatMessage.fromUser",
+							chatUser),
+						Restrictions.eq (
+							"_chatMessage.toUser",
+							chatUser)))
+
+				.setProjection (
+					Projections.rowCount ())
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <ChatMessageRec> findLimit (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
-			Long maxResults) {
+			@NonNull Long maxResults) {
 
-		return findMany (
-			"findLimit (chatUser, maxResults)",
-			ChatMessageRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findLimit");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatMessageRec.class,
-				"_chatMessage")
 
-			.add (
-				Restrictions.or (
-					Restrictions.eq (
-						"_chatMessage.fromUser",
-						chatUser),
-					Restrictions.eq (
-						"_chatMessage.toUser",
-						chatUser)))
+				createCriteria (
+					transaction,
+					ChatMessageRec.class,
+					"_chatMessage")
 
-			.addOrder (
-				Order.desc (
-					"_chatMessage.timestamp"))
+				.add (
+					Restrictions.or (
+						Restrictions.eq (
+							"_chatMessage.fromUser",
+							chatUser),
+						Restrictions.eq (
+							"_chatMessage.toUser",
+							chatUser)))
 
-			.setMaxResults (
-				toJavaIntegerRequired (
-					maxResults))
+				.addOrder (
+					Order.desc (
+						"_chatMessage.timestamp"))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 

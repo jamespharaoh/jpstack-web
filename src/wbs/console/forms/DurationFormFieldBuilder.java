@@ -9,27 +9,38 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Duration;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.DurationFormFieldInterfaceMapping.Format;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("durationFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class DurationFormFieldBuilder {
+class DurationFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -81,111 +92,95 @@ class DurationFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+		) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String name =
+				spec.name ();
 
-		Format format =
-			ifNull (
-				spec.format (),
-				Format.textual);
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		// accessor
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-			.name (
-				name)
+			Format format =
+				ifNull (
+					spec.format (),
+					Format.textual);
 
-			.nativeClass (
-				Duration.class);
+			// accessor
 
-		// native mapping
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+				.name (
+					name)
 
-		// value validators
+				.nativeClass (
+					Duration.class);
 
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+			// native mapping
 
-		if (! nullable) {
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+			// value validators
 
-		}
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-		// constraint validator
+			if (! nullable) {
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldConstraintValidatorProvider.get ();
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
 
-		// interface mapping
+			}
 
-		FormFieldInterfaceMapping interfaceMapping =
-			durationFormFieldInterfaceMapping.get ()
+			// constraint validator
 
-			.label (
-				label)
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldConstraintValidatorProvider.get ();
 
-			.format (
-				format);
+			// interface mapping
 
-		// renderer
+			FormFieldInterfaceMapping interfaceMapping =
+				durationFormFieldInterfaceMapping.get ()
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+				.label (
+					label)
 
-			.name (
-				name)
+				.format (
+					format);
 
-			.label (
-				label)
+			// renderer
 
-			.nullable (
-				nullable)
-
-			.listAlign (
-				FormField.Align.right);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// field
-
-		if (! readOnly) {
-
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -193,53 +188,82 @@ class DurationFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					nullable)
 
-				.nativeMapping (
-					nativeMapping)
+				.listAlign (
+					FormField.Align.right);
 
-				.valueValidators (
-					valueValidators)
+			// update hook
 
-				.constraintValidator (
-					constraintValidator)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.interfaceMapping (
-					interfaceMapping)
+			// field
 
-				.renderer (
-					renderer)
+			if (! readOnly) {
 
-				.updateHook (
-					updateHook)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-			);
+					.name (
+						name)
 
-		} else {
+					.label (
+						label)
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+					.accessor (
+						accessor)
 
-				.name (
-					name)
+					.nativeMapping (
+						nativeMapping)
 
-				.label (
-					label)
+					.valueValidators (
+						valueValidators)
 
-				.accessor (
-					accessor)
+					.constraintValidator (
+						constraintValidator)
 
-				.nativeMapping (
-					nativeMapping)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.interfaceMapping (
-					interfaceMapping)
+					.renderer (
+						renderer)
 
-				.renderer (
-					renderer)
+					.updateHook (
+						updateHook)
 
-			);
+				);
+
+			} else {
+
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			}
 
 		}
 

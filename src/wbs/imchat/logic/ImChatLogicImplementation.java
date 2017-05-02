@@ -14,10 +14,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
@@ -70,20 +70,17 @@ class ImChatLogicImplementation
 	@Override
 	public
 	void conversationEnd (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransactions,
 			@NonNull ImChatConversationRec conversation) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransactions.nestTransaction (
+					logContext,
 					"conversationEnd");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ImChatCustomerRec customer =
 				conversation.getImChatCustomer ();
@@ -122,14 +119,14 @@ class ImChatLogicImplementation
 	@Override
 	public
 	void conversationEmailSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatConversationRec conversation) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"conversationEmailSend");
 
 		) {
@@ -222,15 +219,15 @@ class ImChatLogicImplementation
 	@Override
 	public
 	void customerPasswordGenerate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatCustomerRec customer,
 			@NonNull Optional <UserRec> consoleUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"customerPasswordGenerate");
 
 		) {
@@ -273,7 +270,7 @@ class ImChatLogicImplementation
 			) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"im_chat_customer_generated_password_from_console",
 					consoleUser.get (),
 					customer);
@@ -281,7 +278,7 @@ class ImChatLogicImplementation
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"im_chat_customer_forgotten_password",
 					customer);
 

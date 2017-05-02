@@ -24,8 +24,9 @@ import wbs.console.reporting.StatsProvider;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -58,15 +59,15 @@ class ChatMessageUserStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getStats");
 
 		) {
@@ -81,6 +82,7 @@ class ChatMessageUserStatsProvider
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						(Long)
 						conditions.get (
 							"chatId"));
@@ -91,7 +93,8 @@ class ChatMessageUserStatsProvider
 			} else {
 
 				chats =
-					chatHelper.findAll ();
+					chatHelper.findAll (
+						transaction);
 
 			}
 
@@ -105,7 +108,7 @@ class ChatMessageUserStatsProvider
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						chat,
 						"supervisor")
 				) {
@@ -114,7 +117,7 @@ class ChatMessageUserStatsProvider
 
 				StatsDataSet singleStatsDataSet =
 					getStatsForChat (
-						taskLogger,
+						transaction,
 						period,
 						chat);
 
@@ -136,32 +139,33 @@ class ChatMessageUserStatsProvider
 
 	}
 
+	private
 	StatsDataSet getStatsForChat (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
 			@NonNull ChatRec chat) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getStatsForChat");
 
 		) {
 
 			// setup data structures
 
-			Map<Long,long[]> countPerUser =
+			Map <Long, long[]> countPerUser =
 				new TreeMap<> ();
 
-			Map<Long,long[]> charsPerUser =
+			Map <Long, long[]> charsPerUser =
 				new TreeMap<> ();
 
-			Map<Long,long[]> finalCountPerUser =
+			Map <Long, long[]> finalCountPerUser =
 				new TreeMap<> ();
 
-			Set<Object> userIds =
+			Set <Object> userIds =
 				new HashSet<> ();
 
 			// retrieve messages
@@ -176,7 +180,7 @@ class ChatMessageUserStatsProvider
 
 			List <ChatMessageRec> chatMessages =
 				chatMessageHelper.search (
-					taskLogger,
+					transaction,
 					chatMessageSearch);
 
 			// aggregate stats

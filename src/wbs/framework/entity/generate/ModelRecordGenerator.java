@@ -59,6 +59,7 @@ import wbs.framework.entity.record.RecordComponent;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.entity.record.TypeRecord;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.AtomicFileWriter;
@@ -105,7 +106,7 @@ class ModelRecordGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"generateRecord");
@@ -335,7 +336,7 @@ class ModelRecordGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeFields");
@@ -387,7 +388,7 @@ class ModelRecordGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeCollections");

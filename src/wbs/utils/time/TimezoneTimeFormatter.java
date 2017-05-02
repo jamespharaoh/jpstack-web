@@ -1,5 +1,7 @@
 package wbs.utils.time;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
@@ -9,14 +11,13 @@ import org.joda.time.LocalDate;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
 
-import com.google.common.base.Optional;
-
 public
 interface TimezoneTimeFormatter {
 
 	// details
 
 	TimeFormatter timeFormatter ();
+
 	DateTimeZone timezone ();
 
 	// instant to string
@@ -137,7 +138,7 @@ interface TimezoneTimeFormatter {
 	// string to local date
 
 	default
-	Optional<LocalDate> dateStringToLocalDate (
+	Optional <LocalDate> dateStringToLocalDate (
 			@NonNull String string) {
 
 		return timeFormatter ().dateStringToLocalDate (

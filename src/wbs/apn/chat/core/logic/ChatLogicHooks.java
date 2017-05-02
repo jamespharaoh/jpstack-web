@@ -2,9 +2,10 @@ package wbs.apn.chat.core.logic;
 
 import java.util.List;
 
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.platform.hooks.logic.HooksProxy;
 import wbs.platform.hooks.logic.HooksTarget;
+
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 public
 interface ChatLogicHooks {

@@ -60,6 +60,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -595,7 +596,7 @@ class JavaClassWriter
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeBlock");
@@ -1032,14 +1033,17 @@ class JavaClassWriter
 				Arrays.stream (
 					delegateInterface.getDeclaredMethods ())
 
-				.filter (
-					method -> isNull (
-						method.getAnnotation (
-							DoNotDelegate.class)))
+				.filter (method ->
 
-				.filter (
-					method ->
-						! method.isDefault ())
+					isNull (
+						method.getAnnotation (
+							DoNotDelegate.class))
+
+					&& ! method.isDefault ()
+
+					&& ! method.isSynthetic ()
+
+				)
 
 				.map (
 					method -> Pair.of (

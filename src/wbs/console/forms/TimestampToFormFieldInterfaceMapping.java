@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.ResultUtils.successResultAbsent;
@@ -22,9 +23,12 @@ import org.joda.time.Instant;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TextualInterval;
 
@@ -38,6 +42,9 @@ class TimestampToFormFieldInterfaceMapping <Container>
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleUserHelper formFieldPreferences;
 
@@ -50,44 +57,58 @@ class TimestampToFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<Instant>,String> interfaceToGeneric (
+	Either <Optional <Instant>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			if (
 
-		}
+				optionalIsNotPresent (
+					interfaceValue)
 
-		try {
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
 
-			TextualInterval interval =
-				TextualInterval.parseRequired (
-					formFieldPreferences.timezone (),
-					interfaceValue.get (),
-					formFieldPreferences.hourOffset ());
+			) {
 
-			return successResult (
-				Optional.of (
-					interval.value ().getEnd ().toInstant ()));
+				return successResult (
+					optionalAbsent ());
 
-		} catch (IllegalArgumentException exception) {
+			}
 
-			return errorResultFormat (
-				"Please enter a valid timestamp for %s",
-				name ());
+			try {
+
+				TextualInterval interval =
+					TextualInterval.parseRequired (
+						formFieldPreferences.timezone (
+							transaction),
+						interfaceValue.get (),
+						formFieldPreferences.hourOffset (
+							transaction));
+
+				return successResult (
+					optionalOf (
+						interval.value ().getEnd ().toInstant ()));
+
+			} catch (IllegalArgumentException exception) {
+
+				return errorResultFormat (
+					"Please enter a valid timestamp for %s",
+					name ());
+
+			}
 
 		}
 
@@ -96,23 +117,35 @@ class TimestampToFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Instant> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResultAbsent ();
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
+
+				return successResultAbsent ();
+
+			}
+
+			return successResultPresent (
+				formFieldPreferences.timestampWithTimezoneString (
+					transaction,
+					genericValue.get ()));
 
 		}
-
-		return successResultPresent (
-			formFieldPreferences.timestampWithTimezoneString (
-				genericValue.get ()));
 
 	}
 

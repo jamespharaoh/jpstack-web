@@ -4,6 +4,7 @@
 
 	<layer name="utils">
 		<component class="BuilderFactoryImplementation"/>
+		<component class="BuilderImplementation"/>
 	</layer>
 
 </plugin>

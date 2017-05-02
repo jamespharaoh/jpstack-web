@@ -4,34 +4,59 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.imchat.model.ImChatSessionDao;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ImChatSessionDaoHibernate
 	extends HibernateDao
 	implements ImChatSessionDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	ImChatSessionRec findBySecret (
+			@NonNull Transaction parentTransaction,
 			@NonNull String secret) {
 
-		return findOneOrNull (
-			"findBySecret (secret)",
-			ImChatSessionRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findBySecret");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ImChatSessionRec.class,
-				"_imChatSession")
 
-			.add (
-				Restrictions.eq (
-					"_imChatSession.secret",
-					secret))
+				createCriteria (
+					transaction,
+					ImChatSessionRec.class,
+					"_imChatSession")
 
-		);
+				.add (
+					Restrictions.eq (
+						"_imChatSession.secret",
+						secret))
+
+			);
+
+		}
 
 	}
 

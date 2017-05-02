@@ -35,9 +35,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.group.console.GroupConsoleHelper;
 import wbs.platform.group.model.GroupRec;
@@ -87,13 +88,13 @@ class ObjectSummaryPrivPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -105,10 +106,12 @@ class ObjectSummaryPrivPart
 
 			object =
 				objectLookup.lookupObject (
+					transaction,
 					requestContext.consoleContextStuffRequired ());
 
 			List <PrivRec> privs =
 				objectManager.getChildren (
+					transaction,
 					object,
 					PrivRec.class);
 
@@ -128,6 +131,7 @@ class ObjectSummaryPrivPart
 
 					String userPath =
 						objectManager.objectPathMini (
+							transaction,
 							userPriv.getUser ());
 
 					UserPrivSets userPrivSets =
@@ -166,6 +170,7 @@ class ObjectSummaryPrivPart
 
 					String groupPath =
 						objectManager.objectPathMini (
+							transaction,
 							group);
 
 					Set<String> privCodes =
@@ -191,12 +196,13 @@ class ObjectSummaryPrivPart
 
 			for (
 				UserRec user
-					: userHelper.findAll ()
+					: userHelper.findAll (
+						transaction)
 			) {
 
 				if (
 					! objectManager.canView (
-						taskLogger,
+						transaction,
 						user)
 				) {
 					continue;
@@ -204,6 +210,7 @@ class ObjectSummaryPrivPart
 
 				users.put (
 					objectManager.objectPathMini (
+						transaction,
 						user),
 					user);
 
@@ -211,12 +218,13 @@ class ObjectSummaryPrivPart
 
 			for (
 				GroupRec group
-					: groupHelper.findAll ()
+					: groupHelper.findAll (
+						transaction)
 			) {
 
 				if (
 					! objectManager.canView (
-						taskLogger,
+						transaction,
 						group)
 				) {
 					continue;
@@ -224,6 +232,7 @@ class ObjectSummaryPrivPart
 
 				groups.put (
 					objectManager.objectPathMini (
+						transaction,
 						group),
 					group);
 
@@ -236,7 +245,7 @@ class ObjectSummaryPrivPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		renderUsers ();
 		renderGroups ();

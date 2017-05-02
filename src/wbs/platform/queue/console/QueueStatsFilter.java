@@ -1,5 +1,7 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,9 +13,14 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
@@ -25,6 +32,9 @@ public
 class QueueStatsFilter {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -50,54 +60,68 @@ class QueueStatsFilter {
 
 	public
 	void conditions (
-			Map <String, Object> conditions) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Object> conditions) {
 
-		if (conditions.containsKey ("sliceId")) {
+		try (
 
-			slice =
-				Optional.of (
-					sliceHelper.findRequired (
-						(Long)
-						conditions.get (
-							"sliceId")));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"conditions");
 
-		} else {
+		) {
 
-			slice =
-				Optional.absent ();
+			if (conditions.containsKey ("sliceId")) {
 
-		}
+				slice =
+					Optional.of (
+						sliceHelper.findRequired (
+							transaction,
+							(Long)
+							conditions.get (
+								"sliceId")));
 
-		if (conditions.containsKey ("queueId")) {
+			} else {
 
-			ImmutableSet.Builder <QueueRec> queuesBuilder =
-				ImmutableSet.builder ();
-
-			Set <?> queueIds =
-				(Set <?>)
-				conditions.get (
-					"queueId");
-
-			for (
-				Object queueId
-					: queueIds
-			) {
-
-				queuesBuilder.add (
-					queueHelper.findRequired (
-						(Long)
-						queueId));
+				slice =
+					Optional.absent ();
 
 			}
 
-			queues =
-				Optional.of (
-					queuesBuilder.build ());
+			if (conditions.containsKey ("queueId")) {
 
-		} else {
+				ImmutableSet.Builder <QueueRec> queuesBuilder =
+					ImmutableSet.builder ();
 
-			queues =
-				Optional.absent ();
+				Set <?> queueIds =
+					(Set <?>)
+					conditions.get (
+						"queueId");
+
+				for (
+					Object queueId
+						: queueIds
+				) {
+
+					queuesBuilder.add (
+						queueHelper.findRequired (
+							transaction,
+							(Long)
+							queueId));
+
+				}
+
+				queues =
+					Optional.of (
+						queuesBuilder.build ());
+
+			} else {
+
+				queues =
+					optionalAbsent ();
+
+			}
 
 		}
 
@@ -105,60 +129,73 @@ class QueueStatsFilter {
 
 	public
 	boolean filterQueue (
-			QueueRec queue) {
+			@NonNull Transaction parentTransaction,
+			@NonNull QueueRec queue) {
 
-		if (
-			includeQueues.contains (
-				queue)
-		) {
-			return true;
-		}
+		try (
 
-		if (
-			excludeQueues.contains (
-				queue)
-		) {
-			return false;
-		}
-
-		boolean exclude = false;
-
-		if (
-
-			slice.isPresent ()
-
-			&& ! objectManager.isParent (
-				queue,
-				slice.get ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"filterQueue");
 
 		) {
-			exclude = true;
-		}
 
-		if (
+			if (
+				includeQueues.contains (
+					queue)
+			) {
+				return true;
+			}
 
-			queues.isPresent ()
+			if (
+				excludeQueues.contains (
+					queue)
+			) {
+				return false;
+			}
 
-			&& ! queues.get ().contains (
-				queue)
+			boolean exclude = false;
 
-		) {
-			exclude = true;
-		}
+			if (
 
-		if (exclude) {
+				slice.isPresent ()
 
-			excludeQueues.add (
-				queue);
+				&& ! objectManager.isParent (
+					transaction,
+					queue,
+					slice.get ())
 
-			return false;
+			) {
+				exclude = true;
+			}
 
-		} else {
+			if (
 
-			includeQueues.add (
-				queue);
+				queues.isPresent ()
 
-			return true;
+				&& ! queues.get ().contains (
+					queue)
+
+			) {
+				exclude = true;
+			}
+
+			if (exclude) {
+
+				excludeQueues.add (
+					queue);
+
+				return false;
+
+			} else {
+
+				includeQueues.add (
+					queue);
+
+				return true;
+
+			}
 
 		}
 
@@ -166,28 +203,45 @@ class QueueStatsFilter {
 
 	public
 	List <QueueItemRec> filterQueueItems (
+			@NonNull Transaction parentTransaction,
 			@NonNull List <QueueItemRec> allQueueItems) {
 
-		List <QueueItemRec> filteredQueueItems =
-			new ArrayList<> ();
+		try (
 
-		for (
-			QueueItemRec queueItem
-				: allQueueItems
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"filterQueueItems");
+
 		) {
 
-			QueueRec queue =
-				queueItem.getQueueSubject ().getQueue ();
+			List <QueueItemRec> filteredQueueItems =
+				new ArrayList<> ();
 
-			if (! filterQueue (queue))
-				continue;
+			for (
+				QueueItemRec queueItem
+					: allQueueItems
+			) {
 
-			filteredQueueItems.add (
-				queueItem);
+				QueueRec queue =
+					queueItem.getQueueSubject ().getQueue ();
+
+				if (
+					! filterQueue (
+						transaction,
+						queue)
+				) {
+					continue;
+				}
+
+				filteredQueueItems.add (
+					queueItem);
+
+			}
+
+			return filteredQueueItems;
 
 		}
-
-		return filteredQueueItems;
 
 	}
 

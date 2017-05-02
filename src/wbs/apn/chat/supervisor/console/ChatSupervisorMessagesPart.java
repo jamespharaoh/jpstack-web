@@ -25,9 +25,12 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -60,6 +63,9 @@ class ChatSupervisorMessagesPart
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -102,92 +108,118 @@ class ChatSupervisorMessagesPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		Interval interval =
-			timeFormatter.isoStringToInterval (
-				requestContext.parameterRequired (
-					"interval"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		UserRec senderUser =
-			userHelper.findRequired (
-				requestContext.parameterIntegerRequired (
-					"user_id"));
+		) {
 
-		chatMessages =
-			chatMessageHelper.findBySenderAndTimestamp (
-				chat,
-				senderUser,
-				interval);
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
 
-		Collections.sort (
-			chatMessages);
+			Interval interval =
+				timeFormatter.isoStringToInterval (
+					requestContext.parameterRequired (
+						"interval"));
+
+			UserRec senderUser =
+				userHelper.findRequired (
+					transaction,
+					requestContext.parameterIntegerRequired (
+						"user_id"));
+
+			chatMessages =
+				chatMessageHelper.findBySenderAndTimestamp (
+					transaction,
+					chat,
+					senderUser,
+					interval);
+
+			Collections.sort (
+				chatMessages);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// table open
+		try (
 
-		htmlTableOpenList ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// table header
-
-		htmlTableHeaderRowWrite (
-			"From",
-			"To",
-			"Time",
-			"Message");
-
-		// table content
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					"magic-table-row"),
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveLocalUrlFormat (
-						"/chat.supervisorConversation",
-						"?chatUserId1=%u",
-						integerToDecimalString (
-							chatMessage.getToUser ().getId ()),
-						"&chatUserId2=%u",
-						integerToDecimalString (
-							chatMessage.getFromUser ().getId ()))));
+			// table open
 
-			htmlTableCellWrite (
-				chatConsoleLogic.textForChatUser (
-					chatMessage.getFromUser ()));
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatConsoleLogic.textForChatUser (
-					chatMessage.getToUser ()));
+			// table header
 
-			htmlTableCellWrite (
-				userConsoleLogic.timeString (
-					chatMessage.getTimestamp ()));
+			htmlTableHeaderRowWrite (
+				"From",
+				"To",
+				"Time",
+				"Message");
 
-			htmlTableCellWrite (
-				chatMessage.getOriginalText ().getText ());
+			// table content
 
-			htmlTableRowClose ();
+			for (
+				ChatMessageRec chatMessage
+					: chatMessages
+			) {
+
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"magic-table-row"),
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveLocalUrlFormat (
+							"/chat.supervisorConversation",
+							"?chatUserId1=%u",
+							integerToDecimalString (
+								chatMessage.getToUser ().getId ()),
+							"&chatUserId2=%u",
+							integerToDecimalString (
+								chatMessage.getFromUser ().getId ()))));
+
+				htmlTableCellWrite (
+					chatConsoleLogic.textForChatUser (
+						chatMessage.getFromUser ()));
+
+				htmlTableCellWrite (
+					chatConsoleLogic.textForChatUser (
+						chatMessage.getToUser ()));
+
+				htmlTableCellWrite (
+					userConsoleLogic.timeString (
+						transaction,
+						chatMessage.getTimestamp ()));
+
+				htmlTableCellWrite (
+					chatMessage.getOriginalText ().getText ());
+
+				htmlTableRowClose ();
+
+			}
+
+			// table close
+
+			htmlTableClose ();
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

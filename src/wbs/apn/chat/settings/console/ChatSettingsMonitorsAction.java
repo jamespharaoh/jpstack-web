@@ -61,8 +61,9 @@ class ChatSettingsMonitorsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -70,7 +71,8 @@ class ChatSettingsMonitorsAction
 
 			if (! requestContext.canContext ("chat.manage")) {
 
-				requestContext.addError ("Access denied");
+				requestContext.addError (
+					"Access denied");
 
 				return null;
 
@@ -118,65 +120,62 @@ class ChatSettingsMonitorsAction
 
 			}
 
-			try (
+			// perform action
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatSettingsMonitorsAction.goReal ()",
-						this);
+			ChatRec chat =
+				chatHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.male,
+				Orient.gay,
+				gayMale);
 
-				ChatRec chat =
-					chatHelper.findFromContextRequired ();
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.female,
+				Orient.gay,
+				gayFemale);
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.male,
-					Orient.gay,
-					gayMale);
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.male,
+				Orient.bi,
+				biMale);
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.female,
-					Orient.gay,
-					gayFemale);
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.female,
+				Orient.bi,
+				biFemale);
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.male,
-					Orient.bi,
-					biMale);
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.male,
+				Orient.straight,
+				straightMale);
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.female,
-					Orient.bi,
-					biFemale);
+			chatMiscLogic.monitorsToTarget (
+				transaction,
+				chat,
+				Gender.female,
+				Orient.straight,
+				straightFemale);
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.male,
-					Orient.straight,
-					straightMale);
+			transaction.commit ();
 
-				chatMiscLogic.monitorsToTarget (
-					chat,
-					Gender.female,
-					Orient.straight,
-					straightFemale);
+			requestContext.addNotice (
+				"Chat monitors updated");
 
-				transaction.commit ();
+			requestContext.setEmptyFormData ();
 
-				requestContext.addNotice (
-					"Chat monitors updated");
-
-				requestContext.setEmptyFormData ();
-
-				return null;
-
-			}
+			return null;
 
 		}
 

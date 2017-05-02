@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 public
 class ChatUserOnlineComparator

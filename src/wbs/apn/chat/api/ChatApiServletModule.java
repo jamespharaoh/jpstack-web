@@ -1,10 +1,10 @@
 package wbs.apn.chat.api;
 
 import static wbs.utils.collection.CollectionUtils.arrayLength;
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.LogicUtils.allOf;
-import static wbs.utils.etc.LogicUtils.anyOf;
 import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
@@ -16,6 +16,7 @@ import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -46,7 +47,6 @@ import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.api.mvc.ApiFile;
@@ -58,15 +58,18 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.rpc.core.Rpc;
@@ -216,6 +219,9 @@ class ChatApiServletModule
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
+
+	@SingletonDependency
 	RequestContext requestContext;
 
 	@SingletonDependency
@@ -248,7 +254,7 @@ class ChatApiServletModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setup");
@@ -285,10 +291,11 @@ class ChatApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
+				OwnedTransaction transaction =
+					database.beginReadOnly (
+						logContext,
 						parentTaskLogger,
-						"mediaFile.doGet");
+						"MediaFile.doGet");
 
 			) {
 
@@ -300,84 +307,62 @@ class ChatApiServletModule
 					requestContext.requestIntegerRequired (
 						"mediaId");
 
-				try (
+				Optional <MediaRec> mediaOptional =
+					mediaHelper.find (
+						transaction,
+						mediaId);
 
-					OwnedTransaction transaction =
-						database.beginReadOnly (
-							taskLogger,
-							"ChatApiServletModule.MediaFile.doGet ()",
-							this);
-
+				if (
+					optionalIsNotPresent (
+						mediaOptional)
 				) {
 
-					Optional <MediaRec> mediaOptional =
-						mediaHelper.find (
-							mediaId);
+					requestContext.status (
+						HttpStatus.httpNotFound);
 
-					if (
-						optionalIsNotPresent (
-							mediaOptional)
-					) {
+					return;
 
-						requestContext.status (
-							HttpStatus.httpNotFound);
+				}
 
-						return;
+				MediaRec media =
+					mediaOptional.get ();
 
-					}
+				byte[] data =
+					media.getContent ().getData ();
 
-					MediaRec media =
-						mediaOptional.get ();
+				String mimeType =
+					media.getMediaType ().getMimeType ();
 
-					byte[] data =
-						media.getContent ().getData ();
+				if (allOf (
 
-					String mimeType =
-						media.getMediaType ().getMimeType ();
+					() ->isNotNull (
+						format),
 
-					if (allOf (
+					() -> stringNotEqualSafe (
+						format,
+						"orig")
 
-						() ->isNotNull (
-							format),
+				)) {
 
-						() -> stringNotEqualSafe (
-							format,
-							"orig")
+					if (mediaLogic.isVideo (mimeType)) {
 
-					)) {
+						if (
+							mediaLogic.videoProfileNames ().contains (
+								format)
+						) {
 
-						if (mediaLogic.isVideo (mimeType)) {
-
-							if (
-								mediaLogic.videoProfileNames ().contains (
-									format)
-							) {
-
-								data =
-									mediaLogic.videoConvertRequired (
-										taskLogger,
-										format,
-										data);
-
-							} else {
-
-								taskLogger.warningFormat (
-									"Unable to convert %s to format %s",
-									mimeType,
-									format);
-
-								requestContext.status (
-									HttpStatus.httpNotFound);
-
-								return;
-
-							}
+							data =
+								rawMediaLogic.videoConvertRequired (
+									transaction,
+									format,
+									data);
 
 						} else {
 
-							taskLogger.warningFormat (
-								"Unable to convert %s",
-								 mimeType);
+							transaction.warningFormat (
+								"Unable to convert %s to format %s",
+								mimeType,
+								format);
 
 							requestContext.status (
 								HttpStatus.httpNotFound);
@@ -386,30 +371,41 @@ class ChatApiServletModule
 
 						}
 
-					}
+					} else {
 
-					requestContext.setHeader (
-						"Content-Type",
-						media.getMediaType ().getMimeType ());
+						transaction.warningFormat (
+							"Unable to convert %s",
+							 mimeType);
 
-					requestContext.setHeader (
-						"Content-Length",
-						integerToDecimalString (
-							arrayLength (
-								data)));
+						requestContext.status (
+							HttpStatus.httpNotFound);
 
-					try (
-
-						BorrowedOutputStream out =
-							requestContext.outputStream ();
-
-					) {
-
-						writeBytes (
-							out,
-							data);
+						return;
 
 					}
+
+				}
+
+				requestContext.setHeader (
+					"Content-Type",
+					media.getMediaType ().getMimeType ());
+
+				requestContext.setHeader (
+					"Content-Length",
+					integerToDecimalString (
+						arrayLength (
+							data)));
+
+				try (
+
+					BorrowedOutputStream out =
+						requestContext.outputStream ();
+
+				) {
+
+					writeBytes (
+						out,
+						data);
 
 				}
 
@@ -534,7 +530,7 @@ class ChatApiServletModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerRpcHandlerClasses");
@@ -850,38 +846,37 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnly (
-						taskLogger,
-						"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"ProfilesRpcHandler.handle");
 
 			) {
 
 				// get params
 
-				getParams (source);
+				getParams (
+					source);
 
 				// bail on any request-invalid classErrors
 
-				if (errors.iterator ().hasNext ())
+				if (errors.iterator ().hasNext ()) {
+
 					return Rpc.rpcError (
 						"chat-profiles-response",
 						Rpc.stRequestInvalid,
 						"request-invalid",
 						errors);
 
+				}
+
 				// return
 
 				return makeResponse (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -890,14 +885,14 @@ class ChatApiServletModule
 		@SuppressWarnings ("unchecked")
 		private
 		void getParams (
-				RpcSource source) {
+				@NonNull RpcSource source) {
 
-			Map<String,Object> params =
-				(Map<String,Object>)
-				source.obtain (
-					profilesRequestDef,
-					errors,
-					true);
+			Map <String, Object> params =
+				genericCastUnchecked (
+					source.obtain (
+						profilesRequestDef,
+						errors,
+						true));
 
 			if (params == null)
 				return;
@@ -921,46 +916,36 @@ class ChatApiServletModule
 
 		private
 		RpcResult makeResponse (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"makeResponse");
 
 			) {
-
-				BorrowedTransaction transaction =
-					database.currentTransaction ();
 
 				if (number != null) {
 
 					ChatRec chat =
 						chatHelper.findRequired (
+							transaction,
 							chatId);
 
 					NumberRec numberRec =
 						numberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							number);
 
-					myUser =
-						chatUserHelper.find (
-							chat,
-							numberRec);
-
-					if (anyOf (
-
-						() -> isNull (
-							myUser),
-
-						() -> integerNotEqualSafe (
-							myUser.getChat ().getId (),
-							chatId)
-
-					)) {
+					if (
+						optionalIsNotPresent (
+							chatUserHelper.find (
+								transaction,
+								chat,
+								numberRec))
+					) {
 
 						return Rpc.rpcError (
 							"chat-profiles-response",
@@ -1045,7 +1030,7 @@ class ChatApiServletModule
 
 				List <Long> userIds =
 					chatUserHelper.searchIds (
-						taskLogger,
+						transaction,
 						search);
 
 				// build list
@@ -1068,6 +1053,7 @@ class ChatApiServletModule
 
 					ChatUserRec user =
 						chatUserHelper.findRequired (
+							transaction,
 							userId);
 
 					// ignore system chat user, unless they are asked for
@@ -1474,18 +1460,13 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnly (
-						taskLogger,
-						"ChatApiServletModule.MediaRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"MediaRpcHandler.handle");
 
 			) {
 
@@ -1508,7 +1489,8 @@ class ChatApiServletModule
 
 				// return
 
-				return makeResponse ();
+				return makeResponse (
+					transaction);
 
 			}
 
@@ -1541,65 +1523,78 @@ class ChatApiServletModule
 		}
 
 		private
-		RpcResult makeResponse () {
+		RpcResult makeResponse (
+				@NonNull Transaction parentTransaction) {
 
-			// build list
+			try (
 
-			RpcList medias =
-				Rpc.rpcList (
-					"medias",
-					"media",
-					RpcType.rStructure);
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"makeResponse");
 
-			for (
-				Long mediaId
-					: mediaIds
 			) {
 
-				Optional<MediaRec> mediaRecOptional =
-					mediaHelper.find (
-						mediaId);
+				// build list
 
-				RpcStructure media =
-
-					Rpc.rpcStruct (
+				RpcList medias =
+					Rpc.rpcList (
+						"medias",
 						"media",
+						RpcType.rStructure);
 
-						Rpc.rpcElem (
-							"mediaId",
-							mediaId),
-
-						Rpc.rpcElem (
-							"found",
-							optionalIsPresent (
-								mediaRecOptional)));
-
-				if (
-					optionalIsPresent (
-						mediaRecOptional)
+				for (
+					Long mediaId
+						: mediaIds
 				) {
 
-					MediaRec mediaRec =
-						mediaRecOptional.get ();
+					Optional <MediaRec> mediaRecOptional =
+						mediaHelper.find (
+							transaction,
+							mediaId);
 
-					media.add (
-						Rpc.rpcElem (
-							"content",
-							mediaRec.getContent ().getData ()));
+					RpcStructure media =
+
+						Rpc.rpcStruct (
+							"media",
+
+							Rpc.rpcElem (
+								"mediaId",
+								mediaId),
+
+							Rpc.rpcElem (
+								"found",
+								optionalIsPresent (
+									mediaRecOptional)));
+
+					if (
+						optionalIsPresent (
+							mediaRecOptional)
+					) {
+
+						MediaRec mediaRec =
+							mediaRecOptional.get ();
+
+						media.add (
+							Rpc.rpcElem (
+								"content",
+								mediaRec.getContent ().getData ()));
+
+					}
+
+					medias.add (
+						media);
 
 				}
 
-				medias.add (
-					media);
+				// return
+
+				return Rpc.rpcSuccess (
+					"chat-media-response",
+					"Retrieving media files",
+					medias);
 
 			}
-
-			// return
-
-			return Rpc.rpcSuccess (
-				"chat-media-response",
-				"Retrieving media files",
-				medias);
 
 		}
 
@@ -1789,22 +1784,18 @@ class ChatApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"ProfileRpcHandler.handle");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ChatApiServletModule.ProfileRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"ProfileRpcHandler.handle");
 
 			) {
 
 				// get params
 
 				getParams (
+					transaction,
 					source);
 
 				// bail on any request-invalid classErrors
@@ -1822,7 +1813,6 @@ class ChatApiServletModule
 				// do updates
 
 				doUpdates (
-					taskLogger,
 					transaction);
 
 				// commit
@@ -1839,63 +1829,80 @@ class ChatApiServletModule
 
 		private
 		void getParams (
-				RpcSource source) {
+				@NonNull Transaction parentTransaction,
+				@NonNull RpcSource source) {
 
-			@SuppressWarnings ("unchecked")
-			Map<String,Object> params =
-				(Map<String, Object>)
-				source.obtain (
-					profileRequestDef,
-					errors,
-					true);
+			try (
 
-			if (params == null)
-				return;
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"ProileRpcHandler.getParams");
 
-			chatId = (Long) params.get ("chat-id");
-			number = (String) params.get ("number");
-			schemeCode = (String) params.get ("scheme-code");
-			affiliateCode = (String) params.get ("affiliate-code");
-			name = (String) params.get ("name");
-			gender = (Gender) params.get ("gender");
-			orient = (Orient) params.get ("orient");
-			info = (String) params.get ("info");
-			dob = (LocalDate) params.get ("dob");
-			location = (String) params.get ("location");
-			longitude = (Double) params.get ("longitude");
-			latitude = (Double) params.get ("latitude");
-			dateMode = (ChatUserDateMode) params.get ("date-mode");
-			dateRadius = (Long) params.get ("date-radius");
-			dateStartHour = (Long) params.get ("date-start-hour");
-			dateEndHour = (Long) params.get ("date-end-hour");
-			dateDailyMax = (Long) params.get ("date-daily-max");
-			chargesConfirmed = (Boolean) params.get ("charges-confirmed");
-			image = (byte[]) params.get ("image");
-			email = (String) params.get ("email");
+			) {
 
-			jigsawApplicationIdentifier =
-				(String)
-				params.get ("jigsaw-application-identifier");
+				@SuppressWarnings ("unchecked")
+				Map<String,Object> params =
+					(Map<String, Object>)
+					source.obtain (
+						profileRequestDef,
+						errors,
+						true);
 
-			jigsawToken =
-				(String)
-				params.get ("jigsaw-token");
+				if (params == null)
+					return;
 
-			@SuppressWarnings ("unchecked")
-			Map<String,String> profileFieldsTemp =
-				(Map<String,String>)
-				params.get ("profile-fields");
+				chatId = (Long) params.get ("chat-id");
+				number = (String) params.get ("number");
+				schemeCode = (String) params.get ("scheme-code");
+				affiliateCode = (String) params.get ("affiliate-code");
+				name = (String) params.get ("name");
+				gender = (Gender) params.get ("gender");
+				orient = (Orient) params.get ("orient");
+				info = (String) params.get ("info");
+				dob = (LocalDate) params.get ("dob");
+				location = (String) params.get ("location");
+				longitude = (Double) params.get ("longitude");
+				latitude = (Double) params.get ("latitude");
+				dateMode = (ChatUserDateMode) params.get ("date-mode");
+				dateRadius = (Long) params.get ("date-radius");
+				dateStartHour = (Long) params.get ("date-start-hour");
+				dateEndHour = (Long) params.get ("date-end-hour");
+				dateDailyMax = (Long) params.get ("date-daily-max");
+				chargesConfirmed = (Boolean) params.get ("charges-confirmed");
+				image = (byte[]) params.get ("image");
+				email = (String) params.get ("email");
 
-			profileFields =
-				profileFieldsTemp;
+				jigsawApplicationIdentifier =
+					(String)
+					params.get ("jigsaw-application-identifier");
 
-			if ((schemeCode != null
-						|| affiliateCode != null)
-					&& (schemeCode == null
-						|| affiliateCode == null)) {
+				jigsawToken =
+					(String)
+					params.get ("jigsaw-token");
 
-				errors.add (
-					"scheme-code and affiliate-code must be set together");
+				Map <String, String> profileFieldsTemp =
+					genericCastUnchecked (
+						params.get (
+							"profile-fields"));
+
+				profileFields =
+					profileFieldsTemp;
+
+				if (
+					(
+						schemeCode != null
+						|| affiliateCode != null
+					) && (
+						schemeCode == null
+						|| affiliateCode == null
+					)
+				) {
+
+					errors.add (
+						"scheme-code and affiliate-code must be set together");
+
+				}
 
 			}
 
@@ -1903,30 +1910,30 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
-				@NonNull TaskLogger parentTaskLogger,
-				@NonNull OwnedTransaction transaction) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doUpdates");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
 				chatUser =
 					chatUserHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						chat,
 						numberRec);
 
@@ -1934,6 +1941,7 @@ class ChatApiServletModule
 
 					ChatSchemeRec scheme =
 						chatSchemeHelper.findByCodeOrThrow (
+							transaction,
 							chat,
 							schemeCode,
 							() -> new RpcException (
@@ -1945,6 +1953,7 @@ class ChatApiServletModule
 
 					ChatAffiliateRec affiliate =
 						chatAffiliateHelper.findByCodeOrThrow (
+							transaction,
 							scheme,
 							affiliateCode,
 							() -> new RpcException (
@@ -1955,7 +1964,7 @@ class ChatApiServletModule
 									"The affiliate specified can not be found")));
 
 					chatUserLogic.setAffiliate (
-						taskLogger,
+						transaction,
 						chatUser,
 						affiliate,
 						optionalAbsent ());
@@ -1965,7 +1974,7 @@ class ChatApiServletModule
 				if (name != null) {
 
 					chatMiscLogic.chatUserSetName (
-						taskLogger,
+						transaction,
 						chatUser,
 						name,
 						null);
@@ -1981,7 +1990,7 @@ class ChatApiServletModule
 				if (info != null) {
 
 					chatInfoLogic.chatUserSetInfo (
-						taskLogger,
+						transaction,
 						chatUser,
 						info,
 						null);
@@ -2009,7 +2018,7 @@ class ChatApiServletModule
 
 					if (
 						! chatUserLogic.setPlace (
-							taskLogger,
+							transaction,
 							chatUser,
 							location,
 							optionalAbsent (),
@@ -2044,7 +2053,7 @@ class ChatApiServletModule
 								latitude));
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"chat_user_location_api",
 						chatUser,
 						longitude,
@@ -2065,7 +2074,7 @@ class ChatApiServletModule
 				}
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					null,
 					null,
@@ -2082,7 +2091,7 @@ class ChatApiServletModule
 				if (image != null) {
 
 					chatUserLogic.setPhoto (
-						taskLogger,
+						transaction,
 						chatUser,
 						image,
 						optionalAbsent (),
@@ -2174,7 +2183,7 @@ class ChatApiServletModule
 
 							userField =
 								chatUserProfileFieldHelper.insert (
-									taskLogger,
+									transaction,
 									chatUserProfileFieldHelper.createInstance ()
 
 								.setChatUser (
@@ -2206,6 +2215,7 @@ class ChatApiServletModule
 							// remove field
 
 							chatUserProfileFieldHelper.remove (
+								transaction,
 								userField);
 
 						}
@@ -2495,23 +2505,13 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"profileDeleteRpcHandler.handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						stringFormat (
-							"%s.%s.%s (%s)",
-							"ChatApiServletModule",
-							"ProfileDeleteRpcHandler",
-							"handle",
-							"source"),
-						this);
+						logContext,
+						parentTaskLogger,
+						"ProfileDeleteRpcHandler.handle");
 
 			) {
 
@@ -2535,7 +2535,6 @@ class ChatApiServletModule
 				// do updates
 
 				doUpdates (
-					taskLogger,
 					transaction);
 
 				// commit
@@ -2577,38 +2576,52 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
-				@NonNull TaskLogger parentTaskLogger,
-				@NonNull OwnedTransaction transaction) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doUpdates");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
-				chatUser =
+				Optional <ChatUserRec> chatUserOptional =
 					chatUserHelper.find (
+						transaction,
 						chat,
 						numberRec);
 
-				if (chatUser == null)
+				if (
+					optionalIsNotPresent (
+						chatUserOptional)
+				) {
 					return;
+				}
 
-				chatUser.setNumber (null);
+				chatUser =
+					optionalGetRequired (
+						chatUserOptional);
 
-				taskLogger.noticeFormat (
+				chatUser
+
+					.setNumber (
+						null)
+
+				;
+
+				transaction.noticeFormat (
 					"Delete chat user %s, ",
 					integerToDecimalString (
 						chatUser.getId ()),
@@ -2723,28 +2736,18 @@ class ChatApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"handle");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						stringFormat (
-							"%s.%s.%s (%s)",
-							"ChatApiServletModule",
-							"MessageSendRpcHandler",
-							"handle",
-							"source"),
-						this);
+						logContext,
+						parentTaskLogger,
+						"MessageSendRpcHandler.handle");
 
 			) {
 
 				// get params
 
 				getParams (
-					taskLogger,
+					transaction,
 					source);
 
 				// bail on any request-invalid classErrors
@@ -2762,7 +2765,7 @@ class ChatApiServletModule
 				// do it
 
 				doIt (
-					taskLogger);
+					transaction);
 
 				// commit
 
@@ -2811,34 +2814,36 @@ class ChatApiServletModule
 
 		private
 		void doIt (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doIt");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
 				ChatUserRec fromUser =
 					chatUserHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						chat,
 						numberRec);
 
 				ChatUserRec toUser =
 					chatUserHelper.findByCodeRequired (
+						transaction,
 						chat,
 						toCode);
 
@@ -2859,7 +2864,7 @@ class ChatApiServletModule
 
 				ChatCreditCheckResult creditCheckResult =
 					chatCreditLogic.userSpendCreditCheck (
-						taskLogger,
+						transaction,
 						fromUser,
 						true,
 						optionalAbsent ());
@@ -2879,7 +2884,11 @@ class ChatApiServletModule
 
 				// check the age has been set up
 
-				if (! chatUserLogic.gotDob (fromUser)) {
+				if (
+					! chatUserLogic.gotDob (
+						transaction,
+						fromUser)
+				) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -2892,7 +2901,11 @@ class ChatApiServletModule
 
 				// check the age is ok
 
-				if (! chatUserLogic.dobOk (fromUser)) {
+				if (
+					! chatUserLogic.dobOk (
+						transaction,
+						fromUser)
+				) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -2905,8 +2918,15 @@ class ChatApiServletModule
 
 				// check the charges have been confirmed
 
-				if (fromUser.getDeliveryMethod () != ChatMessageMethod.iphone
-						&& ! fromUser.getChargesConfirmed ()) {
+				if (
+
+					enumNotEqualSafe (
+						fromUser.getDeliveryMethod (),
+						ChatMessageMethod.iphone)
+
+					&& ! fromUser.getChargesConfirmed ()
+
+				) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -2944,7 +2964,7 @@ class ChatApiServletModule
 
 						MediaRec media =
 							mediaLogic.createMediaFromImageRequired (
-								taskLogger,
+								transaction,
 								attachment.data,
 								attachment.type,
 								attachment.filename);
@@ -2959,7 +2979,7 @@ class ChatApiServletModule
 				// send the message
 
 				chatMessageLogic.chatMessageSendFromUser (
-					taskLogger,
+					transaction,
 					fromUser,
 					toUser,
 					message,
@@ -3040,23 +3060,13 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						stringFormat (
-							"%s.%s.%s (%s)",
-							"ChatApiServletModule",
-							"MessagePollRpcHandler",
-							"handle",
-							"source"),
-						this);
+						logContext,
+						parentTaskLogger,
+						"MessagePollRpcHandler.handle");
 
 			) {
 
@@ -3080,8 +3090,7 @@ class ChatApiServletModule
 				// do it
 
 				doIt (
-					taskLogger,
-					transaction.now ());
+					transaction);
 
 				// commit
 
@@ -3120,30 +3129,30 @@ class ChatApiServletModule
 
 		private
 		void doIt (
-				@NonNull TaskLogger parentTaskLogger,
-				Instant now) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doIt");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
 				ChatUserRec chatUser =
 					chatUserHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						chat,
 						numberRec);
 
@@ -3166,7 +3175,7 @@ class ChatApiServletModule
 
 					ChatCreditCheckResult creditCheckResult =
 						chatCreditLogic.userSpendCreditCheck (
-							taskLogger,
+							transaction,
 							chatUser,
 							true,
 							optionalAbsent ());
@@ -3214,7 +3223,7 @@ class ChatApiServletModule
 				if (login) {
 
 					chatMiscLogic.userJoin (
-						taskLogger,
+						transaction,
 						chatUser,
 						false,
 						null,
@@ -3236,7 +3245,7 @@ class ChatApiServletModule
 				if (logout) {
 
 					chatUserLogic.logoff (
-						taskLogger,
+						transaction,
 						chatUser,
 						true);
 
@@ -3247,7 +3256,7 @@ class ChatApiServletModule
 				chatUser
 
 					.setLastMessagePoll (
-						now);
+						transaction.now ());
 
 				// update the last poll message id
 
@@ -3255,7 +3264,7 @@ class ChatApiServletModule
 
 					List <ChatMessageRec> chatMessages =
 						chatMessageHelper.search (
-							taskLogger,
+							transaction,
 							new ChatMessageSearch ()
 
 						.toUserId (
@@ -3300,9 +3309,9 @@ class ChatApiServletModule
 						"message",
 						RpcType.rStructure);
 
-				List<ChatMessageRec> messages =
+				List <ChatMessageRec> messages =
 					chatMessageHelper.search (
-						taskLogger,
+						transaction,
 						new ChatMessageSearch ()
 
 					.toUserId (
@@ -3526,29 +3535,25 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
+						logContext,
+						parentTaskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ChatApiServletModule",
 							"ImageUpdateRpcHandler",
 							"handle",
-							"source"),
-						this);
+							"source"));
 
 			) {
 
 				// get params
 
-				getParams (source);
+				getParams (
+					source);
 
 				// bail on any request-invalid classErrors
 
@@ -3565,7 +3570,6 @@ class ChatApiServletModule
 				// do it
 
 				doIt (
-					taskLogger,
 					transaction);
 
 				// commit
@@ -3668,30 +3672,30 @@ class ChatApiServletModule
 
 		private
 		void doIt (
-				@NonNull TaskLogger parentTaskLogger,
-				@NonNull OwnedTransaction transaction) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doIt");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
 				ChatUserRec chatUser =
 					chatUserHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						chat,
 						numberRec);
 
@@ -3865,6 +3869,7 @@ class ChatApiServletModule
 
 						ChatUserImageRec image =
 							chatUserImageHelper.findRequired (
+								transaction,
 								chatUserImageId);
 
 						image.setIndex (
@@ -3872,7 +3877,8 @@ class ChatApiServletModule
 
 					}
 
-					transaction.refresh (chatUser);
+					transaction.refresh (
+						chatUser);
 
 					images =
 						chatUserLogic.getChatUserImageListByType (
@@ -3888,7 +3894,7 @@ class ChatApiServletModule
 					for (ImageUpdateAdd imageUpdateAdd : add) {
 
 						chatUserLogic.setImage (
-							taskLogger,
+							transaction,
 							chatUser,
 							type,
 							imageUpdateAdd.imageData,
@@ -4200,18 +4206,13 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ChatApiServletModule.CreditRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"CreditRpcHandler.handle");
 
 			) {
 
@@ -4235,7 +4236,6 @@ class ChatApiServletModule
 				// do it
 
 				doIt (
-					taskLogger,
 					transaction);
 
 				// commit
@@ -4282,30 +4282,30 @@ class ChatApiServletModule
 
 		private
 		void doIt (
-				@NonNull TaskLogger parentTaskLogger,
-				@NonNull OwnedTransaction transaction) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"doIt");
 
 			) {
 
 				ChatRec chat =
 					chatHelper.findRequired (
+						transaction,
 						chatId);
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						number);
 
 				ChatUserRec chatUser =
 					chatUserHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						chat,
 						numberRec);
 
@@ -4363,7 +4363,7 @@ class ChatApiServletModule
 					for (int i = 0; i < sendCount; i++) {
 
 						chatCreditLogic.userBillReal (
-							taskLogger,
+							transaction,
 							chatUser,
 							true);
 
@@ -4376,7 +4376,7 @@ class ChatApiServletModule
 				if (creditAmount != null || billAmount != null) {
 
 					chatUserCreditHelper.insert (
-						taskLogger,
+						transaction,
 						chatUserCreditHelper.createInstance ()
 
 						.setChatUser (

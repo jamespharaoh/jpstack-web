@@ -15,7 +15,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
@@ -37,24 +37,28 @@ public
 interface ChatUserLogic {
 
 	AffiliateRec getAffiliate (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	Long getAffiliateId (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void logoff (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Boolean automatic);
 
 	boolean deleted (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void scheduleAd (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	boolean compatible (
+			Transaction parentTransaction,
 			Gender thisGender,
 			Orient thisOrient,
 			Optional <Long> thisCategoryId,
@@ -63,80 +67,52 @@ interface ChatUserLogic {
 			Optional <Long> thatCategoryId);
 
 	boolean compatible (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			ChatUserRec thatUser);
 
 	Collection <ChatUserRec> getNearestUsers (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Collection <ChatUserRec> thoseUsers,
 			Long numToFind);
 
 	List <UserDistance> getUserDistances (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Collection <ChatUserRec> otherUsers);
 
-	@Accessors (fluent = true)
-	@Data
-	@EqualsAndHashCode
-	public static
-	class UserDistance
-		implements Comparable <UserDistance> {
-
-		ChatUserRec user;
-		double miles;
-
-		@Override
-		public
-		int compareTo (
-				UserDistance other) {
-
-			return new CompareToBuilder ()
-
-				.append (
-					miles,
-					other.miles)
-
-				.append (
-					user,
-					other.user)
-
-				.toComparison ();
-
-		}
-
-	}
-
 	void adultVerify (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	ChatUserRec createChatMonitor (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatRec chat);
 
 	void creditModeChange (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatUserCreditMode newMode);
 
 	ChatUserImageRec setImage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatUserImageType type,
 			MediaRec smallMedia,
 			MediaRec fullMedia,
 			Optional <MessageRec> message,
-			boolean append);
+			Boolean append);
 
 	ChatUserImageRec setPhoto (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
 			Optional <MessageRec> message,
-			boolean append);
+			Boolean append);
 
 	ChatUserImageRec setPhoto (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			byte[] data,
 			Optional <String> filename,
@@ -145,20 +121,20 @@ interface ChatUserLogic {
 			Boolean append);
 
 	Optional <ChatUserImageRec> setPhotoFromMessage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MessageRec message,
 			Boolean append);
 
 	void setVideo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
 			MessageRec message,
 			Boolean append);
 
 	void setVideo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			byte[] data,
 			Optional<String> filename,
@@ -167,14 +143,14 @@ interface ChatUserLogic {
 			Boolean append);
 
 	void setAudio (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			byte[] data,
 			MessageRec message,
 			Boolean append);
 
 	void setImage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatUserImageType type,
 			byte[] data,
@@ -184,41 +160,47 @@ interface ChatUserLogic {
 			Boolean append);
 
 	boolean setVideo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MessageRec message,
 			Boolean append);
 
 	boolean setPlace (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			String place,
 			Optional <MessageRec> message,
 			Optional <UserRec> user);
 
 	boolean gotDob (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	boolean dobOk (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void setScheme (
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatSchemeRec chatScheme);
 
 	void setAffiliate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatAffiliateRec chatAffiliate,
 			Optional <MessageRec> message);
 
 	Optional <MediaRec> findPhoto (
+			Transaction parentTransaction,
 			MessageRec message);
 
 	boolean valid (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	ChatUserImageRec chatUserPendingImage (
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			ChatUserImageType type);
 
@@ -301,5 +283,36 @@ interface ChatUserLogic {
 	long getAgeInYears (
 			ChatUserRec chatUser,
 			Instant now);
+
+	@Accessors (fluent = true)
+	@Data
+	@EqualsAndHashCode
+	public static
+	class UserDistance
+		implements Comparable <UserDistance> {
+
+		ChatUserRec user;
+		double miles;
+
+		@Override
+		public
+		int compareTo (
+				UserDistance other) {
+
+			return new CompareToBuilder ()
+
+				.append (
+					miles,
+					other.miles)
+
+				.append (
+					user,
+					other.user)
+
+				.toComparison ();
+
+		}
+
+	}
 
 }

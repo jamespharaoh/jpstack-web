@@ -15,9 +15,12 @@ import org.joda.time.LocalDate;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("timestampAsDateFormFieldNativeMapping")
 public
@@ -29,38 +32,54 @@ class TimestampAsDateFormFieldNativeMapping <Container>
 	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	Optional <LocalDate> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Instant> nativeValueOptional) {
 
-		if (
-			optionalIsNotPresent (
-				nativeValueOptional)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"nativeToGeneric");
+
 		) {
-			return optionalAbsent ();
+
+			if (
+				optionalIsNotPresent (
+					nativeValueOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			Instant nativeInstant =
+				optionalGetRequired (
+					nativeValueOptional);
+
+			DateTime nativeDateTime =
+				nativeInstant.toDateTime (
+					consoleUserHelper.timezone (
+						transaction));
+
+			return optionalOf (
+				nativeDateTime.toLocalDate ());
+
 		}
-
-		Instant nativeInstant =
-			optionalGetRequired (
-				nativeValueOptional);
-
-		DateTime nativeDateTime =
-			nativeInstant.toDateTime (
-				consoleUserHelper.timezone ());
-
-		return optionalOf (
-			nativeDateTime.toLocalDate ());
 
 	}
 
 	@Override
 	public
 	Optional <Instant> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <LocalDate> genericValue) {
 

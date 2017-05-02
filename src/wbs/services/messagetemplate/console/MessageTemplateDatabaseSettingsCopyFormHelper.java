@@ -12,9 +12,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
@@ -51,24 +51,25 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateCopyForm state) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
 
 			MessageTemplateDatabaseRec targetDatabase =
-				messageTemplateDatabaseHelper.findFromContextRequired ();
+				messageTemplateDatabaseHelper.findFromContextRequired (
+					transaction);
 
 			MessageTemplateDatabaseRec sourceDatabase =
 				messageTemplateDatabaseHelper.findRequired (
+					transaction,
 					state.sourceMessageTemplateDatabaseId ());
 
 			for (
@@ -78,7 +79,7 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 
 				MessageTemplateEntryTypeRec targetEntryType =
 					messageTemplateEntryTypeHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						targetDatabase,
 						sourceEntryType.getCode (),
 						newEntryType ->
@@ -98,7 +99,7 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 				) {
 
 					messageTemplateFieldTypeHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						targetEntryType,
 						sourceFieldType.getCode (),
 						targetFieldType ->

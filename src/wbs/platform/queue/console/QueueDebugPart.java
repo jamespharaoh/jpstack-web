@@ -47,9 +47,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
@@ -112,13 +113,13 @@ class QueueDebugPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -135,7 +136,7 @@ class QueueDebugPart
 					userConsoleLogic.userIdRequired ());
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				formFields,
 				form,
@@ -149,24 +150,27 @@ class QueueDebugPart
 					masterQueueCacheProvider.get ())
 
 				.loggedInUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.effectiveUser (
 					optionalOrNull (
 						userHelper.find (
+							transaction,
 							form.userId ())))
 
 				.sort (
-					taskLogger);
+					transaction);
 
 			queueInfos =
 				sortedQueueSubjects.allQueues ().stream ()
 
-				.filter (queueInfo ->
-					userPrivChecker.canRecursive (
-						taskLogger,
-						queueInfo.queue (),
-						"supervisor"))
+				.filter (
+					queueInfo ->
+						userPrivChecker.canRecursive (
+							transaction,
+							queueInfo.queue (),
+							"supervisor"))
 
 				.collect (
 					Collectors.toList ());
@@ -178,19 +182,19 @@ class QueueDebugPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			formFieldLogic.outputFormTable (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				formFields,
@@ -232,7 +236,7 @@ class QueueDebugPart
 				}
 
 				renderQueueInfo (
-					taskLogger,
+					transaction,
 					queueInfo);
 
 			}
@@ -245,25 +249,28 @@ class QueueDebugPart
 
 	private
 	void renderQueueInfo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueInfo queueInfo) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"renderQueueInfo")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderQueueInfo");
 
 		) {
 
 			Record <?> queueParent =
 				objectManager.getParentRequired (
+					transaction,
 					queueInfo.queue ());
 
 			ObjectTypeRec queueParentType =
 				objectTypeHelper.findRequired (
+					transaction,
 					objectManager.getObjectTypeId (
+						transaction,
 						queueParent));
 
 			htmlTableRowOpen (
@@ -300,30 +307,31 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Slice: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
-							taskLogger,
+							transaction,
 							queueInfo.slice ()),
 						queueInfo.slice ().getCode ());
 
 					formatWriter.writeLineFormat (
 						"Type: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
-							taskLogger,
+							transaction,
 							queueParentType),
 						queueParentType.getCode ());
 
 					formatWriter.writeLineFormat (
 						"Service: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
-							taskLogger,
+							transaction,
 							queueParent),
 						objectManager.objectPathMini (
+							transaction,
 							queueParent,
 							queueInfo.slice ()));
 
 					formatWriter.writeLineFormat (
 						"Queue: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
-							taskLogger,
+							transaction,
 							queueInfo.queue ()),
 						queueInfo.queue ().getCode ());
 
@@ -364,6 +372,7 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Last update: %h<br>",
 						userConsoleLogic.timestampWithoutTimezoneString (
+							transaction,
 							queueInfo.slice ()
 								.getCurrentQueueInactivityUpdateTime ()));
 
@@ -373,6 +382,7 @@ class QueueDebugPart
 							queueInfo.slice ().getCurrentQueueInactivityTime (),
 							() -> userConsoleLogic
 								.timestampWithoutTimezoneString (
+									transaction,
 									queueInfo.slice ()
 										.getCurrentQueueInactivityTime ()),
 							() -> "none"));
@@ -383,6 +393,7 @@ class QueueDebugPart
 							queueInfo.slice ()
 								.getQueueOverflowInactivityTime (),
 							() -> userConsoleLogic.prettyDuration (
+								transaction,
 								Duration.standardSeconds (
 									queueInfo.slice ()
 										.getQueueOverflowInactivityTime ())),
@@ -394,6 +405,7 @@ class QueueDebugPart
 							queueInfo.slice ()
 								.getCurrentQueueInactivityTime (),
 							() -> userConsoleLogic.prettyDuration (
+								transaction,
 								queueInfo.slice ()
 									.getCurrentQueueInactivityTime (),
 								transaction.now ()),
@@ -428,9 +440,10 @@ class QueueDebugPart
 
 				htmlLinkWrite (
 					objectManager.localLink (
-						taskLogger,
+						transaction,
 						subjectInfo.subject ()),
 					objectManager.objectPathMini (
+						transaction,
 						subjectInfo.subject (),
 						queueInfo.queue ()));
 
@@ -456,9 +469,10 @@ class QueueDebugPart
 							: stringFormat (
 								"<a href=\"%h\">%h</a>",
 								objectManager.localLink (
-									taskLogger,
+									transaction,
 									subjectInfo.preferredUser ()),
 								objectManager.objectPathMini (
+									transaction,
 									subjectInfo.preferredUser ()))
 						: "nobody");
 
@@ -470,12 +484,14 @@ class QueueDebugPart
 				formatWriter.writeLineFormat (
 					"Configured delay: %h<br>",
 					userConsoleLogic.prettyDuration (
+						transaction,
 						queueInfo.configuredPreferredUserDelay ()));
 
 				formatWriter.writeLineFormat (
 					"Actual delay: %h<br>",
 					subjectInfo.actualPreferredUserDelay () != null
 						? userConsoleLogic.prettyDuration (
+							transaction,
 							subjectInfo.actualPreferredUserDelay ())
 						: "none");
 
@@ -494,6 +510,7 @@ class QueueDebugPart
 					ifNotNullThenElse (
 						queueInfo.slice ().getQueueOverflowGraceTime (),
 						() -> userConsoleLogic.prettyDuration (
+							transaction,
 							Duration.standardSeconds (
 								queueInfo.slice ()
 									.getQueueOverflowGraceTime ())),
@@ -504,6 +521,7 @@ class QueueDebugPart
 					ifNotNullThenElse (
 						queueInfo.slice ().getQueueOverflowOverloadTime (),
 						() -> userConsoleLogic.prettyDuration (
+							transaction,
 							Duration.standardSeconds (
 								queueInfo.slice ()
 									.getQueueOverflowOverloadTime ())),
@@ -524,6 +542,7 @@ class QueueDebugPart
 					ifNotNullThenElse (
 						subjectInfo.overflowDelay (),
 						() -> userConsoleLogic.prettyDuration (
+							transaction,
 							subjectInfo.overflowDelay ()),
 						() -> "none"));
 
@@ -545,6 +564,7 @@ class QueueDebugPart
 				formatWriter.writeLineFormat (
 					"Created time: %h<br>",
 					userConsoleLogic.timestampWithoutTimezoneString (
+						transaction,
 						subjectInfo.createdTime ()));
 
 				formatWriter.writeLineFormat (
@@ -552,6 +572,7 @@ class QueueDebugPart
 					ifNotNullThenElse (
 						subjectInfo.actualPreferredUserDelay,
 						() -> userConsoleLogic.prettyDuration (
+							transaction,
 							subjectInfo.actualPreferredUserDelay ()),
 						() -> "none"));
 
@@ -565,6 +586,7 @@ class QueueDebugPart
 						ifNotNullThenElse (
 							subjectInfo.overflowDelay,
 							() -> userConsoleLogic.prettyDuration (
+								transaction,
 								subjectInfo.overflowDelay ()),
 							() -> "none"),
 						booleanToString (
@@ -582,6 +604,7 @@ class QueueDebugPart
 				formatWriter.writeLineFormat (
 					"Effective time: %h<br>",
 					userConsoleLogic.timestampWithoutTimezoneString (
+						transaction,
 						subjectInfo.effectiveTime ()));
 
 				if (subjectInfo.claimed ()) {
@@ -589,9 +612,10 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Claimed: yes, by <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
-							taskLogger,
+							transaction,
 							subjectInfo.claimedByUser ()),
 						objectManager.objectPathMini (
+							transaction,
 							subjectInfo.claimedByUser ()));
 
 				} else {
@@ -606,6 +630,7 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Available: yes, for %h<br>",
 						userConsoleLogic.prettyDuration (
+							transaction,
 							subjectInfo.effectiveTime (),
 							transaction.now ()));
 
@@ -619,6 +644,7 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Available: no, for %h<br>",
 						userConsoleLogic.prettyDuration (
+							transaction,
 							transaction.now (),
 							subjectInfo.effectiveTime ()));
 

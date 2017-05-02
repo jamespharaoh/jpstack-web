@@ -1,16 +1,21 @@
 package wbs.apn.chat.user.core.logic;
 
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
@@ -59,15 +64,15 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull MessageRec message) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -79,51 +84,59 @@ class ChatUserObjectHelperMethodsImplementation
 
 			// check for an existing ChatUser
 
-			ChatUserRec chatUser =
+			Optional <ChatUserRec> existingChatUserOptional =
 				chatUserHelper.find (
+					transaction,
 					chat,
 					number);
 
-			if (chatUser != null) {
+			if (
+				optionalIsNotPresent (
+					existingChatUserOptional)
+			) {
 
-				// check number
-
-				if (
-
-					! chatNumberReportLogic.isNumberReportSuccessful (
-						taskLogger,
-						number)
-
-					&& isNull (
-						number.getArchiveDate ())
-
-				) {
-
-					taskLogger.debugFormat (
-						"Number archiving %s code %s",
-						number.getNumber (),
-						chatUser.getCode ());
-
-					NumberRec newNumber =
-						numberLogic.archiveNumberFromMessage (
-							taskLogger,
-							message);
-
-					return create (
-						taskLogger,
-						chat,
-						newNumber);
-
-				}
-
-				return chatUser;
+				return create (
+					transaction,
+					chat,
+					number);
 
 			}
 
-			return create (
-				taskLogger,
-				chat,
-				number);
+			ChatUserRec existingChatUser =
+				optionalGetRequired (
+					existingChatUserOptional);
+
+			// check number
+
+			if (
+
+				! chatNumberReportLogic.isNumberReportSuccessful (
+					transaction,
+					number)
+
+				&& isNull (
+					number.getArchiveDate ())
+
+			) {
+
+				transaction.debugFormat (
+					"Number archiving %s code %s",
+					number.getNumber (),
+					existingChatUser.getCode ());
+
+				NumberRec newNumber =
+					numberLogic.archiveNumberFromMessage (
+						transaction,
+						message);
+
+				return create (
+					transaction,
+					chat,
+					newNumber);
+
+			}
+
+			return existingChatUser;
 
 		}
 
@@ -132,33 +145,28 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
 
-			// check for an existing ChatUser
-
-			ChatUserRec chatUser =
+			return optionalOrElse (
 				chatUserHelper.find (
+					transaction,
 					chat,
-					number);
-
-			if (chatUser != null)
-				return chatUser;
-
-			return create (
-				taskLogger,
-				chat,
-				number);
+					number),
+				() -> create (
+					transaction,
+					chat,
+					number));
 
 		}
 
@@ -167,21 +175,18 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec create (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"create");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// create him
 
@@ -221,7 +226,7 @@ class ChatUserObjectHelperMethodsImplementation
 						: ChatUserCreditMode.billedMessages);
 
 			chatUserHelper.insert (
-				taskLogger,
+				transaction,
 				chatUser);
 
 			return chatUser;

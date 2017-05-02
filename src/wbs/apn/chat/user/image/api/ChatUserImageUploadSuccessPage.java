@@ -1,14 +1,15 @@
 package wbs.apn.chat.user.image.api;
 
-import com.google.common.collect.ImmutableMap;
+import static wbs.utils.collection.MapUtils.emptyMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -53,54 +54,79 @@ class ChatUserImageUploadSuccessPage
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		imageUploadToken =
-			chatUserImageUploadTokenHelper.findByToken (
-				(String)
-				requestContext.requestRequired (
-					"chatUserImageUploadToken"));
+		try (
 
-		chatUser =
-			imageUploadToken.getChatUser ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		titleText =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_success_title",
-				ImmutableMap.<String,String> of ());
+		) {
 
-		bodyHtml =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_success_body",
-				ImmutableMap.<String,String> of ());
+			imageUploadToken =
+				chatUserImageUploadTokenHelper.findByToken (
+					transaction,
+					(String)
+					requestContext.requestRequired (
+						"chatUserImageUploadToken"));
+
+			chatUser =
+				imageUploadToken.getChatUser ();
+
+			titleText =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_success_title",
+					emptyMap ());
+
+			bodyHtml =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_success_body",
+					emptyMap ());
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.addHeader (
-			"Content-Type",
-			"text/html");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.addHeader (
+				"Content-Type",
+				"text/html");
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goContent");
 
 		) {
@@ -112,10 +138,10 @@ class ChatUserImageUploadSuccessPage
 				"<html>");
 
 			goHead (
-				taskLogger);
+				transaction);
 
 			goBody (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -126,13 +152,13 @@ class ChatUserImageUploadSuccessPage
 
 	protected
 	void goHead (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goHead");
 
 		) {
@@ -153,13 +179,13 @@ class ChatUserImageUploadSuccessPage
 
 	protected
 	void goBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goBody");
 
 		) {

@@ -2,8 +2,9 @@ package wbs.apn.chat.user.info.hibernate;
 
 import java.sql.Types;
 
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 
 public
 class ChatUserInfoStatusType

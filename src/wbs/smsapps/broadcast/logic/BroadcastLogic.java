@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -15,7 +15,7 @@ public
 interface BroadcastLogic {
 
 	AddResult addNumbers (
-			TaskLogger taskLogger,
+			Transaction parentTransaction,
 			BroadcastRec broadcast,
 			List <String> numbers,
 			UserRec user);

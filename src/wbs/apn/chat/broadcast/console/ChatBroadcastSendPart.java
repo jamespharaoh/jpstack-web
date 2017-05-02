@@ -32,8 +32,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.OptionalUtils;
 
@@ -106,68 +107,80 @@ class ChatBroadcastSendPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		searchFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-search",
-				ChatBroadcastSendForm.class);
+		try (
 
-		numbersFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-numbers",
-				ChatBroadcastSendForm.class);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		commonFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-common",
-				ChatBroadcastSendForm.class);
+		) {
 
-		messageUserFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-message-user",
-				ChatBroadcastSendForm.class);
+			searchFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-search",
+					ChatBroadcastSendForm.class);
 
-		messageMessageFields =
-			chatBroadcastConsoleModule.formFieldSetRequired (
-				"send-message-message",
-				ChatBroadcastSendForm.class);
+			numbersFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-numbers",
+					ChatBroadcastSendForm.class);
 
-		form =
-			(ChatBroadcastSendForm)
-			OptionalUtils.ifNotPresent (
-				requestContext.request (
-					"chatBroadcastForm"),
-				Optional.<ChatBroadcastSendForm>of (
-					new ChatBroadcastSendForm ()));
+			commonFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-common",
+					ChatBroadcastSendForm.class);
 
-		updateResults =
-			OptionalUtils.optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"chatBroadcastUpdates"));
+			messageUserFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-message-user",
+					ChatBroadcastSendForm.class);
 
-		formHints =
-			ImmutableMap.<String, Object> builder ()
+			messageMessageFields =
+				chatBroadcastConsoleModule.formFieldSetRequired (
+					"send-message-message",
+					ChatBroadcastSendForm.class);
 
-			.put (
-				"chat",
-				chatHelper.findFromContextRequired ())
+			form =
+				(ChatBroadcastSendForm)
+				OptionalUtils.ifNotPresent (
+					requestContext.request (
+						"chatBroadcastForm"),
+					Optional.<ChatBroadcastSendForm>of (
+						new ChatBroadcastSendForm ()));
 
-			.build ();
+			updateResults =
+				OptionalUtils.optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"chatBroadcastUpdates"));
+
+			formHints =
+				ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"chat",
+					chatHelper.findFromContextRequired (
+						transaction))
+
+				.build ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -178,7 +191,7 @@ class ChatBroadcastSendPart
 				"Recipients");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -189,7 +202,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				numbersFields,
@@ -200,7 +213,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				commonFields,
@@ -211,7 +224,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageUserFields,
@@ -222,7 +235,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormAlwaysHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageMessageFields,
@@ -237,7 +250,7 @@ class ChatBroadcastSendPart
 				htmlTableOpenDetails ();
 
 				formFieldLogic.outputFormRows (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					numbersFields,
@@ -248,7 +261,7 @@ class ChatBroadcastSendPart
 					"send");
 
 				formFieldLogic.outputFormRows (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					commonFields,
@@ -272,7 +285,7 @@ class ChatBroadcastSendPart
 				htmlParagraphClose ();
 
 				formFieldLogic.outputFormTemporarilyHidden (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					searchFields,
@@ -288,7 +301,7 @@ class ChatBroadcastSendPart
 				htmlTableOpenDetails ();
 
 				formFieldLogic.outputFormRows (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					searchFields,
@@ -299,7 +312,7 @@ class ChatBroadcastSendPart
 					"send");
 
 				formFieldLogic.outputFormRows (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					commonFields,
@@ -321,7 +334,7 @@ class ChatBroadcastSendPart
 					">");
 
 				formFieldLogic.outputFormTemporarilyHidden (
-					taskLogger,
+					transaction,
 					requestContext,
 					formatWriter,
 					numbersFields,
@@ -338,7 +351,7 @@ class ChatBroadcastSendPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageUserFields,
@@ -362,7 +375,7 @@ class ChatBroadcastSendPart
 			htmlParagraphClose ();
 
 			formFieldLogic.outputFormTemporarilyHidden (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				messageMessageFields,

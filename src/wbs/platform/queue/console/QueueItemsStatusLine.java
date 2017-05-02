@@ -2,7 +2,6 @@ package wbs.platform.queue.console;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.ThreadUtils.threadInterruptAndJoinIgnoreInterrupt;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -34,7 +33,9 @@ import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.DummyQueueCache;
@@ -106,7 +107,7 @@ class QueueItemsStatusLine
 	@Override
 	public
 	PagePart createPagePart (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		return queueItemsStatusLinePart.get ();
 
@@ -133,7 +134,7 @@ class QueueItemsStatusLine
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"teardown");
@@ -162,7 +163,7 @@ class QueueItemsStatusLine
 	@Override
 	public
 	Future <JsonObject> getUpdateData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserPrivChecker privChecker) {
 
 		try (
@@ -272,93 +273,74 @@ class QueueItemsStatusLine
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					"updateAllUsers");
 
-		) {
+			HeldLock heldLock =
+				lock.write ();
 
-			Instant startTime =
-				Instant.now ();
+		) {
 
 			// clean out old users
 
 			Instant idleTime =
-				startTime.minus (
+				transaction.now ().minus (
 					idleDuration);
 
-			try (
+			userDatas.values ().removeIf (
+				userData ->
+					laterThan (
+						idleTime,
+						userData.lastContact ()));
 
-				HeldLock heldLock =
-					lock.write ();
+			// create cache
 
-			) {
+			QueueCache queueCache =
+				masterQueueCacheProvider.get ()
 
-				userDatas.values ().removeIf (
-					userData ->
-						laterThan (
-							idleTime,
-							userData.lastContact ()));
+				.setup (
+					transaction);
 
-			}
+			// update users
 
-			// begin transaction and create cache
+			userDatas.values ().forEach (
+				userData -> {
 
-			try (
+				UserRec user =
+					userHelper.findRequired (
+						transaction,
+						userData.userId ());
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						stringFormat (
-							"%s.%s ()",
-							getClass ().getSimpleName (),
-							"getLatestData"),
-						this);
+				SortedQueueSubjects sortedSubjects =
+					queueSubjectSorterProvider.get ()
 
-			) {
+					.queueCache (
+						queueCache)
 
-				QueueCache queueCache =
-					masterQueueCacheProvider.get ();
+					.loggedInUser (
+						user)
 
-				// update users
+					.effectiveUser (
+						user)
 
-				userDatas.values ().forEach (
-					userData -> {
+					.sort (
+						transaction);
 
-					UserRec user =
-						userHelper.findRequired (
-							userData.userId ());
+				synchronized (userData) {
 
-					SortedQueueSubjects sortedSubjects =
-						queueSubjectSorterProvider.get ()
+					userData
 
-						.queueCache (
-							queueCache)
+						.totalAvailableItems (
+							sortedSubjects.totalAvailableItems ())
 
-						.loggedInUser (
-							user)
+						.userClaimedItems (
+							sortedSubjects.userClaimedItems ());
 
-						.effectiveUser (
-							user)
+				}
 
-						.sort (
-							taskLogger);
-
-					synchronized (userData) {
-
-						userData
-
-							.totalAvailableItems (
-								sortedSubjects.totalAvailableItems ())
-
-							.userClaimedItems (
-								sortedSubjects.userClaimedItems ());
-
-					}
-
-				});
-
-			}
+			});
 
 			// tidy up
 
@@ -366,7 +348,7 @@ class QueueItemsStatusLine
 				false;
 
 			lastUpdate =
-				startTime;
+				transaction.now ();
 
 		}
 

@@ -28,8 +28,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
@@ -121,7 +122,7 @@ class ManualResponderStatusLine
 	@Override
 	public
 	PagePart createPagePart (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		return manualResponderStatusLinePartProvider.get ();
 
@@ -130,15 +131,15 @@ class ManualResponderStatusLine
 	@Override
 	public
 	Future <JsonObject> getUpdateData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserPrivChecker privChecker) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getUpdateScript");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getUpdateData");
 
 		) {
 
@@ -147,7 +148,7 @@ class ManualResponderStatusLine
 
 			if (
 				! featureChecker.checkFeatureAccess (
-					taskLogger,
+					transaction,
 					privChecker,
 					"queue_items_status_line")
 			) {
@@ -188,12 +189,12 @@ class ManualResponderStatusLine
 			updateData.addProperty (
 				"numToday",
 				caches.numTodayCache.get (
-					taskLogger));
+					transaction));
 
 			updateData.addProperty (
 				"numThisHour",
 				caches.numThisHourCache.get (
-					taskLogger));
+					transaction));
 
 			return futureValue (
 				updateData);

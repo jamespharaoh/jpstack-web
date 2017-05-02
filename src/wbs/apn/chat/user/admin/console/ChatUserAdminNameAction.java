@@ -78,16 +78,11 @@ class ChatUserAdminNameAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminNameAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -124,7 +119,8 @@ class ChatUserAdminNameAction
 						"name"));
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			if (
 				optionalValueNotEqualSafe (
@@ -135,7 +131,7 @@ class ChatUserAdminNameAction
 
 				ChatUserNameRec chatUserName =
 					chatUserNameHelper.insert (
-						taskLogger,
+						transaction,
 						chatUserNameHelper.createInstance ()
 
 					.setChatUser (
@@ -151,7 +147,8 @@ class ChatUserAdminNameAction
 						name)
 
 					.setModerator (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setStatus (
 						ChatUserInfoStatus.console)

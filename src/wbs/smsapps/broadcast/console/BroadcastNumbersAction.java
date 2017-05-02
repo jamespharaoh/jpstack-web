@@ -107,25 +107,19 @@ class BroadcastNumbersAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"BroadcastNumbersAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			BroadcastRec broadcast =
-				broadcastHelper.findFromContextRequired ();
+				broadcastHelper.findFromContextRequired (
+					transaction);
 
 			BroadcastConfigRec broadcastConfig =
 				broadcast.getBroadcastConfig ();
@@ -155,7 +149,7 @@ class BroadcastNumbersAction
 
 			if (
 				! privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					broadcastConfig,
 					"manage")
 			) {
@@ -189,10 +183,11 @@ class BroadcastNumbersAction
 
 				addResult =
 					broadcastLogic.addNumbers (
-						taskLogger,
+						transaction,
 						broadcast,
 						numbers,
-						userConsoleLogic.userRequired ());
+						userConsoleLogic.userRequired (
+							transaction));
 
 			} else {
 
@@ -219,11 +214,12 @@ class BroadcastNumbersAction
 
 					NumberRec numberRecord =
 						numberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							numberString);
 
 					BroadcastNumberRec broadcastNumber =
 						broadcastNumberHelper.find (
+							transaction,
 							broadcast,
 							numberRecord);
 
@@ -251,7 +247,8 @@ class BroadcastNumbersAction
 								BroadcastNumberState.removed)
 
 							.setRemovedByUser (
-								userConsoleLogic.userRequired ());
+								userConsoleLogic.userRequired (
+									transaction));
 
 						broadcast
 
@@ -276,7 +273,8 @@ class BroadcastNumbersAction
 								BroadcastNumberState.removed)
 
 							.setRemovedByUser (
-								userConsoleLogic.userRequired ());
+								userConsoleLogic.userRequired (
+									transaction));
 
 						broadcast
 
@@ -305,9 +303,10 @@ class BroadcastNumbersAction
 			if (addResult.numAdded () > 0) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_numbers_added",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					addResult.numAdded (),
 					broadcast);
 
@@ -316,9 +315,10 @@ class BroadcastNumbersAction
 			if (numRemoved > 0) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"broadcast_numbers_removed",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					numRemoved,
 					broadcast);
 

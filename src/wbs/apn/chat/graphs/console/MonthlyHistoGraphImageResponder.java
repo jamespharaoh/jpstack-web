@@ -1,6 +1,7 @@
 package wbs.apn.chat.graphs.console;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.max;
 import static wbs.utils.etc.NumberUtils.integerInSafe;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
@@ -18,7 +19,8 @@ import org.joda.time.LocalDate;
 import org.joda.time.YearMonth;
 
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.graph.console.GraphScale;
 
@@ -68,7 +70,7 @@ class MonthlyHistoGraphImageResponder
 
 	protected abstract
 	void prepareData (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Instant minTime,
 			Instant maxTime);
 
@@ -78,13 +80,13 @@ class MonthlyHistoGraphImageResponder
 	@Override
 	protected
 	void prepareData (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepareData");
 
 		) {
@@ -111,7 +113,7 @@ class MonthlyHistoGraphImageResponder
 					.toInstant ();
 
 			prepareData (
-				taskLogger,
+				transaction,
 				minTime,
 				maxTime);
 
@@ -122,18 +124,27 @@ class MonthlyHistoGraphImageResponder
 	@Override
 	protected
 	void prepareVerticalScale (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		int maxValue = 0;
+		try (
 
-		for (Integer value : values)
-			if (value > maxValue)
-				maxValue = value;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareVerticalScale");
 
-		verticalScale =
-			GraphScale.setScale (
-				maxValue,
-				0);
+		) {
+
+			long maxValue =
+				max (
+					values);
+
+			verticalScale =
+				GraphScale.setScale (
+					maxValue,
+					0);
+
+		}
 
 	}
 

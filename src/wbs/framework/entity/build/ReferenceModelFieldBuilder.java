@@ -9,11 +9,15 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
@@ -22,13 +26,20 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.fields.ReferenceFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("referenceModelFieldBuilder")
 @ModelBuilder
 public
-class ReferenceModelFieldBuilder {
+class ReferenceModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -46,83 +57,96 @@ class ReferenceModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		) {
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
-
-		// create model field
-
-		ModelField modelField =
-			new ModelField ()
-
-			.model (
-				target.model ())
-
-			.parentField (
-				context.parentModelField ())
-
-			.name (
-				fieldName)
-
-			.label (
-				camelToSpaces (
-					fieldName))
-
-			.type (
-				ModelFieldType.reference)
-
-			.parent (
-				false)
-
-			.identity (
-				false)
-
-			.valueType (
-				classForNameRequired (
-					fullFieldTypeName))
-
-			.nullable (
+			String fieldName =
 				ifNull (
-					spec.nullable (),
-					false))
+					spec.name (),
+					spec.typeName ());
 
-			.columnNames (
-				ImmutableList.<String>of (
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
+
+			// create model field
+
+			ModelField modelField =
+				new ModelField ()
+
+				.model (
+					target.model ())
+
+				.parentField (
+					context.parentModelField ())
+
+				.name (
+					fieldName)
+
+				.label (
+					camelToSpaces (
+						fieldName))
+
+				.type (
+					ModelFieldType.reference)
+
+				.parent (
+					false)
+
+				.identity (
+					false)
+
+				.valueType (
+					classForNameRequired (
+						fullFieldTypeName))
+
+				.nullable (
 					ifNull (
-						spec.columnName (),
-						stringFormat (
-							"%s_id",
-							camelToUnderscore (
-								fieldName)))));
+						spec.nullable (),
+						false))
 
-		// store field
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							stringFormat (
+								"%s_id",
+								camelToUnderscore (
+									fieldName)))));
 
-		target.fields ().add (
-			modelField);
+			// store field
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+		}
 
 	}
 

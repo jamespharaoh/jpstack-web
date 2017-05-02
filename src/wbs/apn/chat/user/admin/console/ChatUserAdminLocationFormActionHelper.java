@@ -15,9 +15,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -60,49 +60,53 @@ class ChatUserAdminLocationFormActionHelper
 
 	@Override
 	public
-	ChatUserAdminLocationForm constructFormState () {
-
-		return new ChatUserAdminLocationForm ();
-
-	}
-
-	@Override
-	public
 	void updatePassiveFormState (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserAdminLocationForm formState) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		formState
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"updatePassiveFormState");
 
-			.currentLocationName (
-				chatUser.getLocationPlace ())
+		) {
 
-			.currentLocationLongitude (
-				chatUser.getLocationLongLat () != null
-					? chatUser.getLocationLongLat ().longitude ()
-					: null)
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			.currentLocationLatitude (
-				chatUser.getLocationLongLat () != null
-					? chatUser.getLocationLongLat ().latitude ()
-					: null);
+			formState
+
+				.currentLocationName (
+					chatUser.getLocationPlace ())
+
+				.currentLocationLongitude (
+					chatUser.getLocationLongLat () != null
+						? chatUser.getLocationLongLat ().longitude ()
+						: null)
+
+				.currentLocationLatitude (
+					chatUser.getLocationLongLat () != null
+						? chatUser.getLocationLongLat ().latitude ()
+						: null);
+
+		}
 
 	}
 
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserAdminLocationForm formState) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
@@ -121,16 +125,18 @@ class ChatUserAdminLocationFormActionHelper
 			// perform update
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			boolean success =
 				chatUserLogic.setPlace (
-					taskLogger,
+					transaction,
 					chatUser,
 					formState.newLocationName (),
 					optionalAbsent (),
 					optionalOf (
-						userConsoleLogic.userRequired ()));
+						userConsoleLogic.userRequired (
+							transaction)));
 
 			// handle location not found
 

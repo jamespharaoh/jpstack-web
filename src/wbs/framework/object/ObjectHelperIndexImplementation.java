@@ -1,6 +1,5 @@
 package wbs.framework.object;
 
-import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -20,11 +19,18 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.CloseableTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.cache.AdvancedCache;
 import wbs.utils.cache.IdCacheBuilder;
@@ -41,18 +47,29 @@ class ObjectHelperIndexImplementation <
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	ObjectManager objectManager;
 
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <Pair <Long, Long>, Long, RecordType>>
-	parentIdAndIndexCacheBuilderProvider;
+	Provider <IdCacheBuilder <
+		CloseableTransaction,
+		Pair <Long, Long>,
+		Long,
+		RecordType
+	>> parentIdAndIndexCacheBuilderProvider;
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <Pair <GlobalId, Long>, Long, RecordType>>
-	parentGlobalIdAndIndexCacheBuilderProvider;
+	Provider <IdCacheBuilder <
+		CloseableTransaction,
+		Pair <GlobalId, Long>,
+		Long,
+		RecordType
+	>> parentGlobalIdAndIndexCacheBuilderProvider;
 
 	// properties
 
@@ -67,102 +84,135 @@ class ObjectHelperIndexImplementation <
 
 	// state
 
-	AdvancedCache <Pair <Long ,Long>, RecordType> parentIdAndIndexCache;
+	AdvancedCache <CloseableTransaction, Pair <Long ,Long>, RecordType>
+		parentIdAndIndexCache;
 
-	AdvancedCache <Pair <GlobalId, Long>, RecordType>
-	parentGlobalIdAndIndexCache;
+	AdvancedCache <CloseableTransaction, Pair <GlobalId, Long>, RecordType>
+		parentGlobalIdAndIndexCache;
 
 	// life cycle
 
 	@Override
 	public
-	ObjectHelperIndexImplementation <RecordType> setup () {
+	ObjectHelperIndexImplementation <RecordType> setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// parent id and index
+		try (
 
-		if (allOf (
-			() -> isNotNull (objectModel.parentField ()),
-			() -> isNotNull (objectModel.indexField ())
-		)) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			parentIdAndIndexCache =
-				parentIdAndIndexCacheBuilderProvider.get ()
+		) {
 
-				.dummy (! allOf (
-					() -> objectModel.parentField ().cacheable (),
-					() -> objectModel.indexField ().cacheable ()
-				))
+			// parent id and index
 
-				.cacheNegatives (
-					false)
+			if (
 
-				.lookupByIdFunction (
-					objectId ->
-						Optional.fromNullable (
-							objectDatabaseHelper.find (
-								objectId)))
+				isNotNull (
+					objectModel.parentField ())
 
-				.lookupByKeyFunction (
-					key ->
-						Optional.fromNullable (
-							objectDatabaseHelper.findByParentAndIndex (
-								new GlobalId (
-									objectModel.parentTypeId (),
-									key.getLeft ()),
-								key.getRight ())))
+				&& isNotNull (
+					objectModel.indexField ())
 
-				.getIdFunction (
-					record ->
-						record.getId ())
+			) {
 
-				.build ();
+				parentIdAndIndexCache =
+					parentIdAndIndexCacheBuilderProvider.get ()
+
+					.dummy (
+						! objectModel.parentField ().cacheable ()
+						|| ! objectModel.indexField ().cacheable ())
+
+					.cacheNegatives (
+						false)
+
+					.lookupByIdFunction (
+						(innerTransaction, objectId) ->
+							Optional.fromNullable (
+								objectDatabaseHelper.find (
+									innerTransaction,
+									objectId)))
+
+					.lookupByKeyFunction (
+						(innerTransaction, key) ->
+							Optional.fromNullable (
+								objectDatabaseHelper.findByParentAndIndex (
+									innerTransaction,
+									new GlobalId (
+										objectModel.parentTypeId (),
+										key.getLeft ()),
+									key.getRight ())))
+
+					.getIdFunction (
+						record ->
+							record.getId ())
+
+					.wrapperFunction (
+						CloseableTransaction::genericWrapper)
+
+					.build (
+						taskLogger);
+
+			}
+
+			// parent global id and index
+
+			if (
+
+				isNotNull (
+					objectModel.parentTypeField ())
+
+				&& isNotNull (
+					objectModel.parentIdField ())
+
+				&& isNotNull (
+					objectModel.indexField ())
+
+			) {
+
+				parentGlobalIdAndIndexCache =
+					parentGlobalIdAndIndexCacheBuilderProvider.get ()
+
+					.dummy (
+						! objectModel.parentTypeField ().cacheable ()
+						|| ! objectModel.parentIdField ().cacheable ()
+						|| ! objectModel.indexField ().cacheable ()
+					)
+
+					.cacheNegatives (
+						false)
+
+					.lookupByIdFunction (
+						(innerTransaction, objectId) ->
+							Optional.fromNullable (
+								objectDatabaseHelper.find (
+									innerTransaction,
+									objectId)))
+
+					.lookupByKeyFunction (
+						(innerTransaction, key) ->
+							Optional.fromNullable (
+								objectDatabaseHelper.findByParentAndIndex (
+									innerTransaction,
+									key.getLeft (),
+									key.getRight ())))
+
+					.getIdFunction (
+						record ->
+							record.getId ())
+
+					.build (
+						taskLogger);
+
+			}
+
+			// return
+
+			return this;
 
 		}
-
-		// parent global id and index
-
-		if (allOf (
-			() -> isNotNull (objectModel.parentTypeField ()),
-			() -> isNotNull (objectModel.parentIdField ()),
-			() -> isNotNull (objectModel.indexField ())
-		)) {
-
-			parentGlobalIdAndIndexCache =
-				parentGlobalIdAndIndexCacheBuilderProvider.get ()
-
-				.dummy (! allOf (
-					() -> objectModel.parentTypeField ().cacheable (),
-					() -> objectModel.parentIdField ().cacheable (),
-					() -> objectModel.indexField ().cacheable ()
-				))
-
-				.cacheNegatives (
-					false)
-
-				.lookupByIdFunction (
-					objectId ->
-						Optional.fromNullable (
-							objectDatabaseHelper.find (
-								objectId)))
-
-				.lookupByKeyFunction (
-					key ->
-						Optional.fromNullable (
-							objectDatabaseHelper.findByParentAndIndex (
-								key.getLeft (),
-								key.getRight ())))
-
-				.getIdFunction (
-					record ->
-						record.getId ())
-
-				.build ();
-
-		}
-
-		// return
-
-		return this;
 
 	}
 
@@ -171,28 +221,42 @@ class ObjectHelperIndexImplementation <
 	@Override
 	public
 	Optional <RecordType> findByIndex (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
-		if (objectModel.canGetParent ()) {
+		try (
 
-			return parentIdAndIndexCache.find (
-				Pair.of (
-					parent.getId (),
-					index));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByIndex");
 
-		} else {
+		) {
 
-			ObjectHelper <?> parentHelper =
-				objectManager.objectHelperForClassRequired (
-					parent.getClass ());
+			if (objectModel.canGetParent ()) {
 
-			return parentGlobalIdAndIndexCache.find (
-				Pair.of (
-					GlobalId.of (
-						parentHelper.objectTypeId (),
-						parent.getId ()),
-					index));
+				return parentIdAndIndexCache.find (
+					transaction,
+					Pair.of (
+						parent.getId (),
+						index));
+
+			} else {
+
+				ObjectHelper <?> parentHelper =
+					objectManager.objectHelperForClassRequired (
+						parent.getClass ());
+
+				return parentGlobalIdAndIndexCache.find (
+					transaction,
+					Pair.of (
+						GlobalId.of (
+							parentHelper.objectTypeId (),
+							parent.getId ()),
+						index));
+
+			}
 
 		}
 
@@ -201,42 +265,58 @@ class ObjectHelperIndexImplementation <
 	@Override
 	public
 	RecordType findByIndexRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
-		Optional <RecordType> recordOptional =
-			findByIndex (
-				parent,
-				index);
+		try (
 
-		if (
-			optionalIsNotPresent (
-				recordOptional)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByIndexRequired");
+
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Object not found with parent %s ",
-					objectManager.objectPath (
-						parent),
-					"and index %s",
-					integerToDecimalString (
-						index)));
+			Optional <RecordType> recordOptional =
+				findByIndex (
+					transaction,
+					parent,
+					index);
+
+			if (
+				optionalIsNotPresent (
+					recordOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Object not found with parent %s ",
+						objectManager.objectPath (
+							transaction,
+							parent),
+						"and index %s",
+						integerToDecimalString (
+							index)));
+
+			}
+
+			return recordOptional.get ();
 
 		}
-
-		return recordOptional.get ();
 
 	}
 
 	@Override
 	public
 	RecordType findByIndexOrNull (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
 		return optionalOrNull (
 			findByIndex (
+				parentTransaction,
 				parent,
 				index));
 
@@ -245,11 +325,13 @@ class ObjectHelperIndexImplementation <
 	@Override
 	public
 	List <RecordType> findByIndexRange (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
 
 		return objectDatabaseHelper.findByParentAndIndexRange (
+			parentTransaction,
 			parentGlobalId,
 			indexStart,
 			indexEnd);
@@ -259,33 +341,48 @@ class ObjectHelperIndexImplementation <
 	@Override
 	public
 	List <RecordType> findByIndexRange (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
 
-		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForObjectRequired (
-				parent);
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByIndexRange");
 
-		return objectDatabaseHelper.findByParentAndIndexRange (
-			parentGlobalId,
-			indexStart,
-			indexEnd);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForObjectRequired (
+					parent);
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return objectDatabaseHelper.findByParentAndIndexRange (
+				transaction,
+				parentGlobalId,
+				indexStart,
+				indexEnd);
+
+		}
 
 	}
 
 	@Override
 	public
 	RecordType findByIndex (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull Long index) {
 
 		return objectDatabaseHelper.findByParentAndIndex (
+			parentTransaction,
 			parentGlobalId,
 			index);
 

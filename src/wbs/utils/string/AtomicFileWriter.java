@@ -50,7 +50,7 @@ class AtomicFileWriter
 	@Override
 	public
 	void writeFormat (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		stringBuilder.append (
 			stringFormatArray (
@@ -61,7 +61,7 @@ class AtomicFileWriter
 	@Override
 	public
 	void writeFormatArray (
-			@NonNull String [] arguments) {
+			@NonNull CharSequence[] arguments) {
 
 		stringBuilder.append (
 			stringFormatArray (
@@ -72,7 +72,7 @@ class AtomicFileWriter
 	@Override
 	public
 	void writeString (
-			@NonNull String string) {
+			@NonNull CharSequence string) {
 
 		stringBuilder.append (
 			string);

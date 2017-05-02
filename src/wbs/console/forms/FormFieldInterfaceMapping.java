@@ -8,7 +8,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import fj.data.Either;
 
@@ -17,6 +17,7 @@ interface FormFieldInterfaceMapping <Container, Generic, Interface> {
 
 	default
 	Either <Optional <Generic>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue) {
@@ -31,7 +32,7 @@ interface FormFieldInterfaceMapping <Container, Generic, Interface> {
 
 	default
 	Either <Optional <Interface>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Generic> genericValue) {

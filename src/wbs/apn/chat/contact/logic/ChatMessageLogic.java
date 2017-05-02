@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
@@ -21,34 +21,35 @@ public
 interface ChatMessageLogic {
 
 	boolean chatMessageDeliverViaSms (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage,
 			String text);
 
 	boolean chatMessageDeliverToUser (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage);
 
 	boolean chatMessageDeliverViaJigsaw (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage,
 			String text);
 
 	void chatMessageDeliver (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage);
 
 	boolean chatMessageIsRecentDupe (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			TextRec originalText);
 
 	String chatMessagePrependWarning (
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage);
 
 	String chatMessageSendFromUser (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			String text,
@@ -57,21 +58,22 @@ interface ChatMessageLogic {
 			List<MediaRec> medias);
 
 	void chatMessageSendFromUserPartTwo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatMessageRec chatMessage);
 
 	ApprovalResult checkForApproval (
+			Transaction parentTransaction,
 			ChatRec chat,
 			String message);
 
 	ChatMonitorInboxRec findOrCreateChatMonitorInbox (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec monitor,
 			ChatUserRec user,
 			boolean alarm);
 
 	void chatUserRejectionCountInc (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MessageRec message);
 

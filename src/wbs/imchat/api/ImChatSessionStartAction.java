@@ -83,40 +83,36 @@ class ImChatSessionStartAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatSessionStartRequest startRequest =
-			dataFromJson.fromJson (
-				ImChatSessionStartRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatSessionStartAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatSessionStartRequest startRequest =
+				dataFromJson.fromJson (
+					ImChatSessionStartRequest.class,
+					jsonValue);
+
+			// lookup object
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -125,6 +121,7 @@ class ImChatSessionStartAction
 
 			ImChatCustomerRec customer =
 				imChatCustomerHelper.findByEmail (
+					transaction,
 					imChat,
 					startRequest.email ());
 
@@ -174,7 +171,7 @@ class ImChatSessionStartAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.insert (
-					taskLogger,
+					transaction,
 					imChatSessionHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -195,7 +192,7 @@ class ImChatSessionStartAction
 				.setUserAgentText (
 					optionalOrNull (
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							optionalFromNullable (
 								startRequest.userAgent ()))))
 
@@ -223,11 +220,13 @@ class ImChatSessionStartAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer))
 
 				.conversation (
 					customer.getCurrentConversation () != null
 						? imChatApiLogic.conversationData (
+							transaction,
 							customer.getCurrentConversation ())
 						: null);
 

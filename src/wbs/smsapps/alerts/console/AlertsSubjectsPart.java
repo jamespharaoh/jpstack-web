@@ -20,10 +20,11 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
@@ -53,30 +54,42 @@ class AlertsSubjectsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.findFromContextRequired ();
+		try (
 
-		alertsSubjects =
-			new ArrayList<> (
-				alertsSettings.getAlertsSubjects ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		Collections.sort (
-			alertsSubjects);
+		) {
+
+			AlertsSettingsRec alertsSettings =
+				alertsSettingsHelper.findFromContextRequired (
+					transaction);
+
+			alertsSubjects =
+				new ArrayList<> (
+					alertsSettings.getAlertsSubjects ());
+
+			Collections.sort (
+				alertsSubjects);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -95,6 +108,7 @@ class AlertsSubjectsPart
 
 				Record <?> object =
 					objectManager.findObject (
+						transaction,
 						new GlobalId (
 							alertsSubject.getObjectType ().getId (),
 							alertsSubject.getObjectId ()));
@@ -105,7 +119,7 @@ class AlertsSubjectsPart
 					alertsSubject.getObjectType ().getCode ());
 
 				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					object);
 
 				htmlTableCellWrite (

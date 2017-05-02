@@ -5,14 +5,20 @@ import lombok.NonNull;
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 public
 class LocalTab
 	extends Tab {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -47,10 +53,21 @@ class LocalTab
 	@Override
 	public
 	String getUrl (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		return requestContext.resolveLocalUrl (
-			localUrl);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getUrl");
+
+		) {
+
+			return requestContext.resolveLocalUrl (
+				localUrl);
+
+		}
 
 	}
 

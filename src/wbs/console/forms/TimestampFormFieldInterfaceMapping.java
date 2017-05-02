@@ -22,9 +22,12 @@ import org.joda.time.Instant;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -35,6 +38,9 @@ class TimestampFormFieldInterfaceMapping <Container>
 	implements FormFieldInterfaceMapping <Container, Instant, String> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleUserHelper preferences;
@@ -52,46 +58,59 @@ class TimestampFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <Instant>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		if (
-			enumNotEqualSafe (
-				format,
-				TimestampFormFieldSpec.Format.timestamp)
-		) {
+		try (
 
-			throw new RuntimeException ();
-
-		} else if (
-
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			if (
+				enumNotEqualSafe (
+					format,
+					TimestampFormFieldSpec.Format.timestamp)
+			) {
 
-		} else {
+				throw new RuntimeException ();
 
-			try {
+			} else if (
+
+				optionalIsNotPresent (
+					interfaceValue)
+
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
+
+			) {
 
 				return successResult (
-					optionalOf (
-						preferences.timestampStringToInstant (
-							interfaceValue.get ())));
+					optionalAbsent ());
 
-			} catch (IllegalArgumentException exception) {
+			} else {
 
-				return errorResultFormat (
-					"Please enter a valid timestamp for %s",
-					name ());
+				try {
+
+					return successResult (
+						optionalOf (
+							preferences.timestampStringToInstant (
+								transaction,
+								interfaceValue.get ())));
+
+				} catch (IllegalArgumentException exception) {
+
+					return errorResultFormat (
+						"Please enter a valid timestamp for %s",
+						name ());
+
+				}
 
 			}
 
@@ -102,48 +121,62 @@ class TimestampFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Instant> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				Optional.of (
-					""));
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		}
+				return successResult (
+					Optional.of (
+						""));
 
-		switch (format) {
+			}
 
-		case timestamp:
+			switch (format) {
 
-			return successResult (
-				Optional.of (
-					preferences.timestampWithTimezoneString (
-						genericValue.get ())));
+			case timestamp:
 
-		case date:
+				return successResult (
+					Optional.of (
+						preferences.timestampWithTimezoneString (
+							transaction,
+							genericValue.get ())));
 
-			return successResult (
-				Optional.of (
-					preferences.dateStringShort (
-						genericValue.get ())));
+			case date:
 
-		case time:
+				return successResult (
+					Optional.of (
+						preferences.dateStringShort (
+							transaction,
+							genericValue.get ())));
 
-			return successResult (
-				Optional.of (
-					preferences.timeString (
-						genericValue.get ())));
+			case time:
 
-		default:
+				return successResult (
+					Optional.of (
+						preferences.timeString (
+							transaction,
+							genericValue.get ())));
 
-			throw new RuntimeException ();
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 

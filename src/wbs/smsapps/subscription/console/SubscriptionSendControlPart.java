@@ -12,13 +12,14 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import lombok.NonNull;
 
-import org.joda.time.Instant;
-
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -30,6 +31,9 @@ class SubscriptionSendControlPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SubscriptionSendConsoleHelper subscriptionSendHelper;
@@ -46,221 +50,315 @@ class SubscriptionSendControlPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		subscriptionSend =
-			subscriptionSendHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			subscriptionSend =
+				subscriptionSendHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		goDetails ();
+		try (
 
-		switch (subscriptionSend.getState ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		case cancelled:
+		) {
 
-			htmlParagraphWriteFormat (
-				"This send has been cancelled and can no longer be sent.");
+			goDetails (
+				transaction);
 
-			break;
+			switch (subscriptionSend.getState ()) {
 
-		case partiallySent:
+			case cancelled:
 
-			htmlParagraphWriteFormat (
-				"This send was partially sent and then cancelled. It can no ",
-				"longer be sent.");
+				htmlParagraphWriteFormat (
+					"This send has been cancelled and can no longer be sent.");
 
-			break;
+				break;
 
-		case scheduled:
+			case partiallySent:
 
-			htmlParagraphWriteFormat (
-				"This send has been scheduled but not yet sent. It can be ",
-				"unscheduled or cancelled.");
+				htmlParagraphWriteFormat (
+					"This send was partially sent and then cancelled. It can no ",
+					"longer be sent.");
 
-			goUnschedule ();
-			goCancel ();
+				break;
 
-			break;
+			case scheduled:
 
-		case sending:
+				htmlParagraphWriteFormat (
+					"This send has been scheduled but not yet sent. It can be ",
+					"unscheduled or cancelled.");
 
-			htmlParagraphWriteFormat (
-				"This send is being sent. It can be cancelled.");
+				goUnschedule (
+					transaction);
 
-			goCancel ();
+				goCancel (
+					transaction);
 
-			break;
+				break;
 
-		case sent:
+			case sending:
 
-			htmlParagraphWriteFormat (
-				"This send has already been sent.");
+				htmlParagraphWriteFormat (
+					"This send is being sent. It can be cancelled.");
 
-			break;
+				goCancel (
+					transaction);
 
-		case notSent:
+				break;
 
-			htmlParagraphWriteFormat (
-				"This send has not yet been sent. It can be sent now or ",
-				"scheduled to automatically sent at a specific time in the ",
-				"future. Alternatively, it can be cancelled.");
+			case sent:
 
-			goSendNow ();
-			goSchedule ();
-			goCancel ();
+				htmlParagraphWriteFormat (
+					"This send has already been sent.");
 
-			break;
+				break;
 
-		default:
+			case notSent:
 
-			throw new RuntimeException ();
+				htmlParagraphWriteFormat (
+					"This send has not yet been sent. It can be sent now or ",
+					"scheduled to automatically sent at a specific time in ",
+					"the future. Alternatively, it can be cancelled.");
+
+				goSendNow (
+					transaction);
+
+				goSchedule (
+					transaction);
+
+				goCancel (
+					transaction);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
 	}
 
-	void goDetails () {
+	void goDetails (
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenDetails ();
+		try (
 
-		htmlTableDetailsRowWrite (
-			"Description",
-			subscriptionSend.getDescription ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goDetails");
 
-		htmlTableClose ();
+		) {
 
-	}
+			htmlTableOpenDetails ();
 
-	void goSchedule () {
+			htmlTableDetailsRowWrite (
+				"Description",
+				subscriptionSend.getDescription ());
 
-		htmlHeadingTwoWrite (
-			"Schedule");
+			htmlTableClose ();
 
-		htmlParagraphWriteFormat (
-			"Scheduling this send will cause it to be sent automatically at ",
-			"the specified time in the future.");
-
-		// form open
-
-		htmlFormOpenPost ();
-
-		// time and date
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"Time and date<br>");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"timestamp\"",
-			" value=\"%h\"",
-			userConsoleLogic.timestampWithTimezoneString (
-				Instant.now ()),
-			">");
-
-		htmlParagraphClose ();
-
-		// form controls
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"schedule\"",
-			" value=\"schedule\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// form close
-
-		htmlFormClose ();
+		}
 
 	}
 
-	void goUnschedule () {
+	void goSchedule (
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Unschedule");
+		try (
 
-		htmlParagraphWriteFormat (
-			"Unscheduling a send will prevent it from being sent. You will be ",
-			"able to add and remove numbers and send or schedule it again");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goSchedule");
 
-		htmlFormOpenPost ();
+		) {
 
-		htmlParagraphOpen ();
+			htmlHeadingTwoWrite (
+				"Schedule");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"unschedule\"",
-			" value=\"unschedule\"",
-			">");
+			htmlParagraphWriteFormat (
+				"Scheduling this send will cause it to be sent automatically ",
+				"at the specified time in the future.");
 
-		htmlParagraphClose ();
+			// form open
 
-		htmlFormClose ();
+			htmlFormOpenPost ();
+
+			// time and date
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"Time and date<br>");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"timestamp\"",
+				" value=\"%h\"",
+				userConsoleLogic.timestampWithTimezoneString (
+					transaction,
+					transaction.now ()),
+				">");
+
+			htmlParagraphClose ();
+
+			// form controls
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"schedule\"",
+				" value=\"schedule\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 
-	void goSendNow () {
+	void goUnschedule (
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Send now");
+		try (
 
-		htmlParagraphWriteFormat (
-			"Sending a send will begin sending messages immediately.");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goUnschedule");
 
-		htmlFormOpenPost ();
+		) {
 
-		htmlParagraphOpen ();
+			htmlHeadingTwoWrite (
+				"Unschedule");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send\"",
-			">");
+			htmlParagraphWriteFormat (
+				"Unscheduling a send will prevent it from being sent. You will be ",
+				"able to add and remove numbers and send or schedule it again");
 
-		htmlParagraphClose ();
+			htmlFormOpenPost ();
 
-		htmlFormClose ();
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"unschedule\"",
+				" value=\"unschedule\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 
-	void goCancel () {
+	void goSendNow (
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Cancel");
+		try (
 
-		htmlParagraphWriteFormat (
-			"Cancelling a send will stop it from being sent, now or in the ",
-			"future.");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goSendNow");
 
-		htmlFormOpenPost ();
+		) {
 
-		htmlParagraphOpen ();
+			htmlHeadingTwoWrite (
+				"Send now");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"cancel\"",
-			" value=\"cancel\"",
-			">");
+			htmlParagraphWriteFormat (
+				"Sending a send will begin sending messages immediately.");
 
-		htmlParagraphClose ();
+			htmlFormOpenPost ();
 
-		htmlFormClose ();
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"send\"",
+				" value=\"send\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+		}
+
+	}
+
+	void goCancel (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goCancel");
+
+		) {
+
+			htmlHeadingTwoWrite (
+				"Cancel");
+
+			htmlParagraphWriteFormat (
+				"Cancelling a send will stop it from being sent, now or in the ",
+				"future.");
+
+			htmlFormOpenPost ();
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"cancel\"",
+				" value=\"cancel\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 

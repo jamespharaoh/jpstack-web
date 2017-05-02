@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import org.hibernate.Criteria;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -14,54 +14,54 @@ public
 interface ManualResponderRequestDaoMethods {
 
 	List <ManualResponderRequestRec> findRecentLimit (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRec manualResponder,
 			NumberRec number,
 			Long maxResults);
 
 	Criteria searchCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <Long> searchIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	// service report
 
 	Criteria searchServiceReportCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <Long> searchServiceReportIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <ManualResponderServiceReport> searchServiceReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <Optional <ManualResponderServiceReport>> searchServiceReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search,
 			List <Long> ids);
 
 	// operator report
 
 	Criteria searchOperatorReportCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <Long> searchOperatorReportIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <ManualResponderOperatorReport> searchOperatorReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search);
 
 	List <Optional <ManualResponderOperatorReport>> searchOperatorReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRequestSearch search,
 			List <Long> ids);
 

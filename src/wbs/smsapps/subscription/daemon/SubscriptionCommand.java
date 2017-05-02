@@ -23,9 +23,10 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
@@ -167,21 +168,19 @@ class SubscriptionCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
-			transaction =
-				database.currentTransaction ();
-
-			findCommand ();
+			findCommand (
+				transaction);
 
 			message =
 				inbox.getMessage ();
@@ -191,7 +190,7 @@ class SubscriptionCommand
 
 			subscriptionNumber =
 				subscriptionNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					subscription,
 					number);
 
@@ -202,7 +201,7 @@ class SubscriptionCommand
 			) {
 
 				return doSubscribe (
-					taskLogger);
+					transaction);
 
 			} else if (
 				stringEqualSafe (
@@ -225,66 +224,82 @@ class SubscriptionCommand
 
 	}
 
-	void matchKeyword () {
+	private
+	void matchKeyword (
+			@NonNull Transaction parentTransaction) {
 
-		Optional <SubscriptionKeywordRec> subscriptionKeywordOptional =
-			optionalFromJava (
+		try (
 
-			keywordFinder.find (
-				rest)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"matchKeyword");
 
-			.stream ()
-
-			.map (match ->
-				subscriptionKeywordHelper.findByCode (
-					subscription,
-					match.simpleKeyword ()))
-
-			.filter (
-				Optional::isPresent)
-
-			.map (
-				Optional::get)
-
-			.findFirst ()
-
-		);
-
-		if (
-			optionalIsNotPresent (
-				subscriptionKeywordOptional)
 		) {
-			return;
+
+			Optional <SubscriptionKeywordRec> subscriptionKeywordOptional =
+				optionalFromJava (
+
+				keywordFinder.find (
+					rest)
+
+				.stream ()
+
+				.map (
+					match ->
+						subscriptionKeywordHelper.findByCode (
+							transaction,
+							subscription,
+							match.simpleKeyword ()))
+
+				.filter (
+					Optional::isPresent)
+
+				.map (
+					Optional::get)
+
+				.findFirst ()
+
+			);
+
+			if (
+				optionalIsNotPresent (
+					subscriptionKeywordOptional)
+			) {
+				return;
+			}
+
+			SubscriptionKeywordRec subscriptionKeyword =
+				subscriptionKeywordOptional.get ();
+
+			subscriptionAffiliate =
+				ifNull (
+					subscriptionAffiliate,
+					subscriptionKeyword.getSubscriptionAffiliate ());
+
+			subscriptionList =
+				ifNull (
+					subscriptionList,
+					subscriptionKeyword.getSubscriptionList ());
+
 		}
-
-		SubscriptionKeywordRec subscriptionKeyword =
-			subscriptionKeywordOptional.get ();
-
-		subscriptionAffiliate =
-			ifNull (
-				subscriptionAffiliate,
-				subscriptionKeyword.getSubscriptionAffiliate ());
-
-		subscriptionList =
-			ifNull (
-				subscriptionList,
-				subscriptionKeyword.getSubscriptionList ());
 
 	}
 
 	InboxAttemptRec doSubscribe (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"doSubscribe");
 
 		) {
 
-			matchKeyword ();
+			matchKeyword (
+				transaction);
 
 			// set affiliate
 
@@ -299,7 +314,7 @@ class SubscriptionCommand
 						subscriptionAffiliate);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"subscription_number_affiliate",
 					subscriptionNumber,
 					subscriptionAffiliate,
@@ -367,7 +382,7 @@ class SubscriptionCommand
 
 				SubscriptionSubRec newSubscriptionSub =
 					subscriptionSubHelper.insert (
-						taskLogger,
+						transaction,
 						subscriptionSubHelper.createInstance ()
 
 					.setSubscriptionNumber (
@@ -437,7 +452,7 @@ class SubscriptionCommand
 				// create event
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"subscription_number_subscribe",
 					subscriptionNumber,
 					subscriptionList,
@@ -463,25 +478,28 @@ class SubscriptionCommand
 					subscription.getFreeNumber ())
 
 				.routerResolve (
+					transaction,
 					subscription.getFreeRouter ())
 
 				.service (
 					serviceHelper.findByCodeRequired (
+						transaction,
 						subscriptionList,
 						"default"))
 
 				.affiliate (
 					affiliateHelper.findByCodeRequired (
+						transaction,
 						subscriptionAffiliate,
 						"default"))
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// process message
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					response.getService ()),
@@ -499,50 +517,64 @@ class SubscriptionCommand
 
 	}
 
-	void findCommand () {
+	private
+	void findCommand (
+			@NonNull Transaction parentTransaction) {
 
-		Record <?> commandParent =
-			objectManager.getParentRequired (
-				command);
+		try (
 
-		if (commandParent instanceof SubscriptionRec) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findCommand");
 
-			subscription =
-				(SubscriptionRec)
-				commandParent;
+		) {
 
-		}
+			Record <?> commandParent =
+				objectManager.getParentRequired (
+					transaction,
+					command);
 
-		if (commandParent instanceof SubscriptionAffiliateRec) {
+			if (commandParent instanceof SubscriptionRec) {
 
-			subscriptionAffiliate =
-				(SubscriptionAffiliateRec)
-				commandParent;
+				subscription =
+					(SubscriptionRec)
+					commandParent;
 
-			subscription =
-				subscriptionAffiliate.getSubscription ();
+			}
 
-		}
+			if (commandParent instanceof SubscriptionAffiliateRec) {
 
-		if (commandParent instanceof SubscriptionKeywordRec) {
+				subscriptionAffiliate =
+					(SubscriptionAffiliateRec)
+					commandParent;
 
-			subscriptionKeyword =
-				(SubscriptionKeywordRec)
-				commandParent;
+				subscription =
+					subscriptionAffiliate.getSubscription ();
 
-			subscription =
-				subscriptionKeyword.getSubscription ();
+			}
 
-		}
+			if (commandParent instanceof SubscriptionKeywordRec) {
 
-		if (((Object) commandParent) instanceof SubscriptionListRec) {
+				subscriptionKeyword =
+					(SubscriptionKeywordRec)
+					commandParent;
 
-			subscriptionList =
-				(SubscriptionListRec)
-				commandParent;
+				subscription =
+					subscriptionKeyword.getSubscription ();
 
-			subscription =
-				subscriptionList.getSubscription ();
+			}
+
+			if (((Object) commandParent) instanceof SubscriptionListRec) {
+
+				subscriptionList =
+					(SubscriptionListRec)
+					commandParent;
+
+				subscription =
+					subscriptionList.getSubscription ();
+
+			}
 
 		}
 

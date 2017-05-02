@@ -11,7 +11,7 @@ import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
+import wbs.framework.builder.TransactionBuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -20,14 +20,14 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.background.metamodel.BackgroundProcessSpec;
 import wbs.platform.background.model.BackgroundProcessObjectHelper;
@@ -40,7 +40,7 @@ import wbs.utils.time.DurationFormatter;
 @ModelMetaBuilderHandler
 public
 class BackgroundProcessBuilder
-	implements BuilderComponent {
+	implements TransactionBuilderComponent {
 
 	// singleton dependencies
 
@@ -79,21 +79,21 @@ class BackgroundProcessBuilder
 	@Override
 	public
 	void build (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Builder <Transaction> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"build");
 
 		) {
 
 			try {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Create background process %s.%s",
 					hyphenToCamel (
 						spec.objectTypeCode ()),
@@ -101,7 +101,7 @@ class BackgroundProcessBuilder
 						spec.name ()));
 
 				createBackgroundProcess (
-					taskLogger);
+					transaction);
 
 			} catch (Exception exception) {
 
@@ -120,20 +120,14 @@ class BackgroundProcessBuilder
 
 	private
 	void createBackgroundProcess (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createBackgroundProcess");
-
-			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"BackgroundProcessBuilder.createBackgroundProcess ()",
-					this);
 
 		) {
 
@@ -145,13 +139,14 @@ class BackgroundProcessBuilder
 
 			ObjectTypeRec parentType =
 				objectTypeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					parentTypeCode);
 
 			// create background process
 
 			backgroundProcessHelper.insert (
-				taskLogger,
+				transaction,
 				backgroundProcessHelper.createInstance ()
 
 				.setParentType (
@@ -183,10 +178,6 @@ class BackgroundProcessBuilder
 
 
 			);
-
-			// commit transaction
-
-			transaction.commit ();
 
 		}
 

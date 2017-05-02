@@ -6,27 +6,27 @@ import java.util.Set;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface PagePart {
 
 	void setup (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Map <String, Object> parameters);
 
 	void prepare (
-			TaskLogger taskLogger);
+			Transaction parentTransaction);
 
 	Set <ScriptRef> scriptRefs ();
 
 	Set <HtmlLink> links ();
 
 	void renderHtmlHeadContent (
-			TaskLogger taskLogger);
+			Transaction parentTransaction);
 
 	void renderHtmlBodyContent (
-			TaskLogger taskLogger);
+			Transaction parentTransaction);
 
 	void setWithMarkup (
 			boolean markup);

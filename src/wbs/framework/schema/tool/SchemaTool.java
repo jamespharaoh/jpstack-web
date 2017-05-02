@@ -13,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Provider;
-import javax.sql.DataSource;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.LoggingDataSource;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
@@ -36,7 +37,7 @@ class SchemaTool {
 	// singleton dependencies
 
 	@SingletonDependency
-	DataSource dataSource;
+	LoggingDataSource dataSource;
 
 	@SingletonDependency
 	EntityHelper entityHelper;
@@ -69,7 +70,7 @@ class SchemaTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"schemaCreate");
@@ -96,7 +97,7 @@ class SchemaTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"defineTables");
@@ -174,13 +175,14 @@ class SchemaTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"executeSchemaSqlScript");
 
 			Connection connection =
-				dataSource.getConnection ();
+				dataSource.getConnection (
+					taskLogger);
 
 		) {
 
@@ -274,13 +276,14 @@ class SchemaTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"createObjectTypes");
 
 			Connection connection =
-				dataSource.getConnection ();
+				dataSource.getConnection (
+					taskLogger);
 
 		) {
 

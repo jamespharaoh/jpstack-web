@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
@@ -19,24 +21,33 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("dateFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class DateFormFieldBuilder {
+class DateFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -96,150 +107,137 @@ class DateFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String nativeFieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
-
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
-
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
-
-		// field type
-
-		Class <?> propertyClass =
-			optionalGetRequired (
-				objectManager.dereferenceType (
-					optionalOf (
-						context.containerClass ()),
-					optionalOf (
-						nativeFieldName)));
-
-		// accessor
-
-		FormFieldAccessor accessor;
-
-		if (readOnly) {
-
-			accessor =
-				dereferenceFormFieldAccessorProvider.get ()
-
-				.path (
-					nativeFieldName);
-
-		} else {
-
-			accessor =
-				simpleFormFieldAccessorProvider.get ()
-
-				.name (
-					nativeFieldName)
-
-				.nativeClass (
-					propertyClass);
-
-		}
-
-		// native mapping
-
-		FormFieldNativeMapping nativeMapping;
-
-		if (
-			classEqualSafe (
-				propertyClass,
-				LocalDate.class)
 		) {
 
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+			String name =
+				spec.name ();
 
-		} else if (
-			classEqualSafe (
-				propertyClass,
-				Instant.class)
-		) {
+			String nativeFieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
 
-			nativeMapping =
-				timestampAsDateFormFieldNativeMappingProvider.get ();
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		} else {
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-			throw new RuntimeException ();
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		}
+			// field type
 
-		// value validator
+			Class <?> propertyClass =
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						taskLogger,
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							nativeFieldName)));
 
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+			// accessor
 
-		if (! nullable) {
+			FormFieldAccessor accessor;
 
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+			if (readOnly) {
 
-		}
+				accessor =
+					dereferenceFormFieldAccessorProvider.get ()
 
-		// constraint validator
+					.path (
+						nativeFieldName);
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+			} else {
 
-		// interface mapping
+				accessor =
+					simpleFormFieldAccessorProvider.get ()
 
-		FormFieldInterfaceMapping interfaceMapping =
-			dateFormFieldInterfaceMappingProvider.get ();
+					.name (
+						nativeFieldName)
 
-		// renderer
+					.nativeClass (
+						propertyClass);
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+			}
 
-			.name (
-				name)
+			// native mapping
 
-			.label (
-				label)
+			FormFieldNativeMapping nativeMapping;
 
-			.nullable (
-				nullable);
+			if (
+				classEqualSafe (
+					propertyClass,
+					LocalDate.class)
+			) {
 
-		// update hook
+				nativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
 
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
+			} else if (
+				classEqualSafe (
+					propertyClass,
+					Instant.class)
+			) {
 
-		// form field
+				nativeMapping =
+					timestampAsDateFormFieldNativeMappingProvider.get ();
 
-		if (readOnly) {
+			} else {
 
-			target.addFormItem (
+				throw new RuntimeException ();
 
-				readOnlyFormFieldProvider.get ()
+			}
+
+			// value validator
+
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				dateFormFieldInterfaceMappingProvider.get ();
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -247,60 +245,87 @@ class DateFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					nullable);
 
-				.nativeMapping (
-					nativeMapping)
+			// update hook
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.csvMapping (
-					interfaceMapping)
+			// form field
 
-				.renderer (
-					renderer)
+			if (readOnly) {
 
-			);
+				target.addFormItem (
 
-		} else {
+					readOnlyFormFieldProvider.get ()
 
-			target.addFormItem (
+					.name (
+						name)
 
-				updatableFormFieldProvider.get ()
+					.label (
+						label)
 
-				.name (
-					name)
+					.accessor (
+						accessor)
 
-				.label (
-					label)
+					.nativeMapping (
+						nativeMapping)
 
-				.accessor (
-					accessor)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.nativeMapping (
-					nativeMapping)
+					.csvMapping (
+						interfaceMapping)
 
-				.valueValidators (
-					valueValidators)
+					.renderer (
+						renderer)
 
-				.constraintValidator (
-					constraintValidator)
+				);
 
-				.interfaceMapping (
-					interfaceMapping)
+			} else {
 
-				.csvMapping (
-					interfaceMapping)
+				target.addFormItem (
 
-				.renderer (
-					renderer)
+					updatableFormFieldProvider.get ()
 
-				.updateHook (
-					updateHook)
+					.name (
+						name)
 
-			);
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

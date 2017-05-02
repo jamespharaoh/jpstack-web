@@ -30,6 +30,7 @@ import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -77,14 +78,15 @@ class EntityHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"init");
 
 		) {
 
-			initEntityClassNames ();
+			initEntityClassNames (
+				taskLogger);
 
 			initEntityClasses (
 				taskLogger);
@@ -96,34 +98,46 @@ class EntityHelperImplementation
 
 	}
 
-	void initEntityClassNames () {
+	void initEntityClassNames (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		ImmutableList.Builder <String> entityClassNamesBuilder =
-			ImmutableList.builder ();
+		try (
 
-		for (
-			ModelMetaSpec modelMeta
-				: modelMetaLoader.modelMetas ().values ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initEntityClassNames");
+
 		) {
 
-			if (! modelMeta.type ().record ()) {
-				continue;
+			ImmutableList.Builder <String> entityClassNamesBuilder =
+				ImmutableList.builder ();
+
+			for (
+				ModelMetaSpec modelMeta
+					: modelMetaLoader.modelMetas ().values ()
+			) {
+
+				if (! modelMeta.type ().record ()) {
+					continue;
+				}
+
+				PluginSpec plugin =
+					modelMeta.plugin ();
+
+				entityClassNamesBuilder.add (
+					stringFormat (
+						"%s.model.%sRec",
+						plugin.packageName (),
+						capitalise (
+							modelMeta.name ())));
+
 			}
 
-			PluginSpec plugin =
-				modelMeta.plugin ();
-
-			entityClassNamesBuilder.add (
-				stringFormat (
-					"%s.model.%sRec",
-					plugin.packageName (),
-					capitalise (
-						modelMeta.name ())));
+			entityClassNames =
+				entityClassNamesBuilder.build ();
 
 		}
-
-		entityClassNames =
-			entityClassNamesBuilder.build ();
 
 	}
 
@@ -132,7 +146,7 @@ class EntityHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initEntityClasses");
@@ -180,7 +194,7 @@ class EntityHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initModels");

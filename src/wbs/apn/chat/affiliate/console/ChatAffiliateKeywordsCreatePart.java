@@ -16,9 +16,12 @@ import lombok.NonNull;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
 
@@ -27,7 +30,7 @@ public
 class ChatAffiliateKeywordsCreatePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
@@ -35,6 +38,9 @@ class ChatAffiliateKeywordsCreatePart
 	@SingletonDependency
 	@Named
 	EnumConsoleHelper <?> genderConsoleHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	@Named
@@ -45,72 +51,83 @@ class ChatAffiliateKeywordsCreatePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatAffiliate.keywords.create"));
+		try (
 
-		htmlTableOpenDetails ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlTableDetailsRowWriteHtml (
-			"Keyword",
-			stringFormat (
+		) {
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatAffiliate.keywords.create"));
+
+			htmlTableOpenDetails ();
+
+			htmlTableDetailsRowWriteHtml (
+				"Keyword",
+				stringFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"keyword\"",
+					" value=\"%h\"",
+					requestContext.formOrEmptyString (
+						"keyword")));
+
+			htmlTableDetailsRowWriteHtml (
+				"Join type",
+				() -> chatKeywordJoinTypeConsoleHelper.writeSelect (
+					"joinType",
+					requestContext.formOrEmptyString(
+						"joinType")));
+
+			htmlTableDetailsRowWriteHtml (
+				"Gender",
+				() -> {
+
+				genderConsoleHelper.writeSelect (
+					"gender",
+					requestContext.formOrEmptyString (
+						"gender"));
+
+				formatWriter.writeLineFormat (
+					"(optional)");
+
+			});
+
+			htmlTableDetailsRowWriteHtml (
+				"Orient",
+				() -> {
+
+				orientConsoleHelper.writeSelect (
+					"orient",
+					requestContext.formOrEmptyString (
+						"orient"));
+
+				formatWriter.writeLineFormat (
+					"(optional)");
+
+			});
+
+			htmlTableClose ();
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
 				"<input",
-				" type=\"text\"",
-				" name=\"keyword\"",
-				" value=\"%h\"",
-				requestContext.formOrEmptyString (
-					"keyword")));
+				" type=\"submit\"",
+				" value=\"create keyword\"",
+				">");
 
-		htmlTableDetailsRowWriteHtml (
-			"Join type",
-			() -> chatKeywordJoinTypeConsoleHelper.writeSelect (
-				"joinType",
-				requestContext.formOrEmptyString(
-					"joinType")));
+			htmlParagraphClose ();
 
-		htmlTableDetailsRowWriteHtml (
-			"Gender",
-			() -> {
+			htmlFormClose ();
 
-			genderConsoleHelper.writeSelect (
-				"gender",
-				requestContext.formOrEmptyString (
-					"gender"));
-
-			formatWriter.writeLineFormat (
-				"(optional)");
-
-		});
-
-		htmlTableDetailsRowWriteHtml (
-			"Orient",
-			() -> {
-
-			orientConsoleHelper.writeSelect (
-				"orient",
-				requestContext.formOrEmptyString (
-					"orient"));
-
-			formatWriter.writeLineFormat (
-				"(optional)");
-
-		});
-
-		htmlTableClose ();
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"create keyword\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
+		}
 
 	}
 

@@ -2,7 +2,7 @@ package wbs.smsapps.forwarder.logic;
 
 import java.util.Collection;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.media.model.MediaRec;
 
@@ -15,15 +15,15 @@ public
 interface ForwarderLogic {
 
 	boolean sendTemplateCheck (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SendTemplate template);
 
 	void sendTemplateSend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SendTemplate template);
 
 	ForwarderMessageOutRec sendMessage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,

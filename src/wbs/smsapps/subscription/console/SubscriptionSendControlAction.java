@@ -83,23 +83,19 @@ class SubscriptionSendControlAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SubscriptionSendControlAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			SubscriptionSendRec subscriptionSend =
-				subscriptionSendHelper.findFromContextRequired ();
+				subscriptionSendHelper.findFromContextRequired (
+					transaction);
 
 			if (
 				optionalIsPresent (
@@ -122,10 +118,11 @@ class SubscriptionSendControlAction
 				}
 
 				subscriptionLogic.scheduleSend (
-					taskLogger,
+					transaction,
 					subscriptionSend,
 					transaction.now (),
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 				transaction.commit ();
 
@@ -162,6 +159,7 @@ class SubscriptionSendControlAction
 
 					scheduledTime =
 						userConsoleLogic.timestampStringToInstant (
+							transaction,
 							requestContext.parameterRequired (
 								"timestamp"));
 
@@ -175,10 +173,11 @@ class SubscriptionSendControlAction
 				}
 
 				subscriptionLogic.scheduleSend (
-					taskLogger,
+					transaction,
 					subscriptionSend,
 					scheduledTime,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 				transaction.commit ();
 
@@ -224,9 +223,10 @@ class SubscriptionSendControlAction
 						SubscriptionSendState.notSent);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"subscription_send_unscheduled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					subscriptionSend);
 
 				transaction.commit ();
@@ -281,9 +281,10 @@ class SubscriptionSendControlAction
 							SubscriptionSendState.cancelled);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"subscription_send_cancelled",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						subscriptionSend);
 
 					transaction.commit ();
@@ -307,15 +308,17 @@ class SubscriptionSendControlAction
 							SubscriptionSendState.partiallySent);
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"subscription_send_cancelled",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						subscriptionSend);
 
 					transaction.commit ();
 
-					requestContext.addNotice (
-						"Subscription send cancelled after being partially sent");
+					requestContext.addNoticeFormat (
+						"Subscription send cancelled after being partially ",
+						"sent");
 
 					return null;
 

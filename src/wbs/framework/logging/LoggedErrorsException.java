@@ -14,6 +14,15 @@ class LoggedErrorsException
 
 	public
 	LoggedErrorsException (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		this.parentTaskLogger =
+			parentTaskLogger;
+
+	}
+
+	public
+	LoggedErrorsException (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String message) {
 

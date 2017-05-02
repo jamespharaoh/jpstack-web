@@ -15,8 +15,9 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -118,13 +119,13 @@ class ChatNameCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -135,10 +136,12 @@ class ChatNameCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -147,12 +150,13 @@ class ChatNameCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// limit name
@@ -168,7 +172,7 @@ class ChatNameCommand
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -177,7 +181,7 @@ class ChatNameCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -189,26 +193,29 @@ class ChatNameCommand
 				// set name
 
 				chatMiscLogic.chatUserSetName (
-					taskLogger,
+					transaction,
 					chatUser,
 					newName,
-					message.getThreadId ());
+					optionalOf (
+						message.getThreadId ()));
 
 			} else {
 
 				// send reply
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"name_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"name")),
 					TemplateMissing.error,
@@ -219,7 +226,7 @@ class ChatNameCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

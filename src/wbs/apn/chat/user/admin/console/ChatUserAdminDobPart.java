@@ -10,9 +10,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -29,6 +32,9 @@ class ChatUserAdminDobPart
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	TimeFormatter timeFormatter;
 
@@ -41,53 +47,76 @@ class ChatUserAdminDobPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.dob"));
+		try (
 
-		htmlParagraphOpen ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		formatWriter.writeLineFormat (
-			"Date of birth (yyyy-mm-dd)<br>");
+		) {
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"dob\"",
-			" value=\"%h\"",
-			requestContext.formOrElse (
-				"dob",
-				() -> ifNotNullThenElseEmDash (
-					chatUser.getDob (),
-					() -> timeFormatter.dateString (
-						chatUser.getDob ()))),
-			">");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.dob"));
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
 
-		htmlParagraphOpen ();
+			formatWriter.writeLineFormat (
+				"Date of birth (yyyy-mm-dd)<br>");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"update date of birth\"",
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"dob\"",
+				" value=\"%h\"",
+				requestContext.formOrElse (
+					"dob",
+					() -> ifNotNullThenElseEmDash (
+						chatUser.getDob (),
+						() -> timeFormatter.dateString (
+							chatUser.getDob ()))),
+				">");
 
-		htmlParagraphClose ();
+			htmlParagraphClose ();
 
-		htmlFormClose ();
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"update date of birth\"",
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+		}
 
 	}
 

@@ -34,9 +34,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
@@ -89,29 +90,31 @@ class ObjectPrivsPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			object =
-				consoleHelper.findFromContextRequired ();
+				consoleHelper.findFromContextRequired (
+					transaction);
 
 			privCodes =
 				iterableMapToSet (
 					PrivRec::getCode,
 					privHelper.findByParent (
+						transaction,
 						object));
 
 			privDatas =
 				preparePrivDatas (
-					taskLogger,
+					transaction,
 					object);
 
 		}
@@ -120,14 +123,14 @@ class ObjectPrivsPart <
 
 	private
 	List <PrivData> preparePrivDatas (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"preparePrivDatas");
 
 		) {
@@ -146,6 +149,7 @@ class ObjectPrivsPart <
 
 				currentObjectLoop =
 					objectManager.getParent (
+						transaction,
 						optionalGetRequired (
 							currentObjectLoop))
 
@@ -161,13 +165,14 @@ class ObjectPrivsPart <
 
 				ObjectTypeRec currentObjectType =
 					objectTypeHelper.findRequired (
+						transaction,
 						currentObjectHelper.objectTypeId ());
 
 				objectPrivDatasBuilder.addAll (
 					iterableMapToList (
 						priv ->
 							preparePrivData (
-								taskLogger,
+								transaction,
 								currentObjectType,
 								currentObject,
 								priv),
@@ -177,6 +182,7 @@ class ObjectPrivsPart <
 									privCodes.contains (
 										priv.getCode ()),
 								privHelper.findByParent (
+									transaction,
 									currentObject)))));
 
 			}
@@ -189,92 +195,116 @@ class ObjectPrivsPart <
 
 	private
 	PrivData preparePrivData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectTypeRec objectType,
 			@NonNull Record <?> object,
 			@NonNull PrivRec priv) {
 
-		return new PrivData ()
+		try (
 
-			.objectType (
-				objectType)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"preparePrivData");
 
-			.object (
-				object)
+		) {
 
-			.priv (
-				priv)
+			return new PrivData ()
 
-			.users (
-				iterableMapToList (
-					UserPrivRec::getUser,
-					iterableFilter (
-						UserPrivRec::getCan,
-						userPrivHelper.find (
-							priv))))
+				.objectType (
+					objectType)
 
-			.groups (
-				listSorted (
-					priv.getGroups ()))
+				.object (
+					object)
 
-		;
+				.priv (
+					priv)
+
+				.users (
+					iterableMapToList (
+						UserPrivRec::getUser,
+						iterableFilter (
+							UserPrivRec::getCan,
+							userPrivHelper.find (
+								transaction,
+								priv))))
+
+				.groups (
+					listSorted (
+						priv.getGroups ()))
+
+			;
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"Type",
-			"Object",
-			"Priv",
-			"Description",
-			"Users",
-			"Groups");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		for (
-			PrivData privData
-				: privDatas
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				privData.objectType.getCode ());
+			htmlTableHeaderRowWrite (
+				"Type",
+				"Object",
+				"Priv",
+				"Description",
+				"Users",
+				"Groups");
 
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					privData.object ()));
+			for (
+				PrivData privData
+					: privDatas
+			) {
 
-			htmlTableCellWrite (
-				privData.priv ().getCode ());
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				privData.priv ().getPrivType ().getDescription ());
+				htmlTableCellWrite (
+					privData.objectType.getCode ());
 
-			htmlTableCellWriteHtml (
-				() -> privData.users ().forEach (
-					user -> formatWriter.writeLineFormat (
-						"%h.%h<br>",
-						user.getSlice ().getCode (),
-						user.getUsername ())));
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						transaction,
+						privData.object ()));
 
-			htmlTableCellWrite (
-				() -> privData.groups ().forEach (
-					group -> formatWriter.writeLineFormat (
-						"%h.%h<br>",
-						group.getSlice ().getCode (),
-						group.getCode ())));
+				htmlTableCellWrite (
+					privData.priv ().getCode ());
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					privData.priv ().getPrivType ().getDescription ());
+
+				htmlTableCellWriteHtml (
+					() -> privData.users ().forEach (
+						user -> formatWriter.writeLineFormat (
+							"%h.%h<br>",
+							user.getSlice ().getCode (),
+							user.getUsername ())));
+
+				htmlTableCellWrite (
+					() -> privData.groups ().forEach (
+						group -> formatWriter.writeLineFormat (
+							"%h.%h<br>",
+							group.getSlice ().getCode (),
+							group.getCode ())));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

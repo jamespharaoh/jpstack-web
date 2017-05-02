@@ -7,15 +7,15 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectHelper <RecordType> objectHelper,
 			@NonNull ObjectHelper <?> parentHelper,
 			@NonNull Record <?> parentObject) {
@@ -26,7 +26,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void beforeInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		doNothing ();
@@ -35,7 +35,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void afterInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		doNothing ();
@@ -44,6 +44,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void beforeUpdate (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		doNothing ();
@@ -52,6 +53,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	Object getDynamic (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name) {
 
@@ -64,7 +66,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void setDynamic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name,
 			@NonNull Optional <?> value) {
@@ -77,8 +79,10 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 	}
 
 	public
-	class DefaultImplementation<RecordType extends Record<RecordType>>
-		implements ObjectHooks<RecordType> {
+	class DefaultImplementation <
+		RecordType extends Record <RecordType>
+	>
+		implements ObjectHooks <RecordType> {
 
 	}
 

@@ -11,6 +11,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
@@ -43,8 +44,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -91,114 +93,128 @@ class ChatRebillSendPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// get form fields
+		try (
 
-		searchFormFields =
-			chatRebillConsoleModule.formFieldSetRequired (
-				"search",
-				ChatRebillSearch.class);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		billResultsFormFields =
-			chatRebillConsoleModule.formFieldSetRequired (
-				"bill-results",
-				ChatUserRec.class);
+		) {
 
-		nonBillResultsFormFields =
-			chatRebillConsoleModule.formFieldSetRequired (
-				"non-bill-results",
-				ChatRebillNonBillResult.class);
+			// get form fields
 
-		// get form data
+			searchFormFields =
+				chatRebillConsoleModule.formFieldSetRequired (
+					"search",
+					ChatRebillSearch.class);
 
-		formUpdates =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"formUpdates"));
+			billResultsFormFields =
+				chatRebillConsoleModule.formFieldSetRequired (
+					"bill-results",
+					ChatUserRec.class);
 
-		formValues =
-			optionalOrElse (
+			nonBillResultsFormFields =
+				chatRebillConsoleModule.formFieldSetRequired (
+					"non-bill-results",
+					ChatRebillNonBillResult.class);
+
+			// get form data
+
+			formUpdates =
 				optionalCast (
-					ChatRebillSearch.class,
+					UpdateResultSet.class,
 					requestContext.request (
-						"formValues")),
-				() -> new ChatRebillSearch ());
+						"formUpdates"));
 
-		formHints =
-			ImmutableMap.<String, Object> builder ()
+			formValues =
+				optionalOrElse (
+					optionalCast (
+						ChatRebillSearch.class,
+						requestContext.request (
+							"formValues")),
+					() -> new ChatRebillSearch ());
 
-			.put (
-				"chat",
-				chatHelper.findFromContextRequired ())
+			formHints =
+				ImmutableMap.<String, Object> builder ()
 
-			.build ();
+				.put (
+					"chat",
+					chatHelper.findFromContextRequired (
+						transaction))
 
-		// get search results
+				.build ();
 
-		Optional <List <Long>> billSearchResultsTemp =
-			genericCastUnchecked (
-				requestContext.request (
-					"billSearchResults"));
+			// get search results
 
-		billSearchResults =
-			optionalMapRequired (
-				billSearchResultsTemp,
-				list ->
-					iterableMapToList (
-						chatUserHelper::findRequired,
-						list));
+			Optional <List <Long>> billSearchResultsTemp =
+				genericCastUnchecked (
+					requestContext.request (
+						"billSearchResults"));
 
-		Optional <List <Pair <Long, String>>> nonBillSearchResultsTemp =
-			genericCastUnchecked (
-				requestContext.request (
-					"nonBillSearchResults"));
+			billSearchResults =
+				optionalMapRequired (
+					billSearchResultsTemp,
+					chatUserIds ->
+						presentInstancesList (
+							chatUserHelper.findMany (
+								transaction,
+								chatUserIds)));
 
-		nonBillSearchResults =
-			optionalMapRequired (
-				nonBillSearchResultsTemp,
-				list ->
-					iterableMapToList (
-						chatUserWithReason ->
-							new ChatRebillNonBillResult ()
-								.chatUser (
-									chatUserHelper.findRequired (
-										(Long)
-										chatUserWithReason.getLeft ()))
-								.reason (
-									(String)
-									chatUserWithReason.getRight ()),
-						list));
+			Optional <List <Pair <Long, String>>> nonBillSearchResultsTemp =
+				genericCastUnchecked (
+					requestContext.request (
+						"nonBillSearchResults"));
+
+			nonBillSearchResults =
+				optionalMapRequired (
+					nonBillSearchResultsTemp,
+					list ->
+						iterableMapToList (
+							chatUserWithReason ->
+								new ChatRebillNonBillResult ()
+									.chatUser (
+										chatUserHelper.findRequired (
+											transaction,
+											(Long)
+											chatUserWithReason.getLeft ()))
+									.reason (
+										(String)
+										chatUserWithReason.getRight ()),
+							list));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			htmlParagraphWriteFormat (
-				"This tool allows you to rebill users who have not performed an ",
-				"action recently.");
+				"This tool allows you to rebill users who have not performed ",
+				"an action recently.");
 
 			renderSearchForm (
-				taskLogger);
+				transaction);
 
 			renderBillSearchResults (
-				taskLogger);
+				transaction);
 
 			renderNonBillSearchResults (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -206,13 +222,13 @@ class ChatRebillSendPart
 
 	private
 	void renderSearchForm (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderSearchForm");
 
 		) {
@@ -224,7 +240,7 @@ class ChatRebillSendPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				searchFormFields,
@@ -274,13 +290,13 @@ class ChatRebillSendPart
 
 	private
 	void renderBillSearchResults (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderBillSearchResults");
 
 		) {
@@ -323,7 +339,7 @@ class ChatRebillSendPart
 			}
 
 			formFieldLogic.outputListTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				billResultsFormFields,
 				billSearchResults.get (),
@@ -336,13 +352,13 @@ class ChatRebillSendPart
 
 	private
 	void renderNonBillSearchResults (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderNonBillSearchResults");
 
 		) {
@@ -363,16 +379,17 @@ class ChatRebillSendPart
 				"Non-billable results");
 
 			htmlParagraphWriteFormat (
-				"Found %s users who match the search criteria but who are not ",
+				"Found %s ",
 				integerToDecimalString (
 					collectionSize (
 						nonBillSearchResults.get ())),
-				"able to be be billed at this time, due to restrictions that are ",
+				"users who match the search criteria but who are not able to ",
+				"be be billed at this time, due to restrictions that are ",
 				"built into the system. Some of these may be bypassed with ",
 				"settings on the search form.");
 
 			formFieldLogic.outputListTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				nonBillResultsFormFields,
 				nonBillSearchResults.get (),

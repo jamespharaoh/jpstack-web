@@ -30,6 +30,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -129,7 +130,7 @@ class OxygenateRouteInSmsAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goApi");
@@ -236,7 +237,7 @@ class OxygenateRouteInSmsAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"logFailure");
@@ -264,25 +265,21 @@ class OxygenateRouteInSmsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"Oxygen8InboundSmsAction.storeLog ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			oxygenateInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				oxygenateInboundLogHelper.createInstance ()
 
 				.setRoute (
 					routeHelper.findRequired (
+						transaction,
 						parseIntegerRequired (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))
@@ -390,25 +387,22 @@ class OxygenateRouteInSmsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"Oxygen8InboundSmsAction.updateDatabase ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
 			RouteRec route =
 				routeHelper.findRequired (
+					transaction,
 					smsRouteId);
 
 			OxygenateRouteInRec oxygenateRouteIn =
 				oxygenateRouteInHelper.findRequired (
+					transaction,
 					route.getId ());
 
 			OxygenateConfigRec oxygenateConfig =
@@ -416,6 +410,7 @@ class OxygenateRouteInSmsAction
 
 			Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
 				oxygenateNetworkHelper.findByChannel (
+					transaction,
 					oxygenateConfig,
 					channel);
 
@@ -435,14 +430,14 @@ class OxygenateRouteInSmsAction
 				oxygenateNetworkOptional.get ();
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalOf (
 					reference),
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					textContent),
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					msisdn),
 				shortcode,
 				route,

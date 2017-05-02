@@ -3,6 +3,7 @@ package wbs.platform.postgresql.hibernate;
 import java.sql.Types;
 
 import wbs.framework.hibernate.EnumUserType;
+
 import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 
 public

@@ -30,10 +30,11 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.group.model.GroupRec;
@@ -117,13 +118,13 @@ class UserPrivsEditorPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -131,7 +132,8 @@ class UserPrivsEditorPart
 			// build the privs tree
 
 			List <PrivRec> privs =
-				privHelper.findAll ();
+				privHelper.findAll (
+					transaction);
 
 			for (
 				PrivRec priv
@@ -140,7 +142,7 @@ class UserPrivsEditorPart
 
 				if (
 					! privChecker.canGrant (
-						taskLogger,
+						transaction,
 						priv.getId ())
 				) {
 					continue;
@@ -148,10 +150,12 @@ class UserPrivsEditorPart
 
 				Record <?> parentObject =
 					objectManager.getParentRequired (
+						transaction,
 						priv);
 
 				PrivsEditorNode parentNode =
 					findNode (
+						transaction,
 						parentObject);
 
 				parentNode.privs.put (
@@ -163,7 +167,8 @@ class UserPrivsEditorPart
 			// and fill the current priv data sets
 
 			UserRec user =
-				userHelper.findFromContextRequired ();
+				userHelper.findFromContextRequired (
+					transaction);
 
 			for (
 				UserPrivRec userPriv
@@ -211,289 +216,340 @@ class UserPrivsEditorPart
 
 	}
 
+	private
 	PrivsEditorNode findNode (
-			Record <?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
-		// end the recursion if we reach the root node
+		try (
 
-		if ((Object) object instanceof RootRec)
-			return rootNode;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findNode");
 
-		// check if the node already exists
+		) {
 
-		GlobalId dataObjectId =
-			objectManager.getGlobalId (object);
+			// end the recursion if we reach the root node
 
-		PrivsEditorNode node =
-			nodesByDataObjectId.get (dataObjectId);
+			if ((Object) object instanceof RootRec)
+				return rootNode;
 
-		if (node != null)
-			return node;
+			// check if the node already exists
 
-		// find the parent node by recursion
+			GlobalId dataObjectId =
+				objectManager.getGlobalId (
+					transaction,
+					object);
 
-		Record <?> parent =
-			objectManager.getParentRequired (
-				object);
+			PrivsEditorNode node =
+				nodesByDataObjectId.get (
+					dataObjectId);
 
-		PrivsEditorNode parentNode =
-			findNode (parent);
+			if (node != null)
+				return node;
 
-		// lookup or create the map containing this node's children of this
-		// type
+			// find the parent node by recursion
 
-		Map<String,PrivsEditorNode> typeNodesByCode =
-			parentNode.nodesByCodeByTypeCode.get (
-				objectManager.getObjectTypeCode (object));
+			Record <?> parent =
+				objectManager.getParentRequired (
+					transaction,
+					object);
 
-		if (typeNodesByCode == null) {
+			PrivsEditorNode parentNode =
+				findNode (
+					transaction,
+					parent);
 
-			typeNodesByCode =
-				new TreeMap<String,PrivsEditorNode> ();
+			// lookup or create the map containing this node's children of this
+			// type
 
-			parentNode.nodesByCodeByTypeCode.put (
-				objectManager.getObjectTypeCode (object),
-				typeNodesByCode);
-		}
+			Map <String, PrivsEditorNode> typeNodesByCode =
+				parentNode.nodesByCodeByTypeCode.get (
+					objectManager.getObjectTypeCode (
+						transaction,
+						object));
 
-		// lookup or create the node for this object
+			if (typeNodesByCode == null) {
 
-		node =
-			typeNodesByCode.get (
-				objectManager.getCode (object));
+				typeNodesByCode =
+					new TreeMap <String, PrivsEditorNode> ();
 
-		if (node == null) {
+				parentNode.nodesByCodeByTypeCode.put (
+					objectManager.getObjectTypeCode (
+						transaction,
+						object),
+					typeNodesByCode);
+			}
+
+			// lookup or create the node for this object
 
 			node =
-				new PrivsEditorNode ();
+				typeNodesByCode.get (
+					objectManager.getCode (
+						transaction,
+						object));
 
-			typeNodesByCode.put (
-				objectManager.getCode (object),
-				node);
+			if (node == null) {
 
-			nodesByDataObjectId.put (
-				dataObjectId,
-				node);
+				node =
+					new PrivsEditorNode ();
+
+				typeNodesByCode.put (
+					objectManager.getCode (
+						transaction,
+						object),
+					node);
+
+				nodesByDataObjectId.put (
+					dataObjectId,
+					node);
+
+			}
+
+			// and return
+
+			return node;
 
 		}
-
-		// and return
-
-		return node;
 
 	}
 
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		super.renderHtmlHeadContent (
-			parentTaskLogger);
+		try (
 
-		renderScriptBlock ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHeadContent");
+
+		) {
+
+			super.renderHtmlHeadContent (
+				transaction);
+
+			renderScriptBlock (
+				transaction);
+
+		}
 
 	}
 
 	private
-	void renderScriptBlock () {
+	void renderScriptBlock (
+			@NonNull Transaction parentTransaction) {
 
-		// script open
+		try (
 
-		htmlScriptBlockOpen ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderScriptBlock");
 
-		// new priv data
+		) {
 
-		formatWriter.writeLineFormat (
-			"var newPrivData = {}");
+			// script open
 
-		// tree opts
+			htmlScriptBlockOpen ();
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"var treeOpts = {");
+			// new priv data
 
-		formatWriter.writeLineFormat (
-			"blankImage: '%j',",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-blank.gif"));
+			formatWriter.writeLineFormat (
+				"var newPrivData = {}");
 
-		formatWriter.writeLineFormat (
-			"plusImage: '%j',",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-plus.gif"));
+			// tree opts
 
-		formatWriter.writeLineFormat (
-			"minusImage: '%j',",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-minus.gif"));
+			formatWriter.writeLineFormatIncreaseIndent (
+				"var treeOpts = {");
 
-		formatWriter.writeLineFormat (
-			"imageWidth: 17,");
+			formatWriter.writeLineFormat (
+				"blankImage: '%j',",
+				requestContext.resolveApplicationUrl (
+					"/images/tree-blank.gif"));
 
-		formatWriter.writeLineFormat (
-			"imageHeight: 17");
+			formatWriter.writeLineFormat (
+				"plusImage: '%j',",
+				requestContext.resolveApplicationUrl (
+					"/images/tree-plus.gif"));
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"minusImage: '%j',",
+				requestContext.resolveApplicationUrl (
+					"/images/tree-minus.gif"));
 
-		// ob
+			formatWriter.writeLineFormat (
+				"imageWidth: 17,");
 
-		formatWriter.writeLineFormat (
-			"var ob = new SimpleTreeItemGenerator ('%j');",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-object.gif"));
+			formatWriter.writeLineFormat (
+				"imageHeight: 17");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"ob.generateTail = function (itemData) {");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormat (
-			"return ' <span class=\"node\">' + itemData[2] + '</span>';");
+			// ob
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"var ob = new SimpleTreeItemGenerator ('%j');",
+				requestContext.resolveApplicationUrl (
+					"/images/tree-object.gif"));
 
-		// pr
+			formatWriter.writeLineFormatIncreaseIndent (
+				"ob.generateTail = function (itemData) {");
 
-		formatWriter.writeLineFormat (
-			"var pr = new SimpleTreeItemGenerator ('%j');",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-priv.gif"));
+			formatWriter.writeLineFormat (
+				"return ' <span class=\"node\">' + itemData[2] + '</span>';");
 
-		// next priv doc id
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormat (
-			"var nextPrivDocId = 0;");
+			// pr
 
-		// pr generate tail
+			formatWriter.writeLineFormat (
+				"var pr = new SimpleTreeItemGenerator ('%j');",
+				requestContext.resolveApplicationUrl (
+					"/images/tree-priv.gif"));
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"pr.generateTail = function (itemData) {");
+			// next priv doc id
 
-		formatWriter.writeLineFormat (
-			"var privDocId = nextPrivDocId ++;");
+			formatWriter.writeLineFormat (
+				"var nextPrivDocId = 0;");
 
-		formatWriter.writeLineFormat (
-			"s = ' <span class=\"priv\">' + itemData[2] + '</span>'");
+			// pr generate tail
 
-		formatWriter.writeLineFormat (
-			"  + ' |'");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"pr.generateTail = function (itemData) {");
 
-		formatWriter.writeLineFormat (
-			"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
-			"can&quot;, ' + itemData[6] + ')\"'");
+			formatWriter.writeLineFormat (
+				"var privDocId = nextPrivDocId ++;");
 
-		formatWriter.writeLineFormat (
-			"  + ' id=\"' + privDocId + '-can\"'");
+			formatWriter.writeLineFormat (
+				"s = ' <span class=\"priv\">' + itemData[2] + '</span>'");
 
-		formatWriter.writeLineFormat (
-			"  + ' class=\"' + (itemData[3]? 'can-on' : 'can-off') + '\">'");
+			formatWriter.writeLineFormat (
+				"  + ' |'");
 
-		formatWriter.writeLineFormat (
-			"  + 'can</a>'");
+			formatWriter.writeLineFormat (
+				"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
+				"can&quot;, ' + itemData[6] + ')\"'");
 
-		formatWriter.writeLineFormat (
-			"  + ' |'");
+			formatWriter.writeLineFormat (
+				"  + ' id=\"' + privDocId + '-can\"'");
 
-		formatWriter.writeLineFormat (
-			"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
-			"cangrant&quot;, ' + itemData[6] + ')\"'");
+			formatWriter.writeLineFormat (
+				"  + ' class=\"' + (itemData[3]? 'can-on' : 'can-off') + '\">'");
 
-		formatWriter.writeLineFormat (
-			"  + ' id=\"' + privDocId + '-cangrant\"'");
+			formatWriter.writeLineFormat (
+				"  + 'can</a>'");
 
-		formatWriter.writeLineFormat (
-			"  + ' class=\"' + (itemData[4]? 'cangrant-on' : 'cangrant-off') ",
-			"+ '\">'");
+			formatWriter.writeLineFormat (
+				"  + ' |'");
 
-		formatWriter.writeLineFormat (
-			"  + 'can grant</a>';");
+			formatWriter.writeLineFormat (
+				"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
+				"cangrant&quot;, ' + itemData[6] + ')\"'");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"if (itemData[5]) {");
+			formatWriter.writeLineFormat (
+				"  + ' id=\"' + privDocId + '-cangrant\"'");
 
-		formatWriter.writeLineFormat (
-			"s += ' | <span class=\"group-can\">(group can)</span>';");
+			formatWriter.writeLineFormat (
+				"  + ' class=\"' + (itemData[4]? 'cangrant-on' : 'cangrant-off') ",
+				"+ '\">'");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"  + 'can grant</a>';");
 
-		formatWriter.writeLineFormat (
-			"return s;");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"if (itemData[5]) {");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"s += ' | <span class=\"group-can\">(group can)</span>';");
 
-		// toggle priv
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function togglePriv (id, type, privId) {");
+			formatWriter.writeLineFormat (
+				"return s;");
 
-		formatWriter.writeLineFormat (
-			"var a = document.getElementById (id + '-' + type);");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"if (a.className == type + '-off') {");
+			// toggle priv
 
-		formatWriter.writeLineFormat (
-			"a.className = type + '-on';");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function togglePriv (id, type, privId) {");
 
-		formatWriter.writeLineFormat (
-			"newPrivData[privId + '-' + type] = 1;");
+			formatWriter.writeLineFormat (
+				"var a = document.getElementById (id + '-' + type);");
 
-		formatWriter.writeLineFormatDecreaseIncreaseIndent (
-			"} else {");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"if (a.className == type + '-off') {");
 
-		formatWriter.writeLineFormat (
-			"a.className = type + '-off';");
+			formatWriter.writeLineFormat (
+				"a.className = type + '-on';");
 
-		formatWriter.writeLineFormat (
-			"newPrivData[privId + '-' + type] = 0;");
+			formatWriter.writeLineFormat (
+				"newPrivData[privId + '-' + type] = 1;");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"} else {");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"a.className = type + '-off';");
 
-		// get update string
+			formatWriter.writeLineFormat (
+				"newPrivData[privId + '-' + type] = 0;");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function getUpdateString () {");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormat (
-			"var s = '';");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"for (var key in newPrivData) {");
+			// get update string
 
-		formatWriter.writeLineFormat (
-			"if (s.length > 0) s += ',';");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function getUpdateString () {");
 
-		formatWriter.writeLineFormat (
-			"s += key + '=' + newPrivData[key];");
+			formatWriter.writeLineFormat (
+				"var s = '';");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"for (var key in newPrivData) {");
 
-		formatWriter.writeLineFormat (
-			"return s;");
+			formatWriter.writeLineFormat (
+				"if (s.length > 0) s += ',';");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
+			formatWriter.writeLineFormat (
+				"s += key + '=' + newPrivData[key];");
 
-		// tree data
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"var treeData = [");
+			formatWriter.writeLineFormat (
+				"return s;");
 
-		goNode (rootNode);
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"]");
+			// tree data
 
-		// script close
+			formatWriter.writeLineFormatIncreaseIndent (
+				"var treeData = [");
 
-		htmlScriptBlockClose ();
+			goNode (rootNode);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"]");
+
+			// script close
+
+			htmlScriptBlockClose ();
+
+		}
 
 	}
 
@@ -641,61 +697,72 @@ class UserPrivsEditorPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// form open
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/user.privs.editor"),
-			htmlAttributeFormat (
-				"onsubmit",
-				"javascript:%s = %s",
-				"document.getElementById ('privdata').value",
-				"getUpdateString ()"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// form hidden
+		) {
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"privdata\"",
-			" id=\"privdata\"",
-			" value=\"\"",
-			">");
+			// form open
 
-		// form controls
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/user.privs.editor"),
+				htmlAttributeFormat (
+					"onsubmit",
+					"javascript:%s = %s",
+					"document.getElementById ('privdata').value",
+					"getUpdateString ()"));
 
-		htmlParagraphOpen ();
+			// form hidden
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"privdata\"",
+				" id=\"privdata\"",
+				" value=\"\"",
+				">");
 
-		htmlParagraphClose ();
+			// form controls
 
-		// build tree script
+			htmlParagraphOpen ();
 
-		htmlScriptBlockWrite (
-			"document.write (buildTree (treeData, treeOpts));");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
 
-		// form controls
+			htmlParagraphClose ();
 
-		htmlParagraphOpen ();
+			// build tree script
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
+			htmlScriptBlockWrite (
+				"document.write (buildTree (treeData, treeOpts));");
 
-		htmlParagraphClose ();
+			// form controls
 
-		// form close
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

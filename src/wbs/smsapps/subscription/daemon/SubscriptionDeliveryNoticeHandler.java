@@ -87,21 +87,17 @@ class SubscriptionDeliveryNoticeHandler
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SubscriptionDeliveryNoticeHandler.handle (deliveryId, ref)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			MessageRec message =
@@ -109,6 +105,7 @@ class SubscriptionDeliveryNoticeHandler
 
 			SubscriptionBillRec subscriptionBill =
 				subscriptionBillHelper.findRequired (
+					transaction,
 					message.getRef ());
 
 			SubscriptionNumberRec subscriptionNumber =
@@ -191,7 +188,7 @@ class SubscriptionDeliveryNoticeHandler
 				) {
 
 					subscriptionLogic.sendNow (
-						taskLogger,
+						transaction,
 						subscriptionNumber.getPendingSubscriptionSendNumber ());
 
 				}
@@ -205,6 +202,7 @@ class SubscriptionDeliveryNoticeHandler
 			// clean up
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			transaction.commit ();

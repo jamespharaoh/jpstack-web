@@ -18,10 +18,10 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -52,9 +52,6 @@ class AbstractPagePart
 
 	protected
 	FormatWriter formatWriter;
-
-	protected
-	BorrowedTransaction transaction;
 
 	private
 	boolean withMarkup = false;
@@ -97,48 +94,62 @@ class AbstractPagePart
 	@Override
 	public
 	void setup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, Object> parameters) {
 
-		if (requestContext == null) {
+		try (
 
-			throw new IllegalStateException (
-				stringFormat (
-					"%s not autowired correctl",
-					classNameSimple (
-						getClass ())));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
+
+		) {
+
+			if (requestContext == null) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"%s not autowired correctl",
+						classNameSimple (
+							getClass ())));
+
+			}
+
+			this.parameters =
+				parameters;
+
+			formatWriter =
+				currentFormatWriter ();
 
 		}
-
-		this.parameters =
-			parameters;
-
-		formatWriter =
-			currentFormatWriter ();
-
-		transaction =
-			database.currentTransaction ();
 
 	}
 
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
 
 	}
 
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
 
 	}
 

@@ -14,17 +14,24 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 public
 class ModelFixtureCreator {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	Database database;
 
 	@SingletonDependency
 	EntityHelper entityHelper;
@@ -38,7 +45,7 @@ class ModelFixtureCreator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory <?, Transaction>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ModelMetaBuilderHandler
@@ -46,39 +53,60 @@ class ModelFixtureCreator {
 
 	// state
 
-	Builder fixtureBuilder;
+	Builder <Transaction> fixtureBuilder;
 
 	// lifecycle
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		createFixtureBuilder ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			createFixtureBuilder (
+				taskLogger);
+
+		}
 
 	}
 
 	// implementation
 
 	private
-	void createFixtureBuilder () {
+	void createFixtureBuilder (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		BuilderFactory builderFactory =
-			builderFactoryProvider.get ();
+		try (
 
-		for (
-			Map.Entry <Class <?>, Provider <Object>> modelMetaBuilderEntry
-				: modelMetaBuilderProviders.entrySet ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtureBuilder");
+
 		) {
 
-			builderFactory.addBuilder (
-				modelMetaBuilderEntry.getKey (),
-				modelMetaBuilderEntry.getValue ());
+			fixtureBuilder =
+				builderFactoryProvider.get ()
+
+				.contextClass (
+					Transaction.class)
+
+				.addBuilders (
+					taskLogger,
+					modelMetaBuilderProviders)
+
+				.create (
+					taskLogger);
 
 		}
-
-		fixtureBuilder =
-			builderFactory.create ();
 
 	}
 
@@ -89,14 +117,14 @@ class ModelFixtureCreator {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					"runModelFixtureCreators");
 
 		) {
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"About to create model fixtures");
 
 			for (
@@ -109,7 +137,7 @@ class ModelFixtureCreator {
 						spec.name ());
 
 				fixtureBuilder.descend (
-					taskLogger,
+					transaction,
 					spec,
 					spec.children (),
 					model,
@@ -117,7 +145,9 @@ class ModelFixtureCreator {
 
 			}
 
-			taskLogger.noticeFormat (
+			transaction.commit ();
+
+			transaction.noticeFormat (
 				"All model fixtures created successfully");
 
 		}

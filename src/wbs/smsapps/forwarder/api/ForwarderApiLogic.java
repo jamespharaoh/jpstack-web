@@ -1,5 +1,7 @@
 package wbs.smsapps.forwarder.api;
 
+import wbs.framework.database.Transaction;
+
 import wbs.platform.rpc.core.RpcSource;
 
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
@@ -14,6 +16,7 @@ public
 interface ForwarderApiLogic {
 
 	ForwarderRec lookupForwarder (
+			Transaction parentTransaction,
 			RequestContext requestContext,
 			String sliceCode,
 			String code,
@@ -23,19 +26,23 @@ interface ForwarderApiLogic {
 			IncorrectPasswordException;
 
 	Responder controlActionGet (
+			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder);
 
 	Responder controlActionBorrow (
+			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder);
 
 	Responder controlActionUnqueue (
+			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder)
 		throws ReportableException;
 
 	ForwarderRec rpcAuth (
+			Transaction parentTransaction,
 			RpcSource source);
 
 }

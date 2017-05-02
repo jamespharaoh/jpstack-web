@@ -40,6 +40,7 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
@@ -332,7 +333,7 @@ class ClockworkSmsMessageSender {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"decode");

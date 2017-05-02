@@ -68,40 +68,36 @@ class SimulatorSessionPollAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		Long lastId =
-			parseIntegerRequired (
-				requestContext.formRequired (
-					"last"));
-
-		Long limit =
-			parseIntegerRequired (
-				requestContext.formRequired (
-					"limit"));
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"SimulatorSessionPollAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			Long lastId =
+				parseIntegerRequired (
+					requestContext.formRequired (
+						"last"));
+
+			Long limit =
+				parseIntegerRequired (
+					requestContext.formRequired (
+						"limit"));
+
 			List <SimulatorEventRec> events =
 				simulatorEventHelper.findAfterLimit (
+					transaction,
 					lastId,
 					limit);
 
 			// create response
 
-			Map<String,Object> responseObject =
-				new LinkedHashMap<String,Object> ();
+			Map <String, Object> responseObject =
+				new LinkedHashMap<> ();
 
 			List<Object> eventResponses =
 				new ArrayList<Object> ();
@@ -121,11 +117,13 @@ class SimulatorSessionPollAction
 					.put (
 						"date",
 						userConsoleLogic.dateStringShort (
+							transaction,
 							event.getTimestamp ()))
 
 					.put (
 						"time",
 						userConsoleLogic.timeString (
+							transaction,
 							event.getTimestamp ()))
 
 					.put (

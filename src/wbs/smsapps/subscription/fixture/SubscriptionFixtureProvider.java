@@ -12,11 +12,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -95,24 +95,24 @@ class SubscriptionFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -139,11 +139,12 @@ class SubscriptionFixtureProvider
 
 			SubscriptionRec subscription =
 				subscriptionHelper.insert (
-					taskLogger,
+					transaction,
 					subscriptionHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -158,6 +159,7 @@ class SubscriptionFixtureProvider
 
 				.setBilledRoute (
 					routeHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"bill"))
@@ -167,12 +169,14 @@ class SubscriptionFixtureProvider
 
 				.setBilledMessage (
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						"Billed message"))
 
 				.setFreeRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -189,26 +193,27 @@ class SubscriptionFixtureProvider
 
 				.setSubscribeMessageText (
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						"Subsription confirmed"))
 
 				.setUnsubscribeMessageText (
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						"Subscription cancelled"))
 
 			);
 
-			database.flush ();
+			transaction.flush ();
 
 			KeywordSetRec inboundKeywordSet =
 				keywordSetHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					"test",
 					"inbound");
 
 			keywordHelper.insert (
-				taskLogger,
+				transaction,
 				keywordHelper.createInstance ()
 
 				.setKeywordSet (
@@ -222,13 +227,14 @@ class SubscriptionFixtureProvider
 
 				.setCommand (
 					commandHelper.findByCodeRequired (
+						transaction,
 						subscription,
 						"subscribe"))
 
 			);
 
 			keywordHelper.insert (
-				taskLogger,
+				transaction,
 				keywordHelper.createInstance ()
 
 				.setKeywordSet (
@@ -242,6 +248,7 @@ class SubscriptionFixtureProvider
 
 				.setCommand (
 					commandHelper.findByCodeRequired (
+						transaction,
 						subscription,
 						"unsubscribe"))
 
@@ -254,7 +261,7 @@ class SubscriptionFixtureProvider
 
 				SubscriptionListRec list =
 					subscriptionListHelper.insert (
-						taskLogger,
+						transaction,
 						subscriptionListHelper.createInstance ()
 
 					.setSubscription (
@@ -273,7 +280,7 @@ class SubscriptionFixtureProvider
 				);
 
 				subscriptionKeywordHelper.insert (
-					taskLogger,
+					transaction,
 					subscriptionKeywordHelper.createInstance ()
 
 					.setSubscription (
@@ -299,7 +306,7 @@ class SubscriptionFixtureProvider
 
 				SubscriptionAffiliateRec affiliate =
 					subscriptionAffiliateHelper.insert (
-						taskLogger,
+						transaction,
 						subscriptionAffiliateHelper.createInstance ()
 
 					.setSubscription (
@@ -317,10 +324,10 @@ class SubscriptionFixtureProvider
 
 				);
 
-				database.flush ();
+				transaction.flush ();
 
 				keywordHelper.insert (
-					taskLogger,
+					transaction,
 					keywordHelper.createInstance ()
 
 					.setKeywordSet (
@@ -334,6 +341,7 @@ class SubscriptionFixtureProvider
 
 					.setCommand (
 						commandHelper.findByCodeRequired (
+							transaction,
 							affiliate,
 							"subscribe"))
 

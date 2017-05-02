@@ -23,8 +23,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -68,36 +69,49 @@ class ChatUserNotesPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		chatUserNotes =
-			chatUserNoteHelper.find (
-				chatUser);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			chatUserNotes =
+				chatUserNoteHelper.find (
+					transaction,
+					chatUser);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			renderCreateForm (
-				taskLogger);
+				transaction);
 
 			renderHistory (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -105,13 +119,13 @@ class ChatUserNotesPart
 
 	private
 	void renderCreateForm (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderCreateForm");
 
 		) {
@@ -151,13 +165,13 @@ class ChatUserNotesPart
 
 	private
 	void renderHistory (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHistory");
 
 		) {
@@ -189,7 +203,7 @@ class ChatUserNotesPart
 					chatUserNote.getText ().getText ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatUserNote.getUser ());
 
 				htmlTableRowClose ();

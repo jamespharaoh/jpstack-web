@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.apn.chat.bill.model.ChatUserSpendRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -16,12 +16,12 @@ public
 interface ChatCreditLogic {
 
 	void userReceiveSpend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec toUser,
 			Long receivedMessageCount);
 
 	void userSpend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			int userMessageCount,
 			int monitorMessageCount,
@@ -30,60 +30,66 @@ interface ChatCreditLogic {
 			int videoProfileCount);
 
 	void chatUserSpendBasic (
-		ChatUserRec chatUser,
-		int amount);
+			Transaction parentTransaction,
+			ChatUserRec chatUser,
+			int amount);
 
 	ChatUserSpendRec findOrCreateChatUserSpend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			LocalDate date);
 
 	ChatCreditCheckResult userSpendCreditCheck (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Boolean userActed,
 			Optional <Long> threadId);
 
 	ChatCreditCheckResult userCreditCheck (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	ChatCreditCheckResult userCreditCheckStrict (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	Optional <String> userBillCheck (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			BillCheckOptions options);
 
 	void userBill (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			BillCheckOptions options);
 
 	void userBillReal (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			boolean updateRevoked);
 
 	long userBillLimitAmount (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	boolean userBillLimitApplies (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void userCreditHint (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <Long> threadId);
 
-	void doRebill ();
+	void doRebill (
+			Transaction parentTransaction);
 
 	void creditLimitUpdate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	String userCreditDebug (
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	@Accessors (fluent = true)

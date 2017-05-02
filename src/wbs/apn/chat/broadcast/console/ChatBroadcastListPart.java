@@ -18,9 +18,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -51,6 +54,9 @@ class ChatBroadcastListPart
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -67,200 +73,245 @@ class ChatBroadcastListPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chat =
-			chatHelper.findFromContextRequired ();
+		try (
 
-		broadcasts =
-			chatBroadcastHelper.findRecentWindow (
-				chat,
-				0,
-				100);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chat =
+				chatHelper.findFromContextRequired (
+					transaction);
+
+			broadcasts =
+				chatBroadcastHelper.findRecentWindow (
+					transaction,
+					chat,
+					0l,
+					100l);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"User",
-			"Timestamp",
-			"Chat user",
-			"Message",
-			"Count",
-			"Search",
-			"Blocked",
-			"Opt out");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		for (
-			ChatBroadcastRec chatBroadcast
-				: broadcasts
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					chatBroadcast.getCreatedUser ()));
+			htmlTableHeaderRowWrite (
+				"User",
+				"Timestamp",
+				"Chat user",
+				"Message",
+				"Count",
+				"Search",
+				"Blocked",
+				"Opt out");
 
-			htmlTableCellWrite (
-				timeFormatter.timestampTimezoneString (
-					chatMiscLogic.timezone (
-						chat),
-					chatBroadcast.getCreatedTime ()));
+			for (
+				ChatBroadcastRec chatBroadcast
+					: broadcasts
+			) {
 
-			htmlTableCellWrite (
-				objectManager.objectPathMini (
-					chatBroadcast.getChatUser (),
-					chat));
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				chatBroadcast.getText ().getText ());
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						transaction,
+						chatBroadcast.getCreatedUser ()));
 
-			htmlTableCellWrite (
-				integerToDecimalString (
-					+ chatBroadcast.getNumAccepted ()
-					+ chatBroadcast.getNumSent ()));
+				htmlTableCellWrite (
+					timeFormatter.timestampTimezoneString (
+						chatMiscLogic.timezone (
+							transaction,
+							chat),
+						chatBroadcast.getCreatedTime ()));
 
-			htmlTableCellWrite (
-				chatBroadcast.getSearch ()
-					? joinWithCommaAndSpace (
-						getSearchParams (
-							chatBroadcast))
-					: "manual number selection");
+				htmlTableCellWrite (
+					objectManager.objectPathMini (
+						transaction,
+						chatBroadcast.getChatUser (),
+						chat));
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					chatBroadcast.getIncludeBlocked ()));
+				htmlTableCellWrite (
+					chatBroadcast.getText ().getText ());
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					chatBroadcast.getIncludeOptedOut ()));
+				htmlTableCellWrite (
+					integerToDecimalString (
+						+ chatBroadcast.getNumAccepted ()
+						+ chatBroadcast.getNumSent ()));
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					chatBroadcast.getSearch ()
+						? joinWithCommaAndSpace (
+							getSearchParams (
+								transaction,
+								chatBroadcast))
+						: "manual number selection");
+
+				htmlTableCellWrite (
+					booleanToYesNo (
+						chatBroadcast.getIncludeBlocked ()));
+
+				htmlTableCellWrite (
+					booleanToYesNo (
+						chatBroadcast.getIncludeOptedOut ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
+	private
 	List <String> getSearchParams (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatBroadcastRec chatBroadcast) {
 
-		List <String> searchParams =
-			new ArrayList<> ();
+		try (
 
-		if (
-			chatBroadcast.getSearchLastActionFrom () != null
-			&& chatBroadcast.getSearchLastActionTo () != null
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSearchParams");
+
 		) {
 
-			searchParams.add (
-				stringFormat (
-					"last action %s to %s",
-					timeFormatter.timestampTimezoneString (
-						chatMiscLogic.timezone (
-							chat),
-						chatBroadcast.getSearchLastActionFrom ()),
-					timeFormatter.timestampTimezoneString (
-						chatMiscLogic.timezone (
-							chat),
-						chatBroadcast.getSearchLastActionTo ())));
+			List <String> searchParams =
+				new ArrayList<> ();
 
-		} else if (chatBroadcast.getSearchLastActionFrom () != null) {
+			if (
+				chatBroadcast.getSearchLastActionFrom () != null
+				&& chatBroadcast.getSearchLastActionTo () != null
+			) {
 
-			searchParams.add (
-				stringFormat (
-					"last action from %s",
-					timeFormatter.timestampTimezoneString (
-						chatMiscLogic.timezone (
-							chat),
-						chatBroadcast.getSearchLastActionFrom ())));
+				searchParams.add (
+					stringFormat (
+						"last action %s to %s",
+						timeFormatter.timestampTimezoneString (
+							chatMiscLogic.timezone (
+								transaction,
+								chat),
+							chatBroadcast.getSearchLastActionFrom ()),
+						timeFormatter.timestampTimezoneString (
+							chatMiscLogic.timezone (
+								transaction,
+								chat),
+							chatBroadcast.getSearchLastActionTo ())));
 
-		} else if (chatBroadcast.getSearchLastActionTo () != null) {
+			} else if (chatBroadcast.getSearchLastActionFrom () != null) {
 
-			searchParams.add (
-				stringFormat (
-					"last action to %s",
-					timeFormatter.timestampTimezoneString (
-						chatMiscLogic.timezone (
-							chat),
-						chatBroadcast.getSearchLastActionTo ())));
+				searchParams.add (
+					stringFormat (
+						"last action from %s",
+						timeFormatter.timestampTimezoneString (
+							chatMiscLogic.timezone (
+								transaction,
+								chat),
+							chatBroadcast.getSearchLastActionFrom ())));
+
+			} else if (chatBroadcast.getSearchLastActionTo () != null) {
+
+				searchParams.add (
+					stringFormat (
+						"last action to %s",
+						timeFormatter.timestampTimezoneString (
+							chatMiscLogic.timezone (
+								transaction,
+								chat),
+							chatBroadcast.getSearchLastActionTo ())));
+
+			}
+
+			if (chatBroadcast.getSearchGender () != null) {
+
+				searchParams.add (
+					chatBroadcast.getSearchGender ().toString ());
+
+			}
+
+			if (chatBroadcast.getSearchOrient () != null) {
+
+				searchParams.add (
+					chatBroadcast.getSearchOrient ().toString ());
+
+			}
+
+			if (chatBroadcast.getSearchPicture () != null) {
+
+				searchParams.add (
+					chatBroadcast.getSearchPicture ()
+						? "picture"
+						: "no picture");
+
+			}
+
+			if (chatBroadcast.getSearchAdult () != null) {
+
+				searchParams.add (
+					chatBroadcast.getSearchAdult ()
+						? "adult"
+						: "non adult");
+
+			}
+
+			if (chatBroadcast.getSearchSpendMin () != null
+					&& chatBroadcast.getSearchSpendMax () != null) {
+
+				searchParams.add (
+					stringFormat (
+						"total spend %s to %s",
+						currencyLogic.formatText (
+							chatBroadcast.getChat ().getCurrency (),
+							chatBroadcast.getSearchSpendMin ()),
+						currencyLogic.formatText (
+							chatBroadcast.getChat ().getCurrency (),
+							chatBroadcast.getSearchSpendMax ())));
+
+			} else if (chatBroadcast.getSearchSpendMin () != null) {
+
+				searchParams.add (
+					stringFormat (
+						"total spend at least %s",
+						currencyLogic.formatText (
+							chatBroadcast.getChat ().getCurrency (),
+							chatBroadcast.getSearchSpendMin ())));
+
+			} else if (chatBroadcast.getSearchSpendMax () != null) {
+
+				searchParams.add (
+					stringFormat (
+						"total spend at most %s",
+						currencyLogic.formatText (
+							chatBroadcast.getChat ().getCurrency (),
+							chatBroadcast.getSearchSpendMax ())));
+
+			}
+
+			return searchParams;
 
 		}
-
-		if (chatBroadcast.getSearchGender () != null) {
-
-			searchParams.add (
-				chatBroadcast.getSearchGender ().toString ());
-
-		}
-
-		if (chatBroadcast.getSearchOrient () != null) {
-
-			searchParams.add (
-				chatBroadcast.getSearchOrient ().toString ());
-
-		}
-
-		if (chatBroadcast.getSearchPicture () != null) {
-
-			searchParams.add (
-				chatBroadcast.getSearchPicture ()
-					? "picture"
-					: "no picture");
-
-		}
-
-		if (chatBroadcast.getSearchAdult () != null) {
-
-			searchParams.add (
-				chatBroadcast.getSearchAdult ()
-					? "adult"
-					: "non adult");
-
-		}
-
-		if (chatBroadcast.getSearchSpendMin () != null
-				&& chatBroadcast.getSearchSpendMax () != null) {
-
-			searchParams.add (
-				stringFormat (
-					"total spend %s to %s",
-					currencyLogic.formatText (
-						chatBroadcast.getChat ().getCurrency (),
-						Long.valueOf(chatBroadcast.getSearchSpendMin ())),
-					currencyLogic.formatText (
-						chatBroadcast.getChat ().getCurrency (),
-						Long.valueOf(chatBroadcast.getSearchSpendMax ()))));
-
-		} else if (chatBroadcast.getSearchSpendMin () != null) {
-
-			searchParams.add (
-				stringFormat (
-					"total spend at least %s",
-					currencyLogic.formatText (
-						chatBroadcast.getChat ().getCurrency (),
-						Long.valueOf(chatBroadcast.getSearchSpendMin ()))));
-
-		} else if (chatBroadcast.getSearchSpendMax () != null) {
-
-			searchParams.add (
-				stringFormat (
-					"total spend at most %s",
-					currencyLogic.formatText (
-						chatBroadcast.getChat ().getCurrency (),
-						Long.valueOf(chatBroadcast.getSearchSpendMax ()))));
-
-		}
-
-		return searchParams;
 
 	}
 

@@ -2,6 +2,7 @@ package wbs.smsapps.autoresponder.daemon;
 
 import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.Collection;
 
@@ -80,21 +81,23 @@ class AutoResponderDelivery
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"AutoResponderDelivery.handle (deliveryId, ref)",
-					this);
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"handle (%s, %s)",
+					keyEqualsDecimalInteger (
+						"deliveryId",
+						deliveryId),
+					keyEqualsDecimalInteger (
+						"ref",
+						ref));
 
 		) {
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
@@ -104,6 +107,7 @@ class AutoResponderDelivery
 
 				AutoResponderRequestRec request =
 					autoResponderRequestHelper.findRequired (
+						transaction,
 						deliveryMessage.getRef ());
 
 				long deliveryMessageIndex =
@@ -124,7 +128,7 @@ class AutoResponderDelivery
 					if (nextMessage.getStatus () == MessageStatus.held) {
 
 						outboxLogic.unholdMessage (
-							taskLogger,
+							transaction,
 							nextMessage);
 
 					}
@@ -140,6 +144,7 @@ class AutoResponderDelivery
 
 				AutoResponderRequestRec request =
 					autoResponderRequestHelper.findRequired (
+						transaction,
 						deliveryMessage.getRef ());
 
 				Long deliveryMessageIndex =
@@ -161,7 +166,7 @@ class AutoResponderDelivery
 					if (heldMessage.getStatus () == MessageStatus.held) {
 
 						messageLogic.messageStatus (
-							taskLogger,
+							transaction,
 							heldMessage,
 							MessageStatus.cancelled);
 
@@ -172,6 +177,7 @@ class AutoResponderDelivery
 			}
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			transaction.commit ();

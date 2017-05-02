@@ -74,40 +74,36 @@ class ImChatForgotPasswordAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatForgotPasswordRequest forgotPasswordRequest =
-			dataFromJson.fromJson (
-				ImChatForgotPasswordRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatForgotPasswordAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatForgotPasswordRequest forgotPasswordRequest =
+				dataFromJson.fromJson (
+					ImChatForgotPasswordRequest.class,
+					jsonValue);
+
+			// lookup object
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -116,6 +112,7 @@ class ImChatForgotPasswordAction
 
 			ImChatCustomerRec imChatCustomer =
 				imChatCustomerHelper.findByEmail (
+					transaction,
 					imChat,
 					forgotPasswordRequest.email ());
 
@@ -140,7 +137,7 @@ class ImChatForgotPasswordAction
 			// generate new password
 
 			imChatLogic.customerPasswordGenerate (
-				taskLogger,
+				transaction,
 				imChatCustomer,
 				optionalAbsent ());
 

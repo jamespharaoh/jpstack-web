@@ -3,9 +3,10 @@ package wbs.apn.chat.scheme.logic;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 
@@ -26,7 +27,7 @@ class ChatSchemeChargesHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectHelper <ChatSchemeChargesRec> chatSchemeChargesHelper,
 			@NonNull ObjectHelper <?> chatSchemeHelper,
 			@NonNull Record <?> parent) {
@@ -36,9 +37,9 @@ class ChatSchemeChargesHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSingletons");
 
 		) {
@@ -49,7 +50,7 @@ class ChatSchemeChargesHooks
 
 			ChatSchemeChargesRec chatSchemeCharges =
 				chatSchemeChargesHelper.insert (
-					taskLogger,
+					transaction,
 					chatSchemeChargesHelper.createInstance ()
 
 				.setChatScheme (

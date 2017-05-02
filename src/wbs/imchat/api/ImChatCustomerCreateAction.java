@@ -87,40 +87,36 @@ class ImChatCustomerCreateAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatCustomerCreateRequest createRequest =
-			dataFromJson.fromJson (
-				ImChatCustomerCreateRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatCustomerCreateAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatCustomerCreateRequest createRequest =
+				dataFromJson.fromJson (
+					ImChatCustomerCreateRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -129,6 +125,7 @@ class ImChatCustomerCreateAction
 
 			ImChatCustomerRec existingCustomer =
 				imChatCustomerHelper.findByEmail (
+					transaction,
 					imChat,
 					createRequest.email ());
 
@@ -192,7 +189,7 @@ class ImChatCustomerCreateAction
 
 			ImChatCustomerRec newCustomer =
 				imChatCustomerHelper.insert (
-					taskLogger,
+					transaction,
 					imChatCustomerHelper.createInstance ()
 
 				.setImChat (
@@ -219,7 +216,7 @@ class ImChatCustomerCreateAction
 
 			Map <String, String> detailErrors =
 				imChatApiLogic.updateCustomerDetails (
-					taskLogger,
+					transaction,
 					newCustomer,
 					createRequest.details ());
 
@@ -251,7 +248,7 @@ class ImChatCustomerCreateAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.insert (
-					taskLogger,
+					transaction,
 					imChatSessionHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -272,7 +269,7 @@ class ImChatCustomerCreateAction
 				.setUserAgentText (
 					optionalOrNull (
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							optionalFromNullable (
 								createRequest.userAgent ()))))
 
@@ -297,6 +294,7 @@ class ImChatCustomerCreateAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						newCustomer));
 
 			// commit and return

@@ -11,10 +11,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperChildrenImplementation")
@@ -27,6 +31,9 @@ class ObjectHelperChildrenImplementation <
 		ObjectHelperComponent <RecordType> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -47,111 +54,142 @@ class ObjectHelperChildrenImplementation <
 	@Override
 	public <ChildType extends Record <?>>
 	List <ChildType> getChildren (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull Class <ChildType> childClass) {
 
-		ObjectHelper <?> childHelper =
-			objectManager.objectHelperForClassRequired (
-				childClass);
+		try (
 
-		List <?> childrenTemp =
-			childHelper.findByParent (
-				objectHelper.getGlobalId (
-					genericCastUnchecked (
-						object)));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getChildren");
 
-		@SuppressWarnings ("unchecked")
-		List <ChildType> children =
-			(List <ChildType>)
-			childrenTemp;
+		) {
 
-		return children;
+			ObjectHelper <?> childHelper =
+				objectManager.objectHelperForClassRequired (
+					childClass);
 
+			return genericCastUnchecked (
+				childHelper.findByParent (
+					transaction,
+					objectHelper.getGlobalId (
+						genericCastUnchecked (
+							object))));
+
+		}
 
 	}
 
 	@Override
 	public
 	List <Record <?>> getMinorChildren (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		List <Record <?>> children =
-			new ArrayList <Record <?>> ();
+		try (
 
-		GlobalId globalId =
-			objectHelper.getGlobalId (
-				object);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getMinorChildren");
 
-		for (
-			ObjectHelper <?> childHelper
-				: objectManager.objectHelpers ()
 		) {
 
-			if (! childHelper.minor ())
-				continue;
+			List <Record <?>> children =
+				new ArrayList <Record <?>> ();
 
-			if (
+			GlobalId globalId =
+				objectHelper.getGlobalId (
+					object);
 
-				childHelper.parentTypeIsFixed ()
-
-				&& classNotEqual (
-					childHelper.parentClass (),
-					objectHelper ().objectClass ())
-
+			for (
+				ObjectHelper <?> childHelper
+					: objectManager.objectHelpers ()
 			) {
-				continue;
+
+				if (! childHelper.minor ())
+					continue;
+
+				if (
+
+					childHelper.parentTypeIsFixed ()
+
+					&& classNotEqual (
+						childHelper.parentClass (),
+						objectHelper ().objectClass ())
+
+				) {
+					continue;
+				}
+
+				children.addAll (
+					childHelper.findByParent (
+						transaction,
+						globalId));
+
 			}
 
-			children.addAll (
-				childHelper.findByParent (
-					globalId));
+			return children;
 
 		}
-
-		return children;
 
 	}
 
 	@Override
 	public
 	List <Record <?>> getChildren (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		List <Record <?>> children =
-			new ArrayList <Record <?>> ();
+		try (
 
-		GlobalId globalId =
-			objectHelper.getGlobalId (
-				object);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getChildren");
 
-		for (
-			ObjectHelper <?> childHelper
-				: objectManager.objectHelpers ()
 		) {
 
-			if (childHelper.isRoot ()) {
-				continue;
-			}
+			List <Record <?>> children =
+				new ArrayList <Record <?>> ();
 
-			if (
+			GlobalId globalId =
+				objectHelper.getGlobalId (
+					object);
 
-				childHelper.parentTypeIsFixed ()
-
-				&& classNotEqual (
-					childHelper.parentClass (),
-					objectHelper.objectClass ())
-
+			for (
+				ObjectHelper <?> childHelper
+					: objectManager.objectHelpers ()
 			) {
-				continue;
+
+				if (childHelper.isRoot ()) {
+					continue;
+				}
+
+				if (
+
+					childHelper.parentTypeIsFixed ()
+
+					&& classNotEqual (
+						childHelper.parentClass (),
+						objectHelper.objectClass ())
+
+				) {
+					continue;
+				}
+
+				children.addAll (
+					childHelper.findByParent (
+						transaction,
+						globalId));
+
 			}
 
-			children.addAll (
-				childHelper.findByParent (
-					globalId));
+			return children;
 
 		}
-
-		return children;
 
 	}
 

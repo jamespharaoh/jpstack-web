@@ -7,44 +7,69 @@ import lombok.NonNull;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameDao;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatNoteNameDaoHibernate
 	extends HibernateDao
 	implements ChatNoteNameDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<ChatNoteNameRec> findNotDeleted (
+	List <ChatNoteNameRec> findNotDeleted (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat) {
 
-		return findMany (
-			"findNotDeleted (chat)",
-			ChatNoteNameRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findNotDeleted");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatNoteNameRec.class,
-				"_chatNoteName")
 
-			.add (
-				Restrictions.eq (
-					"_chatNoteName.chat",
-					chat))
+				createCriteria (
+					transaction,
+					ChatNoteNameRec.class,
+					"_chatNoteName")
 
-			.add (
-				Restrictions.eq (
-					"_chatNoteName.deleted",
-					false))
+				.add (
+					Restrictions.eq (
+						"_chatNoteName.chat",
+						chat))
 
-			.addOrder (
-				Order.asc (
-					"_chatNoteName.index"))
+				.add (
+					Restrictions.eq (
+						"_chatNoteName.deleted",
+						false))
 
-		);
+				.addOrder (
+					Order.asc (
+						"_chatNoteName.index"))
+
+			);
+
+		}
 
 	}
 

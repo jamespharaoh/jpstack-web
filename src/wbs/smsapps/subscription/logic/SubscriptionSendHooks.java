@@ -2,7 +2,10 @@ package wbs.smsapps.subscription.logic;
 
 import lombok.NonNull;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectHooks;
 
 import wbs.smsapps.subscription.model.SubscriptionRec;
@@ -10,43 +13,70 @@ import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 public
 class SubscriptionSendHooks
-	implements ObjectHooks<SubscriptionSendRec> {
+	implements ObjectHooks <SubscriptionSendRec> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// implementation
 
 	@Override
 	public
 	void beforeInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		SubscriptionRec subscription =
-			subscriptionSend.getSubscription ();
+		try (
 
-		// set index
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"beforeInsert");
 
-		subscriptionSend
+		) {
 
-			.setIndex (
-				subscription.getNumSendsTotal ());
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
+
+			// set index
+
+			subscriptionSend
+
+				.setIndex (
+					subscription.getNumSendsTotal ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void afterInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SubscriptionSendRec subscriptionSend) {
 
-		SubscriptionRec subscription =
-			subscriptionSend.getSubscription ();
+		try (
 
-		// update parent counts
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"afterInsert");
 
-		subscription
+		) {
 
-			.setNumSendsTotal (
-				subscription.getNumSendsTotal () + 1);
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
+
+			// update parent counts
+
+			subscription
+
+				.setNumSendsTotal (
+					subscription.getNumSendsTotal () + 1);
+
+		}
 
 	}
 

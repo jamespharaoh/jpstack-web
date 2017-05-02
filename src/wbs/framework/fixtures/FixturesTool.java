@@ -15,7 +15,6 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -26,15 +25,13 @@ import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 public
 class FixturesTool {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@SingletonDependency
 	List <BackgroundProcess> backgroundProcesses;
@@ -62,7 +59,7 @@ class FixturesTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"runFixtureProviders");
@@ -113,10 +110,10 @@ class FixturesTool {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runFixtureProvider");
+					"runFixtureProvider (pluginFixtureSpec)");
 
 		) {
 
@@ -164,21 +161,11 @@ class FixturesTool {
 			FixtureProvider fixtureProvider =
 				fixtureProviderProvider.get ();
 
-			try (
+			try {
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"FixturesTool.runFixtureProviders (arguments)",
-						this);
-
-			) {
-
-				fixtureProvider.createFixtures (
+				runFixtureProvider (
 					taskLogger,
-					transaction);
-
-				transaction.commit ();
+					fixtureProvider);
 
 			} catch (Exception exception) {
 
@@ -189,6 +176,30 @@ class FixturesTool {
 					plugin.name ());
 
 			}
+
+		}
+
+	}
+
+	private
+	void runFixtureProvider (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FixtureProvider fixtureProvider) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
+					parentTaskLogger,
+					"runFixtureProviders (fixtureProvider)");
+
+		) {
+
+			fixtureProvider.createFixtures (
+				transaction);
+
+			transaction.commit ();
 
 		}
 

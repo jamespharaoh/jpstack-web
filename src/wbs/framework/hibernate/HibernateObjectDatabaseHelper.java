@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -9,14 +9,12 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,16 +29,15 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectTypeRegistry;
@@ -52,9 +49,6 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	implements ObjectDatabaseHelper <RecordType> {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@SingletonDependency
 	HibernateDatabase hibernateDatabase;
@@ -76,17 +70,29 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType find (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
-		Session session =
-			hibernateDatabase.currentSession ();
+		try (
 
-		RecordType object =
-			session.get (
-				objectModel.objectClass (),
-				id);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
 
-		return object;
+		) {
+
+			Session session =
+				transaction.hibernateSession ();
+
+			RecordType object =
+				session.get (
+					objectModel.objectClass (),
+					id);
+
+			return object;
+
+		}
 
 	}
 
@@ -94,26 +100,27 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <RecordType> findMany (
+			@NonNull Transaction parentTransaction,
 			@NonNull List <Long> ids) {
-
-		if (
-			collectionIsEmpty (
-				ids)
-		) {
-			return ImmutableList.of ();
-		}
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findMany",
-					"list of %s ids");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findMany");
 
 		) {
 
+			if (
+				collectionIsEmpty (
+					ids)
+			) {
+				return emptyList ();
+			}
+
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			Criteria criteria =
 				session.createCriteria (
@@ -158,21 +165,21 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByParentAndCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String code) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findByParentAndCode",
-					parentGlobalId.toString (),
-					code);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParentAndCode");
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			if (
 				isNotNull (
@@ -363,24 +370,21 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <RecordType> findManyByParentAndCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull List <String> codes) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findManyByParentAndCode",
-					parentGlobalId.toString (),
-					stringFormat (
-						"%s codes",
-						integerToDecimalString (
-							collectionSize (codes))));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findManyByParentAndCode");
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			if (
 				isNotNull (
@@ -550,33 +554,33 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByParentAndIndex (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull Long index) {
 
-		Session session =
-			hibernateDatabase.currentSession ();
-
-		if (
-			isNotNull (
-				objectModel.typeCodeField ())
-		) {
-
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Object type %s must be looked up by type code",
-					getClass ().getSimpleName ()));
-
-		}
-
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findByParentAndIndex",
-					parentGlobalId.toString (),
-					index.toString ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParentAndIndex");
 
 		) {
+
+			Session session =
+				transaction.hibernateSession ();
+
+			if (
+				isNotNull (
+					objectModel.typeCodeField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"Object type %s must be looked up by type code",
+						getClass ().getSimpleName ()));
+
+			}
 
 			if (objectModel.isRooted ()) {
 
@@ -743,36 +747,35 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType findByParentAndTypeAndCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode,
 			@NonNull String code) {
 
-		if (
-			isNull (
-				objectModel.typeCodeField ())
-		) {
-
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Cannot call findAllByParentAndType for '%s', ",
-					objectModel.objectName (),
-					"because it has no type code field"));
-
-		}
-
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findByParentAndTypeAndCode",
-					parentGlobalId.toString (),
-					typeCode,
-					code);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParentAndTypeAndCode");
 
 		) {
 
+			if (
+				isNull (
+					objectModel.typeCodeField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"Cannot call findAllByParentAndType for '%s', ",
+						objectModel.objectName (),
+						"because it has no type code field"));
+
+			}
+
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			if (objectModel.isRooted ()) {
 
@@ -964,20 +967,23 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
-	List <RecordType> findAll () {
-
-		Session session =
-			hibernateDatabase.currentSession ();
+	List <RecordType> findAll (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findAll");
 
 		) {
+
+			Session session =
+				transaction.hibernateSession ();
 
 			List <?> objectsUncast =
 				session.createQuery (
@@ -991,31 +997,30 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				.list ();
 
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
-
-			return objects;
+			return genericCastUnchecked (
+				objectsUncast);
 
 		}
 
 	}
 
+	@SuppressWarnings ("resource")
 	@Override
 	public
-	List <RecordType> findNotDeleted () {
-
-		Session session =
-			hibernateDatabase.currentSession ();
+	List <RecordType> findNotDeleted (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findAll");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findNotDeleted");
 
 		) {
+
+			Session session =
+				transaction.hibernateSession ();
 
 			List <?> objectsUncast =
 				session.createCriteria (
@@ -1039,12 +1044,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				.list ();
 
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
-
-			return objects;
+			return genericCastUnchecked (
+				objectsUncast);
 
 		}
 
@@ -1053,20 +1054,21 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@SuppressWarnings ("resource")
 	@Override
 	public
-	List<RecordType> findAllByParent (
+	List <RecordType> findAllByParent (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findAllByParent",
-					parentGlobalId.toString ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findAllByParent");
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			if (objectModel.isRooted ()) {
 
@@ -1274,23 +1276,22 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List<RecordType> findByParentAndIndexRange (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findByParentAndIndexRange",
-					parentGlobalId.toString (),
-					indexStart.toString (),
-					indexEnd.toString ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParentAndIndexRange");
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			Criteria criteria =
 				session.createCriteria (
@@ -1348,35 +1349,30 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType insert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"insert");
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"insert",
-					"...");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"insert");
 
 		) {
 
 			objectModel.hooks ().beforeInsert (
-				taskLogger,
+				transaction,
 				object);
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			session.save (
 				object);
 
 			objectModel.hooks ().afterInsert (
-				taskLogger,
+				transaction,
 				object);
 
 			return object;
@@ -1389,39 +1385,34 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType insertSpecial (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"insertSpecial");
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"insertSpecial",
-					stringFormat (
-						"id = %s",
-						integerToDecimalString (
-							object.getId ())));
+			NestedTransaction transaction =
+				parentTransaction.nestTransactionFormat (
+					logContext,
+					"insertSpecial (%s)",
+					keyEqualsDecimalInteger (
+						"id",
+						object.getId ()));
 
 		) {
 
 			objectModel.hooks ().beforeInsert (
-				taskLogger,
+				transaction,
 				object);
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			session.replicate (
 				object,
 				ReplicationMode.EXCEPTION);
 
 			objectModel.hooks ().afterInsert (
-				taskLogger,
+				transaction,
 				object);
 
 			return object;
@@ -1433,21 +1424,23 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType update (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"update",
-					stringFormat (
-						"id = %s",
-						integerToDecimalString (
-							object.getId ())));
+			NestedTransaction transaction =
+				parentTransaction.nestTransactionFormat (
+					logContext,
+					"update (%s)",
+					keyEqualsDecimalInteger (
+						"id",
+						object.getId ()));
 
 		) {
 
 			objectModel.hooks ().beforeUpdate (
+				transaction,
 				object);
 
 			return object;
@@ -1460,22 +1453,23 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public <ObjectType extends EphemeralRecord<RecordType>>
 	ObjectType remove (
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectType object) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"remove",
-					stringFormat (
-						"id = %s",
-						integerToDecimalString (
-							object.getId ())));
+			NestedTransaction transaction =
+				parentTransaction.nestTransactionFormat (
+					logContext,
+					"remove (%s)",
+					keyEqualsDecimalInteger (
+						"id",
+						object.getId ()));
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			session.delete (
 				object);
@@ -1489,35 +1483,35 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@SuppressWarnings ("resource")
 	@Override
 	public
-	List<RecordType> findAllByParentAndType (
+	List <RecordType> findAllByParentAndType (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode) {
 
-		if (
-			isNull (
-				objectModel.typeCodeField ())
-		) {
-
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Cannot call findAllByParentAndType for '%s', ",
-					objectModel.objectName (),
-					"because it has no type code field"));
-
-		}
-
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"findAllByParentAndType",
-					parentGlobalId.toString (),
-					typeCode);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findAllByParentAndType");
 
 		) {
 
+			if (
+				isNull (
+					objectModel.typeCodeField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"Cannot call findAllByParentAndType for '%s', ",
+						objectModel.objectName (),
+						"because it has no type code field"));
+
+			}
+
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			if (objectModel.isRooted ()) {
 
@@ -1684,22 +1678,23 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType lock (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		try (
 
-			ActiveTask activeTask =
-				startTask (
-					"lock",
-					stringFormat (
-						"id = %s",
-						integerToDecimalString (
-							object.getId ())));
+			NestedTransaction transaction =
+				parentTransaction.nestTransactionFormat (
+					logContext,
+					"update (%s)",
+					keyEqualsDecimalInteger (
+						"id",
+						object.getId ()));
 
 		) {
 
 			Session session =
-				hibernateDatabase.currentSession ();
+				transaction.hibernateSession ();
 
 			session.flush ();
 
@@ -1710,23 +1705,6 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			return object;
 
 		}
-
-	}
-
-	private
-	ActiveTask startTask (
-			@NonNull String methodName,
-			@NonNull String... arguments) {
-
-		return activityManager.start (
-			"hibernate",
-			stringFormat (
-				"%sHelperProvider.%s (%s)",
-				objectModel.objectName (),
-				methodName,
-				joinWithCommaAndSpace (
-					arguments)),
-			this);
 
 	}
 

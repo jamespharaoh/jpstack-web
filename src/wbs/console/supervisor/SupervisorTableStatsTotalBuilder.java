@@ -4,6 +4,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.console.reporting.StatsFormatter;
@@ -12,17 +14,28 @@ import wbs.console.reporting.StatsResolver;
 import wbs.console.reporting.UnaryStatsGrouper;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorTableStatsTotalBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorTableStatsTotalBuilder {
+class SupervisorTableStatsTotalBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -52,71 +65,84 @@ class SupervisorTableStatsTotalBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		SupervisorConfigBuilder supervisorConfigBuilder =
-			supervisorTablePartBuilder.supervisorConfigBuilder;
+		try (
 
-		String label =
-			spec.label ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		statsGrouper =
-			unaryStatsGrouperProvider.get ()
-				.label (label);
+		) {
 
-		statsResolver =
-			supervisorConfigBuilder.statsResolversByName ().get (
-				spec.resolverName ());
+			SupervisorConfigBuilder supervisorConfigBuilder =
+				supervisorTablePartBuilder.supervisorConfigBuilder;
 
-		if (statsResolver == null) {
+			String label =
+				spec.label ();
 
-			throw new RuntimeException (
-				stringFormat (
-					"Stats resolver %s does not exist",
-					spec.resolverName ()));
+			statsGrouper =
+				unaryStatsGrouperProvider.get ()
+					.label (label);
 
-		}
+			statsResolver =
+				supervisorConfigBuilder.statsResolversByName ().get (
+					spec.resolverName ());
 
-		statsFormatter =
-			supervisorConfigBuilder.statsFormattersByName ().get (
-				spec.formatterName ());
+			if (statsResolver == null) {
 
-		if (statsFormatter == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Stats formatter %s does not exist",
-					spec.formatterName ()));
-
-		}
-
-		Provider <PagePart> pagePartFactory =
-			new Provider <PagePart> () {
-
-			@Override
-			public
-			PagePart get () {
-
-				return supervisorTableStatsGroupPartProvider.get ()
-
-					.statsGrouper (
-						statsGrouper)
-
-					.statsResolver (
-						statsResolver)
-
-					.statsFormatter (
-						statsFormatter);
+				throw new RuntimeException (
+					stringFormat (
+						"Stats resolver %s does not exist",
+						spec.resolverName ()));
 
 			}
 
-		};
+			statsFormatter =
+				supervisorConfigBuilder.statsFormattersByName ().get (
+					spec.formatterName ());
 
-		supervisorTablePartBuilder.pagePartFactories ()
-			.add (pagePartFactory);
+			if (statsFormatter == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Stats formatter %s does not exist",
+						spec.formatterName ()));
+
+			}
+
+			Provider <PagePart> pagePartFactory =
+				new Provider <PagePart> () {
+
+				@Override
+				public
+				PagePart get () {
+
+					return supervisorTableStatsGroupPartProvider.get ()
+
+						.statsGrouper (
+							statsGrouper)
+
+						.statsResolver (
+							statsResolver)
+
+						.statsFormatter (
+							statsFormatter);
+
+				}
+
+			};
+
+			supervisorTablePartBuilder.pagePartFactories ()
+				.add (pagePartFactory);
+
+		}
 
 	}
 

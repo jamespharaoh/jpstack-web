@@ -2,6 +2,7 @@ package wbs.integrations.fonix.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.booleanEqual;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -24,7 +25,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -146,19 +149,11 @@ class FonixRouteReportAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"updateDatabase"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
@@ -166,6 +161,7 @@ class FonixRouteReportAction
 
 			Optional <RouteRec> smsRouteOptional =
 				smsRouteHelper.find (
+					transaction,
 					Long.parseLong (
 						requestContext.requestStringRequired (
 							"smsRouteId")));
@@ -203,6 +199,7 @@ class FonixRouteReportAction
 
 			Optional <FonixRouteOutRec> fonixRouteOutOptional =
 				fonixRouteOutHelper.find (
+					transaction,
 					smsRoute.getId ());
 
 			if (
@@ -229,7 +226,7 @@ class FonixRouteReportAction
 			// process delivery report
 
 			handleDeliveryReport (
-				taskLogger,
+				transaction,
 				fonixRouteOut);
 
 			// commit and return
@@ -244,14 +241,14 @@ class FonixRouteReportAction
 
 	private
 	void handleDeliveryReport (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FonixRouteOutRec fonixRouteOut) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handleDeliveryReport");
 
 		) {
@@ -260,6 +257,7 @@ class FonixRouteReportAction
 
 			Optional <FonixDeliveryStatusRec> deliveryStatusOptional =
 				fonixDeliveryStatusHelper.findByCode (
+					transaction,
 					fonixRouteOut.getFonixConfig (),
 					lowercase (
 						request.statusCode ()));
@@ -284,6 +282,7 @@ class FonixRouteReportAction
 
 			Optional <MessageRec> smsMessageOptional =
 				smsMessageLogic.findMessageByMangledId (
+					transaction,
 					request.requestId ());
 
 			if (
@@ -305,7 +304,7 @@ class FonixRouteReportAction
 			// store the delivery report
 
 			smsDeliveryReportLogic.deliveryReport (
-				taskLogger,
+				transaction,
 				smsMessage,
 				deliveryStatus.getMessageStatus (),
 				optionalOf (
@@ -362,29 +361,22 @@ class FonixRouteReportAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"storeLog"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			fonixInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				fonixInboundLogHelper.createInstance ()
 
 				.setRoute (
 					smsRouteHelper.findRequired (
-						Long.parseLong (
+						transaction,
+						parseIntegerRequired (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))
 

@@ -2,6 +2,10 @@
 	name="database"
 	package="wbs.framework.database">
 
+	<layer name="data">
+		<component class="LoggingDataSource"/>
+	</layer>
+
 	<layer name="utils">
 		<component class="DbPool"/>
 	</layer>

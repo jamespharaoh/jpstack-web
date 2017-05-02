@@ -4,8 +4,8 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -17,18 +17,19 @@ public
 interface QueueLogic {
 
 	QueueRec findQueueByCodeRequired (
+			Transaction parentTransaction,
 			Record <?> queueParent,
 			String queueCode);
 
 	QueueItemRec createQueueItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueSubjectRec queueSubject,
 			Record <?> refObject,
 			String source,
 			String details);
 
 	QueueItemRec createQueueItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueRec queue,
 			Record <?> subjectObject,
 			Record <?> refObject,
@@ -37,7 +38,7 @@ interface QueueLogic {
 
 	default
 	QueueItemRec createQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> queueParent,
 			@NonNull String queueCode,
 			@NonNull Record <?> subjectObject,
@@ -46,8 +47,9 @@ interface QueueLogic {
 			@NonNull String details) {
 
 		return createQueueItem (
-			parentTaskLogger,
+			parentTransaction,
 			findQueueByCodeRequired (
+				parentTransaction,
 				queueParent,
 				queueCode),
 			subjectObject,
@@ -58,27 +60,30 @@ interface QueueLogic {
 	}
 
 	void cancelQueueItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemRec queueItem);
 
 	void processQueueItem (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemRec queueItem,
 			UserRec user);
 
 	QueueRec findQueue (
-			Record<?> parentObject,
+			Transaction parentTransaction,
+			Record <?> parentObject,
 			String code);
 
 	QueueSubjectRec findOrCreateQueueSubject (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueRec queue,
 			Record <?> object);
 
 	List <QueueItemRec> getActiveQueueItems (
+			Transaction parentTransaction,
 			QueueSubjectRec queueSubject);
 
 	boolean sliceHasQueueActivity (
+			Transaction parentTransaction,
 			SliceRec slice);
 
 }

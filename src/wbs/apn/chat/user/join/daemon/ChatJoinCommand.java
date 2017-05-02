@@ -19,8 +19,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.sms.command.model.CommandObjectHelper;
@@ -128,13 +129,13 @@ class ChatJoinCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -142,6 +143,7 @@ class ChatJoinCommand
 			Object parent =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			if (parent instanceof ChatRec) {
@@ -185,7 +187,7 @@ class ChatJoinCommand
 						rest)
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command);
 
 			}
@@ -222,7 +224,7 @@ class ChatJoinCommand
 						rest)
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command);
 
 			}
@@ -265,7 +267,7 @@ class ChatJoinCommand
 						rest)
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command);
 
 			}

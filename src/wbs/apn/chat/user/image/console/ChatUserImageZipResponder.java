@@ -16,8 +16,9 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -46,25 +47,36 @@ class ChatUserImageZipResponder
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUsers =
-			genericCastUnchecked (
-				requestContext.request (
-					"chatUsers"));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUsers =
+				genericCastUnchecked (
+					requestContext.request (
+						"chatUsers"));
+
+		}
 
 	}
 
 	@Override
 	public
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -84,9 +96,14 @@ class ChatUserImageZipResponder
 	@Override
 	public
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
 
 			ZipOutputStream zipOutputStream =
 				new ZipOutputStream (

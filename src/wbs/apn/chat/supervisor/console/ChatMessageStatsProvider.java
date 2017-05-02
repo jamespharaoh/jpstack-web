@@ -18,8 +18,9 @@ import wbs.console.reporting.StatsProvider;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
@@ -44,15 +45,15 @@ class ChatMessageStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getStats");
 
 		) {
@@ -89,7 +90,7 @@ class ChatMessageStatsProvider
 
 			List <ChatMessageRec> chatMessages =
 				chatMessageHelper.search (
-					taskLogger,
+					transaction,
 					new ChatMessageSearch ()
 
 				.chatId (

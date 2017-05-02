@@ -7,6 +7,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
@@ -196,16 +197,11 @@ class ChatBroadcastSendAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatBroadcastSendAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -253,7 +249,8 @@ class ChatBroadcastSendAction
 
 				.put (
 					"chat",
-					chatHelper.findFromContextRequired ())
+					chatHelper.findFromContextRequired (
+						transaction))
 
 				.build ();
 
@@ -261,7 +258,7 @@ class ChatBroadcastSendAction
 				new UpdateResultSet ();
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				searchFields,
 				verify
@@ -272,7 +269,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				numbersFields,
 				verify
@@ -283,7 +280,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				commonFields,
 				verify
@@ -294,7 +291,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				messageUserFields,
 				verify
@@ -305,7 +302,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				messageMessageFields,
 				send
@@ -376,12 +373,14 @@ class ChatBroadcastSendAction
 				// start transaction
 
 				ChatRec chat =
-					chatHelper.findFromContextRequired ();
+					chatHelper.findFromContextRequired (
+						transaction);
 
 				// lookup user
 
 				Optional <ChatUserRec> fromChatUserOptional =
 					chatUserHelper.findByCode (
+						transaction,
 						chat,
 						form.fromUser ());
 
@@ -453,7 +452,8 @@ class ChatBroadcastSendAction
 						.lastAction (
 							orNull (
 								TextualInterval.forInterval (
-									userConsoleLogic.timezone (),
+									userConsoleLogic.timezone (
+										transaction),
 									Optional.fromNullable (
 										form.lastAction ()))))
 
@@ -487,10 +487,10 @@ class ChatBroadcastSendAction
 
 					allChatUserIds =
 						chatUserHelper.searchIds (
-							taskLogger,
+							transaction,
 							search);
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"Search returned %s users",
 						integerToDecimalString (
 							allChatUserIds.size ()));
@@ -517,6 +517,7 @@ class ChatBroadcastSendAction
 
 							Optional <NumberRec> numberOptional =
 								numberHelper.findByCode (
+									transaction,
 									GlobalId.root,
 									number);
 
@@ -527,20 +528,32 @@ class ChatBroadcastSendAction
 								continue;
 							}
 
-							ChatUserRec chatUser =
+							Optional <ChatUserRec> chatUserOptional =
 								chatUserHelper.find (
+									transaction,
 									chat,
 									numberOptional.get ());
 
-							if (chatUser == null)
+							if (
+								optionalIsNotPresent (
+									chatUserOptional)
+							) {
 								continue;
+							}
+
+							ChatUserRec chatUser =
+								optionalGetRequired (
+									chatUserOptional);
 
 							allChatUserIds.add (
 								chatUser.getId ());
 
 							if (++ loop0 % 128 == 0) {
-								database.flush ();
-								database.clear ();
+
+								transaction.flush ();
+
+								transaction.clear ();
+
 							}
 
 						}
@@ -591,11 +604,12 @@ class ChatBroadcastSendAction
 
 					ChatUserRec chatUser =
 						chatUserHelper.findRequired (
+							transaction,
 							chatUserId);
 
 					if (
 						! chatBroadcastLogic.canSendToUser (
-							taskLogger,
+							transaction,
 							chatUser,
 							includeBlocked,
 							includeOptedOut)
@@ -610,9 +624,9 @@ class ChatBroadcastSendAction
 
 					if (++ loop1 % 128 == 0) {
 
-						database.flush ();
+						transaction.flush ();
 
-						database.clear ();
+						transaction.clear ();
 
 					}
 
@@ -681,7 +695,7 @@ class ChatBroadcastSendAction
 
 				TextRec text =
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						messageString);
 
 				ChatBroadcastRec chatBroadcast =
@@ -694,10 +708,12 @@ class ChatBroadcastSendAction
 						ChatBroadcastState.sending)
 
 					.setCreatedUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setSentUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setCreatedTime (
 						transaction.now ())
@@ -761,19 +777,19 @@ class ChatBroadcastSendAction
 						includeOptedOut);
 
 				chatBroadcastHelper.insert (
-					taskLogger,
+					transaction,
 					chatBroadcast);
 
 				// create batch
 
 				BatchSubjectRec batchSubject =
 					batchLogic.batchSubject (
-						taskLogger,
+						transaction,
 						chat,
 						"broadcast");
 
 				batchHelper.insert (
-					taskLogger,
+					transaction,
 					batchHelper.createInstance ()
 
 					.setSubject (
@@ -784,6 +800,7 @@ class ChatBroadcastSendAction
 
 					.setParentType (
 						objectTypeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"chat_broadcast"))
 
@@ -803,12 +820,13 @@ class ChatBroadcastSendAction
 
 					ChatUserRec toChatUser =
 						chatUserHelper.findRequired (
+							transaction,
 							toChatUserId);
 
 					// record this number in the broadcast
 
 					chatBroadcastNumberHelper.insert (
-						taskLogger,
+						transaction,
 						chatBroadcastNumberHelper.createInstance ()
 
 						.setChatBroadcast (
@@ -821,7 +839,8 @@ class ChatBroadcastSendAction
 							ChatBroadcastNumberState.accepted)
 
 						.setAddedByUser (
-							userConsoleLogic.userRequired ())
+							userConsoleLogic.userRequired (
+								transaction))
 
 					);
 
@@ -829,7 +848,9 @@ class ChatBroadcastSendAction
 
 					if (++ loop3 % 1024 == 0) {
 
-						database.flushAndClear ();
+						transaction.flush ();
+
+						transaction.clear ();
 
 					}
 

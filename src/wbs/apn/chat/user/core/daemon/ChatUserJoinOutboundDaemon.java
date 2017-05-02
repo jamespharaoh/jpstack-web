@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.core.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -18,6 +19,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -75,52 +77,83 @@ class ChatUserJoinOutboundDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatUserJoinOutboundDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
-			List <ChatUserRec> chatUsers =
+			List <Long> chatUserIds =
+				getChatUsers (
+					taskLogger);
+
+			chatUserIds.forEach (
+				chatUserId ->
+					doChatUser (
+						taskLogger,
+						chatUserId));
+
+		}
+
+	}
+
+	private
+	List <Long> getChatUsers (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getChatUsers");
+
+		) {
+
+			return iterableMapToList (
+				ChatUserRec::getId,
 				chatUserHelper.findWantingJoinOutbound (
-					transaction.now ());
+					transaction,
+					transaction.now ()));
 
-			transaction.close ();
+		}
 
-			// then do each one
+	}
 
-			for (
-				ChatUserRec chatUser
-					: chatUsers
-			) {
+	private
+	void doChatUser (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long chatUserId) {
 
-				try {
+		try (
 
-					doChatUserJoinOutbound (
-						taskLogger,
-						chatUser.getId ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doChatUser");
 
-				} catch (Exception exception) {
+		) {
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						stringFormat (
-							"chat user ",
-							integerToDecimalString (
-								chatUser.getId ())),
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.tryAgainLater);
+			try {
 
-				}
+				doChatUserReal (
+					taskLogger,
+					chatUserId);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"daemon",
+					stringFormat (
+						"chat user ",
+						integerToDecimalString (
+							chatUserId)),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
@@ -128,29 +161,22 @@ class ChatUserJoinOutboundDaemon
 
 	}
 
-	void doChatUserJoinOutbound (
+	void doChatUserReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doChatUserJoinOutbound");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
+					logContext,
+					parentTaskLogger,
 					stringFormat (
-						"%s.%s (%s)",
-						"ChatUserJoinOutboundDaemon",
-						"doChatUserJoinOutbound",
+						"doChatUserReal (%s)",
 						stringFormat (
 							"chatUserId = %s",
 							integerToDecimalString (
-								chatUserId))),
-					this);
+								chatUserId))));
 
 		) {
 
@@ -158,6 +184,7 @@ class ChatUserJoinOutboundDaemon
 
 			ChatUserRec user =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			// check and clear the outbound message flag
@@ -186,6 +213,7 @@ class ChatUserJoinOutboundDaemon
 
 			ChatUserRec monitor =
 				chatMiscLogic.getOnlineMonitorForOutbound (
+					transaction,
 					user);
 
 			if (monitor == null) {
@@ -200,7 +228,7 @@ class ChatUserJoinOutboundDaemon
 
 			ChatMonitorInboxRec chatMonitorInbox =
 				chatMessageLogic.findOrCreateChatMonitorInbox (
-					taskLogger,
+					transaction,
 					monitor,
 					user,
 					true);
@@ -213,7 +241,7 @@ class ChatUserJoinOutboundDaemon
 			// create a log
 
 			chatUserInitiationLogHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (

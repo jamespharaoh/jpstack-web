@@ -31,10 +31,12 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -132,25 +134,21 @@ class ChatUserPendingFormAction
 	Responder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"backupResponder");
-
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatUserPendingFormAction.backupResponder ()",
-					this);
+				database.beginReadOnly (
+					logContext,
+					"backupResponder");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			return nextResponder (
+				transaction,
 				chatUser);
 
 		}
@@ -166,7 +164,7 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goReal");
@@ -315,27 +313,24 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goDismiss");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserPendingFormAction.goDismiss ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goDismiss");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			Responder responder =
 				updateQueueItem (
-					taskLogger,
+					transaction,
 					chatUser,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			transaction.commit ();
 
@@ -349,25 +344,21 @@ class ChatUserPendingFormAction
 	Responder goApproveName (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApproveName");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserPendingFormAction.goApproveName ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApproveName");
 
 		) {
 
 			// get database objects
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// confirm there is something to approve
 
@@ -377,6 +368,7 @@ class ChatUserPendingFormAction
 					"No name to approve");
 
 				return nextResponder (
+					transaction,
 					chatUser);
 
 			}
@@ -403,7 +395,8 @@ class ChatUserPendingFormAction
 			chatUserName
 
 				.setModerator (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setStatus (
 					ifThenElse (
@@ -431,9 +424,10 @@ class ChatUserPendingFormAction
 
 			Responder responder =
 				updateQueueItem (
-					taskLogger,
+					transaction,
 					chatUser,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			transaction.commit ();
 
@@ -454,25 +448,21 @@ class ChatUserPendingFormAction
 	Responder goApproveInfo (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApproveInfo");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserPendingFormAction.goApproveInfo ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApproveInfo");
 
 		) {
 
 			// get database objects
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// confirm there is something to approve
 
@@ -485,6 +475,7 @@ class ChatUserPendingFormAction
 					"No info to approve");
 
 				return nextResponder (
+					transaction,
 					chatUser);
 
 			}
@@ -510,13 +501,14 @@ class ChatUserPendingFormAction
 
 			TextRec editedText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					editedInfo);
 
 			chatUserInfo
 
 				.setModerator (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setStatus (
 					ifThenElse (
@@ -544,9 +536,10 @@ class ChatUserPendingFormAction
 
 			Responder responder =
 				updateQueueItem (
-					taskLogger,
+					transaction,
 					chatUser,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			transaction.commit ();
 
@@ -568,35 +561,33 @@ class ChatUserPendingFormAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PendingMode mode) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApproveImage");
-
-		Responder responder;
-
-		ChatUserImageType imageType =
-			chatUserLogic.imageTypeForMode (mode);
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserPendingFormAction.goApproveImage",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApproveImage");
 
 		) {
+
+			Responder responder;
+
+			ChatUserImageType imageType =
+				chatUserLogic.imageTypeForMode (
+					mode);
 
 			// get database objects
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// confirm there is something to approve
 
 			ChatUserImageRec chatUserImage =
 				chatUserLogic.chatUserPendingImage (
+					transaction,
 					chatUser,
 					imageType);
 
@@ -608,6 +599,7 @@ class ChatUserPendingFormAction
 						mode));
 
 				return nextResponder (
+					transaction,
 					chatUser);
 
 			}
@@ -633,7 +625,8 @@ class ChatUserPendingFormAction
 			chatUserImage
 
 				.setModerator (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setStatus (
 					ChatUserInfoStatus.moderatorApproved)
@@ -684,9 +677,10 @@ class ChatUserPendingFormAction
 
 			responder =
 				updateQueueItem (
-					taskLogger,
+					transaction,
 					chatUser,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			transaction.commit ();
 
@@ -709,7 +703,7 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goRejectName");
@@ -745,16 +739,17 @@ class ChatUserPendingFormAction
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ChatUserPendingFormAction.goRejectName ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"goRejectName");
 
 			) {
 
 				// get database objects
 
 				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+					chatUserHelper.findFromContextRequired (
+						transaction);
 
 				if (
 					isNull (
@@ -765,6 +760,7 @@ class ChatUserPendingFormAction
 						"No name to approve");
 
 					return nextResponder (
+						transaction,
 						chatUser);
 
 				}
@@ -784,7 +780,8 @@ class ChatUserPendingFormAction
 						transaction.now ())
 
 					.setModerator (
-						userConsoleLogic.userRequired ());
+						userConsoleLogic.userRequired (
+							transaction));
 
 				chatUser
 
@@ -794,8 +791,9 @@ class ChatUserPendingFormAction
 				// send rejection
 
 				sendRejection (
-					taskLogger,
-					userConsoleLogic.userRequired (),
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser,
 					optionalFromNullable (
 						chatUserName.getThreadId ()),
@@ -803,9 +801,10 @@ class ChatUserPendingFormAction
 
 				Responder responder =
 					updateQueueItem (
-						taskLogger,
+						transaction,
 						chatUser,
-						userConsoleLogic.userRequired ());
+						userConsoleLogic.userRequired (
+							transaction));
 
 				transaction.commit ();
 
@@ -826,7 +825,7 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goRejectInfo");
@@ -862,16 +861,17 @@ class ChatUserPendingFormAction
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ChatUserPendingFormAction.goRejectInfo ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"goRejectInfo");
 
 			) {
 
 				// get database objects
 
 				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+					chatUserHelper.findFromContextRequired (
+						transaction);
 
 				// confirm there is something to approve
 
@@ -884,6 +884,7 @@ class ChatUserPendingFormAction
 						"No info to approve");
 
 					return nextResponder (
+						transaction,
 						chatUser);
 
 				}
@@ -912,7 +913,8 @@ class ChatUserPendingFormAction
 						transaction.now ())
 
 					.setModerator (
-						userConsoleLogic.userRequired ());
+						userConsoleLogic.userRequired (
+							transaction));
 
 				// update chat user
 
@@ -924,8 +926,9 @@ class ChatUserPendingFormAction
 				// send rejection
 
 				sendRejection (
-					taskLogger,
-					userConsoleLogic.userRequired (),
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser,
 					optionalFromNullable (
 						chatUserInfo.getThreadId ()),
@@ -933,9 +936,10 @@ class ChatUserPendingFormAction
 
 				Responder responder =
 					updateQueueItem (
-						taskLogger,
+						transaction,
 						chatUser,
-						userConsoleLogic.userRequired ());
+						userConsoleLogic.userRequired (
+							transaction));
 
 				transaction.commit ();
 
@@ -952,7 +956,7 @@ class ChatUserPendingFormAction
 
 	private
 	void sendRejection (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec myUser,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
@@ -960,15 +964,12 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendRejection");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -991,13 +992,13 @@ class ChatUserPendingFormAction
 
 				TextRec messageText =
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						messageParam);
 
 				chatMessage =
 					Optional.of (
 						chatMessageHelper.insert (
-							taskLogger,
+							transaction,
 							chatMessageHelper.createInstance ()
 
 					.setFromUser (
@@ -1030,37 +1031,39 @@ class ChatUserPendingFormAction
 				));
 
 				chatMessageLogic.chatMessageDeliverToUser (
-					taskLogger,
+					transaction,
 					chatMessage.get ());
 
 			} else {
 
 				TextRec messageText =
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						messageParam);
 
 				message =
 					chatSendLogic.sendMessageMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						threadId,
 						messageText,
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"join_info"),
 						serviceHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"system"),
 						0l);
 
 				chatMessage =
-					Optional.<ChatMessageRec>absent ();
+					optionalAbsent ();
 
 			}
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				optionalOf (
@@ -1070,6 +1073,7 @@ class ChatUserPendingFormAction
 				messageParam,
 				optionalOf (
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"join_info")));
 
@@ -1084,8 +1088,9 @@ class ChatUserPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goRejectImage");
 
@@ -1129,173 +1134,171 @@ class ChatUserPendingFormAction
 
 			// start transaction
 
-			try (
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatUserPendingFormAction.goRejectImage ()",
-						this);
+			ChatRec chat =
+				chatUser.getChat ();
+
+			ChatUserImageRec chatUserImage =
+				chatUserLogic.chatUserPendingImage (
+					transaction,
+					chatUser,
+					ChatUserImageType.valueOf (
+						mode.toString ()));
+
+			// checks involving database
+
+			if (chatUserImage == null) {
+
+				requestContext.addError (
+					"No photo to approve");
+
+				return nextResponder (
+					transaction,
+					chatUser);
+
+			}
+
+			if (chatUserImage.getStatus ()
+					!= ChatUserInfoStatus.moderatorPending)
+				throw new RuntimeException ();
+
+			// update image
+
+			chatUserImage
+
+				.setStatus (
+					ChatUserInfoStatus.moderatorRejected)
+
+				.setModerationTime (
+					transaction.now ())
+
+				.setModerator (
+					userConsoleLogic.userRequired (
+						transaction));
+
+			// send message
+
+			MessageRec message = null;
+			ChatMessageRec chatMessage = null;
+
+			if (
+
+				enumInSafe (
+					chatUser.getDeliveryMethod (),
+					ChatMessageMethod.iphone,
+					ChatMessageMethod.web)
+
+				&& isNotNull (
+					chat.getSystemChatUser ())
 
 			) {
 
-				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+				// iphone/web
 
-				ChatRec chat =
-					chatUser.getChat ();
+				TextRec messageText =
+					textHelper.findOrCreate (
+						transaction,
+						messageParam);
 
-				ChatUserImageRec chatUserImage =
-					chatUserLogic.chatUserPendingImage (
-						chatUser,
-						ChatUserImageType.valueOf (
-							mode.toString ()));
+				chatMessage =
+					chatMessageHelper.insert (
+						transaction,
+						chatMessageHelper.createInstance ()
 
-				// checks involving database
-
-				if (chatUserImage == null) {
-
-					requestContext.addError (
-						"No photo to approve");
-
-					return nextResponder (
-						chatUser);
-
-				}
-
-				if (chatUserImage.getStatus ()
-						!= ChatUserInfoStatus.moderatorPending)
-					throw new RuntimeException ();
-
-				// update image
-
-				chatUserImage
-
-					.setStatus (
-						ChatUserInfoStatus.moderatorRejected)
-
-					.setModerationTime (
-						transaction.now ())
-
-					.setModerator (
-						userConsoleLogic.userRequired ());
-
-				// send message
-
-				MessageRec message = null;
-				ChatMessageRec chatMessage = null;
-
-				if (
-
-					enumInSafe (
-						chatUser.getDeliveryMethod (),
-						ChatMessageMethod.iphone,
-						ChatMessageMethod.web)
-
-					&& isNotNull (
+					.setFromUser (
 						chat.getSystemChatUser ())
 
-				) {
+					.setToUser (
+						chatUser)
 
-					// iphone/web
+					.setTimestamp (
+						transaction.now ())
 
-					TextRec messageText =
-						textHelper.findOrCreate (
-							taskLogger,
-							messageParam);
+					.setChat (
+						chat)
 
-					chatMessage =
-						chatMessageHelper.insert (
-							taskLogger,
-							chatMessageHelper.createInstance ()
+					.setSender (
+						userConsoleLogic.userRequired (
+							transaction))
 
-						.setFromUser (
-							chat.getSystemChatUser ())
+					.setChat (
+						chat)
 
-						.setToUser (
-							chatUser)
+					.setOriginalText (
+						messageText)
 
-						.setTimestamp (
-							transaction.now ())
+					.setEditedText (
+						messageText)
 
-						.setChat (
-							chat)
+					.setStatus (
+						ChatMessageStatus.sent)
 
-						.setSender (
-							userConsoleLogic.userRequired ())
+				);
 
-						.setChat (
-							chat)
+				chatMessageLogic.chatMessageDeliverToUser (
+					transaction,
+					chatMessage);
 
-						.setOriginalText (
-							messageText)
+			} else {
 
-						.setEditedText (
-							messageText)
+				// sms
 
-						.setStatus (
-							ChatMessageStatus.sent)
-
-					);
-
-					chatMessageLogic.chatMessageDeliverToUser (
-						taskLogger,
-						chatMessage);
-
-				} else {
-
-					// sms
-
-					message =
-						chatSendLogic.sendMessageMmsFree (
-							taskLogger,
-							chatUser,
-							optionalAbsent (),
-							messageParam,
-							commandHelper.findByCodeRequired (
-								chat,
-								mode.commandCode ()),
-							serviceHelper.findByCodeRequired (
-								chat,
-								"system"));
-
-				}
-
-				// log message sent
-
-				chatHelpLogLogic.createChatHelpLogOut (
-					taskLogger,
-					chatUser,
-					optionalAbsent (),
-					optionalOf (
-						userConsoleLogic.userRequired ()),
-					message,
-					optionalFromNullable (
-						chatMessage),
-					messageParam,
-					optionalOf (
-						commandHelper.findByCodeRequired (
-							chat,
-							mode.commandCode ())));
-
-				// clear queue item
-
-				Responder responder =
-					updateQueueItem (
-						taskLogger,
+				message =
+					chatSendLogic.sendMessageMmsFree (
+						transaction,
 						chatUser,
-						userConsoleLogic.userRequired ());
-
-				// wrap up
-
-				transaction.commit ();
-
-				requestContext.addNotice (
-					"Rejection sent");
-
-				return responder;
+						optionalAbsent (),
+						messageParam,
+						commandHelper.findByCodeRequired (
+							transaction,
+							chat,
+							mode.commandCode ()),
+						serviceHelper.findByCodeRequired (
+							transaction,
+							chat,
+							"system"));
 
 			}
+
+			// log message sent
+
+			chatHelpLogLogic.createChatHelpLogOut (
+				transaction,
+				chatUser,
+				optionalAbsent (),
+				optionalOf (
+					userConsoleLogic.userRequired (
+						transaction)),
+				message,
+				optionalFromNullable (
+					chatMessage),
+				messageParam,
+				optionalOf (
+					commandHelper.findByCodeRequired (
+						transaction,
+						chat,
+						mode.commandCode ())));
+
+			// clear queue item
+
+			Responder responder =
+				updateQueueItem (
+					transaction,
+					chatUser,
+					userConsoleLogic.userRequired (
+						transaction));
+
+			// wrap up
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder;
 
 		}
 
@@ -1307,20 +1310,24 @@ class ChatUserPendingFormAction
 	 */
 	private
 	Responder updateQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull UserRec myUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateQueueItem");
 
 		) {
 
-			if (moreToApprove (chatUser)) {
+			if (
+				moreToApprove (
+					transaction,
+					chatUser)
+			) {
 
 				return responder (
 					"chatUserPendingFormResponder");
@@ -1328,7 +1335,7 @@ class ChatUserPendingFormAction
 			}
 
 			queueLogic.processQueueItem (
-				taskLogger,
+				transaction,
 				chatUser.getQueueItem (),
 				myUser);
 
@@ -1346,50 +1353,74 @@ class ChatUserPendingFormAction
 
 	private
 	boolean moreToApprove (
-			ChatUserRec chatUser) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec chatUser) {
 
-		if (chatUser.getNewChatUserName () != null)
-			return true;
+		try (
 
-		if (chatUser.getNewChatUserInfo () != null)
-			return true;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"moreToApprove");
 
-		if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.image) != null
 		) {
-			return true;
-		}
 
-		if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.video) != null
-		) {
-			return true;
-		}
+			return (
 
-		if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.audio) != null
-		) {
-			return true;
-		}
+				isNotNull (
+					chatUser.getNewChatUserName ())
 
-		return false;
+				|| isNotNull (
+					chatUser.getNewChatUserInfo ())
+
+				|| isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.image))
+
+				|| isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.video))
+
+
+				|| isNotNull (
+					chatUserLogic.chatUserPendingImage (
+						transaction,
+						chatUser,
+						ChatUserImageType.audio))
+
+			);
+
+		}
 
 	}
 
 	private
 	Responder nextResponder (
-			ChatUserRec chatUser) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec chatUser) {
 
-		return responder (
-			moreToApprove (chatUser)
-				? "chatUserPendingFormResponder"
-				: "queueHomeResponder");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"nextResponder");
+
+		) {
+
+			return responder (
+				ifThenElse (
+					moreToApprove (
+						transaction,
+						chatUser),
+					() -> "chatUserPendingFormResponder",
+					() -> "queueHomeResponder"));
+
+		}
 
 	}
 

@@ -22,6 +22,7 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.MasterFieldSpec;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("masterFieldWriter")
@@ -56,11 +57,11 @@ class MasterFieldWriter
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");

@@ -84,40 +84,36 @@ class ImChatMessageSendAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatMessageSendRequest messageSendRequest =
-			dataFromJson.fromJson (
-				ImChatMessageSendRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatMessageSendAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatMessageSendRequest messageSendRequest =
+				dataFromJson.fromJson (
+					ImChatMessageSendRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -126,6 +122,7 @@ class ImChatMessageSendAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
+					transaction,
 					messageSendRequest.sessionSecret ());
 
 			if (
@@ -162,6 +159,7 @@ class ImChatMessageSendAction
 
 			ImChatConversationRec conversation =
 				imChatConversationHelper.findByIndexRequired (
+					transaction,
 					customer,
 					messageSendRequest.conversationIndex ());
 
@@ -235,7 +233,7 @@ class ImChatMessageSendAction
 
 			ImChatMessageRec message =
 				imChatMessageHelper.insert (
-					taskLogger,
+					transaction,
 					imChatMessageHelper.createInstance ()
 
 				.setImChatConversation (
@@ -267,7 +265,7 @@ class ImChatMessageSendAction
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					taskLogger,
+					transaction,
 					imChat,
 					"reply",
 					conversation,
@@ -296,14 +294,17 @@ class ImChatMessageSendAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer))
 
 				.conversation (
 					imChatApiLogic.conversationData (
+						transaction,
 						conversation))
 
 				.message (
 					imChatApiLogic.messageData (
+						transaction,
 						message));
 
 			// commit and return

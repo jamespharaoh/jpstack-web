@@ -1,11 +1,11 @@
 package wbs.console.part;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface PagePartFactory {
 
 	PagePart buildPagePart (
-			TaskLogger taskLogger);
+			Transaction parentTransaction);
 
 }

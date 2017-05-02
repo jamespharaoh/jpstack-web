@@ -17,8 +17,9 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("delegateFormFieldacessor")
@@ -47,14 +48,14 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 	@Override
 	public
 	Optional <Native> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull PrincipalContainer principalContainer) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"read");
 
 		) {
@@ -62,6 +63,7 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 			Optional <DelegateContainer> delegateContainerOptional =
 				genericCastUnchecked (
 					objectManager.dereference (
+						transaction,
 						principalContainer,
 						path));
 
@@ -77,7 +79,7 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 					delegateContainerOptional);
 
 			return delegateFormFieldAccessor.read (
-				taskLogger,
+				transaction,
 				delegateContainer);
 
 		}
@@ -87,15 +89,15 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull PrincipalContainer principalContainer,
 			@NonNull Optional <Native> nativeValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"write");
 
 		) {
@@ -103,11 +105,12 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 			DelegateContainer delegateContainer =
 				genericCastUnchecked (
 					objectManager.dereferenceRequired (
+						transaction,
 						principalContainer,
 						path));
 
 			delegateFormFieldAccessor.write (
-				taskLogger,
+				transaction,
 				delegateContainer,
 				nativeValue);
 

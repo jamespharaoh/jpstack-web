@@ -30,7 +30,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -120,16 +122,11 @@ class ObjectSettingsAction <
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectSettingsAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -149,22 +146,24 @@ class ObjectSettingsAction <
 
 			object =
 				objectLookup.lookupObject (
+					transaction,
 					requestContext.consoleContextStuffRequired ());
 
 			// perform update
 
 			if (formFieldsProvider != null) {
 
-				prepareParent ();
+				prepareParent (
+					transaction);
 
 				prepareFieldSet (
-					taskLogger);
+					transaction);
 
 			}
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					formFieldSet,
 					object,
@@ -200,7 +199,7 @@ class ObjectSettingsAction <
 			if (object instanceof PermanentRecord) {
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					formFieldSet,
 					updateResultSet,
 					object,
@@ -214,6 +213,7 @@ class ObjectSettingsAction <
 				PermanentRecord <?> linkObject =
 					genericCastUnchecked (
 						objectManager.getParentRequired (
+							transaction,
 							object));
 
 				Object objectRef =
@@ -222,7 +222,7 @@ class ObjectSettingsAction <
 						objectRefName);
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					formFieldSet,
 					updateResultSet,
 					object,
@@ -248,39 +248,53 @@ class ObjectSettingsAction <
 
 	}
 
-	void prepareParent () {
+	void prepareParent (
+			@NonNull Transaction parentTransaction) {
 
-		ConsoleHelper <ParentType> parentHelper =
-			objectManager.findConsoleHelperRequired (
-				consoleHelper.parentClass ());
+		try (
 
-		if (parentHelper.isRoot ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareParent");
 
-			parent =
-				parentHelper.findRequired (
-					0l);
-
-			return;
-
-		}
-
-		Optional <Long> parentIdOptional =
-			requestContext.stuffInteger (
-				parentHelper.idKey ());
-
-		if (
-			optionalIsPresent (
-				parentIdOptional)
 		) {
 
-			// use specific parent
+			ConsoleHelper <ParentType> parentHelper =
+				objectManager.findConsoleHelperRequired (
+					consoleHelper.parentClass ());
 
-			parent =
-				parentHelper.findRequired (
-					optionalGetRequired (
-						parentIdOptional));
+			if (parentHelper.isRoot ()) {
 
-			return;
+				parent =
+					parentHelper.findRequired (
+						transaction,
+						0l);
+
+				return;
+
+			}
+
+			Optional <Long> parentIdOptional =
+				requestContext.stuffInteger (
+					parentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					parentIdOptional)
+			) {
+
+				// use specific parent
+
+				parent =
+					parentHelper.findRequired (
+						transaction,
+						optionalGetRequired (
+							parentIdOptional));
+
+				return;
+
+			}
 
 		}
 

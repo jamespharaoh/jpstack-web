@@ -15,12 +15,12 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.model.FonixConfigObjectHelper;
 import wbs.integrations.fonix.model.FonixDeliveryStatusObjectHelper;
@@ -89,36 +89,30 @@ class FonixFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			createMenus (
-				taskLogger,
 				transaction);
 
 			createConfig (
-				taskLogger,
 				transaction);
 
 			createDefaultDeliveryStatuses (
-				taskLogger,
 				transaction);
 
 			createDefaultNetworks (
-				taskLogger,
 				transaction);
 
 			createRoutes (
-				taskLogger,
 				transaction);
 
 		}
@@ -127,24 +121,24 @@ class FonixFixtureProvider
 
 	private
 	void createMenus (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenus");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"integration"))
@@ -177,20 +171,19 @@ class FonixFixtureProvider
 
 	private
 	void createConfig (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createConfig");
 
 		) {
 
 			fonixConfigHelper.insert (
-				taskLogger,
+				transaction,
 				fonixConfigHelper.createInstance ()
 
 				.setCode (
@@ -212,14 +205,13 @@ class FonixFixtureProvider
 
 	private
 	void createDefaultDeliveryStatuses (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createDefaultDeliveryStatuses");
 
 		) {
@@ -227,11 +219,12 @@ class FonixFixtureProvider
 			defaultDeliveryStatuses.forEach (
 				defaultDeliveryStatus ->
 					fonixDeliveryStatusHelper.insert (
-						taskLogger,
+						transaction,
 						fonixDeliveryStatusHelper.createInstance ()
 
 				.setFonixConfig (
 					fonixConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 
@@ -257,14 +250,13 @@ class FonixFixtureProvider
 
 	private
 	void createDefaultNetworks (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createDefaultNetworks");
 
 		) {
@@ -272,16 +264,18 @@ class FonixFixtureProvider
 			defaultNetworks.forEach (
 				defaultNetwork ->
 					fonixNetworkHelper.insert (
-						taskLogger,
+						transaction,
 						fonixNetworkHelper.createInstance ()
 
 				.setFonixConfig (
 					fonixConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 
 				.setNetwork (
 					networkHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						defaultNetwork.ourCode ()))
 
@@ -298,14 +292,13 @@ class FonixFixtureProvider
 
 	private
 	void createRoutes (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createRoutes");
 
 		) {
@@ -314,7 +307,6 @@ class FonixFixtureProvider
 				"fonix-route",
 				testAccount ->
 					createRoute (
-						taskLogger,
 						transaction,
 						testAccount));
 
@@ -326,15 +318,14 @@ class FonixFixtureProvider
 
 	private
 	void createRoute (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createRoute");
 
 		) {
@@ -347,7 +338,7 @@ class FonixFixtureProvider
 			case "in":
 
 				createInboundRoute (
-					taskLogger,
+					transaction,
 					params);
 
 				break;
@@ -355,7 +346,7 @@ class FonixFixtureProvider
 			case "out":
 
 				createOutboundRoute (
-					taskLogger,
+					transaction,
 					params);
 
 				break;
@@ -375,25 +366,26 @@ class FonixFixtureProvider
 
 	private
 	void createInboundRoute (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createInboundRoute");
 
 		) {
 
 			RouteRec smsRoute =
 				smsRouteHelper.insert (
-					taskLogger,
+					transaction,
 					smsRouteHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -413,7 +405,7 @@ class FonixFixtureProvider
 			);
 
 			fonixRouteInHelper.insert (
-				taskLogger,
+				transaction,
 				fonixRouteInHelper.createInstance ()
 
 				.setRoute (
@@ -421,6 +413,7 @@ class FonixFixtureProvider
 
 				.setFonixConfig (
 					fonixConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 
@@ -432,25 +425,26 @@ class FonixFixtureProvider
 
 	private
 	void createOutboundRoute (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createOutboundRoute");
 
 		) {
 
 			RouteRec smsRoute =
 				smsRouteHelper.insert (
-					taskLogger,
+					transaction,
 					smsRouteHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -472,13 +466,14 @@ class FonixFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"clockwork_sms"))
 
 			);
 
 			fonixRouteOutHelper.insert (
-				taskLogger,
+				transaction,
 				fonixRouteOutHelper.createInstance ()
 
 				.setRoute (
@@ -486,6 +481,7 @@ class FonixFixtureProvider
 
 				.setFonixConfig (
 					fonixConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 

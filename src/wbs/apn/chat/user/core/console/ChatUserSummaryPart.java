@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.core.console;
 
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
@@ -30,8 +31,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -104,23 +106,24 @@ class ChatUserSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			creditCheckResult =
 				chatCreditLogic.userCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			internalChatUserCharges =
@@ -165,19 +168,21 @@ class ChatUserSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			boolean isUser =
-				chatUser.getType () == ChatUserType.user;
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.user);
 
 			htmlTableOpenDetails ();
 
@@ -237,7 +242,7 @@ class ChatUserSummaryPart
 				htmlTableDetailsRowWriteHtml (
 					"Pic",
 					() -> mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						chatUser.getChatUserImageList ().get (0).getMedia ()));
 
 			}
@@ -290,13 +295,13 @@ class ChatUserSummaryPart
 				htmlTableDetailsRowWriteRaw (
 					"Number",
 					() -> objectManager.writeTdForObjectMiniLink (
-						taskLogger,
+						transaction,
 						chatUser.getOldNumber ()));
 
 				htmlTableDetailsRowWriteRaw (
 					"Scheme",
 					() -> objectManager.writeTdForObjectMiniLink (
-						taskLogger,
+						transaction,
 						chatUser.getChatScheme (),
 						chatUser.getChat ()));
 
@@ -305,7 +310,7 @@ class ChatUserSummaryPart
 					() -> ifNotNullThenElse (
 						chatUser.getChatAffiliate (),
 						() -> objectManager.writeTdForObjectMiniLink (
-							taskLogger,
+							transaction,
 							chatUser.getChatAffiliate (),
 							chatUser.getChatScheme ()),
 						() -> htmlTableCellWrite (

@@ -4,6 +4,7 @@ public
 enum LogSeverity {
 	debug,
 	trace,
+	logic,
 	notice,
 	warning,
 	error,

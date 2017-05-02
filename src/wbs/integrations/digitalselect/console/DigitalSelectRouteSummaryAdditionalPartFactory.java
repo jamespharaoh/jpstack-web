@@ -3,8 +3,10 @@ package wbs.integrations.digitalselect.console;
 import javax.inject.Provider;
 
 import wbs.console.part.PagePart;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
 @SingletonComponent ("digitalSelectRouteSummaryAdditionalPartFactory")

@@ -6,24 +6,35 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.meta.ids.ForeignIdFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 
 @PrototypeComponent ("foreignIdModelFieldBuilder")
 @ModelBuilder
 public
-class ForeignIdModelFieldBuilder {
+class ForeignIdModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SchemaNamesHelper schemaNamesHelper;
@@ -41,69 +52,82 @@ class ForeignIdModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		// create model field
+		try (
 
-		ModelField modelField =
-			new ModelField ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.model (
-				target.model ())
+		) {
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				"id")
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				"id")
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.foreignId)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					"id")
 
-			.identity (
-				false)
+				.label (
+					"id")
 
-			.valueType (
-				Long.class)
+				.type (
+					ModelFieldType.foreignId)
 
-			.nullable (
-				false)
+				.parent (
+					false)
 
-			.foreignFieldName (
-				spec.fieldName ())
+				.identity (
+					false)
 
-			.columnNames (
-				ImmutableList.of (
-					ifNull (
-						spec.columnName (),
-						stringFormat (
-							"%s_id",
-							camelToUnderscore (
-								spec.fieldName ())))));
+				.valueType (
+					Long.class)
 
-		// store field
+				.nullable (
+					false)
 
-		target.fields ().add (
-			modelField);
+				.foreignFieldName (
+					spec.fieldName ())
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.columnNames (
+					ImmutableList.of (
+						ifNull (
+							spec.columnName (),
+							stringFormat (
+								"%s_id",
+								camelToUnderscore (
+									spec.fieldName ())))));
 
-		if (target.model ().idField () != null)
-			throw new RuntimeException ();
+			// store field
 
-		target.model ().idField (
-			modelField);
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().idField () != null)
+				throw new RuntimeException ();
+
+			target.model ().idField (
+				modelField);
+
+		}
 
 	}
 

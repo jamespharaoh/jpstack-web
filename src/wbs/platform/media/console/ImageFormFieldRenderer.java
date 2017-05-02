@@ -3,8 +3,14 @@ package wbs.platform.media.console;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.io.IOException;
 import java.util.Map;
@@ -26,8 +32,9 @@ import wbs.console.forms.FormType;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -93,7 +100,7 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -104,9 +111,9 @@ class ImageFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormInput");
 
 		) {
@@ -114,7 +121,7 @@ class ImageFormFieldRenderer <Container>
 			if (interfaceValue.isPresent ()) {
 
 				renderHtmlComplex (
-					taskLogger,
+					transaction,
 					htmlWriter,
 					container,
 					hints,
@@ -156,7 +163,7 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <MediaRec> interfaceValue,
@@ -164,9 +171,9 @@ class ImageFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -222,15 +229,15 @@ class ImageFormFieldRenderer <Container>
 	}
 
 	MediaRec formValue (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"formValue");
 
 		) {
@@ -259,7 +266,7 @@ class ImageFormFieldRenderer <Container>
 						fileItem.getInputStream ());
 
 				return mediaLogic.createMediaFromImageRequired (
-					taskLogger,
+					transaction,
 					data,
 					"image/jpeg",
 					fileItem.getName ());
@@ -278,15 +285,15 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <MediaRec>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"formToInterface");
 
 		) {
@@ -294,7 +301,7 @@ class ImageFormFieldRenderer <Container>
 			return successResult (
 				Optional.fromNullable (
 					formValue (
-						taskLogger,
+						transaction,
 						submission,
 						formName)));
 
@@ -305,18 +312,18 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> interfaceValue,
 			boolean link) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlSimple");
 
 		) {
@@ -326,7 +333,7 @@ class ImageFormFieldRenderer <Container>
 			}
 
 			mediaConsoleLogic.writeMediaThumb32 (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				interfaceValue.get ());
 
@@ -345,7 +352,7 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderHtmlComplex (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
@@ -353,9 +360,9 @@ class ImageFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlComplex");
 
 		) {
@@ -365,7 +372,7 @@ class ImageFormFieldRenderer <Container>
 			}
 
 			mediaConsoleLogic.writeMediaThumb100 (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				interfaceValue.get ());
 
@@ -381,6 +388,94 @@ class ImageFormFieldRenderer <Container>
 						interfaceValue.get ().getContent ().getData ().length));
 
 			}
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
+
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellProperties");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					propertiesAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
 
 		}
 

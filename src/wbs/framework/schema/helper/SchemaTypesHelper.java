@@ -6,7 +6,8 @@ import java.util.Map;
 public
 interface SchemaTypesHelper {
 
-	Map<Class<?>,List<String>> fieldTypeNames ();
-	Map<String,List<String>> enumTypes ();
+	Map <Class <?>, List <String>> fieldTypeNames ();
+
+	Map <String, List <String>> enumTypes ();
 
 }

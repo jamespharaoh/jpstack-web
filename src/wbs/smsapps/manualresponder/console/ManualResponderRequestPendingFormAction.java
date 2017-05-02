@@ -8,8 +8,8 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
@@ -32,6 +32,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -146,7 +147,7 @@ class ManualResponderRequestPendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goReal");
@@ -189,40 +190,31 @@ class ManualResponderRequestPendingFormAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long manualResponderRequestId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goIgnore");
-
-		// start transaction
-
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s (%s)",
-						"ManualResponderRequestPendingFormAction",
-						"goIgnore",
-						stringFormat (
-							"manualResponderRequestId = %s",
-							integerToDecimalString (
-								manualResponderRequestId))),
-					this);
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"goIgnore (%s)",
+					keyEqualsDecimalInteger (
+						"manualResponderRequestId",
+						manualResponderRequestId));
 
 		) {
 
 			ManualResponderRequestRec manualResponderRequest =
 				manualResponderRequestHelper.findRequired (
+					transaction,
 					manualResponderRequestId);
 
 			// remove queue item
 
 			queueLogic.processQueueItem (
-				taskLogger,
+				transaction,
 				manualResponderRequest.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				userConsoleLogic.userRequired (
+					transaction));
 
 			// mark request as not pending
 
@@ -250,41 +242,37 @@ class ManualResponderRequestPendingFormAction
 			@NonNull Long manualResponderRequestId,
 			@NonNull String templateIdString) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goSend");
-
-		boolean sendAgain =
-			false;
-
-		// get params
-
-		Long templateId =
-			Long.parseLong (
-				templateIdString);
-
-		// get message
-
-		String messageParam =
-			optionalOrNull (
-				requestContext.parameter (
-					"message-" + templateId));
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ManualResponderRequestPendingFormAction.goSend (...)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goSend");
 
 		) {
 
+			boolean sendAgain =
+				false;
+
+			// get params
+
+			Long templateId =
+				Long.parseLong (
+					templateIdString);
+
+			// get message
+
+			String messageParam =
+				optionalOrNull (
+					requestContext.parameter (
+						"message-" + templateId));
+
+			// lookup objects
+
 			ManualResponderRequestRec request =
 				manualResponderRequestHelper.findRequired (
+					transaction,
 					manualResponderRequestId);
 
 			ManualResponderNumberRec manualResponderNumber =
@@ -295,6 +283,7 @@ class ManualResponderRequestPendingFormAction
 
 			ManualResponderTemplateRec template =
 				manualResponderTemplateHelper.findRequired (
+					transaction,
 					templateId);
 
 			// consistency checks
@@ -346,7 +335,7 @@ class ManualResponderRequestPendingFormAction
 
 			TextRec messageText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					messageString);
 
 			boolean shortMessageParts =
@@ -360,13 +349,14 @@ class ManualResponderRequestPendingFormAction
 					? 134l
 					: 153l;
 
-			Pair<List<String>,Long> splitResult =
+			Pair <List <String>, Long> splitResult =
 				manualResponderLogic.splitMessage (
+					transaction,
 					template,
 					maxLengthPerMultipartMessage,
 					messageString);
 
-			List<String> messageParts =
+			List <String> messageParts =
 				splitResult.getLeft ();
 
 			long effectiveParts =
@@ -425,6 +415,7 @@ class ManualResponderRequestPendingFormAction
 
 			RouteRec route =
 				routerLogic.resolveRouter (
+					transaction,
 					template.getRouter ());
 
 			// check spend limit
@@ -440,7 +431,7 @@ class ManualResponderRequestPendingFormAction
 
 				Optional <Long> spendAvailable =
 					smsSpendLimitLogic.spendCheck (
-						taskLogger,
+						transaction,
 						manualResponder.getSmsSpendLimiter (),
 						manualResponderNumber.getNumber ());
 
@@ -491,14 +482,15 @@ class ManualResponderRequestPendingFormAction
 
 			ManualResponderReplyRec reply =
 				manualResponderReplyHelper.insert (
-					taskLogger,
+					transaction,
 					manualResponderReplyHelper.createInstance ()
 
 				.setManualResponderRequest (
 					request)
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setText (
 					messageText)
@@ -537,28 +529,33 @@ class ManualResponderRequestPendingFormAction
 						request.getNumber ())
 
 					.messageString (
-						taskLogger,
+						transaction,
 						messagePart)
 
 					.numFrom (
 						template.getNumber ())
 
 					.routerResolve (
+						transaction,
 						template.getRouter ())
 
 					.serviceLookup (
+						transaction,
 						manualResponder,
 						"default")
 
 					.affiliate (
 						optionalOrNull (
 							manualResponderLogic.customerAffiliate (
+								transaction,
 								manualResponderNumber)))
 
 					.user (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.deliveryTypeCode (
+						transaction,
 						"manual_responder")
 
 					.ref (
@@ -569,7 +566,7 @@ class ManualResponderRequestPendingFormAction
 						|| ! template.getSequenceParts ())
 
 					.send (
-						taskLogger)
+						transaction)
 
 				);
 
@@ -601,7 +598,7 @@ class ManualResponderRequestPendingFormAction
 			) {
 
 				smsSpendLimitLogic.spend (
-					taskLogger,
+					transaction,
 					manualResponder.getSmsSpendLimiter (),
 					manualResponderNumber.getNumber (),
 					reply.getMessages (),
@@ -621,9 +618,10 @@ class ManualResponderRequestPendingFormAction
 				// process queue item
 
 				queueLogic.processQueueItem (
-					taskLogger,
+					transaction,
 					request.getQueueItem (),
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 				// update request
 
@@ -633,7 +631,8 @@ class ManualResponderRequestPendingFormAction
 						false)
 
 					.setUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setProcessedTime (
 						transaction.now ());
@@ -649,11 +648,12 @@ class ManualResponderRequestPendingFormAction
 
 				CommandRec command =
 					commandHelper.findByCodeRequired (
+						transaction,
 						manualResponder,
 						"default");
 
 				keywordLogic.createOrUpdateKeywordSetFallback (
-					taskLogger,
+					transaction,
 					template.getReplyKeywordSet (),
 					request.getNumber (),
 					command);

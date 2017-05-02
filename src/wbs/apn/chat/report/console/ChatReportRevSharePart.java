@@ -43,9 +43,10 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.console.AffiliateConsoleHelper;
@@ -167,13 +168,13 @@ class ChatReportRevSharePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -201,7 +202,7 @@ class ChatReportRevSharePart
 						"YYYY-MM"));
 
 			formFieldLogic.update (
-				taskLogger,
+				transaction,
 				requestContext,
 				searchFields,
 				form,
@@ -209,7 +210,8 @@ class ChatReportRevSharePart
 				"search");
 
 			chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			totalReport =
 				new ChatReportRevShareItem ()
@@ -231,14 +233,17 @@ class ChatReportRevSharePart
 
 			// add stat sources
 
-			addSmsMessages ();
-			addCredits ();
+			addSmsMessages (
+				transaction);
+
+			addCredits (
+				transaction);
 
 			addJoiners (
-				taskLogger);
+				transaction);
 
 			addChatMessages (
-				taskLogger);
+				transaction);
 
 			// sort chat reports
 
@@ -257,189 +262,224 @@ class ChatReportRevSharePart
 
 	}
 
-	void addSmsMessages () {
-
-		List <ServiceRec> services =
-			objectManager.getChildren (
-				chat,
-				ServiceRec.class);
-
-		ArrayList <Long> serviceIds =
-			new ArrayList<> ();
-
-		for (
-			ServiceRec service
-				: services
-		) {
-
-			serviceIds.add (
-				service.getId ());
-
-		}
-
-		List <MessageStatsRec> allMessageStats =
-			messageStatsHelper.search (
-				new MessageStatsSearch ()
-
-			.serviceIdIn (
-				serviceIds)
-
-			.dateAfter (
-				startDate)
-
-			.dateBefore (
-				endDate)
-
-			.group (
-				true)
-
-			.groupByAffiliate (
-				true)
-
-			.groupByRoute (
-				true)
-
-			.groupByNetwork (
-				true)
-
-		);
-
-		// aggregate by affiliate
-
-		chatReportsByAffiliate =
-			new HashMap<> ();
-
-		List <Long> errorRoutes =
-			new ArrayList<> ();
-
-		for (
-			MessageStatsRec messageStats
-				: allMessageStats
-		) {
-
-			// find report
-
-			AffiliateRec affiliate =
-				messageStats.getMessageStatsId ().getAffiliate ();
-
-			ChatReportRevShareItem currentReport =
-				getReport (
-					affiliate);
-
-			// find chat route
-
-			RouteRec route =
-				messageStats.getMessageStatsId ().getRoute ();
-
-			ChatRouteRec chatRoute =
-				chat.getChatRoutes ().get (
-					route.getId ());
-
-			if (chatRoute == null) {
-
-				if (
-					! errorRoutes.contains (
-						route.getId ())
-				) {
-
-					errorRoutes.add (
-						route.getId ());
-
-					consoleRequestContext.addErrorFormat (
-						"Unknown route: %s (%s)",
-						route.getCode (),
-						integerToDecimalString (
-							route.getId ()));
-
-				}
-
-				continue;
-
-			}
-
-			// find chat route network
-
-			NetworkRec network =
-				messageStats.getMessageStatsId ().getNetwork ();
-
-			Optional <ChatRouteNetworkRec> chatRouteNetwork =
-				Optional.fromNullable (
-					chatRoute.getChatRouteNetworks ().get (
-						network.getId ()));
-
-			// collect stats
-
-			MessageStatsData statsValue =
-				messageStats.getStats ();
-
-			addToReport (
-				currentReport,
-				chatRoute,
-				chatRouteNetwork,
-				statsValue);
-
-			addToReport (
-				totalReport,
-				chatRoute,
-				chatRouteNetwork,
-				statsValue);
-
-		}
-
-	}
-
-	void addCredits () {
-
-		List <ChatUserCreditRec> chatUserCredits =
-			chatUserCreditHelper.findByTimestamp (
-				chat,
-				new Interval (
-					startDate.toDateTimeAtStartOfDay (),
-					endDate.toDateTimeAtStartOfDay ()));
-
-		for (
-			ChatUserCreditRec chatUserCredit
-				: chatUserCredits
-		) {
-
-			ChatUserRec chatUser =
-				chatUserCredit.getChatUser ();
-
-			AffiliateRec affiliate =
-				chatUserLogic.getAffiliate (
-					chatUser);
-
-			ChatReportRevShareItem affiliateReport =
-				getReport (
-					affiliate);
-
-			addToReport (
-				affiliateReport,
-				chatUserCredit);
-
-			addToReport (
-				totalReport,
-				chatUserCredit);
-
-		}
-
-	}
-
-	void addJoiners (
-			@NonNull TaskLogger parentTaskLogger) {
+	private
+	void addSmsMessages (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"addSmsMessages");
+
+		) {
+
+			List <ServiceRec> services =
+				objectManager.getChildren (
+					transaction,
+					chat,
+					ServiceRec.class);
+
+			ArrayList <Long> serviceIds =
+				new ArrayList<> ();
+
+			for (
+				ServiceRec service
+					: services
+			) {
+
+				serviceIds.add (
+					service.getId ());
+
+			}
+
+			List <MessageStatsRec> allMessageStats =
+				messageStatsHelper.search (
+					transaction,
+					new MessageStatsSearch ()
+
+				.serviceIdIn (
+					serviceIds)
+
+				.dateAfter (
+					startDate)
+
+				.dateBefore (
+					endDate)
+
+				.group (
+					true)
+
+				.groupByAffiliate (
+					true)
+
+				.groupByRoute (
+					true)
+
+				.groupByNetwork (
+					true)
+
+			);
+
+			// aggregate by affiliate
+
+			chatReportsByAffiliate =
+				new HashMap<> ();
+
+			List <Long> errorRoutes =
+				new ArrayList<> ();
+
+			for (
+				MessageStatsRec messageStats
+					: allMessageStats
+			) {
+
+				// find report
+
+				AffiliateRec affiliate =
+					messageStats.getMessageStatsId ().getAffiliate ();
+
+				ChatReportRevShareItem currentReport =
+					getReport (
+						transaction,
+						affiliate);
+
+				// find chat route
+
+				RouteRec route =
+					messageStats.getMessageStatsId ().getRoute ();
+
+				ChatRouteRec chatRoute =
+					chat.getChatRoutes ().get (
+						route.getId ());
+
+				if (chatRoute == null) {
+
+					if (
+						! errorRoutes.contains (
+							route.getId ())
+					) {
+
+						errorRoutes.add (
+							route.getId ());
+
+						consoleRequestContext.addErrorFormat (
+							"Unknown route: %s (%s)",
+							route.getCode (),
+							integerToDecimalString (
+								route.getId ()));
+
+					}
+
+					continue;
+
+				}
+
+				// find chat route network
+
+				NetworkRec network =
+					messageStats.getMessageStatsId ().getNetwork ();
+
+				Optional <ChatRouteNetworkRec> chatRouteNetwork =
+					Optional.fromNullable (
+						chatRoute.getChatRouteNetworks ().get (
+							network.getId ()));
+
+				// collect stats
+
+				MessageStatsData statsValue =
+					messageStats.getStats ();
+
+				addToReport (
+					transaction,
+					currentReport,
+					chatRoute,
+					chatRouteNetwork,
+					statsValue);
+
+				addToReport (
+					transaction,
+					totalReport,
+					chatRoute,
+					chatRouteNetwork,
+					statsValue);
+
+			}
+
+		}
+
+	}
+
+	private
+	void addCredits (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"addCredits");
+
+		) {
+
+			List <ChatUserCreditRec> chatUserCredits =
+				chatUserCreditHelper.findByTimestamp (
+					transaction,
+					chat,
+					new Interval (
+						startDate.toDateTimeAtStartOfDay (),
+						endDate.toDateTimeAtStartOfDay ()));
+
+			for (
+				ChatUserCreditRec chatUserCredit
+					: chatUserCredits
+			) {
+
+				ChatUserRec chatUser =
+					chatUserCredit.getChatUser ();
+
+				AffiliateRec affiliate =
+					chatUserLogic.getAffiliate (
+						transaction,
+						chatUser);
+
+				ChatReportRevShareItem affiliateReport =
+					getReport (
+						transaction,
+						affiliate);
+
+				addToReport (
+					affiliateReport,
+					chatUserCredit);
+
+				addToReport (
+					totalReport,
+					chatUserCredit);
+
+			}
+
+		}
+
+	}
+
+	private
+	void addJoiners (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"addJoiners");
 
 		) {
 
 			List <ChatUserRec> joiners =
 				chatUserHelper.search (
-					taskLogger,
+					transaction,
 					new ChatUserSearch ()
 
 				.chatId (
@@ -447,7 +487,8 @@ class ChatReportRevSharePart
 
 				.firstJoin (
 					TextualInterval.forInterval (
-						userConsoleLogic.timezone (),
+						userConsoleLogic.timezone (
+							transaction),
 						startDate,
 						endDate))
 
@@ -460,10 +501,12 @@ class ChatReportRevSharePart
 
 				AffiliateRec affiliate =
 					chatUserLogic.getAffiliate (
+						transaction,
 						chatUser);
 
 				ChatReportRevShareItem affiliateReport =
 					getReport (
+						transaction,
 						affiliate);
 
 				affiliateReport.setJoiners (
@@ -478,7 +521,9 @@ class ChatReportRevSharePart
 
 	}
 
+	private
 	void addToReport (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatReportRevShareItem report,
 			@NonNull ChatRouteRec chatRoute,
 			@NonNull Optional <ChatRouteNetworkRec> chatRouteNetwork,
@@ -587,113 +632,130 @@ class ChatReportRevSharePart
 	}
 
 	ChatReportRevShareItem getReport (
+			@NonNull Transaction parentTransaction,
 			@NonNull AffiliateRec affiliate) {
-
-		ChatReportRevShareItem existingReport =
-			chatReportsByAffiliate.get (
-				affiliate);
-
-		if (existingReport != null)
-			return existingReport;
-
-		Object affiliateParent =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					affiliate));
-
-		ChatReportRevShareItem newReport;
-
-		if (affiliateParent instanceof ChatAffiliateRec) {
-
-			ChatAffiliateRec chatAffiliate =
-				(ChatAffiliateRec)
-				affiliateParent;
-
-			newReport =
-				new ChatReportRevShareItem ()
-
-				.setAffiliate (
-					affiliate)
-
-				.setPath (
-					objectManager.objectPathMini (
-						chatAffiliate,
-						chat))
-
-				.setDescription (
-					chatAffiliate.getDescription ())
-
-				.setCurrency (
-					chat.getCurrency ());
-
-		} else if (affiliateParent instanceof ChatSchemeRec) {
-
-			ChatSchemeRec chatScheme =
-				(ChatSchemeRec)
-				affiliateParent;
-
-			newReport =
-				new ChatReportRevShareItem ()
-
-				.setAffiliate (
-					affiliate)
-
-				.setPath (
-					objectManager.objectPathMini (
-						chatScheme,
-						chat))
-
-				.setDescription (
-					chatScheme.getDescription ())
-
-				.setCurrency (
-					chat.getCurrency ());
-
-		} else if (affiliateParent instanceof RootRec) {
-
-			newReport =
-				new ChatReportRevShareItem ()
-
-				.setAffiliate (
-					affiliate)
-
-				.setPath (
-					"system")
-
-				.setDescription (
-					"")
-
-				.setCurrency (
-					chat.getCurrency ());
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
-		chatReportsByAffiliate.put (
-			affiliate,
-			newReport);
-
-		return newReport;
-
-	}
-
-	void addChatMessages (
-			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getReport");
+
+		) {
+
+			ChatReportRevShareItem existingReport =
+				chatReportsByAffiliate.get (
+					affiliate);
+
+			if (existingReport != null)
+				return existingReport;
+
+			Object affiliateParent =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						transaction,
+						affiliate));
+
+			ChatReportRevShareItem newReport;
+
+			if (affiliateParent instanceof ChatAffiliateRec) {
+
+				ChatAffiliateRec chatAffiliate =
+					(ChatAffiliateRec)
+					affiliateParent;
+
+				newReport =
+					new ChatReportRevShareItem ()
+
+					.setAffiliate (
+						affiliate)
+
+					.setPath (
+						objectManager.objectPathMini (
+							transaction,
+							chatAffiliate,
+							chat))
+
+					.setDescription (
+						chatAffiliate.getDescription ())
+
+					.setCurrency (
+						chat.getCurrency ());
+
+			} else if (affiliateParent instanceof ChatSchemeRec) {
+
+				ChatSchemeRec chatScheme =
+					(ChatSchemeRec)
+					affiliateParent;
+
+				newReport =
+					new ChatReportRevShareItem ()
+
+					.setAffiliate (
+						affiliate)
+
+					.setPath (
+						objectManager.objectPathMini (
+							transaction,
+							chatScheme,
+							chat))
+
+					.setDescription (
+						chatScheme.getDescription ())
+
+					.setCurrency (
+						chat.getCurrency ());
+
+			} else if (affiliateParent instanceof RootRec) {
+
+				newReport =
+					new ChatReportRevShareItem ()
+
+					.setAffiliate (
+						affiliate)
+
+					.setPath (
+						"system")
+
+					.setDescription (
+						"")
+
+					.setCurrency (
+						chat.getCurrency ());
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+			chatReportsByAffiliate.put (
+				affiliate,
+				newReport);
+
+			return newReport;
+
+		}
+
+	}
+
+	private
+	void addChatMessages (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"addChatMessages");
 
 		) {
 
 			Optional <ChatMonthCostRec> chatMonthCostOptional =
 				chatMonthCostHelper.findByCode (
+					transaction,
 					chat,
 					form.month ());
 
@@ -709,7 +771,7 @@ class ChatReportRevSharePart
 
 			List <ChatMessageRec> chatMessages =
 				chatMessageHelper.search (
-					taskLogger,
+					transaction,
 					new ChatMessageSearch ()
 
 				.hasSender (
@@ -736,10 +798,12 @@ class ChatReportRevSharePart
 
 				AffiliateRec affiliate =
 					chatUserLogic.getAffiliate (
+						transaction,
 						chatMessage.getToUser ());
 
 				ChatReportRevShareItem affiliateReport =
 					getReport (
+						transaction,
 						affiliate);
 
 				affiliateReport.setStaffCost (
@@ -757,35 +821,36 @@ class ChatReportRevSharePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			goSearchForm (
-				taskLogger);
+				transaction);
 
 			goReport (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
+	private
 	void goSearchForm (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goSearchForm");
 
 		) {
@@ -797,7 +862,7 @@ class ChatReportRevSharePart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -824,13 +889,13 @@ class ChatReportRevSharePart
 	}
 
 	void goReport (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goReport");
 
 		) {
@@ -862,7 +927,7 @@ class ChatReportRevSharePart
 				htmlTableRowOpen ();
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					resultsFields,
 					chatReport,
@@ -878,7 +943,7 @@ class ChatReportRevSharePart
 			htmlTableRowOpen ();
 
 			formFieldLogic.outputTableCellsList (
-				taskLogger,
+				transaction,
 				formatWriter,
 				resultsFields,
 				totalReport,

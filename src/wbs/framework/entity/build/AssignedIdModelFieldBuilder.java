@@ -4,25 +4,36 @@ import static wbs.utils.etc.NullUtils.ifNull;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.ids.AssignedIdFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("assignedIdModelFieldBuilder")
 @ModelBuilder
 public
-class AssignedIdModelFieldBuilder {
+class AssignedIdModelFieldBuilder
+	implements BuilderComponent {
 
 	// builder
 
 	@BuilderParent
 	ModelFieldBuilderContext context;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@BuilderSource
 	AssignedIdFieldSpec spec;
@@ -32,63 +43,76 @@ class AssignedIdModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		// create model field
+		try (
 
-		ModelField modelField =
-			new ModelField ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.model (
-				target.model ())
+		) {
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				"id")
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				"id")
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.assignedId)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					"id")
 
-			.identity (
-				false)
+				.label (
+					"id")
 
-			.valueType (
-				Long.class)
+				.type (
+					ModelFieldType.assignedId)
 
-			.nullable (
-				false)
+				.parent (
+					false)
 
-			.columnNames (
-				ImmutableList.<String>of (
-					ifNull (
-						spec.columnName (),
-						"id")));
+				.identity (
+					false)
 
-		// store field
+				.valueType (
+					Long.class)
 
-		target.fields ().add (
-			modelField);
+				.nullable (
+					false)
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							"id")));
 
-		if (target.model ().idField () != null)
-			throw new RuntimeException ();
+			// store field
 
-		target.model ().idField (
-			modelField);
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+			if (target.model ().idField () != null)
+				throw new RuntimeException ();
+
+			target.model ().idField (
+				modelField);
+
+		}
 
 	}
 

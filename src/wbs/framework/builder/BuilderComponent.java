@@ -6,7 +6,7 @@ public
 interface BuilderComponent {
 
 	void build (
-			TaskLogger taskLogger,
-			Builder builder);
+			TaskLogger parentTaskLogger,
+			Builder <TaskLogger> builder);
 
 }

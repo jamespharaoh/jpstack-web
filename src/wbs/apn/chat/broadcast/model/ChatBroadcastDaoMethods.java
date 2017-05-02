@@ -4,20 +4,24 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
-import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.framework.database.Transaction;
+
 import wbs.apn.chat.core.model.ChatRec;
 
 public
 interface ChatBroadcastDaoMethods {
 
-	List<ChatBroadcastRec> findRecentWindow (
+	List <ChatBroadcastRec> findRecentWindow (
+			Transaction parentTransaction,
 			ChatRec chat,
-			int firstResult,
-			int maxResults);
+			Long firstResult,
+			Long maxResults);
 
-	List<ChatBroadcastRec> findSending ();
+	List <ChatBroadcastRec> findSending (
+			Transaction parentTransaction);
 
-	List<ChatBroadcastRec> findScheduled (
+	List <ChatBroadcastRec> findScheduled (
+			Transaction parentTransaction,
 			Instant now);
 
 }

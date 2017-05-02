@@ -3,6 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.maximumJavaInteger;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -80,27 +81,21 @@ class ImChatPendingFormAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatPendingFormAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			// find message
 
 			ImChatMessageRec customerMessage =
-				imChatMessageHelper.findFromContextRequired ();
+				imChatMessageHelper.findFromContextRequired (
+					transaction);
 
 			ImChatConversationRec conversation =
 				customerMessage.getImChatConversation ();
@@ -194,7 +189,8 @@ class ImChatPendingFormAction
 
 				template =
 					imChatTemplateHelper.findRequired (
-						Long.parseLong (
+						transaction,
+						parseIntegerRequired (
 							templateString));
 
 				if (template.getImChat () != imChat)
@@ -273,7 +269,7 @@ class ImChatPendingFormAction
 
 				ImChatMessageRec operatorMessage =
 					imChatMessageHelper.insert (
-						taskLogger,
+						transaction,
 						imChatMessageHelper.createInstance ()
 
 					.setImChatConversation (
@@ -283,7 +279,8 @@ class ImChatPendingFormAction
 						conversation.getNumMessages ())
 
 					.setSenderUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setTimestamp (
 						transaction.now ())
@@ -349,9 +346,10 @@ class ImChatPendingFormAction
 			// remove queue item
 
 			queueLogic.processQueueItem (
-				taskLogger,
+				transaction,
 				customerMessage.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				userConsoleLogic.userRequired (
+					transaction));
 
 			// done
 

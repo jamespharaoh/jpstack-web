@@ -78,8 +78,9 @@ class ChatUserAdminBarringAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -130,82 +131,72 @@ class ChatUserAdminBarringAction
 
 			}
 
-			try (
+			// lookup database stuff
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatUserAdminBarringAction.goReal ()",
-						this);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			// do the work
 
-				// lookup database stuff
+			String eventType = null;
+			String notice = null;
 
-				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+			if (barOn) {
 
-				// do the work
+				chatUserLogic.logoff (
+					transaction,
+					chatUser,
+					true);
 
-				String eventType = null;
-				String notice = null;
+				chatUser
 
-				if (barOn) {
-
-					chatUserLogic.logoff (
-						taskLogger,
-						chatUser,
+					.setBarred (
 						true);
 
-					chatUser
+				eventType =
+					"chat_user_barred";
 
-						.setBarred (
-							true);
+				notice =
+					"Chat user barred";
 
-					eventType =
-						"chat_user_barred";
+			} else if (barOff) {
 
-					notice =
-						"Chat user barred";
+				chatUser
 
-				} else if (barOff) {
+					.setBarred (
+						false);
 
-					chatUser
+				eventType =
+					"chat_user_unbarred";
 
-						.setBarred (
-							false);
+				notice =
+					"Chat user unbarred";
 
-					eventType =
-						"chat_user_unbarred";
+			} else {
 
-					notice =
-						"Chat user unbarred";
-
-				} else {
-
-					throw shouldNeverHappen ();
-
-				}
-
-				// create an event
-
-				eventLogic.createEvent (
-					taskLogger,
-					eventType,
-					userConsoleLogic.userRequired (),
-					chatUser,
-					reason);
-
-				transaction.commit ();
-
-				// return
-
-				requestContext.addNotice (
-					notice);
-
-				return null;
+				throw shouldNeverHappen ();
 
 			}
+
+			// create an event
+
+			eventLogic.createEvent (
+				transaction,
+				eventType,
+				userConsoleLogic.userRequired (
+					transaction),
+				chatUser,
+				reason);
+
+			transaction.commit ();
+
+			// return
+
+			requestContext.addNotice (
+				notice);
+
+			return null;
 
 		}
 

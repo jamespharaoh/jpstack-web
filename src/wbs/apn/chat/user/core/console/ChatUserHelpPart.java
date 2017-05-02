@@ -33,9 +33,12 @@ import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.sms.message.core.console.MessageConsoleLogic;
 
@@ -58,6 +61,9 @@ class ChatUserHelpPart
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MessageConsoleLogic messageConsoleLogic;
 
@@ -75,159 +81,182 @@ class ChatUserHelpPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		chatHelpLogs =
-			new TreeSet<> (
-				chatUser.getChatHelpLogs ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			chatHelpLogs =
+				new TreeSet<> (
+					chatUser.getChatHelpLogs ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		String link =
-			requestContext.resolveLocalUrl (
-				"/chatUser.helpForm");
+		try (
 
-		htmlParagraphOpen ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		formatWriter.writeFormat (
-			"<button",
-			" onclick=\"%h\"",
-			stringFormat (
-				"top.frames['inbox'].location='%j';",
-				link),
-			">send message</button>");
-
-		htmlParagraphClose ();
-
-		if (
-			collectionIsEmpty (
-				chatHelpLogs)
 		) {
 
-			htmlParagraphWrite (
-				"No history to display.");
+			String link =
+				requestContext.resolveLocalUrl (
+					"/chatUser.helpForm");
 
-			return;
+			htmlParagraphOpen ();
 
-		}
+			formatWriter.writeFormat (
+				"<button",
+				" onclick=\"%h\"",
+				stringFormat (
+					"top.frames['inbox'].location='%j';",
+					link),
+				">send message</button>");
 
-		// table open
-
-		htmlTableOpenList ();
-
-		// table headers
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Time",
-			"Message",
-			"Our number",
-			"User");
-
-		// table content
-
-		LocalDate previousDate = null;
-
-		DateTimeZone timezone =
-			chatUserLogic.getTimezone (
-				chatUser);
-
-		for (
-			ChatHelpLogRec chatHelpLog
-				: chatHelpLogs
-		) {
-
-			LocalDate nextDate =
-				chatHelpLog.getTimestamp ()
-
-				.toDateTime (
-					timezone)
-
-				.toLocalDate ();
+			htmlParagraphClose ();
 
 			if (
-
-				isNull (
-					previousDate)
-
-				|| localDateNotEqual (
-					nextDate,
-					previousDate)
-
+				collectionIsEmpty (
+					chatHelpLogs)
 			) {
 
-				previousDate =
-					nextDate;
+				htmlParagraphWrite (
+					"No history to display.");
 
-				htmlTableRowSeparatorWrite ();
+				return;
+
+			}
+
+			// table open
+
+			htmlTableOpenList ();
+
+			// table headers
+
+			htmlTableHeaderRowWrite (
+				"",
+				"Time",
+				"Message",
+				"Our number",
+				"User");
+
+			// table content
+
+			LocalDate previousDate = null;
+
+			DateTimeZone timezone =
+				chatUserLogic.getTimezone (
+					chatUser);
+
+			for (
+				ChatHelpLogRec chatHelpLog
+					: chatHelpLogs
+			) {
+
+				LocalDate nextDate =
+					chatHelpLog.getTimestamp ()
+
+					.toDateTime (
+						timezone)
+
+					.toLocalDate ();
+
+				if (
+
+					isNull (
+						previousDate)
+
+					|| localDateNotEqual (
+						nextDate,
+						previousDate)
+
+				) {
+
+					previousDate =
+						nextDate;
+
+					htmlTableRowSeparatorWrite ();
+
+					htmlTableRowOpen (
+						htmlStyleAttribute (
+							htmlStyleRuleEntry (
+								"font-weight",
+								"bold")));
+
+					htmlTableCellWrite (
+						timeFormatter.dateStringLong (
+							chatUserLogic.getTimezone (
+								chatUser),
+							chatHelpLog.getTimestamp ()),
+						htmlColumnSpanAttribute (5l));
+
+					htmlTableRowClose ();
+
+				}
+
+				String rowClass =
+					messageConsoleLogic.classForMessageDirection (
+						chatHelpLog.getDirection ());
 
 				htmlTableRowOpen (
+					htmlClassAttribute (
+						rowClass));
+
+				htmlTableCellWriteHtml (
+					"&nbsp;",
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
-							"font-weight",
-							"bold")));
+							"background",
+							htmlColourFromObject (
+								ifNull (
+									chatHelpLog.getOurNumber (),
+									0)))));
 
 				htmlTableCellWrite (
-					timeFormatter.dateStringLong (
+					timeFormatter.timeString (
 						chatUserLogic.getTimezone (
 							chatUser),
-						chatHelpLog.getTimestamp ()),
-					htmlColumnSpanAttribute (5l));
+						chatHelpLog.getTimestamp ()));
+
+
+				htmlTableCellWrite (
+					chatHelpLog.getText ());
+
+				htmlTableCellWrite (
+					chatHelpLog.getOurNumber ());
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatHelpLog.getUser (),
+					() ->
+						chatHelpLog.getUser ().getUsername ()));
 
 				htmlTableRowClose ();
 
 			}
 
-			String rowClass =
-				messageConsoleLogic.classForMessageDirection (
-					chatHelpLog.getDirection ());
-
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					rowClass));
-
-			htmlTableCellWriteHtml (
-				"&nbsp;",
-				htmlStyleAttribute (
-					htmlStyleRuleEntry (
-						"background",
-						htmlColourFromObject (
-							ifNull (
-								chatHelpLog.getOurNumber (),
-								0)))));
-
-			htmlTableCellWrite (
-				timeFormatter.timeString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					chatHelpLog.getTimestamp ()));
-
-
-			htmlTableCellWrite (
-				chatHelpLog.getText ());
-
-			htmlTableCellWrite (
-				chatHelpLog.getOurNumber ());
-
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatHelpLog.getUser (),
-				() ->
-					chatHelpLog.getUser ().getUsername ()));
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

@@ -25,12 +25,15 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -47,6 +50,9 @@ class ObjectHelperPropertyImplementation <
 		ObjectHelperPropertyMethods <RecordType> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -152,38 +158,51 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Long getParentId (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		if (
-			isNotInstanceOf (
-				objectModel.objectClass (),
-				object)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getParentId");
+
 		) {
 
-			throw new IllegalArgumentException ();
+			if (
+				isNotInstanceOf (
+					objectModel.objectClass (),
+					object)
+			) {
 
-		} else if (objectModel.isRoot ()) {
+				throw new IllegalArgumentException ();
 
-			throw new UnsupportedOperationException ();
+			} else if (objectModel.isRoot ()) {
 
-		} else if (objectModel.isRooted ()) {
+				throw new UnsupportedOperationException ();
 
-			return 0l;
+			} else if (objectModel.isRooted ()) {
 
-		} else if (objectModel.canGetParent ()) {
+				return 0l;
 
-			Record <?> parent =
-				getParentRequired (
-					object);
+			} else if (objectModel.canGetParent ()) {
 
-			return parent.getId ();
+				Record <?> parent =
+					getParentRequired (
+						transaction,
+						object);
 
-		} else {
+				return parent.getId ();
 
-			return (Long)
-				PropertyUtils.propertyGetAuto (
-					object,
-					objectModel.parentIdField ().name ());
+			} else {
+
+				return (Long)
+					PropertyUtils.propertyGetAuto (
+						object,
+						objectModel.parentIdField ().name ());
+
+			}
 
 		}
 
@@ -207,19 +226,32 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	GlobalId getParentGlobalId (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		if (objectModel.isRoot ()) {
+		try (
 
-			return null;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getParentGlobalId");
 
-		} else {
+		) {
 
-			return new GlobalId (
-				getParentTypeId (
-					object),
-				getParentId (
-					object));
+			if (objectModel.isRoot ()) {
+
+				return null;
+
+			} else {
+
+				return new GlobalId (
+					getParentTypeId (
+						object),
+					getParentId (
+						transaction,
+						object));
+
+			}
 
 		}
 
@@ -228,100 +260,114 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Either <Optional <Record <?>>, String> getParentOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
-		if (objectModel.isRoot ()) {
+		try (
 
-			return successResult (
-				optionalAbsent ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getParentOrError");
 
-		} else if (objectModel.isRooted ()) {
+		) {
 
-			ObjectHelper <?> rootHelper =
-				objectManager.objectHelperForClassRequired (
-					objectTypeRegistry.rootRecordClass ());
+			if (objectModel.isRoot ()) {
 
-			return successResult (
-				optionalOf (
-					rootHelper.findRequired (
-						0l)));
+				return successResult (
+					optionalAbsent ());
 
-		} else if (objectModel.canGetParent ()) {
+			} else if (objectModel.isRooted ()) {
 
-			return successResult (
-				optionalFromNullable (
-					objectModel.getParentOrNull (
-						object)));
+				ObjectHelper <?> rootHelper =
+					objectManager.objectHelperForClassRequired (
+						objectTypeRegistry.rootRecordClass ());
 
-		} else {
+				return successResult (
+					optionalOf (
+						rootHelper.findRequired (
+							transaction,
+							0l)));
 
-			Record <?> parentObjectType =
-				(Record <?>)
-				objectModel.getParentType (
-					object);
+			} else if (objectModel.canGetParent ()) {
 
-			Long parentObjectId =
-				objectModel.getParentId (
-					object);
+				return successResult (
+					optionalFromNullable (
+						objectModel.getParentOrNull (
+							object)));
 
-			if (
-				isNull (
-					parentObjectId)
-			) {
+			} else {
 
-				return errorResultFormat (
-					"Failed to get parent id of %s with id %s",
-					objectModel.objectName (),
-					integerToDecimalString (
-						object.getId ()));
+				Record <?> parentObjectType =
+					(Record <?>)
+					objectModel.getParentType (
+						object);
 
-			}
+				Long parentObjectId =
+					objectModel.getParentId (
+						object);
 
-			Optional <ObjectHelper <?>> parentHelperOptional =
-				objectManager.objectHelperForTypeId (
-					parentObjectType.getId ());
+				if (
+					isNull (
+						parentObjectId)
+				) {
 
-			if (
-				optionalIsNotPresent (
-					parentHelperOptional)
-			) {
-
-				return errorResult (
-					stringFormat (
-						"No object helper provider for %s, ",
-						integerToDecimalString (
-							parentObjectType.getId ()),
-						"parent of %s (%s)",
+					return errorResultFormat (
+						"Failed to get parent id of %s with id %s",
 						objectModel.objectName (),
 						integerToDecimalString (
-							object.getId ())));
+							object.getId ()));
 
-			}
+				}
 
-			ObjectHelper <?> parentHelper =
-				optionalGetRequired (
-					parentHelperOptional);
+				Optional <ObjectHelper <?>> parentHelperOptional =
+					objectManager.objectHelperForTypeId (
+						parentObjectType.getId ());
 
-			Optional <Record <?>> parentOptional =
-				genericCastUnchecked (
-					parentHelper.find (
+				if (
+					optionalIsNotPresent (
+						parentHelperOptional)
+				) {
+
+					return errorResult (
+						stringFormat (
+							"No object helper provider for %s, ",
+							integerToDecimalString (
+								parentObjectType.getId ()),
+							"parent of %s (%s)",
+							objectModel.objectName (),
+							integerToDecimalString (
+								object.getId ())));
+
+				}
+
+				ObjectHelper <?> parentHelper =
+					optionalGetRequired (
+						parentHelperOptional);
+
+				Optional <Record <?>> parentOptional =
+					genericCastUnchecked (
+						parentHelper.find (
+							transaction,
+							parentObjectId));
+
+				if (
+					optionalIsNotPresent (
+						parentOptional)
+				) {
+
+					return errorResultFormat (
+						"Can't find %s with id %s",
+						parentHelper.objectName (),
+						integerToDecimalString (
 						parentObjectId));
 
-			if (
-				optionalIsNotPresent (
-					parentOptional)
-			) {
+				}
 
-				return errorResultFormat (
-					"Can't find %s with id %s",
-					parentHelper.objectName (),
-					integerToDecimalString (
-					parentObjectId));
+				return successResult (
+					parentOptional);
 
 			}
-
-			return successResult (
-				parentOptional);
 
 		}
 
@@ -341,98 +387,111 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Either <Boolean, String> getDeletedOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull Boolean checkParents) {
 
-		Record <?> currentObject =
-			object;
+		try (
 
-		ObjectHelper <?> currentHelper =
-			objectHelper;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getDeletedOrError");
 
-		for (;;) {
+		) {
 
-			// root is never deleted
+			Record <?> currentObject =
+				object;
 
-			if (currentHelper.isRoot ()) {
+			ObjectHelper <?> currentHelper =
+				objectHelper;
 
-				return successResult (
-					false);
+			for (;;) {
 
-			}
+				// root is never deleted
 
-			// check our deleted flag
-
-			try {
-
-				Boolean deletedProperty =
-					genericCastUnchecked (
-						PropertyUtils.propertyGetAuto (
-							currentObject,
-							"deleted"));
-
-				if (deletedProperty) {
+				if (currentHelper.isRoot ()) {
 
 					return successResult (
-						true);
+						false);
 
 				}
 
-			} catch (Exception exception) {
+				// check our deleted flag
 
-				doNothing ();
+				try {
+
+					Boolean deletedProperty =
+						genericCastUnchecked (
+							PropertyUtils.propertyGetAuto (
+								currentObject,
+								"deleted"));
+
+					if (deletedProperty) {
+
+						return successResult (
+							true);
+
+					}
+
+				} catch (Exception exception) {
+
+					doNothing ();
+
+				}
+
+				// try parent
+
+				if (! checkParents) {
+
+					return successResult (
+						false);
+
+				}
+
+				Either <Optional <Record <?>>, String> nextObjectOrError =
+					currentHelper.getParentOrError (
+						transaction,
+						genericCastUnchecked (
+							currentObject));
+
+				if (
+					isError (
+						nextObjectOrError)
+				) {
+
+					return errorResult (
+						getError (
+							nextObjectOrError));
+
+				}
+
+				Optional <Record <?>> nextObjectOptional =
+					resultValueRequired (
+						nextObjectOrError);
+
+				if (
+					optionalIsNotPresent (
+						nextObjectOptional)
+				) {
+
+					return errorResultFormat (
+						"Unable to find parent for %s with id %s",
+						currentHelper.objectName (),
+						integerToDecimalString (
+							object.getId ()));
+
+				}
+
+				currentObject =
+					optionalGetRequired (
+						nextObjectOptional);
+
+				currentHelper =
+					objectManager.objectHelperForObjectRequired (
+						currentObject);
 
 			}
-
-			// try parent
-
-			if (! checkParents) {
-
-				return successResult (
-					false);
-
-			}
-
-			Either <Optional <Record <?>>, String> nextObjectOrError =
-				currentHelper.getParentOrError (
-					genericCastUnchecked (
-						currentObject));
-
-			if (
-				isError (
-					nextObjectOrError)
-			) {
-
-				return errorResult (
-					getError (
-						nextObjectOrError));
-
-			}
-
-			Optional <Record <?>> nextObjectOptional =
-				resultValueRequired (
-					nextObjectOrError);
-
-			if (
-				optionalIsNotPresent (
-					nextObjectOptional)
-			) {
-
-				return errorResultFormat (
-					"Unable to find parent for %s with id %s",
-					currentHelper.objectName (),
-					integerToDecimalString (
-						object.getId ()));
-
-			}
-
-			currentObject =
-				optionalGetRequired (
-					nextObjectOptional);
-
-			currentHelper =
-				objectManager.objectHelperForObjectRequired (
-					currentObject);
 
 		}
 
@@ -441,25 +500,27 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Object getDynamic (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name) {
 
 		return objectModel.hooks ().getDynamic (
-			 object,
-			 name);
+			parentTransaction,
+			object,
+			name);
 
 	}
 
 	@Override
 	public
 	void setDynamic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
 		objectModel.hooks ().setDynamic (
-			parentTaskLogger,
+			parentTransaction,
 			object,
 			name,
 			valueOptional);

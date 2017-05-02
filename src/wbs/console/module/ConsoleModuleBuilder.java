@@ -24,12 +24,13 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("consoleModuleBuilder")
 public
 class ConsoleModuleBuilder
-	implements Builder {
+	implements Builder <TaskLogger> {
 
 	// singleton dependencies
 
@@ -39,7 +40,7 @@ class ConsoleModuleBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ConsoleModuleBuilderHandler
@@ -47,30 +48,40 @@ class ConsoleModuleBuilder
 
 	// state
 
-	Builder builder;
+	Builder <TaskLogger> builder;
 
 	// init
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		BuilderFactory builderFactory =
-			builderFactoryProvider.get ();
+		try (
 
-		for (
-			Map.Entry<Class<?>,Provider<Object>> entry
-				: consoleModuleBuilders.entrySet ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
 		) {
 
-			builderFactory.addBuilder (
-				entry.getKey (),
-				entry.getValue ());
+			builder =
+				builderFactoryProvider.get ()
+
+				.contextClass (
+					TaskLogger.class)
+
+				.addBuilders (
+					taskLogger,
+					consoleModuleBuilders)
+
+				.create (
+					taskLogger)
+
+			;
 
 		}
-
-		builder =
-			builderFactory.create ();
 
 	}
 
@@ -85,7 +96,7 @@ class ConsoleModuleBuilder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"buildFormFieldSet");

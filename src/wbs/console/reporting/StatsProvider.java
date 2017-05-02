@@ -2,13 +2,13 @@ package wbs.console.reporting;
 
 import java.util.Map;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface StatsProvider {
 
 	StatsDataSet getStats (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			StatsPeriod period,
 			Map <String, Object> conditions);
 

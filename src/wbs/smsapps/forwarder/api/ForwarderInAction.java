@@ -61,45 +61,39 @@ class ForwarderInAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goApi");
 
 		) {
 
-			try (
+			String slice =
+				requestContext.parameterRequired (
+					"slice");
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ForwarderInAction.goApi ()",
-						this);
+			String code =
+				requestContext.parameterRequired (
+					"code");
 
-			) {
+			String password =
+				requestContext.parameterRequired (
+					"password");
 
-				String slice =
-					requestContext.parameterRequired (
-						"slice");
+			String action =
+				requestContext.parameterRequired (
+					"action");
 
-				String code =
-					requestContext.parameterRequired (
-						"code");
+			ForwarderRec forwarder;
 
-				String password =
-					requestContext.parameterRequired (
-						"password");
-
-				String action =
-					requestContext.parameterRequired (
-						"action");
-
-				ForwarderRec forwarder;
+			try {
 
 				try {
 
 					forwarder =
 						forwarderApiLogic.lookupForwarder (
+							transaction,
 							requestContext,
 							slice,
 							code,
@@ -122,18 +116,21 @@ class ForwarderInAction
 				if (action.equalsIgnoreCase ("get")) {
 
 					return forwarderApiLogic.controlActionGet (
+						transaction,
 						requestContext,
 						forwarder);
 
 				} else if (action.equalsIgnoreCase ("borrow")) {
 
 					return forwarderApiLogic.controlActionBorrow (
+						transaction,
 						requestContext,
 						forwarder);
 
 				} else if (action.equalsIgnoreCase ("unqueue")) {
 
 					return forwarderApiLogic.controlActionUnqueue (
+						transaction,
 						requestContext,
 						forwarder);
 
@@ -146,7 +143,7 @@ class ForwarderInAction
 
 			} catch (ReportableException exception) {
 
-				taskLogger.errorFormatException (
+				transaction.errorFormatException (
 					exception,
 					"Error doing 'in'");
 
@@ -166,7 +163,7 @@ class ForwarderInAction
 							: values
 					) {
 
-						taskLogger.errorFormat (
+						transaction.errorFormat (
 							"Param %s: %s",
 							 name,
 							 value);

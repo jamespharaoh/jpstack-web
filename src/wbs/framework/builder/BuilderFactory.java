@@ -4,16 +4,27 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import wbs.framework.logging.TaskLogger;
+
 public
-interface BuilderFactory {
+interface BuilderFactory <
+	Factory extends BuilderFactory <Factory, Context>,
+	Context
+> {
 
-	BuilderFactory addBuilder (
-			Class<?> builderClass,
-			Provider<?> builderProvider);
+	Factory contextClass (
+			Class <Context> contextClass);
 
-	BuilderFactory addBuilders (
-			Map<Class<?>,Provider<Object>> builders);
+	Factory addBuilder (
+			TaskLogger parentTaskLogger,
+			Class <?> builderClass,
+			Provider <?> builderProvider);
 
-	Builder create ();
+	Factory addBuilders (
+			TaskLogger parentTaskLogger,
+			Map <Class <?>, Provider <Object>> builders);
+
+	Builder <Context> create (
+			TaskLogger parentTaskLogger);
 
 }

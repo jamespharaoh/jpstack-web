@@ -95,8 +95,9 @@ class ChatUserAdminInfoAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -135,116 +136,107 @@ class ChatUserAdminInfoAction
 				requestContext.parameterOrEmptyString (
 					"info");
 
-			// transaction...
+			// load database objects
 
-			try (
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatUserAdminInfoAction.goReal ()",
-						this);
+			ChatRec chat =
+				chatUser.getChat ();
 
-			) {
+			TextRec newInfoText =
+				newInfo != null
+					? textHelper.findOrCreate (
+						transaction,
+						newInfo)
+					: null;
 
-				// load database objects
+			TextRec oldInfoText =
+				chatUser.getInfoText ();
 
-				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+			if (newInfoText != oldInfoText) {
 
-				ChatRec chat =
-					chatUser.getChat ();
+				ChatUserInfoRec chatUserInfo =
+					chatUserInfoHelper.insert (
+						transaction,
+						chatUserInfoHelper.createInstance ()
 
-				TextRec newInfoText =
-					newInfo != null
-						? textHelper.findOrCreate (
-							taskLogger,
-							newInfo)
-						: null;
+					.setChatUser (
+						chatUser)
 
-				TextRec oldInfoText =
-					chatUser.getInfoText ();
+					.setCreationTime (
+						transaction.now ())
 
-				if (newInfoText != oldInfoText) {
+					.setOriginalText (
+						oldInfoText)
 
-					ChatUserInfoRec chatUserInfo =
-						chatUserInfoHelper.insert (
-							taskLogger,
-							chatUserInfoHelper.createInstance ()
+					.setEditedText (
+						newInfoText)
 
-						.setChatUser (
-							chatUser)
+					.setStatus (
+						ChatUserInfoStatus.console)
 
-						.setCreationTime (
-							transaction.now ())
+					.setModerator (
+						userConsoleLogic.userRequired (
+							transaction))
 
-						.setOriginalText (
-							oldInfoText)
+					.setEditReason (
+						editReason)
 
-						.setEditedText (
-							newInfoText)
+				);
 
-						.setStatus (
-							ChatUserInfoStatus.console)
+				chatUser
 
-						.setModerator (
-							userConsoleLogic.userRequired ())
+					.setInfoText (
+						newInfoText);
 
-						.setEditReason (
-							editReason)
+				chatUser.getChatUserInfos ().add (
+					chatUserInfo);
 
-					);
+				if (newInfoText == null) {
 
-					chatUser
+					// TODO use a template
 
-						.setInfoText (
-							newInfoText);
+					TextRec messageText =
+						textHelper.findOrCreateFormat (
+							transaction,
+							"Please reply with a message we can send out to ",
+							"people to introduce you. Say where you are, ",
+							"describe yourself and say what you are looking ",
+							"for.");
 
-					chatUser.getChatUserInfos ().add (
-						chatUserInfo);
-
-					if (newInfoText == null) {
-
-						// TODO use a template
-
-						TextRec messageText =
-							textHelper.findOrCreateFormat (
-								taskLogger,
-								"Please reply with a message we can send out to ",
-								"people to introduce you. Say where you are, ",
-								"describe yourself and say what you are looking ",
-								"for.");
-
-						chatSendLogic.sendMessageMagic (
-							taskLogger,
-							chatUser,
-							null,
-							messageText,
+					chatSendLogic.sendMessageMagic (
+						transaction,
+						chatUser,
+						null,
+						messageText,
+						commandHelper.findByCodeRequired (
+							transaction,
+							chat,
+							"magic"),
+						serviceHelper.findByCodeRequired (
+							transaction,
+							chat,
+							"system"),
+						objectId (
 							commandHelper.findByCodeRequired (
+								transaction,
 								chat,
-								"magic"),
-							serviceHelper.findByCodeRequired (
-								chat,
-								"system"),
-							objectId (
-								commandHelper.findByCodeRequired (
-									chat,
-									"join_info")));
-
-					}
+								"join_info")));
 
 				}
 
-				transaction.commit ();
-
-				requestContext.addNotice (
-					"User's info updated");
-
-				requestContext.setEmptyFormData ();
-
-				return null;
-
 			}
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"User's info updated");
+
+			requestContext.setEmptyFormData ();
+
+			return null;
 
 		}
 

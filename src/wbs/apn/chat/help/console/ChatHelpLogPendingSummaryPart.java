@@ -30,8 +30,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -89,45 +90,57 @@ class ChatHelpLogPendingSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatHelpLog =
-			chatHelpLogHelper.findFromContextRequired ();
+		try (
 
-		chatUser =
-			chatHelpLog.getChatUser ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+		) {
 
-		timezone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
+			chatHelpLog =
+				chatHelpLogHelper.findFromContextRequired (
+					transaction);
 
-		chatHelpLogs =
-			chatUser.getChatHelpLogs ();
+			chatUser =
+				chatHelpLog.getChatUser ();
+
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
+
+			timezone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
+
+			chatHelpLogs =
+				chatUser.getChatHelpLogs ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			renderDetails (
-				taskLogger);
+				transaction);
 
 			renderHistory (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -135,13 +148,13 @@ class ChatHelpLogPendingSummaryPart
 
 	private
 	void renderDetails (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderDetails");
 
 		) {
@@ -151,7 +164,7 @@ class ChatHelpLogPendingSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"User",
 				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatUser,
 					chatUser.getChat ()));
 
@@ -205,7 +218,7 @@ class ChatHelpLogPendingSummaryPart
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			htmlTableDetailsRowWrite (
@@ -220,13 +233,13 @@ class ChatHelpLogPendingSummaryPart
 
 	private
 	void renderHistory (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHistory");
 
 		) {
@@ -277,6 +290,7 @@ class ChatHelpLogPendingSummaryPart
 					formatWriter.writeLineFormat (
 						"<td colspan=\"5\">%h</td>",
 						userConsoleLogic.dateStringLong (
+							transaction,
 							chatHelpLog.getTimestamp ()));
 
 					htmlTableRowClose ();
@@ -300,6 +314,7 @@ class ChatHelpLogPendingSummaryPart
 
 				htmlTableCellWrite (
 					userConsoleLogic.timeString (
+						transaction,
 						chatHelpLog.getTimestamp ()));
 
 				htmlTableCellWrite (

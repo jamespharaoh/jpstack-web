@@ -16,11 +16,12 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.UnsavedRecordDetector;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperUpdateImplementation")
@@ -56,14 +57,14 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record <?>>
 	RecordTypeAgain insert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordTypeAgain objectUncast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"insert");
 
 		) {
@@ -81,13 +82,12 @@ class ObjectHelperUpdateImplementation <
 
 			}
 
-			@SuppressWarnings ("unchecked")
 			RecordType object =
-				(RecordType)
-				objectUncast;
+				genericCastUnchecked (
+					objectUncast);
 
 			objectDatabaseHelper.insert (
-				taskLogger,
+				transaction,
 				object);
 
 			UnsavedRecordDetector.instance.removeRecord (
@@ -99,7 +99,7 @@ class ObjectHelperUpdateImplementation <
 			) {
 
 				childObjectHelper.createSingletons (
-					taskLogger,
+					transaction,
 					objectHelper,
 					object);
 
@@ -114,14 +114,14 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain insertSpecial (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordTypeAgain objectUncast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"insertSpecial");
 
 		) {
@@ -144,7 +144,7 @@ class ObjectHelperUpdateImplementation <
 					objectUncast);
 
 			objectDatabaseHelper.insertSpecial (
-				taskLogger,
+				transaction,
 				object);
 
 			UnsavedRecordDetector.instance.removeRecord (
@@ -156,7 +156,7 @@ class ObjectHelperUpdateImplementation <
 			) {
 
 				childObjectHelper.createSingletons (
-					taskLogger,
+					transaction,
 					objectHelper,
 					object);
 
@@ -171,14 +171,14 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordTypeAgain objectUncast) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"update");
 
 		) {
@@ -201,6 +201,7 @@ class ObjectHelperUpdateImplementation <
 					objectUncast);
 
 			objectDatabaseHelper.update (
+				transaction,
 				object);
 
 			for (
@@ -209,7 +210,7 @@ class ObjectHelperUpdateImplementation <
 			) {
 
 				childObjectHelper.createSingletons (
-					taskLogger,
+					transaction,
 					objectHelper,
 					object);
 
@@ -224,12 +225,12 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ObjectHelper<?> parentHelper,
-			@NonNull Record<?> parentObject) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ObjectHelper <?> parentHelper,
+			@NonNull Record <?> parentObject) {
 
 		objectModel.hooks ().createSingletons (
-			parentTaskLogger,
+			parentTransaction,
 			objectHelper,
 			parentHelper,
 			parentObject);
@@ -239,6 +240,7 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain remove (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordTypeAgain objectUncast) {
 
 		EphemeralRecord <RecordType> object =
@@ -248,6 +250,7 @@ class ObjectHelperUpdateImplementation <
 				objectUncast);
 
 		objectDatabaseHelper.remove (
+			parentTransaction,
 			object);
 
 		return objectUncast;
@@ -320,6 +323,7 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain lock (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordTypeAgain objectUncast) {
 
 		RecordType object =
@@ -328,6 +332,7 @@ class ObjectHelperUpdateImplementation <
 				objectUncast);
 
 		objectDatabaseHelper.lock (
+			parentTransaction,
 			object);
 
 		return objectUncast;

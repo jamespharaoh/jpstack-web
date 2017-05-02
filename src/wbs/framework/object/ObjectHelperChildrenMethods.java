@@ -4,7 +4,10 @@ import static wbs.utils.etc.TypeUtils.dynamicCast;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.codegen.DoNotDelegate;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 
 public
@@ -16,19 +19,23 @@ interface ObjectHelperChildrenMethods <
 	ObjectHelper <RecordType> objectHelper ();
 
 	List <Record <?>> getChildren (
+			Transaction parentTransaction,
 			RecordType object);
 
-	<ChildType extends Record<?>>
+	<ChildType extends Record <?>>
 	List <ChildType> getChildren (
+			Transaction parentTransaction,
 			RecordType object,
 			Class <ChildType> childClass);
 
-	default <ChildType extends Record<?>>
+	default <ChildType extends Record <?>>
 	List <ChildType> getChildrenGeneric (
-			Record <?> object,
-			Class <ChildType> childClass) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Class <ChildType> childClass) {
 
 		return getChildren (
+			parentTransaction,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object),
@@ -37,13 +44,16 @@ interface ObjectHelperChildrenMethods <
 	}
 
 	List <Record <?>> getMinorChildren (
+			Transaction parentTransaction,
 			RecordType object);
 
 	default
 	List <Record <?>> getMinorChildrenGeneric (
-			Record <?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object) {
 
 		return getMinorChildren (
+			parentTransaction,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));

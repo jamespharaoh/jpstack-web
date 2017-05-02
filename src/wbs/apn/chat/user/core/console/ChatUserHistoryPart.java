@@ -32,9 +32,12 @@ import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -65,6 +68,9 @@ class ChatUserHistoryPart
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	TimeFormatter timeFormatter;
 
@@ -79,28 +85,42 @@ class ChatUserHistoryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		Long chatMessageCount =
-			chatMessageHelper.count (
-				chatUser);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		chatMessages =
-			chatMessageHelper.findLimit (
-				chatUser,
-				1000l);
+		) {
 
-		if (chatMessageCount > 1000l) {
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			requestContext.addWarningFormat (
-				"Only showing %s of %s total messages",
-				integerToDecimalString (
-					1000l),
-				integerToDecimalString (
-					chatMessages.size ()));
+			Long chatMessageCount =
+				chatMessageHelper.count (
+					transaction,
+					chatUser);
+
+			chatMessages =
+				chatMessageHelper.findLimit (
+					transaction,
+					chatUser,
+					1000l);
+
+			if (chatMessageCount > 1000l) {
+
+				requestContext.addWarningFormat (
+					"Only showing %s of %s total messages",
+					integerToDecimalString (
+						1000l),
+					integerToDecimalString (
+						chatMessages.size ()));
+
+			}
 
 		}
 
@@ -109,167 +129,178 @@ class ChatUserHistoryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// table open
+		try (
 
-		htmlTableOpenList ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// table header
-
-		htmlTableHeaderRowWrite (
-			"",
-			"Time",
-			"User",
-			"Message",
-			"Monitor");
-
-		// table content
-
-		DateTimeZone timezone =
-			chatUserLogic.getTimezone (
-				chatUser);
-
-		LocalDate previousDate = null;
-
-		for (
-			ChatMessageRec chatMessage
-				: chatMessages
 		) {
 
-			ChatUserRec fromUser =
-				chatMessage.getFromUser ();
+			// table open
 
-			ChatUserRec toUser =
-				chatMessage.getToUser ();
+			htmlTableOpenList ();
 
-			ChatUserRec otherUser =
-				fromUser != chatUser
-					? fromUser : toUser;
+			// table header
 
-			String otherUserId =
-				otherUser.getName () != null
-					? stringFormat (
-						"%s %s",
-						otherUser.getCode (),
-						otherUser.getName ())
-					: otherUser.getCode ();
+			htmlTableHeaderRowWrite (
+				"",
+				"Time",
+				"User",
+				"Message",
+				"Monitor");
 
-			LocalDate nextDate =
-				chatMessage.getTimestamp ()
+			// table content
 
-				.toDateTime (
-					timezone)
+			DateTimeZone timezone =
+				chatUserLogic.getTimezone (
+					chatUser);
 
-				.toLocalDate ();
+			LocalDate previousDate = null;
 
-			if (
-
-				isNull (
-					previousDate)
-
-				|| localDateNotEqual (
-					nextDate,
-					previousDate)
-
+			for (
+				ChatMessageRec chatMessage
+					: chatMessages
 			) {
 
-				previousDate =
-					nextDate;
+				ChatUserRec fromUser =
+					chatMessage.getFromUser ();
 
-				htmlTableRowSeparatorWrite ();
+				ChatUserRec toUser =
+					chatMessage.getToUser ();
+
+				ChatUserRec otherUser =
+					fromUser != chatUser
+						? fromUser : toUser;
+
+				String otherUserId =
+					otherUser.getName () != null
+						? stringFormat (
+							"%s %s",
+							otherUser.getCode (),
+							otherUser.getName ())
+						: otherUser.getCode ();
+
+				LocalDate nextDate =
+					chatMessage.getTimestamp ()
+
+					.toDateTime (
+						timezone)
+
+					.toLocalDate ();
+
+				if (
+
+					isNull (
+						previousDate)
+
+					|| localDateNotEqual (
+						nextDate,
+						previousDate)
+
+				) {
+
+					previousDate =
+						nextDate;
+
+					htmlTableRowSeparatorWrite ();
+
+					htmlTableRowOpen (
+						htmlStyleAttribute (
+							htmlStyleRuleEntry (
+								"font-weight",
+								"bold")));
+
+					htmlTableCellWrite (
+						timeFormatter.dateStringLong (
+							chatUserLogic.getTimezone (
+								chatUser),
+							chatMessage.getTimestamp ()),
+						htmlColumnSpanAttribute (5l));
+
+					htmlTableRowClose ();
+
+				}
+
+				String rowClass =
+					chatMessage.getFromUser () == chatUser
+						? "message-in"
+						: "message-out";
+
+				String colour =
+					htmlColourFromObject (
+						ifThenElse (
+							comparableLessThan (
+								fromUser.getCode (),
+								toUser.getCode ()),
+
+					() -> joinWithoutSeparator (
+						fromUser.getCode (),
+						toUser.getCode ()),
+
+					() -> joinWithoutSeparator (
+						toUser.getCode (),
+						fromUser.getCode ())
+
+				));
 
 				htmlTableRowOpen (
-					htmlStyleAttribute (
-						htmlStyleRuleEntry (
-							"font-weight",
-							"bold")));
+					htmlClassAttribute (
+						rowClass));
 
 				htmlTableCellWrite (
-					timeFormatter.dateStringLong (
+					"",
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"background-color",
+							colour)));
+
+				htmlTableCellWrite (
+					timeFormatter.timeString (
 						chatUserLogic.getTimezone (
 							chatUser),
-						chatMessage.getTimestamp ()),
-					htmlColumnSpanAttribute (5l));
+						chatMessage.getTimestamp ()));
+
+				htmlTableCellWriteHtml (
+					HtmlUtils.htmlNonBreakingWhitespace (
+						HtmlUtils.htmlEncode (
+							otherUserId)));
+
+				htmlTableCellWrite (
+					spacify (
+						chatMessage.getOriginalText ().getText ()));
+
+				if (fromUser.getType () == ChatUserType.monitor) {
+
+					htmlTableCellWrite (
+						ifNotNullThenElseEmDash (
+							chatMessage.getSender (),
+							() -> chatMessage.getSender ().getUsername ()));
+
+				} else if (toUser.getType () == ChatUserType.monitor) {
+
+					htmlTableCellWrite (
+						"(yes)");
+
+				} else {
+
+					htmlTableCellWrite (
+						"");
+
+				}
 
 				htmlTableRowClose ();
 
 			}
 
-			String rowClass =
-				chatMessage.getFromUser () == chatUser
-					? "message-in"
-					: "message-out";
+			// table close
 
-			String colour =
-				htmlColourFromObject (
-					ifThenElse (
-						comparableLessThan (
-							fromUser.getCode (),
-							toUser.getCode ()),
-
-				() -> joinWithoutSeparator (
-					fromUser.getCode (),
-					toUser.getCode ()),
-
-				() -> joinWithoutSeparator (
-					toUser.getCode (),
-					fromUser.getCode ())
-
-			));
-
-			htmlTableRowOpen (
-				htmlClassAttribute (
-					rowClass));
-
-			htmlTableCellWrite (
-				"",
-				htmlStyleAttribute (
-					htmlStyleRuleEntry (
-						"background-color",
-						colour)));
-
-			htmlTableCellWrite (
-				timeFormatter.timeString (
-					chatUserLogic.getTimezone (
-						chatUser),
-					chatMessage.getTimestamp ()));
-
-			htmlTableCellWriteHtml (
-				HtmlUtils.htmlNonBreakingWhitespace (
-					HtmlUtils.htmlEncode (
-						otherUserId)));
-
-			htmlTableCellWrite (
-				spacify (
-					chatMessage.getOriginalText ().getText ()));
-
-			if (fromUser.getType () == ChatUserType.monitor) {
-
-				htmlTableCellWrite (
-					ifNotNullThenElseEmDash (
-						chatMessage.getSender (),
-						() -> chatMessage.getSender ().getUsername ()));
-
-			} else if (toUser.getType () == ChatUserType.monitor) {
-
-				htmlTableCellWrite (
-					"(yes)");
-
-			} else {
-
-				htmlTableCellWrite (
-					"");
-
-			}
-
-			htmlTableRowClose ();
+			htmlTableClose ();
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

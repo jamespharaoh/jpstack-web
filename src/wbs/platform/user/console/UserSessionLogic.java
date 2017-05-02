@@ -15,7 +15,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.session.UserSessionVerifyLogic;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionRec;
@@ -27,14 +27,14 @@ interface UserSessionLogic
 	extends UserSessionVerifyLogic {
 
 	UserSessionRec userLogon (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ConsoleRequestContext requestContext,
 			UserRec user,
 			Optional <String> userAgent,
 			Optional <String> consoleDeploymentCode);
 
 	Optional <UserSessionRec> userLogonTry (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ConsoleRequestContext requestContext,
 			String sliceCode,
 			String username,
@@ -43,54 +43,57 @@ interface UserSessionLogic
 			Optional <String> consoleDeploymentCode);
 
 	void userLogoff (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserRec user);
 
 	boolean userSessionVerify (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ConsoleRequestContext requestContext);
 
 	Optional <byte[]> userData (
+			Transaction parentTransaction,
 			UserRec user,
 			String code);
 
 	default
 	byte[] userDataRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		return optionalGetRequired (
 			userData (
+				parentTransaction,
 				user,
 				code));
 
 	}
 
 	void userDataStore (
-			TaskLogger taskLogger,
+			Transaction parentTransaction,
 			UserRec user,
 			String code,
 			byte[] value);
 
 	void userDataRemove (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserRec user,
 			String code);
 
 	Optional <Serializable> userDataObject (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserRec user,
 			String code);
 
 	default
 	Serializable userDataObjectRequired (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		return optionalGetRequired (
 			userDataObject (
-				parentTaskLogger,
+				parentTransaction,
 				user,
 				code));
 
@@ -98,13 +101,13 @@ interface UserSessionLogic
 
 	default
 	void userDataObjectStore (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code,
 			@NonNull Serializable value) {
 
 		userDataStore (
-			parentTaskLogger,
+			parentTransaction,
 			user,
 			code,
 			SerializationUtils.serialize (
@@ -114,11 +117,13 @@ interface UserSessionLogic
 
 	default
 	Optional <String> userDataString (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		return optionalMapRequired (
 			userData (
+				parentTransaction,
 				user,
 				code),
 			StringUtils::utf8ToString);
@@ -127,11 +132,13 @@ interface UserSessionLogic
 
 	default
 	String userDataStringRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		return optionalGetRequired (
 			userDataString (
+				parentTransaction,
 				user,
 				code));
 
@@ -139,13 +146,13 @@ interface UserSessionLogic
 
 	default
 	void userDataStringStore (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code,
 			@NonNull String value) {
 
 		userDataStore (
-			parentTaskLogger,
+			parentTransaction,
 			user,
 			code,
 			stringToUtf8 (

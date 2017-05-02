@@ -27,10 +27,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("objectEventsPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -46,6 +50,9 @@ class ObjectEventsPageBuilder <
 
 	@SingletonDependency
 	EventConsoleLogic eventConsoleModule;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -91,25 +98,38 @@ class ObjectEventsPageBuilder <
 	@BuildMethod
 	public
 	void build (
-			@NonNull Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		setDefaults ();
+		try (
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder (
+				taskLogger);
 
 		}
-
-		buildResponder ();
 
 	}
 
@@ -140,26 +160,39 @@ class ObjectEventsPageBuilder <
 
 	}
 
-	void buildResponder () {
+	void buildResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		PagePartFactory eventsPartFactory =
-			eventConsoleModule.makeEventsPartFactory (
-				consoleHelper);
+		try (
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResponder");
 
-				.tab (
-					tabName)
+		) {
 
-				.title (
-					stringFormat (
-						"%s events",
-						capitalise (consoleHelper.friendlyName () + " events")))
+			PagePartFactory eventsPartFactory =
+				eventConsoleModule.makeEventsPartFactory (
+					taskLogger,
+					consoleHelper);
 
-				.pagePartFactory (
-					eventsPartFactory));
+			consoleModule.addResponder (
+				responderName,
+				tabContextResponder.get ()
+
+					.tab (
+						tabName)
+
+					.title (
+						stringFormat (
+							"%s events",
+							capitalise (consoleHelper.friendlyName () + " events")))
+
+					.pagePartFactory (
+						eventsPartFactory));
+
+		}
 
 	}
 

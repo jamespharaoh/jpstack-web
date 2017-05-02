@@ -69,8 +69,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -213,13 +214,13 @@ class ManualResponderRequestPendingSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -230,7 +231,8 @@ class ManualResponderRequestPendingSummaryPart
 					SmsCustomerRec.class);
 
 			manualResponderRequest =
-				manualResponderRequestHelper.findFromContextRequired ();
+				manualResponderRequestHelper.findFromContextRequired (
+					transaction);
 
 			manualResponderNumber =
 				manualResponderRequest.getManualResponderNumber ();
@@ -257,6 +259,7 @@ class ManualResponderRequestPendingSummaryPart
 				&& smsCustomer.getNumSessions () > 0
 
 				? smsCustomerSessionHelper.findByIndexRequired (
+					transaction,
 					smsCustomer,
 					smsCustomer.getNumSessions () - 1)
 
@@ -274,6 +277,7 @@ class ManualResponderRequestPendingSummaryPart
 
 				RouteRec route =
 					routerLogic.resolveRouter (
+						transaction,
 						manualResponderTemplate.getRouter ());
 
 				if (route == null)
@@ -296,6 +300,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					manualResponder,
 					"default");
 
@@ -321,7 +326,8 @@ class ManualResponderRequestPendingSummaryPart
 
 					.createdTime (
 						TextualInterval.after (
-							userConsoleLogic.timezone (),
+							userConsoleLogic.timezone (
+								transaction),
 							startOfToday))
 
 					.direction (
@@ -329,7 +335,7 @@ class ManualResponderRequestPendingSummaryPart
 
 				List <MessageRec> messages =
 					messageHelper.search (
-						taskLogger,
+						transaction,
 						messageSearch);
 
 				for (
@@ -358,7 +364,7 @@ class ManualResponderRequestPendingSummaryPart
 							MessageStatus.delivered)
 					) {
 
-						taskLogger.errorFormat (
+						transaction.errorFormat (
 							"Counting message in unknown state \"%s\"",
 							enumNameSpaces (
 								message.getStatus ()));
@@ -410,7 +416,7 @@ class ManualResponderRequestPendingSummaryPart
 
 				spendAvailable =
 					smsSpendLimitLogic.spendCheck (
-						taskLogger,
+						transaction,
 						manualResponder.getSmsSpendLimiter (),
 						manualResponderRequest.getNumber ());
 
@@ -425,7 +431,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			oldRequests =
 				manualResponderRequestHelper.findRecentLimit (
-					taskLogger,
+					transaction,
 					manualResponder,
 					manualResponderRequest.getNumber (),
 					maxResults + 1);
@@ -440,13 +446,13 @@ class ManualResponderRequestPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -474,7 +480,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			htmlTableCellWriteHtml (
 				() -> goRequestDetails (
-					taskLogger),
+					transaction),
 				htmlAttribute (
 					"style",
 					"width: 50%"));
@@ -482,7 +488,7 @@ class ManualResponderRequestPendingSummaryPart
 			htmlTableCellWriteHtml (
 				() -> {
 					goCustomerDetails (
-						taskLogger);
+						transaction);
 					goNotes ();
 				},
 				htmlAttribute (
@@ -495,14 +501,17 @@ class ManualResponderRequestPendingSummaryPart
 
 			htmlDivClose ();
 
-			goBillHistory ();
+			goBillHistory (
+				transaction);
 
-			goOperatorInfo ();
+			goOperatorInfo (
+				transaction);
 
-			goSessionDetails ();
+			goSessionDetails (
+				transaction);
 
 			goRequestHistory (
-				taskLogger);
+				transaction);
 
 			htmlDivClose ();
 
@@ -511,13 +520,13 @@ class ManualResponderRequestPendingSummaryPart
 	}
 
 	void goRequestDetails (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goRequestDetails");
 
 		) {
@@ -527,7 +536,7 @@ class ManualResponderRequestPendingSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"Manual responder",
 				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					manualResponder));
 
 			htmlTableDetailsRowWrite (
@@ -536,7 +545,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			if (
 				privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					manualResponder,
 					"number")
 			) {
@@ -544,7 +553,7 @@ class ManualResponderRequestPendingSummaryPart
 				htmlTableDetailsRowWriteRaw (
 					"Number",
 					() -> objectManager.writeTdForObjectMiniLink (
-						taskLogger,
+						transaction,
 						number));
 
 			}
@@ -577,13 +586,13 @@ class ManualResponderRequestPendingSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"Network",
 				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					network));
 
 			htmlTableDetailsRowWriteRaw (
 				"Message",
 				() -> objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					message));
 
 			htmlTableDetailsRowWrite (
@@ -605,7 +614,7 @@ class ManualResponderRequestPendingSummaryPart
 					htmlTableDetailsRowWriteHtml (
 						"Text media",
 						() -> mediaConsoleLogic.writeMediaContent (
-							taskLogger,
+							transaction,
 							media));
 
 				} else if (
@@ -617,12 +626,12 @@ class ManualResponderRequestPendingSummaryPart
 						"Image media",
 						() -> htmlLinkWriteHtml (
 							mediaConsoleLogic.mediaUrlScaled (
-								taskLogger,
+								transaction,
 								media,
 								600,
 								600),
 							() -> mediaConsoleLogic.writeMediaThumb100 (
-								taskLogger,
+								transaction,
 								media)));
 
 				} else {
@@ -642,13 +651,13 @@ class ManualResponderRequestPendingSummaryPart
 	}
 
 	void goCustomerDetails (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goCustomerDetails");
 
 		) {
@@ -670,7 +679,7 @@ class ManualResponderRequestPendingSummaryPart
 			}
 
 			formFieldLogic.outputDetailsTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				customerDetailsFields,
 				smsCustomer,
@@ -734,151 +743,192 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goBillHistory () {
+	void goBillHistory (
+			@NonNull Transaction parentTransaction) {
 
-		if (! manualResponder.getShowDailyBillInfo ())
-			return;
+		try (
 
-		if (routeBillInfos.isEmpty ())
-			return;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goBillHistory");
 
-		htmlHeadingTwoWrite (
-			"Bill history for today");
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Route",
-			"All services",
-			"This service");
-
-		for (
-			RouteBillInfo routeBillInfo
-				: routeBillInfos
 		) {
 
-			htmlTableRowOpen ();
+			if (! manualResponder.getShowDailyBillInfo ())
+				return;
 
-			htmlTableCellWrite (
-				routeBillInfo.route ().getCode ());
+			if (routeBillInfos.isEmpty ())
+				return;
 
-			htmlTableCellWriteHtml (
-				currencyLogic.formatHtml (
-					manualResponder.getCurrency (),
-					routeBillInfo.total ()));
+			htmlHeadingTwoWrite (
+				"Bill history for today");
 
-			htmlTableCellWriteHtml (
-				currencyLogic.formatHtml (
-					manualResponder.getCurrency (),
-					routeBillInfo.thisService ()));
+			htmlTableOpenList ();
 
-			htmlTableRowClose ();
+			htmlTableHeaderRowWrite (
+				"Route",
+				"All services",
+				"This service");
+
+			for (
+				RouteBillInfo routeBillInfo
+					: routeBillInfos
+			) {
+
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					routeBillInfo.route ().getCode ());
+
+				htmlTableCellWriteHtml (
+					currencyLogic.formatHtml (
+						manualResponder.getCurrency (),
+						routeBillInfo.total ()));
+
+				htmlTableCellWriteHtml (
+					currencyLogic.formatHtml (
+						manualResponder.getCurrency (),
+						routeBillInfo.thisService ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
 
-		htmlTableClose ();
-
 	}
 
-	void goOperatorInfo () {
+	void goOperatorInfo (
+			@NonNull Transaction parentTransaction) {
 
-		// TODO should be nullable to avoid this...
+		try (
 
-		if (manualResponder.getInfoText () == null)
-			return;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goOperatorInfo");
 
-		if (manualResponder.getInfoText ().getText ().length () == 0)
-			return;
-
-		htmlHeadingTwoWrite (
-			"Operator info");
-
-		formatWriter.writeString (
-			manualResponder.getInfoText ().getText ());
-
-	}
-
-	void goSessionDetails () {
-
-		if (smsCustomerSession == null)
-			return;
-
-		if (
-			smsCustomerSession.getWelcomeMessage () == null
-			&& smsCustomerSession.getWarningMessage () == null
 		) {
-			return;
+
+			// TODO should be nullable to avoid this...
+
+			if (manualResponder.getInfoText () == null)
+				return;
+
+			if (manualResponder.getInfoText ().getText ().length () == 0)
+				return;
+
+			htmlHeadingTwoWrite (
+				"Operator info");
+
+			formatWriter.writeString (
+				manualResponder.getInfoText ().getText ());
+
 		}
 
-		htmlHeadingTwoWrite (
-			"Customer session");
+	}
 
-		htmlTableOpenDetails ();
+	private
+	void goSessionDetails (
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableDetailsRowWrite (
-			"Start time",
-			userConsoleLogic.timestampWithTimezoneString (
-				smsCustomerSession.getStartTime ()));
+		try (
 
-		if (
-			isNotNull (
-				smsCustomerSession.getEndTime ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goSessionDetails");
+
 		) {
+
+			if (smsCustomerSession == null)
+				return;
+
+			if (
+				smsCustomerSession.getWelcomeMessage () == null
+				&& smsCustomerSession.getWarningMessage () == null
+			) {
+				return;
+			}
+
+			htmlHeadingTwoWrite (
+				"Customer session");
+
+			htmlTableOpenDetails ();
 
 			htmlTableDetailsRowWrite (
-				"End time",
+				"Start time",
 				userConsoleLogic.timestampWithTimezoneString (
+					transaction,
 					smsCustomerSession.getStartTime ()));
 
-		}
+			if (
+				isNotNull (
+					smsCustomerSession.getEndTime ())
+			) {
 
-		if (smsCustomerSession.getWelcomeMessage () != null) {
-
-			htmlTableDetailsRowWrite (
-				"Welcome message",
-				stringFormat (
-					"%s (sent %s)",
-					smsCustomerSession
-						.getWelcomeMessage ()
-						.getText ()
-						.getText (),
+				htmlTableDetailsRowWrite (
+					"End time",
 					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
+						smsCustomerSession.getStartTime ()));
+
+			}
+
+			if (smsCustomerSession.getWelcomeMessage () != null) {
+
+				htmlTableDetailsRowWrite (
+					"Welcome message",
+					stringFormat (
+						"%s (sent %s)",
 						smsCustomerSession
 							.getWelcomeMessage ()
-							.getCreatedTime ())));
+							.getText ()
+							.getText (),
+						userConsoleLogic.timestampWithTimezoneString (
+							transaction,
+							smsCustomerSession
+								.getWelcomeMessage ()
+								.getCreatedTime ())));
 
-		}
+			}
 
-		if (smsCustomerSession.getWarningMessage () != null) {
+			if (smsCustomerSession.getWarningMessage () != null) {
 
-			htmlTableDetailsRowWrite (
-				"Warning message",
-				stringFormat (
-					"%s (sent %s)",
-					smsCustomerSession
-						.getWarningMessage ()
-						.getText ()
-						.getText (),
-					userConsoleLogic.timestampWithTimezoneString (
+				htmlTableDetailsRowWrite (
+					"Warning message",
+					stringFormat (
+						"%s (sent %s)",
 						smsCustomerSession
 							.getWarningMessage ()
-							.getCreatedTime ())));
+							.getText ()
+							.getText (),
+						userConsoleLogic.timestampWithTimezoneString (
+							transaction,
+							smsCustomerSession
+								.getWarningMessage ()
+								.getCreatedTime ())));
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
 	private
 	void goRequestHistory (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goRequestHistory");
 
 		) {
@@ -943,6 +993,7 @@ class ManualResponderRequestPendingSummaryPart
 
 					htmlTableCellWriteHtml (
 						userConsoleLogic.timestampWithTimezoneString (
+							transaction,
 							oldReply.getTimestamp ()));
 
 					htmlTableCellWriteHtml (
@@ -968,6 +1019,7 @@ class ManualResponderRequestPendingSummaryPart
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
 						oldRequest.getTimestamp ()),
 					htmlColumnSpanAttribute (2l));
 
@@ -986,7 +1038,7 @@ class ManualResponderRequestPendingSummaryPart
 					) {
 
 						mediaConsoleLogic.writeMediaThumb32 (
-							taskLogger,
+							transaction,
 							media);
 
 					}

@@ -11,12 +11,12 @@ import lombok.NonNull;
 public
 interface LogContext {
 
-	TaskLogger createTaskLogger (
+	OwnedTaskLogger createTaskLogger (
 			String dynamicContext,
 			Optional <Boolean> debugEnabled);
 
 	default
-	TaskLogger createTaskLogger (
+	OwnedTaskLogger createTaskLogger (
 			@NonNull String dynamicContext) {
 
 		return createTaskLogger (
@@ -26,7 +26,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger createTaskLoggerFormat (
+	OwnedTaskLogger createTaskLoggerFormat (
 			@NonNull String ... arguments) {
 
 		return createTaskLogger (
@@ -37,7 +37,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger createTaskLogger (
+	OwnedTaskLogger createTaskLogger (
 			@NonNull String dynamicContext,
 			@NonNull Boolean debugEnabled) {
 
@@ -48,13 +48,13 @@ interface LogContext {
 
 	}
 
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
 			String dynamicContext,
 			Optional <Boolean> debugEnabled);
 
 	default
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			@NonNull Optional <TaskLogger> parent,
 			@NonNull String dynamicContext,
 			@NonNull Boolean debugEnabled) {
@@ -68,7 +68,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			@NonNull TaskLogger parent,
 			@NonNull String dynamicContext,
 			@NonNull Boolean debugEnabled) {
@@ -83,7 +83,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
 			String dynamicContext) {
 
@@ -95,7 +95,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger nestTaskLogger (
+	OwnedTaskLogger nestTaskLogger (
 			TaskLogger parent,
 			String dynamicContext) {
 
@@ -108,7 +108,7 @@ interface LogContext {
 	}
 
 	default
-	TaskLogger nestTaskLoggerFormat (
+	OwnedTaskLogger nestTaskLoggerFormat (
 			@NonNull TaskLogger parent,
 			@NonNull String ... dynamicContextArguments) {
 

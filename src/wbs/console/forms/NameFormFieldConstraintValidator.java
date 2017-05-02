@@ -1,48 +1,71 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("nameFormFieldConstraintValidator")
 public
-class NameFormFieldConstraintValidator<Container>
-	implements FormFieldConstraintValidator<Container,String> {
+class NameFormFieldConstraintValidator <Container>
+	implements FormFieldConstraintValidator <Container, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
 	Optional <String> validate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
 
-		/*
+		try (
 
-		TODO make this work
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"validate");
 
-		if (codeChanged) {
+		) {
 
-			Record<?> existing =
-				consoleHelper.findByCode (
-					objectManager.getParentGlobalId (
-						(Record<?>) object),
-					newCode);
+			/*
 
-			if (existing != null) {
+			TODO make this work
 
-				requestContext.addError ("Name already in use");
+			if (codeChanged) {
 
-				throw new InvalidFormValueException ();
+				Record<?> existing =
+					consoleHelper.findByCode (
+						objectManager.getParentGlobalId (
+							(Record<?>) object),
+						newCode);
+
+				if (existing != null) {
+
+					requestContext.addError ("Name already in use");
+
+					throw new InvalidFormValueException ();
+
+				}
 
 			}
+			*/
+
+			return optionalAbsent ();
 
 		}
-		*/
-
-		return Optional.<String>absent ();
 
 	}
 

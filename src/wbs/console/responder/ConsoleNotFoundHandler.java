@@ -21,9 +21,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.handler.WebNotFoundHandler;
@@ -67,7 +69,7 @@ class ConsoleNotFoundHandler
 		@Override
 		public
 		String getUrl (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			return requestContext.requestPath ();
 
@@ -82,7 +84,7 @@ class ConsoleNotFoundHandler
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleNotFound");

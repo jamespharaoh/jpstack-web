@@ -13,7 +13,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -58,30 +60,32 @@ class AffiliateHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"init");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"AffiliateHooks.init ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"init");
 
 		) {
 
 			affiliateTypeIdsByParentTypeId =
-				affiliateTypeDao.findAll ().stream ().collect (
+				affiliateTypeDao.findAll (
+					transaction)
+
+				.stream ()
+
+				.collect (
 					Collectors.groupingBy (
 
-				affiliateType ->
-					affiliateType.getParentType ().getId (),
-
-				Collectors.mapping (
 					affiliateType ->
-						affiliateType.getId (),
-					Collectors.toList ()))
+						affiliateType.getParentType ().getId (),
+
+					Collectors.mapping (
+						affiliateType ->
+							affiliateType.getId (),
+						Collectors.toList ())
+
+				)
 
 			);
 
@@ -94,10 +98,10 @@ class AffiliateHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ObjectHelper<AffiliateRec> affiliateHelper,
-			@NonNull ObjectHelper<?> parentHelper,
-			@NonNull Record<?> parent) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ObjectHelper <AffiliateRec> affiliateHelper,
+			@NonNull ObjectHelper <?> parentHelper,
+			@NonNull Record <?> parent) {
 
 		if (
 			doesNotContain (
@@ -109,15 +113,16 @@ class AffiliateHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSingletons");
 
 		) {
 
 			ObjectTypeRec parentType =
 				objectTypeDao.findById (
+					transaction,
 					parentHelper.objectTypeId ());
 
 			for (
@@ -128,10 +133,11 @@ class AffiliateHooks
 
 				AffiliateTypeRec affiliateType =
 					affiliateTypeDao.findRequired (
+						transaction,
 						affiliateTypeId);
 
 				affiliateHelper.insert (
-					taskLogger,
+					transaction,
 					affiliateHelper.createInstance ()
 
 					.setAffiliateType (

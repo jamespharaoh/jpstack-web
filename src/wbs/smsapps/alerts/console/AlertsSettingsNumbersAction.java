@@ -1,6 +1,5 @@
 package wbs.smsapps.alerts.console;
 
-import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.LogicUtils.booleanNotEqual;
 import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
 import static wbs.utils.etc.Misc.contains;
@@ -10,17 +9,14 @@ import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
+import wbs.console.notice.ConsoleNotices;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -102,8 +98,9 @@ class AlertsSettingsNumbersAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -118,258 +115,113 @@ class AlertsSettingsNumbersAction
 
 			}
 
-			List <String> notices =
-				new ArrayList<> ();
+			ConsoleNotices notices =
+				new ConsoleNotices ();
 
-			try (
+			AlertsSettingsRec alertsSettings =
+				alertsSettingsHelper.findFromContextRequired (
+					transaction);
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"AlertsSettingsNumbersAction.goReal ()",
-						this);
+			// add/delete
 
+			int updatedNames = 0;
+			int updatedNumbers = 0;
+			int numEnabled = 0;
+			int numDisabled = 0;
+
+			Set <String> numbersSeen =
+				new HashSet<> ();
+
+			for (
+				Iterator <AlertsNumberRec> alertsNumberIterator =
+					alertsSettings.getAlertsNumbers ().iterator ();
+				alertsNumberIterator.hasNext ();
+				doNothing ()
 			) {
 
-				AlertsSettingsRec alertsSettings =
-					alertsSettingsHelper.findFromContextRequired ();
+				AlertsNumberRec alertsNumber =
+					alertsNumberIterator.next ();
 
-				// add/delete
-
-				int updatedNames = 0;
-				int updatedNumbers = 0;
-				int numEnabled = 0;
-				int numDisabled = 0;
-
-				Set <String> numbersSeen =
-					new HashSet<> ();
-
-				for (
-					Iterator <AlertsNumberRec> alertsNumberIterator =
-						alertsSettings.getAlertsNumbers ().iterator ();
-					alertsNumberIterator.hasNext ();
-					doNothing ()
-				) {
-
-					AlertsNumberRec alertsNumber =
-						alertsNumberIterator.next ();
-
-					// delete
-
-					if (
-						requestContext.formIsPresent (
-							stringFormat (
-								"delete_%s",
-								integerToDecimalString (
-									alertsNumber.getId ())))
-					) {
-
-						alertsNumberHelper.remove (
-							alertsNumber);
-
-						alertsNumberIterator.remove ();
-
-						eventLogic.createEvent (
-							taskLogger,
-							"alerts_number_deleted",
-							userConsoleLogic.userRequired (),
-							alertsNumber.getId (),
-							alertsSettings);
-
-						notices.add (
-							stringFormat (
-								"Deleted 1 number"));
-
-						continue;
-
-					}
-
-					// update
-
-					String newName =
-						requestContext.formOrEmptyString (
-							stringFormat (
-								"name_%s",
-								integerToDecimalString (
-									alertsNumber.getId ())));
-
-					if (newName == null)
-						continue;
-
-					if (
-						stringNotEqualSafe (
-							alertsNumber.getName (),
-							newName)
-					) {
-
-						alertsNumber
-
-							.setName (
-								newName);
-
-						updatedNames ++;
-
-						eventLogic.createEvent (
-							taskLogger,
-							"alerts_number_updated",
-							userConsoleLogic.userRequired (),
-							"name",
-							alertsNumber.getId (),
-							alertsSettings,
-							newName);
-
-					}
-
-					String newNumber =
-						requestContext.formRequired (
-							stringFormat (
-								"number_%s",
-								integerToDecimalString (
-									alertsNumber.getId ())));
-
-					if (
-						stringNotEqualSafe (
-							alertsNumber.getNumber ().getNumber (),
-							newNumber)
-					) {
-
-						if (
-							contains (
-								numbersSeen,
-								newNumber)
-						) {
-
-							requestContext.addError (
-								stringFormat (
-									"Duplicate number: %s",
-									newNumber));
-
-							return null;
-
-						}
-
-						NumberRec numberRec =
-							numberHelper.findOrCreate (
-								taskLogger,
-								newNumber);
-
-						alertsNumber
-
-							.setNumber (
-								numberRec);
-
-						updatedNumbers ++;
-
-						eventLogic.createEvent (
-							taskLogger,
-							"alerts_number_updated",
-							userConsoleLogic.userRequired (),
-							"number",
-							alertsNumber.getId (),
-							alertsSettings,
-							numberRec);
-
-					}
-
-					numbersSeen.add (
-						newNumber);
-
-					boolean newEnabled =
-						parseBooleanTrueFalseRequired (
-							requestContext.formRequired (
-								stringFormat (
-									"enabled_%s",
-									integerToDecimalString (
-										alertsNumber.getId ()))));
-
-					if (
-						booleanNotEqual (
-							alertsNumber.getEnabled (),
-							newEnabled)
-					) {
-
-						alertsNumber
-
-							.setEnabled (
-								newEnabled);
-
-						if (newEnabled) {
-
-							numEnabled ++;
-
-						} else {
-
-							numDisabled ++;
-
-						}
-
-						eventLogic.createEvent (
-							taskLogger,
-							"alerts_number_updated",
-							userConsoleLogic.userRequired (),
-							"enabled",
-							alertsNumber.getId (),
-							alertsSettings,
-							newEnabled);
-
-					}
-
-				}
-
-				if (updatedNames > 0) {
-
-					notices.add (
-						stringFormat (
-							"Updated %s",
-							pluralise (
-								updatedNames,
-								"name")));
-
-				}
-
-				if (updatedNumbers > 0) {
-
-					notices.add (
-						stringFormat (
-							"Updated %s",
-							pluralise (
-								updatedNumbers,
-								"number")));
-
-				}
-
-				if (numEnabled > 0) {
-
-					notices.add (
-						stringFormat (
-							"Enabled %s",
-							pluralise (
-								numEnabled,
-								"number")));
-
-				}
-
-				if (numDisabled > 0) {
-
-					notices.add (
-						stringFormat (
-							"Disabled %s",
-							pluralise (
-								numDisabled,
-								"number")));
-
-				}
-
-				// add
+				// delete
 
 				if (
 					requestContext.formIsPresent (
-						"add_new")
+						stringFormat (
+							"delete_%s",
+							integerToDecimalString (
+								alertsNumber.getId ())))
 				) {
 
-					String newNumber =
-						requestContext.formRequired (
-							"number_new");
+					alertsNumberHelper.remove (
+						transaction,
+						alertsNumber);
+
+					alertsNumberIterator.remove ();
+
+					eventLogic.createEvent (
+						transaction,
+						"alerts_number_deleted",
+						userConsoleLogic.userRequired (
+							transaction),
+						alertsNumber.getId (),
+						alertsSettings);
+
+					notices.noticeFormat (
+						"Deleted 1 number");
+
+					continue;
+
+				}
+
+				// update
+
+				String newName =
+					requestContext.formOrEmptyString (
+						stringFormat (
+							"name_%s",
+							integerToDecimalString (
+								alertsNumber.getId ())));
+
+				if (newName == null)
+					continue;
+
+				if (
+					stringNotEqualSafe (
+						alertsNumber.getName (),
+						newName)
+				) {
+
+					alertsNumber
+
+						.setName (
+							newName);
+
+					updatedNames ++;
+
+					eventLogic.createEvent (
+						transaction,
+						"alerts_number_updated",
+						userConsoleLogic.userRequired (
+							transaction),
+						"name",
+						alertsNumber.getId (),
+						alertsSettings,
+						newName);
+
+				}
+
+				String newNumber =
+					requestContext.formRequired (
+						stringFormat (
+							"number_%s",
+							integerToDecimalString (
+								alertsNumber.getId ())));
+
+				if (
+					stringNotEqualSafe (
+						alertsNumber.getNumber ().getNumber (),
+						newNumber)
+				) {
 
 					if (
 						contains (
@@ -388,108 +240,223 @@ class AlertsSettingsNumbersAction
 
 					NumberRec numberRec =
 						numberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							newNumber);
 
-					AlertsNumberRec alertsNumber =
-						alertsNumberHelper.createInstance ()
-
-						.setAlertsSettings (
-							alertsSettings)
-
-						.setName (
-							requestContext.formOrEmptyString (
-								"name_new"))
+					alertsNumber
 
 						.setNumber (
 							numberRec);
 
-					boolean newEnabled =
-						Boolean.parseBoolean (
-							requestContext.formOrEmptyString (
-								"enabled_new"));
+					updatedNumbers ++;
+
+					eventLogic.createEvent (
+						transaction,
+						"alerts_number_updated",
+						userConsoleLogic.userRequired (
+							transaction),
+						"number",
+						alertsNumber.getId (),
+						alertsSettings,
+						numberRec);
+
+				}
+
+				numbersSeen.add (
+					newNumber);
+
+				boolean newEnabled =
+					parseBooleanTrueFalseRequired (
+						requestContext.formRequired (
+							stringFormat (
+								"enabled_%s",
+								integerToDecimalString (
+									alertsNumber.getId ()))));
+
+				if (
+					booleanNotEqual (
+						alertsNumber.getEnabled (),
+						newEnabled)
+				) {
 
 					alertsNumber
 
 						.setEnabled (
 							newEnabled);
 
-					alertsNumberHelper.insert (
-						taskLogger,
-						alertsNumber);
+					if (newEnabled) {
+						numEnabled ++;
+					} else {
+						numDisabled ++;
+					}
 
 					eventLogic.createEvent (
-						taskLogger,
-						"alerts_number_created",
-						userConsoleLogic.userRequired (),
-						alertsNumber.getId (),
-						alertsSettings);
-
-					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						"alerts_number_updated",
-						userConsoleLogic.userRequired (),
-						"name",
-						alertsNumber.getId (),
-						alertsSettings,
-						alertsNumber.getName ());
-
-					eventLogic.createEvent (
-						taskLogger,
-						"alerts_number_updated",
-						userConsoleLogic.userRequired (),
-						"number",
-						alertsNumber.getId (),
-						alertsSettings,
-						numberRec);
-
-					eventLogic.createEvent (
-						taskLogger,
-						"alerts_number_updated",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						"enabled",
 						alertsNumber.getId (),
 						alertsSettings,
-						alertsNumber.getEnabled ());
-
-					notices.add (
-						"Added new number");
-
-					requestContext.hideFormData (
-						ImmutableSet.<String>of (
-							"name_new",
-							"number_new",
-							"enabled_new"));
+						newEnabled);
 
 				}
 
-				// finish up
+			}
 
-				transaction.commit ();
+			if (updatedNames > 0) {
+
+				notices.noticeFormat (
+					"Updated %s",
+					pluralise (
+						updatedNames,
+						"name"));
 
 			}
+
+			if (updatedNumbers > 0) {
+
+				notices.noticeFormat (
+					"Updated %s",
+					pluralise (
+						updatedNumbers,
+						"number"));
+
+			}
+
+			if (numEnabled > 0) {
+
+				notices.noticeFormat (
+					"Enabled %s",
+					pluralise (
+						numEnabled,
+						"number"));
+
+			}
+
+			if (numDisabled > 0) {
+
+				notices.noticeFormat (
+					"Disabled %s",
+					pluralise (
+						numDisabled,
+						"number"));
+
+			}
+
+			// add
 
 			if (
-				collectionIsNotEmpty (
-					notices)
+				requestContext.formIsPresent (
+					"add_new")
 			) {
 
-				for (
-					String notice
-						: notices
+				String newNumber =
+					requestContext.formRequired (
+						"number_new");
+
+				if (
+					contains (
+						numbersSeen,
+						newNumber)
 				) {
 
-					requestContext.addNotice (
-						notice);
+					requestContext.addError (
+						stringFormat (
+							"Duplicate number: %s",
+							newNumber));
+
+					return null;
 
 				}
 
-			} else {
+				NumberRec numberRec =
+					numberHelper.findOrCreate (
+						transaction,
+						newNumber);
 
-				requestContext.addWarning (
-					"No changes to save");
+				AlertsNumberRec alertsNumber =
+					alertsNumberHelper.createInstance ()
+
+					.setAlertsSettings (
+						alertsSettings)
+
+					.setName (
+						requestContext.formOrEmptyString (
+							"name_new"))
+
+					.setNumber (
+						numberRec);
+
+				boolean newEnabled =
+					Boolean.parseBoolean (
+						requestContext.formOrEmptyString (
+							"enabled_new"));
+
+				alertsNumber
+
+					.setEnabled (
+						newEnabled);
+
+				alertsNumberHelper.insert (
+					transaction,
+					alertsNumber);
+
+				eventLogic.createEvent (
+					transaction,
+					"alerts_number_created",
+					userConsoleLogic.userRequired (
+						transaction),
+					alertsNumber.getId (),
+					alertsSettings);
+
+				eventLogic.createEvent (
+					transaction,
+					"alerts_number_updated",
+					userConsoleLogic.userRequired (
+						transaction),
+					"name",
+					alertsNumber.getId (),
+					alertsSettings,
+					alertsNumber.getName ());
+
+				eventLogic.createEvent (
+					transaction,
+					"alerts_number_updated",
+					userConsoleLogic.userRequired (
+						transaction),
+					"number",
+					alertsNumber.getId (),
+					alertsSettings,
+					numberRec);
+
+				eventLogic.createEvent (
+					transaction,
+					"alerts_number_updated",
+					userConsoleLogic.userRequired (
+						transaction),
+					"enabled",
+					alertsNumber.getId (),
+					alertsSettings,
+					alertsNumber.getEnabled ());
+
+				notices.noticeFormat (
+					"Added new number");
+
+				requestContext.hideFormData (
+					"name_new",
+					"number_new",
+					"enabled_new");
 
 			}
+
+			// finish up
+
+			transaction.commit ();
+
+			notices.flushOrNoticeFormat (
+				requestContext.formatWriter (),
+				"No changes to save");
 
 			requestContext.setEmptyFormData ();
 

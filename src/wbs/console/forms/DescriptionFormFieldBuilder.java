@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -11,8 +12,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
-
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -20,24 +19,33 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("descriptionFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class DescriptionFormFieldBuilder {
+class DescriptionFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManager formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -93,150 +101,146 @@ class DescriptionFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		ConsoleHelper thisConsoleHelper =
-			context.consoleHelper ();
+		try (
 
-		ConsoleHelper thatConsoleHelper;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		if (
-			isNotNull (
-				spec.delegate ())
 		) {
 
-			Class thatClass =
-				optionalGetRequired (
-					objectManager.dereferenceType (
-						Optional.<Class<?>>of (
-							thisConsoleHelper.objectClass ()),
-						Optional.of (
-							spec.delegate ())));
+			ConsoleHelper thisConsoleHelper =
+				context.consoleHelper ();
 
-			thatConsoleHelper =
-				objectManager.findConsoleHelperRequired (
-					thatClass);
+			ConsoleHelper thatConsoleHelper;
 
-		} else {
-
-			thatConsoleHelper =
-				thisConsoleHelper;
-
-		}
-
-		String name =
-			ifNull (
-				spec.name (),
-				thatConsoleHelper.descriptionFieldName ());
-
-		String fullName =
-			spec.delegate () != null
-				? stringFormat (
-					"%s.%s",
-					spec.delegate (),
-					name)
-				: name;
-
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					thatConsoleHelper.descriptionLabel ()));
-
-		if (
-			spec.delegate () != null
-			&& spec.readOnly () != null
-			&& spec.readOnly () == false
-		) {
-			throw new RuntimeException ();
-		}
-
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				spec.delegate () != null
-					? true
-					: null,
-				false);
-
-		// accessor
-
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
-
-			.name (
-				name)
-
-			.nativeClass (
-				String.class);
-
-		if (spec.delegate () != null) {
-
-			accessor =
-				delegateFormFieldAccessorProvider.get ()
-
-				.path (
+			if (
+				isNotNull (
 					spec.delegate ())
+			) {
 
-				.delegateFormFieldAccessor (
-					accessor);
+				Class thatClass =
+					optionalGetRequired (
+						objectManager.dereferenceType (
+							taskLogger,
+							optionalOf (
+								thisConsoleHelper.objectClass ()),
+							optionalOf (
+								spec.delegate ())));
 
-		}
+				thatConsoleHelper =
+					objectManager.findConsoleHelperRequired (
+						thatClass);
 
-		// native mapping
+			} else {
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+				thatConsoleHelper =
+					thisConsoleHelper;
 
-		// value validators
+			}
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+			String name =
+				ifNull (
+					spec.name (),
+					thatConsoleHelper.descriptionFieldName ());
 
-		valueValidators.add (
-			requiredFormFieldValueValidatorProvider.get ());
+			String fullName =
+				spec.delegate () != null
+					? stringFormat (
+						"%s.%s",
+						spec.delegate (),
+						name)
+					: name;
 
-		// constraint validators
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						thatConsoleHelper.descriptionLabel ()));
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+			if (
+				spec.delegate () != null
+				&& spec.readOnly () != null
+				&& spec.readOnly () == false
+			) {
+				throw new RuntimeException ();
+			}
 
-		// interface mapping
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					spec.delegate () != null
+						? true
+						: null,
+					false);
 
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			// accessor
 
-		// update hook
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
+				.name (
+					name)
 
-		// renderer
+				.nativeClass (
+					String.class);
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+			if (spec.delegate () != null) {
 
-			.name (
-				fullName)
+				accessor =
+					delegateFormFieldAccessorProvider.get ()
 
-			.label (
-				label)
+					.path (
+						spec.delegate ())
 
-			.nullable (
-				false);
+					.delegateFormFieldAccessor (
+						accessor);
 
-		// field
+			}
 
-		if (readOnly) {
+			// native mapping
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+			// value validators
+
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+			// constraint validators
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// update hook
+
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					fullName)
@@ -244,53 +248,71 @@ class DescriptionFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					false);
 
-				.nativeMapping (
-					nativeMapping)
+			// field
 
-				.interfaceMapping (
-					interfaceMapping)
+			if (readOnly) {
 
-				.renderer (
-					renderer)
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-			);
+					.name (
+						fullName)
 
-		} else {
+					.label (
+						label)
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+					.accessor (
+						accessor)
 
-				.name (
-					name)
+					.nativeMapping (
+						nativeMapping)
 
-				.label (
-					label)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.accessor (
-					accessor)
+					.renderer (
+						renderer)
 
-				.nativeMapping (
-					nativeMapping)
+				);
 
-				.valueValidators (
-					valueValidators)
+			} else {
 
-				.constraintValidator (
-					constraintValidator)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-				.interfaceMapping (
-					interfaceMapping)
+					.name (
+						name)
 
-				.renderer (
-					renderer)
+					.label (
+						label)
 
-				.updateHook (
-					updateHook)
+					.accessor (
+						accessor)
 
-			);
+					.nativeMapping (
+						nativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

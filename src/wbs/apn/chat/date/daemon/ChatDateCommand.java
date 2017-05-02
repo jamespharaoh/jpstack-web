@@ -20,8 +20,9 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -121,13 +122,13 @@ class ChatDateCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -135,10 +136,12 @@ class ChatDateCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -147,12 +150,13 @@ class ChatDateCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// work out date mode
@@ -179,7 +183,7 @@ class ChatDateCommand
 				// log request
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -190,7 +194,7 @@ class ChatDateCommand
 				// set date mode
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					null,
 					optionalOf (
@@ -201,7 +205,7 @@ class ChatDateCommand
 				// process inbox
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -222,7 +226,7 @@ class ChatDateCommand
 				// log request
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -233,7 +237,7 @@ class ChatDateCommand
 				// update user
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					null,
 					optionalOf (
@@ -244,7 +248,7 @@ class ChatDateCommand
 				// process inbox
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalAbsent (),
 					optionalAbsent (),
@@ -255,7 +259,7 @@ class ChatDateCommand
 			// manually process
 
 			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
+				transaction,
 				chatUser,
 				message,
 				rest,
@@ -266,7 +270,7 @@ class ChatDateCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalAbsent (),
 				optionalAbsent (),

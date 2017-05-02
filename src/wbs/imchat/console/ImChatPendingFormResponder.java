@@ -45,7 +45,10 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -122,22 +125,23 @@ class ImChatPendingFormResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			message =
-				imChatMessageHelper.findFromContextRequired ();
+				imChatMessageHelper.findFromContextRequired (
+					transaction);
 
 			conversation =
 				message.getImChatConversation ();
@@ -182,19 +186,19 @@ class ImChatPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			htmlScriptBlockOpen ();
 
@@ -223,13 +227,13 @@ class ImChatPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -243,7 +247,7 @@ class ImChatPendingFormResponder
 				"Reply to IM chat");
 
 			renderForm (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -255,7 +259,7 @@ class ImChatPendingFormResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"renderForm");
@@ -601,7 +605,7 @@ class ImChatPendingFormResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"renderIgnore");

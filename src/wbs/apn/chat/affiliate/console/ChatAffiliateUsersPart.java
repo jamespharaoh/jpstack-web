@@ -16,9 +16,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -37,6 +40,9 @@ class ChatAffiliateUsersPart
 	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	List <ChatUserRec> chatUsers;
@@ -46,60 +52,84 @@ class ChatAffiliateUsersPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findFromContextRequired ();
+		try (
 
-		chatUsers =
-			chatUserHelper.find (
-				chatAffiliate);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		Collections.sort (
-			chatUsers);
+		) {
+
+			ChatAffiliateRec chatAffiliate =
+				chatAffiliateHelper.findFromContextRequired (
+					transaction);
+
+			chatUsers =
+				chatUserHelper.find (
+					transaction,
+					chatAffiliate);
+
+			Collections.sort (
+				chatUsers);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"User",
-			"Name",
-			"Info",
-			"Online");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		for (
-			ChatUserRec chatUser
-				: chatUsers
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				chatUser.getCode ());
+			htmlTableHeaderRowWrite (
+				"User",
+				"Name",
+				"Info",
+				"Online");
 
-			htmlTableCellWrite (
-				chatUser.getName ());
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					chatUser.getInfoText (),
-					() -> chatUser.getInfoText ().getText ()));
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					chatUser.getOnline ()));
+				htmlTableCellWrite (
+					chatUser.getCode ());
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					chatUser.getName ());
+
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatUser.getInfoText (),
+						() -> chatUser.getInfoText ().getText ()));
+
+				htmlTableCellWrite (
+					booleanToYesNo (
+						chatUser.getOnline ()));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

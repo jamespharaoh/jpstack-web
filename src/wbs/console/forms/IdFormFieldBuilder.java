@@ -4,20 +4,34 @@ import static wbs.utils.etc.NullUtils.ifNull;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("idFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class IdFormFieldBuilder {
+class IdFormFieldBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -54,83 +68,96 @@ class IdFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			ifNull (
-				spec.name (),
-				"id");
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				"Id");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// accessor
+		) {
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			String name =
+				ifNull (
+					spec.name (),
+					"id");
 
-			.name (
-				name)
+			String label =
+				ifNull (
+					spec.label (),
+					"Id");
 
-			.nativeClass (
-				Long.class);
+			// accessor
 
-		// native mapping
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+				.name (
+					name)
 
-		// interface mapping
+				.nativeClass (
+					Long.class);
 
-		FormFieldInterfaceMapping interfaceMapping =
-			integerFormFieldInterfaceMappingProvider.get ();
+			// native mapping
 
-		// renderer
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+			// interface mapping
 
-			.name (
-				name)
+			FormFieldInterfaceMapping interfaceMapping =
+				integerFormFieldInterfaceMappingProvider.get ();
 
-			.label (
-				label)
+			// renderer
 
-			.nullable (
-				false);
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
-		// field
+				.name (
+					name)
 
-		formFieldSet.addFormItem (
-			readOnlyFormFieldProvider.get ()
+				.label (
+					label)
 
-			.name (
-				name)
+				.nullable (
+					false);
 
-			.label (
-				label)
+			// field
 
-			.accessor (
-				accessor)
+			formFieldSet.addFormItem (
+				readOnlyFormFieldProvider.get ()
 
-			.nativeMapping (
-				nativeMapping)
+				.name (
+					name)
 
-			.interfaceMapping (
-				interfaceMapping)
+				.label (
+					label)
 
-			.csvMapping (
-				interfaceMapping)
+				.accessor (
+					accessor)
 
-			.renderer (
-				renderer)
+				.nativeMapping (
+					nativeMapping)
 
-		);
+				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+			);
+
+		}
 
 	}
 

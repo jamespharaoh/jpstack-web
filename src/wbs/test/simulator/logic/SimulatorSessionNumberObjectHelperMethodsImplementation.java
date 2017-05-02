@@ -8,8 +8,9 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -34,23 +35,25 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	SimulatorSessionNumberRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
 
 			// find existing
 
-			Optional <SimulatorSessionNumberRec> existingSimulatorSessionNumber =
-				simulatorSessionNumberHelper.find (
-					number.getId ());
+			Optional <SimulatorSessionNumberRec>
+				existingSimulatorSessionNumber =
+					simulatorSessionNumberHelper.find (
+						transaction,
+						number.getId ());
 
 			if (
 				optionalIsPresent (
@@ -63,7 +66,7 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 
 			SimulatorSessionNumberRec newSimulatorSessionNumber =
 				simulatorSessionNumberHelper.insert (
-					taskLogger,
+					transaction,
 					simulatorSessionNumberHelper.createInstance ()
 
 				.setNumber (

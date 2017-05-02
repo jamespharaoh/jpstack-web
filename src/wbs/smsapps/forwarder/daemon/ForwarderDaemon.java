@@ -4,7 +4,12 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrDefault;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsYesNo;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -24,6 +29,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import org.joda.time.Duration;
@@ -32,10 +39,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.AbstractDaemonService;
@@ -82,30 +89,24 @@ class ForwarderDaemon
 		boolean doQuery (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doQuery");
-
-			Set<Long> activeIds =
-				buffer.getKeys ();
-
-			List <ForwarderMessageInRec> forwarderMessageIns;
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnly (
-						taskLogger,
-						"ForwarderDaemon.MainThread.doQuery ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"MainThread.doQuery");
 
 			) {
 
+				Set <Long> activeIds =
+					buffer.getKeys ();
+
 				// get the list
 
-				forwarderMessageIns =
+				List <ForwarderMessageInRec> forwarderMessageIns =
 					forwarderMessageInHelper.findNextLimit (
+						transaction,
 						transaction.now (),
 						buffer.getFullSize ());
 
@@ -165,7 +166,7 @@ class ForwarderDaemon
 
 				try (
 
-					TaskLogger taskLogger =
+					OwnedTaskLogger taskLogger =
 						logContext.createTaskLogger (
 							"MainThread.run");
 
@@ -411,7 +412,7 @@ class ForwarderDaemon
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
 						"WorkerThread.doSend");
@@ -475,29 +476,70 @@ class ForwarderDaemon
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
-						"WorkerThread.doMessage");
+						"doMessage");
 
-				OwnedTransaction checkTransaction =
-					database.beginReadWrite (
+			) {
+
+				// get message
+
+				Optional <ForwarderMessageInRec> forwarderMessageInOptional =
+					getMessage (
 						taskLogger,
-						stringFormat (
-							"%s.%s.%s (%s)",
-							"ForwarderDaemon",
-							"WorkerThread",
-							"doMessage",
-							stringFormat (
-								"forwarderMessageInId = %s",
-								integerToDecimalString (
-									forwarderMessageInId))),
-						this);
+						forwarderMessageInId);
+
+				if (
+					optionalIsNotPresent (
+						forwarderMessageInOptional)
+				) {
+					return;
+				}
+
+				ForwarderMessageInRec forwarderMessageIn =
+					optionalGetRequired (
+						forwarderMessageInOptional);
+
+				// send it
+
+				boolean success =
+					doSend (
+						taskLogger,
+						forwarderMessageIn);
+
+				// record result
+
+				doResult (
+					taskLogger,
+					forwarderMessageInId,
+					success);
+
+			}
+
+		}
+
+		private
+		Optional <ForwarderMessageInRec> getMessage (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Long forwarderMessageInId) {
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWriteFormat (
+						logContext,
+						parentTaskLogger,
+						"getMessage (%s)",
+						keyEqualsDecimalInteger (
+							"forwarderMessageInId",
+							forwarderMessageInId));
 
 			) {
 
 				ForwarderMessageInRec forwarderMessageIn =
 					forwarderMessageInHelper.findRequired (
+						transaction,
 						forwarderMessageInId);
 
 				// check if we should cancel it
@@ -515,50 +557,29 @@ class ForwarderDaemon
 						forwarderMessageIn.getCreatedTime ().plus (
 							Duration.standardSeconds (
 								timeout)),
-						checkTransaction.now ())
+						transaction.now ())
 				) {
 
 					forwarderMessageIn =
 						forwarderMessageInHelper.findRequired (
+							transaction,
 							forwarderMessageIn.getId ());
 
 					forwarderMessageIn
 
 						.setCancelledTime (
-							checkTransaction.now ());
+							transaction.now ());
 
-					checkTransaction.commit ();
+					transaction.commit ();
 
-					return;
+					return optionalAbsent ();
 
 				} else {
 
-					checkTransaction.commit ();
+					transaction.commit ();
 
-				}
-
-				// send it
-
-				boolean success =
-					doSend (
-						taskLogger,
+					return optionalOf (
 						forwarderMessageIn);
-
-				try (
-
-					OwnedTransaction resultTransaction =
-						database.beginReadWrite (
-							taskLogger,
-							"ForwarderDaemon.WorkerThread.doMessage",
-							this);
-
-				) {
-
-					doResult (
-						forwarderMessageIn.getId (),
-						success);
-
-					resultTransaction.commit ();
 
 				}
 
@@ -568,47 +589,64 @@ class ForwarderDaemon
 
 		private
 		void doResult (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long forwarderMessageInId,
 				@NonNull Boolean success) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
+			try (
 
-			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.findRequired (
-					forwarderMessageInId);
+				OwnedTransaction transaction =
+					database.beginReadWriteFormat (
+						logContext,
+						parentTaskLogger,
+						"WorkerThread.doResult (%s, %s)",
+						keyEqualsDecimalInteger (
+							"forwarderMessageInId",
+							forwarderMessageInId),
+						keyEqualsYesNo (
+							"success",
+							success));
 
-			if (! forwarderMessageIn.getPending ())
-				return;
+			) {
 
-			if (success) {
+				ForwarderMessageInRec forwarderMessageIn =
+					forwarderMessageInHelper.findRequired (
+						transaction,
+						forwarderMessageInId);
 
-				forwarderMessageIn
+				if (! forwarderMessageIn.getPending ())
+					return;
 
-					.setPending (
-						false)
+				if (success) {
 
-					.setSendQueue (
-						false)
+					forwarderMessageIn
 
-					.setProcessedTime (
-						transaction.now ())
+						.setPending (
+							false)
 
-					.setRetryTime (
-						null);
+						.setSendQueue (
+							false)
 
-			} else {
+						.setProcessedTime (
+							transaction.now ())
 
-				Calendar calendar =
-					Calendar.getInstance ();
+						.setRetryTime (
+							null);
 
-				calendar.add (Calendar.MINUTE, 1);
+				} else {
 
-				forwarderMessageIn
+					Calendar calendar =
+						Calendar.getInstance ();
 
-					.setRetryTime (
-						transaction.now ().plus (
-							Duration.standardMinutes (1)));
+					calendar.add (Calendar.MINUTE, 1);
+
+					forwarderMessageIn
+
+						.setRetryTime (
+							transaction.now ().plus (
+								Duration.standardMinutes (1)));
+
+				}
 
 			}
 
@@ -635,7 +673,7 @@ class ForwarderDaemon
 
 				try (
 
-					TaskLogger taskLogger =
+					OwnedTaskLogger taskLogger =
 						logContext.createTaskLogger (
 							"WorkerThread.run");
 

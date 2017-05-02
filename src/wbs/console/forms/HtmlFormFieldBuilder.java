@@ -6,24 +6,37 @@ import static wbs.utils.string.StringUtils.capitalise;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("htmlFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class HtmlFormFieldBuilder {
+class HtmlFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -59,94 +72,107 @@ class HtmlFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// field type
+		) {
 
-		Class<?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+			String name =
+				spec.name ();
 
-		// accessor
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			// field type
 
-			.name (
-				name)
+			Class<?> propertyClass =
+				PropertyUtils.propertyClassForClass (
+					context.containerClass (),
+					name);
 
-		/*
-			.dynamic (
-				false)
-		*/
+			// accessor
 
-			.nativeClass (
-				propertyClass);
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.get ()
 
-		// native mapping
+				.name (
+					name)
 
-		FormFieldNativeMapping nativeMapping =
-			formFieldPluginManager.getNativeMappingRequired (
-				context,
-				context.containerClass (),
-				name,
-				String.class,
-				propertyClass);
+			/*
+				.dynamic (
+					false)
+			*/
 
-		// interface mapping
+				.nativeClass (
+					propertyClass);
 
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			// native mapping
 
-		// renderer
+			FormFieldNativeMapping nativeMapping =
+				formFieldPluginManager.getNativeMappingRequired (
+					context,
+					context.containerClass (),
+					name,
+					String.class,
+					propertyClass);
 
-		FormFieldRenderer renderer =
-			htmlFormFieldRendererProvider.get ()
+			// interface mapping
 
-			.name (
-				name)
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
 
-			.label (
-				label);
+			// renderer
 
-		// form field
+			FormFieldRenderer renderer =
+				htmlFormFieldRendererProvider.get ()
 
-		formFieldSet.addFormItem (
-			readOnlyFormFieldProvider.get ()
+				.name (
+					name)
 
-			.name (
-				name)
+				.label (
+					label);
 
-			.label (
-				label)
+			// form field
 
-			.accessor (
-				accessor)
+			formFieldSet.addFormItem (
+				readOnlyFormFieldProvider.get ()
 
-			.nativeMapping (
-				nativeMapping)
+				.name (
+					name)
 
-			.interfaceMapping (
-				interfaceMapping)
+				.label (
+					label)
 
-			.renderer (
-				renderer)
+				.accessor (
+					accessor)
 
-		);
+				.nativeMapping (
+					nativeMapping)
+
+				.interfaceMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+			);
+
+		}
 
 	}
 

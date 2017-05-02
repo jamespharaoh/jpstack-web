@@ -1,6 +1,7 @@
 package wbs.framework.database;
 
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.ReflectionUtils.getConstructor;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
@@ -22,17 +23,20 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.BorrowedTaskLogger;
+import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.etc.ImplicitArgument.BorrowedArgument;
 
 /**
  * TODO a maximum connection life would be nice
@@ -53,9 +57,6 @@ class DbPool
 
 	// singleton dependencies
 
-	@SingletonDependency
-	ActivityManager activityManager;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -69,22 +70,32 @@ class DbPool
 
 	@NormalLifecycleSetup
 	public
-	void init ()
-		throws
-			NoSuchMethodException,
-			SecurityException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		proxyClass =
-			Proxy.getProxyClass (
-			getClass ().getClassLoader (),
-				new Class [] {
-					Connection.class,
-					WbsConnection.class,
-				});
+		try (
 
-		proxyConstructor =
-			proxyClass.getConstructor (
-				InvocationHandler.class);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			proxyClass =
+				Proxy.getProxyClass (
+					getClass ().getClassLoader (),
+						new Class [] {
+							Connection.class,
+							WbsConnection.class,
+						});
+
+			proxyConstructor =
+				getConstructor (
+					proxyClass,
+					InvocationHandler.class);
+
+		}
 
 	}
 
@@ -135,26 +146,81 @@ class DbPool
 	Connection getConnection ()
 		throws SQLException {
 
-		ConnectionStuff connectionStuff;
+		try (
 
-		synchronized (lock) {
+			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
+				taskLoggerProvider =
+					TaskLogger.implicitArgument.borrow ();
 
-			// wait for a connection
+		) {
+
+			BorrowedTaskLogger taskLogger =
+				taskLoggerProvider.get ();
+
+			ConnectionStuff connectionStuff;
+
+			synchronized (lock) {
+
+				// wait for a connection
+
+				waitForConnection (
+					taskLogger,
+					lock);
+
+				// either use an existing one
+
+				if (! idleConnections.isEmpty ()) {
+
+					connectionStuff =
+						idleConnections.iterator ().next ();
+
+					idleConnections.remove (connectionStuff);
+					usedConnections.add (connectionStuff);
+
+					return connectionStuff.createClientConnection ();
+
+				}
+
+				// we are going to create a new one
+
+				connectionStuff =
+					new ConnectionStuff ();
+
+				usedConnections.add (
+					connectionStuff);
+
+			}
+
+			// create a new connection
+
+			return createNewConnection (
+				taskLogger,
+				connectionStuff);
+
+		}
+
+	}
+
+	private
+	void waitForConnection (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object lock) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"waitForConnection");
+
+		) {
 
 			while (
 				idleConnections.isEmpty ()
 				&& usedConnections.size () == maxConnections
 			) {
 
-				try (
-
-					ActiveTask activeTask =
-						activityManager.start (
-							"database",
-							"DbPool.getConnection () - waiting",
-							this);
-
-				) {
+				try {
 
 					lock.wait ();
 
@@ -166,44 +232,42 @@ class DbPool
 
 			}
 
-			// either use an existing one
-
-			if (! idleConnections.isEmpty ()) {
-
-				connectionStuff =
-					idleConnections.iterator ().next ();
-
-				idleConnections.remove (connectionStuff);
-				usedConnections.add (connectionStuff);
-
-				return connectionStuff.createClientConnection ();
-
-			}
-
-			// we are going to create a new one
-
-			connectionStuff =
-				new ConnectionStuff ();
-
-			usedConnections.add (
-				connectionStuff);
-
 		}
 
-		// create a new connection
+	}
+
+	private
+	Connection createNewConnection (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConnectionStuff connectionStuff)
+		throws SQLException {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"database",
-					"DbPool.getConnection () - connecting",
-					this);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createNewConnection");
 
 		) {
 
 			connectionStuff.realConnection =
-				dataSource.getConnection ();
+				TaskLogger.implicitArgument.storeAndInvoke (
+					taskLogger,
+					() -> {
+
+				try {
+
+					return dataSource.getConnection ();
+
+				} catch (SQLException sqlException) {
+
+					throw new RuntimeException (
+						sqlException);
+
+				}
+
+			});
 
 			connectionStuff.realConnection.setTransactionIsolation (
 				Connection.TRANSACTION_SERIALIZABLE);
@@ -218,7 +282,7 @@ class DbPool
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"closeIdle ()");
 

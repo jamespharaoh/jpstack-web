@@ -63,6 +63,7 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
 import wbs.framework.sql.SqlLogicImplementation;
@@ -119,7 +120,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initCustomTypes");
@@ -197,7 +198,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initCustomType");
@@ -278,7 +279,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initEnumType");
@@ -340,7 +341,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");
@@ -373,7 +374,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"buildSessionFactory");
@@ -431,7 +432,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"loadConfiguration");
@@ -499,7 +500,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"loadXmlConfigurationReal");
@@ -530,7 +531,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"configureModel");
@@ -1071,7 +1072,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"configureCollection");
@@ -1241,7 +1242,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"configureCollectionList");
@@ -1405,7 +1406,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"configureCollectionMap");
@@ -1517,7 +1518,7 @@ class HibernateSessionFactoryBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"configureLink");

@@ -60,9 +60,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.activitymanager.RuntimeExceptionWithTask;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
@@ -89,6 +86,8 @@ import wbs.framework.data.tools.DataToXml;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LogContextComponentFactory;
+import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -102,9 +101,6 @@ class ComponentRegistryImplementation
 			ComponentRegistryImplementation.class);
 
 	// properties
-
-	@Getter @Setter
-	ActivityManager activityManager;
 
 	@Getter @Setter
 	String outputPath;
@@ -259,17 +255,11 @@ class ComponentRegistryImplementation
 	public
 	ComponentManager build () {
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"build");
-
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"component-registry",
-					"build ()",
-					this);
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"build");
 
 		) {
 
@@ -282,18 +272,14 @@ class ComponentRegistryImplementation
 				.registry (
 					this)
 
-				.activityManager (
-					activityManager);
+			;
 
 			// automatic components
 
 			registerUnmanagedSingleton (
+				taskLogger,
 				"componentManager",
 				componentManager);
-
-			registerUnmanagedSingleton (
-				"activityManager",
-				activityManager);
 
 			// register scoped singletons
 
@@ -388,9 +374,15 @@ class ComponentRegistryImplementation
 	@Override
 	public
 	ComponentRegistryImplementation registerDefinition (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerDefinition");
 
 			HeldLock heldlock =
 				lock.write ();
@@ -401,30 +393,24 @@ class ComponentRegistryImplementation
 
 			if (componentDefinition.name () == null) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition has no name"));
+				throw taskLogger.fatalFormat (
+					"Component definition has no name");
 
 			}
 
 			if (componentDefinition.componentClass () == null) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s has no component class",
-						componentDefinition.name ()));
+				throw taskLogger.fatalFormat (
+					"Component definition %s has no component class",
+					componentDefinition.name ());
 
 			}
 
 			if (componentDefinition.scope () == null) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Copmonent definition %s has no scope",
-						componentDefinition.name ()));
+				throw taskLogger.fatalFormat (
+					"Copmonent definition %s has no scope",
+					componentDefinition.name ());
 
 			}
 
@@ -433,11 +419,9 @@ class ComponentRegistryImplementation
 					componentDefinition.name ())
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Duplicated component definition name %s",
-						componentDefinition.name ()));
+				throw taskLogger.fatalFormat (
+					"Duplicated component definition name %s",
+					componentDefinition.name ());
 
 			}
 
@@ -448,12 +432,10 @@ class ComponentRegistryImplementation
 					"prototype")
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s has invalid scope %s",
-						componentDefinition.name (),
-						componentDefinition.scope ()));
+				throw taskLogger.fatalFormat (
+					"Component definition %s has invalid scope %s",
+					componentDefinition.name (),
+					componentDefinition.scope ());
 
 			}
 
@@ -469,24 +451,20 @@ class ComponentRegistryImplementation
 					instantiationClass.getModifiers ())
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s refers to non-public class %s",
-						componentDefinition.name (),
-						instantiationClass.getName ()));
+				throw taskLogger.fatalFormat (
+					"Component definition %s refers to non-public class %s",
+					componentDefinition.name (),
+					instantiationClass.getName ());
 
 			}
 
 			if (Modifier.isAbstract (
 					instantiationClass.getModifiers ())) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s refers to abstract class %s",
-						componentDefinition.name (),
-						instantiationClass.getName ()));
+				throw taskLogger.fatalFormat (
+					"Component definition %s refers to abstract class %s",
+					componentDefinition.name (),
+					instantiationClass.getName ());
 
 			}
 
@@ -499,13 +477,11 @@ class ComponentRegistryImplementation
 
 			} catch (NoSuchMethodException exception) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s refers class %s with no default ",
-						componentDefinition.name (),
-						instantiationClass.getName (),
-						"constructor"));
+				throw taskLogger.fatalFormat (
+					"Component definition %s refers class %s with no default ",
+					componentDefinition.name (),
+					instantiationClass.getName (),
+					"constructor");
 
 			}
 
@@ -514,14 +490,12 @@ class ComponentRegistryImplementation
 					constructor.getModifiers ())
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Component definition %s ",
-						componentDefinition.name (),
-						"refers to class %s ",
-						instantiationClass.getName (),
-						"with non-public default constructor"));
+				throw taskLogger.fatalFormat (
+					"Component definition %s ",
+					componentDefinition.name (),
+					"refers to class %s ",
+					instantiationClass.getName (),
+					"with non-public default constructor");
 
 			}
 
@@ -671,10 +645,16 @@ class ComponentRegistryImplementation
 	@Override
 	public
 	ComponentRegistryImplementation registerUnmanagedSingleton (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Object object) {
 
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerUnmanagedSingleton");
 
 			HeldLock heldlock =
 				lock.write ();
@@ -704,6 +684,7 @@ class ComponentRegistryImplementation
 					false);
 
 			registerDefinition (
+				taskLogger,
 				componentDefinition);
 
 			return this;
@@ -717,12 +698,12 @@ class ComponentRegistryImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String classpath) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"registerXmlClasspath");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerXmlClasspath");
 
 			HeldLock heldlock =
 				lock.write ();
@@ -736,6 +717,7 @@ class ComponentRegistryImplementation
 					classpath);
 
 			components.register (
+				taskLogger,
 				this);
 
 			return this;
@@ -769,6 +751,7 @@ class ComponentRegistryImplementation
 					filename);
 
 			componentsSpec.register (
+				taskLogger,
 				this);
 
 			return this;
@@ -804,7 +787,7 @@ class ComponentRegistryImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"outputComponentDefinitions");
@@ -1085,6 +1068,11 @@ class ComponentRegistryImplementation
 
 		try (
 
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerScopedSingletons");
+
 			HeldLock heldlock =
 				lock.write ();
 
@@ -1137,6 +1125,7 @@ class ComponentRegistryImplementation
 				}
 
 				registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -1215,7 +1204,7 @@ class ComponentRegistryImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initComponentDefinitionFields");
@@ -1274,8 +1263,8 @@ class ComponentRegistryImplementation
 						numAnnotations)
 				) {
 
-					throw new RuntimeExceptionWithTask (
-						activityManager.currentTask ());
+					throw new LoggedErrorsException (
+						taskLogger);
 
 				}
 
@@ -1371,8 +1360,8 @@ class ComponentRegistryImplementation
 
 					if (qualifierAnnotations.size () > 1) {
 
-						throw new RuntimeExceptionWithTask (
-							activityManager.currentTask ());
+						throw new LoggedErrorsException (
+							taskLogger);
 
 					}
 
@@ -1435,77 +1424,88 @@ class ComponentRegistryImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Class <?> instantiateClass) {
 
-		for (
-			Method method
-				: instantiateClass.getMethods ()
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initComponentDefinitionMethods");
+
 		) {
 
-			NormalLifecycleSetup normalLifecycleSetupAnnotation =
-				method.getAnnotation (
-					NormalLifecycleSetup.class);
-
-			LateLifecycleSetup lateLifecycleSetupAnnotation =
-				method.getAnnotation (
-					LateLifecycleSetup.class);
-
-			NormalLifecycleTeardown normalLifecycleTeardownAnnotation =
-				method.getAnnotation (
-					NormalLifecycleTeardown.class);
-
-			long numAnnotations =
-				iterableCount (
-					presentInstances (
-						optionalFromNullable (
-							normalLifecycleSetupAnnotation),
-						optionalFromNullable (
-							lateLifecycleSetupAnnotation),
-						optionalFromNullable (
-							normalLifecycleTeardownAnnotation)));
-
-			if (
-				equalToZero (
-					numAnnotations)
-			) {
-				continue;
-			}
-
-			if (
-				moreThanOne (
-					numAnnotations)
+			for (
+				Method method
+					: instantiateClass.getMethods ()
 			) {
 
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask ());
+				NormalLifecycleSetup normalLifecycleSetupAnnotation =
+					method.getAnnotation (
+						NormalLifecycleSetup.class);
 
-			}
+				LateLifecycleSetup lateLifecycleSetupAnnotation =
+					method.getAnnotation (
+						LateLifecycleSetup.class);
 
-			if (
-				isNotNull (
-					normalLifecycleSetupAnnotation)
-			) {
+				NormalLifecycleTeardown normalLifecycleTeardownAnnotation =
+					method.getAnnotation (
+						NormalLifecycleTeardown.class);
 
-				componentDefinition.normalSetupMethods ().add (
-					method);
+				long numAnnotations =
+					iterableCount (
+						presentInstances (
+							optionalFromNullable (
+								normalLifecycleSetupAnnotation),
+							optionalFromNullable (
+								lateLifecycleSetupAnnotation),
+							optionalFromNullable (
+								normalLifecycleTeardownAnnotation)));
 
-			}
+				if (
+					equalToZero (
+						numAnnotations)
+				) {
+					continue;
+				}
 
-			if (
-				isNotNull (
-					lateLifecycleSetupAnnotation)
-			) {
+				if (
+					moreThanOne (
+						numAnnotations)
+				) {
 
-				componentDefinition.lateSetupMethods ().add (
-					method);
+					throw new LoggedErrorsException (
+						taskLogger);
 
-			}
+				}
 
-			if (
-				isNotNull (
-					normalLifecycleTeardownAnnotation)
-			) {
+				if (
+					isNotNull (
+						normalLifecycleSetupAnnotation)
+				) {
 
-				componentDefinition.normalTeardownMethods ().add (
-					method);
+					componentDefinition.normalSetupMethods ().add (
+						method);
+
+				}
+
+				if (
+					isNotNull (
+						lateLifecycleSetupAnnotation)
+				) {
+
+					componentDefinition.lateSetupMethods ().add (
+						method);
+
+				}
+
+				if (
+					isNotNull (
+						normalLifecycleTeardownAnnotation)
+				) {
+
+					componentDefinition.normalTeardownMethods ().add (
+						method);
+
+				}
 
 			}
 
@@ -1886,7 +1886,7 @@ class ComponentRegistryImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"orderByStrongDependencies");

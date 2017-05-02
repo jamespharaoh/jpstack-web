@@ -33,17 +33,17 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -81,9 +81,6 @@ class ChatDateDaemon
 			ChatDateDaemon.class);
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
@@ -157,7 +154,7 @@ class ChatDateDaemon
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
 						"runService");
 
@@ -191,7 +188,7 @@ class ChatDateDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doRun");
@@ -204,33 +201,41 @@ class ChatDateDaemon
 			taskLogger.debugFormat (
 				"Retrieving list of chats");
 
-			try (
+			List <Long> chatIds =
+				getChatIds (
+					taskLogger);
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
+			chatIds.forEach (
+				chatId ->
+					doChat (
 						taskLogger,
-						"ChatDateDaemon.doRun ()",
-						this);
+						chatId));
 
-			) {
+			taskLogger.noticeFormat (
+				"Dating batch complete!");
 
-				List <Long> chatIds =
-					iterableMapToList (
-						ChatRec::getId,
-						chatHelper.findNotDeleted ());
+		}
 
-				transaction.close ();
+	}
 
-				chatIds.forEach (
-					chatId ->
-						doChat (
-							taskLogger,
-							chatId));
+	private
+	List <Long> getChatIds (
+			@NonNull TaskLogger parentTaskLogger) {
 
-				taskLogger.noticeFormat (
-					"Dating batch complete!");
+		try (
 
-			}
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getChatIds");
+
+		) {
+
+			return iterableMapToList (
+				ChatRec::getId,
+				chatHelper.findNotDeleted (
+					transaction));
 
 		}
 
@@ -242,7 +247,7 @@ class ChatDateDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
 					"doChat (%s)",
@@ -343,354 +348,273 @@ class ChatDateDaemon
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLoggerFormat (
-				parentTaskLogger,
-				"getChatData (%s)",
-				integerToDecimalString (
-					chatId));
-
-		ChatData chatData =
-			new ChatData ();
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
+					logContext,
+					parentTaskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						classNameSimple (
 							getClass ()),
 						"getChatData",
 						integerToDecimalString (
-							chatId)),
-					this);
+							chatId)));
 
 		) {
 
-			ChatRec chat;
+			ChatData chatData =
+				new ChatData ();
 
-			int hour;
-			LocalDate today;
+			ChatRec chat =
+				chatHelper.findRequired (
+					transaction,
+					chatId);
 
-			try (
+			if (! chat.getDatingEnabled ()) {
 
-				ActiveTask activeStep =
-					activityManager.start (
-						"step",
-						"find chat",
-						this);
-
-			) {
-
-				chat =
-					chatHelper.findRequired (
-						chatId);
-
-				taskLogger.noticeFormat (
-					"Start dating for chat %s.%s",
-					chat.getSlice ().getCode (),
-					chat.getCode ());
-
-				if (! chat.getDatingEnabled ()) {
-
-					taskLogger.warningFormat (
-						"Dating disabled for %s",
-						objectManager.objectPathMini (
-							chat));
-
-					return optionalAbsent ();
-
-				}
-
-				taskLogger.noticeFormat (
-					"Begin dating for %s",
+				transaction.warningFormat (
+					"Chat dating disabled for %s",
 					objectManager.objectPathMini (
+						transaction,
 						chat));
 
-				hour =
-					transaction.now ()
-
-					.toDateTime (
-						chatMiscLogic.timezone (
-							chat))
-
-					.getHourOfDay ();
-
-				today =
-					LocalDate.now ();
+				return optionalAbsent ();
 
 			}
+
+			transaction.noticeFormat (
+				"Start chat dating for %s",
+				objectManager.objectPathMini (
+					transaction,
+					chat));
+
+			long hour =
+				transaction.now ()
+
+				.toDateTime (
+					chatMiscLogic.timezone (
+						transaction,
+						chat))
+
+				.getHourOfDay ();
+
+			LocalDate today =
+				LocalDate.now ();
 
 			// first cache some database info to make this a little quicker
 
-			Collection <ChatUserRec> datingUsers;
+			transaction.logicFormat (
+				"Find dating users");
 
-			try (
-
-				ActiveTask activeStep =
-					activityManager.start (
-						"step",
-						"find dating users",
-						this);
-
-			) {
-
-				datingUsers =
-					chatUserHelper.findDating (
-						chat);
-
-			}
+			Collection <ChatUserRec> datingUsers =
+				chatUserHelper.findDating (
+					transaction,
+					chat);
 
 			// put all valid dating users into otherUserInfos
 
-			try (
+			transaction.logicFormat (
+				"Find valid dating users");
 
-				ActiveTask activeStep =
-					activityManager.start (
-						"step",
-						"verify dating users",
-						this);
-
+			for (
+				ChatUserRec chatUser
+					: datingUsers
 			) {
 
-				for (
-					ChatUserRec chatUser
-						: datingUsers
-				) {
+				if (chatUser.getNumber () == null) {
 
-					try (
+					transaction.logicFormat (
+						"Chat user %s has no number",
+						chatUser.getCode ());
 
-						ActiveTask activeIteration =
-							activityManager.start (
-								"iteration",
-								stringFormat (
-									"chat user %s",
-									objectManager.objectPathMini (
-										chatUser)),
-								this);
-
-					) {
-
-						if (chatUser.getNumber () == null)
-							continue;
-
-						if (chatUser.getNumber ().getNetwork ().getId () == 0)
-							continue;
-
-						ChatCreditCheckResult creditCheckResult =
-							chatCreditLogic.userSpendCreditCheck (
-								taskLogger,
-								chatUser,
-								false,
-								optionalAbsent ());
-
-						if (creditCheckResult.failed ())
-							continue;
-
-						chatData.otherUserInfos.add (
-							new DatingUserInfo (
-								chatUser));
-
-					}
+					continue;
 
 				}
+
+				if (chatUser.getNumber ().getNetwork ().getId () == 0) {
+
+					transaction.logicFormat (
+						"Chat user %s has no network",
+						chatUser.getCode ());
+
+					continue;
+
+				}
+
+				ChatCreditCheckResult creditCheckResult =
+					chatCreditLogic.userSpendCreditCheck (
+						transaction,
+						chatUser,
+						false,
+						optionalAbsent ());
+
+				if (creditCheckResult.failed ()) {
+
+					transaction.logicFormat (
+						"Chat user %s failed credit check: %s",
+						creditCheckResult.details ());
+
+					continue;
+
+				}
+
+				transaction.logicFormat (
+					"Chat user %s added to dating users");
+
+				chatData.otherUserInfos.add (
+					new DatingUserInfo (
+						chatUser));
 
 			}
 
 			// then add all the monitors too
 
-			try (
+			transaction.logicFormat (
+				"Find valid dating monitors");
 
-				ActiveTask activeStep =
-					activityManager.start (
-						"step",
-						"find dating monitors",
-						this);
+			Collection <Long> monitorIds =
+				chatUserHelper.searchIds (
+					transaction,
+					new ChatUserSearch ()
 
+				.chatId (
+					chatId)
+
+				.type (
+					ChatUserType.monitor)
+
+			);
+
+			for (
+				Long chatUserId
+					: monitorIds
 			) {
 
-				Collection <Long> monitorIds =
-					chatUserHelper.searchIds (
-						taskLogger,
-						new ChatUserSearch ()
+				ChatUserRec chatUser =
+					chatUserHelper.findRequired (
+						transaction,
+						chatUserId);
 
-					.chatId (
-						chatId)
+				transaction.logicFormat (
+					"Chat monitor %s added to dating users",
+					chatUser.getCode ());
 
-					.type (
-						ChatUserType.monitor)
-
-				);
-
-				for (
-					Long chatUserId
-						: monitorIds
-				) {
-
-					try (
-
-						ActiveTask activeIteration =
-							activityManager.start (
-								"iteration",
-								stringFormat (
-									"chat user %s",
-									integerToDecimalString (
-										chatUserId)),
-								this);
-
-					) {
-
-						ChatUserRec chatUser =
-							chatUserHelper.findRequired (
-								chatUserId);
-
-						chatData.otherUserInfos.add (
-							new DatingUserInfo (
-								chatUser));
-
-					}
-
-				}
+				chatData.otherUserInfos.add (
+					new DatingUserInfo (
+						chatUser));
 
 			}
 
-			// put all active dating users who may still need a message into
-			// datingUserIds
+			transaction.logicFormat (
+				"Find dating users to receive a message");
 
-			try (
-
-				ActiveTask activeStep =
-					activityManager.start (
-						"step",
-						"select users for dating",
-						this);
-
+			for (
+				ChatUserRec chatUser
+					: datingUsers
 			) {
 
-				for (
-					ChatUserRec chatUser
-						: datingUsers
-				) {
+				if (chatUser.getType () != ChatUserType.user) {
 
-					try (
+					transaction.debugFormat (
+						"Ignoring %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"(user type)");
 
-						ActiveTask activeIteration =
-							activityManager.start (
-								"iteration",
-								stringFormat (
-									"chat user %s",
-									objectManager.objectPathMini (
-										chatUser)),
-								this);
-
-					) {
-
-						if (chatUser.getType () != ChatUserType.user) {
-
-							taskLogger.debugFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(user type)");
-
-							continue;
-
-						}
-
-						chatData.numUsers ++;
-
-						ChatCreditCheckResult creditCheckResult =
-							chatCreditLogic.userSpendCreditCheck (
-								taskLogger,
-								chatUser,
-								false,
-								optionalAbsent ());
-
-						if (creditCheckResult.failed ()) {
-
-							chatData.numCredit ++;
-
-							taskLogger.noticeFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(%s)",
-								creditCheckResult.details ());
-
-							continue;
-
-						}
-
-						if (
-							! checkHours (
-								hour,
-								chatUser.getDateStartHour (),
-								chatUser.getDateEndHour ())
-						) {
-
-							chatData.numHours ++;
-
-							taskLogger.debugFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(time)");
-
-							continue;
-
-						}
-
-						if (chatUser.getOnline ()) {
-
-							chatData.numOnline ++;
-
-							taskLogger.noticeFormat (
-								"Ignoring %s (online)",
-								integerToDecimalString (
-									chatUser.getId ()));
-
-							continue;
-
-						}
-
-						if (allOf (
-
-							() -> isNotNull (
-								chatUser.getDateDailyDate ()),
-
-							() -> equalSafe (
-								chatUser.getDateDailyDate (),
-								today),
-
-							() -> lessThanOne (
-								chatUser.getDateDailyCount ())
-
-						)) {
-
-							chatData.numSent ++;
-
-							taskLogger.debugFormat (
-								"Ignoring %s (daily limit)",
-								objectManager.objectPathMini (
-									chatUser));
-
-							continue;
-
-						}
-
-						taskLogger.debugFormat (
-							"Including %s",
-							objectManager.objectPathMini (
-								chatUser));
-
-						chatData.datingUserIds.add (
-							chatUser.getId ());
-
-					}
+					continue;
 
 				}
+
+				chatData.numUsers ++;
+
+				ChatCreditCheckResult creditCheckResult =
+					chatCreditLogic.userSpendCreditCheck (
+						transaction,
+						chatUser,
+						false,
+						optionalAbsent ());
+
+				if (creditCheckResult.failed ()) {
+
+					chatData.numCredit ++;
+
+					transaction.debugFormat (
+						"Ignoring %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"(%s)",
+						creditCheckResult.details ());
+
+					continue;
+
+				}
+
+				if (
+					! checkHours (
+						hour,
+						chatUser.getDateStartHour (),
+						chatUser.getDateEndHour ())
+				) {
+
+					chatData.numHours ++;
+
+					transaction.debugFormat (
+						"Ignoring %s ",
+						integerToDecimalString (
+							chatUser.getId ()),
+						"(time)");
+
+					continue;
+
+				}
+
+				if (chatUser.getOnline ()) {
+
+					chatData.numOnline ++;
+
+					transaction.noticeFormat (
+						"Ignoring %s (online)",
+						integerToDecimalString (
+							chatUser.getId ()));
+
+					continue;
+
+				}
+
+				if (allOf (
+
+					() -> isNotNull (
+						chatUser.getDateDailyDate ()),
+
+					() -> equalSafe (
+						chatUser.getDateDailyDate (),
+						today),
+
+					() -> lessThanOne (
+						chatUser.getDateDailyCount ())
+
+				)) {
+
+					chatData.numSent ++;
+
+					transaction.debugFormat (
+						"Ignoring %s (daily limit)",
+						objectManager.objectPathMini (
+							transaction,
+							chatUser));
+
+					continue;
+
+				}
+
+				transaction.logicFormat (
+					"Adding user %s to receive a message",
+					chatUser.getCode ());
+
+				chatData.datingUserIds.add (
+					chatUser.getId ());
 
 			}
 
@@ -706,30 +630,26 @@ class ChatDateDaemon
 			@NonNull Collection <DatingUserInfo> otherUserInfos,
 			@NonNull Long thisUserId) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"doUser");
-
-		taskLogger.noticeFormat (
-			"Doing user %s",
-			integerToDecimalString (
-				thisUserId));
-
-		boolean status = false;
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doUser (otherUserInfos, thisUserId)");
 
 		) {
 
+			transaction.noticeFormat (
+				"Doing user %s",
+				integerToDecimalString (
+					thisUserId));
+
+			boolean status = false;
+
 			ChatUserRec thisUser =
 				chatUserHelper.findRequired (
+					transaction,
 					thisUserId);
 
 			ChatRec chat =
@@ -738,13 +658,19 @@ class ChatDateDaemon
 			int hour =
 				transaction
 					.now ()
-					.toDateTime (chatMiscLogic.timezone (chat))
+					.toDateTime (
+						chatMiscLogic.timezone (
+							transaction,
+							chat))
 					.getHourOfDay ();
 
 			LocalDate today =
 				transaction
 					.now ()
-					.toDateTime (chatMiscLogic.timezone (chat))
+					.toDateTime (
+						chatMiscLogic.timezone (
+							transaction,
+							chat))
 					.toLocalDate ();
 
 			// inc the daily count thing as appropriate
@@ -783,7 +709,7 @@ class ChatDateDaemon
 				.setDateDailyDate (
 					today);
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 
 				"Updated %s: ",
 				integerToDecimalString (
@@ -808,9 +734,10 @@ class ChatDateDaemon
 
 			if (thisUser.getDateDailyCount () < 1) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Ignoring %s (daily check failed)",
 					objectManager.objectPathMini (
+						transaction,
 						thisUser));
 
 				return false;
@@ -819,14 +746,14 @@ class ChatDateDaemon
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					thisUser,
 					false,
 					optionalAbsent ());
 
 			if (creditCheckResult.failed ()) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Ignoring %s ",
 					integerToDecimalString (
 						thisUserId),
@@ -844,9 +771,10 @@ class ChatDateDaemon
 					thisUser.getDateEndHour ())
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Ignoring %s (time check failed)",
 					objectManager.objectPathMini (
+						transaction,
 						thisUser));
 
 				return false;
@@ -855,9 +783,10 @@ class ChatDateDaemon
 
 			if (thisUser.getOnline ()) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Ignoring %s (online check failed)",
 					objectManager.objectPathMini (
+						transaction,
 						thisUser));
 
 				return false;
@@ -866,7 +795,7 @@ class ChatDateDaemon
 
 			if (thisUser.getDateMode () == ChatUserDateMode.none) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Ignoring %s ",
 					integerToDecimalString (
 						thisUserId),
@@ -883,7 +812,7 @@ class ChatDateDaemon
 				if (
 
 					sendSingleLot (
-						taskLogger,
+						transaction,
 						thisUser,
 						otherUserInfos,
 						true,
@@ -892,7 +821,7 @@ class ChatDateDaemon
 						3)
 
 					|| sendSingleLot (
-						taskLogger,
+						transaction,
 						thisUser,
 						otherUserInfos,
 						false,
@@ -908,7 +837,7 @@ class ChatDateDaemon
 
 				if (
 					sendSingleLot (
-						taskLogger,
+						transaction,
 						thisUser,
 						otherUserInfos,
 						false,
@@ -930,9 +859,9 @@ class ChatDateDaemon
 	}
 
 	boolean sendSingleLot (
-			@NonNull TaskLogger parentTaskLogger,
-			ChatUserRec thisUser,
-			Collection<DatingUserInfo> otherUserInfos,
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection <DatingUserInfo> otherUserInfos,
 			boolean sendPhoto,
 			boolean usersWithPhoto,
 			boolean usersWithoutPhoto,
@@ -940,26 +869,29 @@ class ChatDateDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendSingleLot");
 
 		) {
 
 			// check each prospective user
 
-			List<DatingUserDistance> prospectiveUserDistances =
-				new ArrayList<DatingUserDistance> ();
+			List <DatingUserDistance> prospectiveUserDistances =
+				new ArrayList<> ();
 
 			DateUserStats dateUserStats =
 				new DateUserStats ();
 
-			for (DatingUserInfo thatUserInfo
-					: otherUserInfos) {
+			for (
+				DatingUserInfo thatUserInfo
+					: otherUserInfos
+			) {
 
 				DatingUserDistance dateUserDistance =
 					shouldSendUser (
+						transaction,
 						thisUser,
 						thatUserInfo,
 						sendPhoto,
@@ -972,7 +904,7 @@ class ChatDateDaemon
 					prospectiveUserDistances.add (dateUserDistance);
 			}
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Dating user %s: %s blocked, ",
 				integerToDecimalString (
 					thisUser.getId ()),
@@ -1015,6 +947,7 @@ class ChatDateDaemon
 
 				ChatUserRec otherUser =
 					chatUserHelper.findRequired (
+						transaction,
 						datingUserDistance.id);
 
 				if (otherUser.getInfoText () == null)
@@ -1032,7 +965,7 @@ class ChatDateDaemon
 			if (sendPhoto) {
 
 				chatInfoLogic.sendUserPics (
-					taskLogger,
+					transaction,
 					thisUser,
 					otherUsers,
 					null,
@@ -1046,7 +979,7 @@ class ChatDateDaemon
 				)
 
 					chatInfoLogic.sendUserInfo (
-						taskLogger,
+						transaction,
 						thisUser,
 						otherUser,
 						null,
@@ -1074,182 +1007,192 @@ class ChatDateDaemon
 	 * @return Whether we can send this profile
 	 */
 	DatingUserDistance shouldSendUser (
-			ChatUserRec thisUser,
-			DatingUserInfo thatUserInfo,
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec thisUser,
+			@NonNull DatingUserInfo thatUserInfo,
 			boolean sendPhoto,
 			boolean usersWithPhoto,
 			boolean usersWithoutPhoto,
 			boolean reuseOldUsers,
-			DateUserStats dateUserStats) {
+			@NonNull DateUserStats dateUserStats) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		// check its not us
-
-		if (
-			integerEqualSafe (
-				thisUser.getId (),
-				thatUserInfo.id)
-		) {
-			return null;
-		}
-
-		// check they're not blocked
-
-		if (thisUser.getBlocked ().containsKey (thatUserInfo.id)) {
-			dateUserStats.numBlocked++;
-			return null;
-		}
-
-		// check they are compatible
-
-		if (
-
-			isNull (
-				thisUser.getGender ())
-
-			|| isNull (
-				thisUser.getOrient ())
-
-			|| ! chatUserLogic.compatible (
-				thisUser.getGender (),
-				thisUser.getOrient (),
-				thisUser.getCategory () != null
-					? Optional.of (
-						thisUser.getCategory ().getId ())
-					: Optional.absent (),
-				thatUserInfo.gender,
-				thatUserInfo.orient,
-				thatUserInfo.categoryId)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"shouldSendUser");
 
 		) {
 
-			dateUserStats.numIncompatible ++;
+			// check its not us
 
-			return null;
+			if (
+				integerEqualSafe (
+					thisUser.getId (),
+					thatUserInfo.id)
+			) {
+				return null;
+			}
 
-		}
+			// check they're not blocked
 
-		// check they have a photo (where appropriate)
+			if (thisUser.getBlocked ().containsKey (thatUserInfo.id)) {
+				dateUserStats.numBlocked++;
+				return null;
+			}
 
-		if (sendPhoto && ! thatUserInfo.photo) {
-			dateUserStats.numNoPhoto++;
-			return null;
-		}
+			// check they are compatible
 
-		// check we've not already sent it
+			if (
 
-		ChatContactRec contact =
-			thisUser.getFromContacts ().get (thatUserInfo.id);
+				isNull (
+					thisUser.getGender ())
 
-		if (contact != null) {
+				|| isNull (
+					thisUser.getOrient ())
 
-			if (reuseOldUsers) {
+				|| ! chatUserLogic.compatible (
+					transaction,
+					thisUser.getGender (),
+					thisUser.getOrient (),
+					thisUser.getCategory () != null
+						? Optional.of (
+							thisUser.getCategory ().getId ())
+						: Optional.absent (),
+					thatUserInfo.gender,
+					thatUserInfo.orient,
+					thatUserInfo.categoryId)
 
-				Instant compareTime =
-					transaction
-						.now ()
-						.minus (Duration.standardDays (30));
+			) {
 
-				if (sendPhoto) {
+				dateUserStats.numIncompatible ++;
 
-					if (
-						contact.getLastPicTime () != null
-						&& compareTime.isBefore (
-							contact.getLastPicTime ())
-					) {
+				return null;
 
-						dateUserStats.numAlreadySent ++;
+			}
 
-						return null;
+			// check they have a photo (where appropriate)
 
-					}
+			if (sendPhoto && ! thatUserInfo.photo) {
+				dateUserStats.numNoPhoto++;
+				return null;
+			}
 
-				} else {
+			// check we've not already sent it
 
-					if (
+			ChatContactRec contact =
+				thisUser.getFromContacts ().get (thatUserInfo.id);
 
-						(
+			if (contact != null) {
+
+				if (reuseOldUsers) {
+
+					Instant compareTime =
+						transaction
+							.now ()
+							.minus (Duration.standardDays (30));
+
+					if (sendPhoto) {
+
+						if (
 							contact.getLastPicTime () != null
 							&& compareTime.isBefore (
 								contact.getLastPicTime ())
-						)
+						) {
 
-						|| (
-							contact.getLastInfoTime () != null
-							&& compareTime.isBefore (
-								contact.getLastInfoTime ())
-						)
+							dateUserStats.numAlreadySent ++;
 
-					) {
+							return null;
 
-						dateUserStats.numAlreadySent ++;
+						}
 
-						return null;
+					} else {
 
-					}
+						if (
 
-				}
+							(
+								contact.getLastPicTime () != null
+								&& compareTime.isBefore (
+									contact.getLastPicTime ())
+							)
 
-			} else {
+							|| (
+								contact.getLastInfoTime () != null
+								&& compareTime.isBefore (
+									contact.getLastInfoTime ())
+							)
 
-				if (sendPhoto) {
+						) {
 
-					if (contact.getLastPicTime () != null) {
+							dateUserStats.numAlreadySent ++;
 
-						dateUserStats.numAlreadySent ++;
+							return null;
 
-						return null;
+						}
 
 					}
 
 				} else {
 
-					if (contact.getLastPicTime () != null
-							|| contact.getLastInfoTime () != null) {
+					if (sendPhoto) {
 
-						dateUserStats.numAlreadySent++;
-						return null;
+						if (contact.getLastPicTime () != null) {
+
+							dateUserStats.numAlreadySent ++;
+
+							return null;
+
+						}
+
+					} else {
+
+						if (contact.getLastPicTime () != null
+								|| contact.getLastInfoTime () != null) {
+
+							dateUserStats.numAlreadySent++;
+							return null;
+						}
 					}
 				}
 			}
+
+			// check distance
+
+			if (
+				thisUser.getLocationLongLat () == null
+				|| thatUserInfo.longLat == null
+			) {
+
+				dateUserStats.numNoLocation++;
+
+				return null;
+
+			}
+
+			Long miles =
+				roundToIntegerRequired (
+					locatorLogic.distanceMiles (
+						thisUser.getLocationLongLat (),
+						thatUserInfo.longLat));
+
+			if (miles > thisUser.getDateRadius ()) {
+
+				dateUserStats.numTooFar ++;
+
+				return null;
+
+			}
+
+			// ok this one is ok
+
+			dateUserStats.numOk ++;
+
+			return new DatingUserDistance (
+				thatUserInfo.id,
+				miles);
+
 		}
-
-		// check distance
-
-		if (
-			thisUser.getLocationLongLat () == null
-			|| thatUserInfo.longLat == null
-		) {
-
-			dateUserStats.numNoLocation++;
-
-			return null;
-
-		}
-
-		Long miles =
-			roundToIntegerRequired (
-				locatorLogic.distanceMiles (
-					thisUser.getLocationLongLat (),
-					thatUserInfo.longLat));
-
-		if (miles > thisUser.getDateRadius ()) {
-
-			dateUserStats.numTooFar ++;
-
-			return null;
-
-		}
-
-		// ok this one is ok
-
-		dateUserStats.numOk ++;
-
-		return new DatingUserDistance (
-			thatUserInfo.id,
-			miles);
 
 	}
 

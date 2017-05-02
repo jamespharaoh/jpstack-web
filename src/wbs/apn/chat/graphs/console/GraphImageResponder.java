@@ -20,6 +20,8 @@ import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -70,11 +72,11 @@ class GraphImageResponder
 
 	protected abstract
 	void prepareData (
-			TaskLogger parentTaskLogger);
+			Transaction parentTransaction);
 
 	protected abstract
 	void prepareVerticalScale (
-			TaskLogger parentTaskLogger);
+			Transaction parentTransaction);
 
 	protected abstract
 	void prepareImageData ();
@@ -296,25 +298,25 @@ class GraphImageResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			prepareData (
-				taskLogger);
+				transaction);
 
 			prepareVerticalScale (
-				taskLogger);
+				transaction);
 
 			prepareImage (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -323,13 +325,13 @@ class GraphImageResponder
 	@Override
 	protected
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -345,9 +347,16 @@ class GraphImageResponder
 	@Override
 	protected
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		try {
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
 
 			ImageIO.write (
 				image,

@@ -14,9 +14,12 @@ import lombok.NonNull;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TextualInterval;
 
@@ -32,74 +35,102 @@ class IntervalFormFieldInterfaceMapping <Container>
 	@SingletonDependency
 	ConsoleUserHelper formFieldPreferences;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <TextualInterval> genericValue) {
 
-		// allow null
+		try (
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			// allow null
+
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// return textual part
+
+			return successResultPresent (
+				genericValue.get ().genericText ());
 
 		}
-
-		// return textual part
-
-		return successResultPresent (
-			genericValue.get ().genericText ());
 
 	}
 
 	@Override
 	public
 	Either <Optional <TextualInterval>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		// allow null
+		try (
 
-		if (
-			optionalIsNotPresent (
-				interfaceValue)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
+
 		) {
+
+			// allow null
+
+			if (
+				optionalIsNotPresent (
+					interfaceValue)
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// parse interval
+
+			Optional <TextualInterval> optionalInterval =
+				TextualInterval.parse (
+					formFieldPreferences.timezone (
+						transaction),
+					interfaceValue.get (),
+					formFieldPreferences.hourOffset (
+						transaction));
+
+			if (
+				optionalIsNotPresent (
+					optionalInterval)
+			) {
+
+				return errorResultFormat (
+					"You must enter a valid time, date, or range");
+
+			}
 
 			return successResult (
-				Optional.absent ());
+				optionalInterval);
 
 		}
-
-		// parse interval
-
-		Optional <TextualInterval> optionalInterval =
-			TextualInterval.parse (
-				formFieldPreferences.timezone (),
-				interfaceValue.get (),
-				formFieldPreferences.hourOffset ());
-
-		if (
-			optionalIsNotPresent (
-				optionalInterval)
-		) {
-
-			return errorResultFormat (
-				"You must enter a valid time, date, or range");
-
-		}
-
-		return successResult (
-			optionalInterval);
 
 	}
 

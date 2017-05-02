@@ -94,25 +94,19 @@ class ChatMonitorInboxAlarmAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// start transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatMonitorInboxAlarmAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			ChatMonitorInboxRec chatMonitorInbox =
-				chatMonitorInboxHelper.findFromContextRequired ();
+				chatMonitorInboxHelper.findFromContextRequired (
+					transaction);
 
 			ChatUserRec userChatUser =
 				chatMonitorInbox.getUserChatUser ();
@@ -128,6 +122,7 @@ class ChatMonitorInboxAlarmAction
 
 			ChatUserAlarmRec chatUserAlarm =
 				chatUserAlarmHelper.find (
+					transaction,
 					userChatUser,
 					monitorChatUser);
 
@@ -226,12 +221,13 @@ class ChatMonitorInboxAlarmAction
 			if (chatUserAlarm != null && (clear || alarmTime == null)) {
 
 				chatUserAlarmHelper.remove (
+					transaction,
 					chatUserAlarm);
 
 				// and create log
 
 				chatUserInitiationLogHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserInitiationLogHelper.createInstance ()
 
 					.setChatUser (
@@ -247,7 +243,8 @@ class ChatMonitorInboxAlarmAction
 						transaction.now ())
 
 					.setMonitorUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setAlarmTime (
 						chatUserAlarm.getAlarmTime ())
@@ -296,7 +293,7 @@ class ChatMonitorInboxAlarmAction
 				if (insert) {
 
 					chatUserAlarmHelper.insert (
-						taskLogger,
+						transaction,
 						chatUserAlarm);
 
 				}
@@ -304,7 +301,7 @@ class ChatMonitorInboxAlarmAction
 				// create log
 
 				chatUserInitiationLogHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserInitiationLogHelper.createInstance ()
 
 					.setChatUser (
@@ -323,7 +320,8 @@ class ChatMonitorInboxAlarmAction
 						transaction.now ())
 
 					.setMonitorUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 				);
 

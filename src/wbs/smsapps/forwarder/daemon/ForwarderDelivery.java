@@ -70,16 +70,10 @@ class ForwarderDelivery
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ForwarderDelivery.handle (deliveryId, ref)",
-					this);
+					logContext,
+					"handle");
 
 		) {
 
@@ -87,12 +81,14 @@ class ForwarderDelivery
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			// lookup the forwarder message out
 
 			ForwarderMessageOutRec forwarderMessageOut =
 				forwarderMessageOutHelper.findRequired (
+					transaction,
 					delivery.getMessage ().getRef ());
 
 			// unhold / cancel next message(s) if required
@@ -108,7 +104,7 @@ class ForwarderDelivery
 				if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 					outboxLogic.unholdMessage (
-						taskLogger,
+						transaction,
 						forwarderMessageOut
 							.getNextForwarderMessageOut ()
 							.getMessage ());
@@ -130,7 +126,7 @@ class ForwarderDelivery
 					) {
 
 						outboxLogic.cancelMessage (
-							taskLogger,
+							transaction,
 							nextForwarderMessageOut.getMessage ());
 
 					}
@@ -147,7 +143,7 @@ class ForwarderDelivery
 
 				ForwarderMessageOutReportRec forwarderMessageOutReport =
 					forwarderMessageOutReportHelper.insert (
-						taskLogger,
+						transaction,
 						forwarderMessageOutReportHelper.createInstance ()
 
 					.setForwarderMessageOut (
@@ -192,6 +188,7 @@ class ForwarderDelivery
 			// remove the dnq
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			transaction.commit ();

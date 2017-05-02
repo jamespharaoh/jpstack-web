@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.objectClassNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -17,9 +18,10 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dynamicFormFieldAccessor")
@@ -51,63 +53,75 @@ class DynamicFormFieldAccessor <
 	@Override
 	public
 	Optional <Native> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
-		// get native object
+		try (
 
-		ConsoleHelper <?> consoleHelper =
-			consoleObjectManager.findConsoleHelperRequired (
-				container);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"read");
 
-		Object nativeObject =
-			consoleHelper.getDynamic (
-				genericCastUnchecked (
-					container),
-				name);
-
-		// special case for null
-
-		if (nativeObject == null) {
-			return Optional.<Native>absent ();
-		}
-
-		// sanity check native type
-
-		if (
-			! nativeClass.isInstance (
-				nativeObject)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Field %s is %s, not %s",
-					name,
-					nativeObject.getClass ().getSimpleName (),
-					nativeClass.getSimpleName ()));
+			// get native object
+
+			ConsoleHelper <?> consoleHelper =
+				consoleObjectManager.findConsoleHelperRequired (
+					container);
+
+			Object nativeObject =
+				consoleHelper.getDynamic (
+					transaction,
+					genericCastUnchecked (
+						container),
+					name);
+
+			// special case for null
+
+			if (nativeObject == null) {
+				return Optional.<Native>absent ();
+			}
+
+			// sanity check native type
+
+			if (
+				! nativeClass.isInstance (
+					nativeObject)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Field %s is %s, not %s",
+						name,
+						nativeObject.getClass ().getSimpleName (),
+						nativeClass.getSimpleName ()));
+
+			}
+
+			// cast and return
+
+			return optionalOf (
+				nativeClass.cast (
+					nativeObject));
 
 		}
-
-		// cast and return
-
-		return Optional.<Native>of (
-			nativeClass.cast (
-				nativeObject));
 
 	}
 
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValueOptional) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"write");
 
 		) {
@@ -140,7 +154,7 @@ class DynamicFormFieldAccessor <
 					container);
 
 			consoleHelper.setDynamic (
-				taskLogger,
+				transaction,
 				genericCastUnchecked (
 					container),
 				name,

@@ -1,6 +1,5 @@
 package wbs.framework.component.tools;
 
-import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 import static wbs.utils.string.StringUtils.uncapitalise;
@@ -19,6 +18,7 @@ import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -60,7 +60,7 @@ class ComponentRunner {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"run");
@@ -109,7 +109,7 @@ class ComponentRunner {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initComponentManager");
@@ -161,7 +161,7 @@ class ComponentRunner {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"invokeTarget");
@@ -198,7 +198,7 @@ class ComponentRunner {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"main");
 
@@ -257,7 +257,8 @@ class ComponentRunner {
 
 			} catch (LoggedErrorsException loggedErrorsException) {
 
-				doNothing ();
+				taskLogger.fatalFormat (
+					"Aborting due to logged errors");
 
 				System.exit (1);
 

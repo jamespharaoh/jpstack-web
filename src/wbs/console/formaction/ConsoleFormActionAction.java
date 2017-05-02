@@ -78,31 +78,29 @@ class ConsoleFormActionAction <FormState, History>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ContextFormActionAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			FormState formState =
-				formActionHelper.constructFormState ();
+				formActionHelper.constructFormState (
+					transaction);
 
 			Map <String, Object> formHints =
-				formActionHelper.formHints ();
+				formActionHelper.formHints (
+					transaction);
 
 			formActionHelper.updatePassiveFormState (
+				transaction,
 				formState);
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					fields,
 					formState,
@@ -126,7 +124,6 @@ class ConsoleFormActionAction <FormState, History>
 
 			Optional <Responder> responder =
 				formActionHelper.processFormSubmission (
-					taskLogger,
 					transaction,
 					formState);
 

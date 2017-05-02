@@ -15,8 +15,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -116,13 +117,13 @@ class ChatVideoSetCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -130,10 +131,12 @@ class ChatVideoSetCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -142,18 +145,19 @@ class ChatVideoSetCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// log request
 
 			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
+				transaction,
 				chatUser,
 				message,
 				rest,
@@ -163,7 +167,7 @@ class ChatVideoSetCommand
 
 			if (
 				chatUserLogic.setVideo (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					false)
@@ -172,7 +176,7 @@ class ChatVideoSetCommand
 				// send a message
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
@@ -183,7 +187,7 @@ class ChatVideoSetCommand
 				// auto join
 
 				chatMiscLogic.userAutoJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					true);
@@ -193,7 +197,7 @@ class ChatVideoSetCommand
 				// no video found
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
@@ -206,7 +210,7 @@ class ChatVideoSetCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

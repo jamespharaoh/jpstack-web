@@ -131,8 +131,9 @@ class UnwiredPlazaApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						logContext,
 						parentTaskLogger,
 						"reportFile.doGet");
 
@@ -188,53 +189,42 @@ class UnwiredPlazaApiServletModule
 					statusResults.get (
 						status);
 
-				// begin transaction
+				// lookup objects
 
-				try (
+				RouteRec route =
+					routeHelper.findRequired (
+						transaction,
+						routeId);
 
-					OwnedTransaction transaction =
-						database.beginReadWrite (
-							taskLogger,
-							"UnwiredPlazaApiServletModule.reportFile.doGet ()",
-							this);
+				// process delivery report
 
-				) {
-
-					RouteRec route =
-						routeHelper.findRequired (
-							routeId);
-
-					// process delivery report
-
-					reportLogic.deliveryReport (
-						taskLogger,
-						route,
-						id.toString (),
-						result,
-						Optional.of (
-							statusParam),
-						Optional.of (
+				reportLogic.deliveryReport (
+					transaction,
+					route,
+					id.toString (),
+					result,
+					Optional.of (
+						statusParam),
+					Optional.of (
+						stringFormat (
+							"%s — %s",
+							statusCode,
+							subStatusCode)),
+					Optional.of (
+						joinWithSpace (
 							stringFormat (
-								"%s — %s",
-								statusCode,
-								subStatusCode)),
-						Optional.of (
-							joinWithSpace (
-								stringFormat (
-									"status = %s",
-									statusParam),
-								stringFormat (
-									"substatus = %s",
-									subStatusParam),
-								stringFormat (
-									"final = %s",
-									integerToDecimalString (
-										finalValue)))),
-						Optional.absent ());
+								"status = %s",
+								statusParam),
+							stringFormat (
+								"substatus = %s",
+								subStatusParam),
+							stringFormat (
+								"final = %s",
+								integerToDecimalString (
+									finalValue)))),
+					Optional.absent ());
 
-					transaction.commit ();
-
-				}
+				transaction.commit ();
 
 			}
 

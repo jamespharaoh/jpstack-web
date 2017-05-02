@@ -86,16 +86,11 @@ class ImChatCustomerCreditAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatCustomerCreditAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -120,11 +115,12 @@ class ImChatCustomerCreditAction
 			);
 
 			request.customer (
-				imChatCustomerHelper.findFromContextRequired ());
+				imChatCustomerHelper.findFromContextRequired (
+					transaction));
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					formFields,
 					request,
@@ -149,7 +145,7 @@ class ImChatCustomerCreditAction
 			// create credit log
 
 			imChatCustomerCreditHelper.insert (
-				taskLogger,
+				transaction,
 				imChatCustomerCreditHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -162,7 +158,8 @@ class ImChatCustomerCreditAction
 					transaction.now ())
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setReason (
 					request.reason ())

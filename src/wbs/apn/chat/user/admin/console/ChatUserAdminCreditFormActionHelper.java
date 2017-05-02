@@ -22,9 +22,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -78,23 +78,24 @@ class ChatUserAdminCreditFormActionHelper
 	@Override
 	public
 	Permissions canBePerformed (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canBePerformed");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			boolean canView =
 				userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					chatUser.getChat (),
 					"user_credit");
 
@@ -105,6 +106,7 @@ class ChatUserAdminCreditFormActionHelper
 					ChatUserType.user)
 
 				&& ! chatUserLogic.deleted (
+					transaction,
 					chatUser)
 
 			);
@@ -119,82 +121,117 @@ class ChatUserAdminCreditFormActionHelper
 
 	@Override
 	public
-	ChatUserAdminCreditForm constructFormState () {
+	ChatUserAdminCreditForm constructFormState (
+			@NonNull Transaction parentTransaction) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		return new ChatUserAdminCreditForm ()
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"constructFormState");
 
-			.currentCredit (
-				chatUser.getCredit ());
+		) {
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			return new ChatUserAdminCreditForm ()
+
+				.currentCredit (
+					chatUser.getCredit ());
+
+		}
 
 	}
 
 	@Override
 	public
-	Map <String, Object> formHints () {
+	Map <String, Object> formHints (
+			@NonNull Transaction parentTransaction) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		return ImmutableMap.<String, Object> builder ()
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formHints");
 
-			.put (
+		) {
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			return ImmutableMap.of (
 				"chat",
-				chatUser.getChat ())
+				chatUser.getChat ());
 
-			.build ();
+		}
 
 	}
 
 	@Override
 	public
 	void writePreamble (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		if (
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.monitor)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writePreamble");
+
 		) {
 
-			htmlParagraphWriteFormat (
-				formatWriter,
-				"This is a monitor and can not be credited.");
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-		} else if (
-			chatUserLogic.deleted (
-				chatUser)
-		) {
+			if (
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.monitor)
+			) {
 
-			htmlParagraphWriteFormat (
-				formatWriter,
-				"This user has been deleted and can not be credit.");
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"This is a monitor and can not be credited.");
 
-		} else {
+			} else if (
+				chatUserLogic.deleted (
+					transaction,
+					chatUser)
+			) {
 
-			htmlParagraphWriteFormat (
-				formatWriter,
-				"The credit amount is the actual credit to give the user. The ",
-				"bill amount is the amount they have paid.");
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"This user has been deleted and can not be credit.");
 
-			htmlParagraphWriteFormat (
-				formatWriter,
-				"To give someone some free credit enter it in credit amount ",
-				"and enter 0.00 in bill amount. To process a credit card ",
-				"payment enter the amount of credit in credit amount and the ",
-				"amount they have paid in bill amount.");
+			} else {
 
-			htmlParagraphWriteFormat (
-				formatWriter,
-				"You may also use negative amounts to adjust a previous error ",
-				"as appropriate.");
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"The credit amount is the actual credit to give the user. The ",
+					"bill amount is the amount they have paid.");
+
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"To give someone some free credit enter it in credit amount ",
+					"and enter 0.00 in bill amount. To process a credit card ",
+					"payment enter the amount of credit in credit amount and the ",
+					"amount they have paid in bill amount.");
+
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"You may also use negative amounts to adjust a previous error ",
+					"as appropriate.");
+
+			}
 
 		}
 
@@ -203,25 +240,25 @@ class ChatUserAdminCreditFormActionHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserAdminCreditForm formState) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			ChatUserCreditRec chatUserCredit =
 				chatUserCreditHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserCreditHelper.createInstance ()
 
 				.setChatUser (
@@ -237,7 +274,8 @@ class ChatUserAdminCreditFormActionHelper
 					formState.billAmount ())
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setGift (
 					equalToZero (
@@ -275,13 +313,26 @@ class ChatUserAdminCreditFormActionHelper
 
 	@Override
 	public
-	List <ChatUserCreditRec> history () {
+	List <ChatUserCreditRec> history (
+			@NonNull Transaction parentTransaction) {
 
-		ChatUserRec chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		return ImmutableList.copyOf (
-			chatUser.getChatUserCredits ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"history");
+
+		) {
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			return ImmutableList.copyOf (
+				chatUser.getChatUserCredits ());
+
+		}
 
 	}
 

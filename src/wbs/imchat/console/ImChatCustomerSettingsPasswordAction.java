@@ -1,8 +1,7 @@
 package wbs.imchat.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -73,31 +72,28 @@ class ImChatCustomerSettingsPasswordAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChaCustomerSettingsPasswordAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			// find customer
 
 			ImChatCustomerRec customer =
-				imChatCustomerHelper.findFromContextRequired ();
+				imChatCustomerHelper.findFromContextRequired (
+					transaction);
 
 			// generate new password
 
 			imChatLogic.customerPasswordGenerate (
-				taskLogger,
+				transaction,
 				customer,
-				Optional.of (
-					userConsoleLogic.userRequired ()));
+				optionalOf (
+					userConsoleLogic.userRequired (
+						transaction)));
 
 			// complete transaction
 

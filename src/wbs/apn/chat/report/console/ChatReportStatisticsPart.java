@@ -24,8 +24,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.affiliate.console.ChatAffiliateUsersSummaryConsoleHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateUsersSummaryRec;
@@ -83,22 +84,24 @@ class ChatReportStatisticsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			List <ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
 				chatAffiliateUsersSummaryHelper.findByParent (
+					transaction,
 					chat);
 
 			for (
@@ -108,7 +111,7 @@ class ChatReportStatisticsPart
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						chatAffiliateUsersSummary.getChatAffiliate (),
 						"chat_user_view")
 				) {
@@ -157,11 +160,12 @@ class ChatReportStatisticsPart
 
 			users =
 				chatUsersSummaryHelper.findRequired (
+					transaction,
 					chat.getId ());
 
 			canMonitor =
 				privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					chat,
 					"monitor");
 
@@ -172,13 +176,13 @@ class ChatReportStatisticsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -193,8 +197,8 @@ class ChatReportStatisticsPart
 			) {
 
 				htmlParagraphWriteFormat (
-					"You don't have permission to view any information on this ",
-					"page.");
+					"You don't have permission to view any information on ",
+					"this page.");
 
 				return;
 

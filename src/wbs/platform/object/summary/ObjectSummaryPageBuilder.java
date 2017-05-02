@@ -49,8 +49,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -141,11 +143,11 @@ class ObjectSummaryPageBuilder <
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");
@@ -239,12 +241,16 @@ class ObjectSummaryPageBuilder <
 	void buildResponder () {
 
 		PagePartFactory partFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildResponder");
+
+			) {
 
 				return objectSummaryPartProvider.get ().partFactories (
 					pagePartFactories);
@@ -282,12 +288,16 @@ class ObjectSummaryPageBuilder <
 			@NonNull FormFieldSet <ObjectType> formFieldSet) {
 
 		PagePartFactory partFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"addFieldsPart");
+
+			) {
 
 				return summaryFieldsPartProvider.get ()
 
@@ -315,19 +325,22 @@ class ObjectSummaryPageBuilder <
 	ObjectSummaryPageBuilder <ObjectType, ParentType> addHeading (
 			@NonNull String heading) {
 
-		final
 		String html =
 			stringFormat (
 				"<h2>%h</h2>\n",
 				heading);
 
 		PagePartFactory pagePartFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"addHeading");
+
+			) {
 
 				return textPart.get ()
 
@@ -350,16 +363,20 @@ class ObjectSummaryPageBuilder <
 			@NonNull String beanName) {
 
 		PagePartFactory partFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"addPart");
+
+			) {
 
 				Object object =
 					componentManager.getComponentRequired (
-						parentTaskLogger,
+						transaction,
 						beanName,
 						Object.class);
 
@@ -395,7 +412,7 @@ class ObjectSummaryPageBuilder <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setDefaults");
@@ -453,7 +470,7 @@ class ObjectSummaryPageBuilder <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"defaultFields");

@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import org.joda.time.Instant;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.media.model.MediaRec;
 
@@ -20,6 +20,7 @@ interface ChatInfoLogic {
 	 * cutoffTime.
 	 */
 	Collection <ChatUserRec> getNearbyOnlineUsersForInfo (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Instant cutoffTime,
 			Long numToFind);
@@ -29,87 +30,89 @@ interface ChatInfoLogic {
 	 * cutoffTime.
 	 */
 	Collection <ChatUserRec> getNearbyOnlineUsersForPic (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Instant cutoffTime,
 			Long numToFind);
 
 	Collection <ChatUserRec> getNearbyOnlineUsersForVideo (
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Instant cutoffTime,
 			Long numToFind);
 
 	void sendUserInfo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			ChatUserRec otherUser,
 			Optional <Long> threadIdOptional,
 			Boolean asDating);
 
 	long sendUserInfos (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Long numToSend,
 			Optional <Long> threadIdOptional);
 
 	String chatUserBlurb (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			ChatUserRec otherUser);
 
 	MediaRec chatUserBlurbMedia (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			ChatUserRec otherUser);
 
 	void sendUserPics (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Collection <ChatUserRec> otherUsers,
 			Optional <Long> threadId,
 			Boolean asDating);
 
 	void sendUserVideos (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Collection <ChatUserRec> otherUsers,
 			Optional <Long> threadId,
 			Boolean asDating);
 
 	long sendRequestedUserPicandOtherUserPics (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			ChatUserRec requestedUser,
 			Long numToSend,
 			Optional <Long> threadId);
 
 	long sendUserPics (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Long numToSend,
 			Optional <Long> threadId);
 
 	long sendUserVideos (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec thisUser,
 			Long numToSend,
 			Optional <Long> threadId);
 
 	void chatUserSetInfo (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			String info,
 			Optional <Long> threadId);
 
 	void sendNameHint (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void sendPicHint (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 	void sendPicHint2 (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser);
 
 }

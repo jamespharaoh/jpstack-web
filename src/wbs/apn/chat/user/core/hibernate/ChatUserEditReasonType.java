@@ -2,8 +2,9 @@ package wbs.apn.chat.user.core.hibernate;
 
 import java.sql.Types;
 
-import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.user.core.model.ChatUserEditReason;
 
 public
 class ChatUserEditReasonType

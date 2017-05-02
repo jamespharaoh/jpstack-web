@@ -16,8 +16,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -164,14 +165,14 @@ class TabList {
 
 	public
 	Prepared prepare (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Tab currentTab) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -197,7 +198,7 @@ class TabList {
 				prepared.preparedTabs.add (
 					new PreparedTab (
 						tabRef.getTab ().getUrl (
-							taskLogger),
+							transaction),
 						tabRef.getLabel (),
 						tabRef.getTab () == currentTab));
 
@@ -208,7 +209,7 @@ class TabList {
 				prepared.preparedTabs.add (
 					new PreparedTab (
 						currentTab.getUrl (
-							taskLogger),
+							transaction),
 						currentTab.getDefaultLabel (),
 						true));
 
@@ -222,10 +223,12 @@ class TabList {
 
 	public
 	boolean contains (
-			Tab tab) {
+			@NonNull Tab tab) {
 
-		for (TabRef tabRef
-				: tabRefs) {
+		for (
+			TabRef tabRef
+				: tabRefs
+		) {
 
 			if (tabRef.getTab () == tab)
 				return true;

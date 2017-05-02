@@ -2,7 +2,7 @@ package wbs.imchat.logic;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -13,15 +13,15 @@ public
 interface ImChatLogic {
 
 	void conversationEnd (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatConversationRec conversation);
 
 	void conversationEmailSend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatConversationRec conversation);
 
 	void customerPasswordGenerate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ImChatCustomerRec customer,
 			Optional <UserRec> consoleUser);
 

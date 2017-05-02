@@ -31,8 +31,11 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.logic.DeploymentLogic;
@@ -109,7 +112,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setup");
@@ -137,7 +140,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"tearDown");
@@ -163,7 +166,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 			} catch (InterruptedException interruptedException) {
 
-				taskLogger.fatalFormat (
+				throw taskLogger.fatalFormat (
 					"Interrupted while waiting for shutdown");
 
 			}
@@ -184,7 +187,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"message");
@@ -256,7 +259,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"sendUpdates");
 
@@ -267,56 +270,9 @@ class ConsoleAsyncSubscription <SubscriberState>
 				Set <String> closedConnectionIds =
 					new HashSet<> ();
 
-				try (
-
-					OwnedTransaction transaction =
-						database.beginReadOnly (
-							taskLogger,
-							"sendUpdates",
-							this);
-
-				) {
-
-					helper.prepareUpdate (
-						taskLogger);
-
-					for (
-						Map.Entry <
-							String,
-							Subscriber <SubscriberState>
-						> subscriberEntry
-							: subscribersByConnectionId.entrySet ()
-					) {
-
-						String connectionId =
-							subscriberEntry.getKey ();
-
-						Subscriber <SubscriberState> subscriber =
-							subscriberEntry.getValue ();
-
-						if (! subscriber.connectionHandle ().isConnected ()) {
-
-							closedConnectionIds.add (
-								connectionId);
-
-							continue;
-
-						}
-
-						if (! subscriber.connectionHandle ().isFresh ()) {
-
-							continue;
-
-						}
-
-						updateSubscriber (
-							taskLogger,
-							transaction,
-							subscriber);
-
-					}
-
-				}
+				sendUpdatesReal (
+					taskLogger,
+					closedConnectionIds);
 
 				closedConnectionIds.forEach (
 					subscribersByConnectionId::remove);
@@ -328,22 +284,79 @@ class ConsoleAsyncSubscription <SubscriberState>
 	}
 
 	private
-	void updateSubscriber (
+	void sendUpdatesReal (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Set <String> closedConnectionIds) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"sendUpdates");
+
+		) {
+
+			helper.prepareUpdate (
+				transaction);
+
+			for (
+				Map.Entry <
+					String,
+					Subscriber <SubscriberState>
+				> subscriberEntry
+					: subscribersByConnectionId.entrySet ()
+			) {
+
+				String connectionId =
+					subscriberEntry.getKey ();
+
+				Subscriber <SubscriberState> subscriber =
+					subscriberEntry.getValue ();
+
+				if (! subscriber.connectionHandle ().isConnected ()) {
+
+					closedConnectionIds.add (
+						connectionId);
+
+					continue;
+
+				}
+
+				if (! subscriber.connectionHandle ().isFresh ()) {
+
+					continue;
+
+				}
+
+				updateSubscriber (
+					transaction,
+					subscriber);
+
+			}
+
+		}
+
+	}
+
+	private
+	void updateSubscriber (
+			@NonNull Transaction parentTransaction,
 			@NonNull Subscriber <SubscriberState> subscriber) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateSubscriber");
 
 		) {
 
 			UserRec user =
 				userHelper.findRequired (
+					transaction,
 					subscriber.userId ());
 
 			UserPrivChecker privChecker =
@@ -353,21 +366,20 @@ class ConsoleAsyncSubscription <SubscriberState>
 					subscriber.userId ())
 
 				.build (
-					taskLogger);
+					transaction);
 
 			try {
 
 				helper.updateSubscriber (
-					taskLogger,
+					transaction,
 					subscriber.state (),
 					subscriber.connectionHandle (),
-					transaction,
 					user,
 					privChecker);
 
 			} catch (Exception exception) {
 
-				taskLogger.errorFormatException (
+				transaction.errorFormatException (
 					exception,
 					"%s async endpoint error updating subscriber",
 					helper.endpointName ());
@@ -390,13 +402,12 @@ class ConsoleAsyncSubscription <SubscriberState>
 				TaskLogger parentTaskLogger);
 
 		void prepareUpdate (
-				TaskLogger parentTaskLogger);
+				Transaction parentTransaction);
 
 		void updateSubscriber (
-				TaskLogger parentTaskLogger,
+				Transaction parentTransaction,
 				SubscriberStateType subscriberState,
 				ConsoleAsyncConnectionHandle connectionHandle,
-				OwnedTransaction transaction,
 				UserRec user,
 				UserPrivChecker privChecker);
 

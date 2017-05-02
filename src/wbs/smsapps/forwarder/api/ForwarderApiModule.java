@@ -42,11 +42,15 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcChecker;
@@ -95,22 +99,16 @@ class ForwarderApiModule
 	ForwarderApiLogic forwarderApiLogic;
 
 	@SingletonDependency
+	ForwarderLogic forwarderLogic;
+
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
 	@SingletonDependency
 	ForwarderMessageOutObjectHelper forwarderMessageOutHelper;
 
 	@SingletonDependency
-	ForwarderLogic forwarderLogic;
-
-	@SingletonDependency
 	ForwarderQueryExMessageChecker forwarderQueryExMessageChecker;
-
-	@ClassSingletonDependency
-	LogContext logContext;
-
-	@SingletonDependency
-	MediaLogic mediaLogic;
 
 	@SingletonDependency
 	@Named ("forwarderPeekExRequestDef")
@@ -119,6 +117,15 @@ class ForwarderApiModule
 	@SingletonDependency
 	@Named ("forwarderQueryExRequestDef")
 	RpcDefinition forwarderQueryExRequestDef;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	MediaLogic mediaLogic;
+
+	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
 
 	// prototype dependencies
 
@@ -149,7 +156,7 @@ class ForwarderApiModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"setup");
@@ -175,7 +182,7 @@ class ForwarderApiModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initFiles");
@@ -301,7 +308,7 @@ class ForwarderApiModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initRpcHandlers");
@@ -354,7 +361,7 @@ class ForwarderApiModule
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initActions");
@@ -493,25 +500,22 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ForwarderApiModule.SendRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"SendRpcHandler.handle");
 
 			) {
 
 				// authenticate
 
 				forwarder =
-					forwarderApiLogic.rpcAuth (source);
+					forwarderApiLogic.rpcAuth (
+						transaction,
+						source);
 
 				// get params
 
@@ -537,13 +541,13 @@ class ForwarderApiModule
 
 				if (
 					checkTemplate (
-						taskLogger)
+						transaction)
 				) {
 
 					// and send
 
 					sendTemplate (
-						taskLogger);
+						transaction);
 
 					// return success
 
@@ -631,19 +635,19 @@ class ForwarderApiModule
 
 		private
 		boolean checkTemplate (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"checkTemplate");
 
 			) {
 
 				return forwarderLogic.sendTemplateCheck (
-					taskLogger,
+					transaction,
 					sendTemplate);
 
 			}
@@ -652,19 +656,19 @@ class ForwarderApiModule
 
 		private
 		void sendTemplate (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"sendTemplate");
 
 			) {
 
 				forwarderLogic.sendTemplateSend (
-					taskLogger,
+					transaction,
 					sendTemplate);
 
 			}
@@ -910,30 +914,27 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ForwarderApiModule.SendExRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"SendExRpcHandler.handle");
 
 			) {
 
 				// authenticate
 
 				forwarder =
-					forwarderApiLogic.rpcAuth (source);
+					forwarderApiLogic.rpcAuth (
+						transaction,
+						source);
 
 				// get params
 
 				getParams (
-					taskLogger,
+					transaction,
 					source);
 
 				// bail on any request-invalid classErrors
@@ -955,14 +956,14 @@ class ForwarderApiModule
 				// check the template is ok
 
 				checkTemplate (
-					taskLogger);
+					transaction);
 
 				// send the message (if appropriate)
 
 				if (! cancel) {
 
 					sendTemplate (
-						taskLogger);
+						transaction);
 
 				}
 
@@ -980,16 +981,16 @@ class ForwarderApiModule
 
 		private
 		Collection <MediaRec> getMedias (
-				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction parentTransaction,
 				@NonNull List <Map <String, Object>> mpList)
 			throws ReportableException {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"getMedias");
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"SendExRpcHandler.getMedias");
 
 			) {
 
@@ -1022,7 +1023,7 @@ class ForwarderApiModule
 
 						medias.add (
 							mediaLogic.createMediaFromImageRequired (
-								taskLogger,
+								transaction,
 								getImageContent (url),
 								"image/jpeg",
 								filename));
@@ -1051,7 +1052,7 @@ class ForwarderApiModule
 
 							medias.add (
 								mediaLogic.createTextMedia (
-									taskLogger,
+									transaction,
 									message,
 									"text/plain",
 									txtFilename));
@@ -1138,14 +1139,14 @@ class ForwarderApiModule
 		 */
 		private
 		void getParams (
-				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction parentTransaction,
 				@NonNull RpcSource source) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"getParams");
 
 			) {
@@ -1276,7 +1277,7 @@ class ForwarderApiModule
 
 										sendExMessage.medias =
 											getMedias (
-												taskLogger,
+												transaction,
 												mediaList);
 
 										sendExMessage.subject =
@@ -1399,13 +1400,13 @@ class ForwarderApiModule
 		 */
 		private
 		void checkTemplate (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"checkTemplate");
 
 			) {
@@ -1423,7 +1424,7 @@ class ForwarderApiModule
 
 					if (
 						forwarderLogic.sendTemplateCheck (
-							taskLogger,
+							transaction,
 							sendExMessageChain.sendTemplate)
 					) {
 
@@ -1456,13 +1457,13 @@ class ForwarderApiModule
 
 		private
 		void sendTemplate (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"sendTemplate");
 
 			) {
@@ -1476,7 +1477,7 @@ class ForwarderApiModule
 						continue;
 
 					forwarderLogic.sendTemplateSend (
-						taskLogger,
+						transaction,
 						sendExMessasgeChain.sendTemplate);
 
 				}
@@ -1929,29 +1930,28 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ForwarderApiModule.QueryExRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"QueryExRpcHandler.handle");
 
 			) {
 
 				// authenticate
 
 				forwarder =
-					forwarderApiLogic.rpcAuth (source);
+					forwarderApiLogic.rpcAuth (
+						transaction,
+						source);
 
 				// get params
 
-				getParams (source);
+				getParams (
+					transaction,
+					source);
 
 				// bail on any request-invalid classErrors
 
@@ -1967,14 +1967,18 @@ class ForwarderApiModule
 
 				// do the stuff
 
-				findMessages ();
-				checkIdsMatch ();
+				findMessages (
+					transaction);
+
+				checkIdsMatch (
+					transaction);
 
 				// return
 
 				transaction.commit ();
 
-				return makeSuccess ();
+				return makeSuccess (
+					transaction);
 
 			}
 
@@ -1982,7 +1986,8 @@ class ForwarderApiModule
 
 		private
 		void getParams (
-				RpcSource source) {
+				@NonNull Transaction parentTransaction,
+				@NonNull RpcSource source) {
 
 			Map <String, Object> params =
 				genericCastUnchecked (
@@ -2029,150 +2034,195 @@ class ForwarderApiModule
 		}
 
 		private
-		void findMessages () {
+		void findMessages (
+				@NonNull Transaction parentTransaction) {
 
-			for (
-				int i = 0;
-				i < messages.size ();
-				i ++
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"findMessages");
+
 			) {
 
-				QueryExMessage queryExMessage =
-					messages.get (i);
-
-				if (queryExMessage.serverId != null) {
-
-					queryExMessage.fmOut =
-						optionalOrNull (
-							forwarderMessageOutHelper.find (
-								queryExMessage.serverId));
-
-				}
-
-				if (
-
-					isNotNull (
-						queryExMessage.clientId)
-
-					&& isNull (
-						queryExMessage.fmOut)
-
+				for (
+					int i = 0;
+					i < messages.size ();
+					i ++
 				) {
 
-					queryExMessage.fmOut =
-						forwarderMessageOutHelper.findByOtherId (
-							forwarder,
-							queryExMessage.clientId);
+					QueryExMessage queryExMessage =
+						messages.get (i);
+
+					if (queryExMessage.serverId != null) {
+
+						queryExMessage.fmOut =
+							optionalOrNull (
+								forwarderMessageOutHelper.find (
+									transaction,
+									queryExMessage.serverId));
+
+					}
+
+					if (
+
+						isNotNull (
+							queryExMessage.clientId)
+
+						&& isNull (
+							queryExMessage.fmOut)
+
+					) {
+
+						queryExMessage.fmOut =
+							forwarderMessageOutHelper.findByOtherId (
+								transaction,
+								forwarder,
+								queryExMessage.clientId);
+
+					}
+
+					if (queryExMessage.fmOut == null) {
+
+						errors.add (
+							stringFormat (
+								"Message %s not found",
+								integerToDecimalString (
+									i)));
+
+					}
 
 				}
 
-				if (queryExMessage.fmOut == null)
-					errors.add ("Message " + i + " not found");
+				if (errors.size() > 0) {
 
-			}
+					throw new RpcException (
+						"forwarder-query-ex-response",
+						ForwarderApiConstants.stMessageNotFound,
+						"message-not-found",
+						errors);
 
-			if (errors.size() > 0) {
-
-				throw new RpcException (
-					"forwarder-query-ex-response",
-					ForwarderApiConstants.stMessageNotFound,
-					"message-not-found",
-					errors);
+				}
 
 			}
 
 		}
 
 		private
-		void checkIdsMatch () {
+		void checkIdsMatch (
+				@NonNull Transaction parentTransaction) {
 
-			for (
-				int index = 0;
-				index < messages.size ();
-				index ++
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"checkIdsMatch");
+
 			) {
 
-				QueryExMessage queryExMessage =
-					messages.get (index);
-
-				if (queryExMessage.serverId == null
-						|| queryExMessage.clientId == null)
-					continue;
-
-				if (
-
-					integerNotEqualSafe (
-						queryExMessage.serverId,
-						queryExMessage.fmOut.getId ())
-
-					|| stringNotEqualSafe (
-						queryExMessage.clientId,
-						queryExMessage.fmOut.getOtherId ())
-
+				for (
+					int index = 0;
+					index < messages.size ();
+					index ++
 				) {
 
-					errors.add ("Message " + index + " id mismatch");
+					QueryExMessage queryExMessage =
+						messages.get (index);
+
+					if (queryExMessage.serverId == null
+							|| queryExMessage.clientId == null)
+						continue;
+
+					if (
+
+						integerNotEqualSafe (
+							queryExMessage.serverId,
+							queryExMessage.fmOut.getId ())
+
+						|| stringNotEqualSafe (
+							queryExMessage.clientId,
+							queryExMessage.fmOut.getOtherId ())
+
+					) {
+
+						errors.add ("Message " + index + " id mismatch");
+
+					}
 
 				}
 
-			}
+				if (errors.size () > 0) {
 
-			if (errors.size () > 0) {
+					throw new RpcException (
+						"forwarder-query-ex-response",
+						ForwarderApiConstants.stMessageIdMismatch,
+						"message-id-mismatch",
+						errors);
 
-				throw new RpcException (
-					"forwarder-query-ex-response",
-					ForwarderApiConstants.stMessageIdMismatch,
-					"message-id-mismatch",
-					errors);
+				}
 
 			}
 
 		}
 
 		private
-		RpcResult makeSuccess () {
+		RpcResult makeSuccess (
+				@NonNull Transaction parentTransaction) {
 
-			RpcList messagesPart =
-				Rpc.rpcList (
-					"unqueueExMessages",
-					"message",
-					RpcType.rStructure);
+			try (
 
-			for (QueryExMessage queryExMessage
-					: messages) {
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"makeSuccess");
 
-				MessageStatus messageStatus =
-					queryExMessage.fmOut.getMessage ().getStatus ();
+			) {
 
-				ForwarderMessageStatus forwarderMessageStatus =
-					statusMap.get (messageStatus);
-
-				messagesPart.add (
-					Rpc.rpcStruct (
+				RpcList messagesPart =
+					Rpc.rpcList (
+						"unqueueExMessages",
 						"message",
+						RpcType.rStructure);
 
-						Rpc.rpcElem (
-							"server-id",
-							queryExMessage.fmOut.getId ()),
+				for (QueryExMessage queryExMessage
+						: messages) {
 
-						Rpc.rpcElem (
-							"client-id",
-							queryExMessage.fmOut.getOtherId ()),
+					MessageStatus messageStatus =
+						queryExMessage.fmOut.getMessage ().getStatus ();
 
-						Rpc.rpcElem (
-							"message-status",
-							forwarderMessageStatus.status),
+					ForwarderMessageStatus forwarderMessageStatus =
+						statusMap.get (messageStatus);
 
-						Rpc.rpcElem (
-							"message-status-code",
-							forwarderMessageStatus.statusCode)));
+					messagesPart.add (
+						Rpc.rpcStruct (
+							"message",
+
+							Rpc.rpcElem (
+								"server-id",
+								queryExMessage.fmOut.getId ()),
+
+							Rpc.rpcElem (
+								"client-id",
+								queryExMessage.fmOut.getOtherId ()),
+
+							Rpc.rpcElem (
+								"message-status",
+								forwarderMessageStatus.status),
+
+							Rpc.rpcElem (
+								"message-status-code",
+								forwarderMessageStatus.statusCode)));
+
+				}
+
+				return Rpc.rpcSuccess (
+					"Success",
+					"forwarder-query-ex-response",
+					messagesPart);
 
 			}
-
-			return Rpc.rpcSuccess (
-				"Success",
-				"forwarder-query-ex-response",
-				messagesPart);
 
 		}
 
@@ -2298,29 +2348,28 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"peekExRpcHandler.handle");
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnly (
-						taskLogger,
-						"ForwarderApiModule.PeekExRpcHandler.handle (source)",
-						this);
+						logContext,
+						parentTaskLogger,
+						"PeekExRpcHandler.handle");
 
 			) {
 
 				// authenticate
 
 				forwarder =
-					forwarderApiLogic.rpcAuth (source);
+					forwarderApiLogic.rpcAuth (
+						transaction,
+						source);
 
 				// get params
 
-				getParams (source);
+				getParams (
+					transaction,
+					source);
 
 				// bail on any request-invalid classErrors
 
@@ -2335,7 +2384,7 @@ class ForwarderApiModule
 
 				RpcResult result =
 					makeSuccess (
-						taskLogger);
+						transaction);
 
 				// commit
 
@@ -2347,46 +2396,58 @@ class ForwarderApiModule
 
 		private
 		void getParams (
-				RpcSource source) {
+				@NonNull Transaction parentTransaction,
+				@NonNull RpcSource source) {
 
-			Map <String, Object> params =
-				genericCastUnchecked (
-					source.obtain (
-						forwarderPeekExRequestDef,
-						errors,
-						true));
+			try (
 
-			getMessages =
-				(Boolean)
-				params.get (
-					"get-unqueueExMessages");
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"getParams");
 
-			getReports =
-				(Boolean)
-				params.get (
-					"get-reports");
+			) {
 
-			maxResults =
-				(Long)
-				params.get (
-					"max-results");
+				Map <String, Object> params =
+					genericCastUnchecked (
+						source.obtain (
+							forwarderPeekExRequestDef,
+							errors,
+							true));
 
-			advancedReporting =
-				(Boolean)
-				params.get (
-					"advanced-reporting");
+				getMessages =
+					(Boolean)
+					params.get (
+						"get-unqueueExMessages");
+
+				getReports =
+					(Boolean)
+					params.get (
+						"get-reports");
+
+				maxResults =
+					(Long)
+					params.get (
+						"max-results");
+
+				advancedReporting =
+					(Boolean)
+					params.get (
+						"advanced-reporting");
+
+			}
 
 		}
 
 		private
 		RpcResult makeSuccess (
-				@NonNull TaskLogger parentTaskLogger) {
+				@NonNull Transaction parentTransaction) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"makeSuccess");
 
 			) {
@@ -2415,11 +2476,14 @@ class ForwarderApiModule
 
 					List <ForwarderMessageInRec> pendingMessageList =
 						forwarderMessageInHelper.findPendingLimit (
+							transaction,
 							forwarder,
 							maxResults);
 
-					for (ForwarderMessageInRec forwarderMessageIn
-							: pendingMessageList) {
+					for (
+						ForwarderMessageInRec forwarderMessageIn
+							: pendingMessageList
+					) {
 
 						RpcStructure message;
 
@@ -2477,6 +2541,7 @@ class ForwarderApiModule
 
 					List <ForwarderMessageOutRec> pendingReportList =
 						forwarderMessageOutHelper.findPendingLimit (
+							transaction,
 							forwarder,
 							maxResults);
 
@@ -2487,7 +2552,7 @@ class ForwarderApiModule
 							: pendingReportList
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"fmo.id = %s",
 							integerToDecimalString (
 								forwarderMessageOut.getId ()));

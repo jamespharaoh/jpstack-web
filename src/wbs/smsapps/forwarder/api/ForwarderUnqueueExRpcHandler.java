@@ -17,9 +17,10 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -87,25 +88,22 @@ class ForwarderUnqueueExRpcHandler
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RpcSource source) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ForwarderUnqueueExRpcHandler.handle (source)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			// authenticate
 
 			forwarder =
-				forwarderApiLogic.rpcAuth (source);
+				forwarderApiLogic.rpcAuth (
+					transaction,
+					source);
 
 			// get params
 
@@ -125,8 +123,11 @@ class ForwarderUnqueueExRpcHandler
 
 			// find unqueueExMessages and reports
 
-			findMessages ();
-			findReports ();
+			findMessages (
+				transaction);
+
+			findReports (
+				transaction);
 
 			if (numFailed > 0 && ! allowPartial)
 				cancel = true;
@@ -134,8 +135,13 @@ class ForwarderUnqueueExRpcHandler
 			// unqueue them (unless we are cancelling)
 
 			if (! cancel) {
-				unqueueMessages ();
-				unqueueReports ();
+
+				unqueueMessages (
+					transaction);
+
+				unqueueReports (
+					transaction);
+
 			}
 
 			// return
@@ -226,198 +232,245 @@ class ForwarderUnqueueExRpcHandler
 	}
 
 	private
-	void findMessages () {
+	void findMessages (
+			@NonNull Transaction parentTransaction) {
 
-		for (
-			UnqueueExMessage unqueueExMessage
-				: unqueueExMessages
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findMessages");
+
 		) {
 
-			// lookup the message
+			for (
+				UnqueueExMessage unqueueExMessage
+					: unqueueExMessages
+			) {
 
-			unqueueExMessage.forwarderMessageIn =
-				optionalOrNull (
-					forwarderMessageInHelper.find (
-						unqueueExMessage.serverId));
+				// lookup the message
 
-			if (unqueueExMessage.forwarderMessageIn != null) {
+				unqueueExMessage.forwarderMessageIn =
+					optionalOrNull (
+						forwarderMessageInHelper.find (
+							transaction,
+							unqueueExMessage.serverId));
 
-				// if this report doesn't belong to this forwarder pretend
-				// it doesn't exist
+				if (unqueueExMessage.forwarderMessageIn != null) {
 
-				if (
-					referenceNotEqualWithClass (
-						ForwarderRec.class,
-						unqueueExMessage.forwarderMessageIn.getForwarder (),
-						forwarder)
-				) {
-					unqueueExMessage.forwarderMessageIn = null;
+					// if this report doesn't belong to this forwarder pretend
+					// it doesn't exist
+
+					if (
+						referenceNotEqualWithClass (
+							ForwarderRec.class,
+							unqueueExMessage.forwarderMessageIn.getForwarder (),
+							forwarder)
+					) {
+						unqueueExMessage.forwarderMessageIn = null;
+					}
+
 				}
+
+				// keep track of whether any failed
+				if (unqueueExMessage.forwarderMessageIn != null)
+					numSuccess++;
+				else
+					numFailed++;
 
 			}
 
-			// keep track of whether any failed
-			if (unqueueExMessage.forwarderMessageIn != null)
-				numSuccess++;
-			else
-				numFailed++;
 		}
+
 	}
 
 	private
-	void findReports () {
+	void findReports (
+			@NonNull Transaction parentTransaction) {
 
-		for (
-			UnqueueExReport unqueueExReport
-				: reports
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findReports");
+
 		) {
 
-			// lookup the report
-
-			unqueueExReport.fmOutReport =
-				forwarderMessageOutReportHelper.findRequired (
-					unqueueExReport.reportId);
-
-			if (
-				isNotNull (
-					unqueueExReport.fmOutReport)
+			for (
+				UnqueueExReport unqueueExReport
+					: reports
 			) {
 
-				// if this report doesn't belong to this forwarder pretend
-				// it doesn't exist
+				// lookup the report
+
+				unqueueExReport.fmOutReport =
+					forwarderMessageOutReportHelper.findRequired (
+						transaction,
+						unqueueExReport.reportId);
 
 				if (
-					referenceNotEqualWithClass (
-						ForwarderRec.class,
-						unqueueExReport.fmOutReport.getForwarderMessageOut ()
-							.getForwarder (),
-						forwarder)
-				) {
-					unqueueExReport.fmOutReport = null;
-				}
-
-				// if this report is not pending yet then pretend it doesn't
-				// exist
-				else if (
-
 					isNotNull (
-						unqueueExReport.fmOutReport.getForwarderMessageOut ()
-							.getReportIndexPending ())
-
-					&& moreThan (
-						unqueueExReport.fmOutReport.getIndex (),
-						unqueueExReport.fmOutReport.getForwarderMessageOut ()
-							.getReportIndexPending ())
-
+						unqueueExReport.fmOutReport)
 				) {
-					unqueueExReport.fmOutReport = null;
+
+					// if this report doesn't belong to this forwarder pretend
+					// it doesn't exist
+
+					if (
+						referenceNotEqualWithClass (
+							ForwarderRec.class,
+							unqueueExReport.fmOutReport.getForwarderMessageOut ()
+								.getForwarder (),
+							forwarder)
+					) {
+						unqueueExReport.fmOutReport = null;
+					}
+
+					// if this report is not pending yet then pretend it doesn't
+					// exist
+					else if (
+
+						isNotNull (
+							unqueueExReport.fmOutReport.getForwarderMessageOut ()
+								.getReportIndexPending ())
+
+						&& moreThan (
+							unqueueExReport.fmOutReport.getIndex (),
+							unqueueExReport.fmOutReport.getForwarderMessageOut ()
+								.getReportIndexPending ())
+
+					) {
+						unqueueExReport.fmOutReport = null;
+					}
+
+				}
+
+				// keep track of whether any failed
+				if (unqueueExReport.fmOutReport != null)
+					numSuccess++;
+				else
+					numFailed++;
+
+			}
+
+		}
+
+	}
+
+	private
+	void unqueueReports (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"unqueueReports");
+
+		) {
+
+			for (
+				UnqueueExReport unqueueExReport
+					: reports
+			) {
+
+				// skip any which weren't found
+
+				if (unqueueExReport.fmOutReport == null)
+					continue;
+
+				// skip any which are already processed
+
+				if (unqueueExReport.fmOutReport.getProcessedTime() != null)
+					continue;
+
+				unqueueExReport.fmOutReport
+
+					.setProcessedTime (
+						transaction.now ());
+
+				ForwarderMessageOutRec forwarderMessageOut =
+					unqueueExReport.fmOutReport
+						.getForwarderMessageOut ();
+
+				if (
+					forwarderMessageOut.getReportIndexPending () + 1
+						< forwarderMessageOut.getReportIndexNext ()
+				) {
+
+					forwarderMessageOut
+
+						.setReportIndexPending (
+							forwarderMessageOut.getReportIndexPending () + 1);
+
+				} else {
+
+					forwarderMessageOut
+
+						.setReportIndexPending (
+							null)
+
+						.setReportRetryTime (
+							null)
+
+						.setReportTries (
+							null);
+
 				}
 
 			}
 
-			// keep track of whether any failed
-			if (unqueueExReport.fmOutReport != null)
-				numSuccess++;
-			else
-				numFailed++;
 		}
+
 	}
 
 	private
-	void unqueueReports () {
+	void unqueueMessages (
+			@NonNull Transaction parentTransaction) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		for (
-			UnqueueExReport unqueueExReport
-				: reports
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"unqueueMessages");
 		) {
 
-			// skip any which weren't found
-
-			if (unqueueExReport.fmOutReport == null)
-				continue;
-
-			// skip any which are already processed
-
-			if (unqueueExReport.fmOutReport.getProcessedTime() != null)
-				continue;
-
-			unqueueExReport.fmOutReport
-
-				.setProcessedTime (
-					transaction.now ());
-
-			ForwarderMessageOutRec forwarderMessageOut =
-				unqueueExReport.fmOutReport
-					.getForwarderMessageOut ();
-
-			if (
-				forwarderMessageOut.getReportIndexPending () + 1
-					< forwarderMessageOut.getReportIndexNext ()
+			for (
+				UnqueueExMessage unqueueExMessage
+					: unqueueExMessages
 			) {
 
-				forwarderMessageOut
+				// skip any which weren't found
 
-					.setReportIndexPending (
-						forwarderMessageOut.getReportIndexPending () + 1);
+				if (unqueueExMessage.forwarderMessageIn == null)
+					continue;
 
-			} else {
+				// skip any which are already processed
 
-				forwarderMessageOut
+				if (unqueueExMessage.forwarderMessageIn.getPending () == false)
+					continue;
 
-					.setReportIndexPending (
-						null)
+				// unqueue it
 
-					.setReportRetryTime (
-						null)
+				unqueueExMessage.forwarderMessageIn
 
-					.setReportTries (
+					.setProcessedTime (
+						transaction.now ())
+
+					.setPending (
+						false)
+
+					.setSendQueue (
+						false)
+
+					.setRetryTime (
 						null);
 
 			}
-
-		}
-
-	}
-
-	private
-	void unqueueMessages () {
-
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
-
-		for (
-			UnqueueExMessage unqueueExMessage
-				: unqueueExMessages
-		) {
-
-			// skip any which weren't found
-
-			if (unqueueExMessage.forwarderMessageIn == null)
-				continue;
-
-			// skip any which are already processed
-
-			if (unqueueExMessage.forwarderMessageIn.getPending () == false)
-				continue;
-
-			// unqueue it
-
-			unqueueExMessage.forwarderMessageIn
-
-				.setProcessedTime (
-					transaction.now ())
-
-				.setPending (
-					false)
-
-				.setSendQueue (
-					false)
-
-				.setRetryTime (
-					null);
 
 		}
 

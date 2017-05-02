@@ -15,9 +15,10 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -119,13 +120,13 @@ class ChatHelpCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -133,10 +134,12 @@ class ChatHelpCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -145,19 +148,20 @@ class ChatHelpCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// send barred users to help
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -166,7 +170,7 @@ class ChatHelpCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -174,7 +178,7 @@ class ChatHelpCommand
 					true);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -189,16 +193,18 @@ class ChatHelpCommand
 				// send help error
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.getThreadId ()),
 					"help_error",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help")),
 					TemplateMissing.error,
@@ -209,12 +215,13 @@ class ChatHelpCommand
 				// store message as help request
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
 					optionalOf (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help")),
 					true);
@@ -224,7 +231,7 @@ class ChatHelpCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

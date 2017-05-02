@@ -37,9 +37,12 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.oxygenate.model.OxygenateInboundLogObjectHelper;
@@ -119,7 +122,7 @@ class OxygenateRouteInMmsNewAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"processRequest");
@@ -222,24 +225,17 @@ class OxygenateRouteInMmsNewAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"updateDatabase"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
 			OxygenateRouteInRec oxygenateRouteIn =
 				oxygenateRouteInHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"smsRouteId")));
@@ -251,7 +247,7 @@ class OxygenateRouteInMmsNewAction
 				iterableMapToList (
 					attachment ->
 						processAttachment (
-							taskLogger,
+							transaction,
 							attachment),
 					request.attachments ());
 
@@ -303,14 +299,14 @@ class OxygenateRouteInMmsNewAction
 
 			TextRec messageBodyText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					stringBuilder.toString ());
 
 			// lookup number, discarding extra info
 
 			NumberRec number =
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					listFirstElementRequired (
 						stringSplitSlash (
 							request.source ())));
@@ -318,7 +314,7 @@ class OxygenateRouteInMmsNewAction
 			// insert message
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalOf (
 					request.oxygenateReference ()),
 				messageBodyText,
@@ -371,25 +367,21 @@ class OxygenateRouteInMmsNewAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ClockworkSmsRouteInAction.storeLog ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			oxygenateInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				oxygenateInboundLogHelper.createInstance ()
 
 				.setRoute (
 					smsRouteHelper.findRequired (
+						transaction,
 						Long.parseLong (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))
@@ -418,14 +410,14 @@ class OxygenateRouteInMmsNewAction
 
 	private
 	MediaRec processAttachment (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OxygenateRouteInMmsNewRequest.Attachment attachment) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processAttachment");
 
 		) {
@@ -437,7 +429,7 @@ class OxygenateRouteInMmsNewAction
 			) {
 
 				return mediaLogic.createTextMedia (
-					taskLogger,
+					transaction,
 					attachment.content (),
 					attachment.contentType (),
 					attachment.fileName ());
@@ -453,7 +445,7 @@ class OxygenateRouteInMmsNewAction
 						attachment.content ());
 
 				return mediaLogic.createMediaRequired (
-					taskLogger,
+					transaction,
 					attachmentContent,
 					attachment.contentType (),
 					attachment.fileName (),

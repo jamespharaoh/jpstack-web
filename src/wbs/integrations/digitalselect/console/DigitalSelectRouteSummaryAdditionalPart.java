@@ -12,10 +12,13 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 
@@ -31,6 +34,9 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 	@SingletonDependency
 	DigitalSelectRouteOutConsoleHelper digitalSelectRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
@@ -48,67 +54,91 @@ class DigitalSelectRouteSummaryAdditionalPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		route =
-			routeHelper.findFromContextRequired ();
+		try (
 
-		digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findRequired (
-				route.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			route =
+				routeHelper.findFromContextRequired (
+					transaction);
+
+			digitalSelectRouteOut =
+				digitalSelectRouteOutHelper.findRequired (
+					transaction,
+					route.getId ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingTwoWrite (
-			"Digital Select route information");
+		try (
 
-		htmlTableOpenDetails ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		if (digitalSelectRouteOut != null) {
-
-			htmlTableDetailsRowWrite (
-				"URL",
-				digitalSelectRouteOut.getUrl ());
-
-			htmlTableDetailsRowWrite (
-				"Username",
-				digitalSelectRouteOut.getUsername ());
-
-			htmlTableDetailsRowWrite (
-				"Password",
-				ifThenElse (
-					requestContext.canContext ("route.manage"),
-					() -> digitalSelectRouteOut.getPassword (),
-					() -> "**********"));
-
-		}
-
-		if (
-			digitalSelectRouteOut != null
-			&& route.getCanSend ()
-			&& route.getDeliveryReports ()
 		) {
 
-			htmlTableDetailsRowWrite (
-				"Delivery reports URL",
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/digitalselect",
-					"/route",
-					"/%s",
-					integerToDecimalString (
-						route.getId ()),
-					"/report"));
+			htmlHeadingTwoWrite (
+				"Digital Select route information");
+
+			htmlTableOpenDetails ();
+
+			if (digitalSelectRouteOut != null) {
+
+				htmlTableDetailsRowWrite (
+					"URL",
+					digitalSelectRouteOut.getUrl ());
+
+				htmlTableDetailsRowWrite (
+					"Username",
+					digitalSelectRouteOut.getUsername ());
+
+				htmlTableDetailsRowWrite (
+					"Password",
+					ifThenElse (
+						requestContext.canContext ("route.manage"),
+						() -> digitalSelectRouteOut.getPassword (),
+						() -> "**********"));
+
+			}
+
+			if (
+				digitalSelectRouteOut != null
+				&& route.getCanSend ()
+				&& route.getDeliveryReports ()
+			) {
+
+				htmlTableDetailsRowWrite (
+					"Delivery reports URL",
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/digitalselect",
+						"/route",
+						"/%s",
+						integerToDecimalString (
+							route.getId ()),
+						"/report"));
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

@@ -5,14 +5,20 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("objectSummaryBeanPartBuilder")
 @ConsoleModuleBuilderHandler
@@ -20,7 +26,12 @@ public
 class ObjectSummaryBeanPartBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
-> {
+> implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -41,13 +52,26 @@ class ObjectSummaryBeanPartBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			@NonNull Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		objectSummaryPageBuilder.addPart (
-			objectSummaryBeanPartSpec.beanName ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			objectSummaryPageBuilder.addPart (
+				objectSummaryBeanPartSpec.beanName ());
+
+		}
 
 	}
 

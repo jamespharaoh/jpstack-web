@@ -6,26 +6,37 @@ import static wbs.utils.string.StringUtils.camelToUnderscore;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+
 import org.joda.time.LocalDate;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.entity.meta.identities.IdentityDateFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("identityDateModelFieldBuilder")
 @ModelBuilder
 public
-class IdentityDateModelFieldBuilder {
+class IdentityDateModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -43,62 +54,75 @@ class IdentityDateModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			spec.name ();
+		try (
 
-		// create model field
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		ModelField modelField =
-			new ModelField ()
+		) {
 
-			.model (
-				target.model ())
+			String fieldName =
+				spec.name ();
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.identitySimple)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				true)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.valueType (
-				LocalDate.class)
+				.type (
+					ModelFieldType.identitySimple)
 
-			.nullable (
-				false)
+				.parent (
+					false)
 
-			.columnNames (
-				ImmutableList.<String>of (
-					ifNull (
-						spec.columnName (),
-						camelToUnderscore (
-							fieldName))));
+				.identity (
+					true)
 
-		// store field
+				.valueType (
+					LocalDate.class)
 
-		target.fields ().add (
-			modelField);
+				.nullable (
+					false)
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.columnNames (
+					ImmutableList.<String>of (
+						ifNull (
+							spec.columnName (),
+							camelToUnderscore (
+								fieldName))));
+
+			// store field
+
+			target.fields ().add (
+				modelField);
+
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
+
+		}
 
 	}
 

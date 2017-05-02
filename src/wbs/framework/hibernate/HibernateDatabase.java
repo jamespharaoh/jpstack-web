@@ -1,31 +1,32 @@
 package wbs.framework.hibernate;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Provider;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.TransactionMethods;
+import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("database")
@@ -34,9 +35,6 @@ class HibernateDatabase
 	implements Database {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -64,10 +62,10 @@ class HibernateDatabase
 
 		@Override
 		protected
-		List<HibernateTransaction> initialValue () {
+		List <HibernateTransaction> initialValue () {
 
 			return Collections.synchronizedList (
-				new ArrayList<HibernateTransaction> ());
+				new ArrayList<> ());
 
 		}
 
@@ -75,77 +73,64 @@ class HibernateDatabase
 
 	// implementation
 
-	@SuppressWarnings ("resource")
 	@Override
 	public
 	OwnedTransaction beginTransaction (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull LogContext parentLogContext,
+			@NonNull Optional <TaskLogger> parentTaskLogger,
 			@NonNull String summary,
-			@NonNull Object owner,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,
 			boolean makeCurrent) {
 
+		OwnedTaskLogger transactionTaskLogger;
+
+		if (
+			optionalIsPresent (
+				parentTaskLogger)
+		) {
+
+			transactionTaskLogger =
+				logContext.nestTaskLogger (
+					optionalGetRequired (
+						parentTaskLogger),
+					"beginTransaction");
+
+		} else {
+
+			transactionTaskLogger =
+				logContext.createTaskLogger (
+					"beginTransaction");
+
+		}
+
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger,
+					transactionTaskLogger,
 					"beginTransaction");
 
 		) {
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"database",
-					summary,
-					owner,
-					ImmutableMap.of ());
-
-			try {
-
-				HibernateTransaction transaction =
-					beginTransactionReal (
-						taskLogger,
-						activeTask,
-						readWrite,
-						canJoin,
-						canCreateNew,
-						makeCurrent);
-
-				activeTask.put (
-					"process id",
-					Long.toString (
-						transaction.serverProcessId ()));
-
-				return transaction;
-
-			} catch (RuntimeException exception) {
-
-				throw activeTask.fail (
-					exception);
-
-			} catch (Error exception) {
-
-				throw activeTask.fail (
-					exception);
-
-			} catch (Throwable exception) {
-
-				throw activeTask.fail (
-					new RuntimeException (
-						exception));
-
-			}
+			return beginTransactionReal (
+				taskLogger,
+				transactionTaskLogger,
+				readWrite,
+				canJoin,
+				canCreateNew,
+				makeCurrent);
 
 		}
 
 	}
 
+	@SuppressWarnings ("resource")
+	private
 	HibernateTransaction beginTransactionReal (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ActiveTask transactionTask,
+			@NonNull CloseableTaskLogger transactionTaskLogger,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,
@@ -153,7 +138,7 @@ class HibernateDatabase
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"beginTransactionReal");
@@ -169,110 +154,99 @@ class HibernateDatabase
 
 			}
 
-			try (
+			// get current transaction & stack
 
-				ActiveTask beginTask =
-					activityManager.start (
-						"database",
-						"beginTransactCionReal (...)",
-						this);
+			List <HibernateTransaction> currentTransactionStack =
+				currentTransactionStackLocal.get ();
 
+			HibernateTransaction currentTransaction =
+				currentTransactionStack.size () > 0
+					? currentTransactionStack.get (
+						currentTransactionStack.size () - 1)
+					: null;
+
+			// join an existing transaction
+
+			if (
+				currentTransaction != null
+				&& canJoin
+				&& (
+					! readWrite
+					|| ! currentTransaction.isReadWrite
+				)
 			) {
 
-				// get current transaction & stack
+				HibernateTransaction newTransaction =
+					hibernateTransactionProvider.get ()
 
-				List <HibernateTransaction> currentTransactionStack =
-					currentTransactionStackLocal.get ();
+					.parentTaskLogger (
+						taskLogger)
 
-				@SuppressWarnings ("resource")
-				HibernateTransaction currentTransaction =
-					currentTransactionStack.size () > 0
-						? currentTransactionStack.get (
-							currentTransactionStack.size () - 1)
-						: null;
+					.hibernateDatabase (
+						this)
 
-				// join an existing transaction
+					.isReadWrite (
+						readWrite)
 
-				if (
-					currentTransaction != null
-					&& canJoin
-					&& (
-						! readWrite
-						|| ! currentTransaction.isReadWrite
-					)
-				) {
+					.realTransaction (
+						currentTransaction)
 
-					HibernateTransaction newTransaction =
-						hibernateTransactionProvider.get ()
+					.stack (
+						currentTransactionStack)
 
-						.parentTaskLogger (
-							taskLogger)
+					.transactionTaskLogger (
+						transactionTaskLogger);
 
-						.hibernateDatabase (
-							this)
+				newTransaction.begin (
+					taskLogger);
 
-						.isReadWrite (
-							readWrite)
+				if (makeCurrent) {
 
-						.realTransaction (
-							currentTransaction)
-
-						.stack (
-							currentTransactionStack)
-
-						.activeTask (
-							transactionTask);
-
-					newTransaction.begin ();
-
-					if (makeCurrent) {
-
-						currentTransactionStack.add (
-							newTransaction);
-
-					}
-
-					return newTransaction;
+					currentTransactionStack.add (
+						newTransaction);
 
 				}
 
-				// create a new transaction
+				return newTransaction;
 
-				if (canCreateNew) {
+			}
 
-					HibernateTransaction newTransaction =
-						hibernateTransactionProvider.get ()
+			// create a new transaction
 
-						.parentTaskLogger (
-							taskLogger)
+			if (canCreateNew) {
 
-						.hibernateDatabase (
-							this)
+				HibernateTransaction newTransaction =
+					hibernateTransactionProvider.get ()
 
-						.id (
-							Transaction.IdGenerator.nextId ())
+					.parentTaskLogger (
+						taskLogger)
 
-						.isReadWrite (
-							readWrite)
+					.hibernateDatabase (
+						this)
 
-						.stack (
-							currentTransactionStack)
+					.id (
+						TransactionMethods.IdGenerator.nextId ())
 
-						.activeTask (
-							transactionTask);
+					.isReadWrite (
+						readWrite)
 
-					newTransaction.begin ();
+					.stack (
+						currentTransactionStack)
 
-					if (makeCurrent) {
+					.transactionTaskLogger (
+						transactionTaskLogger);
 
-						currentTransactionStack.add (
-							newTransaction);
+				newTransaction.begin (
+					taskLogger);
 
-					}
+				if (makeCurrent) {
 
-					return newTransaction;
+					currentTransactionStack.add (
+						newTransaction);
 
 				}
+
+				return newTransaction;
 
 			}
 
@@ -282,81 +256,6 @@ class HibernateDatabase
 				"Unable to begin transaction");
 
 		}
-
-	}
-
-	@Override
-	public
-	BorrowedTransaction currentTransaction () {
-
-		return new BorrowedTransaction (
-			currentTransactionReal ());
-
-	}
-
-	private
-	HibernateTransaction currentTransactionReal () {
-
-		List<HibernateTransaction> currentTransactionStack =
-			currentTransactionStackLocal.get ();
-
-		if (currentTransactionStack.size () == 0)
-			return null;
-
-		return currentTransactionStack.get (
-			currentTransactionStack.size () - 1);
-
-	}
-
-	@SuppressWarnings ("resource")
-	public
-	Session currentSession () {
-
-		HibernateTransaction currentTransaction =
-			currentTransactionReal ();
-
-		if (currentTransaction == null) {
-
-			throw new RuntimeException (
-				"No current transaction");
-
-		}
-
-		return currentTransaction.getSession ();
-
-	}
-
-	@Override
-	public
-	void flush () {
-
-		@SuppressWarnings ("resource")
-		Session session =
-			currentSession ();
-
-		session.flush ();
-
-	}
-
-	@Override
-	public
-	void clear () {
-
-		@SuppressWarnings ("resource")
-		Session session =
-			currentSession ();
-
-		session.clear ();
-
-	}
-
-	@Override
-	public
-	void flushAndClear () {
-
-		flush ();
-
-		clear ();
 
 	}
 

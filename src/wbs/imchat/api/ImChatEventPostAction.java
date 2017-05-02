@@ -82,40 +82,36 @@ class ImChatEventPostAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatEventPostRequest eventPostRequest =
-			dataFromJson.fromJson (
-				ImChatEventPostRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatEventPostAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatEventPostRequest eventPostRequest =
+				dataFromJson.fromJson (
+					ImChatEventPostRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -143,6 +139,7 @@ class ImChatEventPostAction
 
 					session =
 						imChatSessionHelper.findBySecret (
+							transaction,
 							eventItemRequest.sessionSecret ());
 
 					if (
@@ -172,7 +169,7 @@ class ImChatEventPostAction
 				}
 
 				imChatEventHelper.insert (
-					taskLogger,
+					transaction,
 					imChatEventHelper.createInstance ()
 
 					.setImChat (
@@ -230,7 +227,7 @@ class ImChatEventPostAction
 						eventItemRequest.payload ();
 
 					exceptionLogger.logSimple (
-						taskLogger,
+						transaction,
 						"external",
 
 						objectToString (
@@ -297,7 +294,7 @@ class ImChatEventPostAction
 						eventItemRequest.payload ();
 
 					exceptionLogger.logSimple (
-						taskLogger,
+						transaction,
 						"external",
 
 						objectToString (

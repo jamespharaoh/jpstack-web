@@ -7,6 +7,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 import lombok.NonNull;
@@ -66,6 +68,16 @@ interface ConsoleRequestContextFormMethods
 	}
 
 	default
+	void hideFormData (
+			@NonNull String ... keys) {
+
+		hideFormData (
+			ImmutableSet.copyOf (
+				keys));
+
+	}
+
+	default
 	Optional <String> form (
 			@NonNull String key) {
 
@@ -86,7 +98,7 @@ interface ConsoleRequestContextFormMethods
 
 	default
 	String formRequired (
-			String key) {
+			@NonNull String key) {
 
 		return optionalOrThrow (
 			form (key),
@@ -95,6 +107,16 @@ interface ConsoleRequestContextFormMethods
 					"Form data does not contain key: %s",
 					key)));
 
+
+	}
+
+	default
+	String formRequiredFormat (
+			@NonNull String ... keyArguments) {
+
+		return formRequired (
+			stringFormatArray (
+				keyArguments));
 
 	}
 

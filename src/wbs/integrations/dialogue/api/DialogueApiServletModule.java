@@ -3,7 +3,10 @@ package wbs.integrations.dialogue.api;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -33,6 +36,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.model.TextObjectHelper;
@@ -142,7 +146,7 @@ class DialogueApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
 						"inFile.doPost");
@@ -223,9 +227,15 @@ class DialogueApiServletModule
 
 				byte[] messageBytes;
 
-				UserDataHeader userDataHeader = null;
+				Optional <UserDataHeader> userDataHeader =
+					optionalAbsent ();
 
-				if ("1".equals (userDataHeaderIndicatorParam)) {
+				if (
+					stringEqualSafe (
+						userDataHeaderIndicatorParam,
+						"1")
+				) {
+
 					try {
 
 						// get header
@@ -265,7 +275,10 @@ class DialogueApiServletModule
 						// and decode it
 
 						userDataHeader =
-							UserDataHeader.decode (ByteBuffer.wrap (headerBytes));
+							optionalOf (
+								UserDataHeader.decode (
+									ByteBuffer.wrap (
+										headerBytes)));
 
 						// then find the message bytes
 
@@ -319,79 +332,16 @@ class DialogueApiServletModule
 
 				// save the message
 
-				try (
-
-					OwnedTransaction transaction =
-						database.beginReadWrite (
-							taskLogger,
-							"DialogueApiServletModule.inFile.doPost ()",
-							this);
-
-				) {
-
-					RouteRec route =
-						routeHelper.findRequired (
-							routeId);
-
-					NetworkRec network =
-						networkId == null
-							? null
-							: networkHelper.findRequired (
-								networkId);
-
-					// if it's a concatenated message...
-
-					ConcatenatedInformationElement concat =
-						userDataHeader != null
-							? userDataHeader.find (
-								ConcatenatedInformationElement.class)
-							: null;
-
-					if (concat != null) {
-
-						// insert a part message
-
-						inboxMultipartLogic.insertInboxMultipart (
-							taskLogger,
-							route,
-							concat.getRef (),
-							concat.getSeqMax (),
-							concat.getSeqNum (),
-							numToParam,
-							numFromParam,
-							null,
-							network,
-							idParam,
-							message);
-
-					} else {
-
-						// insert a message
-
-						smsInboxLogic.inboxInsert (
-							taskLogger,
-							optionalOf (
-								idParam),
-							textHelper.findOrCreate (
-								taskLogger,
-								message),
-							smsNumberHelper.findOrCreate (
-								taskLogger,
-								numFromParam),
-							numToParam,
-							route,
-							optionalOf (
-								network),
-							optionalAbsent (),
-							emptyList (),
-							optionalAbsent (),
-							optionalAbsent ());
-
-					}
-
-					transaction.commit ();
-
-				}
+				saveMessage (
+					taskLogger,
+					routeId,
+					optionalOf (
+						networkId),
+					numFromParam,
+					numToParam,
+					userDataHeader,
+					message,
+					idParam);
 
 				try (
 
@@ -415,6 +365,100 @@ class DialogueApiServletModule
 
 		}
 
+		private
+		void saveMessage (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Long routeId,
+				@NonNull Optional <Long> networkIdOptional,
+				@NonNull String numberFrom,
+				@NonNull String numberTo,
+				@NonNull Optional <UserDataHeader> userDataHeaderOptional,
+				@NonNull String message,
+				@NonNull String otherId) {
+
+			try (
+
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						logContext,
+						parentTaskLogger,
+						"saveMessage");
+
+			) {
+
+				RouteRec route =
+					routeHelper.findRequired (
+						transaction,
+						routeId);
+
+				Optional <NetworkRec> networkOptional =
+					optionalMapRequired (
+						networkIdOptional,
+						networkId ->
+							networkHelper.findRequired (
+								transaction,
+								networkId));
+
+				// if it's a concatenated message...
+
+				Optional <ConcatenatedInformationElement> concatOptional =
+					optionalMapRequired (
+						userDataHeaderOptional,
+						nestedUserDataHeader ->
+							nestedUserDataHeader.find (
+								ConcatenatedInformationElement.class));
+
+				if (
+					optionalIsPresent (
+						concatOptional)
+				) {
+
+					// insert a part message
+
+					inboxMultipartLogic.insertInboxMultipart (
+						transaction,
+						route,
+						concatOptional.get ().getRef (),
+						concatOptional.get ().getSeqMax (),
+						concatOptional.get ().getSeqNum (),
+						numberTo,
+						numberFrom,
+						optionalAbsent (),
+						networkOptional,
+						optionalOf (
+							otherId),
+						message);
+
+				} else {
+
+					// insert a message
+
+					smsInboxLogic.inboxInsert (
+						transaction,
+						optionalOf (
+							otherId),
+						textHelper.findOrCreate (
+							transaction,
+							message),
+						smsNumberHelper.findOrCreate (
+							transaction,
+							numberFrom),
+						numberTo,
+						route,
+						networkOptional,
+						optionalAbsent (),
+						emptyList (),
+						optionalAbsent (),
+						optionalAbsent ());
+
+				}
+
+				transaction.commit ();
+
+			}
+
+		}
+
 	};
 
 	private final
@@ -428,10 +472,11 @@ class DialogueApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
+				OwnedTransaction transaction =
+					database.beginReadWrite (
+						logContext,
 						parentTaskLogger,
-						"reportAction.handle");
+						"handle");
 
 			) {
 
@@ -469,7 +514,7 @@ class DialogueApiServletModule
 							: values
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Param %s = %s",
 							name,
 							value);
@@ -482,7 +527,7 @@ class DialogueApiServletModule
 
 				if (userKeyParam == null) {
 
-					taskLogger.warningFormat (
+					transaction.warningFormat (
 						"Ignoring dialogue report with no user key, X-E3-ID=%s",
 						idParam);
 
@@ -540,7 +585,7 @@ class DialogueApiServletModule
 
 				} else {
 
-					taskLogger.errorFormat (
+					transaction.errorFormat (
 						"Unrecognised report for %s",
 						integerToDecimalString (
 							messageId));
@@ -550,32 +595,20 @@ class DialogueApiServletModule
 
 				}
 
-				try (
+				reportLogic.deliveryReport (
+					transaction,
+					messageId,
+					newMessageStatus,
+					optionalOf (
+						deliveryReportParam),
+					optionalAbsent (),
+					optionalAbsent (),
+					optionalAbsent ());
 
-					OwnedTransaction transaction =
-						database.beginReadWrite (
-							taskLogger,
-							"DialogueApiServletModule.reportAction.handle ()",
-							this);
+				transaction.commit ();
 
-				) {
-
-					reportLogic.deliveryReport (
-						taskLogger,
-						messageId,
-						newMessageStatus,
-						Optional.of (
-							deliveryReportParam),
-						Optional.absent (),
-						Optional.absent (),
-						Optional.absent ());
-
-					transaction.commit ();
-
-					return dialogueResponderProvider
-						.get ();
-
-				}
+				return dialogueResponderProvider
+					.get ();
 
 			}
 

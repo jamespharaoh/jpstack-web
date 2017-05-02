@@ -15,12 +15,12 @@ import org.joda.time.LocalDate;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.event.model.EventLinkObjectHelper;
@@ -64,25 +64,23 @@ class EventLogicImplementation
 	@Override
 	public
 	EventRec createEvent (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String typeCode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createEvent");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// lookup type
 
 			EventTypeRec eventType =
 				eventTypeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					typeCode);
 
@@ -90,7 +88,7 @@ class EventLogicImplementation
 
 			EventRec event =
 				eventHelper.insert (
-					taskLogger,
+					transaction,
 					eventHelper.createInstance ()
 
 				.setEventType (
@@ -112,15 +110,15 @@ class EventLogicImplementation
 	@Override
 	public
 	EventRec createEvent (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String typeCode,
 			@NonNull Object ... linkObjects) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createEvent");
 
 		) {
@@ -129,7 +127,7 @@ class EventLogicImplementation
 
 			EventRec event =
 				createEvent (
-					taskLogger,
+					transaction,
 					typeCode);
 
 			// create event links
@@ -143,14 +141,14 @@ class EventLogicImplementation
 
 				EventLinkRec eventLink =
 					createEventLink (
-						taskLogger,
+						transaction,
 						event,
 						linkObject,
 						fromJavaInteger (
 							index));
 
 				eventLinkHelper.insert (
-					taskLogger,
+					transaction,
 					eventLink);
 
 				event.getEventLinks ().add (
@@ -170,23 +168,23 @@ class EventLogicImplementation
 
 	private
 	EventLinkRec createEventLink (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull EventRec event,
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createEventLink");
 
 		) {
 
 			Object linkObject =
 				normaliseLinkObject (
-					taskLogger,
+					transaction,
 					originalLinkObject,
 					index);
 
@@ -210,6 +208,7 @@ class EventLogicImplementation
 
 					.setTypeId (
 						objectManager.getObjectTypeId (
+							transaction,
 							dataObject))
 
 					.setRefId (
@@ -321,16 +320,17 @@ class EventLogicImplementation
 
 	}
 
+	private
 	Object normaliseLinkObject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"normaliseLinkObject");
 
 		) {
@@ -368,7 +368,7 @@ class EventLogicImplementation
 			if (currentLinkObject instanceof String) {
 
 				return textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					(String)
 					currentLinkObject);
 

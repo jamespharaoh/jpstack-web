@@ -1,4 +1,4 @@
-package wbs.framework.activitymanager;
+package wbs.framework.activitymanagerold;
 
 import static wbs.utils.collection.MapUtils.mapIsEmpty;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;

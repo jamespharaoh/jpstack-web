@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
@@ -20,8 +21,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -53,20 +55,33 @@ class ChatUserAdminDeletePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
 
-		if (
-			isNotNull (
-				chatUser.getOldNumber ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
 		) {
 
-			newChatUser =
-				chatUserHelper.find (
-					chatUser.getChat (),
-					chatUser.getOldNumber ());
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+			if (
+				isNotNull (
+					chatUser.getOldNumber ())
+			) {
+
+				newChatUser =
+					chatUserHelper.findRequired (
+						transaction,
+						chatUser.getChat (),
+						chatUser.getOldNumber ());
+
+			}
 
 		}
 
@@ -75,13 +90,13 @@ class ChatUserAdminDeletePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -113,7 +128,7 @@ class ChatUserAdminDeletePart
 			htmlTableDetailsRowWriteRaw (
 				"Number",
 				() -> consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatUser.getOldNumber ()));
 
 			htmlTableDetailsRowWrite (
@@ -126,11 +141,11 @@ class ChatUserAdminDeletePart
 
 			// general information
 
-			formatWriter.writeFormat (
-				"<p>The delete function simply removes the connection between the ",
-				"user and their phone number. This appears to the customer as if ",
-				"their profile has gone, while still allowing us to view ",
-				"historical information in the console.</p>");
+			htmlParagraphWriteFormat (
+				"The delete function simply removes the connection between ",
+				"the user and their phone number. This appears to the ",
+				"customer as if their profile has gone, while still allowing ",
+				"us to view historical information in the console.");
 
 			// action button, or excuse for having none
 

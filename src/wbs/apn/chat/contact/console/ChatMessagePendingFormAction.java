@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -107,7 +108,7 @@ class ChatMessagePendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goReal");
@@ -164,31 +165,27 @@ class ChatMessagePendingFormAction
 	Responder goSend (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goSend");
-
-		// get params
-
-		String messageParam =
-			requestContext.parameterRequired (
-				"message");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatMessagePendingFormAction.goSend ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goSend");
 
 		) {
+
+			// get params
+
+			String messageParam =
+				requestContext.parameterRequired (
+					"message");
 
 			// get database objects
 
 			ChatMessageRec chatMessage =
-				chatMessageHelper.findFromContextRequired ();
+				chatMessageHelper.findFromContextRequired (
+					transaction);
 
 			ChatRec chat =
 				chatMessage.getChat ();
@@ -203,6 +200,7 @@ class ChatMessagePendingFormAction
 
 				ChatMessageLogic.ApprovalResult approvalResult =
 					chatMessageLogic.checkForApproval (
+						transaction,
 						chat,
 						messageParam);
 
@@ -238,16 +236,18 @@ class ChatMessagePendingFormAction
 			// process the queue item
 
 			queueLogic.processQueueItem (
-				taskLogger,
+				transaction,
 				chatMessage.getQueueItem (),
-				userConsoleLogic.userRequired ());
+				userConsoleLogic.userRequired (
+					transaction));
 
 			// update the chat message
 
 			chatMessage
 
 				.setModerator (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setModeratorTimestamp (
 					transaction.now ());
@@ -282,15 +282,17 @@ class ChatMessagePendingFormAction
 						ChatMessageStatus.moderatorAutoEdited);
 
 				chatMessageLogic.chatUserRejectionCountInc (
-					taskLogger,
+					transaction,
 					chatMessage.getFromUser (),
 					smsMessageHelper.findRequired (
+						transaction,
 						chatMessage.getThreadId ()));
 
 				chatMessageLogic.chatUserRejectionCountInc (
-					taskLogger,
+					transaction,
 					chatMessage.getToUser (),
 					smsMessageHelper.findRequired (
+						transaction,
 						chatMessage.getThreadId ()));
 
 			} else {
@@ -301,19 +303,21 @@ class ChatMessagePendingFormAction
 					.setStatus (ChatMessageStatus.moderatorEdited)
 					.setEditedText (
 						textHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							messageParam));
 
 				chatMessageLogic.chatUserRejectionCountInc (
-					taskLogger,
+					transaction,
 					chatMessage.getFromUser (),
 					smsMessageHelper.findRequired (
+						transaction,
 						chatMessage.getThreadId ()));
 
 				chatMessageLogic.chatUserRejectionCountInc (
-					taskLogger,
+					transaction,
 					chatMessage.getToUser (),
 					smsMessageHelper.findRequired (
+						transaction,
 						chatMessage.getThreadId ()));
 
 			}
@@ -322,7 +326,7 @@ class ChatMessagePendingFormAction
 
 			ChatContactRec chatContact =
 				chatContactHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chatMessage.getFromUser (),
 					chatMessage.getToUser ());
 
@@ -338,7 +342,7 @@ class ChatMessagePendingFormAction
 			case user:
 
 				chatMessageLogic.chatMessageDeliverToUser (
-					taskLogger,
+					transaction,
 					chatMessage);
 
 				break;
@@ -347,7 +351,7 @@ class ChatMessagePendingFormAction
 
 				ChatMonitorInboxRec chatMonitorInbox =
 					chatMessageLogic.findOrCreateChatMonitorInbox (
-						taskLogger,
+						transaction,
 						chatMessage.getToUser (),
 						chatMessage.getFromUser (),
 						false);
@@ -382,8 +386,9 @@ class ChatMessagePendingFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReject");
 
@@ -414,80 +419,74 @@ class ChatMessagePendingFormAction
 
 			}
 
-			try (
+			// get database objects
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatMessagePendingFormAction.goReject ()",
-						this);
+			ChatMessageRec chatMessage =
+				chatMessageHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			// confirm message status
 
-				// get database objects
+			if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
 
-				ChatMessageRec chatMessage =
-					chatMessageHelper.findFromContextRequired ();
-
-				// confirm message status
-
-				if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
-
-					requestContext.addError (
-						"Message is already approved");
-
-					return responder ("queueHomeResponder");
-
-				}
-
-				// remove the queue item
-
-				queueLogic.processQueueItem (
-					taskLogger,
-					chatMessage.getQueueItem (),
-					userConsoleLogic.userRequired ());
-
-				// update the chatMessage
-
-				chatMessage
-
-					.setModerator (
-						userConsoleLogic.userRequired ())
-
-					.setStatus (
-						ChatMessageStatus.moderatorRejected)
-
-					.setEditedText (
-						null);
-
-				// and send help message
-
-				chatHelpLogic.sendHelpMessage (
-					taskLogger,
-					userConsoleLogic.userRequired (),
-					chatMessage.getFromUser (),
-					messageParam,
-					optionalOf (
-						chatMessage.getThreadId ()),
-					optionalAbsent ());
-
-				// inc rejection count
-
-				chatMessageLogic.chatUserRejectionCountInc (
-					taskLogger,
-					chatMessage.getFromUser (),
-					smsMessageHelper.findRequired (
-						chatMessage.getThreadId ()));
-
-				transaction.commit ();
-
-				requestContext.addNotice (
-					"Rejection sent");
+				requestContext.addError (
+					"Message is already approved");
 
 				return responder (
 					"queueHomeResponder");
 
 			}
+
+			// remove the queue item
+
+			queueLogic.processQueueItem (
+				transaction,
+				chatMessage.getQueueItem (),
+				userConsoleLogic.userRequired (
+					transaction));
+
+			// update the chatMessage
+
+			chatMessage
+
+				.setModerator (
+					userConsoleLogic.userRequired (
+						transaction))
+
+				.setStatus (
+					ChatMessageStatus.moderatorRejected)
+
+				.setEditedText (
+					null);
+
+			// and send help message
+
+			chatHelpLogic.sendHelpMessage (
+				transaction,
+				userConsoleLogic.userRequired (
+					transaction),
+				chatMessage.getFromUser (),
+				messageParam,
+				optionalOf (
+					chatMessage.getThreadId ()),
+				optionalAbsent ());
+
+			// inc rejection count
+
+			chatMessageLogic.chatUserRejectionCountInc (
+				transaction,
+				chatMessage.getFromUser (),
+				smsMessageHelper.findRequired (
+					transaction,
+					chatMessage.getThreadId ()));
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder (
+				"queueHomeResponder");
 
 		}
 

@@ -22,7 +22,10 @@ import wbs.console.session.UserSessionVerifyLogic;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("consoleAsyncConnection")
@@ -67,7 +70,7 @@ class ConsoleAsyncConnection
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleMessage");
@@ -153,7 +156,7 @@ class ConsoleAsyncConnection
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleConnectionClosed");
@@ -211,14 +214,14 @@ class ConsoleAsyncConnection
 		@Override
 		public
 		void send (
-				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction parentTransaction,
 				@NonNull JsonObject payload) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"send");
 
 			) {
@@ -239,7 +242,7 @@ class ConsoleAsyncConnection
 						message);
 
 				connectionProvider.sendMessage (
-					taskLogger,
+					transaction,
 					messageJson);
 
 			}

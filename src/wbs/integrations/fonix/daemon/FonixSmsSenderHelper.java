@@ -21,7 +21,10 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -83,165 +86,177 @@ public class FonixSmsSenderHelper
 	@Override
 	public
 	SetupRequestResult <FonixMessageSender> setupRequest (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec smsOutbox) {
 
-		// get stuff
+		try (
 
-		MessageRec smsMessage =
-			smsOutbox.getMessage ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setupRequest");
 
-		RouteRec smsRoute =
-			smsOutbox.getRoute ();
-
-		// lookup route out
-
-		Optional <FonixRouteOutRec> fonixRouteOutOptional =
-			fonixRouteOutHelper.find (
-				smsRoute.getId ());
-
-		if (
-			optionalIsNotPresent (
-				fonixRouteOutOptional)
 		) {
+
+			// get stuff
+
+			MessageRec smsMessage =
+				smsOutbox.getMessage ();
+
+			RouteRec smsRoute =
+				smsOutbox.getRoute ();
+
+			// lookup route out
+
+			Optional <FonixRouteOutRec> fonixRouteOutOptional =
+				fonixRouteOutHelper.find (
+					transaction,
+					smsRoute.getId ());
+
+			if (
+				optionalIsNotPresent (
+					fonixRouteOutOptional)
+			) {
+
+				return new SetupRequestResult <FonixMessageSender> ()
+
+					.status (
+						SetupRequestStatus.configError)
+
+					.statusMessage (
+						stringFormat (
+							"Fonix outbound route not found for %s",
+							smsRoute.getCode ()));
+
+			}
+
+			FonixRouteOutRec fonixRouteOut =
+				fonixRouteOutOptional.get ();
+
+			// validate message text
+
+			if (
+				gsmStringIsNotValid (
+					smsMessage.getText ().getText ())
+			) {
+
+				return new SetupRequestResult <FonixMessageSender> ()
+
+					.status (
+						SetupRequestStatus.validationError)
+
+					.statusMessage (
+						"The message text contains non-GSM characters");
+
+			}
+
+			long gsmLength =
+				GsmUtils.gsmStringLength (
+					smsMessage.getText ().getText ());
+
+			long gsmParts =
+				GsmUtils.gsmCountMessageParts (
+					gsmLength);
+
+			if (
+				moreThanOne (
+					gsmParts)
+			) {
+
+				return new SetupRequestResult <FonixMessageSender> ()
+
+					.status (
+						SetupRequestStatus.validationError)
+
+					.statusMessage (
+						stringFormat (
+							"Message has length %s ",
+							integerToDecimalString (
+								gsmLength),
+							"and so would be split into %s parts ",
+							integerToDecimalString (
+								gsmParts),
+							"but the maximum is one"));
+
+			}
+
+			// pick a handler
+
+			if (
+				stringEqualSafe (
+					smsMessage.getMessageType ().getCode (),
+					"sms")
+			) {
+
+				// nothing to do
+
+			} else {
+
+				return new SetupRequestResult <FonixMessageSender> ()
+
+					.status (
+						SetupRequestStatus.unknownError)
+
+					.statusMessage (
+						stringFormat (
+							"Don't know what to do with a %s",
+							smsMessage.getMessageType ().getCode ()));
+
+			}
+
+			// create request
+
+			FonixMessageSendRequest fonixRequest =
+				new FonixMessageSendRequest ()
+
+				.url (
+					fonixRouteOut.getUrl ())
+
+				.apiKey (
+					fonixRouteOut.getApiKey ())
+
+				.id (
+					smsMessage.getId ())
+
+				.originator (
+					smsMessage.getNumFrom ())
+
+				.numbers (
+					ImmutableList.of (
+						smsMessage.getNumTo ()))
+
+				.body (
+					smsMessage.getText ().getText ())
+
+				.dummy (
+					false);
+
+			// create sender
+
+			FonixMessageSender fonixSender =
+				fonixMessageSenderProvider.get ()
+
+				.request (
+					fonixRequest);
+
+			// encode request
+
+			fonixSender.encode ();
+
+			// return
 
 			return new SetupRequestResult <FonixMessageSender> ()
 
 				.status (
-					SetupRequestStatus.configError)
+					SetupRequestStatus.success)
 
-				.statusMessage (
-					stringFormat (
-						"Fonix outbound route not found for %s",
-						smsRoute.getCode ()));
+				.requestTrace (
+					fonixSender.requestTrace ())
 
-		}
-
-		FonixRouteOutRec fonixRouteOut =
-			fonixRouteOutOptional.get ();
-
-		// validate message text
-
-		if (
-			gsmStringIsNotValid (
-				smsMessage.getText ().getText ())
-		) {
-
-			return new SetupRequestResult <FonixMessageSender> ()
-
-				.status (
-					SetupRequestStatus.validationError)
-
-				.statusMessage (
-					"The message text contains non-GSM characters");
+				.state (
+					fonixSender);
 
 		}
-
-		long gsmLength =
-			GsmUtils.gsmStringLength (
-				smsMessage.getText ().getText ());
-
-		long gsmParts =
-			GsmUtils.gsmCountMessageParts (
-				gsmLength);
-
-		if (
-			moreThanOne (
-				gsmParts)
-		) {
-
-			return new SetupRequestResult <FonixMessageSender> ()
-
-				.status (
-					SetupRequestStatus.validationError)
-
-				.statusMessage (
-					stringFormat (
-						"Message has length %s ",
-						integerToDecimalString (
-							gsmLength),
-						"and so would be split into %s parts ",
-						integerToDecimalString (
-							gsmParts),
-						"but the maximum is one"));
-
-		}
-
-		// pick a handler
-
-		if (
-			stringEqualSafe (
-				smsMessage.getMessageType ().getCode (),
-				"sms")
-		) {
-
-			// nothing to do
-
-		} else {
-
-			return new SetupRequestResult <FonixMessageSender> ()
-
-				.status (
-					SetupRequestStatus.unknownError)
-
-				.statusMessage (
-					stringFormat (
-						"Don't know what to do with a %s",
-						smsMessage.getMessageType ().getCode ()));
-
-		}
-
-		// create request
-
-		FonixMessageSendRequest fonixRequest =
-			new FonixMessageSendRequest ()
-
-			.url (
-				fonixRouteOut.getUrl ())
-
-			.apiKey (
-				fonixRouteOut.getApiKey ())
-
-			.id (
-				smsMessage.getId ())
-
-			.originator (
-				smsMessage.getNumFrom ())
-
-			.numbers (
-				ImmutableList.of (
-					smsMessage.getNumTo ()))
-
-			.body (
-				smsMessage.getText ().getText ())
-
-			.dummy (
-				false);
-
-		// create sender
-
-		FonixMessageSender fonixSender =
-			fonixMessageSenderProvider.get ()
-
-			.request (
-				fonixRequest);
-
-		// encode request
-
-		fonixSender.encode ();
-
-		// return
-
-		return new SetupRequestResult <FonixMessageSender> ()
-
-			.status (
-				SetupRequestStatus.success)
-
-			.requestTrace (
-				fonixSender.requestTrace ())
-
-			.state (
-				fonixSender);
 
 	}
 
@@ -253,7 +268,7 @@ public class FonixSmsSenderHelper
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"performSend");
@@ -301,7 +316,7 @@ public class FonixSmsSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FonixMessageSender fonixSender) {
 
 		// check for generic error

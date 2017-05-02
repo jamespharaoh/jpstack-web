@@ -1,7 +1,6 @@
 package wbs.apn.chat.adult.daemon;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -65,26 +64,22 @@ class ChatAdultExpiryDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"runOnce ()");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ChatAdultExpiryDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Checking for all users whose adult verification has expired");
 
 			List <ChatUserRec> chatUsers =
 				chatUserHelper.findAdultExpiryLimit (
+					transaction,
 					transaction.now (),
-					1000);
+					1000l);
 
 			transaction.close ();
 
@@ -94,7 +89,7 @@ class ChatAdultExpiryDaemon
 			) {
 
 				doUserAdultExpiry (
-					taskLogger,
+					transaction,
 					chatUser.getId ());
 
 			}
@@ -109,23 +104,17 @@ class ChatAdultExpiryDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"doUserAdultExpiry (%s)",
-					integerToDecimalString (
-						chatUserId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatAdultExpiryDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"ChatAdultExpiryDaemon.runOnce ()");
 
 		) {
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			ChatSchemeRec chatScheme =
@@ -133,13 +122,14 @@ class ChatAdultExpiryDaemon
 
 			String chatUserPath =
 				objectManager.objectPath (
+					transaction,
 					chatUser);
 
 			// make sure adult expiry is set
 
 			if (chatUser.getAdultExpiry () == null) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Skipped adult expiry for %s ",
 					chatUserPath,
 					"(field is null)");
@@ -156,7 +146,7 @@ class ChatAdultExpiryDaemon
 					chatUser.getAdultExpiry ())
 			) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Skipped adult expiry for %s ",
 					chatUserPath,
 					"(time is in future)");
@@ -165,7 +155,7 @@ class ChatAdultExpiryDaemon
 
 			}
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Performing adult expiry for %s (time is %s)",
 				chatUserPath,
 				chatUser.getAdultExpiry ().toString ());
@@ -177,19 +167,19 @@ class ChatAdultExpiryDaemon
 
 			if (chatUser.getBlockAll ()) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Not sending adult expiry message to %s due to block all",
 					chatUserPath);
 
 			} else if (chatUser.getNumber () == null) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Not sending adult expiry message to %s due to deletion",
 					chatUserPath);
 
 			} else if (chatUser.getChatScheme () == null) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Not sending adult expiry message to %s ",
 					chatUserPath,
 					"due to lack of scheme");
@@ -201,7 +191,7 @@ class ChatAdultExpiryDaemon
 				if (chatScheme.getRbFreeRouter () != null) {
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalAbsent (),
 						"adult_expiry",
@@ -210,7 +200,7 @@ class ChatAdultExpiryDaemon
 
 				} else {
 
-					taskLogger.warningFormat (
+					transaction.warningFormat (
 						"Not sending adult expiry to %s ",
 						chatUserPath,
 						"as no route is configured");

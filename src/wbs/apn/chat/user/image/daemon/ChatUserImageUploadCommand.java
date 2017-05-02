@@ -18,10 +18,10 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -122,19 +122,16 @@ class ChatUserImageUploadCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			MessageRec messageIn =
 				inbox.getMessage ();
@@ -142,21 +139,24 @@ class ChatUserImageUploadCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					messageIn);
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// generate token and url
@@ -173,18 +173,20 @@ class ChatUserImageUploadCommand
 
 			CommandRec magicCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"magic");
 
 			CommandRec helpCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"help");
 
 			MessageRec messageOut =
 				optionalGetRequired (
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							messageIn.getThreadId ()),
@@ -199,7 +201,7 @@ class ChatUserImageUploadCommand
 			// save token in database
 
 			chatUserImageUploadTokenHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserImageUploadTokenHelper.createInstance ()
 
 				.setChatUser (
@@ -236,7 +238,7 @@ class ChatUserImageUploadCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

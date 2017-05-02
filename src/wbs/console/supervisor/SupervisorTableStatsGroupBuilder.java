@@ -4,6 +4,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.console.reporting.StatsFormatter;
@@ -11,17 +13,28 @@ import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsResolver;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorTableStatsGroupBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorTableStatsGroupBuilder {
+class SupervisorTableStatsGroupBuilder
+	implements BuilderComponent {
+
+	// singleton depdedencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -48,77 +61,90 @@ class SupervisorTableStatsGroupBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		SupervisorConfigBuilder supervisorConfigBuilder =
-			supervisorTablePartBuilder.supervisorConfigBuilder;
+		try (
 
-		statsGrouper =
-			supervisorConfigBuilder.statsGroupersByName ().get (
-				spec.grouperName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		if (statsGrouper == null) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Stats grouper %s does not exist",
-					spec.grouperName ()));
+			SupervisorConfigBuilder supervisorConfigBuilder =
+				supervisorTablePartBuilder.supervisorConfigBuilder;
 
-		}
+			statsGrouper =
+				supervisorConfigBuilder.statsGroupersByName ().get (
+					spec.grouperName ());
 
-		statsResolver =
-			supervisorConfigBuilder.statsResolversByName ().get (
-				spec.resolverName ());
+			if (statsGrouper == null) {
 
-		if (statsResolver == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Stats resolver %s does not exist",
-					spec.resolverName ()));
-
-		}
-
-		statsFormatter =
-			supervisorConfigBuilder.statsFormattersByName ().get (
-				spec.formatterName ());
-
-		if (statsFormatter == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Stats formatter %s does not exist",
-					spec.formatterName ()));
-
-		}
-
-		Provider <PagePart> pagePartFactory =
-			new Provider <PagePart> () {
-
-			@Override
-			public
-			PagePart get () {
-
-				return supervisorTableStatsGroupPartProvider.get ()
-
-					.statsGrouper (
-						statsGrouper)
-
-					.statsResolver (
-						statsResolver)
-
-					.statsFormatter (
-						statsFormatter);
+				throw new RuntimeException (
+					stringFormat (
+						"Stats grouper %s does not exist",
+						spec.grouperName ()));
 
 			}
 
-		};
+			statsResolver =
+				supervisorConfigBuilder.statsResolversByName ().get (
+					spec.resolverName ());
 
-		supervisorTablePartBuilder.pagePartFactories ()
-			.add (pagePartFactory);
+			if (statsResolver == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Stats resolver %s does not exist",
+						spec.resolverName ()));
+
+			}
+
+			statsFormatter =
+				supervisorConfigBuilder.statsFormattersByName ().get (
+					spec.formatterName ());
+
+			if (statsFormatter == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Stats formatter %s does not exist",
+						spec.formatterName ()));
+
+			}
+
+			Provider <PagePart> pagePartFactory =
+				new Provider <PagePart> () {
+
+				@Override
+				public
+				PagePart get () {
+
+					return supervisorTableStatsGroupPartProvider.get ()
+
+						.statsGrouper (
+							statsGrouper)
+
+						.statsResolver (
+							statsResolver)
+
+						.statsFormatter (
+							statsFormatter);
+
+				}
+
+			};
+
+			supervisorTablePartBuilder.pagePartFactories ()
+				.add (pagePartFactory);
+
+		}
 
 	}
 

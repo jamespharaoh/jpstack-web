@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHelperImplementation <
@@ -8,6 +9,7 @@ interface ObjectHelperImplementation <
 > {
 
 	void objectManager (
+			TaskLogger parentTaskLogger,
 			ObjectManager objectManager);
 
 	ObjectHelperChildrenImplementation <RecordType> childrenImplementation ();

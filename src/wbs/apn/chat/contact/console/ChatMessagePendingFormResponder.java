@@ -33,8 +33,9 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
@@ -70,34 +71,47 @@ class ChatMessagePendingFormResponder
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatMessage =
-			chatMessageHelper.findFromContextRequired ();
+		try (
 
-		chatHelpTemplates =
-			chatHelpTemplateHelper.findByParentAndType (
-				chatMessage.getFromUser ().getChat (),
-				"reject_message");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatMessage =
+				chatMessageHelper.findFromContextRequired (
+					transaction);
+
+			chatHelpTemplates =
+				chatHelpTemplateHelper.findByParentAndType (
+					transaction,
+					chatMessage.getFromUser ().getChat (),
+					"reject_message");
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			// script open
 
@@ -245,193 +259,204 @@ class ChatMessagePendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingOneWrite (
-			"Chat message to approve");
+		try (
 
-		requestContext.flushNotices (
-			formatWriter);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/chatMessage.pending",
-					"/%u",
-					integerToDecimalString (
-						chatMessage.getId ()),
-					"/chatMessage.pending.form")));
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"chat_message_id\"",
-			" value=\"%h\"",
-			integerToDecimalString (
-				chatMessage.getId ()),
-			">");
-
-		// table open
-
-		htmlTableOpenDetails ();
-
-		// options
-
-		htmlTableDetailsRowWriteHtml (
-			"Options",
-			() -> {
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" value=\"original message\"",
-				" onclick=\"showMessage (originalMessage);\"",
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" value=\"edited message\"",
-				" onclick=\"showMessage (editedMessage);\"",
-				">");
-		});
-
-		// template
-
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"helpRow"),
-			htmlStyleRuleEntry (
-				"display",
-				"none"));
-
-		htmlTableHeaderCellWrite (
-			"Template");
-
-		htmlTableCellOpen ();
-
-		htmlSelectOpen (
-			htmlIdAttribute (
-				"templateId"));
-
-		htmlOptionWrite ();
-
-		for (
-			ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates
 		) {
 
-			htmlOptionWrite (
+			htmlHeadingOneWrite (
+				"Chat message to approve");
+
+			requestContext.flushNotices (
+				formatWriter);
+
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrl (
+					stringFormat (
+						"/chatMessage.pending",
+						"/%u",
+						integerToDecimalString (
+							chatMessage.getId ()),
+						"/chatMessage.pending.form")));
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"chat_message_id\"",
+				" value=\"%h\"",
 				integerToDecimalString (
-					chatHelpTemplate.getId ()),
-				chatHelpTemplate.getCode ());
+					chatMessage.getId ()),
+				">");
 
-		}
+			// table open
 
-		htmlSelectClose ();
+			htmlTableOpenDetails ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"button\"",
-			" onclick=\"useTemplate ()\"",
-			" value=\"ok\"",
-			">");
+			// options
 
-		htmlTableCellClose ();
+			htmlTableDetailsRowWriteHtml (
+				"Options",
+				() -> {
 
-		htmlTableRowClose ();
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"button\"",
+					" value=\"original message\"",
+					" onclick=\"showMessage (originalMessage);\"",
+					">");
 
-		// message
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"button\"",
+					" value=\"edited message\"",
+					" onclick=\"showMessage (editedMessage);\"",
+					">");
+			});
 
-		htmlTableDetailsRowWriteHtml (
-			"Message",
-			() -> formatWriter.writeLineFormat (
-				"<textarea",
-				" id=\"message\"",
-				" name=\"message\"",
-				" rows=\"4\"",
-				" cols=\"48\"",
-				">%h</textarea>",
-				ifNull (
-					requestContext.parameterOrElse (
-						"message",
-						() -> chatMessage.getOriginalText ().getText ()))));
+			// template
 
-		// actions
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"helpRow"),
+				htmlStyleRuleEntry (
+					"display",
+					"none"));
 
-		htmlTableRowOpen ();
+			htmlTableHeaderCellWrite (
+				"Template");
 
-		htmlTableHeaderCellWrite (
-			"Actions");
+			htmlTableCellOpen ();
 
-		htmlTableCellOpen ();
+			htmlSelectOpen (
+				htmlIdAttribute (
+					"templateId"));
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" id=\"sendButton\"",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send as shown\"",
-			">");
+			htmlOptionWrite ();
 
-		if (
-			isNotNull (
-				requestContext.request (
-					"showSendWithoutApproval"))
-		) {
+			for (
+				ChatHelpTemplateRec chatHelpTemplate
+					: chatHelpTemplates
+			) {
+
+				htmlOptionWrite (
+					integerToDecimalString (
+						chatHelpTemplate.getId ()),
+					chatHelpTemplate.getCode ());
+
+			}
+
+			htmlSelectClose ();
 
 			formatWriter.writeLineFormat (
 				"<input",
-				" id=\"sendWithoutApprovalButton\"",
-				" type=\"submit\"",
-				" name=\"sendWithoutApproval\"",
-				" value=\"send as shown (no warning)\"",
+				" type=\"button\"",
+				" onclick=\"useTemplate ()\"",
+				" value=\"ok\"",
 				">");
 
-		}
+			htmlTableCellClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" id=\"rejectButton\"",
-			" style=\"display: none\"",
-			" type=\"submit\"",
-			" name=\"reject\"",
-			" value=\"reject and send warning\"",
-			">");
+			htmlTableRowClose ();
 
-		htmlTableCellClose ();
+			// message
 
-		htmlTableRowClose ();
+			htmlTableDetailsRowWriteHtml (
+				"Message",
+				() -> formatWriter.writeLineFormat (
+					"<textarea",
+					" id=\"message\"",
+					" name=\"message\"",
+					" rows=\"4\"",
+					" cols=\"48\"",
+					">%h</textarea>",
+					ifNull (
+						requestContext.parameterOrElse (
+							"message",
+							() -> chatMessage.getOriginalText ().getText ()))));
 
-		// table close
+			// actions
 
-		htmlTableClose ();
+			htmlTableRowOpen ();
 
-		// script
+			htmlTableHeaderCellWrite (
+				"Actions");
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"reject"))
-		) {
-
-			htmlScriptBlockOpen ();
-
-			formatWriter.writeLineFormat (
-				"showReject ();");
+			htmlTableCellOpen ();
 
 			formatWriter.writeLineFormat (
-				"document.getElementById ('message').value = '%j';",
-				requestContext.parameterRequired (
-					"message"));
+				"<input",
+				" id=\"sendButton\"",
+				" type=\"submit\"",
+				" name=\"send\"",
+				" value=\"send as shown\"",
+				">");
+
+			if (
+				isNotNull (
+					requestContext.request (
+						"showSendWithoutApproval"))
+			) {
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" id=\"sendWithoutApprovalButton\"",
+					" type=\"submit\"",
+					" name=\"sendWithoutApproval\"",
+					" value=\"send as shown (no warning)\"",
+					">");
+
+			}
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" id=\"rejectButton\"",
+				" style=\"display: none\"",
+				" type=\"submit\"",
+				" name=\"reject\"",
+				" value=\"reject and send warning\"",
+				">");
+
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
+
+			// table close
+
+			htmlTableClose ();
+
+			// script
+
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"reject"))
+			) {
+
+				htmlScriptBlockOpen ();
+
+				formatWriter.writeLineFormat (
+					"showReject ();");
+
+				formatWriter.writeLineFormat (
+					"document.getElementById ('message').value = '%j';",
+					requestContext.parameterRequired (
+						"message"));
+
+				htmlScriptBlockClose ();
+
+			}
+
+			// form close
 
 			htmlScriptBlockClose ();
 
 		}
-
-		// form close
-
-		htmlScriptBlockClose ();
 
 	}
 

@@ -33,8 +33,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -86,40 +87,52 @@ class ChatUserImageListPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		type =
-			toEnum (
-				ChatUserImageType.class,
-				requestContext.stuffString (
-					"chatUserImageType"));
+		try (
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		switch (type) {
+		) {
 
-		case image:
+			type =
+				toEnum (
+					ChatUserImageType.class,
+					requestContext.stuffString (
+						"chatUserImageType"));
 
-			chatUserImages =
-				chatUser.getChatUserImageList ();
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			break;
+			switch (type) {
 
-		case video:
+			case image:
 
-			chatUserImages =
-				chatUser.getChatUserVideoList ();
+				chatUserImages =
+					chatUser.getChatUserImageList ();
 
-			break;
+				break;
 
-		default:
+			case video:
 
-			throw new RuntimeException (
-				stringFormat (
-					"Unknown chat user image type: %s",
-					enumNameSpaces (
-						type)));
+				chatUserImages =
+					chatUser.getChatUserVideoList ();
+
+				break;
+
+			default:
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unknown chat user image type: %s",
+						enumNameSpaces (
+							type)));
+
+			}
 
 		}
 
@@ -128,13 +141,13 @@ class ChatUserImageListPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -217,7 +230,7 @@ class ChatUserImageListPart
 					() -> ifNotNullThenElse (
 						chatUserImage.getMedia (),
 						() -> mediaConsoleLogic.writeMediaThumb100 (
-							taskLogger,
+							transaction,
 							chatUserImage.getMedia ()),
 						() -> formatWriter.writeLineFormat (
 							"(none)")));
@@ -226,12 +239,15 @@ class ChatUserImageListPart
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithoutTimezoneString (
+						transaction,
 						chatUserImage.getTimestamp ()));
 
 				htmlTableCellWrite (
 					objectManager.objectPathMini (
+						transaction,
 						chatUserImage.getModerator (),
-						userConsoleLogic.sliceRequired ()));
+						userConsoleLogic.sliceRequired (
+							transaction)));
 
 				htmlTableCellWrite (
 					chatUserImage.getClassification ());

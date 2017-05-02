@@ -14,8 +14,9 @@ import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.model.EventRec;
 
@@ -39,16 +40,16 @@ class EventDetailsFormFieldInterfaceMapping
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull EventRec container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <EventRec> genericValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"genericToInterface");
 
 		) {
@@ -57,7 +58,7 @@ class EventDetailsFormFieldInterfaceMapping
 				formatWriterConsumerToString (
 					formatWriter ->
 						eventConsoleLogic.writeEventHtml (
-							taskLogger,
+							transaction,
 							formatWriter,
 							genericValue.get ())));
 

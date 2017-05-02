@@ -2,12 +2,10 @@ package wbs.test.fixtures;
 
 import lombok.extern.log4j.Log4j;
 
-import wbs.apn.chat.contact.model.ChatContactObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.priv.model.PrivObjectHelper;
@@ -16,6 +14,7 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivObjectHelper;
+
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
@@ -24,9 +23,14 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.sms.route.sender.model.SenderObjectHelper;
+
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
+
+import wbs.apn.chat.contact.model.ChatContactObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 
 @Log4j
 @SuppressWarnings ("unused")

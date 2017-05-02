@@ -20,8 +20,9 @@ import wbs.console.part.PagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePart")
@@ -45,13 +46,13 @@ class SupervisorTablePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -70,11 +71,11 @@ class SupervisorTablePart
 					pagePartFactory.get ();
 
 				pagePart.setup (
-					taskLogger,
+					transaction,
 					parameters);
 
 				pagePart.prepare (
-					taskLogger);
+					transaction);
 
 				pagePartsBuilder.add (
 					pagePart);
@@ -91,13 +92,13 @@ class SupervisorTablePart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContent");
 
 		) {
@@ -108,7 +109,7 @@ class SupervisorTablePart
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -119,13 +120,13 @@ class SupervisorTablePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -138,7 +139,7 @@ class SupervisorTablePart
 			) {
 
 				pagePart.renderHtmlBodyContent (
-					taskLogger);
+					transaction);
 
 			}
 

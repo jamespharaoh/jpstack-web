@@ -1,5 +1,6 @@
 package wbs.console.notice;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.ArrayList;
@@ -53,6 +54,26 @@ class ConsoleNotices {
 		}
 
 		notices.clear ();
+
+	}
+
+	public
+	void flushOrNoticeFormat (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String ... arguments) {
+
+		if (
+			collectionIsEmpty (
+				notices)
+		) {
+
+			noticeFormat (
+				arguments);
+
+		}
+
+		flush (
+			formatWriter);
 
 	}
 

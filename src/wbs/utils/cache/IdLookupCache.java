@@ -15,21 +15,25 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.etc.SafeCloseable;
+
+@PrototypeComponent ("idLookupCache")
 @Accessors (fluent = true)
 public
-class IdLookupCache <Key, Id, Value>
-	implements AdvancedCache <Key, Value> {
+class IdLookupCache <Context extends SafeCloseable, Key, Id, Value>
+	implements AdvancedCache <Context, Key, Value> {
 
 	private final static
 	LogContext logContext =
@@ -49,23 +53,26 @@ class IdLookupCache <Key, Id, Value>
 
 	// properties
 
-	@Getter @Setter
+	@Setter
 	Boolean assumeNegatives;
 
-	@Getter @Setter
+	@Setter
 	Boolean cacheNegatives;
 
-	@Getter @Setter
-	Function <Key, Optional <Value>> lookupByKeyFunction;
+	@Setter
+	BiFunction <Context, Key, Optional <Value>> lookupByKeyFunction;
 
-	@Getter @Setter
-	Function <Id, Optional <Value>> lookupByIdFunction;
+	@Setter
+	BiFunction <Context, Id, Optional <Value>> lookupByIdFunction;
 
-	@Getter @Setter
+	@Setter
 	Function <Value, Id> getIdFunction;
 
-	@Getter @Setter
-	BiFunction <TaskLogger, Key, Value> createFunction;
+	@Setter
+	BiFunction <Context, Key, Value> createFunction;
+
+	@Setter
+	BiFunction <Pair <LogContext, String>, Context, Context> wrapperFunction;
 
 	// state
 
@@ -92,91 +99,97 @@ class IdLookupCache <Key, Id, Value>
 	@Override
 	public
 	Optional <Value> find (
+			@NonNull Context parentContext,
 			@NonNull Key key) {
 
-		// first try the cache
+		try (
 
-		Optional <Id> cachedId =
-			idCache.getIfPresent (
-				key);
+			Context context =
+				wrapperFunction.apply (
+					Pair.of (logContext, "find"),
+					parentContext);
 
-		if (
-			isNotNull (
-				cachedId)
 		) {
 
+			// first try the cache
+
+			Optional <Id> cachedIdOptional =
+				idCache.getIfPresent (
+					key);
+
 			if (
-				optionalIsPresent (
-					cachedId)
+				isNotNull (
+					cachedIdOptional)
 			) {
 
-				return lookupByIdFunction.apply (
-					cachedId.get ());
+				return optionalMapOptional (
+					cachedIdOptional,
+					cachedId ->
+						lookupByIdFunction.apply (
+							context,
+							cachedId));
 
-			} else {
+			} else if (assumeNegatives) {
 
-				return Optional.absent ();
+				return optionalAbsent ();
 
 			}
 
-		} else if (assumeNegatives) {
+			// lookup by key and store in cache
 
-			return optionalAbsent ();
+			Optional <Value> valueOptional =
+				lookupByKeyFunction.apply (
+					context,
+					key);
+
+			if (cacheNegatives) {
+
+				idCache.put (
+					key,
+					optionalMapOptional (
+						valueOptional,
+						value ->
+							Optional.of (
+								getIdFunction.apply (
+									value))));
+
+			} else if (
+				optionalIsPresent (
+					valueOptional)
+			) {
+
+				idCache.put (
+					key,
+					Optional.of (
+						getIdFunction.apply (
+							valueOptional.get ())));
+
+			}
+
+			return valueOptional;
 
 		}
-
-		// lookup by key and store in cache
-
-		Optional <Value> valueOptional =
-			lookupByKeyFunction.apply (
-				key);
-
-		if (cacheNegatives) {
-
-			idCache.put (
-				key,
-				optionalMapOptional (
-					valueOptional,
-					value ->
-						Optional.of (
-							getIdFunction.apply (
-								value))));
-
-		} else if (
-			optionalIsPresent (
-				valueOptional)
-		) {
-
-			idCache.put (
-				key,
-				Optional.of (
-					getIdFunction.apply (
-						valueOptional.get ())));
-
-		}
-
-		return valueOptional;
 
 	}
 
 	@Override
 	public
 	Value create (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Context parentContext,
 			@NonNull Key key) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"create");
+			Context context =
+				wrapperFunction.apply (
+					Pair.of (logContext, "create"),
+					parentContext);
 
 		) {
 
 			Value value =
 				createFunction.apply (
-					taskLogger,
+					context,
 					key);
 
 			Id id =
@@ -197,20 +210,21 @@ class IdLookupCache <Key, Id, Value>
 	@Override
 	public
 	Value findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Context parentContext,
 			@NonNull Key key) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"findOrCreate");
+			Context context =
+				wrapperFunction.apply (
+					Pair.of (logContext, "findOrCreate"),
+					parentContext);
 
 		) {
 
 			Optional <Value> valueOptional =
 				find (
+					context,
 					key);
 
 			if (
@@ -224,7 +238,7 @@ class IdLookupCache <Key, Id, Value>
 			} else {
 
 				return create (
-					taskLogger,
+					context,
 					key);
 
 			}

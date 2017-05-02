@@ -22,6 +22,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
+import wbs.console.notice.ConsoleNotices;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -33,6 +34,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -64,6 +66,9 @@ class ChatUserImageListAction
 	MediaLogic mediaLogic;
 
 	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// details
@@ -92,25 +97,22 @@ class ChatUserImageListAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		String notice = null;
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserImageListAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			ConsoleNotices notices =
+				new ConsoleNotices ();
+
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			ChatUserImageType type =
 				toEnum (
@@ -196,8 +198,8 @@ class ChatUserImageListAction
 
 					}
 
-					notice =
-						"Image/video removed";
+					notices.noticeFormat (
+						"Image/video removed");
 
 				}
 
@@ -221,12 +223,12 @@ class ChatUserImageListAction
 
 					BufferedImage smallImage =
 						mediaLogic.getImageRequired (
-							taskLogger,
+							transaction,
 							chatUserImage.getMedia ());
 
 					BufferedImage fullImage =
 						mediaLogic.getImageRequired (
-							taskLogger,
+							transaction,
 							chatUserImage.getFullMedia ());
 
 					if (
@@ -236,11 +238,11 @@ class ChatUserImageListAction
 					) {
 
 						smallImage =
-							mediaLogic.rotateImage270 (
+							rawMediaLogic.rotateImage270 (
 								smallImage);
 
 						fullImage =
-							mediaLogic.rotateImage270 (
+							rawMediaLogic.rotateImage270 (
 								fullImage);
 
 					}
@@ -252,10 +254,12 @@ class ChatUserImageListAction
 					) {
 
 						smallImage =
-							mediaLogic.rotateImage90 (smallImage);
+							rawMediaLogic.rotateImage90 (
+								smallImage);
 
 						fullImage =
-							mediaLogic.rotateImage90 (fullImage);
+							rawMediaLogic.rotateImage90 (
+								fullImage);
 
 					}
 
@@ -264,20 +268,20 @@ class ChatUserImageListAction
 
 					chatUserImage.setMedia (
 						mediaLogic.createMediaFromImage (
-							taskLogger,
+							transaction,
 							smallImage,
 							"image/jpeg",
 							filename));
 
 					chatUserImage.setFullMedia (
 						mediaLogic.createMediaFromImage (
-							taskLogger,
+							transaction,
 							fullImage,
 							"image/jpeg",
 							filename));
 
-					notice =
-						"Image/video rotated";
+					notices.noticeFormat (
+						"Image/video rotated");
 
 				}
 
@@ -323,8 +327,8 @@ class ChatUserImageListAction
 					otherImage.setIndex (
 						index);
 
-					notice =
-						"Image/video moved";
+					notices.noticeFormat (
+						"Image/video moved");
 
 				}
 
@@ -354,8 +358,8 @@ class ChatUserImageListAction
 							type,
 							Optional.absent ());
 
-						notice =
-							"Image unselected";
+						notices.noticeFormat (
+							"Image unselected");
 
 					} else {
 
@@ -365,8 +369,8 @@ class ChatUserImageListAction
 							Optional.of (
 								chatUserImage));
 
-						notice =
-							"Image selected";
+						notices.noticeFormat (
+							"Image selected");
 
 					}
 
@@ -376,12 +380,8 @@ class ChatUserImageListAction
 
 			transaction.commit ();
 
-			if (notice != null) {
-
-				requestContext.addNotice (
-					notice);
-
-			}
+			requestContext.addNotices (
+				notices);
 
 			return null;
 

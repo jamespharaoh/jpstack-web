@@ -90,16 +90,11 @@ class ComshenApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"reportFile.doGet");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"ComshenApiServletModule.reportFile.doGet ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"reportFile.doGet");
 
 			) {
 
@@ -121,6 +116,7 @@ class ComshenApiServletModule
 
 				RouteRec route =
 					routeHelper.findRequired (
+						transaction,
 						routeId);
 
 				MessageStatus result =
@@ -130,7 +126,7 @@ class ComshenApiServletModule
 				// process delivery report
 
 				reportLogic.deliveryReport (
-					taskLogger,
+					transaction,
 					route,
 					idParam,
 					result,

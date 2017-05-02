@@ -1,7 +1,10 @@
 package wbs.apn.chat.ad.daemon;
 
+import static wbs.utils.collection.CollectionUtils.iterableFirstElementRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.List;
@@ -102,58 +105,46 @@ class ChatAdultAdDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					parentTaskLogger,
-					"runOnce");
+					"ChatAdultAdDaemon.runOnce ()");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Looking for users to send an adult ad to");
 
-			// get a list of users who have passed their ad time
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findWantingAdultAd (
+					transaction,
+					transaction.now ());
 
-			try (
+			transaction.close ();
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"ChatAdultAdDaemon.runOnce ()",
-						this);
+			// then call doAdultAd for each one
 
+			for (
+				ChatUserRec chatUser
+					: chatUsers
 			) {
 
-				List <ChatUserRec> chatUsers =
-					chatUserHelper.findWantingAdultAd (
-						transaction.now ());
+				try {
 
-				transaction.close ();
+					doAdultAd (
+						transaction,
+						chatUser.getId ());
 
-				// then call doAdultAd for each one
+				} catch (Exception exception) {
 
-				for (
-					ChatUserRec chatUser
-						: chatUsers
-				) {
-
-					try {
-
-						doAdultAd (
-							taskLogger,
-							chatUser.getId ());
-
-					} catch (Exception exception) {
-
-						exceptionLogger.logThrowable (
-							taskLogger,
-							"daemon",
-							"ChatAdDaemon",
-							exception,
-							Optional.absent (),
-							GenericExceptionResolution.tryAgainLater);
-
-					}
+					exceptionLogger.logThrowable (
+						transaction,
+						"daemon",
+						"ChatAdDaemon",
+						exception,
+						Optional.absent (),
+						GenericExceptionResolution.tryAgainLater);
 
 				}
 
@@ -170,20 +161,15 @@ class ChatAdultAdDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"doAdultAd");
 
-			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ChatAdultAdDaemon.doAdultAd (chatUserId)",
-					this);
-
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Attempting to send adult ad to %s",
 				integerToDecimalString (
 					chatUserId));
@@ -192,6 +178,7 @@ class ChatAdultAdDaemon
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			ChatRec chat =
@@ -209,9 +196,10 @@ class ChatAdultAdDaemon
 
 			if (chat.getAdultAdsChat () == null) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Skipping adult ad to %s (no adult ads on this service)",
 					objectManager.objectPath (
+						transaction,
 						chatUser));
 
 				chatUser
@@ -225,22 +213,34 @@ class ChatAdultAdDaemon
 
 			}
 
-			ChatUserRec userOnAdultService =
+			Optional <ChatUserRec> userOnAdultService =
 				chatUserDao.find (
+					transaction,
 					chat.getAdultAdsChat (),
 					chatUser.getNumber ());
 
 			if (
-				userOnAdultService != null
-				&& userOnAdultService.getFirstJoin () != null
+
+				optionalIsPresent (
+					userOnAdultService)
+
+				&& isNotNull (
+					userOnAdultService.get ().getFirstJoin ())
+
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Skipping adult ad to %s (already on adult service)",
 					objectManager.objectPath (
+						transaction,
 						chatUser));
 
-				chatUser.setNextAdultAd (null);
+				chatUser
+
+					.setNextAdultAd (
+						null)
+
+				;
 
 				transaction.commit ();
 
@@ -250,14 +250,15 @@ class ChatAdultAdDaemon
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser);
 
 			if (creditCheckResult.failed ()) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Skipping adult ad to %s (%s)",
 					objectManager.objectPath (
+						transaction,
 						chatUser),
 					creditCheckResult.details ());
 
@@ -274,9 +275,10 @@ class ChatAdultAdDaemon
 
 			if (chatUser.getFirstJoin () == null) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Skipping adult ad to %s (never fully joined)",
 					objectManager.objectPath (
+						transaction,
 						chatUser));
 
 				chatUser.setNextAdultAd (null);
@@ -322,21 +324,25 @@ class ChatAdultAdDaemon
 
 			ChatHelpTemplateRec template =
 				chatHelpTemplateHelper.findByTypeAndCode (
+					transaction,
 					chat,
 					"system",
 					templateCode);
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Sending adult ad to %s: %s",
 				objectManager.objectPath (
+					transaction,
 					chatUser),
 				template.getText ());
 
 			ChatSchemeRec adultScheme =
-				chat.getAdultAdsChat ().getChatSchemes ().iterator ().next ();
+				iterableFirstElementRequired (
+					chat.getAdultAdsChat ().getChatSchemes ());
 
 			ServiceRec systemService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"system");
 
@@ -346,20 +352,21 @@ class ChatAdultAdDaemon
 					chatUser.getNumber ())
 
 				.messageString (
-					taskLogger,
+					transaction,
 					template.getText ())
 
 				.numFrom (
 					adultScheme.getRbNumber ())
 
 				.routerResolve (
+					transaction,
 					adultScheme.getRbFreeRouter ())
 
 				.service (
 					systemService)
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// clear his next ad time
 

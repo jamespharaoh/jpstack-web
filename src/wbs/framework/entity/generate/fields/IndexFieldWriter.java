@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.IndexFieldSpec;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("indexFieldWriter")
@@ -47,11 +48,11 @@ class IndexFieldWriter
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");

@@ -70,23 +70,19 @@ class ChatUserImageUploadPostAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserImageUploadPostAction.goApi ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
 			ChatUserImageUploadTokenRec imageUploadToken =
 				chatUserImageUploadTokenHelper.findByToken (
+					transaction,
 					requestContext.requestStringRequired (
 						"chatUserImageUploadToken"));
 
@@ -118,7 +114,7 @@ class ChatUserImageUploadPostAction
 				transaction.commit ();
 
 				return responder (
-					taskLogger,
+					transaction,
 					"chatUserImageUploadExpiredPage");
 
 			}
@@ -160,7 +156,7 @@ class ChatUserImageUploadPostAction
 
 				}
 
-				if (taskLogger.debugEnabled ()) {
+				if (transaction.debugEnabled ()) {
 
 					try {
 
@@ -173,7 +169,7 @@ class ChatUserImageUploadPostAction
 							filename,
 							fileItem.get ());
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Written %s bytes to temporary file %s",
 							integerToDecimalString (
 								fileItem.get ().length),
@@ -181,7 +177,7 @@ class ChatUserImageUploadPostAction
 
 					} catch (Exception exception) {
 
-						taskLogger.debugFormatException (
+						transaction.debugFormatException (
 							exception,
 							"Error writing image data to debug file");
 
@@ -190,7 +186,7 @@ class ChatUserImageUploadPostAction
 				}
 
 				chatUserLogic.setImage (
-					taskLogger,
+					transaction,
 					imageUploadToken.getChatUser (),
 					ChatUserImageType.image,
 					fileItem.get (),
@@ -220,7 +216,7 @@ class ChatUserImageUploadPostAction
 				transaction.commit ();
 
 				return responder (
-					taskLogger,
+					transaction,
 					"chatUserImageUploadSuccessPage");
 
 			} catch (Exception exception) {
@@ -228,51 +224,69 @@ class ChatUserImageUploadPostAction
 				// log exception
 
 				exceptionLogger.logThrowable (
-					taskLogger,
+					transaction,
 					"webapi",
 					requestContext.requestPath (),
 					exception,
 					optionalAbsent (),
 					GenericExceptionResolution.ignoreWithUserWarning);
 
-				// start new transaction
-
-				try (
-
-					OwnedTransaction errorTransaction =
-						database.beginReadWrite (
-							taskLogger,
-							"ChatUserImageUploadPostAction.goApi ()",
-							this);
-
-				) {
-
-					// update token
-
-					imageUploadToken
-
-						.setFirstFailedTime (
-							imageUploadToken.getFirstFailedTime () != null
-								? imageUploadToken.getFirstFailedTime ()
-								: transaction.now ())
-
-						.setLastFailedTime (
-							transaction.now ())
-
-						.setNumFailures (
-							imageUploadToken.getNumFailures () + 1);
-
-					// commit and show error page
-
-					errorTransaction.commit ();
-
-					return responder (
-						taskLogger,
-						"chatUserImageUploadErrorPage");
-
-				}
+				return handleException (
+					transaction,
+					exception,
+					imageUploadToken.getId ());
 
 			}
+
+		}
+
+	}
+
+	private
+	Responder handleException (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Exception exception,
+			@NonNull Long tokenId) {
+
+		// start new transaction
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
+					parentTaskLogger,
+					"handleException");
+
+		) {
+
+			// update token
+
+			ChatUserImageUploadTokenRec imageUploadToken =
+				chatUserImageUploadTokenHelper.findRequired (
+					transaction,
+					tokenId);
+
+			imageUploadToken
+
+				.setFirstFailedTime (
+					imageUploadToken.getFirstFailedTime () != null
+						? imageUploadToken.getFirstFailedTime ()
+						: transaction.now ())
+
+				.setLastFailedTime (
+					transaction.now ())
+
+				.setNumFailures (
+					imageUploadToken.getNumFailures () + 1);
+
+			// commit and show error page
+
+			transaction.commit ();
+
+			return responder (
+				transaction,
+				"chatUserImageUploadErrorPage");
 
 		}
 

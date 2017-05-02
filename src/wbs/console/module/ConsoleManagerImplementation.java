@@ -54,8 +54,11 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.exceptions.ExternalRedirectException;
@@ -202,7 +205,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"init");
@@ -258,7 +261,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectContextTypes");
@@ -329,7 +332,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectContextTabs");
@@ -392,7 +395,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"addTabsToContextTypes");
@@ -510,7 +513,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectContextFiles");
@@ -578,7 +581,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectContextTypeFiles");
@@ -675,7 +678,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"resolveContextTabs");
@@ -735,7 +738,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectConsoleContexts");
@@ -836,7 +839,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectContextsByParentType");
@@ -905,7 +908,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"collectSupervisorConfigs");
@@ -964,7 +967,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"dumpData");
@@ -1023,7 +1026,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"findResponders");
@@ -1103,7 +1106,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"paths");
@@ -1230,8 +1233,9 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					parentTaskLogger,
 					"changeContext");
 
@@ -1251,33 +1255,22 @@ class ConsoleManagerImplementation
 
 			contextStuff.reset ();
 
-			try (
+			context.initContext (
+				transaction,
+				pathParts,
+				contextStuff);
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"ConsoleManager.chatContext (...)",
-						this);
+			context.initTabContext (
+				contextStuff);
 
-			) {
+			transaction.close ();
 
-				context.initContext (
-					taskLogger,
-					pathParts,
-					contextStuff);
-
-				context.initTabContext (
-					contextStuff);
-
-				transaction.close ();
-
-				if (pathParts.size () > 0)
-					throw new RuntimeException ();
-
-				requestContext.consoleContext (
-					context);
-
+			if (pathParts.size () > 0) {
+				throw new RuntimeException ();
 			}
+
+			requestContext.consoleContext (
+				context);
 
 		}
 
@@ -1286,15 +1279,15 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	void runPostProcessors (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String name,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"runPostProcessors");
 
 		) {
@@ -1307,7 +1300,7 @@ class ConsoleManagerImplementation
 				consoleHelper.consoleHelperProvider ();
 
 			consoleHelperProvider.postProcess (
-				taskLogger,
+				transaction,
 				contextStuff);
 
 		}
@@ -1342,10 +1335,10 @@ class ConsoleManagerImplementation
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
-						"processPath");
+						"ContextPathHandler.processPath");
 
 			) {
 
@@ -1368,24 +1361,19 @@ class ConsoleManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String path) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"fileForPath");
-
-		taskLogger.debugFormat (
-			"processing path %s",
-			path);
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ConsoleManagerImplementation.fileForPath (path)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"fileForPath");
 
 		) {
+
+			transaction.debugFormat (
+				"processing path %s",
+				path);
 
 			PathSupply pathParts =
 				pathParts (path);
@@ -1409,7 +1397,7 @@ class ConsoleManagerImplementation
 
 			while (true) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"starting lap with context %s",
 					consoleContext.name ());
 
@@ -1427,19 +1415,19 @@ class ConsoleManagerImplementation
 							.embeddedParentContextTab (parentContextTab);
 
 					consoleContext.initContext (
-						taskLogger,
+						transaction,
 						pathParts,
 						contextStuff);
 
 					consoleContext.initTabContext (
 						contextStuff);
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"context initialised");
 
 					if (pathParts.size () == 0) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"no more path parts, looking up default file");
 
 						String defaultLocalFile =
@@ -1452,7 +1440,7 @@ class ConsoleManagerImplementation
 							|| defaultLocalFile.length () == 0
 						) {
 
-							taskLogger.errorFormat (
+							transaction.errorFormat (
 								"context %s has no default file",
 								consoleContext.name ());
 
@@ -1462,18 +1450,18 @@ class ConsoleManagerImplementation
 
 						}
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"got default file %s",
 							defaultLocalFile);
 
 						String defaultUrl =
 							resolveLocalFile (
-								taskLogger,
+								transaction,
 								contextStuff,
 								contextStuff.consoleContext (),
 								defaultLocalFile);
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"redirecting to \"%s\"",
 							defaultUrl);
 
@@ -1486,13 +1474,13 @@ class ConsoleManagerImplementation
 
 					if (pathParts.size () == 1) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"single path part left, looking up file");
 
 						String file =
 							pathParts.next ();
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"file name is %s",
 							file);
 
@@ -1509,7 +1497,7 @@ class ConsoleManagerImplementation
 
 						if (webFile == null) {
 
-							taskLogger.errorFormat (
+							transaction.errorFormat (
 								"context %s has no file %s",
 								consoleContext.name (),
 								file);
@@ -1520,7 +1508,7 @@ class ConsoleManagerImplementation
 
 						}
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"returning successful resolution");
 
 						return webFile;
@@ -1543,7 +1531,7 @@ class ConsoleManagerImplementation
 
 				// process links
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"multiple remaining path parts, assuming link");
 
 				String link =
@@ -1563,7 +1551,7 @@ class ConsoleManagerImplementation
 				String nextPathPart =
 					pathParts.next ();
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"context name from path \"%s\"",
 					nextPathPart);
 
@@ -1576,7 +1564,7 @@ class ConsoleManagerImplementation
 
 				if (consoleContext == null) {
 
-					taskLogger.errorFormat (
+					transaction.errorFormat (
 						"context not found \"%s\"",
 						contextName);
 
@@ -1618,7 +1606,7 @@ class ConsoleManagerImplementation
 
 				}
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"link complete");
 
 			}
@@ -1843,16 +1831,16 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	String resolveLocalFile (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff contextStuff,
 			@NonNull ConsoleContext consoleContext,
 			@NonNull String localFile) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"resolveLocalFile");
 
 		) {
@@ -1942,7 +1930,7 @@ class ConsoleManagerImplementation
 					contextStuff.foreignPath (),
 					targetContext.get ().pathPrefix (),
 					consoleContext.localPathForStuff (
-						taskLogger,
+						transaction,
 						contextStuff));
 
 			} else {
@@ -1952,7 +1940,7 @@ class ConsoleManagerImplementation
 					contextStuff.foreignPath (),
 					consoleContext.pathPrefix (),
 					consoleContext.localPathForStuff (
-						taskLogger,
+						transaction,
 						contextStuff),
 					"/",
 					contextStuff.substitutePlaceholders (
@@ -1974,7 +1962,7 @@ class ConsoleManagerImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"relatedContext");

@@ -14,30 +14,41 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("timestampFromFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TimestampFromFormFieldBuilder {
+class TimestampFromFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -93,143 +104,131 @@ class TimestampFromFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String fieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+		) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String name =
+				spec.name ();
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+			String fieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
 
-		// accessor and native mapping
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		Class <?> propertyClass =
-			optionalGetRequired (
-				objectManager.dereferenceType (
-					optionalOf (
-						context.containerClass ()),
-					optionalOf (
-						fieldName)));
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		FormFieldAccessor formFieldAccessor;
-		FormFieldNativeMapping formFieldNativeMapping;
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		if (propertyClass == Instant.class) {
+			// accessor and native mapping
 
-			formFieldAccessor =
-				dereferenceFormFieldAccessorProvider.get ()
+			Class <?> propertyClass =
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						taskLogger,
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							fieldName)));
 
-				.path (
-					fieldName)
+			FormFieldAccessor formFieldAccessor;
+			FormFieldNativeMapping formFieldNativeMapping;
 
-				.nativeClass (
-					Instant.class);
+			if (propertyClass == Instant.class) {
 
-			formFieldNativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				formFieldAccessor =
+					dereferenceFormFieldAccessorProvider.get ()
 
-		} else if (propertyClass == Date.class) {
+					.path (
+						fieldName)
 
-			formFieldAccessor =
-				dereferenceFormFieldAccessorProvider.get ()
+					.nativeClass (
+						Instant.class);
 
-				.path (
-					fieldName)
+				formFieldNativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
 
-				.nativeClass (
-					Date.class);
+			} else if (propertyClass == Date.class) {
 
-			formFieldNativeMapping =
-				dateFormFieldNativeMappingProvider.get ();
+				formFieldAccessor =
+					dereferenceFormFieldAccessorProvider.get ()
 
-		} else {
+					.path (
+						fieldName)
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map %s as timestamp for %s.%s",
-					classNameSimple (
-						propertyClass),
-					classNameSimple (
-						context.containerClass ()),
-					name));
+					.nativeClass (
+						Date.class);
 
-		}
+				formFieldNativeMapping =
+					dateFormFieldNativeMappingProvider.get ();
 
-		// value validator
+			} else {
 
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to map %s as timestamp for %s.%s",
+						classNameSimple (
+							propertyClass),
+						classNameSimple (
+							context.containerClass ()),
+						name));
 
-		if (! nullable) {
+			}
 
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+			// value validator
 
-		}
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-		// constraint validator
+			if (! nullable) {
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
 
-		// interface mapping
+			}
 
-		FormFieldInterfaceMapping interfaceMapping =
-			timestampFromFormFieldInterfaceMappingProvider.get ()
+			// constraint validator
 
-			.name (
-				name);
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
 
-		// renderer
+			// interface mapping
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+			FormFieldInterfaceMapping interfaceMapping =
+				timestampFromFormFieldInterfaceMappingProvider.get ()
 
-			.name (
-				name)
+				.name (
+					name);
 
-			.label (
-				label)
+			// renderer
 
-			.nullable (
-				nullable);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// form field
-
-		if (readOnly) {
-
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -237,53 +236,79 @@ class TimestampFromFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					formFieldAccessor)
+				.nullable (
+					nullable);
 
-				.nativeMapping (
-					formFieldNativeMapping)
+			// update hook
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.renderer (
-					renderer)
+			// form field
 
-			);
+			if (readOnly) {
 
-		} else {
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+					.name (
+						name)
 
-				.name (
-					name)
+					.label (
+						label)
 
-				.label (
-					label)
+					.accessor (
+						formFieldAccessor)
 
-				.accessor (
-					formFieldAccessor)
+					.nativeMapping (
+						formFieldNativeMapping)
 
-				.nativeMapping (
-					formFieldNativeMapping)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.valueValidators (
-					valueValidators)
+					.renderer (
+						renderer)
 
-				.constraintValidator (
-					constraintValidator)
+				);
 
-				.interfaceMapping (
-					interfaceMapping)
+			} else {
 
-				.renderer (
-					renderer)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-				.updateHook (
-					updateHook)
+					.name (
+						name)
 
-			);
+					.label (
+						label)
+
+					.accessor (
+						formFieldAccessor)
+
+					.nativeMapping (
+						formFieldNativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

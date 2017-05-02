@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 @PrototypeComponent ("identityFormFieldNativeMapping")
 public
@@ -15,6 +15,7 @@ class IdentityFormFieldNativeMapping <Container, Type>
 	@Override
 	public
 	Optional <Type> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Type> nativeValue) {
 
@@ -25,7 +26,7 @@ class IdentityFormFieldNativeMapping <Container, Type>
 	@Override
 	public
 	Optional <Type> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Type> genericValue) {
 

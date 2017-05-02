@@ -4,20 +4,23 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface ExceptionLogDaoMethods {
 
-	Long countWithAlert ();
+	Long countWithAlert (
+			Transaction parentTransaction);
 
-	Long countWithAlertAndFatal ();
+	Long countWithAlertAndFatal (
+			Transaction parentTransaction);
 
 	List <Long> searchIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ExceptionLogSearch search);
 
 	List <ExceptionLogRec> findOldLimit (
+			Transaction parentTransaction,
 			Instant cutoffTime,
 			Long maxResults);
 

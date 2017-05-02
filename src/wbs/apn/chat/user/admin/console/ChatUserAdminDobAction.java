@@ -74,8 +74,9 @@ class ChatUserAdminDobAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -113,45 +114,35 @@ class ChatUserAdminDobAction
 
 			}
 
-			try (
+			// lookup database stuff
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatUserAdminDobAction.goReal ()",
-						this);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			) {
+			// update chat user
 
-				// lookup database stuff
+			chatUser
 
-				ChatUserRec chatUser =
-					chatUserHelper.findFromContextRequired ();
+				.setDob (
+					dobLocalDate);
 
-				// update chat user
+			// create event
 
-				chatUser
+			eventLogic.createEvent (
+				transaction,
+				"chat_user_dob",
+				userConsoleLogic.userRequired (
+					transaction),
+				chatUser,
+				dobString);
 
-					.setDob (
-						dobLocalDate);
+			transaction.commit ();
 
-				// create event
+			requestContext.addNotice (
+				"Chat user date of birth updated");
 
-				eventLogic.createEvent (
-					taskLogger,
-					"chat_user_dob",
-					userConsoleLogic.userRequired (),
-					chatUser,
-					dobString);
-
-				transaction.commit ();
-
-				requestContext.addNotice (
-					"Chat user date of birth updated");
-
-				return null;
-
-			}
+			return null;
 
 		}
 

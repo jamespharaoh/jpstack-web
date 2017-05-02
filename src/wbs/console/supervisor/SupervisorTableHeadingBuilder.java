@@ -2,20 +2,34 @@ package wbs.console.supervisor;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorTableHeadingBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorTableHeadingBuilder {
+class SupervisorTableHeadingBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -35,29 +49,42 @@ class SupervisorTableHeadingBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		Provider <PagePart> pagePartFactory =
-			new Provider <PagePart> () {
+		try (
 
-			@Override
-			public
-			PagePart get () {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-				return supervisorTableHeadingPartProvider.get ()
+		) {
 
-					.supervisorTableHeadingSpec (
-						supervisorTableHeadingSpec);
+			Provider <PagePart> pagePartFactory =
+				new Provider <PagePart> () {
 
-			}
+				@Override
+				public
+				PagePart get () {
 
-		};
+					return supervisorTableHeadingPartProvider.get ()
 
-		supervisorTablePartBuilder.pagePartFactories ()
-			.add (pagePartFactory);
+						.supervisorTableHeadingSpec (
+							supervisorTableHeadingSpec);
+
+				}
+
+			};
+
+			supervisorTablePartBuilder.pagePartFactories ()
+				.add (pagePartFactory);
+
+		}
 
 	}
 

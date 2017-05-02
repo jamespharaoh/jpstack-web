@@ -11,8 +11,11 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import fj.data.Either;
 
@@ -22,35 +25,49 @@ class EnumCsvFormFieldInterfaceMapping <
 	Container,
 	Generic extends Enum <Generic>
 >
-	implements FormFieldInterfaceMapping <
-		Container,
-		Generic,
-		String
-	> {
+	implements FormFieldInterfaceMapping <Container, Generic, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Generic> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				optionalOf (
-					""));
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else {
+				return successResult (
+					optionalOf (
+						""));
 
-			return successResult (
-				optionalOf (
-					camelToHyphen (
-						genericValue.get ().toString ())));
+			} else {
+
+				return successResult (
+					optionalOf (
+						camelToHyphen (
+							genericValue.get ().toString ())));
+
+			}
 
 		}
 

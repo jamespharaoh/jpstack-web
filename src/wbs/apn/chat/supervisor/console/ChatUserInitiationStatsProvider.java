@@ -18,9 +18,12 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
@@ -41,134 +44,150 @@ class ChatUserInitiationStatsProvider
 	@SingletonDependency
 	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	StatsDataSet getStats (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 
-		if (period.granularity () != StatsGranularity.hour)
-			throw new IllegalArgumentException ();
+		try (
 
-		if (! conditions.containsKey ("chatId"))
-			throw new IllegalArgumentException ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getStats");
 
-		// setup data structures
-
-		Map <Long, long[]> alarmsPerUser =
-			new TreeMap<> ();
-
-		Set <Object> userIdObjects =
-			new HashSet <> ();
-
-		// retrieve messages
-
-		ChatRec chat =
-			chatHelper.findRequired (
-				(Long)
-				conditions.get (
-					"chatId"));
-
-		List <ChatUserInitiationLogRec> logs =
-			chatUserInitiationLogHelper.findByTimestamp (
-				chat,
-				period.toInterval ());
-
-		// aggregate stats
-
-		for (
-			ChatUserInitiationLogRec log
-				: logs
 		) {
 
-			if (log.getReason () != ChatUserInitiationReason.alarmSet)
-				continue;
+			if (period.granularity () != StatsGranularity.hour)
+				throw new IllegalArgumentException ();
 
-			if (log.getMonitorUser () == null)
-				continue;
+			if (! conditions.containsKey ("chatId"))
+				throw new IllegalArgumentException ();
 
-			// work out which hour
+			// setup data structures
 
-			Instant timestamp =
-				log.getTimestamp ();
+			Map <Long, long[]> alarmsPerUser =
+				new TreeMap<> ();
 
-			int hour =
-				period.assign (
-					timestamp);
+			Set <Object> userIdObjects =
+				new HashSet <> ();
 
-			// count alarms per user
+			// retrieve messages
 
-			if (! userIdObjects.contains (
-					log.getMonitorUser ().getId ())) {
+			ChatRec chat =
+				chatHelper.findRequired (
+					transaction,
+					(Long)
+					conditions.get (
+						"chatId"));
 
-				userIdObjects.add (
-					log.getMonitorUser ().getId ());
+			List <ChatUserInitiationLogRec> logs =
+				chatUserInitiationLogHelper.findByTimestamp (
+					transaction,
+					chat,
+					period.toInterval ());
 
-				alarmsPerUser.put (
-					log.getMonitorUser ().getId (),
-					new long [
-						toJavaIntegerRequired (
-							period.size ())]);
-
-			}
-
-			long[] userAlarms =
-				alarmsPerUser.get (
-					log.getMonitorUser ().getId ());
-
-			userAlarms [hour] ++;
-
-		}
-
-		// create return value
-
-		StatsDataSet statsDataSet =
-			new StatsDataSet ();
-
-		statsDataSet.indexValues ().put (
-			"userId",
-			userIdObjects);
-
-		for (
-			int hour = 0;
-			hour < period.size ();
-			hour ++
-		) {
+			// aggregate stats
 
 			for (
-				Object userIdObject
-					: userIdObjects
+				ChatUserInitiationLogRec log
+					: logs
 			) {
 
-				Long userId =
-					(Long) userIdObject;
+				if (log.getReason () != ChatUserInitiationReason.alarmSet)
+					continue;
 
-				statsDataSet.data ().add (
-					new StatsDatum ()
+				if (log.getMonitorUser () == null)
+					continue;
 
-					.startTime (
-						period.step (hour))
+				// work out which hour
 
-					.addIndex (
-						"chatId",
-						conditions.get ("chatId"))
+				Instant timestamp =
+					log.getTimestamp ();
 
-					.addIndex (
-						"userId",
-						userId)
+				int hour =
+					period.assign (
+						timestamp);
 
-					.addValue (
-						"alarmsSet",
-						alarmsPerUser.get (userId) [hour]));
+				// count alarms per user
+
+				if (! userIdObjects.contains (
+						log.getMonitorUser ().getId ())) {
+
+					userIdObjects.add (
+						log.getMonitorUser ().getId ());
+
+					alarmsPerUser.put (
+						log.getMonitorUser ().getId (),
+						new long [
+							toJavaIntegerRequired (
+								period.size ())]);
+
+				}
+
+				long[] userAlarms =
+					alarmsPerUser.get (
+						log.getMonitorUser ().getId ());
+
+				userAlarms [hour] ++;
 
 			}
 
-		}
+			// create return value
 
-		return statsDataSet;
+			StatsDataSet statsDataSet =
+				new StatsDataSet ();
+
+			statsDataSet.indexValues ().put (
+				"userId",
+				userIdObjects);
+
+			for (
+				int hour = 0;
+				hour < period.size ();
+				hour ++
+			) {
+
+				for (
+					Object userIdObject
+						: userIdObjects
+				) {
+
+					Long userId =
+						(Long) userIdObject;
+
+					statsDataSet.data ().add (
+						new StatsDatum ()
+
+						.startTime (
+							period.step (hour))
+
+						.addIndex (
+							"chatId",
+							conditions.get ("chatId"))
+
+						.addIndex (
+							"userId",
+							userId)
+
+						.addValue (
+							"alarmsSet",
+							alarmsPerUser.get (userId) [hour]));
+
+				}
+
+			}
+
+			return statsDataSet;
+
+		}
 
 	}
 

@@ -7,14 +7,15 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	Optional <String> getHtml (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull Boolean mini) {
 
@@ -24,6 +25,7 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	Optional <String> getListClass (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		return optionalAbsent ();
@@ -32,7 +34,7 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void applySearchFilter (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object searchObject) {
 
 		doNothing ();
@@ -41,6 +43,7 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void beforeCreate (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		doNothing ();
@@ -49,6 +52,7 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void afterCreate (
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		doNothing ();

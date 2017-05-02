@@ -76,32 +76,28 @@ class ImChatPendingCustomerNoteUpdateAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		// get params
-
-		String valueParam =
-			stringTrim (
-				requestContext.parameterRequired (
-					"value"));
-
-		// start transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatPendingCustomerNoteUpdateAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			// get params
+
+			String valueParam =
+				stringTrim (
+					requestContext.parameterRequired (
+						"value"));
+
+			// lookup objects
+
 			ImChatMessageRec message =
-				imChatMessageHelper.findFromContextRequired ();
+				imChatMessageHelper.findFromContextRequired (
+					transaction);
 
 			ImChatConversationRec conversation =
 				message.getImChatConversation ();
@@ -118,7 +114,7 @@ class ImChatPendingCustomerNoteUpdateAction
 				valueParam.isEmpty ()
 					? null
 					: textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						valueParam);
 
 			if (
@@ -152,9 +148,10 @@ class ImChatPendingCustomerNoteUpdateAction
 			if (newValue != null) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_updated",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					customer,
 					newValue);
@@ -162,9 +159,10 @@ class ImChatPendingCustomerNoteUpdateAction
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_field_nulled",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					"notesText",
 					customer);
 

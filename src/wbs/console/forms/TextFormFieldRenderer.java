@@ -5,9 +5,15 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,8 +27,9 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -119,7 +126,7 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
@@ -202,7 +209,7 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
@@ -210,9 +217,9 @@ class TextFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -258,48 +265,156 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <String>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		String formValue =
-			formValue (
-				submission,
-				formName);
+		try (
 
-		if (
-
-			nullable ()
-
-			&& stringIsEmpty (
-				formValue)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formToInterface");
 
 		) {
 
+			String formValue =
+				formValue (
+					submission,
+					formName);
+
+			if (
+
+				nullable ()
+
+				&& stringIsEmpty (
+					formValue)
+
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
 			return successResult (
-				optionalAbsent ());
+				optionalOf (
+					formValue));
 
 		}
-
-		return successResult (
-			optionalOf (
-				formValue));
 
 	}
 
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue,
 			boolean link) {
 
-		htmlWriter.writeLineFormat (
-			"%h",
-			interfaceValue.or (""));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlSimple");
+
+		) {
+
+			htmlWriter.writeLineFormat (
+				"%h",
+				interfaceValue.or (""));
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellProperties");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					propertiesAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
 
 	}
 

@@ -23,8 +23,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -115,7 +116,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageRbFree (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull ServiceRec service,
@@ -123,9 +124,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendMessageRbFree");
 
 		) {
@@ -135,7 +136,9 @@ class ChatSendLogicImplementation
 				throw new NullPointerException (
 					stringFormat (
 						"%s has no number",
-						objectManager.objectPath (chatUser)));
+						objectManager.objectPath (
+							transaction,
+							chatUser)));
 
 			}
 
@@ -147,12 +150,16 @@ class ChatSendLogicImplementation
 				throw new NullPointerException (
 					stringFormat (
 						"%s has no chat scheme",
-						objectManager.objectPath (chatUser)));
+						objectManager.objectPath (
+							transaction,
+							chatUser)));
 
 			}
 
 			AffiliateRec affiliate =
-				chatUserLogic.getAffiliate (chatUser);
+				chatUserLogic.getAffiliate (
+					transaction,
+					chatUser);
 
 			return messageSenderProvider.get ()
 
@@ -163,13 +170,14 @@ class ChatSendLogicImplementation
 					chatUser.getNumber ())
 
 				.messageString (
-					taskLogger,
+					transaction,
 					message)
 
 				.numFrom (
 					chatScheme.getRbNumber ())
 
 				.routerResolve (
+					transaction,
 					chatScheme.getRbFreeRouter ())
 
 				.service (
@@ -179,7 +187,7 @@ class ChatSendLogicImplementation
 					affiliate)
 
 				.send (
-					taskLogger);
+					transaction);
 
 		}
 
@@ -203,7 +211,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Optional <MessageRec> sendSystem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
@@ -217,9 +225,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendSystem");
 
 		) {
@@ -231,6 +239,7 @@ class ChatSendLogicImplementation
 
 			ChatHelpTemplateRec chatHelpTemplate =
 				chatTemplateLogic.findChatHelpTemplate (
+					transaction,
 					chatUser,
 					"system",
 					templateCode);
@@ -244,11 +253,12 @@ class ChatSendLogicImplementation
 							"System template %s not found for chat %s",
 							templateCode,
 							objectManager.objectPathMini (
+								transaction,
 								chat)));
 
 				} else {
 
-					return Optional.absent ();
+					return optionalAbsent ();
 
 				}
 
@@ -256,8 +266,9 @@ class ChatSendLogicImplementation
 
 			// substitute the params
 
-			Map<String,String> allParams =
+			Map <String, String> allParams =
 				addDefaultParams (
+					transaction,
 					chatUser,
 					suppliedParams);
 
@@ -271,11 +282,13 @@ class ChatSendLogicImplementation
 
 			ServiceRec service =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					serviceCode);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// send the message
@@ -290,13 +303,14 @@ class ChatSendLogicImplementation
 					chatUser.getNumber ())
 
 				.messageString (
-					taskLogger,
+					transaction,
 					finalText)
 
 				.numFrom (
 					numFrom)
 
 				.routerResolve (
+					transaction,
 					router)
 
 				.service (
@@ -306,6 +320,7 @@ class ChatSendLogicImplementation
 					affiliate)
 
 				.deliveryTypeCode (
+					transaction,
 					deliveryTypeCode)
 
 				.ref (
@@ -315,12 +330,12 @@ class ChatSendLogicImplementation
 					tags)
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// log it
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				optionalAbsent (),
@@ -339,7 +354,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Optional <MessageRec> sendSystemRbFree (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
@@ -348,9 +363,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendSystemRbFree");
 
 		) {
@@ -362,6 +377,7 @@ class ChatSendLogicImplementation
 
 			ChatHelpTemplateRec chatHelpTemplate =
 				chatTemplateLogic.findChatHelpTemplate (
+					transaction,
 					chatUser,
 					"system",
 					templateCode);
@@ -388,6 +404,7 @@ class ChatSendLogicImplementation
 
 			Map <String, String> allParams =
 				addDefaultParams (
+					transaction,
 					chatUser,
 					suppliedParams);
 
@@ -400,10 +417,11 @@ class ChatSendLogicImplementation
 
 			MessageRec message =
 				sendMessageRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					threadId,
 					serviceHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"system"),
 					finalText);
@@ -411,7 +429,7 @@ class ChatSendLogicImplementation
 			// log it
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				optionalAbsent (),
@@ -432,7 +450,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageMmsFree (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String message,
@@ -441,9 +459,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendMessageMmsFree");
 
 		) {
@@ -455,6 +473,7 @@ class ChatSendLogicImplementation
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			MessageRec ret =
@@ -467,13 +486,14 @@ class ChatSendLogicImplementation
 					chatUser.getNumber ())
 
 				.messageString (
-					taskLogger,
+					transaction,
 					message)
 
 				.numFrom (
 					chatScheme.getMmsNumber ())
 
 				.routerResolve (
+					transaction,
 					chatScheme.getMmsFreeRouter ())
 
 				.service (
@@ -483,7 +503,7 @@ class ChatSendLogicImplementation
 					affiliate)
 
 				.send (
-					taskLogger);
+					transaction);
 
 			// set the fallback keyword on the mms thing to handle a reply with no
 			// keyword
@@ -491,7 +511,7 @@ class ChatSendLogicImplementation
 			if (chatScheme.getMmsKeywordSet () != null) {
 
 				keywordLogic.createOrUpdateKeywordSetFallback (
-					taskLogger,
+					transaction,
 					chatScheme.getMmsKeywordSet (),
 					chatUser.getNumber (),
 					command);
@@ -509,7 +529,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Optional <MessageRec> sendSystemMmsFree (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
@@ -518,9 +538,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendSystemMmsFree");
 
 		) {
@@ -532,6 +552,7 @@ class ChatSendLogicImplementation
 
 			ChatHelpTemplateRec chatHelpTemplate =
 				chatTemplateLogic.findChatHelpTemplate (
+					transaction,
 					chatUser,
 					"system",
 					templateCode);
@@ -559,12 +580,13 @@ class ChatSendLogicImplementation
 
 			ServiceRec systemService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"system");
 
 			MessageRec message =
 				sendMessageMmsFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					threadId,
 					chatHelpTemplate.getText (),
@@ -574,7 +596,7 @@ class ChatSendLogicImplementation
 			// log it
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				optionalAbsent (),
@@ -595,7 +617,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageMagic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull TextRec message,
@@ -605,9 +627,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendMessageMagic");
 
 		) {
@@ -624,8 +646,10 @@ class ChatSendLogicImplementation
 						"Error sending to chat user %s: " +
 						"Chat scheme %s has no magic number set",
 						objectManager.objectPath (
+							transaction,
 							chatUser),
 						objectManager.objectPath (
+							transaction,
 							chatScheme)));
 
 			}
@@ -633,7 +657,7 @@ class ChatSendLogicImplementation
 			// send the message and return
 
 			return magicNumberLogic.sendMessage (
-				taskLogger,
+				transaction,
 				chatScheme.getMagicNumberSet (),
 				chatUser.getNumber (),
 				magicCommand,
@@ -644,6 +668,7 @@ class ChatSendLogicImplementation
 				service,
 				optionalAbsent (),
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser),
 				optionalAbsent ());
 
@@ -654,7 +679,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Optional <MessageRec> sendSystemMagic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <Long> threadId,
 			@NonNull String templateCode,
@@ -665,9 +690,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendSystemMagic");
 
 		) {
@@ -679,6 +704,7 @@ class ChatSendLogicImplementation
 
 			ChatHelpTemplateRec chatHelpTemplate =
 				chatTemplateLogic.findChatHelpTemplate (
+					transaction,
 					chatUser,
 					"system",
 					templateCode);
@@ -720,6 +746,7 @@ class ChatSendLogicImplementation
 
 			Map<String,String> allParams =
 				addDefaultParams (
+					transaction,
 					chatUser,
 					suppliedParams);
 
@@ -730,19 +757,20 @@ class ChatSendLogicImplementation
 
 			TextRec text =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					finalText);
 
 			// send message
 
 			MessageRec message =
 				sendMessageMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					threadId,
 					text,
 					magicCommand,
 					serviceHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"system"),
 					magicRef);
@@ -750,7 +778,7 @@ class ChatSendLogicImplementation
 			// log it
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				optionalAbsent (),
@@ -763,9 +791,11 @@ class ChatSendLogicImplementation
 							CommandRec.class,
 							magicCommand,
 							commandHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"magic")),
 						() -> commandHelper.findRequired (
+							transaction,
 							magicRef),
 						() -> magicCommand)));
 
@@ -779,7 +809,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Long sendMessageMagic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <Long> threadId,
 			@NonNull Collection <TextRec> parts,
@@ -790,9 +820,9 @@ class ChatSendLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendMessageMagic");
 
 		) {
@@ -801,7 +831,7 @@ class ChatSendLogicImplementation
 				chatUser.getChatScheme ();
 
 			return magicNumberLogic.sendMessage (
-				taskLogger,
+				transaction,
 				chatScheme.getMagicNumberSet (),
 				chatUser.getNumber (),
 				magicCommand,
@@ -812,6 +842,7 @@ class ChatSendLogicImplementation
 				service,
 				optionalAbsent (),
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser),
 				user);
 
@@ -822,50 +853,77 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Map <String, String> addDefaultParams (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Map <String, String> params) {
 
-		return ImmutableMap.<String,String>builder ()
+		try (
 
-			.putAll (
-				params)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"addDefaultParams");
 
-			.put (
-				"brandName",
-				chatUserLogic.getBrandName (chatUser))
+		) {
 
-			.build ();
+			return ImmutableMap.<String, String> builder ()
+
+				.putAll (
+					params)
+
+				.put (
+					"brandName",
+					chatUserLogic.getBrandName (
+						chatUser))
+
+				.build ();
+
+		}
 
 	}
 
 	@Override
 	public
 	String renderTemplate (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String templateTypeCode,
 			@NonNull String templateCode,
 			@NonNull Map<String,String> suppliedParams) {
 
-		Map<String,String> allParams =
-			addDefaultParams (
-				chatUser,
-				suppliedParams);
+		try (
 
-		ChatHelpTemplateRec template =
-			chatTemplateLogic.findChatHelpTemplate (
-				chatUser,
-				templateTypeCode,
-				templateCode);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderTemplate");
 
-		String originalText =
-			template.getText ();
+		) {
 
-		String finalText =
-			MapStringSubstituter.substitute (
-				originalText,
-				allParams);
+			Map <String, String> allParams =
+				addDefaultParams (
+					transaction,
+					chatUser,
+					suppliedParams);
 
-		return finalText;
+			ChatHelpTemplateRec template =
+				chatTemplateLogic.findChatHelpTemplate (
+					transaction,
+					chatUser,
+					templateTypeCode,
+					templateCode);
+
+			String originalText =
+				template.getText ();
+
+			String finalText =
+				MapStringSubstituter.substitute (
+					originalText,
+					allParams);
+
+			return finalText;
+
+		}
 
 	}
 

@@ -1,6 +1,6 @@
 package wbs.console.tab;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public abstract
 class Tab {
@@ -29,7 +29,7 @@ class Tab {
 
 	public abstract
 	String getUrl (
-			TaskLogger parentTaskLogger);
+			Transaction parentTransaction);
 
 	public
 	boolean isAvailable () {

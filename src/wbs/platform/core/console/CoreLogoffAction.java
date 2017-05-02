@@ -71,16 +71,11 @@ class CoreLogoffAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"CoreLogoffAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -100,10 +95,11 @@ class CoreLogoffAction
 
 			UserRec user =
 				userHelper.findRequired (
+					transaction,
 					userId);
 
 			userSessionLogic.userLogoff (
-				taskLogger,
+				transaction,
 				user);
 
 			transaction.commit ();

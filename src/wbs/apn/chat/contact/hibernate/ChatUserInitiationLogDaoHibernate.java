@@ -15,8 +15,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.contact.model.ChatUserInitiationLogDao;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
@@ -28,150 +31,182 @@ class ChatUserInitiationLogDaoHibernate
 	extends HibernateDao
 	implements ChatUserInitiationLogDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<ChatUserInitiationLogRec> findByTimestamp (
+	List <ChatUserInitiationLogRec> findByTimestamp (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
 			@NonNull Interval timestamp) {
 
-		return findMany (
-			"findByTimestamp (chat, timestamp)",
-			ChatUserInitiationLogRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByTimestamp");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatUserInitiationLogRec.class,
-				"_chatUserInitiationLog")
 
-			.createAlias (
-				"_chatUserInitiationLog.chatUser",
-				"_chatUser")
+				createCriteria (
+					transaction,
+					ChatUserInitiationLogRec.class,
+					"_chatUserInitiationLog")
 
-			.add (
-				Restrictions.eq (
-					"_chatUser.chat",
-					chat))
+				.createAlias (
+					"_chatUserInitiationLog.chatUser",
+					"_chatUser")
 
-			.add (
-				Restrictions.ge (
-					"_chatUserInitiationLog.timestamp",
-					timestamp.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_chatUser.chat",
+						chat))
 
-			.add (
-				Restrictions.lt (
-					"_chatUserInitiationLog.timestamp",
-					timestamp.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_chatUserInitiationLog.timestamp",
+						timestamp.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_chatUserInitiationLog.timestamp",
+						timestamp.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserInitiationLogSearch search) {
 
-		Criteria criteria =
-			createCriteria (
-				ChatUserInitiationLogRec.class,
-				"_chatUserInitiationLog")
+		try (
 
-			.createAlias (
-				"_chatUserInitiationLog.chatUser",
-				"_chatUser")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchIds");
 
-			.createAlias (
-				"_chatUser.chat",
-				"_chat");
-
-		if (
-			isNotNull (
-				search.chatId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_chatUserInitiationLog.chat.id",
-					search.chatId ()));
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ChatUserInitiationLogRec.class,
+					"_chatUserInitiationLog")
 
-		}
+				.createAlias (
+					"_chatUserInitiationLog.chatUser",
+					"_chatUser")
 
-		if (
-			isNotNull (
-				search.timestamp ())
-		) {
-
-			criteria.add (
-				Restrictions.ge (
-					"_chatUserInitiationLog.timestamp",
-					search.timestamp ().start ()));
-
-			criteria.add (
-				Restrictions.lt (
-					"_chatUserInitiationLog.timestamp",
-					search.timestamp ().end ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.reason ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_chatUserInitiationLog.reason",
-					search.reason ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.monitorUserId ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_chatUserInitiationLog.monitorUser.id",
-					search.monitorUserId ()));
-
-		}
-
-		if (search.filter ()) {
-
-			List <Criterion> filterCriteria =
-				new ArrayList<> ();
+				.createAlias (
+					"_chatUser.chat",
+					"_chat");
 
 			if (
-				collectionIsNotEmpty (
-					search.filterChatIds ())
+				isNotNull (
+					search.chatId ())
 			) {
 
-				filterCriteria.add (
-					Restrictions.in (
-						"_chat.id",
-						search.filterChatIds ()));
+				criteria.add (
+					Restrictions.eq (
+						"_chatUserInitiationLog.chat.id",
+						search.chatId ()));
 
 			}
 
-			criteria.add (
-				Restrictions.or (
-					filterCriteria.toArray (
-						new Criterion [] {})));
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_chatUserInitiationLog.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_chatUserInitiationLog.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.reason ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_chatUserInitiationLog.reason",
+						search.reason ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.monitorUserId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_chatUserInitiationLog.monitorUser.id",
+						search.monitorUserId ()));
+
+			}
+
+			if (search.filter ()) {
+
+				List <Criterion> filterCriteria =
+					new ArrayList<> ();
+
+				if (
+					collectionIsNotEmpty (
+						search.filterChatIds ())
+				) {
+
+					filterCriteria.add (
+						Restrictions.in (
+							"_chat.id",
+							search.filterChatIds ()));
+
+				}
+
+				criteria.add (
+					Restrictions.or (
+						filterCriteria.toArray (
+							new Criterion [] {})));
+
+			}
+
+			criteria.addOrder (
+				Order.desc (
+					"_chatUserInitiationLog.timestamp"));
+
+			criteria.setProjection (
+				Projections.id ());
+
+			return findMany (
+				transaction,
+				Long.class,
+				criteria);
 
 		}
-
-		criteria.addOrder (
-			Order.desc (
-				"_chatUserInitiationLog.timestamp"));
-
-		criteria.setProjection (
-			Projections.id ());
-
-		return findMany (
-			"search (search)",
-			Long.class,
-			criteria);
 
 	}
 

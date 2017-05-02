@@ -1,12 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
-import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.util.Map;
 
@@ -14,7 +8,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.utils.string.FormatWriter;
 
@@ -48,7 +42,7 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	void renderFormInput (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			FormFieldSubmission submission,
 			FormatWriter htmlWriter,
 			Container container,
@@ -58,76 +52,32 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	void renderFormReset (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			FormatWriter htmlWriter,
 			Container container,
 			Optional <Interface> interfaceValue,
 			String formName);
 
-	default
 	void renderHtmlTableCellList (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter htmlWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <Interface> interfaceValue,
-			@NonNull Boolean link,
-			@NonNull Long colspan) {
+			Transaction parentTransaction,
+			FormatWriter htmlWriter,
+			Container container,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
+			Boolean link,
+			Long colspan);
 
-		htmlTableCellOpen (
-			htmlStyleRuleEntry (
-				"text-align",
-				listAlign ().name ()),
-			htmlColumnSpanAttribute (
-				colspan),
-			htmlClassAttribute (
-				presentInstances (
-					htmlClass (
-						interfaceValue))));
-
-		renderHtmlSimple (
-			parentTaskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			link);
-
-		htmlTableCellClose ();
-
-	}
-
-	default
 	void renderHtmlTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter htmlWriter,
-			@NonNull Container container,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <Interface> interfaceValue,
-			@NonNull Boolean link,
-			@NonNull Long colspan) {
-
-		htmlTableCellOpen (
-			htmlStyleRuleEntry (
-				"text-align",
-				propertiesAlign ().name ()),
-			htmlColumnSpanAttribute (
-				colspan));
-
-		renderHtmlSimple (
-			parentTaskLogger,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			link);
-
-		htmlTableCellClose ();
-
-	}
+			Transaction parentTransaction,
+			FormatWriter htmlWriter,
+			Container container,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
+			Boolean link,
+			Long colspan);
 
 	void renderHtmlSimple (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			FormatWriter htmlWriter,
 			Container container,
 			Map <String, Object> hints,
@@ -136,14 +86,14 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	void renderHtmlComplex (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue) {
 
 		renderHtmlSimple (
-			parentTaskLogger,
+			parentTransaction,
 			htmlWriter,
 			container,
 			hints,
@@ -158,7 +108,7 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	Either <Optional <Interface>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

@@ -14,8 +14,9 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -117,13 +118,13 @@ class ChatCheckCreditCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -131,10 +132,12 @@ class ChatCheckCreditCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -143,19 +146,20 @@ class ChatCheckCreditCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// send barred users to help
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -164,7 +168,7 @@ class ChatCheckCreditCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -172,7 +176,7 @@ class ChatCheckCreditCommand
 					true);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -190,7 +194,7 @@ class ChatCheckCreditCommand
 					chatUser.getCredit ());
 
 			chatSendLogic.sendSystemRbFree (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
 					message.getThreadId ()),
@@ -203,7 +207,7 @@ class ChatCheckCreditCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

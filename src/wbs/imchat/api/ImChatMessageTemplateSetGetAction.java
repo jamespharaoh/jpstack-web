@@ -73,20 +73,12 @@ class ImChatMessageTemplateSetGetAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ImChatMessageTemplateSetGetAction.handle ()",
-					this);
+				database.beginReadWrite (
+					logContext,
+					"handle");
 
 		) {
 
@@ -94,6 +86,7 @@ class ImChatMessageTemplateSetGetAction
 
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -104,6 +97,7 @@ class ImChatMessageTemplateSetGetAction
 
 			Optional <MessageTemplateSetRec> messageTemplateSetOptional =
 				messageTemplateSetHelper.findByCode (
+					transaction,
 					imChat.getMessageTemplateDatabase (),
 					messageTemplateSetCode);
 

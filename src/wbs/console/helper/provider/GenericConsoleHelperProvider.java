@@ -48,8 +48,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
@@ -136,7 +139,7 @@ class GenericConsoleHelperProvider <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"init");
@@ -259,19 +262,19 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	void postProcess (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"postProcess");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Running post processor for %s",
 				objectName ());
 
@@ -284,6 +287,7 @@ class GenericConsoleHelperProvider <
 
 			Record <?> object =
 				objectHelper.findRequired (
+					transaction,
 					id);
 
 			// set context stuff
@@ -312,6 +316,7 @@ class GenericConsoleHelperProvider <
 					contextStuff.set (
 						contextStuffSpec.name (),
 						objectManager.dereferenceRequired (
+							transaction,
 							object,
 							contextStuffSpec.fieldName ()));
 
@@ -356,6 +361,7 @@ class GenericConsoleHelperProvider <
 					privObject =
 						genericCastUnchecked (
 							objectManager.dereferenceRequired (
+								transaction,
 								object,
 								listFirstElementRequired (
 									privCodeParts)));
@@ -372,7 +378,7 @@ class GenericConsoleHelperProvider <
 
 				if (
 					privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						privObject,
 						privCode)
 				) {
@@ -392,7 +398,7 @@ class GenericConsoleHelperProvider <
 			) {
 
 				consoleManager.runPostProcessors (
-					taskLogger,
+					transaction,
 					runPostProcessorSpec.name (),
 					contextStuff);
 
@@ -405,14 +411,14 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String getPathId (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Long objectId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getPathId");
 
 		) {
@@ -420,7 +426,7 @@ class GenericConsoleHelperProvider <
 			if (cryptor != null) {
 
 				return cryptor.encryptInteger (
-					taskLogger,
+					transaction,
 					objectId);
 
 			} else {
@@ -437,14 +443,14 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String getDefaultContextPath (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getDefaultContextPath");
 
 		) {
@@ -477,7 +483,7 @@ class GenericConsoleHelperProvider <
 
 					"/%s",
 					getPathId (
-						taskLogger,
+						transaction,
 						object.getId ()));
 
 			return stringSubstituter.substitute (
@@ -490,14 +496,14 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String localPath (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"localPath");
 
 		) {
@@ -510,7 +516,7 @@ class GenericConsoleHelperProvider <
 
 					"/%s",
 					getPathId (
-						taskLogger,
+						transaction,
 						object.getId ()));
 
 			StringSubstituter stringSubstituter =
@@ -535,16 +541,15 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"canView (%s)",
-					object.toString ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"canView");
 
 		) {
 
@@ -552,7 +557,7 @@ class GenericConsoleHelperProvider <
 
 			if (objectHelper.type ()) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Object types are visible to everyone");
 
 				return true;
@@ -566,7 +571,7 @@ class GenericConsoleHelperProvider <
 					cryptor)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Object with encrypted IDs are visible to everyone");
 
 				return true;
@@ -580,7 +585,7 @@ class GenericConsoleHelperProvider <
 					viewPrivKeySpecs)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Checking view priv keys");
 
 				Boolean visible =
@@ -625,6 +630,7 @@ class GenericConsoleHelperProvider <
 						privObjectOptional =
 							genericCastUnchecked (
 								objectManager.dereference (
+									transaction,
 									object,
 									privObjectPath));
 
@@ -643,7 +649,7 @@ class GenericConsoleHelperProvider <
 							privObjectOptional)
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Can't find delegate %s for view priv key",
 							privObjectPath);
 
@@ -656,15 +662,16 @@ class GenericConsoleHelperProvider <
 
 					if (
 						privChecker.canRecursive (
-							taskLogger,
+							transaction,
 							privObject,
 							privCode)
 					) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Object is visible because of priv '%s' on: %s",
 							privCode,
 							objectManager.objectPathMini (
+								transaction,
 								privObject));
 
 						visible = true;
@@ -674,14 +681,15 @@ class GenericConsoleHelperProvider <
 							privObjectPath)
 					) {
 
-						taskLogger.debugFormat (
-							"Not granted visibility because of priv '%s' on: %s",
+						transaction.debugFormat (
+							"Not granted visibility because of priv '%s' ",
 							privCode,
+							"on: %s",
 							privObjectPath);
 
 					} else {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Not granted visibility because of priv '%s'",
 							privCode);
 
@@ -719,6 +727,7 @@ class GenericConsoleHelperProvider <
 						optionalGetOrAbsent (
 							resultValue (
 								objectManager.dereferenceOrError (
+									transaction,
 									object,
 									viewDelegateField))));
 
@@ -727,7 +736,7 @@ class GenericConsoleHelperProvider <
 						delegateOptional)
 				) {
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"Object is not visible because view delegate %s ",
 						viewDelegateField,
 						"is not present");
@@ -747,13 +756,13 @@ class GenericConsoleHelperProvider <
 						viewDelegatePrivCode)
 				) {
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"Delegating to %s priv %s",
 						viewDelegateField,
 						viewDelegatePrivCode);
 
 					return privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						delegate,
 						viewDelegatePrivCode);
 
@@ -763,12 +772,12 @@ class GenericConsoleHelperProvider <
 						consoleObjectManager.findConsoleHelperRequired (
 							delegate);
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"Delegating to %s",
 						viewDelegateField);
 
 					return delegateHelper.canView (
-						taskLogger,
+						transaction,
 						genericCastUnchecked (
 							delegate));
 
@@ -778,11 +787,11 @@ class GenericConsoleHelperProvider <
 
 			// default
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Delegating to priv checker");
 
 			return privChecker.canRecursive (
-				taskLogger,
+				transaction,
 				object);
 
 		}
@@ -792,19 +801,32 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	RecordType lookupObject (
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		Long objectId =
-			(Long)
-			contextStuff.get (
-				idKey);
+		try (
 
-		return objectClass ().cast (
-			optionalOrNull (
-				optionalCast (
-					Record.class,
-					objectHelper.find (
-						objectId))));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"lookupObject");
+
+		) {
+
+			Long objectId =
+				(Long)
+				contextStuff.get (
+					idKey);
+
+			return objectClass ().cast (
+				optionalOrNull (
+					optionalCast (
+						Record.class,
+						objectHelper.find (
+							transaction,
+							objectId))));
+
+		}
 
 	}
 

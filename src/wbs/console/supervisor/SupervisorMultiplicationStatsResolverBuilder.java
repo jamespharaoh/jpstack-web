@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.MultiplicationStatsResolver;
 import wbs.console.reporting.StatsResolver;
@@ -15,13 +17,22 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorMultiplicationStatsResolverBuilder")
 @ConsoleModuleBuilderHandler
 public
 class SupervisorMultiplicationStatsResolverBuilder {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -44,60 +55,72 @@ class SupervisorMultiplicationStatsResolverBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		List<SupervisorMultiplicationOperandSpec> operandSpecs =
-			spec.operandSpecs ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		MultiplicationStatsResolver multiplicationStatsResolver =
-			this.multiplicationStatsResolverProvider.get ();
-
-		for (
-			SupervisorMultiplicationOperandSpec operandSpec
-				: operandSpecs
 		) {
 
-			StatsResolver resolver = null;
+			String name =
+				spec.name ();
 
-			if (operandSpec.resolverName () != null) {
+			List <SupervisorMultiplicationOperandSpec> operandSpecs =
+				spec.operandSpecs ();
 
-				resolver =
-					supervisorConfigBuilder.statsResolversByName ().get (
-						operandSpec.resolverName ());
+			MultiplicationStatsResolver multiplicationStatsResolver =
+				this.multiplicationStatsResolverProvider.get ();
 
-				if (resolver == null) {
+			for (
+				SupervisorMultiplicationOperandSpec operandSpec
+					: operandSpecs
+			) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Stats resolver %s does not exist",
-							operandSpec.resolverName ()));
+				StatsResolver resolver = null;
+
+				if (operandSpec.resolverName () != null) {
+
+					resolver =
+						supervisorConfigBuilder.statsResolversByName ().get (
+							operandSpec.resolverName ());
+
+					if (resolver == null) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Stats resolver %s does not exist",
+								operandSpec.resolverName ()));
+
+					}
 
 				}
 
+				multiplicationStatsResolver.operands ().add (
+					new MultiplicationStatsResolver.Operand ()
+
+					.power (
+						operandSpec.power ())
+
+					.value (
+						operandSpec.value ())
+
+					.resolver (
+						resolver)
+
+				);
+
 			}
 
-			multiplicationStatsResolver.operands ().add (
-				new MultiplicationStatsResolver.Operand ()
-
-				.power (
-					operandSpec.power ())
-
-				.value (
-					operandSpec.value ())
-
-				.resolver (
-					resolver)
-
-			);
+			supervisorConfigBuilder.statsResolversByName ().put (
+				name,
+				multiplicationStatsResolver);
 
 		}
-
-		supervisorConfigBuilder.statsResolversByName ().put (
-			name,
-			multiplicationStatsResolver);
 
 	}
 

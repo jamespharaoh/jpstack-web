@@ -14,8 +14,9 @@ import org.hibernate.TransientObjectException;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
@@ -45,42 +46,55 @@ class MessageTemplateEntryValueHooks
 	@Override
 	public
 	Object getDynamic (
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name) {
 
-		MessageTemplateEntryTypeRec entryType =
-			entryValue.getMessageTemplateEntryType ();
+		try (
 
-		// find the ticket field type
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getDynamic");
 
-		MessageTemplateFieldTypeRec fieldType =
-			messageTemplateFieldTypeHelper.findByCodeRequired (
-				entryType,
-				name);
+		) {
 
-		try {
+			MessageTemplateEntryTypeRec entryType =
+				entryValue.getMessageTemplateEntryType ();
 
-			// find the message template value
+			// find the ticket field type
 
-			MessageTemplateFieldValueRec fieldValue =
-				entryValue.getFields ().get (
-					fieldType.getId ());
+			MessageTemplateFieldTypeRec fieldType =
+				messageTemplateFieldTypeHelper.findByCodeRequired (
+					transaction,
+					entryType,
+					name);
 
-			if (fieldValue == null) {
+			try {
 
-				return fieldType.getDefaultValue ();
+				// find the message template value
 
-			} else {
+				MessageTemplateFieldValueRec fieldValue =
+					entryValue.getFields ().get (
+						fieldType.getId ());
 
-				return fieldValue.getStringValue ();
+				if (fieldValue == null) {
+
+					return fieldType.getDefaultValue ();
+
+				} else {
+
+					return fieldValue.getStringValue ();
+
+				}
+
+			} catch (TransientObjectException exception) {
+
+				// object not yet saved so fields will all be null
+
+				return null;
 
 			}
-
-		} catch (TransientObjectException exception) {
-
-			// object not yet saved so fields will all be null
-
-			return null;
 
 		}
 
@@ -89,16 +103,16 @@ class MessageTemplateEntryValueHooks
 	@Override
 	public
 	void setDynamic (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setDynamic");
 
 		) {
@@ -110,6 +124,7 @@ class MessageTemplateEntryValueHooks
 
 			MessageTemplateFieldTypeRec fieldType =
 				messageTemplateFieldTypeHelper.findByCodeRequired (
+					transaction,
 					entryType,
 					name);
 
@@ -251,7 +266,7 @@ class MessageTemplateEntryValueHooks
 
 				fieldValue =
 					messageTemplateFieldValueHelper.insert (
-						taskLogger,
+						transaction,
 						messageTemplateFieldValueHelper.createInstance ()
 
 					.setMessageTemplateEntryValue (
@@ -294,6 +309,7 @@ class MessageTemplateEntryValueHooks
 			) {
 
 				messageTemplateFieldValueHelper.remove (
+					transaction,
 					fieldValue);
 
 				entryValue.getFields ().remove (

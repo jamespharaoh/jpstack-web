@@ -3,6 +3,7 @@ package wbs.apn.chat.core.logic;
 import lombok.experimental.Delegate;
 
 import wbs.framework.component.annotations.SingletonComponent;
+
 import wbs.platform.hooks.logic.HooksProxyImplementation;
 
 @SingletonComponent ("chatLogicHooksImpl")

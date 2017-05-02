@@ -69,16 +69,11 @@ class ChatUserHelpFormAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserHelpFormAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -101,20 +96,26 @@ class ChatUserHelpFormAction
 			}
 
 			if (GsmUtils.gsmStringLength(text) > 149) {
-				requestContext.addError("Text is too long!");
+
+				requestContext.addError (
+					"Text is too long!");
+
 				return null;
+
 			}
 
 			// get objects
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// send message
 
 			chatHelpLogic.sendHelpMessage (
-				taskLogger,
-				userConsoleLogic.userRequired (),
+				transaction,
+				userConsoleLogic.userRequired (
+					transaction),
 				chatUser,
 				text,
 				optionalAbsent (),

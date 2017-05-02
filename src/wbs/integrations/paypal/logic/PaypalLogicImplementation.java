@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.component.annotations.SingletonComponent;
+
 import wbs.integrations.paypal.model.PaypalAccountRec;
 
 @SingletonComponent ("paypalApiLogic")

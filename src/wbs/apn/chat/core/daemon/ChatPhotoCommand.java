@@ -18,9 +18,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -125,13 +126,13 @@ class ChatPhotoCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -139,10 +140,12 @@ class ChatPhotoCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -151,19 +154,20 @@ class ChatPhotoCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// send barred users to help
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -172,7 +176,7 @@ class ChatPhotoCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -186,6 +190,7 @@ class ChatPhotoCommand
 
 				Optional <ChatUserRec> photoUserOptional =
 					chatUserHelper.findByCode (
+						transaction,
 						chat,
 						text);
 
@@ -194,7 +199,7 @@ class ChatPhotoCommand
 					// just send any three users
 
 					chatInfoLogic.sendUserPics (
-						taskLogger,
+						transaction,
 						chatUser,
 						3l,
 						optionalOf (
@@ -206,6 +211,7 @@ class ChatPhotoCommand
 						photoUserOptional)
 
 					|| ! chatUserLogic.valid (
+						transaction,
 						photoUserOptional.get ())
 
 				) {
@@ -213,16 +219,18 @@ class ChatPhotoCommand
 					// send no such user error
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"request_photo_error",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"magic"),
 						IdObject.objectId (
 							commandHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"help")),
 						TemplateMissing.error,
@@ -236,16 +244,18 @@ class ChatPhotoCommand
 					// send no such photo error
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
 						"no_photo_error",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"magic"),
 						IdObject.objectId (
 							commandHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"help")),
 						TemplateMissing.error,
@@ -256,7 +266,7 @@ class ChatPhotoCommand
 					// send pics
 
 					chatInfoLogic.sendRequestedUserPicandOtherUserPics (
-						taskLogger,
+						transaction,
 						chatUser,
 						photoUserOptional.get (),
 						2l,
@@ -270,7 +280,7 @@ class ChatPhotoCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

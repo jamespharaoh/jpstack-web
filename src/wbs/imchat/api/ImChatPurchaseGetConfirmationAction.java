@@ -101,40 +101,36 @@ class ImChatPurchaseGetConfirmationAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatPurchaseGetConfirmationRequest confirmationRequest =
-			dataFromJson.fromJson (
-				ImChatPurchaseGetConfirmationRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatPurchaseGetConfirmationAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatPurchaseGetConfirmationRequest confirmationRequest =
+				dataFromJson.fromJson (
+					ImChatPurchaseGetConfirmationRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -143,6 +139,7 @@ class ImChatPurchaseGetConfirmationAction
 
 			ImChatPurchaseRec purchase =
 				imChatPurchaseHelper.findByToken (
+					transaction,
 					confirmationRequest.token ());
 
 			if (purchase == null)
@@ -252,10 +249,12 @@ class ImChatPurchaseGetConfirmationAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer))
 
 				.purchase (
 					imChatApiLogic.purchaseData (
+						transaction,
 						purchase));
 
 			// commit and return

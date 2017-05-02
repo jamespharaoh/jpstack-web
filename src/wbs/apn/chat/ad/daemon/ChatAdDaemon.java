@@ -110,58 +110,46 @@ class ChatAdDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					parentTaskLogger,
 					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Looking for users to send an ad to");
 
-			// get a list of users who have passed their ad time
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findWantingAd (
+					transaction,
+					transaction.now ());
 
-			try (
+			transaction.close ();
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"ChatAdDaemon.runOnce ()",
-						this);
+			// then call doChatUserAd for each one
 
+			for (
+				ChatUserRec chatUser
+					: chatUsers
 			) {
 
-				List <ChatUserRec> chatUsers =
-					chatUserHelper.findWantingAd (
-						transaction.now ());
+				try {
 
-				transaction.close ();
+					doChatUserAd (
+						transaction,
+						chatUser.getId ());
 
-				// then call doChatUserAd for each one
+				} catch (Exception exception) {
 
-				for (
-					ChatUserRec chatUser
-						: chatUsers
-				) {
-
-					try {
-
-						doChatUserAd (
-							taskLogger,
-							chatUser.getId ());
-
-					} catch (Exception exception) {
-
-						exceptionLogger.logThrowable (
-							taskLogger,
-							"daemon",
-							"ChatAdDaemon",
-							exception,
-							optionalAbsent (),
-							GenericExceptionResolution.tryAgainLater);
-
-					}
+					exceptionLogger.logThrowable (
+						transaction,
+						"daemon",
+						"ChatAdDaemon",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
 
 				}
 
@@ -178,205 +166,205 @@ class ChatAdDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"doChatUserAd");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Attempting to send ad to %s",
 				integerToDecimalString (
 					chatUserId));
 
-			try (
+			// find the user
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatAdDaemon.doChatUserAd",
-						this);
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					transaction,
+					chatUserId);
 
+			ChatRec chat =
+				chatUser.getChat ();
+
+			// check he really is due an ad
+
+			if (
+				laterThan (
+					chatUser.getNextAd (),
+					transaction.now ())
+			) {
+				return;
+			}
+
+			// do a credit and number check
+
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userCreditCheck (
+					transaction,
+					chatUser);
+
+			if (
+				creditCheckResult.failed ()
 			) {
 
-				// find the user
+				transaction.noticeFormat (
+					"Skipping ad to %s (%s)",
+					objectManager.objectPath (
+						transaction,
+						chatUser),
+					creditCheckResult.details ());
 
-				ChatUserRec chatUser =
-					chatUserHelper.findRequired (
-						chatUserId);
+			} else if (chatUser.getFirstJoin () == null) {
 
-				ChatRec chat =
-					chatUser.getChat ();
+				transaction.noticeFormat (
+					"Skipping ad to %s (never fully joined)",
+					objectManager.objectPath (
+						transaction,
+						chatUser));
 
-				// check he really is due an ad
+			} else if (
+				! chatUser.getNumber ().getNumber ().startsWith ("447")
+				|| chatUser.getNumber ().getNumber ().length () != 12
+			) {
 
-				if (
-					laterThan (
-						chatUser.getNextAd (),
-						transaction.now ())
-				) {
-					return;
-				}
+				transaction.noticeFormat (
+					"Skipping ad to %s (not a mobile number)",
+					objectManager.objectPath (
+						transaction,
+						chatUser));
 
-				// do a credit and number check
+			} else {
 
-				ChatCreditCheckResult creditCheckResult =
-					chatCreditLogic.userCreditCheck (
-						taskLogger,
-						chatUser);
+				// work out credit
 
-				if (
-					creditCheckResult.failed ()
-				) {
+				long approvedCredit =
+					+ chatUser.getCredit ()
+					- chatUser.getCreditPending ()
+					- chatUser.getCreditPendingStrict ();
 
-					taskLogger.noticeFormat (
-						"Skipping ad to %s (%s)",
-						objectManager.objectPath (chatUser),
-						creditCheckResult.details ());
+				// pick an ad
 
-				} else if (chatUser.getFirstJoin () == null) {
+				List <ChatAdTemplateRec> adTemplates =
+					new ArrayList<> (
+						chatUser.getChat ().getChatAdTemplates ());
 
-					taskLogger.noticeFormat (
-						"Skipping ad to %s (never fully joined)",
-						objectManager.objectPath (
-							chatUser));
+				TextRec text = null;
 
-				} else if (
-					! chatUser.getNumber ().getNumber ().startsWith ("447")
-					|| chatUser.getNumber ().getNumber ().length () != 12
-				) {
+				while (! adTemplates.isEmpty ()) {
 
-					taskLogger.noticeFormat (
-						"Skipping ad to %s (not a mobile number)",
-						objectManager.objectPath (chatUser));
+					int templateNumber =
+						randomLogic.randomJavaInteger (
+							adTemplates.size ());
 
-				} else {
+					ChatAdTemplateRec chatAdTemplate =
+						adTemplates.get (templateNumber);
 
-					// work out credit
+					// pick the text
 
-					long approvedCredit =
-						+ chatUser.getCredit ()
-						- chatUser.getCreditPending ()
-						- chatUser.getCreditPendingStrict ();
+					if (chatUser.getOrient () == Orient.gay
+							&& chatUser.getGender () == Gender.male) {
 
-					// pick an ad
+						text =
+							chatAdTemplate.getGayMaleText ();
 
-					List<ChatAdTemplateRec> adTemplates =
-						new ArrayList<ChatAdTemplateRec> (
-							chatUser.getChat ().getChatAdTemplates ());
+					} else if (chatUser.getOrient () == Orient.gay
+							&& chatUser.getGender () == Gender.female) {
 
-					TextRec text = null;
-
-					while (! adTemplates.isEmpty ()) {
-
-						int templateNumber =
-							randomLogic.randomJavaInteger (
-								adTemplates.size ());
-
-						ChatAdTemplateRec chatAdTemplate =
-							adTemplates.get (templateNumber);
-
-						// pick the text
-
-						if (chatUser.getOrient () == Orient.gay
-								&& chatUser.getGender () == Gender.male) {
-
-							text =
-								chatAdTemplate.getGayMaleText ();
-
-						} else if (chatUser.getOrient () == Orient.gay
-								&& chatUser.getGender () == Gender.female) {
-
-							text =
-								chatAdTemplate.getGayFemaleText ();
-
-						} else {
-
-							text =
-								chatAdTemplate.getGenericText ();
-
-						}
-
-						// check for the place holder
-
-						boolean hasCreditPlaceholder =
-							text.getText ().contains ("{credit}");
-
-						boolean wantCreditPlaceholder =
-							approvedCredit > 0;
-
-						if (hasCreditPlaceholder == wantCreditPlaceholder)
-							break;
-
-						adTemplates.remove (templateNumber);
-
-					}
-
-					if (text == null) {
-
-						taskLogger.noticeFormat (
-							"Skipping ad to %s (no suitable ads configured)",
-							objectManager.objectPath (
-								chatUser));
+						text =
+							chatAdTemplate.getGayFemaleText ();
 
 					} else {
 
-						// replace placeholder with credit
-
-						String messageString =
-							text.getText ().replace (
-								"{credit}",
-								String.format (
-									"%d.%02d",
-									approvedCredit / 100,
-									approvedCredit % 100));
-
-						// send the message
-
-						taskLogger.noticeFormat (
-							"Sending ad to %s: %s",
-							objectManager.objectPath (
-								chatUser),
-							messageString);
-
-						TextRec messageText =
-							textHelper.findOrCreate (
-								taskLogger,
-								messageString);
-
-						ServiceRec adService =
-							serviceHelper.findByCodeRequired (
-								chat,
-								"ad");
-
-						chatSendLogic.sendMessageMagic (
-							taskLogger,
-							chatUser,
-							optionalAbsent (),
-							messageText,
-							commandHelper.findByCodeRequired (
-								chat,
-								"magic"),
-							adService,
-							IdObject.objectId (
-								commandHelper.findByCodeRequired (
-									chat,
-									"join_next")));
+						text =
+							chatAdTemplate.getGenericText ();
 
 					}
 
+					// check for the place holder
+
+					boolean hasCreditPlaceholder =
+						text.getText ().contains ("{credit}");
+
+					boolean wantCreditPlaceholder =
+						approvedCredit > 0;
+
+					if (hasCreditPlaceholder == wantCreditPlaceholder)
+						break;
+
+					adTemplates.remove (templateNumber);
+
 				}
 
-				// set his next ad time
+				if (text == null) {
 
-				chatUserLogic.scheduleAd (
-					taskLogger,
-					chatUser);
+					transaction.noticeFormat (
+						"Skipping ad to %s (no suitable ads configured)",
+						objectManager.objectPath (
+							transaction,
+							chatUser));
 
-				transaction.commit ();
+				} else {
+
+					// replace placeholder with credit
+
+					String messageString =
+						text.getText ().replace (
+							"{credit}",
+							String.format (
+								"%d.%02d",
+								approvedCredit / 100,
+								approvedCredit % 100));
+
+					// send the message
+
+					transaction.noticeFormat (
+						"Sending ad to %s: %s",
+						objectManager.objectPath (
+							transaction,
+							chatUser),
+						messageString);
+
+					TextRec messageText =
+						textHelper.findOrCreate (
+							transaction,
+							messageString);
+
+					ServiceRec adService =
+						serviceHelper.findByCodeRequired (
+							transaction,
+							chat,
+							"ad");
+
+					chatSendLogic.sendMessageMagic (
+						transaction,
+						chatUser,
+						optionalAbsent (),
+						messageText,
+						commandHelper.findByCodeRequired (
+							transaction,
+							chat,
+							"magic"),
+						adService,
+						IdObject.objectId (
+							commandHelper.findByCodeRequired (
+								transaction,
+								chat,
+								"join_next")));
+
+				}
 
 			}
+
+			// set his next ad time
+
+			chatUserLogic.scheduleAd (
+				transaction,
+				chatUser);
+
+			transaction.commit ();
 
 		}
 

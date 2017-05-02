@@ -5,8 +5,9 @@ import static wbs.utils.string.FormatWriterUtils.setCurrentFormatWriter;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -26,28 +27,33 @@ class PrintResponder
 
 	// implementation
 
-	@SuppressWarnings ("resource")
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setup");
+		try (
 
-		formatWriter =
-			requestContext.formatWriter ()
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
 
-			.indentString (
-				"  ");
+		) {
 
-		setCurrentFormatWriter (
-			formatWriter);
+			super.setup (
+				transaction);
 
-		super.setup (
-			taskLogger);
+			formatWriter =
+				requestContext.formatWriter ()
+
+				.indentString (
+					"  ");
+
+			setCurrentFormatWriter (
+				formatWriter);
+
+		}
 
 	}
 

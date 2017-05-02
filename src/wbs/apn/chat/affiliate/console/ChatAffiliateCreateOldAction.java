@@ -111,8 +111,9 @@ class ChatAffiliateCreateOldAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"goReal");
 
@@ -146,7 +147,11 @@ class ChatAffiliateCreateOldAction
 					continue;
 				}
 
-				if (! keywordLogic.checkKeyword (keyword)) {
+				if (
+					! keywordLogic.checkKeyword (
+						transaction,
+						keyword)
+				) {
 
 					requestContext.addError (
 						"keyword can only contain letters and numbers");
@@ -172,193 +177,188 @@ class ChatAffiliateCreateOldAction
 
 			Long chatAffiliateId;
 
-			try (
+			ChatRec chat =
+				chatHelper.findFromContextRequired (
+					transaction);
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"ChatAffiliateCreateOldAction.goReal ()",
-						this);
+			ChatSchemeRec chatScheme =
+				chatSchemeHelper.findRequired (
+					transaction,
+					chatSchemeId);
 
+			if (chatScheme.getChat () != chat)
+				throw new RuntimeException ();
+
+			// check permissions
+
+			if (
+				! privChecker.canRecursive (
+					transaction,
+					chatScheme,
+					"affiliate_create")
 			) {
 
-				ChatRec chat =
-					chatHelper.findFromContextRequired ();
+				requestContext.addError (
+					"Access denied");
 
-				ChatSchemeRec chatScheme =
-					chatSchemeHelper.findRequired (
-						chatSchemeId);
+				return null;
 
-				if (chatScheme.getChat () != chat)
-					throw new RuntimeException ();
+			}
 
-				// check permissions
+			// check uniqueness of code
+
+			Optional <ChatAffiliateRec> existingChatAffiliateOptional =
+				chatAffiliateHelper.findByCode (
+					transaction,
+					chatScheme,
+					code);
+
+			if (
+				optionalIsPresent (
+					existingChatAffiliateOptional)
+			) {
+
+				requestContext.addError (
+					stringFormat (
+						"That name is already in use."));
+
+				return null;
+
+			}
+
+			// check uniqueness of keywords
+
+			for (int i = 0; i < 3; i++) {
+
+				String keyword =
+					requestContext.parameterRequired (
+						"keyword" + i);
 
 				if (
-					! privChecker.canRecursive (
-						taskLogger,
-						chatScheme,
-						"affiliate_create")
+					stringIsEmpty (
+						keyword)
 				) {
-
-					requestContext.addError ("Access denied");
-
-					return null;
-
+					continue;
 				}
 
-				// check uniqueness of code
-
-				Optional <ChatAffiliateRec> existingChatAffiliateOptional =
-					chatAffiliateHelper.findByCode (
-						chatScheme,
-						code);
+				Optional <ChatKeywordRec> existingChatKeywordOptional =
+					chatKeywordHelper.findByCode (
+						transaction,
+						chat,
+						keyword);
 
 				if (
 					optionalIsPresent (
-						existingChatAffiliateOptional)
+						existingChatKeywordOptional)
 				) {
 
 					requestContext.addError (
 						stringFormat (
-							"That name is already in use."));
+							"Global keyword already exists: %s",
+							keyword));
 
 					return null;
 
 				}
 
-				// check uniqueness of keywords
+				Optional <ChatSchemeKeywordRec> existingChatSchemeKeywordOptional =
+					chatSchemeKeywordHelper.findByCode (
+						transaction,
+						chatScheme,
+						keyword);
 
-				for (int i = 0; i < 3; i++) {
+				if (
+					optionalIsPresent (
+						existingChatSchemeKeywordOptional)
+				) {
 
-					String keyword =
-						requestContext.parameterRequired (
-							"keyword" + i);
+					requestContext.addError (
+						stringFormat (
+							"Keyword already exists: %s",
+							keyword));
 
-					if (
-						stringIsEmpty (
-							keyword)
-					) {
-						continue;
-					}
-
-					Optional <ChatKeywordRec> existingChatKeywordOptional =
-						chatKeywordHelper.findByCode (
-							chat,
-							keyword);
-
-					if (
-						optionalIsPresent (
-							existingChatKeywordOptional)
-					) {
-
-						requestContext.addError (
-							stringFormat (
-								"Global keyword already exists: %s",
-								keyword));
-
-						return null;
-					}
-
-					Optional <ChatSchemeKeywordRec> existingChatSchemeKeywordOptional =
-						chatSchemeKeywordHelper.findByCode (
-							chatScheme,
-							keyword);
-
-					if (
-						optionalIsPresent (
-							existingChatSchemeKeywordOptional)
-					) {
-
-						requestContext.addError (
-							stringFormat (
-								"Keyword already exists: %s",
-								keyword));
-
-						return null;
-
-					}
+					return null;
 
 				}
 
-				// create chat affiliate
+			}
 
-				ChatAffiliateRec chatAffiliate =
-					chatAffiliateHelper.insert (
-						taskLogger,
-						chatAffiliateHelper.createInstance ()
+			// create chat affiliate
+
+			ChatAffiliateRec chatAffiliate =
+				chatAffiliateHelper.insert (
+					transaction,
+					chatAffiliateHelper.createInstance ()
+
+				.setChatScheme (
+					chatScheme)
+
+				.setName (
+					name)
+
+				.setCode (
+					code)
+
+				.setDescription (
+					requestContext.parameterRequired (
+						"description"))
+
+			);
+
+			chatAffiliateId =
+				chatAffiliate.getId ();
+
+			// create keywords
+
+			for (int index = 0; index < 3; index ++) {
+
+				String keyword =
+					requestContext.parameterRequired (
+						"keyword" + index);
+
+				if (
+					stringIsEmpty (
+						keyword)
+				) {
+					continue;
+				}
+
+				chatSchemeKeywordHelper.insert (
+					transaction,
+					chatSchemeKeywordHelper.createInstance ()
 
 					.setChatScheme (
 						chatScheme)
 
-					.setName (
-						name)
+					.setKeyword (
+						keyword)
 
-					.setCode (
-						code)
+					.setJoinType (
+						toEnum (
+							ChatKeywordJoinType.class,
+							requestContext.parameterRequired (
+								"joinType" + index)))
 
-					.setDescription (
-						requestContext.parameterRequired (
-							"description"))
+					.setJoinGender (
+						toEnum (
+							Gender.class,
+							requestContext.parameterRequired (
+								"gender" + index)))
+
+					.setJoinOrient (
+						toEnum (
+							Orient.class,
+							requestContext.parameterRequired (
+								"orient" + index)))
+
+					.setJoinChatAffiliate (
+						chatAffiliate)
 
 				);
 
-				chatAffiliateId =
-					chatAffiliate.getId ();
-
-				// create keywords
-
-				for (int index = 0; index < 3; index ++) {
-
-					String keyword =
-						requestContext.parameterRequired (
-							"keyword" + index);
-
-					if (
-						stringIsEmpty (
-							keyword)
-					) {
-						continue;
-					}
-
-					chatSchemeKeywordHelper.insert (
-						taskLogger,
-						chatSchemeKeywordHelper.createInstance ()
-
-						.setChatScheme (
-							chatScheme)
-
-						.setKeyword (
-							keyword)
-
-						.setJoinType (
-							toEnum (
-								ChatKeywordJoinType.class,
-								requestContext.parameterRequired (
-									"joinType" + index)))
-
-						.setJoinGender (
-							toEnum (
-								Gender.class,
-								requestContext.parameterRequired (
-									"gender" + index)))
-
-						.setJoinOrient (
-							toEnum (
-								Orient.class,
-								requestContext.parameterRequired (
-									"orient" + index)))
-
-						.setJoinChatAffiliate (
-							chatAffiliate)
-
-					);
-
-				}
-
-				transaction.commit ();
-
 			}
+
+			transaction.commit ();
 
 			// set up our new tab context
 
@@ -368,7 +368,7 @@ class ChatAffiliateCreateOldAction
 			requestContext.setEmptyFormData ();
 
 			privChecker.refresh (
-				taskLogger);
+				transaction);
 
 			ConsoleContext targetContext =
 				consoleManager.context (
@@ -376,7 +376,7 @@ class ChatAffiliateCreateOldAction
 					true);
 
 			consoleManager.changeContext (
-				taskLogger,
+				transaction,
 				targetContext,
 				"/" + chatAffiliateId);
 

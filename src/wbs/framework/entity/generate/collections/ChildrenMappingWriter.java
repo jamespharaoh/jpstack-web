@@ -32,6 +32,7 @@ import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.entity.meta.collections.ChildrenMappingSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("childrenMappingWriter")
@@ -69,11 +70,11 @@ class ChildrenMappingWriter
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");

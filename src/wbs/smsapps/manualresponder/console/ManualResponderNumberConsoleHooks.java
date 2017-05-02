@@ -7,9 +7,12 @@ import lombok.NonNull;
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.event.logic.EventLogic;
 
@@ -28,6 +31,9 @@ class ManualResponderNumberConsoleHooks
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RandomLogic randomLogic;
 
@@ -39,18 +45,29 @@ class ManualResponderNumberConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object searchObject) {
 
-		ManualResponderNumberSearch search =
-			genericCastUnchecked (
-				searchObject);
+		try (
 
-		search
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"applySearchFilter");
 
-			.manualResponderId (
-				requestContext.stuffIntegerRequired (
-					"manualResponderId"));
+		) {
+
+			ManualResponderNumberSearch search =
+				genericCastUnchecked (
+					searchObject);
+
+			search
+
+				.manualResponderId (
+					requestContext.stuffIntegerRequired (
+						"manualResponderId"));
+
+		}
 
 	}
 

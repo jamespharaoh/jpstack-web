@@ -19,12 +19,15 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
@@ -62,6 +65,9 @@ class ForwarderApiLogicImplementation
 	@SingletonDependency
 	ForwarderObjectHelper forwarderHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
@@ -75,67 +81,81 @@ class ForwarderApiLogicImplementation
 	@Override
 	public
 	ForwarderRec lookupForwarder (
-			RequestContext requestContext,
-			String sliceCode,
-			String code,
-			String password)
+			@NonNull Transaction parentTransaction,
+			@NonNull RequestContext requestContext,
+			@NonNull String sliceCode,
+			@NonNull String code,
+			@NonNull String password)
 		throws
 			ForwarderNotFoundException,
 			IncorrectPasswordException {
 
-		// find the slice
+		try (
 
-		Optional<SliceRec> sliceOptional =
-			sliceHelper.findByCode (
-				GlobalId.root,
-				sliceCode);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"lookupForwarder");
 
-		if (
-			optionalIsNotPresent (
-				sliceOptional)
 		) {
 
-			throw new ForwarderNotFoundException ();
+			// find the slice
+
+			Optional <SliceRec> sliceOptional =
+				sliceHelper.findByCode (
+					transaction,
+					GlobalId.root,
+					sliceCode);
+
+			if (
+				optionalIsNotPresent (
+					sliceOptional)
+			) {
+
+				throw new ForwarderNotFoundException ();
+
+			}
+
+			SliceRec slice =
+				sliceOptional.get ();
+
+			// find the forwarder
+
+			Optional <ForwarderRec> forwarderOptional =
+				forwarderHelper.findByCode (
+					transaction,
+					slice,
+					code);
+
+			if (
+				optionalIsNotPresent (
+					forwarderOptional)
+			) {
+
+				throw new ForwarderNotFoundException ();
+
+			}
+
+			ForwarderRec forwarder =
+				forwarderOptional.get ();
+
+			// check the password
+
+			if (
+				stringNotEqualSafe (
+					forwarder.getPassword (),
+					password)
+			) {
+
+				throw new IncorrectPasswordException ();
+
+			}
+
+			// return
+
+			return forwarder;
 
 		}
-
-		SliceRec slice =
-			sliceOptional.get ();
-
-		// find the forwarder
-
-		Optional<ForwarderRec> forwarderOptional =
-			forwarderHelper.findByCode (
-				slice,
-				code);
-
-		if (
-			optionalIsNotPresent (
-				forwarderOptional)
-		) {
-
-			throw new ForwarderNotFoundException ();
-
-		}
-
-		ForwarderRec forwarder =
-			forwarderOptional.get ();
-
-		// check the password
-
-		if (
-			stringNotEqualSafe (
-				forwarder.getPassword (),
-				password)
-		) {
-
-			throw new IncorrectPasswordException ();
-
-		}
-
-		// return
-
-		return forwarder;
 
 	}
 
@@ -148,151 +168,33 @@ class ForwarderApiLogicImplementation
 	@Override
 	public
 	Responder controlActionGet (
-			RequestContext requestContext,
-			ForwarderRec forwarder) {
-
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
-
-		ForwarderMessageInRec forwarderMessageIn =
-			forwarderMessageInHelper.findNext (
-				transaction.now (),
-				forwarder);
-
-		if (forwarderMessageIn == null) {
-
-			return textResponderProvider.get ()
-
-				.text (
-					"NONE\n");
-
-		}
-
-		forwarderMessageIn
-
-			.setPending (
-				false)
-
-			.setSendQueue (
-				false)
-
-			.setRetryTime (
-				null)
-
-			.setProcessedTime (
-				transaction.now ());
-
-		return textResponderProvider.get ()
-
-			.text (
-				printMessageIn (
-					requestContext,
-					forwarderMessageIn));
-
-	}
-
-	// ================================= control action borrow
-
-	/**
-	 * Given a forwarderId, "borrows" the next message in the queue and outputs
-	 * it appropriately.
-	 */
-	@Override
-	public
-	Responder controlActionBorrow (
-			RequestContext requestContext,
-			ForwarderRec forwarder) {
-
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
-
-		ForwarderMessageInRec forwarderMessageIn =
-			forwarderMessageInHelper.findNext (
-				transaction.now (),
-				forwarder);
-
-		if (forwarderMessageIn == null) {
-
-			return textResponderProvider.get ()
-				.text ("NONE\n");
-
-		}
-
-		forwarderMessageIn
-
-			.setBorrowedTime (
-				transaction.now ().plus (
-					Duration.standardMinutes (10)));
-
-		return textResponderProvider.get ()
-			.text (
-				printMessageIn (
-					requestContext,
-					forwarderMessageIn));
-
-	}
-
-	// ============================================================ control
-	// action unique
-
-	@Override
-	public
-	Responder controlActionUnqueue (
+			@NonNull Transaction parentTransaction,
 			@NonNull RequestContext requestContext,
-			@NonNull ForwarderRec forwarder)
-		throws ReportableException {
+			@NonNull ForwarderRec forwarder) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		// get the message id
-
-		String tempString =
-			requestContext.parameterOrNull (
-				"id");
-
-		if (tempString == null) {
-
-			return textResponderProvider.get ()
-
-				.text (
-					"ERROR\nNo id supplied\n");
-
-		}
-
-		Long forwarderMessageInId =
-			Long.parseLong (
-				tempString);
-
-		// find the message
-
-		Optional <ForwarderMessageInRec> forwarderMessageInOptional =
-			forwarderMessageInHelper.find (
-				forwarderMessageInId);
-
-		if (
-
-			optionalIsNotPresent (
-				forwarderMessageInOptional)
-
-			|| referenceNotEqualWithClass (
-				ForwarderRec.class,
-				forwarderMessageInOptional.get ().getForwarder (),
-				forwarder)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"controlActionGet");
 
 		) {
 
-			throw new ReportableException (
-				"Message not found");
+			ForwarderMessageInRec forwarderMessageIn =
+				forwarderMessageInHelper.findNext (
+					transaction,
+					transaction.now (),
+					forwarder);
 
-		}
+			if (forwarderMessageIn == null) {
 
-		ForwarderMessageInRec forwarderMessageIn =
-			forwarderMessageInOptional.get ();
+				return textResponderProvider.get ()
 
-		// update it
+					.text (
+						"NONE\n");
 
-		if (forwarderMessageIn.getPending ()) {
+			}
 
 			forwarderMessageIn
 
@@ -308,10 +210,158 @@ class ForwarderApiLogicImplementation
 				.setProcessedTime (
 					transaction.now ());
 
+			return textResponderProvider.get ()
+
+				.text (
+					printMessageIn (
+						requestContext,
+						forwarderMessageIn));
+
 		}
 
-		return textResponderProvider.get ()
-			.text ("OK\n");
+	}
+
+	// ================================= control action borrow
+
+	/**
+	 * Given a forwarderId, "borrows" the next message in the queue and outputs
+	 * it appropriately.
+	 */
+	@Override
+	public
+	Responder controlActionBorrow (
+			@NonNull Transaction parentTransaction,
+			@NonNull RequestContext requestContext,
+			@NonNull ForwarderRec forwarder) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"controlActionBorrow");
+
+		) {
+
+			ForwarderMessageInRec forwarderMessageIn =
+				forwarderMessageInHelper.findNext (
+					transaction,
+					transaction.now (),
+					forwarder);
+
+			if (forwarderMessageIn == null) {
+
+				return textResponderProvider.get ()
+					.text ("NONE\n");
+
+			}
+
+			forwarderMessageIn
+
+				.setBorrowedTime (
+					transaction.now ().plus (
+						Duration.standardMinutes (10)));
+
+			return textResponderProvider.get ()
+				.text (
+					printMessageIn (
+						requestContext,
+						forwarderMessageIn));
+
+		}
+
+	}
+
+	// ============================================================ control
+	// action unique
+
+	@Override
+	public
+	Responder controlActionUnqueue (
+			@NonNull Transaction parentTransaction,
+			@NonNull RequestContext requestContext,
+			@NonNull ForwarderRec forwarder)
+		throws ReportableException {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"controlActionUnqueue");
+
+		) {
+
+			// get the message id
+
+			String tempString =
+				requestContext.parameterOrNull (
+					"id");
+
+			if (tempString == null) {
+
+				return textResponderProvider.get ()
+
+					.text (
+						"ERROR\nNo id supplied\n");
+
+			}
+
+			Long forwarderMessageInId =
+				Long.parseLong (
+					tempString);
+
+			// find the message
+
+			Optional <ForwarderMessageInRec> forwarderMessageInOptional =
+				forwarderMessageInHelper.find (
+					transaction,
+					forwarderMessageInId);
+
+			if (
+
+				optionalIsNotPresent (
+					forwarderMessageInOptional)
+
+				|| referenceNotEqualWithClass (
+					ForwarderRec.class,
+					forwarderMessageInOptional.get ().getForwarder (),
+					forwarder)
+
+			) {
+
+				throw new ReportableException (
+					"Message not found");
+
+			}
+
+			ForwarderMessageInRec forwarderMessageIn =
+				forwarderMessageInOptional.get ();
+
+			// update it
+
+			if (forwarderMessageIn.getPending ()) {
+
+				forwarderMessageIn
+
+					.setPending (
+						false)
+
+					.setSendQueue (
+						false)
+
+					.setRetryTime (
+						null)
+
+					.setProcessedTime (
+						transaction.now ());
+
+			}
+
+			return textResponderProvider.get ()
+				.text ("OK\n");
+
+		}
 
 	}
 
@@ -362,110 +412,124 @@ class ForwarderApiLogicImplementation
 	@Override
 	public
 	ForwarderRec rpcAuth (
-			RpcSource source) {
+			@NonNull Transaction parentTransaction,
+			@NonNull RpcSource source) {
 
-		List <String> errors =
-			new ArrayList<> ();
+		try (
 
-		// check params are present
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"rpcAuth");
 
-		Map <String, Object> params =
-			genericCastUnchecked (
-				source.obtain (
-					authRequestDefinition,
-					errors,
-					false));
-
-		if (errors.size () > 0) {
-
-			throw new RpcException (
-				Rpc.rpcError (
-					"error-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors));
-
-		}
-
-		// get them
-
-		String sliceCode =
-			(String) params.get ("slice");
-
-		String forwarderCode =
-			(String) params.get ("forwarder");
-
-		String password =
-			(String) params.get ("password");
-
-		// lookup slice
-
-		Optional<SliceRec> sliceOptional =
-			sliceHelper.findByCode (
-				GlobalId.root,
-				sliceCode);
-
-		if (
-			optionalIsNotPresent (
-				sliceOptional)
 		) {
 
-			throw new RpcException (
-				Rpc.rpcError (
-					"error-response",
-					Rpc.stAuthError,
-					"auth-error",
-					"Slice, forwarder and/or password not recognised"));
+			List <String> errors =
+				new ArrayList<> ();
+
+			// check params are present
+
+			Map <String, Object> params =
+				genericCastUnchecked (
+					source.obtain (
+						authRequestDefinition,
+						errors,
+						false));
+
+			if (errors.size () > 0) {
+
+				throw new RpcException (
+					Rpc.rpcError (
+						"error-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors));
+
+			}
+
+			// get them
+
+			String sliceCode =
+				(String) params.get ("slice");
+
+			String forwarderCode =
+				(String) params.get ("forwarder");
+
+			String password =
+				(String) params.get ("password");
+
+			// lookup slice
+
+			Optional <SliceRec> sliceOptional =
+				sliceHelper.findByCode (
+					transaction,
+					GlobalId.root,
+					sliceCode);
+
+			if (
+				optionalIsNotPresent (
+					sliceOptional)
+			) {
+
+				throw new RpcException (
+					Rpc.rpcError (
+						"error-response",
+						Rpc.stAuthError,
+						"auth-error",
+						"Slice, forwarder and/or password not recognised"));
+
+			}
+
+			SliceRec slice =
+				sliceOptional.get ();
+
+			// lookup forwarder
+
+			Optional<ForwarderRec> forwarderOptional =
+				forwarderHelper.findByCode (
+					transaction,
+					slice,
+					forwarderCode);
+
+			if (
+				optionalIsNotPresent (
+					forwarderOptional)
+			) {
+
+				throw new RpcException (
+					Rpc.rpcError (
+						"error-response",
+						Rpc.stAuthError,
+						"auth-error",
+						"Slice, forwarder and/or password not recognised"));
+
+			}
+
+			ForwarderRec forwarder =
+				forwarderOptional.get ();
+
+			// check password
+
+			if (
+				stringNotEqualSafe (
+					forwarder.getPassword (),
+					password)
+			) {
+
+				throw new RpcException (
+					Rpc.rpcError (
+						"error-response",
+						Rpc.stAuthError,
+						"auth-error",
+						"Slice, forwarder and/or password not recognised"));
+
+			}
+
+			// return
+
+			return forwarder;
 
 		}
-
-		SliceRec slice =
-			sliceOptional.get ();
-
-		// lookup forwarder
-
-		Optional<ForwarderRec> forwarderOptional =
-			forwarderHelper.findByCode (
-				slice,
-				forwarderCode);
-
-		if (
-			optionalIsNotPresent (
-				forwarderOptional)
-		) {
-
-			throw new RpcException (
-				Rpc.rpcError (
-					"error-response",
-					Rpc.stAuthError,
-					"auth-error",
-					"Slice, forwarder and/or password not recognised"));
-
-		}
-
-		ForwarderRec forwarder =
-			forwarderOptional.get ();
-
-		// check password
-
-		if (
-			stringNotEqualSafe (
-				forwarder.getPassword (),
-				password)
-		) {
-
-			throw new RpcException (
-				Rpc.rpcError (
-					"error-response",
-					Rpc.stAuthError,
-					"auth-error",
-					"Slice, forwarder and/or password not recognised"));
-
-		}
-
-		// return
-
-		return forwarder;
 
 	}
 

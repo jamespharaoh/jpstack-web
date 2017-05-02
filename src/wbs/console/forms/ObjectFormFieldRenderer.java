@@ -36,9 +36,10 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.etc.OptionalUtils;
@@ -111,7 +112,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
@@ -122,9 +123,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormInput");
 
 		) {
@@ -141,6 +142,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				root =
 					genericCastUnchecked (
 						objectManager.dereference (
+							transaction,
 							container,
 							rootFieldName,
 							hints));
@@ -173,7 +175,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 						formName)
 					? resultValueRequired (
 						formToInterface (
-							taskLogger,
+							transaction,
 							submission,
 							formName))
 					: interfaceValue;
@@ -181,7 +183,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			// get a list of options
 
 			Collection <Interface> allOptions =
-				entityFinder.findAllEntities ();
+				entityFinder.findAllEntities (
+					transaction);
 
 			// filter visible options
 
@@ -191,6 +194,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				.filter (
 					root.isPresent ()
 						? item -> objectManager.isParent (
+							transaction,
 							item,
 							root.get ())
 						: item -> true)
@@ -202,11 +206,12 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 						successOrElse (
 							entityFinder.getNotDeletedOrErrorCheckParents (
+								transaction,
 								item),
 							error -> true)
 
 						&& objectManager.canView (
-							taskLogger,
+							transaction,
 							item)
 
 					) || (
@@ -238,6 +243,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 				sortedOptions.put (
 					objectManager.objectPathMiniPreload (
+						transaction,
 						option,
 						root),
 					option);
@@ -311,6 +317,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					! selected
 
 					&& objectHelper.getDeleted (
+						transaction,
 						genericCastUnchecked (
 							optionValue),
 						true)
@@ -342,7 +349,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Interface> interfaceValue,
@@ -350,9 +357,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -393,39 +400,51 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	Either <Optional <Interface>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		String param =
-			submission.parameter (
-				stringFormat (
-					"%s.%s",
-					formName,
-					name ()));
+		try (
 
-		if (
-			stringEqualSafe (
-				param,
-				"none")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formToInterface");
+
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			String param =
+				submission.parameter (
+					stringFormat (
+						"%s.%s",
+						formName,
+						name ()));
 
-		} else {
+			if (
+				stringEqualSafe (
+					param,
+					"none")
+			) {
 
-			Long objectId =
-				parseIntegerRequired (
-					param);
+				return successResult (
+					optionalAbsent ());
 
-			Interface interfaceValue =
-				entityFinder.findEntity (
-					objectId);
+			} else {
 
-			return successResult (
-				optionalOf (
-					interfaceValue));
+				Long objectId =
+					parseIntegerRequired (
+						param);
+
+				Interface interfaceValue =
+					entityFinder.findEntity (
+						transaction,
+						objectId);
+
+				return successResult (
+					optionalOf (
+						interfaceValue));
+
+			}
 
 		}
 
@@ -434,51 +453,64 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
 			boolean link) {
 
-		// work out root
+		try (
 
-		Optional <Record <?>> root;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlSimple");
 
-		if (rootFieldName != null) {
-
-			root =
-				genericCastUnchecked (
-					objectManager.dereferenceRequired (
-						container,
-						rootFieldName));
-
-		} else {
-
-			root =
-				optionalAbsent ();
-
-		}
-
-		// render object path
-
-		if (
-			OptionalUtils.optionalIsPresent (
-				interfaceValue)
 		) {
 
-			htmlWriter.writeLineFormat (
-				"%h",
-				objectManager.objectPath (
-					interfaceValue.get (),
-					root,
-					true,
-					false));
+			// work out root
 
-		} else {
+			Optional <Record <?>> root;
 
-			htmlWriter.writeLineFormat (
-				"&mdash;");
+			if (rootFieldName != null) {
+
+				root =
+					genericCastUnchecked (
+						objectManager.dereferenceRequired (
+							transaction,
+							container,
+							rootFieldName));
+
+			} else {
+
+				root =
+					optionalAbsent ();
+
+			}
+
+			// render object path
+
+			if (
+				OptionalUtils.optionalIsPresent (
+					interfaceValue)
+			) {
+
+				htmlWriter.writeLineFormat (
+					"%h",
+					objectManager.objectPath (
+						transaction,
+						interfaceValue.get (),
+						root,
+						true,
+						false));
+
+			} else {
+
+				htmlWriter.writeLineFormat (
+					"&mdash;");
+
+			}
 
 		}
 
@@ -487,7 +519,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlTableCellList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -497,9 +529,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlTableCellList");
 
 		) {
@@ -522,6 +554,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					optionalOf (
 						(Record <?>)
 						objectManager.dereferenceObsolete (
+							transaction,
 							container,
 							rootFieldName));
 
@@ -540,7 +573,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			) {
 
 				objectManager.writeTdForObject (
-					taskLogger,
+					transaction,
 					formatWriter,
 					interfaceValue.orNull (),
 					rootOptional,
@@ -572,7 +605,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -582,9 +615,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlTableCellProperties");
 
 		) {
@@ -607,6 +640,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					optionalOf (
 						(Record <?>)
 						objectManager.dereferenceObsolete (
+							transaction,
 							container,
 							rootFieldName));
 
@@ -625,7 +659,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			) {
 
 				objectManager.writeTdForObject (
-					taskLogger,
+					transaction,
 					formatWriter,
 					interfaceValue.orNull (),
 					rootOptional,

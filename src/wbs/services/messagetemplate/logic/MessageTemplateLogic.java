@@ -1,6 +1,6 @@
 package wbs.services.messagetemplate.logic;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.scaffold.model.SliceRec;
 
@@ -10,7 +10,7 @@ public
 interface MessageTemplateLogic {
 
 	MessageTemplateDatabaseRec readMessageTemplateDatabaseFromClasspath (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SliceRec slice,
 			String resourceName);
 

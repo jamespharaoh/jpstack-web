@@ -21,7 +21,8 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -74,15 +75,15 @@ class ChatGraphsDailyUsersImageResponder
 	@Override
 	protected
 	void prepareData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Instant minTime,
 			@NonNull Instant maxTime) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepareData");
 
 		) {
@@ -99,7 +100,8 @@ class ChatGraphsDailyUsersImageResponder
 				maxTime);
 
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			searchMap.put (
 				"chatId",
@@ -122,7 +124,7 @@ class ChatGraphsDailyUsersImageResponder
 
 			Collection <ChatUserSessionRec> chatUserSessions =
 				chatUserSessionHelper.search (
-					taskLogger,
+					transaction,
 					searchMap);
 
 			List <Set <ChatUserRec>> chatUserSets =
@@ -137,6 +139,7 @@ class ChatGraphsDailyUsersImageResponder
 
 			timezone =
 				chatMiscLogic.timezone (
+					transaction,
 					chat);
 
 			for (ChatUserSessionRec chatUserSession

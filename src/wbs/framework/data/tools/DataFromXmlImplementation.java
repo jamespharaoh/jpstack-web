@@ -72,6 +72,7 @@ import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
@@ -113,7 +114,7 @@ class DataFromXmlImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"readInputStream");
@@ -193,7 +194,7 @@ class DataFromXmlImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"readClasspath");
@@ -237,7 +238,7 @@ class DataFromXmlImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"readClasspath");
@@ -288,7 +289,7 @@ class DataFromXmlImplementation
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
 						"ElementBuilder.build");

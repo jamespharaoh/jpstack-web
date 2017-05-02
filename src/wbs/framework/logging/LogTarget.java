@@ -8,7 +8,7 @@ interface LogTarget {
 	void writeToLog (
 			TaskLogger parentTaskLogger,
 			LogSeverity severity,
-			String message,
+			CharSequence message,
 			Optional <Throwable> exception);
 
 	boolean debugEnabled ();

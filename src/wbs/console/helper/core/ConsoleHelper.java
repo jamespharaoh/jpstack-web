@@ -2,6 +2,7 @@ package wbs.console.helper.core;
 
 import wbs.console.forms.EntityFinder;
 import wbs.console.lookup.ObjectLookup;
+
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectModelMethods;

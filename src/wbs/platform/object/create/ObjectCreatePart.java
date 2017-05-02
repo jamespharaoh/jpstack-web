@@ -34,6 +34,8 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -116,25 +118,26 @@ class ObjectCreatePart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			prepareParents ();
+			prepareParents (
+				transaction);
 
 			// if a field provider was provided
 
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -168,109 +171,126 @@ class ObjectCreatePart <
 
 	}
 
-	void prepareParents () {
+	void prepareParents (
+			@NonNull Transaction parentTransaction) {
 
-		ConsoleHelper <ParentType> parentHelperTemp =
-			objectManager.findConsoleHelperRequired (
-				consoleHelper.parentClass ());
+		try (
 
-		parentHelper =
-			parentHelperTemp;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareParents");
 
-		if (parentHelper.isRoot ()) {
-
-			ParentType parentTemp =
-				genericCastUnchecked (
-					rootHelper.findRequired (
-						0l));
-
-			parent =
-				parentTemp;
-
-			return;
-
-		}
-
-		Optional <Long> parentIdOptional =
-			requestContext.stuffInteger (
-				parentHelper.idKey ());
-
-		if (
-			optionalIsPresent (
-				parentIdOptional)
 		) {
 
-			// use specific parent
+			ConsoleHelper <ParentType> parentHelperTemp =
+				objectManager.findConsoleHelperRequired (
+					consoleHelper.parentClass ());
 
-			parent =
-				parentHelper.findRequired (
-					optionalGetRequired (
-						parentIdOptional));
+			parentHelper =
+				parentHelperTemp;
 
-			return;
+			if (parentHelper.isRoot ()) {
 
-		}
+				ParentType parentTemp =
+					genericCastUnchecked (
+						rootHelper.findRequired (
+							transaction,
+							0l));
 
-		ConsoleHelper <?> grandParentHelper =
-			objectManager.findConsoleHelperRequired (
-				parentHelper.parentClass ());
+				parent =
+					parentTemp;
 
-		Optional <Long> grandParentIdOptional =
-			requestContext.stuffInteger (
-				grandParentHelper.idKey ());
+				return;
 
-		if (
-			optionalIsPresent (
-				grandParentIdOptional)
-		) {
+			}
 
-			// show parents based on grand parent
+			Optional <Long> parentIdOptional =
+				requestContext.stuffInteger (
+					parentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					parentIdOptional)
+			) {
+
+				// use specific parent
+
+				parent =
+					parentHelper.findRequired (
+						transaction,
+						optionalGetRequired (
+							parentIdOptional));
+
+				return;
+
+			}
+
+			ConsoleHelper <?> grandParentHelper =
+				objectManager.findConsoleHelperRequired (
+					parentHelper.parentClass ());
+
+			Optional <Long> grandParentIdOptional =
+				requestContext.stuffInteger (
+					grandParentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					grandParentIdOptional)
+			) {
+
+				// show parents based on grand parent
+
+				parents =
+					parentHelper.findByParent (
+						transaction,
+						new GlobalId (
+							grandParentHelper.objectTypeId (),
+							optionalGetRequired (
+								grandParentIdOptional)));
+
+				// set grandparent hints
+
+				Record <?> grandparent =
+					grandParentHelper.findRequired (
+						transaction,
+						optionalGetRequired (
+							grandParentIdOptional));
+
+				hints.put (
+					"grandparent",
+					grandparent);
+
+				hints.put (
+					stringFormat (
+						"%s.parent",
+						consoleHelper.parentFieldName ()),
+					grandparent);
+
+				hints.put (
+					stringFormat (
+						"parent.%s",
+						parentHelper.parentFieldName ()),
+					grandparent);
+
+				hints.put (
+					stringFormat (
+						"%s.%s",
+						consoleHelper.parentFieldName (),
+						parentHelper.parentFieldName ()),
+					grandparent);
+
+				return;
+
+			}
+
+			// show all parents
 
 			parents =
-				parentHelper.findByParent (
-					new GlobalId (
-						grandParentHelper.objectTypeId (),
-						optionalGetRequired (
-							grandParentIdOptional)));
-
-			// set grandparent hints
-
-			Record <?> grandparent =
-				grandParentHelper.findRequired (
-					optionalGetRequired (
-						grandParentIdOptional));
-
-			hints.put (
-				"grandparent",
-				grandparent);
-
-			hints.put (
-				stringFormat (
-					"%s.parent",
-					consoleHelper.parentFieldName ()),
-				grandparent);
-
-			hints.put (
-				stringFormat (
-					"parent.%s",
-					parentHelper.parentFieldName ()),
-				grandparent);
-
-			hints.put (
-				stringFormat (
-					"%s.%s",
-					consoleHelper.parentFieldName (),
-					parentHelper.parentFieldName ()),
-				grandparent);
-
-			return;
+				parentHelper.findAll (
+					transaction);
 
 		}
-
-		// show all parents
-
-		parents =
-			parentHelper.findAll ();
 
 	}
 
@@ -289,13 +309,13 @@ class ObjectCreatePart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -305,7 +325,7 @@ class ObjectCreatePart <
 				consoleHelper.shortName ());
 
 			formFieldLogic.outputFormTable (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				formFieldSet,

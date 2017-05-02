@@ -16,22 +16,26 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -40,7 +44,7 @@ import wbs.framework.logging.TaskLogger;
 public
 class SupervisorPageBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+> implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -49,6 +53,9 @@ class SupervisorPageBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -91,29 +98,43 @@ class SupervisorPageBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
-	void buildConsoleModule (
-			@NonNull Builder builder) {
+	void build (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		setDefaults ();
+		try (
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
+			 OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildConsoleModule");
+
 		) {
 
-			buildContextTab (
-				resolvedExtensionPoint);
+			setDefaults ();
 
-			buildContextFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildContextTab (
+					resolvedExtensionPoint);
+
+				buildContextFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildPagePartFactory ();
+
+			buildResponder ();
 
 		}
-
-		buildPagePartFactory ();
-		buildResponder ();
 
 	}
 
@@ -145,12 +166,16 @@ class SupervisorPageBuilder <
 	void buildPagePartFactory () {
 
 		pagePartFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildPagePartFactory");
+
+			) {
 
 				return supervisorPart.get ()
 

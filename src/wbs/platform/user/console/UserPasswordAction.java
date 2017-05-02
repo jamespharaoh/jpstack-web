@@ -71,33 +71,29 @@ class UserPasswordAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		String password1 =
-			requestContext.parameterRequired (
-				"password_1");
-
-		String password2 =
-			requestContext.parameterRequired (
-				"password_2");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"UserPasswordAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
+
+			String password1 =
+				requestContext.parameterRequired (
+					"password_1");
+
+			String password2 =
+				requestContext.parameterRequired (
+					"password_2");
 
 			// load user
 
 			UserRec user =
-				userHelper.findFromContextRequired ();
+				userHelper.findFromContextRequired (
+					transaction);
 
 			// check privs
 
@@ -106,10 +102,11 @@ class UserPasswordAction
 				referenceNotEqualWithClass (
 					UserRec.class,
 					user,
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				&& ! privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					user,
 					"manage")
 
@@ -177,9 +174,10 @@ class UserPasswordAction
 			// create an event
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"user_password_reset",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				user);
 
 			transaction.commit ();

@@ -1,11 +1,11 @@
 package wbs.smsapps.broadcast.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -17,10 +17,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.model.UserRec;
 
@@ -64,22 +64,19 @@ class BroadcastLogicImplementation
 	@Override
 	public
 	AddResult addNumbers (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <String> numberStrings,
 			UserRec user) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"addNumbers");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			AddResult result =
 				new AddResult ();
@@ -98,7 +95,7 @@ class BroadcastLogicImplementation
 
 				List <NumberRec> batchNumbers =
 					numberHelper.findOrCreateMany (
-						taskLogger,
+						transaction,
 						numberStringsBatch);
 
 				Pair <List <NumberRec>, List <NumberRec>> batchSplitNumbers =
@@ -106,10 +103,11 @@ class BroadcastLogicImplementation
 						isNotNull (
 							broadcastConfig.getBlockNumberLookup ()),
 						() -> numberLookupManager.splitNumbersPresent (
+							transaction,
 							broadcastConfig.getBlockNumberLookup (),
 							batchNumbers),
 						() -> Pair.of (
-							new ArrayList <NumberRec> (),
+							emptyList (),
 							batchNumbers));
 
 				// process rejected numbers
@@ -119,7 +117,7 @@ class BroadcastLogicImplementation
 
 				List <BroadcastNumberRec> batchRejectedBroadcastNumbers =
 					broadcastNumberHelper.findOrCreateMany (
-						taskLogger,
+						transaction,
 						broadcast,
 						batchRejectedNumbers);
 
@@ -140,7 +138,7 @@ class BroadcastLogicImplementation
 
 					case removed:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Reject number %s",
 							rejectedBroadcastNumber.getNumber ().getNumber ());
 
@@ -166,7 +164,7 @@ class BroadcastLogicImplementation
 
 					case accepted:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Don't reject existing number %s",
 							rejectedBroadcastNumber.getNumber ().getNumber ());
 
@@ -176,7 +174,7 @@ class BroadcastLogicImplementation
 
 					case rejected:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Already rejected number %s",
 							rejectedBroadcastNumber.getNumber ().getNumber ());
 
@@ -200,7 +198,7 @@ class BroadcastLogicImplementation
 
 				List <BroadcastNumberRec> batchAcceptedBroadcastNumbers =
 					broadcastNumberHelper.findOrCreateMany (
-						taskLogger,
+						transaction,
 						broadcast,
 						batchAcceptedNumbers);
 
@@ -221,7 +219,7 @@ class BroadcastLogicImplementation
 
 					case removed:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Add number %s",
 							acceptedBroadcastNumber.getNumber ().getNumber ());
 
@@ -250,7 +248,7 @@ class BroadcastLogicImplementation
 
 					case accepted:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Already added number %s",
 							acceptedBroadcastNumber.getNumber ().getNumber ());
 
@@ -260,7 +258,7 @@ class BroadcastLogicImplementation
 
 					case rejected:
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Adding previously rejected number %s",
 							acceptedBroadcastNumber.getNumber ().getNumber ());
 

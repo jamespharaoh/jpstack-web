@@ -13,18 +13,25 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.CodeUtils;
 
@@ -32,9 +39,13 @@ import wbs.utils.string.CodeUtils;
 @PrototypeComponent ("codeFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class CodeFormFieldBuilder {
+class CodeFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -97,207 +108,220 @@ class CodeFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		ConsoleHelper consoleHelper =
-			context.consoleHelper ();
+		try (
 
-		String name =
-			ifNull (
-				spec.name (),
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			ConsoleHelper consoleHelper =
+				context.consoleHelper ();
+
+			String name =
+				ifNull (
+					spec.name (),
+					spec.delegate () == null
+						? consoleHelper.codeFieldName ()
+						: null,
+					"code");
+
+			String fullName =
 				spec.delegate () == null
-					? consoleHelper.codeFieldName ()
-					: null,
-				"code");
+					? name
+					: stringFormat (
+						"%s.%s",
+						spec.delegate (),
+						name);
 
-		String fullName =
-			spec.delegate () == null
-				? name
-				: stringFormat (
-					"%s.%s",
-					spec.delegate (),
+			String label =
+				ifNull (
+					spec.label (),
+					spec.delegate () == null
+						? capitalise (
+							consoleHelper.codeLabel ())
+						: null,
+					"Code");
+
+			if (
+				spec.delegate () != null
+				&& spec.readOnly () != null
+				&& spec.readOnly () == false
+			) {
+				throw new RuntimeException ();
+			}
+
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					spec.delegate () != null ? true : null,
+					! consoleHelper.nameIsCode (),
+					false);
+
+			Pattern pattern =
+				spec.pattern () != null
+					? namedPatterns.containsKey (
+						spec.pattern ())
+						? namedPatterns.get (
+							spec.pattern ())
+						: Pattern.compile (
+							spec.pattern ())
+					: CodeUtils.codePattern;
+
+			// accessor
+
+			FormFieldAccessor accessor =
+				specialFormFieldAccessorProvider.get ()
+
+				.specialName (
+					"code")
+
+				.nativeClass (
+					String.class);
+
+			if (spec.delegate () != null) {
+
+				accessor =
+					delegateFormFieldAccessorProvider.get ()
+
+					.path (
+						spec.delegate ())
+
+					.delegateFormFieldAccessor (
+						accessor);
+
+			}
+
+			// native mapping
+
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+			// value validator
+
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+			valueValidators.add (
+				codeFormFieldValueValidatorProvider.get ()
+
+				.pattern (
+					pattern)
+
+			);
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				codeFormFieldValueConstraintValidatorProvider.get ();
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.get ();
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
+
+				.name (
+					fullName)
+
+				.label (
+					label)
+
+				.nullable (
+					false);
+
+			// update hook
+
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
 					name);
 
-		String label =
-			ifNull (
-				spec.label (),
-				spec.delegate () == null
-					? capitalise (
-						consoleHelper.codeLabel ())
-					: null,
-				"Code");
+			// field
 
-		if (
-			spec.delegate () != null
-			&& spec.readOnly () != null
-			&& spec.readOnly () == false
-		) {
-			throw new RuntimeException ();
-		}
+			if (readOnly) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				spec.delegate () != null ? true : null,
-				! consoleHelper.nameIsCode (),
-				false);
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-		Pattern pattern =
-			spec.pattern () != null
-				? namedPatterns.containsKey (
-					spec.pattern ())
-					? namedPatterns.get (
-						spec.pattern ())
-					: Pattern.compile (
-						spec.pattern ())
-				: CodeUtils.codePattern;
+					.name (
+						fullName)
 
-		// accessor
+					.label (
+						label)
 
-		FormFieldAccessor accessor =
-			specialFormFieldAccessorProvider.get ()
+					.accessor (
+						accessor)
 
-			.specialName (
-				"code")
+					.nativeMapping (
+						nativeMapping)
 
-			.nativeClass (
-				String.class);
+					.interfaceMapping (
+						interfaceMapping)
 
-		if (spec.delegate () != null) {
+					.csvMapping (
+						interfaceMapping)
 
-			accessor =
-				delegateFormFieldAccessorProvider.get ()
+					.renderer (
+						renderer)
 
-				.path (
-					spec.delegate ())
+				);
 
-				.delegateFormFieldAccessor (
-					accessor);
+			} else {
 
-		}
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-		// native mapping
+					.name (
+						fullName)
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+					.label (
+						label)
 
-		// value validator
+					.accessor (
+						accessor)
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+					.nativeMapping (
+						nativeMapping)
 
-		valueValidators.add (
-			requiredFormFieldValueValidatorProvider.get ());
+					.valueValidators (
+						valueValidators)
 
-		valueValidators.add (
-			codeFormFieldValueValidatorProvider.get ()
+					.constraintValidator (
+						constraintValidator)
 
-			.pattern (
-				pattern)
+					.interfaceMapping (
+						interfaceMapping)
 
-		);
+					.csvMapping (
+						interfaceMapping)
 
-		// constraint validator
+					.renderer (
+						renderer)
 
-		FormFieldConstraintValidator constraintValidator =
-			codeFormFieldValueConstraintValidatorProvider.get ();
+					.updateHook (
+						updateHook)
 
-		// interface mapping
+				);
 
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
-
-			.name (
-				fullName)
-
-			.label (
-				label)
-
-			.nullable (
-				false);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// field
-
-		if (readOnly) {
-
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
-
-				.name (
-					fullName)
-
-				.label (
-					label)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.interfaceMapping (
-					interfaceMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.renderer (
-					renderer)
-
-			);
-
-		} else {
-
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
-
-				.name (
-					fullName)
-
-				.label (
-					label)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.valueValidators (
-					valueValidators)
-
-				.constraintValidator (
-					constraintValidator)
-
-				.interfaceMapping (
-					interfaceMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.renderer (
-					renderer)
-
-				.updateHook (
-					updateHook)
-
-			);
+			}
 
 		}
 

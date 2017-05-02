@@ -25,11 +25,18 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.OwnedTransaction;
+import wbs.framework.logging.BorrowedTaskLogger;
+import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
+
+import wbs.utils.etc.ImplicitArgument.BorrowedArgument;
+import wbs.utils.io.RuntimeIoException;
 
 import wbs.web.responder.Responder;
 
@@ -65,6 +72,23 @@ class CoreAuthFilter
 
 	@Override
 	public
+	void init (
+			@NonNull FilterConfig filterConfig) {
+
+		doNothing ();
+
+	}
+
+	@Override
+	public
+	void destroy () {
+
+		doNothing ();
+
+	}
+
+	@Override
+	public
 	void doFilter (
 			@NonNull ServletRequest request,
 			@NonNull ServletResponse response,
@@ -75,10 +99,14 @@ class CoreAuthFilter
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"doFilter",
-					true);
+			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
+				parentTaskLogger =
+					TaskLogger.implicitArgument.borrow ();
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger.get (),
+					"doFilter");
 
 		) {
 
@@ -91,7 +119,7 @@ class CoreAuthFilter
 				"Verify user session");
 
 			boolean userOk =
-				userSessionLogic.userSessionVerify (
+				userSessionVerify (
 					taskLogger,
 					requestContext);
 
@@ -102,9 +130,11 @@ class CoreAuthFilter
 
 				// and show the page
 
-				chain.doFilter (
+				chainFilter (
+					taskLogger,
 					request,
-					response);
+					response,
+					chain);
 
 			} else {
 
@@ -119,9 +149,11 @@ class CoreAuthFilter
 
 					if (requestContext.post ()) {
 
-						chain.doFilter (
+						chainFilter (
+							taskLogger,
 							request,
-							response);
+							response,
+							chain);
 
 					} else {
 
@@ -151,9 +183,11 @@ class CoreAuthFilter
 
 					// these paths are available before login
 
-					chain.doFilter (
+					chainFilter (
+						taskLogger,
 						request,
-						response);
+						response,
+						chain);
 
 				} else {
 
@@ -171,20 +205,60 @@ class CoreAuthFilter
 
 	}
 
-	@Override
-	public
-	void destroy () {
+	// private implementation
 
-		doNothing ();
+	private
+	void chainFilter (
+			@NonNull OwnedTaskLogger parentTaskLogger,
+			@NonNull ServletRequest request,
+			@NonNull ServletResponse response,
+			@NonNull FilterChain chain) {
+
+		TaskLogger.implicitArgument.storeAndInvokeVoid (
+			parentTaskLogger,
+			() -> {
+
+			try {
+
+				chain.doFilter (
+					request,
+					response);
+
+			} catch (ServletException exception) {
+
+				throw new RuntimeException (
+					exception);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
+		});
 
 	}
 
-	@Override
-	public
-	void init (
-			@NonNull FilterConfig filterConfig) {
+	private
+	boolean userSessionVerify (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext) {
 
-		doNothing ();
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"userSessionVerify");
+		) {
+
+			return userSessionLogic.userSessionVerify (
+				transaction,
+				requestContext);
+
+		}
 
 	}
 

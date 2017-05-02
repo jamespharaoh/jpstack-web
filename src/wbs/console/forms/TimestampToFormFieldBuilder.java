@@ -12,18 +12,25 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -31,12 +38,16 @@ import wbs.utils.etc.PropertyUtils;
 @PrototypeComponent ("timestampToFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TimestampToFormFieldBuilder {
+class TimestampToFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototsype dependencies
 
@@ -89,126 +100,112 @@ class TimestampToFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+		) {
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+			String name =
+				spec.name ();
 
-		// accessor and native mapping
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		Class<?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		FormFieldAccessor formFieldAccessor;
-		FormFieldNativeMapping formFieldNativeMapping;
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		if (propertyClass == Instant.class) {
+			// accessor and native mapping
 
-			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Instant.class);
+			Class<?> propertyClass =
+				PropertyUtils.propertyClassForClass (
+					context.containerClass (),
+					name);
 
-			formFieldNativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+			FormFieldAccessor formFieldAccessor;
+			FormFieldNativeMapping formFieldNativeMapping;
 
-		} else if (propertyClass == Date.class) {
+			if (propertyClass == Instant.class) {
 
-			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Date.class);
+				formFieldAccessor =
+					simpleFormFieldAccessorProvider.get ()
+						.name (name)
+						.nativeClass (Instant.class);
 
-			formFieldNativeMapping =
-				dateFormFieldNativeMappingProvider.get ();
+				formFieldNativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
 
-		} else {
+			} else if (propertyClass == Date.class) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map %s as timestamp for %s.%s",
-					classNameSimple (
-						propertyClass),
-					classNameSimple (
-						context.containerClass ()),
-					name));
+				formFieldAccessor =
+					simpleFormFieldAccessorProvider.get ()
+						.name (name)
+						.nativeClass (Date.class);
 
-		}
+				formFieldNativeMapping =
+					dateFormFieldNativeMappingProvider.get ();
 
-		// value validators
+			} else {
 
-		List<FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to map %s as timestamp for %s.%s",
+						classNameSimple (
+							propertyClass),
+						classNameSimple (
+							context.containerClass ()),
+						name));
 
-		if (! nullable) {
+			}
 
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+			// value validators
 
-		}
+			List<FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-		// constraint validator
+			if (! nullable) {
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
 
-		// interface mapping
+			}
 
-		FormFieldInterfaceMapping interfaceMapping =
-			timestampToFormFieldInterfaceMappingProvider.get ()
-				.name (name);
+			// constraint validator
 
-		// renderer
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
 
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
+			// interface mapping
 
-			.name (
-				name)
+			FormFieldInterfaceMapping interfaceMapping =
+				timestampToFormFieldInterfaceMappingProvider.get ()
+					.name (name);
 
-			.label (
-				label)
+			// renderer
 
-			.nullable (
-				nullable);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// form field
-
-		if (readOnly) {
-
-			formFieldSet.addFormItem (
-
-				readOnlyFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -216,54 +213,81 @@ class TimestampToFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					formFieldAccessor)
+				.nullable (
+					nullable);
 
-				.nativeMapping (
-					formFieldNativeMapping)
+			// update hook
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.renderer (
-					renderer)
+			// form field
 
-			);
+			if (readOnly) {
 
-		} else {
+				formFieldSet.addFormItem (
 
-			formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
 
-				updatableFormFieldProvider.get ()
+					.name (
+						name)
 
-				.name (
-					name)
+					.label (
+						label)
 
-				.label (
-					label)
+					.accessor (
+						formFieldAccessor)
 
-				.accessor (
-					formFieldAccessor)
+					.nativeMapping (
+						formFieldNativeMapping)
 
-				.nativeMapping (
-					formFieldNativeMapping)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.valueValidators (
-					valueValidators)
+					.renderer (
+						renderer)
 
-				.constraintValidator (
-					constraintValidator)
+				);
 
-				.interfaceMapping (
-					interfaceMapping)
+			} else {
 
-				.renderer (
-					renderer)
+				formFieldSet.addFormItem (
 
-				.updateHook (
-					updateHook)
+					updatableFormFieldProvider.get ()
 
-			);
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						formFieldAccessor)
+
+					.nativeMapping (
+						formFieldNativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			}
 
 		}
 

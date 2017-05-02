@@ -14,10 +14,10 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
@@ -44,28 +44,26 @@ class ChatNumberReportLogicImplementation
 	@Override
 	public
 	boolean isNumberReportSuccessful (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"isNumberReportSuccessful");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			Instant sixMonthsAgo =
 				transaction
 					.now ()
 					.minus (Duration.standardDays (365 / 2));
 
-			Optional<ChatUserNumberReportRec> numberReportOptional =
+			Optional <ChatUserNumberReportRec> numberReportOptional =
 				chatUserNumberReportHelper.find (
+					transaction,
 					number.getId ());
 
 			if (
@@ -75,7 +73,7 @@ class ChatNumberReportLogicImplementation
 
 				// no DR yet for this number
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"REPORT NULL %s",
 					number.getNumber ());
 
@@ -88,7 +86,7 @@ class ChatNumberReportLogicImplementation
 
 			if (numberReport.getLastSuccess () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"REPORT LAST SUCCESS %s %s",
 					numberReport.getLastSuccess ().toString (),
 					number.getNumber ());
@@ -101,7 +99,7 @@ class ChatNumberReportLogicImplementation
 
 			if (numberReport.getFirstFailure () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"REPORT FIRST FAILURE %s %s",
 					numberReport.getFirstFailure ().toString (),
 					number.getNumber ());
@@ -114,7 +112,7 @@ class ChatNumberReportLogicImplementation
 
 			// shouldn't happen
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"REPORT ERROR %s",
 				number.getNumber ());
 
@@ -127,20 +125,21 @@ class ChatNumberReportLogicImplementation
 	@Override
 	public
 	boolean isNumberReportPastPermanentDeliveryConstraint (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"isNumberReportPastPermanentDeliveryConstraint");
 
 		) {
 
 			Optional <ChatUserNumberReportRec> numberReportOptional =
 				chatUserNumberReportHelper.find (
+					transaction,
 					number.getId ());
 
 			if (
@@ -150,7 +149,7 @@ class ChatNumberReportLogicImplementation
 
 				// no DR yet for this number
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"REPORT PERMANENT NULL %s",
 					number.getNumber ());
 
@@ -166,7 +165,7 @@ class ChatNumberReportLogicImplementation
 				long count =
 					numberReport.getPermanentFailureCount ();
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"REPORT PERMANENT COUNT %s %s",
 					integerToDecimalString (
 						count),

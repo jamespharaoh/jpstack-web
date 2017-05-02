@@ -79,23 +79,19 @@ class ChatUserNotesAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserNotesAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// check params
 
@@ -120,11 +116,11 @@ class ChatUserNotesAction
 
 			TextRec noteText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					noteString);
 
 			chatUserNoteHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserNoteHelper.createInstance ()
 
 				.setChatUser (
@@ -134,7 +130,8 @@ class ChatUserNotesAction
 					transaction.now ())
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.setText (
 					noteText)

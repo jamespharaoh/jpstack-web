@@ -1,6 +1,6 @@
 package wbs.apn.chat.user.core.model;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberRec;
@@ -11,17 +11,17 @@ public
 interface ChatUserObjectHelperMethods {
 
 	ChatUserRec findOrCreate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatRec chat,
 			NumberRec number);
 
 	ChatUserRec findOrCreate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatRec chat,
 			MessageRec message);
 
 	ChatUserRec create (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatRec chat,
 			NumberRec number);
 

@@ -29,9 +29,11 @@ import org.apache.http.message.BasicNameValuePair;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.digitalselect.daemon.DigitalSelectSender.State;
@@ -79,24 +81,22 @@ class DigitalSelectSender
 	@Override
 	protected
 	State getMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec outbox)
 		throws SendFailureException {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getMessage");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			DigitalSelectRouteOutRec digitalSelectRouteOut =
 				digitalSelectRouteOutHelper.findOrThrow (
+					transaction,
 					outbox.getRoute ().getId (),
 					() -> new RuntimeException (
 						stringFormat (
@@ -141,7 +141,7 @@ class DigitalSelectSender
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"sendMessage");
@@ -197,7 +197,7 @@ class DigitalSelectSender
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"openConnection");
@@ -280,7 +280,7 @@ class DigitalSelectSender
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"readResponse");

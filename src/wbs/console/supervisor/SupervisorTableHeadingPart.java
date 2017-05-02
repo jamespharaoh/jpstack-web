@@ -17,9 +17,13 @@ import org.joda.time.Instant;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableHeadingPart")
@@ -31,6 +35,9 @@ class SupervisorTableHeadingPart
 
 	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -46,61 +53,84 @@ class SupervisorTableHeadingPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		statsPeriod =
-			(StatsPeriod)
-			parameters.get (
-				"statsPeriod");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			statsPeriod =
+				(StatsPeriod)
+				parameters.get (
+					"statsPeriod");
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// main heading
+		try (
 
-		if (supervisorTableHeadingSpec.label () != null) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
+
+		) {
+
+			// main heading
+
+			if (supervisorTableHeadingSpec.label () != null) {
+
+				htmlTableRowOpen ();
+
+				htmlTableHeaderCellWrite (
+					supervisorTableHeadingSpec.label (),
+					htmlColumnSpanAttribute (
+						statsPeriod.size () + 2l));
+
+				htmlTableRowClose ();
+
+			}
+
+			// hours
 
 			htmlTableRowOpen ();
 
 			htmlTableHeaderCellWrite (
-				supervisorTableHeadingSpec.label (),
-				htmlColumnSpanAttribute (
-					statsPeriod.size () + 2l));
+				supervisorTableHeadingSpec.groupLabel ());
+
+			for (
+				Instant step
+					: statsPeriod.steps ()
+			) {
+
+				htmlTableHeaderCellWrite (
+					String.format (
+						"%02d",
+						step
+							.toDateTime (
+								consoleUserHelper.timezone (
+									transaction))
+							.getHourOfDay ()));
+
+			}
+
+			htmlTableHeaderCellWrite (
+				"Total");
 
 			htmlTableRowClose ();
 
 		}
-
-		// hours
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			supervisorTableHeadingSpec.groupLabel ());
-
-		for (
-			Instant step
-				: statsPeriod.steps ()
-		) {
-
-			htmlTableHeaderCellWrite (
-				String.format (
-					"%02d",
-					step
-						.toDateTime (
-							consoleUserHelper.timezone ())
-						.getHourOfDay ()));
-
-		}
-
-		htmlTableHeaderCellWrite (
-			"Total");
-
-		htmlTableRowClose ();
 
 	}
 

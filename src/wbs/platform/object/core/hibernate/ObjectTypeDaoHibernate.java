@@ -16,7 +16,9 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
@@ -57,21 +59,17 @@ class ObjectTypeDaoHibernate
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"setup (taskLogger)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"setup");
 
 		) {
 
 			List <ObjectTypeRec> objectTypes =
-				findAll ();
+				findAll (
+					transaction);
 
 			typeIdsByCode =
 				mapWithDerivedKeyAndValue (
@@ -94,51 +92,90 @@ class ObjectTypeDaoHibernate
 	@Override
 	public
 	ObjectTypeRec findById (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long id) {
 
-		return get (
-			ObjectTypeRec.class,
-			id);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findById");
+
+		) {
+
+			return get (
+				transaction,
+				ObjectTypeRec.class,
+				id);
+
+		}
 
 	}
 
 	@Override
 	public
 	ObjectTypeRec findByCode (
+			@NonNull Transaction parentTransaction,
 			@NonNull String code) {
 
-		return findOneOrNull (
-			"findByCode (code)",
-			ObjectTypeRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCode");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ObjectTypeRec.class,
-				"_objectType")
 
-			.add (
-				Restrictions.eq (
-					"_objectType.code",
-					code))
+				createCriteria (
+					transaction,
+					ObjectTypeRec.class,
+					"_objectType")
 
-			.setCacheable (
-				true)
+				.add (
+					Restrictions.eq (
+						"_objectType.code",
+						code))
 
-		);
+				.setCacheable (
+					true)
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List <ObjectTypeRec> findAll () {
+	List <ObjectTypeRec> findAll (
+			@NonNull Transaction parentTransaction) {
 
-		return findMany (
-			"findAll ()",
-			ObjectTypeRec.class,
+		try (
 
-			createCriteria (
-				ObjectTypeRec.class)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findAll");
 
-		);
+		) {
+
+			return findMany (
+				transaction,
+				ObjectTypeRec.class,
+
+				createCriteria (
+					transaction,
+					ObjectTypeRec.class)
+
+			);
+
+		}
 
 	}
 

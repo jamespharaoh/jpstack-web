@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHelperUpdateMethods <
@@ -12,29 +12,31 @@ interface ObjectHelperUpdateMethods <
 
 	<RecordTypeAgain extends Record <?>>
 	RecordTypeAgain insert (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordTypeAgain object);
 
 	<RecordTypeAgain extends Record <?>>
 	RecordTypeAgain insertSpecial (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordTypeAgain object);
 
 	<RecordTypeAgain extends Record <?>>
 	RecordTypeAgain update (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordTypeAgain object);
 
 	<RecordTypeAgain extends Record <?>>
 	RecordTypeAgain remove (
+			Transaction parentTransaction,
 			RecordTypeAgain object);
 
 	<RecordTypeAgain extends Record <?>>
 	RecordTypeAgain lock (
+			Transaction parentTransaction,
 			RecordTypeAgain object);
 
 	void createSingletons (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ObjectHelper <?> parentHelper,
 			Record <?> parentObject);
 

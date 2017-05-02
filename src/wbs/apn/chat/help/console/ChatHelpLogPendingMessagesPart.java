@@ -20,8 +20,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -79,19 +80,20 @@ class ChatHelpLogPendingMessagesPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			chatHelpLog =
-				chatHelpLogHelper.findFromContextRequired ();
+				chatHelpLogHelper.findFromContextRequired (
+					transaction);
 
 			chatUser =
 				chatHelpLog.getChatUser ();
@@ -101,6 +103,7 @@ class ChatHelpLogPendingMessagesPart
 
 			ServiceRec service =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -121,7 +124,7 @@ class ChatHelpLogPendingMessagesPart
 
 			messages =
 				messageHelper.search (
-					taskLogger,
+					transaction,
 					messageSearch);
 
 		}
@@ -131,13 +134,13 @@ class ChatHelpLogPendingMessagesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {

@@ -1,6 +1,9 @@
 package wbs.framework.object;
 
+import lombok.NonNull;
+
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHelperComponent <RecordType extends Record <RecordType>> {
@@ -15,8 +18,11 @@ interface ObjectHelperComponent <RecordType extends Record <RecordType>> {
 			ObjectDatabaseHelper <RecordType> objectDatabaseHelper);
 
 	default
-	ObjectHelperComponent <RecordType> setup () {
+	ObjectHelperComponent <RecordType> setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return this;
+
 	}
 
 }

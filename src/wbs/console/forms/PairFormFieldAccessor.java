@@ -16,8 +16,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("pairFormFieldAccessor")
@@ -43,14 +44,14 @@ class PairFormFieldAccessor <Container, Left, Right>
 	@Override
 	public
 	Optional <Pair <Left, Right>> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"read");
 
 		) {
@@ -67,12 +68,12 @@ class PairFormFieldAccessor <Container, Left, Right>
 
 			Optional <Left> leftValue =
 				leftAccessor.read (
-					taskLogger,
+					transaction,
 					container);
 
 			Optional<Right> rightValue =
 				rightAccessor.read (
-					taskLogger,
+					transaction,
 					container);
 
 			// return as pair
@@ -96,15 +97,15 @@ class PairFormFieldAccessor <Container, Left, Right>
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Pair <Left, Right>> nativeValueOptional) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"write");
 
 		) {
@@ -119,13 +120,13 @@ class PairFormFieldAccessor <Container, Left, Right>
 			// write values
 
 			leftAccessor.write (
-				taskLogger,
+				transaction,
 				container,
 				optionalFromNullable (
 					nativeValue.getLeft ()));
 
 			rightAccessor.write (
-				taskLogger,
+				transaction,
 				container,
 				optionalFromNullable (
 					nativeValue.getRight ()));

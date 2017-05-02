@@ -2,7 +2,7 @@ package wbs.smsapps.subscription.logic;
 
 import org.joda.time.Instant;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -13,15 +13,15 @@ public
 interface SubscriptionLogic {
 
 	void sendNow (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SubscriptionSendNumberRec subscriptionSendNumber);
 
 	void sendLater (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SubscriptionSendNumberRec subscriptionSendNumber);
 
 	void scheduleSend (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SubscriptionSendRec subscriptionSend,
 			Instant scheduleForTime,
 			UserRec user);

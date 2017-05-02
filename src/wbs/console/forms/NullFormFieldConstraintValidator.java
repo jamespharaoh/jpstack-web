@@ -7,17 +7,19 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 @PrototypeComponent ("nullFormFieldConstraintValidator")
 public
 class NullFormFieldConstraintValidator <Container, Native>
 	implements FormFieldConstraintValidator <Container, Native> {
 
+	// transaction
+
 	@Override
 	public
 	Optional <String> validate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 

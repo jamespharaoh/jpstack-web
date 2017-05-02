@@ -11,8 +11,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
@@ -41,15 +42,15 @@ class ChatMessageHooks
 	@Override
 	public
 	void beforeInsert (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatMessageRec chatMessage) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"beforeInsert");
+			NestedTransaction transaction =
+				parentTransaction.nestTransactionFormat (
+					logContext,
+					"beforeInsert (chatMessage)");
 
 		) {
 
@@ -85,7 +86,7 @@ class ChatMessageHooks
 
 			ChatContactRec chatContact =
 				chatContactHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chatMessage.getFromUser (),
 					chatMessage.getToUser ());
 

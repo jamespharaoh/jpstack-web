@@ -1,6 +1,9 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -71,23 +74,19 @@ class ChatUserAdminDeleteAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminDeleteAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			if (chatUser.getType () != ChatUserType.user) {
 
@@ -116,9 +115,10 @@ class ChatUserAdminDeleteAction
 				chatUser.setNumber (null);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_delete",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser);
 
 				transaction.commit ();
@@ -145,12 +145,16 @@ class ChatUserAdminDeleteAction
 					return null;
 				}
 
-				ChatUserRec newChatUser =
+				Optional <ChatUserRec> exisingChatUserOptional =
 					chatUserHelper.find (
+						transaction,
 						chatUser.getChat (),
 						chatUser.getOldNumber ());
 
-				if (newChatUser != null) {
+				if (
+					optionalIsNotPresent (
+						exisingChatUserOptional)
+				) {
 
 					requestContext.addError (
 						"Cannot undelete this user");
@@ -165,9 +169,10 @@ class ChatUserAdminDeleteAction
 						chatUser.getOldNumber ());
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"chat_user_undelete",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					chatUser);
 
 				transaction.commit ();

@@ -9,14 +9,15 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chainedFormFieldNativeMapping")
 public
-class ChainedFormFieldNativeMapping<Container,Generic,Temporary,Native>
-	implements FormFieldNativeMapping<Container,Generic,Native> {
+class ChainedFormFieldNativeMapping <Container, Generic, Temporary, Native>
+	implements FormFieldNativeMapping <Container, Generic, Native> {
 
 	// singleton components
 
@@ -26,58 +27,72 @@ class ChainedFormFieldNativeMapping<Container,Generic,Temporary,Native>
 	// properties
 
 	@Getter @Setter
-	FormFieldNativeMapping<Container,Generic,Temporary> previousMapping;
+	FormFieldNativeMapping <Container, Generic, Temporary> previousMapping;
 
 	@Getter @Setter
-	FormFieldNativeMapping<Container,Temporary,Native> nextMapping;
+	FormFieldNativeMapping <Container, Temporary, Native> nextMapping;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Generic> nativeToGeneric (
+	Optional <Generic> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Native> nativeValue) {
 
-		Optional<Temporary> temporaryValue =
-			nextMapping.nativeToGeneric (
-				container,
-				nativeValue);
+		try (
 
-		Optional<Generic> genericValue =
-			previousMapping.nativeToGeneric (
-				container,
-				temporaryValue);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"nativeToGeneric");
 
-		return genericValue;
+		) {
+
+			Optional <Temporary> temporaryValue =
+				nextMapping.nativeToGeneric (
+					transaction,
+					container,
+					nativeValue);
+
+			Optional<Generic> genericValue =
+				previousMapping.nativeToGeneric (
+					transaction,
+					container,
+					temporaryValue);
+
+			return genericValue;
+
+		}
 
 	}
 
 	@Override
 	public
 	Optional <Native> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Generic> genericValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"genericToNative");
 
 		) {
 
 			Optional <Temporary> temporaryValue =
 				previousMapping.genericToNative (
-					taskLogger,
+					transaction,
 					container,
 					genericValue);
 
 			Optional <Native> nativeValue =
 				nextMapping.genericToNative (
-					taskLogger,
+					transaction,
 					container,
 					temporaryValue);
 

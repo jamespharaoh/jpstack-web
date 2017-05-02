@@ -17,12 +17,20 @@ import org.joda.time.YearMonth;
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.part.AbstractPagePart;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @Accessors (fluent = true)
 public abstract
 class AbstractMonthlyGraphPart
 	extends AbstractPagePart {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// dependencies
 
@@ -41,71 +49,93 @@ class AbstractMonthlyGraphPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		yearMonth =
-			YearMonth.parse (
-				requestContext.parameterRequired (
-					"month"));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			yearMonth =
+				YearMonth.parse (
+					requestContext.parameterRequired (
+						"month"));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger)  {
+			@NonNull Transaction parentTransaction) {
 
-		htmlFormOpenGetAction (
-			requestContext.resolveLocalUrl (
-				myLocalPart));
+		try (
 
-		htmlParagraphOpen ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		formatWriter.writeLineFormat (
-			"Month<br>");
+		) {
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"month\"",
-			" value=\"%h\"",
-			yearMonth.toString (),
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"ok\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
-
-		if (yearMonth != null) {
-
-			ObsoleteDateLinks.monthlyBrowserParagraph (
-				formatWriter,
+			htmlFormOpenGetAction (
 				requestContext.resolveLocalUrl (
-					myLocalPart),
-				emptyMap (),
-				yearMonth.toLocalDate (1));
+					myLocalPart));
 
 			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
-				"<img",
-				" style=\"graph\"",
-				" src=\"%h\"",
-				requestContext.resolveLocalUrl (
-					stringFormat (
-						"%s",
-						imageLocalPart,
-						"?month=%u",
-						yearMonth.toString ())),
+				"Month<br>");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"month\"",
+				" value=\"%h\"",
+				yearMonth.toString (),
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"ok\"",
 				">");
 
 			htmlParagraphClose ();
+
+			htmlFormClose ();
+
+			if (yearMonth != null) {
+
+				ObsoleteDateLinks.monthlyBrowserParagraph (
+					formatWriter,
+					requestContext.resolveLocalUrl (
+						myLocalPart),
+					emptyMap (),
+					yearMonth.toLocalDate (1));
+
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<img",
+					" style=\"graph\"",
+					" src=\"%h\"",
+					requestContext.resolveLocalUrl (
+						stringFormat (
+							"%s",
+							imageLocalPart,
+							"?month=%u",
+							yearMonth.toString ())),
+					">");
+
+				htmlParagraphClose ();
+
+			}
 
 		}
 

@@ -19,9 +19,12 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.DateTime;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -35,6 +38,9 @@ class TimestampTimezoneFormFieldInterfaceMapping <Container>
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	TimeFormatter timeFormatter;
 
@@ -47,40 +53,52 @@ class TimestampTimezoneFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<DateTime>,String> interfaceToGeneric (
+	Either <Optional <DateTime>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				interfaceValue)
-
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			if (
 
-		}
+				optionalIsNotPresent (
+					interfaceValue)
 
-		try {
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
 
-			return successResult (
-				optionalOf (
-					timeFormatter.timestampTimezoneToDateTime (
-						optionalGetRequired (
-							interfaceValue))));
+			) {
 
-		} catch (IllegalArgumentException exception) {
+				return successResult (
+					optionalAbsent ());
 
-			return errorResultFormat (
-				"Please enter a valid timestamp with timezone for %s",
-				name ());
+			}
+
+			try {
+
+				return successResult (
+					optionalOf (
+						timeFormatter.timestampTimezoneToDateTime (
+							optionalGetRequired (
+								interfaceValue))));
+
+			} catch (IllegalArgumentException exception) {
+
+				return errorResultFormat (
+					"Please enter a valid timestamp with timezone for %s",
+					name ());
+
+			}
 
 		}
 
@@ -89,22 +107,33 @@ class TimestampTimezoneFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <DateTime> genericValue) {
 
-		if (! genericValue.isPresent ()) {
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
+		) {
+
+			if (! genericValue.isPresent ()) {
+
+				return successResult (
+					Optional.<String>absent ());
+
+			}
 
 			return successResult (
-				Optional.<String>absent ());
+				Optional.of (
+					timeFormatter.timestampTimezoneString (
+						genericValue.get ())));
 
 		}
-
-		return successResult (
-			Optional.of (
-				timeFormatter.timestampTimezoneString (
-					genericValue.get ())));
 
 	}
 

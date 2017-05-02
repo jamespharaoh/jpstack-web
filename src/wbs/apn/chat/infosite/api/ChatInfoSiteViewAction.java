@@ -1,5 +1,6 @@
 package wbs.apn.chat.infosite.api;
 
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import lombok.NonNull;
@@ -45,30 +46,35 @@ class ChatInfoSiteViewAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatInfoSiteViewAction.goApi ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
 			ChatInfoSiteRec infoSite =
 				chatInfoSiteHelper.findRequired (
+					transaction,
 					requestContext.requestIntegerRequired (
 						"chatInfoSiteId"));
 
 			// update first view time
 
-			if (infoSite.getFirstViewTime () == null)
-				infoSite.setFirstViewTime (transaction.now ());
+			if (
+				isNull (
+					infoSite.getFirstViewTime ())
+			) {
+
+				infoSite
+
+					.setFirstViewTime (
+						transaction.now ());
+
+			}
 
 			// check the token
 
@@ -100,22 +106,29 @@ class ChatInfoSiteViewAction
 				// and show expired page
 
 				return responder (
-					taskLogger,
+					transaction,
 					"chatInfoSiteExpiredResponder");
 
 			}
 
 			// update successful view counts
 
-			infoSite.setLastViewTime (transaction.now ());
-			infoSite.setNumViews (infoSite.getNumViews () + 1);
+			infoSite
+
+				.setLastViewTime (
+					transaction.now ())
+
+				.setNumViews (
+					infoSite.getNumViews () + 1)
+
+			;
 
 			transaction.commit ();
 
 			// and show info site
 
 			return responder (
-				taskLogger,
+				transaction,
 				"chatInfoSiteViewResponder");
 
 		}

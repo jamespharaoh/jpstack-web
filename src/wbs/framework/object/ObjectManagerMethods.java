@@ -19,6 +19,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -32,24 +33,29 @@ interface ObjectManagerMethods {
 	// navigation
 
 	Either <Optional <Record <?>>, String> getParentOrError (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	default
 	Optional <Record <?>> getParent (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return successOrThrowRuntimeException (
 			getParentOrError (
+				parentTransaction,
 				object));
 
 	}
 
 	default
 	Either <Record <?>, String> getParentRequiredOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return mapSuccess (
 			getParentOrError (
+				parentTransaction,
 				object),
 			optional ->
 				optionalGetRequired (
@@ -59,11 +65,13 @@ interface ObjectManagerMethods {
 
 	default
 	Record <?> getParentRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return optionalGetRequired (
 			successOrThrowRuntimeException (
 				getParentOrError (
+					parentTransaction,
 					object)));
 
 	}
@@ -71,56 +79,68 @@ interface ObjectManagerMethods {
 	@Deprecated
 	default
 	Record <?> getParentOrNull (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object) {
 
 		return optionalOrNull (
 			successOrThrowRuntimeException (
 				getParentOrError (
+					parentTransaction,
 					object)));
 
 	}
 
 	GlobalId getGlobalId (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	GlobalId getParentGlobalId (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	public abstract <ObjectType extends Record <ObjectType>>
 	List <ObjectType> getChildren (
+			Transaction parentTransaction,
 			Record <?> object,
 			Class <ObjectType> childClass);
 
 	Long getObjectTypeId (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	String getCode (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	List<Record<?>> getMinorChildren (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	String getObjectTypeCode (
+			Transaction parentTransaction,
 			Record <?> object);
 
 	public
 	abstract <ObjectType extends Record <ObjectType>>
 	Optional <ObjectType> getAncestor (
+			Transaction parentTransaction,
 			Class <ObjectType> ancestorClass,
 			Record <?> object);
 
 	// data access
 
 	Record <?> findObject (
+			Transaction parentTransaction,
 			GlobalId objectGlobalId);
 
 	<ObjectType extends Record <?>>
 	ObjectType update (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ObjectType object);
 
 	<ObjectType extends EphemeralRecord <?>>
 	ObjectType remove (
+			Transaction parentTransaction,
 			ObjectType object);
 
 	// utilities
@@ -148,17 +168,20 @@ interface ObjectManagerMethods {
 			Class <?> objectClass);
 
 	boolean isParent (
+			Transaction parentTransaction,
 			Record <?> object,
 			Record <?> parent);
 
 	<ObjectType extends Record <?>>
 	ObjectType firstParent (
+			Transaction parentTransaction,
 			Record <?> object,
 			Set <ObjectType> parents);
 
 	// object paths
 
 	String objectPath (
+			Transaction parentTransaction,
 			Record <?> dataObject,
 			Optional <Record <?>> assumedRoot,
 			boolean mini,
@@ -166,9 +189,11 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPath (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> dataObject) {
 
 		return objectPath (
+			parentTransaction,
 			dataObject,
 			optionalAbsent (),
 			false,
@@ -178,9 +203,11 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> dataObject) {
 
 		return objectPath (
+			parentTransaction,
 			dataObject,
 			optionalAbsent (),
 			true,
@@ -190,10 +217,12 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> root) {
 
 		return objectPath (
+			parentTransaction,
 			object,
 			root,
 			true,
@@ -203,10 +232,12 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Record <?> root) {
 
 		return objectPath (
+			parentTransaction,
 			object,
 			optionalOf (
 				root),
@@ -217,10 +248,12 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMiniPreload (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record<?> object,
 			@NonNull Optional<Record<?>> root) {
 
 		return objectPath (
+			parentTransaction,
 			object,
 			root,
 			true,
@@ -230,12 +263,14 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMiniPreload (
-			@NonNull Record<?> object,
-			@NonNull Record<?> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Record <?> root) {
 
 		return objectPath (
+			parentTransaction,
 			object,
-			Optional.<Record<?>>of (
+			optionalOf (
 				root),
 			true,
 			true);
@@ -244,10 +279,12 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPath (
-			@NonNull Record<?> dataObject,
-			@NonNull Optional<Record<?>> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> dataObject,
+			@NonNull Optional <Record <?>> root) {
 
 		return objectPath (
+			parentTransaction,
 			dataObject,
 			root,
 			false,
@@ -257,12 +294,14 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPath (
-			@NonNull Record<?> dataObject,
-			@NonNull Record<?> root) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> dataObject,
+			@NonNull Record <?> root) {
 
 		return objectPath (
+			parentTransaction,
 			dataObject,
-			Optional.<Record<?>>of (
+			optionalOf (
 				root),
 			false,
 			false);
@@ -272,10 +311,11 @@ interface ObjectManagerMethods {
 	// object path utilities
 
 	String objectIdString (
-			Record<?> dataObject);
+			Record <?> dataObject);
 
-	<ObjectType extends Record<?>>
+	<ObjectType extends Record <?>>
 	SortedMap <String, ObjectType> pathMap (
+			Transaction parentTransaction,
 			Collection <ObjectType> objects,
 			Record <?> root,
 			boolean mini);
@@ -283,16 +323,19 @@ interface ObjectManagerMethods {
 	// structured dereferncing
 
 	Either <Optional <Object>, String> dereferenceOrError (
+			Transaction parentTransaction,
 			Object object,
 			String path,
 			Map <String, Object> hints);
 
 	default
 	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path) {
 
 		return dereferenceOrError (
+			parentTransaction,
 			object,
 			path,
 			emptyMap ());
@@ -301,12 +344,14 @@ interface ObjectManagerMethods {
 
 	default
 	Optional <Object> dereference (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
 
 		return successOrThrowRuntimeException (
 			dereferenceOrError (
+				parentTransaction,
 				object,
 				path,
 				hints));
@@ -315,11 +360,13 @@ interface ObjectManagerMethods {
 
 	default
 	Optional <Object> dereference (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path) {
 
 		return successOrThrowRuntimeException (
 			dereferenceOrError (
+				parentTransaction,
 				object,
 				path,
 				emptyMap ()));
@@ -328,6 +375,7 @@ interface ObjectManagerMethods {
 
 	default
 	Object dereferenceRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
@@ -335,6 +383,7 @@ interface ObjectManagerMethods {
 		return optionalGetRequired (
 			successOrThrowRuntimeException (
 				dereferenceOrError (
+					parentTransaction,
 					object,
 					path,
 					hints)));
@@ -343,12 +392,14 @@ interface ObjectManagerMethods {
 
 	default
 	Object dereferenceRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path) {
 
 		return optionalGetRequired (
 			successOrThrowRuntimeException (
 				dereferenceOrError (
+					parentTransaction,
 					object,
 					path,
 					emptyMap ())));
@@ -358,6 +409,7 @@ interface ObjectManagerMethods {
 	@Deprecated
 	default
 	Object dereferenceObsolete (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
@@ -365,6 +417,7 @@ interface ObjectManagerMethods {
 		return optionalOrNull (
 			successOrElse (
 				dereferenceOrError (
+					parentTransaction,
 					object,
 					path,
 					hints),
@@ -376,12 +429,14 @@ interface ObjectManagerMethods {
 	@Deprecated
 	default
 	Object dereferenceObsolete (
+			@NonNull Transaction parentTransaction,
 			@NonNull Object object,
 			@NonNull String path) {
 
 		return optionalOrNull (
 			successOrElse (
 				dereferenceOrError (
+					parentTransaction,
 					object,
 					path,
 					emptyMap ()),
@@ -391,6 +446,7 @@ interface ObjectManagerMethods {
 	}
 
 	Optional <Class <?>> dereferenceType (
+			TaskLogger taskLogger,
 			Optional <Class <?>> objectClass,
 			Optional <String> path);
 

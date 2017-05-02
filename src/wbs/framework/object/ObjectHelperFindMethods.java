@@ -2,39 +2,45 @@ package wbs.framework.object;
 
 import java.util.List;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHelperFindMethods <
 	RecordType extends Record <RecordType>
 > {
 
-	List <RecordType> findAll ();
+	List <RecordType> findAll (
+			Transaction parentTransaction);
 
-	List <RecordType> findNotDeleted ();
+	List <RecordType> findNotDeleted (
+			Transaction parentTransaction);
 
 	List <RecordType> findByParent (
+			Transaction parentTransaction,
 			Record <?> parent);
 
 	List <RecordType> findByParent (
+			Transaction parentTransaction,
 			GlobalId parentGlobalId);
 
 	List <RecordType> findByParentAndType (
+			Transaction parentTransaction,
 			Record <?> parent,
 			String typeCode);
 
 	List <RecordType> findByParentAndType (
+			Transaction parentTransaction,
 			GlobalId parentGlobalId,
 			String typeCode);
 
 	List <RecordType> search (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Object search);
 
 	List <Long> searchIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Object search);
 
 }

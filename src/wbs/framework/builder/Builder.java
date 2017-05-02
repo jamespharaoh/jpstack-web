@@ -2,15 +2,13 @@ package wbs.framework.builder;
 
 import java.util.List;
 
-import wbs.framework.logging.TaskLogger;
-
 public
-interface Builder {
+interface Builder <Context> {
 
 	void descend (
-			TaskLogger taskLogger,
+			Context taskLogger,
 			Object parentObject,
-			List<?> childObjects,
+			List <?> childObjects,
 			Object targetObject,
 			MissingBuilderBehaviour missingBuilderBehaviour);
 

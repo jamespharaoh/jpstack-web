@@ -37,6 +37,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -124,7 +125,7 @@ class EnumFormFieldBuilder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");
@@ -164,6 +165,7 @@ class EnumFormFieldBuilder
 			Class <?> propertyClass =
 				optionalGetRequired (
 					objectManager.dereferenceType (
+						taskLogger,
 						optionalOf (
 							context.containerClass ()),
 						optionalOf (

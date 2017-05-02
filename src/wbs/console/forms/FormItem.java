@@ -13,7 +13,7 @@ import lombok.NonNull;
 
 import wbs.console.html.ScriptRef;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface FormItem <Container> {
@@ -48,7 +48,7 @@ interface FormItem <Container> {
 
 	default
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 

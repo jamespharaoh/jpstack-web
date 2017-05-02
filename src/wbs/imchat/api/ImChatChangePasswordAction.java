@@ -65,42 +65,36 @@ class ImChatChangePasswordAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatChangePasswordRequest changePasswordRequest =
-			dataFromJson.fromJson (
-				ImChatChangePasswordRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatChangePasswordAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
+
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatChangePasswordRequest changePasswordRequest =
+				dataFromJson.fromJson (
+					ImChatChangePasswordRequest.class,
+					jsonValue);
 
 			// lookup session
 
 			ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
+					transaction,
 					changePasswordRequest.sessionSecret ());
 
 			if (

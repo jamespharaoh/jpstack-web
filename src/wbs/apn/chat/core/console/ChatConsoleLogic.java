@@ -4,10 +4,11 @@ import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 
 import lombok.NonNull;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.utils.string.FormatWriter;
 
 public
 interface ChatConsoleLogic {

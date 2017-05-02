@@ -1,8 +1,10 @@
 package wbs.apn.chat.core.console;
 
-import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.console.helper.enums.EnumConsoleHelper;
+
 import wbs.framework.component.annotations.SingletonComponent;
+
+import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 
 @SingletonComponent ("chatKeywordJoinTypeConsoleHelper")
 public

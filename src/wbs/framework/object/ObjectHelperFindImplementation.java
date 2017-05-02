@@ -19,6 +19,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -55,69 +57,88 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	List <RecordType> findAll () {
+	List <RecordType> findAll (
+			@NonNull Transaction parentTransaction) {
 
-		return objectDatabaseHelper.findAll ();
+		return objectDatabaseHelper.findAll (
+			parentTransaction);
 
 	}
 
 	@Override
 	public
-	List <RecordType> findNotDeleted () {
+	List <RecordType> findNotDeleted (
+			@NonNull Transaction parentTransaction) {
 
-		return objectDatabaseHelper.findNotDeleted ();
+		return objectDatabaseHelper.findNotDeleted (
+			parentTransaction);
 
 	}
 
 	@Override
 	public
 	List <RecordType> findByParent (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId) {
 
 		return objectDatabaseHelper.findAllByParent (
+			parentTransaction,
 			parentGlobalId);
 
 	}
 
 	@Override
 	public
-	List<RecordType> findByParentAndType (
+	List <RecordType> findByParentAndType (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent,
 			@NonNull String typeCode) {
 
-		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForClassRequired (
-				parent.getClass ());
+		try (
 
-		GlobalId parentGlobalId =
-			new GlobalId (
-				parentHelper.objectTypeId (),
-				parent.getId ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParentAndType");
 
-		return objectDatabaseHelper.findAllByParentAndType (
-			parentGlobalId,
-			typeCode);
+		) {
+
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForClassRequired (
+					parent.getClass ());
+
+			GlobalId parentGlobalId =
+				new GlobalId (
+					parentHelper.objectTypeId (),
+					parent.getId ());
+
+			return objectDatabaseHelper.findAllByParentAndType (
+				transaction,
+				parentGlobalId,
+				typeCode);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <RecordType> search (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"search");
 
 		) {
 
 			List <Long> objectIds =
 				searchIds (
-					taskLogger,
+					transaction,
 					search);
 
 			ImmutableList.Builder <RecordType> objectsBuilder =
@@ -131,6 +152,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 				objectsBuilder.add (
 					optionalOrNull (
 						objectHelper.find (
+							transaction,
 							objectId)));
 
 			}
@@ -144,14 +166,14 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchIds");
 
 		) {
@@ -184,7 +206,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 					genericCastUnchecked (
 						searchIdsMethod.invoke (
 							objectModel.daoImplementation (),
-							taskLogger,
+							transaction,
 							search));
 
 				return objectIds;
@@ -221,33 +243,41 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <RecordType> findByParent (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> parent) {
 
-		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForClassRequired (
-				parent.getClass ());
+		try (
 
-		List <?> objectsUncast =
-			parentHelper.getChildrenGeneric (
-				parent,
-				objectModel.objectClass ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByParent");
 
-		@SuppressWarnings ("unchecked")
-		List <RecordType> objects =
-			(List <RecordType>)
-			objectsUncast;
+		) {
 
-		return objects;
+			ObjectHelper <?> parentHelper =
+				objectManager.objectHelperForClassRequired (
+					parent.getClass ());
+
+			return genericCastUnchecked (
+				parentHelper.getChildrenGeneric (
+					transaction,
+					parent,
+					objectModel.objectClass ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	List <RecordType> findByParentAndType (
+			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode) {
 
 		return objectDatabaseHelper.findAllByParentAndType (
+			parentTransaction,
 			parentGlobalId,
 			typeCode);
 

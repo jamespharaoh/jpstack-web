@@ -5,6 +5,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
@@ -13,6 +14,7 @@ import static wbs.utils.time.TimeUtils.earlierThan;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import wbs.framework.component.tools.ComponentManagerBuilder;
 import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.random.RandomLogic;
@@ -72,7 +75,7 @@ class WbsServletListener
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"contextInitialized");
 
@@ -165,7 +168,7 @@ class WbsServletListener
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"contextDestroyed");
 
@@ -221,51 +224,70 @@ class WbsServletListener
 
 	@Override
 	public
-	void requestDestroyed (
+	void requestInitialized (
 			@NonNull ServletRequestEvent event) {
 
-		try (
+		HttpServletRequest request =
+			genericCastUnchecked (
+				event.getServletRequest ());
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"requestDestroyed");
+		TaskLogger.implicitArgument.store (
+			logContext.createTaskLogger (
+				stringFormat (
+					"%s %s",
+					request.getMethod (),
+					request.getRequestURI ()),
+				Arrays.stream (request.getCookies ())
+					.anyMatch (cookie ->
+						stringEqualSafe (
+							cookie.getName (),
+							"wbs-debug")
+						&& stringEqualSafe (
+							cookie.getValue (),
+							"yes"))));
 
-		) {
-
-			for (
-				String requestBeanName
-					: componentManager.requestComponentNames ()
-			) {
-
-				ThreadLocalProxyComponentFactory.Control control =
-					genericCastUnchecked (
-						componentManager.getComponentRequired (
-							taskLogger,
-							requestBeanName,
-							Object.class));
-
-				control.threadLocalProxyReset ();
-
-			}
-
-			RequestContextImplementation
-				.servletRequestThreadLocal
-				.remove ();
-
-		}
+		TaskLogger.implicitArgument.retrieveAndInvokeVoid (
+			taskLogger ->
+				requestInitializedReal (
+					taskLogger,
+					event));
 
 	}
 
 	@Override
 	public
-	void requestInitialized (
+	void requestDestroyed (
+			@NonNull ServletRequestEvent event) {
+
+		try {
+
+			TaskLogger.implicitArgument.retrieveAndInvokeVoid (
+				taskLogger ->
+					requestDestroyedReal (
+						taskLogger,
+						event));
+
+		} finally {
+
+			TaskLogger.implicitArgument.retrieve ().close ();
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void requestInitializedReal (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ServletRequestEvent event) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"requestInitialized");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"requestInitializedReal");
 
 		) {
 
@@ -367,7 +389,43 @@ class WbsServletListener
 
 	}
 
-	// private implementation
+	private
+	void requestDestroyedReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ServletRequestEvent event) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"requestDestroyedReal");
+
+		) {
+
+			for (
+				String requestBeanName
+					: componentManager.requestComponentNames ()
+			) {
+
+				ThreadLocalProxyComponentFactory.Control control =
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							requestBeanName,
+							Object.class));
+
+				control.threadLocalProxyReset ();
+
+			}
+
+			RequestContextImplementation
+				.servletRequestThreadLocal
+				.remove ();
+
+		}
+
+	}
 
 	private
 	void watchdogThread () {
@@ -408,7 +466,7 @@ class WbsServletListener
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"shutdown ()");
 

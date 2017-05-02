@@ -20,14 +20,17 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
 import org.joda.time.Instant;
 
-import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.WbsConnection;
 import wbs.framework.entity.record.UnsavedRecordDetector;
+import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.TaskLoggerImplementation;
 
 @PrototypeComponent ("hibernateTransaction")
 @Accessors (fluent = true)
@@ -58,10 +61,10 @@ class HibernateTransaction
 	HibernateTransaction realTransaction;
 
 	@Getter @Setter
-	List<HibernateTransaction> stack;
+	List <HibernateTransaction> stack;
 
 	@Getter @Setter
-	ActiveTask activeTask;
+	CloseableTaskLogger transactionTaskLogger;
 
 	// state
 
@@ -96,11 +99,12 @@ class HibernateTransaction
 
 	// implementation
 
-	void begin () {
+	void begin (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"begin");
@@ -124,75 +128,41 @@ class HibernateTransaction
 
 			// create session
 
-			try (
+			session =
+				hibernateDatabase.sessionFactory.withOptions ()
 
-				ActiveTask activeTask =
-					hibernateDatabase.activityManager.start (
-						"database",
-						"HibernateTransaction.begin () - create session",
-						this);
+				.interceptor (
+					hibernateDatabase.hibernateInterceptorProvider.get ())
 
-			) {
-
-				session =
-					hibernateDatabase.sessionFactory.withOptions ()
-
-					.interceptor (
-						hibernateDatabase.hibernateInterceptorProvider.get ())
-
-					.openSession ();
-
-			}
+				.openSession ();
 
 			// begin transaction
 
-			try (
-
-				ActiveTask activeTask =
-					hibernateDatabase.activityManager.start (
-						"database",
-						"HibernateTransaction.begin () - begin transaction",
-						this);
-
-			) {
-
-				hibernateTransaction =
-					session.beginTransaction ();
-
-			}
+			hibernateTransaction =
+				TaskLogger.implicitArgument.storeAndInvoke (
+					taskLogger,
+					() -> session.beginTransaction ());
 
 			// get server process id
 
-			try (
+			serverProcessId =
+				session.doReturningWork (
+					new ReturningWork <Long> () {
 
-				ActiveTask activeTask =
-					hibernateDatabase.activityManager.start (
-						"database",
-						"HibernateTransaction.begin () - get server process id",
-						this);
+				@Override
+				public
+				Long execute (
+						@NonNull Connection connection)
+					throws SQLException {
 
-			) {
+					WbsConnection wbsConnection =
+						(WbsConnection) connection;
 
-				serverProcessId =
-					session.doReturningWork (
-						new ReturningWork<Long> () {
+					return wbsConnection.serverProcessId ();
 
-					@Override
-					public
-					Long execute (
-							@NonNull Connection connection)
-						throws SQLException {
+				}
 
-						WbsConnection wbsConnection =
-							(WbsConnection) connection;
-
-						return wbsConnection.serverProcessId ();
-
-					}
-
-				});
-
-			}
+			});
 
 			// create unsaved record detector frame
 
@@ -215,7 +185,7 @@ class HibernateTransaction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"commit");
@@ -301,7 +271,7 @@ class HibernateTransaction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"close");
@@ -376,18 +346,13 @@ class HibernateTransaction
 
 				try {
 
-					if (
-						isNotNull (
-							activeTask)
-					) {
-						activeTask.close ();
-					}
+					transactionTaskLogger.close ();
 
 				} catch (Exception exception) {
 
 					taskLogger.fatalFormatException (
 						exception,
-						"Error teardown active task");
+						"Error closing transaction trask logger");
 
 				}
 
@@ -416,8 +381,9 @@ class HibernateTransaction
 
 	}
 
+	@Override
 	public
-	Session getSession () {
+	Session hibernateSession () {
 
 		if (closed) {
 
@@ -427,7 +393,7 @@ class HibernateTransaction
 		}
 
 		if (realTransaction != null) {
-			return realTransaction.getSession ();
+			return realTransaction.hibernateSession ();
 		}
 
 		return session;
@@ -441,7 +407,7 @@ class HibernateTransaction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"finalize");
@@ -568,6 +534,37 @@ class HibernateTransaction
 		}
 
 		return true;
+
+	}
+
+	@Override
+	public
+	OwnedTransaction ownedTransaction () {
+
+		return this;
+
+	}
+
+	@Override
+	public
+	NestedTransaction nestTransaction (
+			@NonNull LogContext logContext,
+			@NonNull String dynamicContext) {
+
+		return new NestedTransaction (
+			this,
+			logContext.nestTaskLogger (
+				transactionTaskLogger,
+				dynamicContext
+			).taskLoggerImplementation ());
+
+	}
+
+	@Override
+	public
+	TaskLoggerImplementation taskLoggerImplementation () {
+
+		return transactionTaskLogger.taskLoggerImplementation ();
 
 	}
 

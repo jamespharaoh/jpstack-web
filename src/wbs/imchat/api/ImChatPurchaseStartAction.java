@@ -25,7 +25,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -138,18 +140,18 @@ class ImChatPurchaseStartAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					"handle");
 
 		) {
 
 			decodeRequest ();
 
-			Optional<Responder> createPurchaseResult =
+			Optional <Responder> createPurchaseResult =
 				createPurchase (
-					taskLogger);
+					transaction);
 
 			if (
 				optionalIsPresent (
@@ -161,7 +163,7 @@ class ImChatPurchaseStartAction
 			makeApiCall ();
 
 			updatePurchase (
-				taskLogger);
+				transaction);
 
 			return createResponse ();
 
@@ -187,27 +189,22 @@ class ImChatPurchaseStartAction
 	}
 
 	Optional <Responder> createPurchase (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createPurchase");
-
-		// begin transaction
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"ImChatPurchaseStartAction.createPurchase ()",
-					this);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createPurchase");
 
 		) {
 
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -219,6 +216,7 @@ class ImChatPurchaseStartAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
+					transaction,
 					purchaseRequest.sessionSecret ());
 
 			if (
@@ -256,8 +254,9 @@ class ImChatPurchaseStartAction
 
 			// lookup price point
 
-			Optional<ImChatPricePointRec> pricePointOptional =
+			Optional <ImChatPricePointRec> pricePointOptional =
 				imChatPricePointHelper.findByCode (
+					transaction,
 					imChat,
 					hyphenToUnderscore (
 						purchaseRequest.pricePointCode ()));
@@ -321,7 +320,7 @@ class ImChatPurchaseStartAction
 
 				paypalPayment =
 					paypalPaymentHelper.insert (
-						taskLogger,
+						transaction,
 						paypalPaymentHelper.createInstance ()
 
 					.setPaypalAccount (
@@ -346,7 +345,7 @@ class ImChatPurchaseStartAction
 
 			ImChatPurchaseRec purchase =
 				imChatPurchaseHelper.insert (
-					taskLogger,
+					transaction,
 					imChatPurchaseHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -473,16 +472,11 @@ class ImChatPurchaseStartAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updatePurchase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatPurchaseStartAction.updatePurchase",
-					this);
+					logContext,
+					parentTaskLogger,
+					"updatePurchase");
 
 		) {
 
@@ -490,6 +484,7 @@ class ImChatPurchaseStartAction
 
 			ImChatPurchaseRec purchase =
 				imChatPurchaseHelper.findRequired (
+					transaction,
 					purchaseId);
 
 			purchase
@@ -503,10 +498,12 @@ class ImChatPurchaseStartAction
 
 			ImChatCustomerRec customer =
 				imChatCustomerHelper.findRequired (
+					transaction,
 					customerId);
 
 			customerData =
 				imChatApiLogic.customerData (
+					transaction,
 					customer);
 
 			// commit transaction

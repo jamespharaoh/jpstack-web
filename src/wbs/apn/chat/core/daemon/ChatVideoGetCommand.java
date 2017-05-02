@@ -1,5 +1,6 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -22,8 +23,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -144,13 +146,13 @@ class ChatVideoGetCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -161,21 +163,24 @@ class ChatVideoGetCommand
 			ChatRec chat =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			ChatSchemeRec chatScheme =
@@ -185,7 +190,7 @@ class ChatVideoGetCommand
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -194,7 +199,7 @@ class ChatVideoGetCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					message,
 					rest,
@@ -202,7 +207,7 @@ class ChatVideoGetCommand
 					true);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -215,7 +220,7 @@ class ChatVideoGetCommand
 			// log request
 
 			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
+				transaction,
 				chatUser,
 				message,
 				rest,
@@ -232,7 +237,7 @@ class ChatVideoGetCommand
 
 				long numSent =
 					chatInfoLogic.sendUserVideos (
-						taskLogger,
+						transaction,
 						chatUser,
 						3l,
 						optionalOf (
@@ -243,7 +248,7 @@ class ChatVideoGetCommand
 				if (numSent == 0) {
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
@@ -257,8 +262,9 @@ class ChatVideoGetCommand
 
 				// find other user and ensure they have video
 
-				Optional<ChatUserRec> otherUserOptional =
+				Optional <ChatUserRec> otherUserOptional =
 					chatUserHelper.findByCode (
+						transaction,
 						chat,
 						text);
 
@@ -267,12 +273,13 @@ class ChatVideoGetCommand
 					optionalIsNotPresent (
 						otherUserOptional)
 
-					|| otherUserOptional.get ().getChatUserVideoList ().isEmpty ()
+					|| collectionIsEmpty (
+						otherUserOptional.get ().getChatUserVideoList ())
 
 				) {
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							message.getThreadId ()),
@@ -281,7 +288,7 @@ class ChatVideoGetCommand
 						emptyMap ());
 
 					return smsInboxLogic.inboxProcessed (
-						taskLogger,
+						transaction,
 						inbox,
 						optionalOf (
 							defaultService),
@@ -304,7 +311,7 @@ class ChatVideoGetCommand
 
 				medias.add (
 					chatInfoLogic.chatUserBlurbMedia (
-						taskLogger,
+						transaction,
 						chatUser,
 						otherUser));
 
@@ -317,7 +324,7 @@ class ChatVideoGetCommand
 						chatUser.getNumber ())
 
 					.messageString (
-						taskLogger,
+						transaction,
 						"")
 
 					.numFrom (
@@ -333,19 +340,19 @@ class ChatVideoGetCommand
 						affiliate)
 
 					.subjectString (
-						taskLogger,
+						transaction,
 						"User video")
 
 					.medias (
 						medias)
 
 					.send (
-						taskLogger);
+						transaction);
 
 				// charge for one video
 
 				chatCreditLogic.userSpend (
-					taskLogger,
+					transaction,
 					chatUser,
 					0,
 					0,
@@ -358,7 +365,7 @@ class ChatVideoGetCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

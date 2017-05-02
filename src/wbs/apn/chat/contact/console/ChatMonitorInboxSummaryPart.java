@@ -70,10 +70,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -206,25 +206,23 @@ class ChatMonitorInboxSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			now =
 				transaction.now ();
 
 			monitorInbox =
-				chatMonitorInboxHelper.findFromContextRequired ();
+				chatMonitorInboxHelper.findFromContextRequired (
+					transaction);
 
 			monitorChatUser =
 				monitorInbox.getMonitorChatUser ();
@@ -247,11 +245,13 @@ class ChatMonitorInboxSummaryPart
 					Iterables.concat (
 
 				chatMessageHelper.findLimit (
+					transaction,
 					userChatUser,
 					monitorChatUser,
 					50l),
 
 				chatMessageHelper.findLimit (
+					transaction,
 					monitorChatUser,
 					userChatUser,
 					50l)
@@ -276,6 +276,7 @@ class ChatMonitorInboxSummaryPart
 
 			alarm =
 				chatUserAlarmHelper.find (
+					transaction,
 					userChatUser,
 					monitorChatUser);
 
@@ -283,20 +284,24 @@ class ChatMonitorInboxSummaryPart
 
 			notes =
 				chatContactNoteHelper.find (
+					transaction,
 					userChatUser,
 					monitorChatUser);
 
 			chatNoteNames =
 				chatNoteNameHelper.findNotDeleted (
+					transaction,
 					chat);
 
 			userNamedNotes =
 				getNamedNotes (
+					transaction,
 					userChatUser,
 					monitorChatUser);
 
 			monitorNamedNotes =
 				getNamedNotes (
+					transaction,
 					monitorChatUser,
 					userChatUser);
 
@@ -304,38 +309,52 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
+	private
 	Map <Long, ChatNamedNoteRec> getNamedNotes (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec thatUser) {
 
-		Map <Long, ChatNamedNoteRec> namedNotes =
-			new HashMap<> ();
+		try (
 
-		List <ChatNamedNoteRec> namedNotesTemp =
-			chatNamedNoteHelper.find (
-				thisUser,
-				thatUser);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getNamedNotes");
 
-		for (
-			ChatNamedNoteRec namedNote
-				: namedNotesTemp
 		) {
 
-			namedNotes.put (
-				namedNote.getChatNoteName ().getId (),
-				namedNote);
+			Map <Long, ChatNamedNoteRec> namedNotes =
+				new HashMap<> ();
+
+			List <ChatNamedNoteRec> namedNotesTemp =
+				chatNamedNoteHelper.find (
+					transaction,
+					thisUser,
+					thatUser);
+
+			for (
+				ChatNamedNoteRec namedNote
+					: namedNotesTemp
+			) {
+
+				namedNotes.put (
+					namedNote.getChatNoteName ().getId (),
+					namedNote);
+
+			}
+
+			return namedNotes;
 
 		}
-
-		return namedNotes;
 
 	}
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -357,33 +376,44 @@ class ChatMonitorInboxSummaryPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlStyleBlockOpen ();
+		try (
 
-		htmlStyleRuleOpen (
-			"span.namedNote form input");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHeadContent");
 
-		htmlStyleRuleEntryWrite (
-			"width",
-			"50%");
+		) {
 
-		htmlStyleRuleClose ();
+			htmlStyleBlockOpen ();
 
-		htmlStyleBlockClose ();
+			htmlStyleRuleOpen (
+				"span.namedNote form input");
+
+			htmlStyleRuleEntryWrite (
+				"width",
+				"50%");
+
+			htmlStyleRuleClose ();
+
+			htmlStyleBlockClose ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -396,16 +426,16 @@ class ChatMonitorInboxSummaryPart
 			goPrefs ();
 
 			goCode (
-				taskLogger);
+				transaction);
 
 			goName (
-				taskLogger);
+				transaction);
 
 			goInfo (
-				taskLogger);
+				transaction);
 
 			goPic (
-				taskLogger);
+				transaction);
 
 			goLocation ();
 			goDob ();
@@ -545,13 +575,13 @@ class ChatMonitorInboxSummaryPart
 	}
 
 	void goCode (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goCode");
 
 		) {
@@ -562,12 +592,12 @@ class ChatMonitorInboxSummaryPart
 				"User number");
 
 			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				monitorChatUser,
 				chat);
 
 			objectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				userChatUser,
 				chat);
 
@@ -578,13 +608,13 @@ class ChatMonitorInboxSummaryPart
 	}
 
 	void goName (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goName");
 
 		) {
@@ -609,13 +639,13 @@ class ChatMonitorInboxSummaryPart
 	}
 
 	void goInfo (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goInfo");
 
 		) {
@@ -643,13 +673,13 @@ class ChatMonitorInboxSummaryPart
 
 	private
 	void goPic (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goPic");
 
 		) {
@@ -665,7 +695,7 @@ class ChatMonitorInboxSummaryPart
 
 				() ->
 					mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						formatWriter,
 						monitorChatUser.getChatUserImageList ().get (0)
 							.getMedia ()),
@@ -681,7 +711,7 @@ class ChatMonitorInboxSummaryPart
 
 				() ->
 					mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						formatWriter,
 						userChatUser.getChatUserImageList ().get (0).getMedia ()),
 

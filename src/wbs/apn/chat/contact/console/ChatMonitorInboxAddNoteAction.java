@@ -66,27 +66,23 @@ class ChatMonitorInboxAddNoteAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		String newNote =
-			requestContext.parameterRequired (
-				"moreNotes");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatMonitorInboxAddNoteAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			String newNote =
+				requestContext.parameterRequired (
+					"moreNotes");
+
 			ChatMonitorInboxRec chatMonitorInbox =
-				chatMonitorInboxHelper.findFromContextRequired ();
+				chatMonitorInboxHelper.findFromContextRequired (
+					transaction);
 
 			ChatUserRec userChatUser =
 				chatMonitorInbox.getUserChatUser ();
@@ -99,12 +95,12 @@ class ChatMonitorInboxAddNoteAction
 
 			if (newNote != null) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Adding note to %s",
 					chatMonitorInbox.getMonitorChatUser ().getName ());
 
 				chatContactNoteHelper.insert (
-					taskLogger,
+					transaction,
 					chatContactNoteHelper.createInstance ()
 
 					.setChat (
@@ -123,7 +119,8 @@ class ChatMonitorInboxAddNoteAction
 						transaction.now ())
 
 					.setConsoleUser (
-						userConsoleLogic.userRequired ()));
+						userConsoleLogic.userRequired (
+							transaction)));
 
 			}
 

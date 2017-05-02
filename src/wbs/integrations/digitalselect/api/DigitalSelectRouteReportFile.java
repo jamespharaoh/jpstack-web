@@ -1,5 +1,6 @@
 package wbs.integrations.digitalselect.api;
 
+import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -68,16 +69,11 @@ class DigitalSelectRouteReportFile
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doPost");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"DigitalSelectRouteReportFile.doPost ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doPost");
 
 		) {
 
@@ -96,11 +92,15 @@ class DigitalSelectRouteReportFile
 			// debugging
 
 			requestContext.debugDump (
-				taskLogger);
+				transaction);
 
 			// sanity checks
 
-			if (! messageStatusCodes.containsKey (statParam)) {
+			if (
+				mapDoesNotContainKey (
+					messageStatusCodes,
+					statParam)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -110,10 +110,12 @@ class DigitalSelectRouteReportFile
 			}
 
 			MessageStatus newMessageStatus =
-				messageStatusCodes.get (statParam);
+				messageStatusCodes.get (
+					statParam);
 
 			DigitalSelectRouteOutRec digitalSelectRouteOut =
 				digitalSelectRouteOutHelper.findRequired (
+					transaction,
 					routeId);
 
 			// store report
@@ -121,7 +123,7 @@ class DigitalSelectRouteReportFile
 			try {
 
 				reportLogic.deliveryReport (
-					taskLogger,
+					transaction,
 					digitalSelectRouteOut.getRoute (),
 					msgidParam,
 					newMessageStatus,
@@ -138,7 +140,7 @@ class DigitalSelectRouteReportFile
 
 				// TODO expose frequent errors like this better somehow
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Received delivery report for unknown message %s",
 					msgidParam);
 
@@ -161,8 +163,8 @@ class DigitalSelectRouteReportFile
 	// data
 
 	final static
-	Map<String,MessageStatus> messageStatusCodes =
-		ImmutableMap.<String,MessageStatus>builder ()
+	Map <String, MessageStatus> messageStatusCodes =
+		ImmutableMap.<String, MessageStatus> builder ()
 			.put ("acked", MessageStatus.submitted)
 			.put ("buffered phone", MessageStatus.submitted)
 			.put ("buffered smsc", MessageStatus.submitted)

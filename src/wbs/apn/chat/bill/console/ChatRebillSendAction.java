@@ -6,7 +6,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
@@ -109,24 +108,17 @@ class ChatRebillSendAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"goReal"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			// process form submission
 
@@ -148,7 +140,7 @@ class ChatRebillSendAction
 
 			formUpdates =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					formFields,
 					formValues,
@@ -183,6 +175,7 @@ class ChatRebillSendAction
 
 			List <Pair <ChatUserRec, Optional <String>>> allChatUsers =
 				chatUserHelper.findWantingBill (
+					transaction,
 					chat,
 					formValues.lastAction (),
 					ifNull (
@@ -201,7 +194,7 @@ class ChatRebillSendAction
 						Pair.of (
 							chatUser,
 							chatCreditLogic.userBillCheck (
-								taskLogger,
+								transaction,
 								chatUser,
 								billCheckOptions)))
 
@@ -261,7 +254,7 @@ class ChatRebillSendAction
 			) {
 
 				chatRebillLogHelper.insert (
-					taskLogger,
+					transaction,
 					chatRebillLogHelper.createInstance ()
 
 					.setChat (
@@ -271,7 +264,8 @@ class ChatRebillSendAction
 						transaction.now ())
 
 					.setUser (
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 
 					.setLastAction (
 						formValues.lastAction ())
@@ -298,7 +292,7 @@ class ChatRebillSendAction
 				billChatUsers.forEach (
 					chatUser ->
 						chatCreditLogic.userBillReal (
-							taskLogger,
+							transaction,
 							chatUser,
 							true));
 

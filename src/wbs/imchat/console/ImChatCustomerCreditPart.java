@@ -25,8 +25,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatCustomerCreditRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -71,63 +72,76 @@ class ImChatCustomerCreditPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		customerFormFields =
-			imChatCustomerConsoleModule.formFieldSetRequired (
-				"credit-summary",
-				ImChatCustomerRec.class);
+		try (
 
-		creditFormFields =
-			imChatCustomerConsoleModule.formFieldSetRequired (
-				"credit-request",
-				ImChatCustomerCreditRequest.class);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		creditHistoryFormFields =
-			imChatCustomerConsoleModule.formFieldSetRequired (
-				"credit-history",
-				ImChatCustomerCreditRec.class);
+		) {
 
-		request =
-			ifNotPresent (
+			customerFormFields =
+				imChatCustomerConsoleModule.formFieldSetRequired (
+					"credit-summary",
+					ImChatCustomerRec.class);
 
-			optionalCast (
-				ImChatCustomerCreditRequest.class,
-				requestContext.request (
-					"imChatCustomerCreditRequest")),
+			creditFormFields =
+				imChatCustomerConsoleModule.formFieldSetRequired (
+					"credit-request",
+					ImChatCustomerCreditRequest.class);
 
-			Optional.of (
-				new ImChatCustomerCreditRequest ())
+			creditHistoryFormFields =
+				imChatCustomerConsoleModule.formFieldSetRequired (
+					"credit-history",
+					ImChatCustomerCreditRec.class);
 
-		);
+			request =
+				ifNotPresent (
 
-		request.customer (
-			imChatCustomerHelper.findFromContextRequired ());
+				optionalCast (
+					ImChatCustomerCreditRequest.class,
+					requestContext.request (
+						"imChatCustomerCreditRequest")),
 
-		updateResultSet =
-			optionalCast (
-				UpdateResultSet.class,
-				requestContext.request (
-					"imChatCustomerCreditUpdateResults"));
+				Optional.of (
+					new ImChatCustomerCreditRequest ())
 
-		creditHistory =
-			imChatCustomerCreditHelper.findByIndexRange (
-				request.customer (),
-				max (0l, request.customer.getNumCredits () - 10l),
-				request.customer.getNumCredits ());
+			);
+
+			request.customer (
+				imChatCustomerHelper.findFromContextRequired (
+					transaction));
+
+			updateResultSet =
+				optionalCast (
+					UpdateResultSet.class,
+					requestContext.request (
+						"imChatCustomerCreditUpdateResults"));
+
+			creditHistory =
+				imChatCustomerCreditHelper.findByIndexRange (
+					transaction,
+					request.customer (),
+					max (0l, request.customer.getNumCredits () - 10l),
+					request.customer.getNumCredits ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -138,7 +152,7 @@ class ImChatCustomerCreditPart
 				"Customer details");
 
 			formFieldLogic.outputDetailsTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				customerFormFields,
 				request.customer (),
@@ -148,7 +162,7 @@ class ImChatCustomerCreditPart
 				"Apply credit");
 
 			formFieldLogic.outputFormTable (
-				taskLogger,
+				transaction,
 				requestContext,
 				formatWriter,
 				creditFormFields,
@@ -166,7 +180,7 @@ class ImChatCustomerCreditPart
 				"Recent credit history");
 
 			formFieldLogic.outputListTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				creditHistoryFormFields,
 				Lists.reverse (

@@ -1,9 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
-import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -58,8 +56,9 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 
@@ -151,22 +150,23 @@ class ManualResponderRequestPendingFormResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			request =
-				manualResponderRequestHelper.findFromContextRequired ();
+				manualResponderRequestHelper.findFromContextRequired (
+					transaction);
 
 			manualResponderNumber =
 				request.getManualResponderNumber ();
@@ -276,7 +276,7 @@ class ManualResponderRequestPendingFormResponder
 
 			manager =
 				privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					manualResponder,
 					"manage");
 
@@ -287,7 +287,7 @@ class ManualResponderRequestPendingFormResponder
 			gotTemplates =
 				! templates.isEmpty ();
 
-			Set<ManualResponderReplyRec> manualResponderReplies =
+			Set <ManualResponderReplyRec> manualResponderReplies =
 				request.getReplies ();
 
 			alreadyReplied =
@@ -300,19 +300,19 @@ class ManualResponderRequestPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			// show relevant frames
 
@@ -343,13 +343,13 @@ class ManualResponderRequestPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
@@ -370,7 +370,7 @@ class ManualResponderRequestPendingFormResponder
 			} else if (
 
 				! privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					manualResponder,
 					"reply")
 
@@ -378,20 +378,18 @@ class ManualResponderRequestPendingFormResponder
 
 				goAccessDenied ();
 
-			} else if (allOf (
+			} else if (
 
-				() -> templates.isEmpty (),
+				templates.isEmpty ()
 
-				() -> not (
-					manualResponder.getCanIgnore ()),
+				&& ! manualResponder.getCanIgnore ()
 
-				() -> not (
-					privChecker.canRecursive (
-						taskLogger,
-						manualResponder,
-						"manage"))
+				&& ! privChecker.canRecursive (
+					transaction,
+					manualResponder,
+					"manage")
 
-			)) {
+			) {
 
 				goNoTemplates ();
 
@@ -616,6 +614,7 @@ class ManualResponderRequestPendingFormResponder
 
 		RouteRec route =
 			routerLogic.resolveRouter (
+				transaction,
 				template.getRouter ());
 
 		htmlTableCellWriteHtml (

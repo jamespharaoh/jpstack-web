@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
@@ -20,9 +21,12 @@ import org.joda.time.Instant;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TextualInterval;
 
@@ -35,6 +39,9 @@ class TimestampFromFormFieldInterfaceMapping <Container>
 	implements FormFieldInterfaceMapping <Container, Instant, String> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleUserHelper preferences;
@@ -49,44 +56,58 @@ class TimestampFromFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <Instant>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		if (
+		try (
 
-			optionalIsNotPresent (
-				interfaceValue)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
-			|| stringIsEmpty (
-				optionalGetRequired (
-					interfaceValue))
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			if (
 
-		} else {
+				optionalIsNotPresent (
+					interfaceValue)
 
-			try {
-
-				// TODO timezone should not be hardcoded
-
-				TextualInterval interval =
-					TextualInterval.parseRequired (
-						preferences.timezone (),
-						interfaceValue.get (),
-						preferences.hourOffset ());
+				|| stringIsEmpty (
+					optionalGetRequired (
+						interfaceValue))
+			) {
 
 				return successResult (
-					Optional.of (
-						interval.start ()));
+					optionalAbsent ());
 
-			} catch (IllegalArgumentException exception) {
+			} else {
 
-				return errorResultFormat (
-					"Please enter a valid timestamp for %s",
-					name ());
+				try {
+
+					// TODO timezone should not be hardcoded
+
+					TextualInterval interval =
+						TextualInterval.parseRequired (
+							preferences.timezone (
+								transaction),
+							interfaceValue.get (),
+							preferences.hourOffset (
+								transaction));
+
+					return successResult (
+						optionalOf (
+							interval.start ()));
+
+				} catch (IllegalArgumentException exception) {
+
+					return errorResultFormat (
+						"Please enter a valid timestamp for %s",
+						name ());
+
+				}
 
 			}
 
@@ -97,25 +118,37 @@ class TimestampFromFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Instant> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				Optional.<String>absent ());
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else {
+				return successResult (
+					Optional.<String>absent ());
 
-			return successResult (
-				Optional.of (
-					preferences.timestampWithTimezoneString (
-						genericValue.get ())));
+			} else {
+
+				return successResult (
+					Optional.of (
+						preferences.timestampWithTimezoneString (
+							transaction,
+							genericValue.get ())));
+
+			}
 
 		}
 

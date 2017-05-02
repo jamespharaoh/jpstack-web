@@ -6,11 +6,15 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
@@ -19,13 +23,20 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.identities.MasterFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("masterModelFieldBuilder")
 @ModelBuilder
 public
-class MasterModelFieldBuilder {
+class MasterModelFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -43,87 +54,100 @@ class MasterModelFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
+		try (
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		) {
 
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+			String fieldName =
+				ifNull (
+					spec.name (),
+					spec.typeName ());
 
-		// create model field
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
 
-		ModelField modelField =
-			new ModelField ()
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
 
-			.model (
-				target.model ())
+			String fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
 
-			.parentField (
-				context.parentModelField ())
+			// create model field
 
-			.name (
-				fieldName)
+			ModelField modelField =
+				new ModelField ()
 
-			.label (
-				camelToSpaces (
-					fieldName))
+				.model (
+					target.model ())
 
-			.type (
-				ModelFieldType.master)
+				.parentField (
+					context.parentModelField ())
 
-			.parent (
-				false)
+				.name (
+					fieldName)
 
-			.identity (
-				true)
+				.label (
+					camelToSpaces (
+						fieldName))
 
-			.valueType (
-				classForNameRequired (
-					fullFieldTypeName))
+				.type (
+					ModelFieldType.master)
 
-			.nullable (
-				false)
+				.parent (
+					false)
 
-			.cacheable (
-				true);
+				.identity (
+					true)
 
-		// store field
+				.valueType (
+					classForNameRequired (
+						fullFieldTypeName))
 
-		target.fields ().add (
-			modelField);
+				.nullable (
+					false)
 
-		target.fieldsByName ().put (
-			modelField.name (),
-			modelField);
+				.cacheable (
+					true);
 
-		if (target.model ().masterField () != null)
-			throw new RuntimeException ();
+			// store field
 
-		target.model ().masterField (
-			modelField);
+			target.fields ().add (
+				modelField);
 
-		if (target.model ().parentField () != null)
-			throw new RuntimeException ();
+			target.fieldsByName ().put (
+				modelField.name (),
+				modelField);
 
-		target.model ().parentField (
-			modelField);
+			if (target.model ().masterField () != null)
+				throw new RuntimeException ();
+
+			target.model ().masterField (
+				modelField);
+
+			if (target.model ().parentField () != null)
+				throw new RuntimeException ();
+
+			target.model ().parentField (
+				modelField);
+
+		}
 
 	}
 

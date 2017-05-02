@@ -15,7 +15,9 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
@@ -30,6 +32,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.background.model.BackgroundProcessObjectHelper;
@@ -81,7 +84,7 @@ class BackgroundLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerBackgroundProcess");
@@ -107,47 +110,11 @@ class BackgroundLogicImplementation
 				listSecondElementRequired (
 					backgroundProcessNameParts);
 
-			Long backgroundProcessId;
-			Boolean backgroundProcessDebugEnabled;
-			Duration backgroundProcessFrequency;
-
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"SleepingDaemonService.setup ()",
-						this);
-			) {
-
-				ObjectTypeRec parentType =
-					objectTypeHelper.findByCodeRequired (
-						GlobalId.root,
-						hyphenToUnderscore (
-							parentTypeCode));
-
-				BackgroundProcessRec backgroundProcess =
-					backgroundProcessHelper.findByCodeRequired (
-						parentType,
-						hyphenToUnderscore (
-							backgroundProcessCode));
-
-				backgroundProcessId =
-					backgroundProcess.getId ();
-
-				backgroundProcessDebugEnabled =
-					backgroundProcess.getDebug ();
-
-				backgroundProcessFrequency =
-					backgroundProcess.getFrequency ();
-
-				taskLogger.noticeFormat (
-					"Found background process %s with id %s",
-					backgroundProcessName,
-					integerToDecimalString (
-						backgroundProcess.getId ()));
-
-			}
+			BackgroundProcessData backgroundProcessData =
+				lookupBackgroundProcess (
+					taskLogger,
+					parentTypeCode,
+					backgroundProcessCode);
 
 			ComponentMetaData componentMetaData =
 				componentManager.componentMetaData (
@@ -185,16 +152,83 @@ class BackgroundLogicImplementation
 					backgroundProcessCode)
 
 				.backgroundProcessId (
-					backgroundProcessId)
+					backgroundProcessData.id ())
 
 				.backgroundProcessFrequency (
-					backgroundProcessFrequency)
+					backgroundProcessData.frequency ())
 
 				.backgroundProcessDebugEnabled (
-					backgroundProcessDebugEnabled);
+					backgroundProcessData.debugEnabled ())
+
+			;
 
 		}
 
+	}
+
+	private
+	BackgroundProcessData lookupBackgroundProcess (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String parentTypeCode,
+			@NonNull String backgroundProcessCode) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"lookupBackgroundProcess");
+
+		) {
+
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					transaction,
+					GlobalId.root,
+					hyphenToUnderscore (
+						parentTypeCode));
+
+			BackgroundProcessRec backgroundProcess =
+				backgroundProcessHelper.findByCodeRequired (
+					transaction,
+					parentType,
+					hyphenToUnderscore (
+						backgroundProcessCode));
+
+			BackgroundProcessData backgroundProcessData =
+				new BackgroundProcessData ()
+
+				.id (
+					backgroundProcess.getId ())
+
+				.debugEnabled (
+					backgroundProcess.getDebug ())
+
+				.frequency (
+					backgroundProcess.getFrequency ())
+
+			;
+
+			transaction.noticeFormat (
+				"Found background process %s with id %s",
+				backgroundProcess.getName (),
+				integerToDecimalString (
+					backgroundProcess.getId ()));
+
+			return backgroundProcessData;
+
+		}
+
+	}
+
+	@Accessors (fluent = true)
+	@Data
+	private static
+	class BackgroundProcessData {
+		Long id;
+		Boolean debugEnabled;
+		Duration frequency;
 	}
 
 }

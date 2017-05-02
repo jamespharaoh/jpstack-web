@@ -53,6 +53,7 @@ import wbs.framework.entity.generate.ObjectHelperGenerator;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectModel;
@@ -547,7 +548,7 @@ class ConsoleHelperGenerator {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeLifecycle");

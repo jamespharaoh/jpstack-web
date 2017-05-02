@@ -17,9 +17,12 @@ import lombok.NonNull;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -39,6 +42,9 @@ class ChatUserAdminCreditModePart
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	ChatUserRec chatUser;
@@ -46,60 +52,83 @@ class ChatUserAdminCreditModePart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		if (
-			enumEqualSafe (
-				chatUser.getType (),
-				ChatUserType.monitor)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
+
 		) {
 
-			htmlParagraphOpen ();
+			if (
+				enumEqualSafe (
+					chatUser.getType (),
+					ChatUserType.monitor)
+			) {
 
-			formatWriter.writeFormat (
-				"This is a monitor and has no credit mode.");
+				htmlParagraphOpen ();
 
-			htmlParagraphClose ();
+				formatWriter.writeFormat (
+					"This is a monitor and has no credit mode.");
 
-			return;
+				htmlParagraphClose ();
+
+				return;
+
+			}
+
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatUser.admin.creditMode"));
+
+			htmlTableOpenDetails ();
+
+			htmlTableDetailsRowWriteHtml (
+				"Credit mode",
+				() -> chatUserCreditModeConsoleHelper.writeSelect (
+					"creditMode",
+					requestContext.formOrElse (
+						"creditMode",
+						() -> chatUser.getCreditMode ().name ())));
+
+			htmlTableDetailsRowWriteHtml (
+				"Actions",
+				stringFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"change mode\"",
+					">"));
+
+			htmlTableClose ();
+
+			htmlFormClose ();
 
 		}
-
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatUser.admin.creditMode"));
-
-		htmlTableOpenDetails ();
-
-		htmlTableDetailsRowWriteHtml (
-			"Credit mode",
-			() -> chatUserCreditModeConsoleHelper.writeSelect (
-				"creditMode",
-				requestContext.formOrElse (
-					"creditMode",
-					() -> chatUser.getCreditMode ().name ())));
-
-		htmlTableDetailsRowWriteHtml (
-			"Actions",
-			stringFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"change mode\"",
-				">"));
-
-		htmlTableClose ();
-
-		htmlFormClose ();
 
 	}
 

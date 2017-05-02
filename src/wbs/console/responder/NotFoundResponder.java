@@ -10,9 +10,12 @@ import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("notFoundResponder")
 public
@@ -20,6 +23,9 @@ class NotFoundResponder
 	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -29,21 +35,32 @@ class NotFoundResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingOneWrite (
-			"Page not found");
+		try (
 
-		htmlParagraphWriteFormatError (
-			"Page not found");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlParagraphWriteFormat (
-			"The requested page could not be found:");
+		) {
 
-		htmlParagraphWriteHtml (
-			stringFormat (
-				"<code>%h</code>",
-				requestContext.requestUri ()));
+			htmlHeadingOneWrite (
+				"Page not found");
+
+			htmlParagraphWriteFormatError (
+				"Page not found");
+
+			htmlParagraphWriteFormat (
+				"The requested page could not be found:");
+
+			htmlParagraphWriteHtml (
+				stringFormat (
+					"<code>%h</code>",
+					requestContext.requestUri ()));
+
+		}
 
 	}
 

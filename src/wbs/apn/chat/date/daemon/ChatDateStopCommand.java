@@ -14,8 +14,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -113,13 +114,13 @@ class ChatDateStopCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
@@ -145,6 +146,7 @@ class ChatDateStopCommand
 
 			ChatSchemeRec chatScheme =
 				chatSchemeHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			ChatRec chat =
@@ -152,6 +154,7 @@ class ChatDateStopCommand
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -160,18 +163,19 @@ class ChatDateStopCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// update dating mode
 
 			chatDateLogic.userDateStuff (
-				taskLogger,
+				transaction,
 				chatUser,
 				null,
 				optionalOf (
@@ -182,7 +186,7 @@ class ChatDateStopCommand
 			// log help message
 
 			chatHelpLogLogic.createChatHelpLogIn (
-				taskLogger,
+				transaction,
 				chatUser,
 				message,
 				rest,
@@ -193,7 +197,7 @@ class ChatDateStopCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

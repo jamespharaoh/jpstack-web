@@ -13,7 +13,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -58,27 +60,25 @@ class PrivHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"setup ()",
-					this);
+					logContext,
+					"setup");
 
 		) {
 
 			// preload object types
 
-			objectTypeDao.findAll ();
+			objectTypeDao.findAll (
+				transaction);
 
 			// load priv types and construct index
 
 			privTypeIdsByParentTypeId =
-				privTypeDao.findAll ().stream ()
+				privTypeDao.findAll (
+					transaction)
+
+				.stream ()
 
 				.collect (
 					Collectors.groupingBy (
@@ -102,7 +102,7 @@ class PrivHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectHelper<PrivRec> privHelper,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parent) {
@@ -117,15 +117,16 @@ class PrivHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSingletons");
 
 		) {
 
 			ObjectTypeRec parentType =
 				objectTypeDao.findById (
+					transaction,
 					parentHelper.objectTypeId ());
 
 			for (
@@ -136,10 +137,11 @@ class PrivHooks
 
 				PrivTypeRec privType =
 					privTypeDao.findRequired (
+						transaction,
 						privTypeId);
 
 				privHelper.insert (
-					taskLogger,
+					transaction,
 					privHelper.createInstance ()
 
 					.setPrivType (

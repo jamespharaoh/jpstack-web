@@ -30,10 +30,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
@@ -88,449 +88,556 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatPricePointData pricePointData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatPricePointRec pricePoint) {
 
-		ImChatRec imChat =
-			pricePoint.getImChat ();
+		try (
 
-		return new ImChatPricePointData ()
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"pricePointData");
 
-			.code (
-				underscoreToHyphen (
-					pricePoint.getCode ()))
+		) {
 
-			.name (
-				pricePoint.getPublicName ())
+			ImChatRec imChat =
+				pricePoint.getImChat ();
 
-			.description (
-				pricePoint.getPublicDescription ())
+			return new ImChatPricePointData ()
 
-			.priceString (
-				currencyLogic.formatText (
-					imChat.getBillingCurrency (),
-					pricePoint.getPrice ()))
+				.code (
+					underscoreToHyphen (
+						pricePoint.getCode ()))
 
-			.valueString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					pricePoint.getValue ()));
+				.name (
+					pricePoint.getPublicName ())
+
+				.description (
+					pricePoint.getPublicDescription ())
+
+				.priceString (
+					currencyLogic.formatText (
+						imChat.getBillingCurrency (),
+						pricePoint.getPrice ()))
+
+				.valueString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						pricePoint.getValue ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	ImChatProfileData profileData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatProfileRec profile) {
 
-		if (profile.getDeleted ()) {
-			throw new RuntimeException ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"profileData");
+
+		) {
+
+			if (profile.getDeleted ()) {
+				throw new RuntimeException ();
+			}
+
+			MediaRec image =
+				profile.getProfileImage ();
+
+			ContentRec content =
+				image.getContent ();
+
+			Long hash =
+				Math.abs (
+					content.getHash ());
+
+			long resizedWidth = 98;
+
+			long resizedHeight =
+				image.getHeight () * resizedWidth / image.getWidth ();
+
+			return new ImChatProfileData ()
+
+				.code (
+					underscoreToHyphen (
+						profile.getCode ()))
+
+				.name (
+					profile.getPublicName ())
+
+				.description (
+					profile.getPublicDescription ())
+
+				.descriptionShort (
+					profile.getPublicDescriptionShort ())
+
+				.thumbnailImageLink (
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/im-chat-media/%u",
+						integerToDecimalString (
+							image.getId ()),
+						"/%u",
+						integerToDecimalString (
+							hash),
+						"/thumbnail.jpg"))
+
+				.thumbnailImageWidth (
+					resizedWidth)
+
+				.thumbnailImageHeight (
+					resizedHeight)
+
+				.miniatureImageLink (
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/im-chat-media/%u",
+						integerToDecimalString (
+							image.getId ()),
+						"/%u",
+						integerToDecimalString (
+							hash),
+						"/miniature.jpg"))
+
+				.miniatureImageWidth (
+					24l)
+
+				.miniatureImageHeight (
+					24l);
+
 		}
-
-		MediaRec image =
-			profile.getProfileImage ();
-
-		ContentRec content =
-			image.getContent ();
-
-		Long hash =
-			Math.abs (
-				content.getHash ());
-
-		long resizedWidth = 98;
-
-		long resizedHeight =
-			image.getHeight () * resizedWidth / image.getWidth ();
-
-		return new ImChatProfileData ()
-
-			.code (
-				underscoreToHyphen (
-					profile.getCode ()))
-
-			.name (
-				profile.getPublicName ())
-
-			.description (
-				profile.getPublicDescription ())
-
-			.descriptionShort (
-				profile.getPublicDescriptionShort ())
-
-			.thumbnailImageLink (
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/im-chat-media/%u",
-					integerToDecimalString (
-						image.getId ()),
-					"/%u",
-					integerToDecimalString (
-						hash),
-					"/thumbnail.jpg"))
-
-			.thumbnailImageWidth (
-				resizedWidth)
-
-			.thumbnailImageHeight (
-				resizedHeight)
-
-			.miniatureImageLink (
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/im-chat-media/%u",
-					integerToDecimalString (
-						image.getId ()),
-					"/%u",
-					integerToDecimalString (
-						hash),
-					"/miniature.jpg"))
-
-			.miniatureImageWidth (
-				24l)
-
-			.miniatureImageHeight (
-				24l);
 
 	}
 
 	@Override
 	public
 	ImChatCustomerData customerData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatCustomerRec customer) {
 
-		ImChatRec imChat =
-			customer.getImChat ();
+		try (
 
-		Long requiredBalance =
-			customer.getBalance () < imChat.getMessageCost ()
-				? imChat.getMessageCost () - customer.getBalance ()
-				: 0;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"customerData");
 
-		return new ImChatCustomerData ()
-
-			.code (
-				underscoreToHyphen (
-					customer.getCode ()))
-
-			.email (
-				customer.getEmail ())
-
-			.conditionsAccepted (
-				customer.getAcceptedTermsAndConditions ())
-
-			.detailsCompleted (
-				customer.getDetailsCompleted ()
-				|| ! imChat.getDetailsPageOnFirstLogin ())
-
-			.balance (
-				customer.getBalance ())
-
-			.balanceString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					customer.getBalance ()))
-
-			.minimumBalance (
-				imChat.getMessageCost ())
-
-			.minimumBalanceString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					imChat.getMessageCost ()))
-
-			.requiredBalance (
-				requiredBalance)
-
-			.requiredBalanceString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					requiredBalance))
-
-			.developerMode (
-				customer.getDeveloperMode ())
-
-			.details (
-				customerDetailData (
-					customer));
-
-	}
-
-	@Override
-	public
-	List<ImChatCustomerDetailData> customerDetailData (
-			@NonNull ImChatCustomerRec customer) {
-
-		ImChatRec imChat =
-			customer.getImChat ();
-
-		ImmutableList.Builder<ImChatCustomerDetailData> returnBuilder =
-			ImmutableList.<ImChatCustomerDetailData>builder ();
-
-		for (
-			ImChatCustomerDetailTypeRec customerDetailType
-				: imChat.getCustomerDetailTypes ()
 		) {
 
-			ImChatCustomerDetailValueRec customerDetailValue =
-				customer.getDetails ().get (
-					customerDetailType.getId ());
+			ImChatRec imChat =
+				customer.getImChat ();
 
-			returnBuilder.add (
-				new ImChatCustomerDetailData ()
+			Long requiredBalance =
+				customer.getBalance () < imChat.getMessageCost ()
+					? imChat.getMessageCost () - customer.getBalance ()
+					: 0;
+
+			return new ImChatCustomerData ()
 
 				.code (
 					underscoreToHyphen (
-						customerDetailType.getCode ()))
+						customer.getCode ()))
 
-				.label (
-					customerDetailType.getLabel ())
+				.email (
+					customer.getEmail ())
 
-				.help (
-					customerDetailType.getHelp ())
+				.conditionsAccepted (
+					customer.getAcceptedTermsAndConditions ())
 
-				.required (
-					customerDetailType.getRequired ())
+				.detailsCompleted (
+					customer.getDetailsCompleted ()
+					|| ! imChat.getDetailsPageOnFirstLogin ())
 
-				.requiredLabel (
-					customerDetailType.getRequired ()
-						? customerDetailType.getRequiredLabel ()
-						: "")
+				.balance (
+					customer.getBalance ())
 
-				.dataType (
-					camelToHyphen (
-						customerDetailType.getDataType ().toString ()))
+				.balanceString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						customer.getBalance ()))
 
-				.minimumAge (
-					customerDetailType.getMinimumAge ())
+				.minimumBalance (
+					imChat.getMessageCost ())
 
-				.value (
-					customerDetailValue != null
-						? customerDetailValue.getValue ()
-						: null)
+				.minimumBalanceString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						imChat.getMessageCost ()))
 
-			);
+				.requiredBalance (
+					requiredBalance)
+
+				.requiredBalanceString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						requiredBalance))
+
+				.developerMode (
+					customer.getDeveloperMode ())
+
+				.details (
+					customerDetailData (
+						transaction,
+						customer));
 
 		}
 
-		return returnBuilder.build ();
+	}
+
+	@Override
+	public
+	List <ImChatCustomerDetailData> customerDetailData (
+			@NonNull Transaction parentTransaction,
+			@NonNull ImChatCustomerRec customer) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"customerDetailData");
+
+		) {
+
+			ImChatRec imChat =
+				customer.getImChat ();
+
+			ImmutableList.Builder<ImChatCustomerDetailData> returnBuilder =
+				ImmutableList.<ImChatCustomerDetailData>builder ();
+
+			for (
+				ImChatCustomerDetailTypeRec customerDetailType
+					: imChat.getCustomerDetailTypes ()
+			) {
+
+				ImChatCustomerDetailValueRec customerDetailValue =
+					customer.getDetails ().get (
+						customerDetailType.getId ());
+
+				returnBuilder.add (
+					new ImChatCustomerDetailData ()
+
+					.code (
+						underscoreToHyphen (
+							customerDetailType.getCode ()))
+
+					.label (
+						customerDetailType.getLabel ())
+
+					.help (
+						customerDetailType.getHelp ())
+
+					.required (
+						customerDetailType.getRequired ())
+
+					.requiredLabel (
+						customerDetailType.getRequired ()
+							? customerDetailType.getRequiredLabel ()
+							: "")
+
+					.dataType (
+						camelToHyphen (
+							customerDetailType.getDataType ().toString ()))
+
+					.minimumAge (
+						customerDetailType.getMinimumAge ())
+
+					.value (
+						customerDetailValue != null
+							? customerDetailValue.getValue ()
+							: null)
+
+				);
+
+			}
+
+			return returnBuilder.build ();
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ImChatCustomerDetailData> createDetailData (
+	List <ImChatCustomerDetailData> createDetailData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatRec imChat) {
 
-		return imChat.getCustomerDetailTypes ().stream ()
+		try (
 
-			.filter (
-				ImChatCustomerDetailTypeRec::getWhenCreatingAccount)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createDetailData");
 
-			.map (
-				detailType ->
-					new ImChatCustomerDetailData ()
+		) {
 
-				.code (
-					underscoreToHyphen (
-						detailType.getCode ()))
+			return imChat.getCustomerDetailTypes ().stream ()
 
-				.label (
-					detailType.getLabel ())
+				.filter (
+					ImChatCustomerDetailTypeRec::getWhenCreatingAccount)
 
-				.help (
-					detailType.getHelp ())
+				.map (
+					detailType ->
+						new ImChatCustomerDetailData ()
 
-				.required (
-					detailType.getRequired ())
+					.code (
+						underscoreToHyphen (
+							detailType.getCode ()))
 
-				.requiredLabel (
-					detailType.getRequired ()
-						? detailType.getRequiredLabel ()
-						: "")
+					.label (
+						detailType.getLabel ())
 
-				.dataType (
-					camelToHyphen (
-						detailType.getDataType ().toString ()))
+					.help (
+						detailType.getHelp ())
 
-				.minimumAge (
-					detailType.getMinimumAge ())
+					.required (
+						detailType.getRequired ())
 
-				.value (
-					null)
+					.requiredLabel (
+						detailType.getRequired ()
+							? detailType.getRequiredLabel ()
+							: "")
 
-				.requiredErrorTitle (
-					detailType.getRequiredErrorTitle ())
+					.dataType (
+						camelToHyphen (
+							detailType.getDataType ().toString ()))
 
-				.requiredErrorMessage (
-					detailType.getRequiredErrorMessage ())
+					.minimumAge (
+						detailType.getMinimumAge ())
 
-				.invalidErrorTitle (
-					detailType.getInvalidErrorTitle ())
+					.value (
+						null)
 
-				.invalidErrorMessage (
-					detailType.getInvalidErrorMessage ())
+					.requiredErrorTitle (
+						detailType.getRequiredErrorTitle ())
 
-				.ageErrorTitle (
-					detailType.getAgeErrorTitle ())
+					.requiredErrorMessage (
+						detailType.getRequiredErrorMessage ())
 
-				.ageErrorMessage (
-					detailType.getAgeErrorMessage ())
+					.invalidErrorTitle (
+						detailType.getInvalidErrorTitle ())
 
-			)
+					.invalidErrorMessage (
+						detailType.getInvalidErrorMessage ())
 
-			.collect (
-				Collectors.toList ());
+					.ageErrorTitle (
+						detailType.getAgeErrorTitle ())
+
+					.ageErrorMessage (
+						detailType.getAgeErrorMessage ())
+
+				)
+
+				.collect (
+					Collectors.toList ());
+
+		}
 
 	}
 
 	@Override
 	public
 	ImChatConversationData conversationData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatConversationRec conversation) {
 
-		return new ImChatConversationData ()
+		try (
 
-			.index (
-				conversation.getIndex ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"conversationData");
 
-			.profile (
-				profileData (
-					conversation.getImChatProfile ()))
+		) {
 
-			.replyPending (
-				conversation.getPendingReply ());
+			return new ImChatConversationData ()
+
+				.index (
+					conversation.getIndex ())
+
+				.profile (
+					profileData (
+						transaction,
+						conversation.getImChatProfile ()))
+
+				.replyPending (
+					conversation.getPendingReply ());
+
+		}
 
 	}
 
 	@Override
 	public
 	ImChatMessageData messageData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatMessageRec message) {
 
-		ImChatConversationRec conversation =
-			message.getImChatConversation ();
+		try (
 
-		ImChatCustomerRec customer =
-			conversation.getImChatCustomer ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"messageData");
 
-		ImChatRec imChat =
-			customer.getImChat ();
+		) {
 
-		return new ImChatMessageData ()
+			ImChatConversationRec conversation =
+				message.getImChatConversation ();
 
-			.index (
-				message.getIndex ())
+			ImChatCustomerRec customer =
+				conversation.getImChatCustomer ();
 
-			.sender (
-				message.getSenderUser () != null
-					? "operator"
-					: "customer")
+			ImChatRec imChat =
+				customer.getImChat ();
 
-			.messageText (
-				message.getMessageText ())
+			return new ImChatMessageData ()
 
-			.timestamp (
-				message.getTimestamp ().getMillis ())
+				.index (
+					message.getIndex ())
 
-			.charge (
-				ifNull (
-					message.getPrice (),
-					0l))
+				.sender (
+					message.getSenderUser () != null
+						? "operator"
+						: "customer")
 
-			.chargeString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
+				.messageText (
+					message.getMessageText ())
+
+				.timestamp (
+					message.getTimestamp ().getMillis ())
+
+				.charge (
 					ifNull (
 						message.getPrice (),
-						0l)));
+						0l))
+
+				.chargeString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						ifNull (
+							message.getPrice (),
+							0l)));
+
+		}
 
 	}
 
 	@Override
 	public
 	ImChatPurchaseData purchaseData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatPurchaseRec purchase) {
 
-		ImChatCustomerRec customer =
-			purchase.getImChatCustomer ();
+		try (
 
-		ImChatRec imChat =
-			customer.getImChat ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"purchaseData");
 
-		return new ImChatPurchaseData ()
+		) {
 
-			.token (
-				purchase.getToken ())
+			ImChatCustomerRec customer =
+				purchase.getImChatCustomer ();
 
-			.priceString (
-				currencyLogic.formatText (
-					imChat.getBillingCurrency (),
-					purchase.getPrice ()))
+			ImChatRec imChat =
+				customer.getImChat ();
 
-			.valueString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					purchase.getValue ()));
+			return new ImChatPurchaseData ()
+
+				.token (
+					purchase.getToken ())
+
+				.priceString (
+					currencyLogic.formatText (
+						imChat.getBillingCurrency (),
+						purchase.getPrice ()))
+
+				.valueString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						purchase.getValue ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	ImChatPurchaseHistoryData purchaseHistoryData (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatPurchaseRec purchase) {
 
-		ImChatCustomerRec customer =
-			purchase.getImChatCustomer ();
+		try (
 
-		ImChatRec imChat =
-			customer.getImChat ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"purchaseHistoryData");
 
-		return new ImChatPurchaseHistoryData ()
+		) {
 
-			.priceString (
-				currencyLogic.formatText (
-					imChat.getBillingCurrency (),
-					purchase.getPrice ()))
+			ImChatCustomerRec customer =
+				purchase.getImChatCustomer ();
 
-			.valueString (
-				currencyLogic.formatText (
-					imChat.getCreditCurrency (),
-					purchase.getValue ()))
+			ImChatRec imChat =
+				customer.getImChat ();
 
-			.timestampString (
-				timeFormatter.timestampString (
-					timeFormatter.timezone (
-						ifNull (
-							imChat.getSlice ().getDefaultTimezone (),
-							wbsConfig.defaultTimezone ())),
-					purchase.getCreatedTime ()));
+			return new ImChatPurchaseHistoryData ()
+
+				.priceString (
+					currencyLogic.formatText (
+						imChat.getBillingCurrency (),
+						purchase.getPrice ()))
+
+				.valueString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						purchase.getValue ()))
+
+				.timestampString (
+					timeFormatter.timestampString (
+						timeFormatter.timezone (
+							ifNull (
+								imChat.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
+						purchase.getCreatedTime ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	Map <String, String> updateCustomerDetails (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatCustomerRec customer,
 			@NonNull Map <String, String> newDetails) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"updateCustomerDetails");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			ImChatRec imChat =
 				customer.getImChat ();
 
-			ImmutableMap.Builder<String,String> returnBuilder =
+			ImmutableMap.Builder <String, String> returnBuilder =
 				ImmutableMap.builder ();
 
 			for (
@@ -656,7 +763,7 @@ class ImChatApiLogicImplementation
 
 				ImChatCustomerDetailValueRec detailValue =
 					imChatCustomerDetailValueHelper.insert (
-						taskLogger,
+						transaction,
 						imChatCustomerDetailValueHelper.createInstance ()
 
 					.setImChatCustomer (
@@ -675,7 +782,7 @@ class ImChatApiLogicImplementation
 					detailValue);
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"im_chat_customer_detail_updated",
 					customer,
 					detailType,

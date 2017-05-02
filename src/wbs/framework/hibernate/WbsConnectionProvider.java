@@ -16,7 +16,7 @@ class WbsConnectionProvider
 
 	static
 	ThreadLocal<DataSource> dataSourceThreadLocal =
-		new ThreadLocal<DataSource> ();
+		new ThreadLocal <> ();
 
 	public
 	WbsConnectionProvider () {

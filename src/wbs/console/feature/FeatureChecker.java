@@ -2,13 +2,13 @@ package wbs.console.feature;
 
 import wbs.console.priv.UserPrivChecker;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface FeatureChecker {
 
 	boolean checkFeatureAccess (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserPrivChecker privChecker,
 			String featureName);
 

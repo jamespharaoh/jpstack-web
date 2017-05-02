@@ -76,16 +76,11 @@ class ChatUserAdminDateAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminDateAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -148,13 +143,15 @@ class ChatUserAdminDateAction
 			}
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			chatDateLogic.userDateStuff (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
-					userConsoleLogic.userRequired ()),
+					userConsoleLogic.userRequired (
+						transaction)),
 				optionalAbsent (),
 				dateMode,
 				radius,

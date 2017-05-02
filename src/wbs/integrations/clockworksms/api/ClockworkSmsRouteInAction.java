@@ -5,6 +5,7 @@ import static wbs.utils.etc.BinaryUtils.bytesToHex;
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.min;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -32,6 +33,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogObjectHelper;
@@ -112,7 +114,7 @@ class ClockworkSmsRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"processRequest");
@@ -227,24 +229,20 @@ class ClockworkSmsRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ClockworkSmsRouteInAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
 			// lookup route
 
-			Optional<RouteRec> smsRouteOptional =
+			Optional <RouteRec> smsRouteOptional =
 				smsRouteHelper.find (
-					Long.parseLong (
+					transaction,
+					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"smsRouteId")));
 
@@ -274,6 +272,7 @@ class ClockworkSmsRouteInAction
 
 			Optional <ClockworkSmsRouteInRec> clockworkSmsRouteInOptional =
 				clockworkSmsRouteInHelper.find (
+					transaction,
 					smsRoute.getId ());
 
 			if (
@@ -310,14 +309,14 @@ class ClockworkSmsRouteInAction
 			// insert message
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalOf (
 					request.id ()),
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					request.content ()),
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					request.from ()),
 				request.to (),
 				smsRoute,
@@ -358,25 +357,21 @@ class ClockworkSmsRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ClockworkSmsRouteInAction.storeLog ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			clockworkSmsInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				clockworkSmsInboundLogHelper.createInstance ()
 
 				.setRoute (
 					smsRouteHelper.findRequired (
+						transaction,
 						Long.parseLong (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))

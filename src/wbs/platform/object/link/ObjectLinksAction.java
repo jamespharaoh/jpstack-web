@@ -116,6 +116,18 @@ class ObjectLinksAction
 	Pattern oldGroupPattern =
 		Pattern.compile ("(\\d+),(true|false)");
 
+	// details
+
+	@Override
+	protected
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			responderName);
+
+	}
+
 	// implementation
 
 	@Override
@@ -123,22 +135,19 @@ class ObjectLinksAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectLinksAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
+
 		) {
 
 			Record <?> contextObject =
 				contextHelper.lookupObject (
+					transaction,
 					requestContext.consoleContextStuffRequired ());
 
 			Set <Record <?>> contextLinks =
@@ -188,20 +197,20 @@ class ObjectLinksAction
 				if (oldIsMember == newIsMember)
 					continue;
 
-				Record<?> targetObject =
+				Record <?> targetObject =
 					targetHelper.findRequired (
+						transaction,
 						linkId);
 
-				@SuppressWarnings ("unchecked")
-				Set<Record<?>> targetLinks =
-					(Set<Record<?>>)
-					PropertyUtils.propertyGetAuto (
-						targetObject,
-						targetLinkField);
+				Set <Record <?>> targetLinks =
+					genericCastUnchecked (
+						PropertyUtils.propertyGetAuto (
+							targetObject,
+							targetLinkField));
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						targetObject,
 						"manage")
 				) {
@@ -227,9 +236,10 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.contextThenTarget) {
 
 						eventLogic.createEvent (
-							taskLogger,
+							transaction,
 							addEventName,
-							userConsoleLogic.userRequired (),
+							userConsoleLogic.userRequired (
+								transaction),
 							contextObject,
 							targetObject);
 
@@ -238,9 +248,10 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.targetThenContext) {
 
 						eventLogic.createEvent (
-							taskLogger,
+							transaction,
 							addEventName,
-							userConsoleLogic.userRequired (),
+							userConsoleLogic.userRequired (
+								transaction),
 							targetObject,
 							contextObject);
 
@@ -267,9 +278,10 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.contextThenTarget) {
 
 						eventLogic.createEvent (
-							taskLogger,
+							transaction,
 							removeEventName,
-							userConsoleLogic.userRequired (),
+							userConsoleLogic.userRequired (
+								transaction),
 							contextObject,
 							targetObject);
 
@@ -278,9 +290,10 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.targetThenContext) {
 
 						eventLogic.createEvent (
-							taskLogger,
+							transaction,
 							removeEventName,
-							userConsoleLogic.userRequired (),
+							userConsoleLogic.userRequired (
+								transaction),
 							targetObject,
 							contextObject);
 
@@ -304,7 +317,7 @@ class ObjectLinksAction
 				) {
 
 					updateManager.signalUpdate (
-						taskLogger,
+						transaction,
 						contextUpdateSignalName,
 						contextObject.getId ());
 
@@ -321,7 +334,7 @@ class ObjectLinksAction
 					) {
 
 						updateManager.signalUpdate (
-							taskLogger,
+							transaction,
 							targetUpdateSignalName,
 							targetObject.getId ());
 
@@ -346,16 +359,6 @@ class ObjectLinksAction
 			return null;
 
 		}
-
-	}
-
-	@Override
-	protected
-	Responder backupResponder (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		return responder (
-			responderName);
 
 	}
 

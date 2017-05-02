@@ -5,8 +5,9 @@ import java.sql.Types;
 import org.hibernate.type.CustomType;
 import org.hibernate.type.Type;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
 
 public
 class ChatUserCreditModeType

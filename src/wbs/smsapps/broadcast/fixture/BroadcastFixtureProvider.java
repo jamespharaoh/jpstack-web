@@ -5,11 +5,11 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -65,24 +65,21 @@ class BroadcastFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			createMenuItems (
-				taskLogger,
 				transaction);
 
 			createBroadcastConfigs (
-				taskLogger,
 				transaction);
 
 		}
@@ -91,24 +88,24 @@ class BroadcastFixtureProvider
 
 	private
 	void createMenuItems (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenuItems");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -141,24 +138,24 @@ class BroadcastFixtureProvider
 
 	private
 	void createBroadcastConfigs (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createBroadcastConfigs");
 
 		) {
 
 			broadcastConfigHelper.insert (
-				taskLogger,
+				transaction,
 				broadcastConfigHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -173,7 +170,9 @@ class BroadcastFixtureProvider
 
 				.setRouter (
 					routerHelper.findByCodeRequired (
+						transaction,
 						routeHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"free"),
@@ -181,7 +180,9 @@ class BroadcastFixtureProvider
 
 				.setBlockNumberLookup (
 					numberLookupHelper.findByCodeRequired (
+						transaction,
 						numberListHelper.findByCodeRequired (
+							transaction,
 							GlobalId.root,
 							"test",
 							"uk_blocked"),
@@ -189,6 +190,7 @@ class BroadcastFixtureProvider
 
 				.setNumberFormat (
 					numberFormatHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"uk"))
 

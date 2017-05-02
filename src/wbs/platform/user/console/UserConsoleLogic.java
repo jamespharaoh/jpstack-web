@@ -2,25 +2,36 @@ package wbs.platform.user.console;
 
 import com.google.common.base.Optional;
 
+import wbs.console.misc.ConsoleUserHelper;
+
+import wbs.framework.database.Transaction;
+
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
-import wbs.utils.time.TimezoneTimeFormatter;
-
 public
 interface UserConsoleLogic
-	extends TimezoneTimeFormatter {
+	extends ConsoleUserHelper {
 
-	Optional <UserRec> user ();
-	UserRec userRequired ();
+	Optional <UserRec> user (
+			Transaction parentTransaction);
 
-	Optional <SliceRec> slice ();
-	SliceRec sliceRequired ();
+	UserRec userRequired (
+			Transaction parentTransaction);
+
+	Optional <SliceRec> slice (
+			Transaction parentTransaction);
+
+	SliceRec sliceRequired (
+			Transaction parentTransaction);
 
 	Optional <Long> userId ();
 	Long userIdRequired ();
 
-	Optional <Long> sliceId ();
-	Long sliceIdRequired ();
+	Optional <Long> sliceId (
+			Transaction parentTransaction);
+
+	Long sliceIdRequired (
+			Transaction parentTransaction);
 
 }

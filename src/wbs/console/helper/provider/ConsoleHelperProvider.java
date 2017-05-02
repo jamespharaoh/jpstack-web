@@ -2,8 +2,8 @@ package wbs.console.helper.provider;
 
 import wbs.console.context.ConsoleContextStuff;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
 
 public
 interface ConsoleHelperProvider <
@@ -17,26 +17,27 @@ interface ConsoleHelperProvider <
 	String idKey ();
 
 	String getPathId (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Long objectId);
 
 	String getDefaultContextPath (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	String localPath (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	boolean canView (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			RecordType object);
 
 	RecordType lookupObject (
+			Transaction parentTransaction,
 			ConsoleContextStuff contextStuff);
 
 	void postProcess (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ConsoleContextStuff contextStuff);
 
 }

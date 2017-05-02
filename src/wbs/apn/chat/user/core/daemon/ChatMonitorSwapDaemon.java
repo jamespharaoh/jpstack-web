@@ -6,7 +6,8 @@ import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsEnum;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -19,10 +20,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -83,33 +87,18 @@ class ChatMonitorSwapDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatMonitorSwapDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
 			// get list of chats
 
 			List <Long> chatIds =
-				iterableMapToList (
-					ChatRec::getId,
-					iterableFilter (
-						chat ->
-							chatNeedsMonitorSwap (
-								taskLogger,
-								transaction,
-								chat),
-						chatHelper.findNotDeleted ()));
-
-			transaction.close ();
+				getChatIds (
+					taskLogger);
 
 			// then call doMonitorSwap for any whose time has come
 
@@ -128,22 +117,60 @@ class ChatMonitorSwapDaemon
 	}
 
 	private
+	List <Long> getChatIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getChatIds");
+
+		) {
+
+			return iterableMapToList (
+				ChatRec::getId,
+				iterableFilter (
+					chat ->
+						chatNeedsMonitorSwap (
+							transaction,
+							chat),
+					chatHelper.findNotDeleted (
+						transaction)));
+
+		}
+
+	}
+
+	private
 	boolean chatNeedsMonitorSwap (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat) {
 
-		return (
+		try (
 
-			isNull (
-				chat.getLastMonitorSwap ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"chatNeedsMonitorSwap");
 
-			|| earlierThan (
-				chat.getLastMonitorSwap ().plus (
-					chat.getTimeMonitorSwap () * 1000),
-				transaction.now ())
+		) {
 
-		);
+			return (
+
+				isNull (
+					chat.getLastMonitorSwap ())
+
+				|| earlierThan (
+					chat.getLastMonitorSwap ().plus (
+						chat.getTimeMonitorSwap () * 1000),
+					transaction.now ())
+
+			);
+
+		}
 
 	}
 
@@ -156,7 +183,7 @@ class ChatMonitorSwapDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doMonitorSwap");
@@ -194,6 +221,7 @@ class ChatMonitorSwapDaemon
 
 	}
 
+	private
 	void doMonitorSwapReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId,
@@ -202,42 +230,30 @@ class ChatMonitorSwapDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doMonitorSwapReal");
-
 			OwnedTransaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s (%s)",
-						"ChatMonitorSwapDaemon",
-						"doMonitorSwapReal",
-						joinWithCommaAndSpace (
-							stringFormat (
-								"chatId = %s",
-								integerToDecimalString (
-									chatId)),
-							stringFormat (
-								"gender = %s",
-								enumName (
-									gender)),
-							stringFormat (
-								"orient = %s",
-								enumName (
-									orient)))),
-					this);
+				database.beginReadWriteFormat (
+					logContext,
+					parentTaskLogger,
+					"doMonitorSwapReal (%s, %s, %s)",
+					keyEqualsDecimalInteger (
+						"chatId",
+						chatId),
+					keyEqualsEnum (
+						"gender",
+						gender),
+					keyEqualsEnum (
+						"orient",
+						orient));
 
 		) {
 
 			ChatRec chat =
 				chatHelper.findRequired (
+					transaction,
 					chatId);
 
 			if (
 				! chatNeedsMonitorSwap (
-					taskLogger,
 					transaction,
 					chat)
 			) {
@@ -253,6 +269,7 @@ class ChatMonitorSwapDaemon
 
 			List <ChatUserRec> allMonitors =
 				chatUserHelper.find (
+					transaction,
 					chat,
 					ChatUserType.monitor,
 					orient,
@@ -285,9 +302,12 @@ class ChatMonitorSwapDaemon
 
 			}
 
-			if (onlineMonitors.size () == 0
-					|| offlineMonitors.size () == 0)
+			if (
+				onlineMonitors.size () == 0
+				|| offlineMonitors.size () == 0
+			) {
 				return;
+			}
 
 			// pick a random monitor to take offline
 
@@ -317,7 +337,7 @@ class ChatMonitorSwapDaemon
 			String putOn =
 				monitor.getCode ();
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Swapping %s %s monitor %s for %s",
 				enumName (
 					orient),

@@ -3,7 +3,13 @@ package wbs.platform.queue.hibernate;
 import java.util.List;
 
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.queue.model.QueueTypeDao;
 import wbs.platform.queue.model.QueueTypeRec;
 
@@ -12,29 +18,62 @@ class QueueTypeDaoHibernate
 	extends HibernateDao
 	implements QueueTypeDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<QueueTypeRec> findAll () {
+	List <QueueTypeRec> findAll (
+			@NonNull Transaction parentTransaction) {
 
-		return findMany (
-			"findAll ()",
-			QueueTypeRec.class,
+		try (
 
-			createCriteria (
-				QueueTypeRec.class)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findAll");
 
-		);
+		) {
+
+			return findMany (
+				transaction,
+				QueueTypeRec.class,
+
+				createCriteria (
+					transaction,
+					QueueTypeRec.class)
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	QueueTypeRec findRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Long queueTypeId) {
 
-		return get (
-			QueueTypeRec.class,
-			queueTypeId);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findRequired");
+
+		) {
+
+			return get (
+				transaction,
+				QueueTypeRec.class,
+				queueTypeId);
+
+		}
 
 	}
 

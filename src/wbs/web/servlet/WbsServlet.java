@@ -1,9 +1,6 @@
 package wbs.web.servlet;
 
-import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.utils.etc.OptionalUtils.optionalOr;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 
@@ -15,13 +12,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.NonNull;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.logging.Log4jLogContext;
+import wbs.framework.logging.BorrowedTaskLogger;
+import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.etc.ImplicitArgument.BorrowedArgument;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.ExternalRedirectException;
@@ -34,15 +33,10 @@ public abstract
 class WbsServlet
 	extends HttpServlet {
 
-	private final static
-	LogContext logContext =
-		Log4jLogContext.forClass (
-			WbsServlet.class);
-
 	// singleton dependencies
 
-	@SingletonDependency
-	ActivityManager activityManager;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -52,36 +46,18 @@ class WbsServlet
 	protected
 	RequestContext requestContext;
 
-	private
-	ActiveTask startTask (
-			@NonNull String methodName) {
-
-		return activityManager.start (
-			"web-request",
-			stringFormat (
-				"WbsServlet.%s () %s",
-				methodName,
-				requestContext.requestPath ()),
-			this);
-
-	}
-
 	protected
 	void doGet () {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"doGet",
-					parseBooleanYesNoRequired (
-						optionalOr (
-							requestContext.cookie (
-								"wbs-debug"),
-							"no")));
+			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
+				parentTaskLogger =
+					TaskLogger.implicitArgument.borrow ();
 
-			ActiveTask activeTask =
-				startTask (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger.get (),
 					"doGet");
 
 		) {
@@ -104,12 +80,7 @@ class WbsServlet
 
 				}
 
-				activeTask.success ();
-
 			} catch (Throwable throwable) {
-
-				activeTask.fail (
-					throwable);
 
 				handleException (
 					taskLogger,
@@ -126,24 +97,18 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"doPost",
-					parseBooleanYesNoRequired (
-						optionalOr (
-							requestContext.cookie (
-								"wbs-debug"),
-							"no")));
+			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
+				parentTaskLogger =
+					TaskLogger.implicitArgument.borrow ();
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger.get (),
+					"doPost");
 
 		) {
 
-			try (
-
-				ActiveTask activeTask =
-					startTask (
-						"doPost");
-
-			) {
+			try {
 
 				WebFile file =
 					processPath (
@@ -178,17 +143,13 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"doOptions",
-					parseBooleanYesNoRequired (
-						optionalOr (
-							requestContext.cookie (
-								"wbs-debug"),
-							"no")));
+			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
+				parentTaskLogger =
+					TaskLogger.implicitArgument.borrow ();
 
-			ActiveTask activeTask =
-				startTask (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger.get (),
 					"doOptions");
 
 		) {
@@ -278,7 +239,7 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleException");
@@ -327,7 +288,7 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleNotFound");
@@ -353,7 +314,7 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleMethodNotAllowed");
@@ -379,7 +340,7 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"handleForbidden");
@@ -405,7 +366,7 @@ class WbsServlet
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"init");
 

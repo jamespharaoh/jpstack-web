@@ -6,9 +6,9 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
@@ -199,23 +199,18 @@ class MediaburstApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"inFile.doPost");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"MediaburstApiServletModule.inFile.doPost ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"inFile.doPost");
 
 			) {
 
 				// debugging
 
 				requestContext.debugParameters (
-					taskLogger);
+					transaction);
 
 				// get request stuff
 
@@ -249,34 +244,21 @@ class MediaburstApiServletModule
 					requestContext.parameter (
 						"udh");
 
-				Long networkId = null;
-
-				if (
-					optionalIsPresent (
-						networkParamOptional)
-				) {
-
-					String networkParam =
-						optionalGetRequired (
-							networkParamOptional);
-
-					networkId =
-						networkMap.get (
-							networkParam);
-
-				}
-
-				// load the stuff
+				// lookup objects
 
 				RouteRec route =
 					routeHelper.findRequired (
+						transaction,
 						routeId);
 
-				NetworkRec network =
-					networkId == null
-						? null
-						: networkHelper.findRequired (
-							networkId);
+				Optional <NetworkRec> networkOptional =
+					optionalMapRequired (
+						networkParamOptional,
+						networkParam ->
+							networkHelper.findRequired (
+								transaction,
+								networkMap.get (
+									networkParam)));
 
 				// check for concatenation
 
@@ -325,38 +307,38 @@ class MediaburstApiServletModule
 
 				TextRec messageText =
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						messageParam);
 
 				if (concatenatedInformationElement != null) {
 
 					inboxMultipartLogic.insertInboxMultipart (
-						taskLogger,
+						transaction,
 						route,
 						concatenatedInformationElement.getRef (),
 						concatenatedInformationElement.getSeqMax (),
 						concatenatedInformationElement.getSeqNum (),
 						numToParam,
 						numFromParam,
-						null,
-						network,
-						msgIdParam,
+						optionalAbsent (),
+						networkOptional,
+						optionalOf (
+							msgIdParam),
 						messageText.getText ());
 
 				} else {
 
 					smsInboxLogic.inboxInsert (
-						taskLogger,
+						transaction,
 						optionalOf (
 							msgIdParam),
 						messageText,
 						smsNumberHelper.findOrCreate (
-							taskLogger,
+							transaction,
 							numFromParam),
 						numToParam,
 						route,
-						optionalFromNullable (
-							network),
+						networkOptional,
 						optionalAbsent (),
 						emptyList (),
 						optionalAbsent (),
@@ -416,21 +398,17 @@ class MediaburstApiServletModule
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
-						"reportFile.doGet");
-
 				OwnedTransaction transaction =
 					database.beginReadWrite (
-						taskLogger,
-						"MediaburstApiServletModule.reportFile.doGet ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"reportFile.doGet");
 
 			) {
 
 				RouteRec route =
 					routeHelper.findRequired (
+						transaction,
 						requestContext.requestIntegerRequired (
 							"routeId"));
 
@@ -463,7 +441,7 @@ class MediaburstApiServletModule
 					) {
 
 						reportLogic.deliveryReport (
-							taskLogger,
+							transaction,
 							route,
 							requestContext.parameterRequired (
 								"msg_id"),
@@ -487,7 +465,7 @@ class MediaburstApiServletModule
 
 				} catch (NoSuchMessageException exception) {
 
-					taskLogger.fatalFormat (
+					throw transaction.fatalFormat (
 						"Ignoring report for unknown message %s/%s",
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (
@@ -497,7 +475,7 @@ class MediaburstApiServletModule
 
 				} catch (InvalidMessageStateException exception) {
 
-					taskLogger.fatalFormat (
+					throw transaction.fatalFormat (
 						"Ignoring report for message %s/%s: %s",
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (

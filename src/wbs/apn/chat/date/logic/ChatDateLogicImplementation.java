@@ -17,11 +17,11 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.model.UserRec;
 
@@ -66,20 +66,17 @@ class ChatDateLogicImplementation
 	@Override
 	public
 	void chatUserDateJoinHint (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"chatUserDateJoinHint");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -87,11 +84,12 @@ class ChatDateLogicImplementation
 			// send the message
 
 			chatSendLogic.sendSystemMagic (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				"date_hint_photo",
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"date_join_photo"),
 				0l,
@@ -112,20 +110,17 @@ class ChatDateLogicImplementation
 	@Override
 	public
 	void chatUserDateUpgradeHint (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"chatUserDateUpgradeHint");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -133,15 +128,17 @@ class ChatDateLogicImplementation
 			// send the message
 
 			chatSendLogic.sendSystemMagic (
-				taskLogger,
+				transaction,
 				chatUser,
 				Optional.absent (),
 				"date_hint_upgrade",
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"magic"),
 				IdObject.objectId (
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"date_join_photo")),
 				TemplateMissing.error,
@@ -161,7 +158,7 @@ class ChatDateLogicImplementation
 	@Override
 	public
 	void userDateStuff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <UserRec> user,
 			@NonNull Optional <MessageRec> message,
@@ -174,15 +171,12 @@ class ChatDateLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userDateStuff");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -234,6 +228,7 @@ class ChatDateLogicImplementation
 			}
 
 			chatUserHelper.lock (
+				transaction,
 				chatUser);
 
 			if (dateMode != null) {
@@ -281,7 +276,7 @@ class ChatDateLogicImplementation
 			}
 
 			chatUserDateLogHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserDateLogHelper.createInstance ()
 
 				.setChatUser (
@@ -346,16 +341,18 @@ class ChatDateLogicImplementation
 				}
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						message.get ().getThreadId ()),
 					code,
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help")),
 					TemplateMissing.ignore,

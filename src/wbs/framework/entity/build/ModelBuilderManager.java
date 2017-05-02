@@ -15,6 +15,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("modelBuilderManager")
@@ -29,7 +30,7 @@ class ModelBuilderManager {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ModelBuilder
@@ -37,7 +38,7 @@ class ModelBuilderManager {
 
 	// state
 
-	Builder modelBuilder;
+	Builder <TaskLogger> modelBuilder;
 
 	// lifecycle
 
@@ -46,13 +47,29 @@ class ModelBuilderManager {
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		modelBuilder =
-			builderFactoryProvider.get ()
+		try (
 
-			.addBuilders (
-				modelBuilderProviders)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			.create ();
+		) {
+
+			modelBuilder =
+				builderFactoryProvider.get ()
+
+				.contextClass (
+					TaskLogger.class)
+
+				.addBuilders (
+					taskLogger,
+					modelBuilderProviders)
+
+				.create (
+					taskLogger);
+
+		}
 
 	}
 

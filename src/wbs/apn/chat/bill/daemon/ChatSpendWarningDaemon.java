@@ -1,7 +1,7 @@
 package wbs.apn.chat.bill.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import java.util.List;
@@ -16,6 +16,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -70,49 +71,82 @@ class ChatSpendWarningDaemon
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"ChatSpendWarningDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
+			List <Long> chatUserIds =
+				getChatUserIds (
+					taskLogger);
+
+			chatUserIds.forEach (
+				chatUserId ->
+					doChatUser (
+						taskLogger,
+						chatUserId));
+
+		}
+
+	}
+
+	private
+	List <Long> getChatUserIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			transaction.debugFormat (
 				"Looking for users to send spend warning to");
 
-			List <ChatUserRec> chatUsers =
-				chatUserHelper.findWantingWarning ();
+			return iterableMapToList (
+				ChatUserRec::getId,
+				chatUserHelper.findWantingWarning (
+					transaction));
 
-			transaction.close ();
+		}
 
-			for (
-				ChatUserRec chatUser
-					: chatUsers
-			) {
+	}
 
-				try {
+	private
+	void doChatUser (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long chatUserId) {
 
-					doUser (
-						taskLogger,
-						chatUser.getId ());
+		try (
 
-				} catch (Exception exception) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doChatUser");
 
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						"ChatSpendWarningDaemon",
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.tryAgainLater);
+		) {
 
-				}
+			try {
+
+				doChatUserReal (
+					taskLogger,
+					chatUserId);
+
+			} catch (Exception exception) {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"daemon",
+					"ChatSpendWarningDaemon",
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
@@ -121,29 +155,23 @@ class ChatSpendWarningDaemon
 	}
 
 	private
-	void doUser (
+	void doChatUserReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"doUser (%s)",
-					integerToDecimalString (
-						chatUserId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatSpendWarningDaemon.doUser (chatUserId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doUser");
 
 		) {
 
 			ChatUserRec chatUser =
 				chatUserHelper.findRequired (
+					transaction,
 					chatUserId);
 
 			ChatSchemeRec chatScheme =
@@ -163,15 +191,16 @@ class ChatSpendWarningDaemon
 
 			// log message
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Sending warning to user %s",
 				objectManager.objectPathMini (
+					transaction,
 					chatUser));
 
 			// send message
 
 			chatSendLogic.sendSystemRbFree (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				chatUser.getNumSpendWarnings () == 0

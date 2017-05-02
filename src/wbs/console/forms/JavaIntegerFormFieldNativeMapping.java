@@ -6,8 +6,10 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.etc.NumberUtils;
 
@@ -16,9 +18,17 @@ public
 class JavaIntegerFormFieldNativeMapping <Container>
 	implements FormFieldNativeMapping <Container, Long, Integer> {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	Optional <Long> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Integer> nativeValue) {
 
@@ -31,7 +41,7 @@ class JavaIntegerFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <Integer> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Long> genericValue) {
 

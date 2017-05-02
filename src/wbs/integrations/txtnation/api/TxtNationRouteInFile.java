@@ -72,8 +72,9 @@ class TxtNationRouteInFile
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
 					"doPost");
 
@@ -120,132 +121,121 @@ class TxtNationRouteInFile
 			// debugging
 
 			requestContext.debugDump (
-				taskLogger);
+				transaction);
 
 			// start transaction
 
-			try (
+			TxtNationRouteInRec txtNationRouteIn =
+				txtNationRouteInHelper.findOrThrow (
+					transaction,
+					routeId,
+					() -> new RuntimeException (
+						stringFormat (
+							"No txtNation inbound route info for route %s",
+							integerToDecimalString (
+								routeId))));
 
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"TxtNationRouteInFile.doPost ()",
-						this);
+			// sanity checks
 
+			if (
+				stringNotEqualSafe (
+					actionParam,
+					"mpush_ir_message")
 			) {
 
-				TxtNationRouteInRec txtNationRouteIn =
-					txtNationRouteInHelper.findOrThrow (
-						routeId,
-						() -> new RuntimeException (
-							stringFormat (
-								"No txtNation inbound route info for route %s",
-								integerToDecimalString (
-									routeId))));
-
-				// sanity checks
-
-				if (
-					stringNotEqualSafe (
-						actionParam,
-						"mpush_ir_message")
-				) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Got unrecognised action: %s",
-							actionParam));
-
-				}
-
-				if (
-					stringNotEqualSafe (
-						countryParam,
-						"UK")
-				) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Got unrecognised country: %s",
-							countryParam));
-
-				}
-
-				String numberFrom;
-
-				try {
-
-					numberFrom =
-						numberFormatLogic.parse (
-							txtNationRouteIn.getNumberFormat (),
-							numberParam);
-
-				} catch (WbsNumberFormatException exception) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Invalid number: %s",
-							numberParam));
-
-				}
-
-				String numberTo;
-
-				try {
-
-					numberTo =
-						numberFormatLogic.parse (
-							txtNationRouteIn.getNumberFormat (),
-							shortcodeParam);
-
-				} catch (WbsNumberFormatException exception) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Invalid shortcode: %s",
-							shortcodeParam));
-
-				}
-
-				// store message
-
-				smsInboxLogic.inboxInsert (
-					taskLogger,
-					optionalOf (
-						idParam),
-					textHelper.findOrCreate (
-						taskLogger,
-						messageParam),
-					smsNumberHelper.findOrCreate (
-						taskLogger,
-						numberFrom),
-					numberTo,
-					txtNationRouteIn.getRoute (),
-					optionalAbsent (),
-					optionalAbsent (),
-					emptyList (),
-					optionalAbsent (),
-					optionalAbsent ());
-
-				// commit
-
-				transaction.commit ();
+				throw new RuntimeException (
+					stringFormat (
+						"Got unrecognised action: %s",
+						actionParam));
 
 			}
 
-			// send response
-
-			try (
-
-				FormatWriter formatWriter =
-					requestContext.formatWriter ();
-
+			if (
+				stringNotEqualSafe (
+					countryParam,
+					"UK")
 			) {
 
-				formatWriter.writeLineFormat (
-					"OK");
+				throw new RuntimeException (
+					stringFormat (
+						"Got unrecognised country: %s",
+						countryParam));
 
 			}
+
+			String numberFrom;
+
+			try {
+
+				numberFrom =
+					numberFormatLogic.parse (
+						txtNationRouteIn.getNumberFormat (),
+						numberParam);
+
+			} catch (WbsNumberFormatException exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Invalid number: %s",
+						numberParam));
+
+			}
+
+			String numberTo;
+
+			try {
+
+				numberTo =
+					numberFormatLogic.parse (
+						txtNationRouteIn.getNumberFormat (),
+						shortcodeParam);
+
+			} catch (WbsNumberFormatException exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Invalid shortcode: %s",
+						shortcodeParam));
+
+			}
+
+			// store message
+
+			smsInboxLogic.inboxInsert (
+				transaction,
+				optionalOf (
+					idParam),
+				textHelper.findOrCreate (
+					transaction,
+					messageParam),
+				smsNumberHelper.findOrCreate (
+					transaction,
+					numberFrom),
+				numberTo,
+				txtNationRouteIn.getRoute (),
+				optionalAbsent (),
+				optionalAbsent (),
+				emptyList (),
+				optionalAbsent (),
+				optionalAbsent ());
+
+			// commit
+
+			transaction.commit ();
+
+		}
+
+		// send response
+
+		try (
+
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"OK");
 
 		}
 

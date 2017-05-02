@@ -23,8 +23,9 @@ import org.apache.commons.lang3.Range;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -57,16 +58,16 @@ class RangeFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <Range <Interface>>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"genericToInterface");
 
 		) {
@@ -85,10 +86,10 @@ class RangeFormFieldInterfaceMapping <
 
 			Either <Optional <Interface>, String> leftResult =
 				itemMapping.genericToInterface (
-					taskLogger,
+					transaction,
 					container,
 					hints,
-					Optional.of (
+					optionalOf (
 						genericValue.get ().getMinimum ()));
 
 			if (
@@ -117,7 +118,7 @@ class RangeFormFieldInterfaceMapping <
 
 			Either <Optional <Interface>, String> rightResult =
 				itemMapping.genericToInterface (
-					taskLogger,
+					transaction,
 					container,
 					hints,
 					optionalOf (
@@ -164,97 +165,111 @@ class RangeFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <Range <Generic>>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Interface>> interfaceValue) {
 
-		if (
-			optionalIsNotPresent (
-				interfaceValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
+
 		) {
+
+			if (
+				optionalIsNotPresent (
+					interfaceValue)
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// get minimum
+
+			Either <Optional <Generic>, String> leftResult =
+				itemMapping.interfaceToGeneric (
+					transaction,
+					container,
+					hints,
+					optionalOf (
+						interfaceValue.get ().getMinimum ()));
+
+			if (
+				isError (
+					leftResult)
+			) {
+
+				return errorResult (
+					getError (
+						leftResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						leftResult))
+			) {
+
+				return successResult (
+					Optional.absent ());
+
+			}
+
+			// get maximum
+
+			Either <Optional <Generic>, String> rightResult =
+				itemMapping.interfaceToGeneric (
+					transaction,
+					container,
+					hints,
+					optionalOf (
+						interfaceValue.get ().getMaximum ()));
+
+			if (
+				isError (
+					rightResult)
+			) {
+
+				return errorResult (
+					getError (
+						rightResult));
+
+			}
+
+			if (
+				optionalIsNotPresent (
+					resultValueRequired (
+						rightResult))
+			) {
+
+				return successResult (
+					optionalAbsent ());
+
+			}
+
+			// return
 
 			return successResult (
-				Optional.absent ());
+				optionalOf (
+					Range.between (
+
+				optionalGetRequired (
+					resultValueRequired (
+						leftResult)),
+
+				optionalGetRequired (
+					resultValueRequired (
+						rightResult))
+
+			)));
 
 		}
-
-		// get minimum
-
-		Either <Optional <Generic>, String> leftResult =
-			itemMapping.interfaceToGeneric (
-				container,
-				hints,
-				Optional.of (
-					interfaceValue.get ().getMinimum ()));
-
-		if (
-			isError (
-				leftResult)
-		) {
-
-			return errorResult (
-				getError (
-					leftResult));
-
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					leftResult))
-		) {
-
-			return successResult (
-				Optional.absent ());
-
-		}
-
-		// get maximum
-
-		Either <Optional <Generic>, String> rightResult =
-			itemMapping.interfaceToGeneric (
-				container,
-				hints,
-				Optional.of (
-					interfaceValue.get ().getMaximum ()));
-
-		if (
-			isError (
-				rightResult)
-		) {
-
-			return errorResult (
-				getError (
-					rightResult));
-
-		}
-
-		if (
-			optionalIsNotPresent (
-				resultValueRequired (
-					rightResult))
-		) {
-
-			return successResult (
-				optionalAbsent ());
-
-		}
-
-		// return
-
-		return successResult (
-			optionalOf (
-				Range.between (
-
-			optionalGetRequired (
-				resultValueRequired (
-					leftResult)),
-
-			optionalGetRequired (
-				resultValueRequired (
-					rightResult))
-
-		)));
 
 	}
 

@@ -8,6 +8,7 @@ import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -34,9 +35,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -106,15 +108,15 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canView");
 
 		) {
@@ -139,7 +141,7 @@ class HiddenFormField <Container, Generic, Native>
 					privParts.get (0);
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					(Record <?>) container,
 					privCode);
 
@@ -157,12 +159,13 @@ class HiddenFormField <Container, Generic, Native>
 				Record <?> delegate =
 					genericCastUnchecked (
 						objectManager.dereferenceRequired (
+							transaction,
 							container,
 							delegatePath,
 							hints));
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					delegate,
 					privCode);
 
@@ -179,7 +182,7 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	void renderFormAlwaysHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -189,9 +192,9 @@ class HiddenFormField <Container, Generic, Native>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormAlwaysHidden");
 
 		) {
@@ -199,12 +202,13 @@ class HiddenFormField <Container, Generic, Native>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -212,7 +216,7 @@ class HiddenFormField <Container, Generic, Native>
 				requiredValue (
 					eitherGetLeft (
 						csvMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
@@ -248,14 +252,14 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	void implicit (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"implicit");
 
 		) {
@@ -270,12 +274,12 @@ class HiddenFormField <Container, Generic, Native>
 			Optional <Native> nativeValue =
 				requiredValue (
 					nativeMapping.genericToNative (
-						taskLogger,
+						transaction,
 						container,
 						implicitValue.get ()));
 
 			accessor.write (
-				taskLogger,
+				transaction,
 				container,
 				nativeValue);
 
@@ -286,7 +290,7 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	UpdateResult <Generic, Native> update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -294,9 +298,9 @@ class HiddenFormField <Container, Generic, Native>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"update");
 
 		) {
@@ -328,11 +332,12 @@ class HiddenFormField <Container, Generic, Native>
 
 			// convert to generic
 
-			Either<Optional<Generic>,String> interfaceToGenericResult =
+			Either <Optional <Generic>, String> interfaceToGenericResult =
 				csvMapping.interfaceToGeneric (
+					transaction,
 					container,
 					hints,
-					Optional.of (
+					optionalOf (
 						newInterfaceValue));
 
 			if (
@@ -359,7 +364,7 @@ class HiddenFormField <Container, Generic, Native>
 			Optional <Native> newNativeValue =
 				requiredValue (
 					nativeMapping.genericToNative (
-						taskLogger,
+						transaction,
 						container,
 						newGenericValue));
 
@@ -368,12 +373,13 @@ class HiddenFormField <Container, Generic, Native>
 			Optional <Native> oldNativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> oldGenericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						oldNativeValue));
 
@@ -396,7 +402,7 @@ class HiddenFormField <Container, Generic, Native>
 			// set the new value
 
 			accessor.write (
-				taskLogger,
+				transaction,
 				container,
 				newNativeValue);
 

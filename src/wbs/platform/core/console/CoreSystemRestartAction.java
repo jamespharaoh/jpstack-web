@@ -12,7 +12,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -78,18 +80,13 @@ class CoreSystemRestartAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -105,7 +102,6 @@ class CoreSystemRestartAction
 				) {
 
 					restartApi (
-						taskLogger,
 						transaction,
 						substringFrom (
 							parameterName,
@@ -121,7 +117,6 @@ class CoreSystemRestartAction
 				) {
 
 					restartConsole (
-						taskLogger,
 						transaction,
 						substringFrom (
 							parameterName,
@@ -137,7 +132,6 @@ class CoreSystemRestartAction
 				) {
 
 					restartDaemon (
-						taskLogger,
 						transaction,
 						substringFrom (
 							parameterName,
@@ -155,27 +149,27 @@ class CoreSystemRestartAction
 
 	private
 	void restartApi (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull String apiDeploymentCode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"restartApi");
 
 		) {
 
 			ApiDeploymentRec apiDeployment =
 				apiDeploymentHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					apiDeploymentCode);
 
 			if (
 				! userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					apiDeployment,
 					"restart")
 			) {
@@ -202,9 +196,10 @@ class CoreSystemRestartAction
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"api_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				apiDeployment);
 
 			transaction.commit ();
@@ -218,27 +213,27 @@ class CoreSystemRestartAction
 
 	private
 	void restartConsole (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull String consoleDeploymentCode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"restartConsole");
 
 		) {
 
 			ConsoleDeploymentRec consoleDeployment =
 				consoleDeploymentHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					consoleDeploymentCode);
 
 			if (
 				! userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					consoleDeployment,
 					"restart")
 			) {
@@ -265,9 +260,10 @@ class CoreSystemRestartAction
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"console_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				consoleDeployment);
 
 			transaction.commit ();
@@ -281,27 +277,27 @@ class CoreSystemRestartAction
 
 	private
 	void restartDaemon (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull String daemonDeploymentCode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"restartDaemon");
 
 		) {
 
 			DaemonDeploymentRec daemonDeployment =
 				daemonDeploymentHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					daemonDeploymentCode);
 
 			if (
 				! userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					daemonDeployment,
 					"restart")
 			) {
@@ -328,9 +324,10 @@ class CoreSystemRestartAction
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"daemon_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				daemonDeployment);
 
 			transaction.commit ();

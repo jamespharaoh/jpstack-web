@@ -1,29 +1,32 @@
 package wbs.framework.database;
 
+import static wbs.utils.etc.Misc.todo;
+
 import lombok.NonNull;
 
-import org.joda.time.Instant;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLoggerImplementation;
 
 public
 class BorrowedTransaction
 	implements Transaction {
 
 	private
-	OwnedTransaction realTransaction;
+	OwnedTransaction ownedTransaction;
 
 	public
 	BorrowedTransaction (
-			@NonNull OwnedTransaction realTransaction) {
+			@NonNull OwnedTransaction ownedTransaction) {
 
-		this.realTransaction =
-			realTransaction;
+		this.ownedTransaction =
+			ownedTransaction;
 
 	}
 
 	@Override
 	public
 	long getId () {
-		return realTransaction.getId ();
+		return ownedTransaction.getId ();
 	}
 
 	@Override
@@ -34,14 +37,8 @@ class BorrowedTransaction
 
 	@Override
 	public
-	Instant now () {
-		return realTransaction.now ();
-	}
-
-	@Override
-	public
 	void flush () {
-		realTransaction.flush ();
+		ownedTransaction.flush ();
 	}
 
 	@Override
@@ -49,7 +46,7 @@ class BorrowedTransaction
 	void refresh (
 			Object... objects) {
 
-		realTransaction.refresh (
+		ownedTransaction.refresh (
 			objects);
 
 	}
@@ -60,7 +57,7 @@ class BorrowedTransaction
 			String key,
 			Object value) {
 
-		realTransaction.setMeta (
+		ownedTransaction.setMeta (
 			key,
 			value);
 
@@ -71,7 +68,7 @@ class BorrowedTransaction
 	Object getMeta (
 			String key) {
 
-		return realTransaction.getMeta (
+		return ownedTransaction.getMeta (
 			key);
 
 	}
@@ -81,7 +78,7 @@ class BorrowedTransaction
 	void fetch (
 			Object... objects) {
 
-		realTransaction.fetch (
+		ownedTransaction.fetch (
 			objects);
 
 	}
@@ -91,8 +88,34 @@ class BorrowedTransaction
 	boolean contains (
 			Object... objects) {
 
-		return realTransaction.contains (
+		return ownedTransaction.contains (
 			objects);
+
+	}
+
+	@Override
+	public
+	TaskLoggerImplementation taskLoggerImplementation () {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	OwnedTransaction ownedTransaction () {
+
+		return ownedTransaction;
+
+	}
+
+	@Override
+	public
+	NestedTransaction nestTransaction (
+			@NonNull LogContext logContext,
+			@NonNull String dynamicContext) {
+
+		throw todo ();
 
 	}
 

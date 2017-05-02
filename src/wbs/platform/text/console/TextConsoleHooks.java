@@ -1,24 +1,31 @@
 package wbs.platform.text.console;
 
-import lombok.NonNull;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.helper.core.ConsoleHooks;
+
+import wbs.framework.database.Transaction;
+
 import wbs.platform.text.model.TextRec;
+
 import wbs.web.utils.HtmlUtils;
 
 public
 class TextConsoleHooks
-	implements ConsoleHooks<TextRec> {
+	implements ConsoleHooks <TextRec> {
 
 	@Override
 	public
-	Optional<String> getHtml (
+	Optional <String> getHtml (
+			@NonNull Transaction parentTransaction,
 			@NonNull TextRec text,
 			@NonNull Boolean mini) {
 
-		return Optional.of (
+		return optionalOfFormat (
 			HtmlUtils.htmlEncode (
 				"\"" + text.getText () + "\""));
 

@@ -20,9 +20,10 @@ import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -48,237 +49,261 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <ManualResponderRequestRec> findRecentLimit (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number,
 			@NonNull Long maxResults) {
 
-		return findMany (
-			"findRecentLimit (manualResponder, number, maxResults)",
-			ManualResponderRequestRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findRecentLimit");
+
+		) {
+
+			return findMany (
+				transaction,
 				ManualResponderRequestRec.class,
-				"_manualResponderRequest")
 
-			.createAlias (
-				"_manualResponderRequest.manualResponderNumber",
-				"_manualResponderNumber")
+				createCriteria (
+					transaction,
+					ManualResponderRequestRec.class,
+					"_manualResponderRequest")
 
-			.add (
-				Restrictions.eq (
-					"_manualResponderNumber.manualResponder",
-					manualResponder))
+				.createAlias (
+					"_manualResponderRequest.manualResponderNumber",
+					"_manualResponderNumber")
 
-			.add (
-				Restrictions.eq (
-					"_manualResponderRequest.number",
-					number))
+				.add (
+					Restrictions.eq (
+						"_manualResponderNumber.manualResponder",
+						manualResponder))
 
-			.addOrder (
-				Order.desc (
-					"_manualResponderRequest.timestamp"))
+				.add (
+					Restrictions.eq (
+						"_manualResponderRequest.number",
+						number))
 
-			.addOrder (
-				Order.desc (
-					"_manualResponderRequest.id"))
+				.addOrder (
+					Order.desc (
+						"_manualResponderRequest.timestamp"))
 
-			.setMaxResults (
-				toJavaIntegerRequired (
-					maxResults))
+				.addOrder (
+					Order.desc (
+						"_manualResponderRequest.id"))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	Criteria searchCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
-		Criteria criteria =
+		try (
 
-			createCriteria (
-				ManualResponderRequestRec.class,
-				"_manualResponderRequest")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchCriteria");
 
-			.createAlias (
-				"_manualResponderRequest.manualResponderNumber",
-				"_manualResponderNumber")
-
-			.createAlias (
-				"_manualResponderNumber.manualResponder",
-				"_manualResponder")
-
-			.createAlias (
-				"_manualResponder.slice",
-				"_manualResponderSlice")
-
-			.createAlias (
-				"_manualResponderRequest.number",
-				"_number")
-
-			.createAlias (
-				"_manualResponderRequest.user",
-				"_processedByUser",
-				JoinType.LEFT_OUTER_JOIN)
-
-			.createAlias (
-				"_processedByUser.slice",
-				"_processedByUserSlice",
-				JoinType.LEFT_OUTER_JOIN);
-
-		if (search.manualResponderId () != null) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_manualResponder.id",
-					search.manualResponderId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.manualResponderSliceId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_manualResponderSlice.id",
-					search.manualResponderSliceId ()));
+			Criteria criteria =
 
-		}
+				createCriteria (
+					transaction,
+					ManualResponderRequestRec.class,
+					"_manualResponderRequest")
 
-		if (search.numberLike () != null) {
+				.createAlias (
+					"_manualResponderRequest.manualResponderNumber",
+					"_manualResponderNumber")
 
-			criteria.add (
-				Restrictions.like (
-					"_number.number",
-					search.numberLike ()));
+				.createAlias (
+					"_manualResponderNumber.manualResponder",
+					"_manualResponder")
 
-		}
+				.createAlias (
+					"_manualResponder.slice",
+					"_manualResponderSlice")
 
-		if (
-			isNotNull (
-				search.processedByUserId ())
-		) {
+				.createAlias (
+					"_manualResponderRequest.number",
+					"_number")
 
-			criteria.add (
-				Restrictions.eq (
-					"_manualResponderRequest.user.id",
-					search.processedByUserId ()));
+				.createAlias (
+					"_manualResponderRequest.user",
+					"_processedByUser",
+					JoinType.LEFT_OUTER_JOIN)
 
-		}
+				.createAlias (
+					"_processedByUser.slice",
+					"_processedByUserSlice",
+					JoinType.LEFT_OUTER_JOIN);
 
-		if (
-			isNotNull (
-				search.processedByUserSliceId ())
-		) {
+			if (search.manualResponderId () != null) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_processedByUserSlice.id",
-					search.processedByUserSliceId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.createdTime ())
-		) {
-
-			criteria.add (
-				Restrictions.ge (
-					"_manualResponderRequest.timestamp",
-					search.createdTime ().start ()));
-
-			criteria.add (
-				Restrictions.lt (
-					"_manualResponderRequest.timestamp",
-					search.createdTime ().end ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.processedTime ())
-		) {
-
-			criteria.add (
-				Restrictions.ge (
-					"_manualResponderRequest.processedTime",
-					search.processedTime ().start ()));
-
-			criteria.add (
-				Restrictions.lt (
-					"_manualResponderRequest.processedTime",
-					search.processedTime ().end ()));
-
-		}
-
-		// apply filter
-
-		if (search.filter ()) {
-
-			List <Criterion> filterCriteria =
-				new ArrayList<> ();
-
-			if (
-				collectionIsNotEmpty (
-					search.filterManualResponderIds ())
-			) {
-
-				filterCriteria.add (
-					Restrictions.in (
+				criteria.add (
+					Restrictions.eq (
 						"_manualResponder.id",
-						search.filterManualResponderIds ()));
+						search.manualResponderId ()));
 
 			}
 
 			if (
-				collectionIsNotEmpty (
-					search.filterProcessedByUserIds ())
+				isNotNull (
+					search.manualResponderSliceId ())
 			) {
 
-				filterCriteria.add (
-					Restrictions.in (
-						"_processedByUser.id",
-						search.filterProcessedByUserIds ()));
+				criteria.add (
+					Restrictions.eq (
+						"_manualResponderSlice.id",
+						search.manualResponderSliceId ()));
 
 			}
 
-			criteria.add (
-				Restrictions.or (
-					filterCriteria.toArray (
-						new Criterion [] {})));
+			if (search.numberLike () != null) {
+
+				criteria.add (
+					Restrictions.like (
+						"_number.number",
+						search.numberLike ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.processedByUserId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_manualResponderRequest.user.id",
+						search.processedByUserId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.processedByUserSliceId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_processedByUserSlice.id",
+						search.processedByUserSliceId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.createdTime ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_manualResponderRequest.timestamp",
+						search.createdTime ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_manualResponderRequest.timestamp",
+						search.createdTime ().end ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.processedTime ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_manualResponderRequest.processedTime",
+						search.processedTime ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_manualResponderRequest.processedTime",
+						search.processedTime ().end ()));
+
+			}
+
+			// apply filter
+
+			if (search.filter ()) {
+
+				List <Criterion> filterCriteria =
+					new ArrayList<> ();
+
+				if (
+					collectionIsNotEmpty (
+						search.filterManualResponderIds ())
+				) {
+
+					filterCriteria.add (
+						Restrictions.in (
+							"_manualResponder.id",
+							search.filterManualResponderIds ()));
+
+				}
+
+				if (
+					collectionIsNotEmpty (
+						search.filterProcessedByUserIds ())
+				) {
+
+					filterCriteria.add (
+						Restrictions.in (
+							"_processedByUser.id",
+							search.filterProcessedByUserIds ()));
+
+				}
+
+				criteria.add (
+					Restrictions.or (
+						filterCriteria.toArray (
+							new Criterion [] {})));
+
+			}
+
+			// return
+
+			return criteria;
 
 		}
-
-		// return
-
-		return criteria;
 
 	}
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			// set order
@@ -311,7 +336,7 @@ class ManualResponderRequestDaoHibernate
 				Projections.id ());
 
 			return findMany (
-				"searchIds (search)",
+				transaction,
 				Long.class,
 				criteria);
 
@@ -322,21 +347,21 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	Criteria searchServiceReportCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchServiceReportCriteria");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -376,21 +401,21 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Long> searchServiceReportIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchServiceReportIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -433,25 +458,25 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <ManualResponderServiceReport> searchServiceReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchServiceReports");
 
 		) {
 
 			Criteria criteria =
 				searchServiceReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			return findMany (
-				"searchServiceReports (search)",
+				transaction,
 				ManualResponderServiceReport.class,
 				criteria);
 
@@ -462,22 +487,22 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Optional <ManualResponderServiceReport>> searchServiceReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchServiceReports");
 
 		) {
 
 			Criteria criteria =
 				searchServiceReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -486,7 +511,7 @@ class ManualResponderRequestDaoHibernate
 					objectIds));
 
 			return findOrdered (
-				taskLogger,
+				transaction,
 				ManualResponderServiceReport.class,
 				objectIds,
 				criteria.list ());
@@ -498,21 +523,21 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	Criteria searchOperatorReportCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReportCriteria");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -552,21 +577,21 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Long> searchOperatorReportIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReportIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.setProjection (
@@ -609,25 +634,25 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <ManualResponderOperatorReport> searchOperatorReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReports");
 
 		) {
 
 			Criteria criteria =
 				searchOperatorReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			return findMany (
-				"searchOperatorReports (search)",
+				transaction,
 				ManualResponderOperatorReport.class,
 				criteria);
 
@@ -638,22 +663,22 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Optional <ManualResponderOperatorReport>> searchOperatorReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchOperatorReports");
 
 		) {
 
 			Criteria criteria =
 				searchOperatorReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -662,7 +687,7 @@ class ManualResponderRequestDaoHibernate
 					objectIds));
 
 			return findOrdered (
-				taskLogger,
+				transaction,
 				ManualResponderOperatorReport.class,
 				objectIds,
 				criteria.list ());

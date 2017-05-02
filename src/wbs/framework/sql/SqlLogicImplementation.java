@@ -6,16 +6,19 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.LoggingDataSource;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("sqlLogic")
 public
@@ -25,7 +28,10 @@ class SqlLogicImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	DataSource dataSource;
+	LoggingDataSource dataSource;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -36,12 +42,19 @@ class SqlLogicImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
 			Connection connection =
-				dataSource.getConnection ();
+				dataSource.getConnection (
+					taskLogger);
 
 		) {
 

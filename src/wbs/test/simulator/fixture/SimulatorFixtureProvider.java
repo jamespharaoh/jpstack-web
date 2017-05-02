@@ -5,13 +5,12 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -72,23 +71,22 @@ class SimulatorFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			createMenuItem (
-				taskLogger);
+				transaction);
 
 			createSimulator (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -96,23 +94,24 @@ class SimulatorFixtureProvider
 
 	private
 	void createMenuItem (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenuItem");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test"))
@@ -143,27 +142,25 @@ class SimulatorFixtureProvider
 
 	private
 	void createSimulator (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSimulator");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			SimulatorRec simulator =
 				simulatorHelper.insert (
-					taskLogger,
+					transaction,
 					simulatorHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -182,6 +179,7 @@ class SimulatorFixtureProvider
 
 			RouteRec freeRoute =
 				routeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					"test",
 					"free");
@@ -190,6 +188,7 @@ class SimulatorFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"simulator"));
 
@@ -197,6 +196,7 @@ class SimulatorFixtureProvider
 
 			RouteRec billRoute =
 				routeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					"test",
 					"bill");
@@ -205,6 +205,7 @@ class SimulatorFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"simulator"));
 
@@ -239,12 +240,13 @@ class SimulatorFixtureProvider
 
 			RouteRec inboundRoute =
 				routeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					"test",
 					"inbound");
 
 			simulatorRouteHelper.insert (
-				taskLogger,
+				transaction,
 				simulatorRouteHelper.createInstance ()
 
 				.setSimulator (
@@ -264,7 +266,7 @@ class SimulatorFixtureProvider
 			// session
 
 			simulatorSessionHelper.insert (
-				taskLogger,
+				transaction,
 				simulatorSessionHelper.createInstance ()
 
 				.setSimulator (
@@ -278,6 +280,7 @@ class SimulatorFixtureProvider
 
 				.setCreatedUser (
 					userHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"test0"))

@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import com.google.common.base.Optional;
 
@@ -10,10 +12,13 @@ import org.joda.time.Interval;
 
 import wbs.console.misc.ConsoleUserHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.time.TextualInterval;
 
@@ -27,6 +32,9 @@ class IntervalFormFieldNativeMapping <Container>
 	@SingletonDependency
 	ConsoleUserHelper formFieldPreferences;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	WbsConfig wbsConfig;
 
@@ -35,7 +43,7 @@ class IntervalFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <Interval> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <TextualInterval> genericValue) {
 
@@ -45,12 +53,12 @@ class IntervalFormFieldNativeMapping <Container>
 			optionalIsNotPresent (
 				genericValue)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
 		// return interval
 
-		return Optional.of (
+		return optionalOf (
 			genericValue.get ().value ());
 
 	}
@@ -58,24 +66,37 @@ class IntervalFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <TextualInterval> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<Interval> nativeValue) {
+			@NonNull Optional <Interval> nativeValue) {
 
-		// handle not present
+		try (
 
-		if (
-			optionalIsNotPresent (
-				nativeValue)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"nativeToGeneric");
+
 		) {
-			return Optional.absent ();
+
+			// handle not present
+
+			if (
+				optionalIsNotPresent (
+					nativeValue)
+			) {
+				return optionalAbsent ();
+			}
+
+			// return textual interval
+
+			return optionalOf (
+				TextualInterval.forInterval (
+					formFieldPreferences.timezone (
+						transaction),
+					nativeValue.get ()));
+
 		}
-
-		// return textual interval
-
-		return Optional.of (
-			TextualInterval.forInterval (
-				formFieldPreferences.timezone (),
-				nativeValue.get ()));
 
 	}
 

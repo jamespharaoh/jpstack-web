@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import org.joda.time.DateTimeZone;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.sms.message.core.model.MessageRec;
 
@@ -20,48 +20,52 @@ public
 interface ChatMiscLogic {
 
 	List <ChatUserRec> getOnlineMonitorsForOutbound (
+			Transaction parentTransaction,
 			ChatUserRec thisUser);
 
 	ChatUserRec getOnlineMonitorForOutbound (
+			Transaction parentTransaction,
 			ChatUserRec thisUser);
 
 	void blockAll (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			Optional <MessageRec> message);
 
 	void userJoin (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
-			boolean sendMessage,
-			Long threadId,
+			Boolean sendMessage,
+			Optional <Long> threadId,
 			ChatMessageMethod deliveryMethod);
 
 	void userLogoffWithMessage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
-			Long threadId,
-			boolean automatic);
+			Optional <Long> threadId,
+			Boolean automatic);
 
 	void monitorsToTarget (
+			Transaction parentTransaction,
 			ChatRec chat,
 			Gender gender,
 			Orient orient,
-			long target);
+			Long target);
 
 	void userAutoJoin (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			MessageRec message,
-			boolean sendMessage);
+			Boolean sendMessage);
 
 	void chatUserSetName (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ChatUserRec chatUser,
 			String name,
-			Long threadId);
+			Optional <Long> threadId);
 
 	DateTimeZone timezone (
+			Transaction parentTransaction,
 			ChatRec chat);
 
 }

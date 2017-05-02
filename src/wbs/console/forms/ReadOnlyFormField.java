@@ -40,10 +40,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -126,15 +127,15 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	boolean canView (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canView");
 
 		) {
@@ -147,7 +148,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 					featureCode)
 
 				&& ! featureChecker.checkFeatureAccess (
-					taskLogger,
+					transaction,
 					privChecker,
 					featureCode)
 
@@ -177,7 +178,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 					privParts.get (0);
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					(Record<?>) container,
 					privCode);
 
@@ -195,12 +196,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				Record<?> delegate =
 					(Record<?>)
 					objectManager.dereferenceObsolete (
+						transaction,
 						container,
 						delegatePath,
 						hints);
 
 				return privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					delegate,
 					privCode);
 
@@ -217,7 +219,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormAlwaysHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -227,9 +229,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormAlwaysHidden");
 
 		) {
@@ -237,12 +239,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -250,7 +253,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
@@ -277,7 +280,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -286,9 +289,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderTableCellList");
 
 		) {
@@ -296,12 +299,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -309,13 +313,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
 
 			renderer.renderHtmlTableCellList (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				container,
 				hints,
@@ -330,16 +334,16 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellProperties (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderTableCellProperties");
 
 		) {
@@ -347,12 +351,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -360,13 +365,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
 
 			renderer.renderHtmlTableCellProperties (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				container,
 				hints,
@@ -381,7 +386,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -392,9 +397,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormRow");
 
 		) {
@@ -402,12 +407,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
@@ -415,7 +421,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					eitherGetLeft (
 						interfaceMapping.genericToInterface (
-							taskLogger,
+							transaction,
 							container,
 							hints,
 							genericValue)));
@@ -431,7 +437,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				htmlWriter);
 
 			renderer.renderHtmlComplex (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				container,
 				hints,
@@ -450,28 +456,30 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		doNothing ();
+
 	}
 
 	@Override
 	public
 	void renderCsvRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderCsvRow");
 
 		) {
@@ -479,19 +487,20 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			Optional <Native> nativeValue =
 				requiredValue (
 					accessor.read (
-						taskLogger,
+						transaction,
 						container));
 
 			Optional <Generic> genericValue =
 				requiredValue (
 					nativeMapping.nativeToGeneric (
+						transaction,
 						container,
 						nativeValue));
 
 			Optional <String> csvValueOptional =
 				resultValueRequired (
 					csvMapping.genericToInterface (
-						taskLogger,
+						transaction,
 						container,
 						hints,
 						genericValue));
@@ -523,26 +532,37 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	UpdateResult <Generic, Native> update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
-		return new UpdateResult <Generic, Native> ()
+		try (
 
-			.updated (
-				false)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"update");
 
-			.error (
-				optionalAbsent ());
+		) {
+
+			return new UpdateResult <Generic, Native> ()
+
+				.updated (
+					false)
+
+				.error (
+					optionalAbsent ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void runUpdateHook (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UpdateResult<Generic,Native> updateResult,
 			@NonNull Container container,
 			@NonNull PermanentRecord<?> linkObject,

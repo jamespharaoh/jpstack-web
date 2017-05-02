@@ -2,17 +2,17 @@ package wbs.console.forms;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface FormFieldAccessor <Container, Native> {
 
 	Optional <Native> read (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Container container);
 
 	void write (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			Container container,
 			Optional <Native> nativeValue);
 

@@ -18,7 +18,7 @@ class TaskLogEntryEvent
 	LogSeverity severity;
 
 	private final
-	String text;
+	CharSequence text;
 
 	private final
 	Instant startTime;
@@ -30,7 +30,7 @@ class TaskLogEntryEvent
 
 	TaskLogEntryEvent (
 			@NonNull LogSeverity severity,
-			@NonNull String text) {
+			@NonNull CharSequence text) {
 
 		this.severity =
 			severity;
@@ -57,7 +57,7 @@ class TaskLogEntryEvent
 	@Override
 	public
 	String eventText () {
-		return text;
+		return text.toString ();
 	}
 
 	@Override

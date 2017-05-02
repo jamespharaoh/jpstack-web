@@ -87,40 +87,35 @@ class ImChatConversationStartAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatConversationStartRequest startRequest =
-			dataFromJson.fromJson (
-				ImChatConversationStartRequest.class,
-				jsonValue);
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ImChatConversationStartAction.handle ()",
-					this);
+					logContext,
+					"handle");
 
 		) {
 
+			// decode request
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			ImChatConversationStartRequest startRequest =
+				dataFromJson.fromJson (
+					ImChatConversationStartRequest.class,
+					jsonValue);
+
+			// lookup objects
+
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -129,6 +124,7 @@ class ImChatConversationStartAction
 
 			ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
+					transaction,
 					startRequest.sessionSecret ());
 
 			if (
@@ -160,6 +156,7 @@ class ImChatConversationStartAction
 
 			Optional <ImChatProfileRec> profileOptional =
 				imChatProfileHelper.findByCode (
+					transaction,
 					imChat,
 					hyphenToUnderscore (
 						startRequest.profileCode ()));
@@ -226,7 +223,7 @@ class ImChatConversationStartAction
 
 			ImChatConversationRec conversation =
 				imChatConversationHelper.insert (
-					taskLogger,
+					transaction,
 					imChatConversationHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -263,14 +260,17 @@ class ImChatConversationStartAction
 
 				.customer (
 					imChatApiLogic.customerData (
+						transaction,
 						customer))
 
 				.profile (
 					imChatApiLogic.profileData (
+						transaction,
 						profile))
 
 				.conversation (
 					imChatApiLogic.conversationData (
+						transaction,
 						conversation));
 
 			// commit and return

@@ -55,8 +55,9 @@ class QueueFilterResponder
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
 					parentTaskLogger,
 					"execute");
 
@@ -75,26 +76,16 @@ class QueueFilterResponder
 				timeFormatter.httpTimestampString (
 					Instant.now ()));
 
-			try (
+			String filter =
+				ifNull (
+					userConsoleLogic.sliceRequired (
+						transaction
+					).getFilter (),
+					defaultFilter);
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						"QueueFilterResponder.execute ()",
-						this);
-
-			) {
-
-				String filter =
-					ifNull (
-						userConsoleLogic.sliceRequired ().getFilter (),
-						defaultFilter);
-
-				writeBytes (
-					requestContext.outputStream (),
-					filter.getBytes ());
-
-			}
+			writeBytes (
+				requestContext.outputStream (),
+				filter.getBytes ());
 
 		}
 

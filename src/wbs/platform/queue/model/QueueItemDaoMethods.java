@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 import org.hibernate.Criteria;
 import org.joda.time.Interval;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -15,40 +15,45 @@ public
 interface QueueItemDaoMethods {
 
 	Criteria searchCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemSearch search);
 
 	List <Long> searchIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemSearch search);
 
 	Criteria searchUserQueueReportCriteria (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemSearch search);
 
 	List <Long> searchUserQueueReportIds (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemSearch search);
 
 	List <Optional <UserQueueReport>> searchUserQueueReports (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			QueueItemSearch search,
 			List <Long> ids);
 
 	List <QueueItemRec> find (
+			Transaction parentTransaction,
 			List <QueueItemState> state);
 
 	List <QueueItemRec> findByCreatedTime (
+			Transaction parentTransaction,
 			Interval createdTimeInterval);
 
 	List <QueueItemRec> findByCreatedTime (
+			Transaction parentTransaction,
 			QueueRec queue,
 			Interval createdTimeInterval);
 
 	List <QueueItemRec> findByProcessedTime (
+			Transaction parentTransaction,
 			Interval processedTimeInterval);
 
 	List <QueueItemRec> findByProcessedTime (
+			Transaction parentTransaction,
 			UserRec user,
 			Interval processedTimeInterval);
 

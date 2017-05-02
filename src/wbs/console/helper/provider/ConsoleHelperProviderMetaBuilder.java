@@ -31,6 +31,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
@@ -70,16 +71,16 @@ class ConsoleHelperProviderMetaBuilder <
 
 	// build
 
-	@BuildMethod
 	@Override
+	@BuildMethod
 	public
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Builder builder) {
+			@NonNull Builder <TaskLogger> builder) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"build");
@@ -105,11 +106,10 @@ class ConsoleHelperProviderMetaBuilder <
 					capitalise (
 						objectHelper.objectName ()));
 
-			@SuppressWarnings ("unchecked")
 			Class <ConsoleHelper <RecordType>> consoleHelperClass =
-				(Class <ConsoleHelper <RecordType>>)
-				classForNameRequired (
-					consoleHelperClassName);
+				genericCastUnchecked (
+					classForNameRequired (
+						consoleHelperClassName));
 
 			genericConsoleHelperProviderProvider.get ()
 

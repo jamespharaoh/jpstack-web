@@ -12,8 +12,11 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
 
 import wbs.imchat.model.ImChatCustomerDao;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -25,173 +28,205 @@ class ImChatCustomerDaoHibernate
 	extends HibernateDao
 	implements ImChatCustomerDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	ImChatCustomerRec findByEmail (
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatRec imChat,
 			@NonNull String email) {
 
-		return findOneOrNull (
-			"findByEmail (imChat, email)",
-			ImChatCustomerRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByEmail");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				ImChatCustomerRec.class,
-				"_imChatCustomer")
 
-			.add (
-				Restrictions.eq (
-					"_imChatCustomer.imChat",
-					imChat))
+				createCriteria (
+					transaction,
+					ImChatCustomerRec.class,
+					"_imChatCustomer")
 
-			.add (
-				Restrictions.eq (
-					"_imChatCustomer.email",
-					email))
+				.add (
+					Restrictions.eq (
+						"_imChatCustomer.imChat",
+						imChat))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_imChatCustomer.email",
+						email))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ImChatCustomerSearch imChatCustomerSearch) {
 
-		Criteria criteria =
+		try (
 
-			createCriteria (
-				ImChatCustomerRec.class,
-				"_imChatCustomer")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchIds");
 
-			.createAlias (
-				"_imChatCustomer.imChat",
-				"_imChat");
-
-		if (
-			isNotNull (
-				imChatCustomerSearch.imChatId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_imChat.id",
-					imChatCustomerSearch.imChatId ()));
+			Criteria criteria =
 
-		}
+				createCriteria (
+					transaction,
+					ImChatCustomerRec.class,
+					"_imChatCustomer")
 
-		if (imChatCustomerSearch.code () != null) {
+				.createAlias (
+					"_imChatCustomer.imChat",
+					"_imChat");
 
-			criteria.add (
-				Restrictions.eq (
-					"_imChatCustomer.code",
-					imChatCustomerSearch.code ()));
+			if (
+				isNotNull (
+					imChatCustomerSearch.imChatId ())
+			) {
 
-		}
+				criteria.add (
+					Restrictions.eq (
+						"_imChat.id",
+						imChatCustomerSearch.imChatId ()));
 
-		if (
-			isNotNull (
-				imChatCustomerSearch.email ())
-		) {
+			}
 
-			criteria.add (
-				Restrictions.eq (
-					"_imChatCustomer.email",
-					imChatCustomerSearch.email ()));
+			if (imChatCustomerSearch.code () != null) {
 
-		}
+				criteria.add (
+					Restrictions.eq (
+						"_imChatCustomer.code",
+						imChatCustomerSearch.code ()));
 
-		if (
-			isNotNull (
-				imChatCustomerSearch.firstSession ())
-		) {
+			}
 
-			criteria.add (
-				Restrictions.ge (
-					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().start ()));
+			if (
+				isNotNull (
+					imChatCustomerSearch.email ())
+			) {
 
-			criteria.add (
-				Restrictions.lt (
-					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().end ()));
+				criteria.add (
+					Restrictions.eq (
+						"_imChatCustomer.email",
+						imChatCustomerSearch.email ()));
 
-		}
+			}
 
-		if (
-			isNotNull (
-				imChatCustomerSearch.lastSession ())
-		) {
+			if (
+				isNotNull (
+					imChatCustomerSearch.firstSession ())
+			) {
 
-			criteria.add (
-				Restrictions.ge (
-					"_imChatCustomer.lastSession",
-					toInstant (
-						imChatCustomerSearch.lastSession ().start ())));
+				criteria.add (
+					Restrictions.ge (
+						"_imChatCustomer.firstSession",
+						imChatCustomerSearch.firstSession ().start ()));
 
-			criteria.add (
-				Restrictions.lt (
-					"_imChatCustomer.lastSession",
-					toInstant (
-						imChatCustomerSearch.lastSession ().end ())));
+				criteria.add (
+					Restrictions.lt (
+						"_imChatCustomer.firstSession",
+						imChatCustomerSearch.firstSession ().end ()));
 
-		}
+			}
 
-		// set order
+			if (
+				isNotNull (
+					imChatCustomerSearch.lastSession ())
+			) {
 
-		switch (imChatCustomerSearch.order ()) {
+				criteria.add (
+					Restrictions.ge (
+						"_imChatCustomer.lastSession",
+						toInstant (
+							imChatCustomerSearch.lastSession ().start ())));
 
-		case timestampDesc:
+				criteria.add (
+					Restrictions.lt (
+						"_imChatCustomer.lastSession",
+						toInstant (
+							imChatCustomerSearch.lastSession ().end ())));
+
+			}
+
+			// set order
+
+			switch (imChatCustomerSearch.order ()) {
+
+			case timestampDesc:
+
+				criteria
+
+					.addOrder (
+						Order.desc (
+							"_imChatCustomer.lastSession"));
+
+				break;
+
+			case totalPurchaseDesc:
+
+				criteria
+
+					.addOrder (
+						Order.desc (
+							"_imChatCustomer.totalPurchase"));
+
+				break;
+
+			case balanceDesc:
+
+				criteria
+
+					.addOrder (
+						Order.desc (
+							"_imChatCustomer.balance"));
+
+				break;
+
+			default:
+
+				throw new RuntimeException (
+					"should never happen");
+
+			}
+
+			// set to return ids only
 
 			criteria
 
-				.addOrder (
-					Order.desc (
-						"_imChatCustomer.lastSession"));
+				.setProjection (
+					Projections.id ());
 
-			break;
+			// perform and return
 
-		case totalPurchaseDesc:
-
-			criteria
-
-				.addOrder (
-					Order.desc (
-						"_imChatCustomer.totalPurchase"));
-
-			break;
-
-		case balanceDesc:
-
-			criteria
-
-				.addOrder (
-					Order.desc (
-						"_imChatCustomer.balance"));
-
-			break;
-
-		default:
-
-			throw new RuntimeException (
-				"should never happen");
+			return findMany (
+				transaction,
+				Long.class,
+				criteria);
 
 		}
-
-		// set to return ids only
-
-		criteria
-
-			.setProjection (
-				Projections.id ());
-
-		// perform and return
-
-		return findMany (
-			"searchIds (imCustomerSearch)",
-			Long.class,
-			criteria);
 
 	}
 

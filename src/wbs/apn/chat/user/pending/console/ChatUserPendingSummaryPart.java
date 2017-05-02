@@ -20,8 +20,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -62,23 +63,35 @@ class ChatUserPendingSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -93,7 +106,7 @@ class ChatUserPendingSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"User",
 				() -> consoleObjectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					chatUser,
 					2l));
 
@@ -136,6 +149,7 @@ class ChatUserPendingSummaryPart
 
 			ChatUserImageRec newImage =
 				chatUserLogic.chatUserPendingImage (
+					transaction,
 					chatUser,
 					ChatUserImageType.image);
 
@@ -144,7 +158,7 @@ class ChatUserPendingSummaryPart
 					chatUser.getChatUserImageList (),
 
 				() -> mediaConsoleLogic.writeMediaContent (
-					taskLogger,
+					transaction,
 					formatWriter,
 					chatUser.getChatUserImageList ().get (0).getMedia ()),
 
@@ -165,7 +179,7 @@ class ChatUserPendingSummaryPart
 
 					htmlTableCellWriteHtml (
 						() -> mediaConsoleLogic.writeMediaContent (
-							taskLogger,
+							transaction,
 							formatWriter,
 							newImage.getMedia ()));
 				},
@@ -180,6 +194,7 @@ class ChatUserPendingSummaryPart
 
 			ChatUserImageRec newVideo =
 				chatUserLogic.chatUserPendingImage (
+					transaction,
 					chatUser,
 					ChatUserImageType.video);
 
@@ -188,7 +203,7 @@ class ChatUserPendingSummaryPart
 					chatUser.getChatUserVideoList (),
 
 				() -> mediaConsoleLogic.writeMediaContent (
-					taskLogger,
+					transaction,
 					chatUser.getChatUserImageList ().get (0).getMedia ()),
 
 				() -> formatWriter.writeFormat (
@@ -208,7 +223,7 @@ class ChatUserPendingSummaryPart
 
 					htmlTableCellWriteHtml (
 						() -> mediaConsoleLogic.writeMediaContent (
-							taskLogger,
+							transaction,
 							newVideo.getMedia ()));
 
 				},
@@ -223,6 +238,7 @@ class ChatUserPendingSummaryPart
 
 			ChatUserImageRec newAudio =
 				chatUserLogic.chatUserPendingImage (
+					transaction,
 					chatUser,
 					ChatUserImageType.audio);
 
@@ -231,7 +247,7 @@ class ChatUserPendingSummaryPart
 					chatUser.getChatUserAudioList (),
 
 				() -> mediaConsoleLogic.writeMediaContent (
-					taskLogger,
+					transaction,
 					chatUser.getChatUserAudioList ().get (0).getMedia ()),
 
 				() -> formatWriter.writeFormat (
@@ -251,7 +267,7 @@ class ChatUserPendingSummaryPart
 
 					htmlTableCellWriteHtml (
 						() -> mediaConsoleLogic.writeMediaContent (
-							taskLogger,
+							transaction,
 							newAudio.getMedia ()));
 
 				},

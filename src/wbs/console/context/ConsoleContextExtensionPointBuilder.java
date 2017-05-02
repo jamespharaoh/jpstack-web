@@ -6,14 +6,20 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleContextExtensionPointBuilder")
@@ -21,12 +27,15 @@ import wbs.framework.entity.record.Record;
 public
 class ConsoleContextExtensionPointBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+> implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -41,21 +50,34 @@ class ConsoleContextExtensionPointBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			@NonNull Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
-			) {
+		try (
 
-			consoleModule.addTabLocation (
-				container.tabLocation (),
-				spec.name (),
-				resolvedExtensionPoint.contextTypeNames ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+				) {
+
+				consoleModule.addTabLocation (
+					container.tabLocation (),
+					spec.name (),
+					resolvedExtensionPoint.contextTypeNames ());
+
+			}
 
 		}
 

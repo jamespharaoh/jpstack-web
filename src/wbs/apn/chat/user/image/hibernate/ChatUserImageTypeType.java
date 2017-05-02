@@ -2,8 +2,9 @@ package wbs.apn.chat.user.image.hibernate;
 
 import java.sql.Types;
 
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.hibernate.EnumUserType;
+
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 
 public
 class ChatUserImageTypeType

@@ -87,16 +87,11 @@ class CoreLogonAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"CoreLogonAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -160,12 +155,12 @@ class CoreLogonAction
 
 			// attempt logon
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Attempting logon");
 
 			Optional <UserSessionRec> userSessionOptional =
 				userSessionLogic.userLogonTry (
-					taskLogger,
+					transaction,
 					requestContext,
 					slice.toLowerCase (),
 					username.toLowerCase (),
@@ -182,7 +177,7 @@ class CoreLogonAction
 					userSessionOptional)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Logon success");
 
 				UserSessionRec userSession =
@@ -198,7 +193,7 @@ class CoreLogonAction
 
 			} else {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Logon failure");
 
 				userIdOptional =
@@ -219,7 +214,7 @@ class CoreLogonAction
 					"Sorry, the details you entered did not match. Please try ",
 					"again, or contact an appropriate person for help.");
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Failed logon attempt for %s.%s",
 					slice,
 					username);
@@ -234,7 +229,7 @@ class CoreLogonAction
 
 			// save the userid
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Successful logon for %s.%s (%s)",
 				slice,
 				username,

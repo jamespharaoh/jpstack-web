@@ -20,12 +20,12 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.clockworksms.model.ClockworkSmsConfigObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsConfigRec;
@@ -92,28 +92,24 @@ class ClockworkSmsFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
 
 			createMenus (
-				taskLogger,
 				transaction);
 
 			createConfig (
-				taskLogger,
 				transaction);
 
 			createRoutes (
-				taskLogger,
 				transaction);
 
 		}
@@ -122,24 +118,24 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createMenus (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createMenus");
 
 		) {
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"integration"))
@@ -172,21 +168,20 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createConfig (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createConfig");
 
 		) {
 
 			ClockworkSmsConfigRec config =
 				clockworkSmsConfigHelper.insert (
-					taskLogger,
+					transaction,
 					clockworkSmsConfigHelper.createInstance ()
 
 				.setCode (
@@ -206,7 +201,7 @@ class ClockworkSmsFixtureProvider
 			) {
 
 				clockworkSmsDeliveryStatusHelper.insert (
-					taskLogger,
+					transaction,
 					clockworkSmsDeliveryStatusHelper.createInstance ()
 
 					.setClockworkSmsConfig (
@@ -238,7 +233,7 @@ class ClockworkSmsFixtureProvider
 			) {
 
 				clockworkSmsDeliveryStatusDetailCodeHelper.insert (
-					taskLogger,
+					transaction,
 					clockworkSmsDeliveryStatusDetailCodeHelper.createInstance ()
 
 					.setClockworkSmsConfig (
@@ -270,14 +265,13 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createRoutes (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createRoutes");
 
 		) {
@@ -286,7 +280,6 @@ class ClockworkSmsFixtureProvider
 				"clockwork-sms-route",
 				testAccount ->
 					createRoute (
-						taskLogger,
 						transaction,
 						testAccount));
 
@@ -298,15 +291,14 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createRoute (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createRoute");
 
 		) {
@@ -319,7 +311,7 @@ class ClockworkSmsFixtureProvider
 			case "in":
 
 				createInboundRoute (
-					taskLogger,
+					transaction,
 					params);
 
 				break;
@@ -327,7 +319,7 @@ class ClockworkSmsFixtureProvider
 			case "out":
 
 				createOutboundRoute (
-					taskLogger,
+					transaction,
 					params);
 
 				break;
@@ -347,25 +339,26 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createInboundRoute (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createInboundRoute");
 
 		) {
 
 			RouteRec smsRoute =
 				smsRouteHelper.insert (
-					taskLogger,
+					transaction,
 					smsRouteHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -385,7 +378,7 @@ class ClockworkSmsFixtureProvider
 			);
 
 			clockworkSmsRouteInHelper.insert (
-				taskLogger,
+				transaction,
 				clockworkSmsRouteInHelper.createInstance ()
 
 				.setRoute (
@@ -393,6 +386,7 @@ class ClockworkSmsFixtureProvider
 
 				.setClockworkSmsConfig (
 					clockworkSmsConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 
@@ -404,25 +398,26 @@ class ClockworkSmsFixtureProvider
 
 	private
 	void createOutboundRoute (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, String> params) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createOutboundRoute");
 
 		) {
 
 			RouteRec smsRoute =
 				smsRouteHelper.insert (
-					taskLogger,
+					transaction,
 					smsRouteHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -444,13 +439,14 @@ class ClockworkSmsFixtureProvider
 
 				.setSender (
 					senderHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"clockwork_sms"))
 
 			);
 
 			clockworkSmsRouteOutHelper.insert (
-				taskLogger,
+				transaction,
 				clockworkSmsRouteOutHelper.createInstance ()
 
 				.setRoute (
@@ -458,6 +454,7 @@ class ClockworkSmsFixtureProvider
 
 				.setClockworkSmsConfig (
 					clockworkSmsConfigHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"default"))
 

@@ -12,60 +12,93 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("secondsFormFieldNativeMapping")
 public
 class SecondsFormFieldNativeMapping <Container>
 	implements FormFieldNativeMapping <Container, Duration, Long> {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	Optional <Duration> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Long> nativeValueOptional) {
 
-		if (
-			optionalIsNotPresent (
-				nativeValueOptional)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"nativeToGeneric");
+
 		) {
-			return optionalAbsent ();
+
+			if (
+				optionalIsNotPresent (
+					nativeValueOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			Long nativeValue =
+				optionalGetRequired (
+					nativeValueOptional);
+
+			return optionalOf (
+				secondsToDuration (
+					nativeValue));
+
 		}
-
-		Long nativeValue =
-			optionalGetRequired (
-				nativeValueOptional);
-
-		return optionalOf (
-			secondsToDuration (
-				nativeValue));
 
 	}
 
 	@Override
 	public Optional <Long> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Duration> genericValueOptional) {
 
-		if (
-			optionalIsNotPresent (
-				genericValueOptional)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToNative");
+
 		) {
-			return optionalAbsent ();
+
+			if (
+				optionalIsNotPresent (
+					genericValueOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			Duration genericValue =
+				optionalGetRequired (
+					genericValueOptional);
+
+			if (genericValue.getMillis () % 1000l != 0) {
+				throw new RuntimeException ();
+			}
+
+			return optionalOf (
+				genericValue.getMillis () / 1000l);
+
 		}
-
-		Duration genericValue =
-			optionalGetRequired (
-				genericValueOptional);
-
-		if (genericValue.getMillis () % 1000l != 0) {
-			throw new RuntimeException ();
-		}
-
-		return optionalOf (
-			genericValue.getMillis () / 1000l);
 
 	}
 

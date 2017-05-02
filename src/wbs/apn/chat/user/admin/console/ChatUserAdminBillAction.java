@@ -85,16 +85,11 @@ class ChatUserAdminBillAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatUserAdminBillAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
@@ -111,18 +106,25 @@ class ChatUserAdminBillAction
 			}
 
 			ChatUserRec chatUser =
-				chatUserHelper.findFromContextRequired ();
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
 			// lock prevents race condition between limit check and update
 
 			chatUserHelper.lock (
+				transaction,
 				chatUser);
 
 			// enforce ��30/day limit
 
-			if (chatCreditLogic.userBillLimitApplies (chatUser)) {
+			if (
+				chatCreditLogic.userBillLimitApplies (
+					transaction,
+					chatUser)
+			) {
 
-				requestContext.addError ("Daily limit reached");
+				requestContext.addError (
+					"Daily limit reached");
 
 				return null;
 
@@ -144,8 +146,9 @@ class ChatUserAdminBillAction
 					.toDateTimeAtStartOfDay ()
 					.toInstant ();
 
-			List<ChatUserBillLogRec> todayBillLogs =
+			List <ChatUserBillLogRec> todayBillLogs =
 				chatUserBillLogHelper.findByTimestamp (
+					transaction,
 					chatUser,
 					new Interval (
 						startOfToday,
@@ -170,14 +173,14 @@ class ChatUserAdminBillAction
 			// bill the user
 
 			chatCreditLogic.userBillReal (
-				taskLogger,
+				transaction,
 				chatUser,
 				true);
 
 			// log it
 
 			chatUserBillLogHelper.insert (
-				taskLogger,
+				transaction,
 				chatUserBillLogHelper.createInstance ()
 
 				.setChatUser (
@@ -187,7 +190,8 @@ class ChatUserAdminBillAction
 					transaction.now ())
 
 				.setUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 			);
 

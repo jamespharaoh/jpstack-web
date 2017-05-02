@@ -14,11 +14,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 
@@ -133,14 +133,13 @@ class ImChatCoreFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createFixtures");
 
 		) {
@@ -148,11 +147,12 @@ class ImChatCoreFixtureProvider
 			// menu
 
 			menuItemHelper.insert (
-				taskLogger,
+				transaction,
 				menuItemHelper.createInstance ()
 
 				.setMenuGroup (
 					menuGroupHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"facility"))
@@ -181,8 +181,9 @@ class ImChatCoreFixtureProvider
 
 			MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
 				messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
-					taskLogger,
+					transaction,
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"),
 					joinWithSlash (
@@ -190,7 +191,7 @@ class ImChatCoreFixtureProvider
 						"im-chat-message-template-database.xml"));
 
 			messageTemplateSetHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateSetHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -209,8 +210,9 @@ class ImChatCoreFixtureProvider
 
 			MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
 				messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
-					taskLogger,
+					transaction,
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"),
 					joinWithSlash (
@@ -218,7 +220,7 @@ class ImChatCoreFixtureProvider
 						"im-chat-embedded-message-template-database.xml"));
 
 			messageTemplateSetHelper.insert (
-				taskLogger,
+				transaction,
 				messageTemplateSetHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -239,11 +241,12 @@ class ImChatCoreFixtureProvider
 
 			ImChatRec imChat =
 				imChatHelper.insert (
-					taskLogger,
+					transaction,
 					imChatHelper.createInstance ()
 
 				.setSlice (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test"))
 
@@ -258,18 +261,21 @@ class ImChatCoreFixtureProvider
 
 				.setPaypalAccount (
 					paypalAccountHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"sandbox"))
 
 				.setBillingCurrency (
 					currencyHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"gbp"))
 
 				.setCreditCurrency (
 					currencyHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						"test",
 						"credit"))
@@ -331,7 +337,7 @@ class ImChatCoreFixtureProvider
 
 			ImChatPricePointRec basicPricePoint =
 				imChatPricePointHelper.insert (
-					taskLogger,
+					transaction,
 					imChatPricePointHelper.createInstance ()
 
 				.setImChat (
@@ -364,7 +370,7 @@ class ImChatCoreFixtureProvider
 			);
 
 			imChatPricePointHelper.insert (
-				taskLogger,
+				transaction,
 				imChatPricePointHelper.createInstance ()
 
 				.setImChat (
@@ -397,7 +403,7 @@ class ImChatCoreFixtureProvider
 			);
 
 			imChatPricePointHelper.insert (
-				taskLogger,
+				transaction,
 				imChatPricePointHelper.createInstance ()
 
 				.setImChat (
@@ -438,7 +444,7 @@ class ImChatCoreFixtureProvider
 			) {
 
 				imChatTemplateHelper.insert (
-					taskLogger,
+					transaction,
 					imChatTemplateHelper.createInstance ()
 
 					.setImChat (
@@ -475,7 +481,7 @@ class ImChatCoreFixtureProvider
 			// customer detail types
 
 			imChatCustomerDetailTypeHelper.insert (
-				taskLogger,
+				transaction,
 				imChatCustomerDetailTypeHelper.createInstance ()
 
 				.setImChat (
@@ -517,7 +523,7 @@ class ImChatCoreFixtureProvider
 			);
 
 			imChatCustomerDetailTypeHelper.insert (
-				taskLogger,
+				transaction,
 				imChatCustomerDetailTypeHelper.createInstance ()
 
 				.setImChat (
@@ -562,7 +568,7 @@ class ImChatCoreFixtureProvider
 			);
 
 			imChatCustomerDetailTypeHelper.insert (
-				taskLogger,
+				transaction,
 				imChatCustomerDetailTypeHelper.createInstance ()
 
 				.setImChat (
@@ -604,7 +610,7 @@ class ImChatCoreFixtureProvider
 			);
 
 			imChatCustomerDetailTypeHelper.insert (
-				taskLogger,
+				transaction,
 				imChatCustomerDetailTypeHelper.createInstance ()
 
 				.setImChat (
@@ -649,7 +655,7 @@ class ImChatCoreFixtureProvider
 
 			MediaRec dougalMedia =
 				mediaLogic.createMediaFromImageRequired (
-					taskLogger,
+					transaction,
 					fileReadBytes (
 						"binaries/test/dougal.jpg"),
 					"image/jpeg",
@@ -657,7 +663,7 @@ class ImChatCoreFixtureProvider
 
 			MediaRec ermintrudeMedia =
 				mediaLogic.createMediaFromImageRequired (
-					taskLogger,
+					transaction,
 					fileReadBytes (
 						"binaries/test/dougal.jpg"),
 					"image/jpeg",
@@ -674,7 +680,7 @@ class ImChatCoreFixtureProvider
 
 				profiles.add (
 					imChatProfileHelper.insert (
-						taskLogger,
+						transaction,
 						imChatProfileHelper.createInstance ()
 
 					.setImChat (
@@ -732,7 +738,7 @@ class ImChatCoreFixtureProvider
 
 			ImChatCustomerRec imChatCustomer =
 				imChatCustomerHelper.insert (
-					taskLogger,
+					transaction,
 					imChatCustomerHelper.createInstance ()
 
 				.setImChat (
@@ -759,7 +765,7 @@ class ImChatCoreFixtureProvider
 
 			ImChatConversationRec imChatConversation =
 				imChatConversationHelper.insert (
-					taskLogger,
+					transaction,
 					imChatConversationHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -788,7 +794,7 @@ class ImChatCoreFixtureProvider
 
 			ImChatSessionRec imChatSession =
 				imChatSessionHelper.insert (
-					taskLogger,
+					transaction,
 					imChatSessionHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -811,7 +817,7 @@ class ImChatCoreFixtureProvider
 
 				.setUserAgentText (
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						"User agent"))
 
 				.setIpAddress (
@@ -822,7 +828,7 @@ class ImChatCoreFixtureProvider
 			// im chat purchase
 
 			imChatPurchaseHelper.insert (
-				taskLogger,
+				transaction,
 				imChatPurchaseHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -862,7 +868,7 @@ class ImChatCoreFixtureProvider
 			// im chat message
 
 			imChatMessageHelper.insert (
-				taskLogger,
+				transaction,
 				imChatMessageHelper.createInstance ()
 
 				.setImChatConversation (

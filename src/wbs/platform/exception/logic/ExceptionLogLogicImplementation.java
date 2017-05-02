@@ -12,13 +12,13 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtilsImplementation;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.model.ConcreteExceptionResolution;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
@@ -55,7 +55,7 @@ class ExceptionLogLogicImplementation
 	@Override
 	public
 	ExceptionLogRec logException (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -65,20 +65,18 @@ class ExceptionLogLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"logException");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// lookup type
 
 			ExceptionLogTypeRec exceptionLogType =
 				exceptionLogTypeHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					typeCode);
 
@@ -87,6 +85,7 @@ class ExceptionLogLogicImplementation
 			UserRec user =
 				userId.isPresent ()
 					? userHelper.findRequired (
+						transaction,
 						userId.get ())
 					: null;
 
@@ -94,7 +93,7 @@ class ExceptionLogLogicImplementation
 
 			ExceptionLogRec exceptionLog =
 				exceptionLogHelper.insert (
-					taskLogger,
+					transaction,
 					exceptionLogHelper.createInstance ()
 
 				.setTimestamp (

@@ -1,12 +1,15 @@
 package wbs.apn.chat.core.logic;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.collection.MapUtils.mapContainsKey;
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -29,9 +32,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -167,66 +171,98 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	List <ChatUserRec> getOnlineMonitorsForOutbound (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec thisUser) {
 
-		ChatRec chat =
-			thisUser.getChat ();
+		try (
 
-		Collection<ChatUserRec> onlineUsers =
-			chatUserHelper.findOnline (
-				chat);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getOnlineMonitorsForOutbound");
 
-		List<ChatUserRec> ret =
-			new ArrayList<ChatUserRec> ();
+		) {
 
-		for (ChatUserRec chatUser : onlineUsers) {
+			ChatRec chat =
+				thisUser.getChat ();
 
-			// ignore non-monitors
-			if (chatUser.getType () != ChatUserType.monitor)
-				continue;
+			Collection <ChatUserRec> onlineUsers =
+				chatUserHelper.findOnline (
+					transaction,
+					chat);
 
-			// ignore blocked users
-			if (thisUser.getBlocked ().containsKey (chatUser.getId ()))
-				continue;
+			List <ChatUserRec> ret =
+				new ArrayList<> ();
 
-			// if we aren't suitable gender/orients for each other skip it
+			for (
+				ChatUserRec chatUser
+					: onlineUsers
+			) {
 
-			if (! chatUserLogic.compatible (
-					thisUser,
-					chatUser))
-				continue;
+				// ignore non-monitors
 
-			// ignore users we have previously had a message from
+				if (
+					enumNotEqualSafe (
+						chatUser.getType (),
+						ChatUserType.monitor)
+				) {
+					continue;
+				}
 
-			ChatContactRec chatContact =
-				thisUser.getFromContacts ().get (
-					chatUser.getId ());
+				// ignore blocked users
 
-			if (chatContact != null
-					&& chatContact.getLastDeliveredMessageTime () != null)
-				continue;
+				if (
+					mapContainsKey (
+						thisUser.getBlocked (),
+						chatUser.getId ())
+				) {
+					continue;
+				}
 
-			// ignore users with no info or pic
+				// if we aren't suitable gender/orients for each other skip it
 
-			if (chatUser.getInfoText () == null)
-				continue;
+				if (
+					! chatUserLogic.compatible (
+						transaction,
+						thisUser,
+						chatUser)
+				) {
+					continue;
+				}
 
-			if (chatUser.getMainChatUserImage () == null)
-				continue;
+				// ignore users we have previously had a message from
 
-			// ignore users according to monitor cap
+				ChatContactRec chatContact =
+					thisUser.getFromContacts ().get (
+						chatUser.getId ());
 
-			if (thisUser.getMonitorCap () != null
-					&& chatUser.getType () == ChatUserType.monitor
-					&& (chatUser.getCode ().charAt (2) - '0')
-						< thisUser.getMonitorCap ())
-				continue;
+				if (chatContact != null
+						&& chatContact.getLastDeliveredMessageTime () != null)
+					continue;
 
-			ret.add (chatUser);
+				// ignore users with no info or pic
+
+				if (chatUser.getInfoText () == null)
+					continue;
+
+				if (chatUser.getMainChatUserImage () == null)
+					continue;
+
+				// ignore users according to monitor cap
+
+				if (thisUser.getMonitorCap () != null
+						&& chatUser.getType () == ChatUserType.monitor
+						&& (chatUser.getCode ().charAt (2) - '0')
+							< thisUser.getMonitorCap ())
+					continue;
+
+				ret.add (chatUser);
+
+			}
+
+			return ret;
 
 		}
-
-		return ret;
 
 	}
 
@@ -242,38 +278,52 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	ChatUserRec getOnlineMonitorForOutbound (
-			ChatUserRec thisUser) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec thisUser) {
 
-		List<ChatUserRec> monitors =
-			getOnlineMonitorsForOutbound (
-				thisUser);
+		try (
 
-		List<UserDistance> distances =
-			chatUserLogic.getUserDistances (
-				thisUser,
-				monitors);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getOnlineMonitorForOutbound");
 
-		Collections.sort (
-			distances);
+		) {
 
-		return distances.size () > 0
-			? distances.get (0).user ()
-			: null;
+			List <ChatUserRec> monitors =
+				getOnlineMonitorsForOutbound (
+					transaction,
+					thisUser);
+
+			List <UserDistance> distances =
+				chatUserLogic.getUserDistances (
+					transaction,
+					thisUser,
+					monitors);
+
+			Collections.sort (
+				distances);
+
+			return distances.size () > 0
+				? distances.get (0).user ()
+				: null;
+
+		}
 
 	}
 
 	@Override
 	public
 	void blockAll (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <MessageRec> message) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"blockAll");
 
 		) {
@@ -281,7 +331,7 @@ class ChatMiscLogicImplementation
 			// log them off
 
 			chatUserLogic.logoff (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalIsNotPresent (
 					message));
@@ -299,7 +349,7 @@ class ChatMiscLogicImplementation
 			// turn off dating
 
 			chatDateLogic.userDateStuff (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalAbsent (),
 				message,
@@ -311,7 +361,7 @@ class ChatMiscLogicImplementation
 			if (chatUser.getChatScheme () != null) {
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalAbsent (),
 					"block_all_confirm",
@@ -327,16 +377,16 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void userAutoJoin (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
-			boolean sendMessage) {
+			@NonNull Boolean sendMessage) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userAutoJoin");
 
 		) {
@@ -355,10 +405,11 @@ class ChatMiscLogicImplementation
 			) {
 
 				userJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					sendMessage,
-					message.getThreadId (),
+					optionalOf (
+						message.getThreadId ()),
 					ChatMessageMethod.sms);
 
 				currentSendMessage = true;
@@ -373,7 +424,7 @@ class ChatMiscLogicImplementation
 			) {
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalAbsent (),
 					optionalOf (
@@ -392,23 +443,20 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void userJoin (
-			@NonNull TaskLogger parentTaskLogger,
-			ChatUserRec chatUser,
-			boolean sendMessage,
-			Long threadId,
-			ChatMessageMethod deliveryMethod) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Boolean sendMessage,
+			@NonNull Optional <Long> threadId,
+			@NonNull ChatMessageMethod deliveryMethod) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userJoin");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -455,7 +503,7 @@ class ChatMiscLogicImplementation
 			// schedule an ad
 
 			chatUserLogic.scheduleAd (
-				taskLogger,
+				transaction,
 				chatUser);
 
 			// create session
@@ -463,7 +511,7 @@ class ChatMiscLogicImplementation
 			if (! wasOnline) {
 
 				chatUserSessionHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserSessionHelper.createInstance ()
 
 					.setChatUser (
@@ -481,16 +529,17 @@ class ChatMiscLogicImplementation
 			if (sendMessage) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
-					optionalFromNullable (
-						threadId),
+					threadId,
 					"logon",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help")),
 					TemplateMissing.error,
@@ -524,91 +573,28 @@ class ChatMiscLogicImplementation
 					chat.getLocator ().getId ();
 
 				locatorManager.locate (
-					taskLogger,
+					transaction,
 					chat.getLocator ().getId (),
 					chatUser.getNumber ().getId (),
 					serviceHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"default").getId (),
-					chatUserLogic.getAffiliateId (chatUser),
+					chatUserLogic.getAffiliateId (
+						transaction,
+						chatUser),
 					new LocatorManager.AbstractCallback () {
 
 					@Override
 					public
 					void success (
-							LongLat longLat) {
+							@NonNull LongLat longLat) {
 
-						try (
-
-							OwnedTransaction transaction =
-								database.beginReadWrite (
-									taskLogger,
-									stringFormat (
-										"%s.%s.%s.%s (...)",
-										"ChatMiscLogicImplementation",
-										"userJoin",
-										"locatorCallback",
-										"success"),
-									this);
-
-						) {
-
-							ChatUserRec chatUser =
-								chatUserHelper.findRequired (
-									chatUserId);
-
-							if (longLat == null) {
-								throw new NullPointerException ();
-							}
-
-							{
-
-								if (
-									! transaction.contains (
-										chatUser)
-								) {
-
-									throw new IllegalStateException (
-										stringFormat (
-											"Chat user %s not in transaction",
-											integerToDecimalString (
-												chatUser.getId ())));
-
-								}
-
-							}
-
-							chatUser
-
-								.setLocationLongLat (
-									longLat)
-
-								.setLocationBackupLongLat (
-									longLat)
-
-								.setLocationTime (
-									transaction.now ());
-
-							LocatorRec locator =
-								locatorHelper.findRequired (
-									locatorId);
-
-							eventLogic.createEvent (
-								taskLogger,
-								"chat_user_location_locator",
-								chatUser,
-								longLat.longitude (),
-								longLat.latitude (),
-								locator);
-
-							transaction.commit ();
-
-							taskLogger.noticeFormat (
-								"Got location for %s: %s",
-								chatUser.getCode (),
-								longLat.toString ());
-
-						}
+						locatorSuccess (
+							transaction,
+							chatUserId,
+							locatorId,
+							longLat);
 
 					}
 
@@ -620,19 +606,89 @@ class ChatMiscLogicImplementation
 
 	}
 
-	@Override
-	public
-	void userLogoffWithMessage (
+	private
+	void locatorSuccess (
 			@NonNull TaskLogger parentTaskLogger,
-			ChatUserRec chatUser,
-			Long threadId,
-			boolean automatic) {
+			@NonNull Long chatUserId,
+			@NonNull Long locatorId,
+			@NonNull LongLat longLat) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
 					parentTaskLogger,
+					"userJoin");
+
+		) {
+
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					transaction,
+					chatUserId);
+
+			if (
+				! transaction.contains (
+					chatUser)
+			) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"Chat user %s not in transaction",
+						integerToDecimalString (
+							chatUser.getId ())));
+
+			}
+
+			chatUser
+
+				.setLocationLongLat (
+					longLat)
+
+				.setLocationBackupLongLat (
+					longLat)
+
+				.setLocationTime (
+					transaction.now ());
+
+			LocatorRec locator =
+				locatorHelper.findRequired (
+					transaction,
+					locatorId);
+
+			eventLogic.createEvent (
+				transaction,
+				"chat_user_location_locator",
+				chatUser,
+				longLat.longitude (),
+				longLat.latitude (),
+				locator);
+
+			transaction.commit ();
+
+			transaction.noticeFormat (
+				"Got location for %s: %s",
+				chatUser.getCode (),
+				longLat.toString ());
+
+		}
+
+	}
+
+	@Override
+	public
+	void userLogoffWithMessage (
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Optional <Long> threadId,
+			@NonNull Boolean automatic) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userLogoffWithMessage");
 
 		) {
@@ -646,12 +702,12 @@ class ChatMiscLogicImplementation
 				if (chatUser.getDateMode () != ChatUserDateMode.none) {
 
 					chatSendLogic.sendSystemMagic (
-						taskLogger,
+						transaction,
 						chatUser,
-						optionalFromNullable (
-							threadId),
+						threadId,
 						"date_stop_hint",
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"help"),
 						0l,
@@ -667,7 +723,7 @@ class ChatMiscLogicImplementation
 			// log the user off
 
 			chatUserLogic.logoff (
-				taskLogger,
+				transaction,
 				chatUser,
 				automatic);
 
@@ -676,10 +732,9 @@ class ChatMiscLogicImplementation
 			if (chatUser.getNumber () != null) {
 
 				chatSendLogic.sendSystemRbFree (
-					taskLogger,
+					transaction,
 					chatUser,
-					optionalFromNullable (
-						threadId),
+					threadId,
 					"logoff_confirm",
 					TemplateMissing.error,
 					emptyMap ());
@@ -693,61 +748,90 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void monitorsToTarget (
-			ChatRec chat,
-			Gender gender,
-			Orient orient,
-			long target) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatRec chat,
+			@NonNull Gender gender,
+			@NonNull Orient orient,
+			@NonNull Long target) {
 
-		// fetch all appropriate monitors
+		try (
 
-		List <ChatUserRec> allMonitors =
-			chatUserHelper.find (
-				chat,
-				ChatUserType.monitor,
-				orient,
-				gender);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"monitorsToTarget");
 
-		// now sort into online and offline ones
+		) {
 
-		List<ChatUserRec> onlineMonitors =
-			new ArrayList<ChatUserRec> ();
+			// fetch all appropriate monitors
 
-		List<ChatUserRec> offlineMonitors =
-			new ArrayList<ChatUserRec> ();
+			List <ChatUserRec> allMonitors =
+				chatUserHelper.find (
+					transaction,
+					chat,
+					ChatUserType.monitor,
+					orient,
+					gender);
 
-		for (ChatUserRec monitor : allMonitors) {
+			// now sort into online and offline ones
 
-			if (monitor.getOnline ()) {
-				onlineMonitors.add (monitor);
-			} else {
-				offlineMonitors.add (monitor);
+			List<ChatUserRec> onlineMonitors =
+				new ArrayList<ChatUserRec> ();
+
+			List<ChatUserRec> offlineMonitors =
+				new ArrayList<ChatUserRec> ();
+
+			for (ChatUserRec monitor : allMonitors) {
+
+				if (monitor.getOnline ()) {
+					onlineMonitors.add (monitor);
+				} else {
+					offlineMonitors.add (monitor);
+				}
 			}
-		}
 
-		// put monitors online
-		while (onlineMonitors.size () < target
-				&& offlineMonitors.size () > 0) {
+			// put monitors online
 
-			ChatUserRec monitor =
-				randomLogic.sample (
-					offlineMonitors);
+			while (
+				onlineMonitors.size () < target
+				&& offlineMonitors.size () > 0
+			) {
 
-			monitor.setOnline (true);
+				ChatUserRec monitor =
+					randomLogic.sample (
+						offlineMonitors);
 
-			onlineMonitors.add (monitor);
+				monitor
 
-		}
+					.setOnline (
+						true)
 
-		// take monitors offline
+				;
 
-		while (onlineMonitors.size () > target) {
+				onlineMonitors.add (
+					monitor);
 
-			ChatUserRec monitor =
-				randomLogic.sample (
-					onlineMonitors);
+			}
 
-			monitor.setOnline (false);
-			offlineMonitors.add (monitor);
+			// take monitors offline
+
+			while (onlineMonitors.size () > target) {
+
+				ChatUserRec monitor =
+					randomLogic.sample (
+						onlineMonitors);
+
+				monitor
+
+					.setOnline (
+						false)
+
+				;
+
+				offlineMonitors.add (
+					monitor);
+
+			}
 
 		}
 
@@ -756,22 +840,19 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void chatUserSetName (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String name,
-			@NonNull Long threadId) {
+			@NonNull Optional <Long> threadId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"chatUserSetName");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			ChatRec chat =
 				chatUser.getChat ();
@@ -781,7 +862,7 @@ class ChatMiscLogicImplementation
 
 			ChatUserNameRec chatUserName =
 				chatUserNameHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserNameHelper.createInstance ()
 
 				.setChatUser (
@@ -800,7 +881,8 @@ class ChatMiscLogicImplementation
 					ChatUserInfoStatus.moderatorPending)
 
 				.setThreadId (
-					threadId)
+					optionalOrNull (
+						threadId))
 
 			);
 
@@ -816,9 +898,9 @@ class ChatMiscLogicImplementation
 
 			if (chatUser.getQueueItem () == null) {
 
-				QueueItemRec qi =
+				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						taskLogger,
+						transaction,
 						chat,
 						"user",
 						chatUser,
@@ -827,31 +909,40 @@ class ChatMiscLogicImplementation
 							chatUser),
 						"Name to approve");
 
-				chatUser.setQueueItem (qi);
+				chatUser
+
+					.setQueueItem (
+						queueItem);
 
 			}
 
 			// send reply
 
-			if (threadId != null)
+			if (
+				optionalIsPresent (
+					threadId)
+			) {
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					chatUser,
-					optionalOf (
-						threadId),
+					threadId,
 					"name_confirm",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"name")),
 					TemplateMissing.error,
 					ImmutableMap.<String, String> builder ()
 						.put ("newName", name)
 						.build ());
+
+			}
 
 		}
 
@@ -860,6 +951,7 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	DateTimeZone timezone (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat) {
 
 		return timeFormatter.timezone (

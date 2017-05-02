@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.equalToOne;
@@ -53,11 +54,12 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.exception.DetailedException;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -78,15 +80,15 @@ class FormFieldLogic {
 
 	public <Container>
 	void implicit (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container container) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"implicit");
 
 		) {
@@ -97,7 +99,7 @@ class FormFieldLogic {
 			) {
 
 				formField.implicit (
-					taskLogger,
+					transaction,
 					container);
 
 			}
@@ -108,16 +110,16 @@ class FormFieldLogic {
 
 	public <Container>
 	void setDefaults (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container container) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"implicit");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setDefaults");
 
 		) {
 
@@ -127,7 +129,7 @@ class FormFieldLogic {
 			) {
 
 				formField.setDefault (
-					taskLogger,
+					transaction,
 					container);
 
 			}
@@ -138,7 +140,7 @@ class FormFieldLogic {
 
 	public
 	UpdateResultSet update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object container,
@@ -149,7 +151,7 @@ class FormFieldLogic {
 			new UpdateResultSet ();
 
 		update (
-			parentTaskLogger,
+			parentTransaction,
 			requestContext,
 			formFieldSet,
 			updateResultSet,
@@ -163,7 +165,7 @@ class FormFieldLogic {
 
 	public
 	void update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
@@ -172,7 +174,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		update (
-			parentTaskLogger,
+			parentTransaction,
 			requestContextToSubmission (
 				requestContext),
 			formFieldSet,
@@ -185,7 +187,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void update (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull UpdateResultSet updateResults,
@@ -195,9 +197,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"update");
 
 		) {
@@ -213,7 +215,7 @@ class FormFieldLogic {
 
 					updateResult =
 						formField.update (
-							taskLogger,
+							transaction,
 							submission,
 							container,
 							hints,
@@ -353,7 +355,7 @@ class FormFieldLogic {
 
 	public
 	void runUpdateHooks (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResultSet,
 			@NonNull Object container,
@@ -364,9 +366,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"runUpdateHooks");
 
 		) {
@@ -397,7 +399,7 @@ class FormFieldLogic {
 					continue;
 
 				formField.runUpdateHook (
-					taskLogger,
+					transaction,
 					updateResult,
 					container,
 					linkObject,
@@ -494,7 +496,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormRows (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -505,7 +507,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormRows (
-			parentTaskLogger,
+			parentTransaction,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -520,7 +522,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormAlwaysHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -531,7 +533,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormAlwaysHidden (
-			parentTaskLogger,
+			parentTransaction,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -546,7 +548,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormAlwaysHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -558,9 +560,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputFormAlwaysHidden");
 
 		) {
@@ -572,7 +574,7 @@ class FormFieldLogic {
 
 				if (
 					! formField.canView (
-						taskLogger,
+						transaction,
 						object,
 						hints)
 				) {
@@ -593,7 +595,7 @@ class FormFieldLogic {
 				}
 
 				formField.renderFormAlwaysHidden (
-					taskLogger,
+					transaction,
 					submission,
 					htmlWriter,
 					object,
@@ -609,7 +611,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTemporarilyHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -619,7 +621,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormTemporarilyHidden (
-			parentTaskLogger,
+			parentTransaction,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -633,7 +635,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormTemporarilyHidden (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -644,9 +646,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputFormTemporarilyHidden");
 
 		) {
@@ -658,7 +660,7 @@ class FormFieldLogic {
 
 				if (
 					! formField.canView (
-						taskLogger,
+						transaction,
 						object,
 						hints)
 				) {
@@ -666,7 +668,7 @@ class FormFieldLogic {
 				}
 
 				formField.renderFormTemporarilyHidden (
-					parentTaskLogger,
+					transaction,
 					submission,
 					htmlWriter,
 					object,
@@ -682,7 +684,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormRows (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -694,9 +696,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputFormRows");
 
 		) {
@@ -708,7 +710,7 @@ class FormFieldLogic {
 
 				if (
 					! formField.canView (
-						taskLogger,
+						transaction,
 						object,
 						hints)
 				) {
@@ -734,7 +736,7 @@ class FormFieldLogic {
 							updateResultOptional)
 					) {
 
-						taskLogger.errorFormat (
+						transaction.errorFormat (
 							"Unable to find update result for %s-%s",
 							formName,
 							formField.name ());
@@ -759,7 +761,7 @@ class FormFieldLogic {
 				try {
 
 					formField.renderFormRow (
-						taskLogger,
+						transaction,
 						submission,
 						htmlWriter,
 						object,
@@ -788,7 +790,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull FormType formType,
@@ -796,18 +798,29 @@ class FormFieldLogic {
 			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
-		for (
-			FormField <Container, ?, ?, ?> formField
-				: formFieldSet.formFields ()
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"outputFormReset");
+
 		) {
 
-			formField.renderFormReset (
-				parentTaskLogger,
-				javascriptWriter,
-				object,
-				hints,
-				formType,
-				formName);
+			for (
+				FormField <Container, ?, ?, ?> formField
+					: formFieldSet.formFields ()
+			) {
+
+				formField.renderFormReset (
+					transaction,
+					javascriptWriter,
+					object,
+					hints,
+					formType,
+					formName);
+
+			}
 
 		}
 
@@ -815,7 +828,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTable (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -829,7 +842,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormTable (
-			parentTaskLogger,
+			parentTransaction,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -847,7 +860,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTable (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -862,15 +875,15 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputFormTable");
 
 		) {
 
 			outputFormDebug (
-				taskLogger,
+				transaction,
 				formatWriter,
 				formFieldSet,
 				object,
@@ -907,7 +920,7 @@ class FormFieldLogic {
 				formatWriter);
 
 			outputFormRows (
-				taskLogger,
+				transaction,
 				submission,
 				formatWriter,
 				formFieldSet,
@@ -940,7 +953,7 @@ class FormFieldLogic {
 
 	public
 	void outputDetailsTable (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
@@ -948,9 +961,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputDetailsTable");
 
 		) {
@@ -959,7 +972,7 @@ class FormFieldLogic {
 				htmlWriter);
 
 			outputTableRows (
-				taskLogger,
+				transaction,
 				htmlWriter,
 				formFieldSet,
 				object,
@@ -973,7 +986,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputListTable (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull List <Container> objects,
@@ -982,9 +995,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputListTable");
 
 		) {
@@ -1036,7 +1049,7 @@ class FormFieldLogic {
 						htmlWriter);
 
 					outputTableCellsList (
-						taskLogger,
+						transaction,
 						htmlWriter,
 						formFieldSet,
 						object,
@@ -1061,51 +1074,62 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputCsvRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter csvWriter,
 			@NonNull List <FormFieldSet <Container>> formFieldSets,
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints) {
 
-		boolean first = true;
+		try (
 
-		for (
-			FormFieldSet <Container> formFieldSet
-				: formFieldSets
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"outputCsvRow");
+
 		) {
 
+			boolean first = true;
+
 			for (
-				FormField <Container, ?, ?, ?> formField
-					: formFieldSet.formFields ()
+				FormFieldSet <Container> formFieldSet
+					: formFieldSets
 			) {
 
-				if (! first) {
+				for (
+					FormField <Container, ?, ?, ?> formField
+						: formFieldSet.formFields ()
+				) {
 
-					csvWriter.writeFormat (
-						",");
+					if (! first) {
+
+						csvWriter.writeFormat (
+							",");
+
+					}
+
+					formField.renderCsvRow (
+						transaction,
+						csvWriter,
+						object,
+						hints);
+
+					first = false;
 
 				}
 
-				formField.renderCsvRow (
-					parentTaskLogger,
-					csvWriter,
-					object,
-					hints);
-
-				first = false;
-
 			}
 
-		}
+			csvWriter.writeFormat (
+				"\n");
 
-		csvWriter.writeFormat (
-			"\n");
+		}
 
 	}
 
 	public <Container>
 	void outputTableCellsList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
@@ -1114,9 +1138,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputTableCellsList");
 
 		) {
@@ -1129,7 +1153,7 @@ class FormFieldLogic {
 				try {
 
 					formField.renderTableCellList (
-						taskLogger,
+						transaction,
 						htmlWriter,
 						object,
 						hints,
@@ -1156,7 +1180,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputTableRowsList (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
@@ -1165,9 +1189,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputTableRowsList");
 
 		) {
@@ -1178,10 +1202,10 @@ class FormFieldLogic {
 			) {
 
 				formField.renderTableCellList (
-					taskLogger,
+					transaction,
 					htmlWriter,
 					object,
-					ImmutableMap.of (),
+					emptyMap (),
 					links,
 					columnSpan);
 
@@ -1193,7 +1217,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputTableRows (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
@@ -1201,9 +1225,9 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputTableRows");
 
 		) {
@@ -1215,7 +1239,7 @@ class FormFieldLogic {
 
 				if (
 					! formField.canView (
-						taskLogger,
+						transaction,
 						object,
 						hints)
 				) {
@@ -1230,7 +1254,7 @@ class FormFieldLogic {
 					formField.label ());
 
 				formField.renderTableCellProperties (
-					taskLogger,
+					transaction,
 					htmlWriter,
 					object,
 					hints);
@@ -1246,7 +1270,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormDebug (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Container object,
@@ -1254,16 +1278,16 @@ class FormFieldLogic {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"outputFormDebug");
 
 		) {
 
 			if (
 				! privChecker.canSimple (
-					taskLogger,
+					transaction,
 					GlobalId.root,
 					"debug")
 			) {

@@ -13,7 +13,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("identityFormFieldAccessor")
@@ -36,7 +36,7 @@ class IdentityFormFieldAccessor <Container>
 	@Override
 	public
 	Optional <Container> read (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
 		return Optional.of (
@@ -47,7 +47,7 @@ class IdentityFormFieldAccessor <Container>
 	@Override
 	public
 	void write (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Container> nativeValue) {
 

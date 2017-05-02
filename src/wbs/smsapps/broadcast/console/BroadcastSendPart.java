@@ -4,6 +4,7 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenMethod;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
@@ -15,9 +16,12 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -33,6 +37,9 @@ class BroadcastSendPart
 	@SingletonDependency
 	BroadcastConsoleHelper broadcastHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
@@ -45,240 +52,264 @@ class BroadcastSendPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		broadcast =
-			broadcastHelper.findFromContextRequired ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			broadcast =
+				broadcastHelper.findFromContextRequired (
+					transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		switch (broadcast.getState ()) {
+		try (
 
-		case cancelled:
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast has been cancelled and can no longer be ",
-				"sent.</p>");
+		) {
 
-			break;
+			switch (broadcast.getState ()) {
 
-		case partiallySent:
+			case cancelled:
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast was partially sent and then cancelled. It ",
-				"can no longer be sent.</p>");
+				htmlParagraphWriteFormat (
+					"This broadcast has been cancelled and can no longer be ",
+					"sent.");
 
-			break;
+				break;
 
-		case scheduled:
+			case partiallySent:
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast has been scheduled but not yet sent. It ",
-				"can be unscheduled or cancelled.</p>");
+				htmlParagraphWriteFormat (
+					"This broadcast was partially sent and then cancelled. It ",
+					"can no longer be sent.");
 
-			goDetails ();
+				break;
 
-			// unschedule
+			case scheduled:
 
-			htmlHeadingTwoWrite (
-				"Unschedule");
+				htmlParagraphWriteFormat (
+					"This broadcast has been scheduled but not yet sent. It ",
+					"can be unscheduled or cancelled.");
 
-			formatWriter.writeLineFormat (
-				"<p>Unscheduling a broadcast will prevent it from being sent. ",
-				"You will be able to add and remove numbers and send or ",
-				"schedule it again.</p>");
+				goDetails ();
 
-			htmlFormOpenPost ();
+				// unschedule
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Unschedule");
 
-			formatWriter.writeFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"unschedule\"",
-				" value=\"unschedule\"",
-				">");
+				formatWriter.writeLineFormat (
+					"<p>Unscheduling a broadcast will prevent it from being sent. ",
+					"You will be able to add and remove numbers and send or ",
+					"schedule it again.</p>");
 
-			htmlParagraphClose ();
+				htmlFormOpenPost ();
 
-			htmlFormClose ();
+				htmlParagraphOpen ();
 
-			// cancel
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"unschedule\"",
+					" value=\"unschedule\"",
+					">");
 
-			htmlHeadingTwoWrite (
-				"Cancel");
+				htmlParagraphClose ();
 
-			formatWriter.writeLineFormat (
-				"<p>Cancelling a broadcast will stop it from being sent, now ",
-				"or in the future.</p>");
+				htmlFormClose ();
 
-			htmlFormOpenPost ();
+				// cancel
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Cancel");
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"cancel\"",
-				" value=\"cancel\"",
-				">");
+				formatWriter.writeLineFormat (
+					"<p>Cancelling a broadcast will stop it from being sent, now ",
+					"or in the future.</p>");
 
-			htmlParagraphClose ();
+				htmlFormOpenPost ();
 
-			htmlFormClose ();
+				htmlParagraphOpen ();
 
-			break;
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"cancel\"",
+					" value=\"cancel\"",
+					">");
 
-		case sending:
+				htmlParagraphClose ();
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast is being sent. It can be cancelled.</p>");
+				htmlFormClose ();
 
-			goDetails ();
+				break;
 
-			htmlHeadingTwoWrite (
-				"Cancel");
+			case sending:
 
-			formatWriter.writeFormat (
-				"<p>Cancelling a broadcast will stop the current send and ",
-				"prevent it from being sent in the future.</p>");
+				formatWriter.writeLineFormat (
+					"<p>This broadcast is being sent. It can be cancelled.</p>");
 
-			htmlFormOpenPost ();
+				goDetails ();
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Cancel");
 
-			formatWriter.writeFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"cancel\"",
-				" value=\"cancel\"",
-				">");
+				formatWriter.writeFormat (
+					"<p>Cancelling a broadcast will stop the current send and ",
+					"prevent it from being sent in the future.</p>");
 
-			htmlParagraphClose ();
+				htmlFormOpenPost ();
 
-			htmlFormClose ();
+				htmlParagraphOpen ();
 
-			break;
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"cancel\"",
+					" value=\"cancel\"",
+					">");
 
-		case sent:
+				htmlParagraphClose ();
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast has already been sent.</p>");
+				htmlFormClose ();
 
-			break;
+				break;
 
-		case unsent:
+			case sent:
 
-			formatWriter.writeLineFormat (
-				"<p>This broadcast has not yet been sent. It can be sent now ",
-				"or scheduled to automatically sent at a specific time in the ",
-				"future. Alternatively, it can be cancelled.</p>");
+				formatWriter.writeLineFormat (
+					"<p>This broadcast has already been sent.</p>");
 
-			goDetails ();
+				break;
 
-			// send broadcast
+			case unsent:
 
-			htmlHeadingTwoWrite (
-				"Send now");
+				formatWriter.writeLineFormat (
+					"<p>This broadcast has not yet been sent. It can be sent now ",
+					"or scheduled to automatically sent at a specific time in the ",
+					"future. Alternatively, it can be cancelled.</p>");
 
-			formatWriter.writeFormat (
-				"<p>Sending a broadcast will begin sending messages ",
-				"immediately.</p>");
+				goDetails ();
 
-			htmlFormOpenMethod (
-				"post");
+				// send broadcast
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Send now");
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"send\"",
-				" value=\"send\"",
-				">");
+				formatWriter.writeFormat (
+					"<p>Sending a broadcast will begin sending messages ",
+					"immediately.</p>");
 
-			htmlParagraphClose ();
+				htmlFormOpenMethod (
+					"post");
 
-			htmlFormClose ();
+				htmlParagraphOpen ();
 
-			// schedule broadcast
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"send\"",
+					" value=\"send\"",
+					">");
 
-			htmlHeadingTwoWrite (
-				"Schedule");
+				htmlParagraphClose ();
 
-			formatWriter.writeLineFormat (
-				"<p>Scheduling this broadcast will cause it to be sent ",
-				"automatically at the specified time in the future.</p>");
+				htmlFormClose ();
 
-			htmlFormOpenMethod (
-				"post");
+				// schedule broadcast
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Schedule");
 
-			formatWriter.writeLineFormat (
-				"Time and date<br>");
+				formatWriter.writeLineFormat (
+					"<p>Scheduling this broadcast will cause it to be sent ",
+					"automatically at the specified time in the future.</p>");
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"timestamp\"",
-				" value=\"%h\"",
-				userConsoleLogic.timestampWithTimezoneString (
-					transaction.now ()),
-				">");
+				htmlFormOpenMethod (
+					"post");
 
-			htmlParagraphClose ();
+				htmlParagraphOpen ();
 
-			htmlParagraphOpen ();
+				formatWriter.writeLineFormat (
+					"Time and date<br>");
 
-			formatWriter.writeFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"schedule\"",
-				" value=\"schedule\"",
-				">");
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"text\"",
+					" name=\"timestamp\"",
+					" value=\"%h\"",
+					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
+						transaction.now ()),
+					">");
 
-			htmlParagraphClose ();
+				htmlParagraphClose ();
 
-			htmlFormClose ();
+				htmlParagraphOpen ();
 
-			// cancel broadcast
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"schedule\"",
+					" value=\"schedule\"",
+					">");
 
-			htmlHeadingTwoWrite (
-				"Cancel");
+				htmlParagraphClose ();
 
-			formatWriter.writeLineFormat (
-				"<p>Cancelling a broadcast will prevent it from being sent in ",
-				"the future.</p>");
+				htmlFormClose ();
 
-			htmlFormOpenMethod (
-				"post");
+				// cancel broadcast
 
-			htmlParagraphOpen ();
+				htmlHeadingTwoWrite (
+					"Cancel");
 
-			formatWriter.writeFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"cancel\"",
-				" value=\"cancel\"",
-				">");
+				formatWriter.writeLineFormat (
+					"<p>Cancelling a broadcast will prevent it from being sent in ",
+					"the future.</p>");
 
-			htmlParagraphClose ();
+				htmlFormOpenMethod (
+					"post");
 
-			// close form
+				htmlParagraphOpen ();
 
-			htmlFormClose ();
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"cancel\"",
+					" value=\"cancel\"",
+					">");
 
-			break;
+				htmlParagraphClose ();
 
-		default:
+				// close form
 
-			throw new RuntimeException ();
+				htmlFormClose ();
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 

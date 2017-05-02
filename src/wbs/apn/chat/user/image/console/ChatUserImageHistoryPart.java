@@ -28,8 +28,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -72,32 +73,44 @@ class ChatUserImageHistoryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		type =
-			toEnum (
-				ChatUserImageType.class,
-				requestContext.stuffString (
-					"chatUserImageType"));
+		try (
 
-		chatUser =
-			chatUserHelper.findFromContextRequired ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		chatUserImages =
-			new TreeSet<> (
-				chatUser.getChatUserImages ());
+		) {
 
-		Iterator <ChatUserImageRec> iterator =
-			chatUserImages.iterator ();
+			type =
+				toEnum (
+					ChatUserImageType.class,
+					requestContext.stuffString (
+						"chatUserImageType"));
 
-		while (iterator.hasNext ()) {
+			chatUser =
+				chatUserHelper.findFromContextRequired (
+					transaction);
 
-			if (
-				enumNotEqualSafe (
-					iterator.next ().getType (),
-					type)
-			) {
-				iterator.remove ();
+			chatUserImages =
+				new TreeSet<> (
+					chatUser.getChatUserImages ());
+
+			Iterator <ChatUserImageRec> iterator =
+				chatUserImages.iterator ();
+
+			while (iterator.hasNext ()) {
+
+				if (
+					enumNotEqualSafe (
+						iterator.next ().getType (),
+						type)
+				) {
+					iterator.remove ();
+				}
+
 			}
 
 		}
@@ -107,13 +120,13 @@ class ChatUserImageHistoryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -174,7 +187,7 @@ class ChatUserImageHistoryPart
 				) {
 
 					mediaConsoleLogic.writeMediaThumb100 (
-						taskLogger,
+						transaction,
 						chatUserImage.getMedia ());
 
 				} else {
@@ -190,6 +203,7 @@ class ChatUserImageHistoryPart
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithoutTimezoneString (
+						transaction,
 						chatUserImage.getTimestamp ()));
 
 				// status
@@ -201,13 +215,16 @@ class ChatUserImageHistoryPart
 
 				htmlTableCellWrite (
 					objectManager.objectPathMini (
+						transaction,
 						chatUserImage.getModerator (),
-						userConsoleLogic.sliceRequired ()));
+						userConsoleLogic.sliceRequired (
+							transaction)));
 
 				// moderation time
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithoutTimezoneString (
+						transaction,
 						chatUserImage.getModerationTime ()));
 
 				// end row

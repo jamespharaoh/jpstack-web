@@ -2,7 +2,7 @@ package wbs.apn.chat.help.logic;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -13,7 +13,7 @@ public
 interface ChatHelpLogic {
 
 	void sendHelpMessage (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserRec user,
 			ChatUserRec chatUser,
 			String text,

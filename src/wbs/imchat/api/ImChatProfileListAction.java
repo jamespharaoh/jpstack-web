@@ -66,25 +66,19 @@ class ImChatProfileListAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"handle");
-
-		// begin transaction
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"ImChatProfileListAction.handle ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"handle");
 
 		) {
 
 			ImChatRec imChat =
 				imChatHelper.findRequired (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
@@ -93,6 +87,7 @@ class ImChatProfileListAction
 
 			List <ImChatProfileRec> profiles =
 				imChatProfileHelper.findByParent (
+					transaction,
 					imChat);
 
 			Collections.sort (
@@ -116,6 +111,7 @@ class ImChatProfileListAction
 
 				profileDatas.add (
 					imChatApiLogic.profileData (
+						transaction,
 						profile));
 
 			}

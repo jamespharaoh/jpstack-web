@@ -79,21 +79,16 @@ class ManualResponderDelivery
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handle");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ManualResopnderDelivery.handle (deliveryId, ref)",
-					this);
+					logContext,
+					"handle");
 
 		) {
 
 			DeliveryRec delivery =
 				deliveryHelper.findRequired (
+					transaction,
 					deliveryId);
 
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
@@ -103,6 +98,7 @@ class ManualResponderDelivery
 
 				ManualResponderReplyRec reply =
 					manualResponderReplyHelper.findRequired (
+						transaction,
 						deliveryMessage.getRef ());
 
 				Long deliveryMessageIndex =
@@ -123,7 +119,7 @@ class ManualResponderDelivery
 					if (nextMessage.getStatus () == MessageStatus.held) {
 
 						outboxLogic.unholdMessage (
-							taskLogger,
+							transaction,
 							nextMessage);
 
 					}
@@ -139,6 +135,7 @@ class ManualResponderDelivery
 
 				ManualResponderReplyRec reply =
 					manualResponderReplyHelper.findRequired (
+						transaction,
 						deliveryMessage.getRef ());
 
 				Long deliveryMessageIndex =
@@ -160,7 +157,7 @@ class ManualResponderDelivery
 					if (heldMessage.getStatus () == MessageStatus.held) {
 
 						messageLogic.messageStatus (
-							taskLogger,
+							transaction,
 							heldMessage,
 							MessageStatus.cancelled);
 
@@ -171,6 +168,7 @@ class ManualResponderDelivery
 			}
 
 			deliveryHelper.remove (
+				transaction,
 				delivery);
 
 			transaction.commit ();

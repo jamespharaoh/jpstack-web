@@ -1,14 +1,15 @@
 package wbs.apn.chat.user.image.api;
 
-import com.google.common.collect.ImmutableMap;
+import static wbs.utils.collection.MapUtils.emptyMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -53,53 +54,78 @@ class ChatUserImageUploadErrorPage
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		imageUploadToken =
-			chatUserImageUploadTokenHelper.findByToken (
-				requestContext.requestStringRequired (
-					"chatUserImageUploadToken"));
+		try (
 
-		chatUser =
-			imageUploadToken.getChatUser ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		titleText =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_error_title",
-				ImmutableMap.<String,String> of ());
+		) {
 
-		bodyHtml =
-			chatSendLogic.renderTemplate (
-				chatUser,
-				"web",
-				"image_upload_error_body",
-				ImmutableMap.<String,String> of ());
+			imageUploadToken =
+				chatUserImageUploadTokenHelper.findByToken (
+					transaction,
+					requestContext.requestStringRequired (
+						"chatUserImageUploadToken"));
+
+			chatUser =
+				imageUploadToken.getChatUser ();
+
+			titleText =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_error_title",
+					emptyMap ());
+
+			bodyHtml =
+				chatSendLogic.renderTemplate (
+					transaction,
+					chatUser,
+					"web",
+					"image_upload_error_body",
+					emptyMap ());
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.addHeader (
-			"Content-Type",
-			"text/html");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeaders");
+
+		) {
+
+			requestContext.addHeader (
+				"Content-Type",
+				"text/html");
+
+		}
 
 	}
 
 	@Override
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goContent");
 
 		) {
@@ -111,10 +137,10 @@ class ChatUserImageUploadErrorPage
 				"<html>");
 
 			goHead (
-				taskLogger);
+				transaction);
 
 			goBody (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -125,13 +151,13 @@ class ChatUserImageUploadErrorPage
 
 	protected
 	void goHead (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goHead");
 
 		) {
@@ -152,21 +178,32 @@ class ChatUserImageUploadErrorPage
 
 	protected
 	void goBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<body>");
+		try (
 
-		formatWriter.writeLineFormat (
-			"<h1>%h</h1>",
-			titleText);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goBody");
 
-		formatWriter.writeFormat (
-			"%s\n",
-			bodyHtml);
+		) {
 
-		formatWriter.writeLineFormatDecreaseIndent (
-			"</body>");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<body>");
+
+			formatWriter.writeLineFormat (
+				"<h1>%h</h1>",
+				titleText);
+
+			formatWriter.writeFormat (
+				"%s\n",
+				bodyHtml);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</body>");
+
+		}
 
 	}
 

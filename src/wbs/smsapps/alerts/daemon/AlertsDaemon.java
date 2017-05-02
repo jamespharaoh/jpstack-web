@@ -26,7 +26,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
@@ -128,16 +130,11 @@ class AlertsDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"runOnce ()");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"AlertsDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
@@ -153,7 +150,10 @@ class AlertsDaemon
 			// find alerts settings pending
 
 			List <Long> alertsSettingsIds =
-				alertsSettingsHelper.findAll ().stream ()
+				alertsSettingsHelper.findAll (
+					transaction)
+
+				.stream ()
 
 				.filter (
 					alertsSettings ->
@@ -194,19 +194,19 @@ class AlertsDaemon
 				try {
 
 					runOnce (
-						taskLogger,
+						transaction,
 						alertsSettingsId);
 
 				} catch (Exception exception) {
 
-					taskLogger.errorFormatException (
+					transaction.errorFormatException (
 						exception,
 						"Error checking alerts for %s",
 						integerToDecimalString (
 							alertsSettingsId));
 
 					exceptionLogger.logThrowable (
-						taskLogger,
+						transaction,
 						"daemon",
 						"alerts daemon " + alertsSettingsId,
 						exception,
@@ -228,28 +228,22 @@ class AlertsDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"runOnce (%s)",
-					integerToDecimalString (
-						alertsSettingsId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"AlertsDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"checking if we should send an alert for %s",
 				integerToDecimalString (
 					alertsSettingsId));
 
 			AlertsSettingsRec alertsSettings =
 				alertsSettingsHelper.findRequired (
+					transaction,
 					alertsSettingsId);
 
 			// check it's still pending
@@ -286,6 +280,7 @@ class AlertsDaemon
 
 				Record<?> subject =
 					objectManager.findObject (
+						transaction,
 						new GlobalId (
 							alertsSubject.getObjectType ().getId (),
 							alertsSubject.getObjectId ()));
@@ -305,11 +300,13 @@ class AlertsDaemon
 
 			for (
 				QueueSubjectRec queueSubject
-					: queueSubjectHelper.findActive ()
+					: queueSubjectHelper.findActive (
+						transaction)
 			) {
 
 				if (
 					! isSubject (
+						transaction,
 						subjects,
 						queueSubject.getQueue ())
 				) {
@@ -321,6 +318,7 @@ class AlertsDaemon
 				for (
 					QueueItemRec queueItem
 						: queueLogic.getActiveQueueItems (
+							transaction,
 							queueSubject)
 				) {
 
@@ -358,22 +356,22 @@ class AlertsDaemon
 						.toStandardSeconds ()
 						.getSeconds ());
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"now is %s",
 				timeFormatter.timestampSecondStringIso (
 					now));
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"oldest is %s",
 				timeFormatter.timestampSecondStringIso (
 					oldest));
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"oldest duration is %s",
 				timeFormatter.prettyDuration (
 					maxDurationFoundInQueue));
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"unclaimed count is %s",
 				integerToDecimalString (
 					numUnclaimed));
@@ -389,17 +387,19 @@ class AlertsDaemon
 
 			boolean alertDue;
 
-			if (! maxDurationExceeded
-					&& ! maxItemsExceeded) {
+			if (
+				! maxDurationExceeded
+				&& ! maxItemsExceeded
+			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"everything within limits");
 
 				alertDue = false;
 
 			} else if (maxDurationExceeded) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"maximum duration of %s exceeded",
 					maxDurationAllowedInQueue.toString ());
 
@@ -407,7 +407,7 @@ class AlertsDaemon
 
 			} else if (maxItemsExceeded) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"maximum unclaimed count of %s exceeded",
 					integerToDecimalString (
 						alertsSettings.getMaxItemsInQueue ()));
@@ -424,7 +424,7 @@ class AlertsDaemon
 
 			TextRec messageText =
 				constructMessage (
-					taskLogger,
+					transaction,
 					alertsSettings,
 					numUnclaimed,
 					maxDurationFoundInQueue);
@@ -433,7 +433,6 @@ class AlertsDaemon
 
 			boolean sentRecently =
 				checkSentRecently (
-					taskLogger,
 					transaction,
 					alertsSettings);
 
@@ -449,14 +448,14 @@ class AlertsDaemon
 
 				long numSent =
 					sendAlerts (
-						taskLogger,
+						transaction,
 						alertsSettings,
 						messageText);
 
 				// create alert
 
 				alertsAlertHelper.insert (
-					taskLogger,
+					transaction,
 					alertsAlertHelper.createInstance ()
 
 					.setAlertsSettings (
@@ -497,7 +496,7 @@ class AlertsDaemon
 			// create status check log
 
 			alertsStatusCheckHelper.insert (
-				taskLogger,
+				transaction,
 				alertsStatusCheckHelper.createInstance ()
 
 				.setAlertsSettings (
@@ -549,16 +548,16 @@ class AlertsDaemon
 
 	private
 	TextRec constructMessage (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull AlertsSettingsRec alertsSettings,
 			@NonNull Long numUnclaimed,
 			@NonNull Duration maximumDuration) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"constructMessage");
 
 		) {
@@ -584,13 +583,13 @@ class AlertsDaemon
 				.substitute (
 					alertsSettings.getTemplate ());
 
-			taskLogger.warningFormat (
+			transaction.warningFormat (
 				"%s",
 				message);
 
 			TextRec messageText =
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					message);
 
 			return messageText;
@@ -599,16 +598,16 @@ class AlertsDaemon
 
 	}
 
+	private
 	boolean checkSentRecently (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull AlertsSettingsRec alertsSettings) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"checkSentRecently");
 
 		) {
@@ -621,7 +620,7 @@ class AlertsDaemon
 			if (alertsSettings.getLastAlert () == null)
 				return false;
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"last alert was at %s",
 				timeFormatter.timestampSecondStringIso (
 					alertsSettings.getLastAlert ()));
@@ -631,7 +630,7 @@ class AlertsDaemon
 					alertsSettings.getLastAlert (),
 					transaction.now ());
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"duration since last alert is %s",
 				timeFormatter.prettyDuration (
 					durationSinceLastSend));
@@ -642,7 +641,7 @@ class AlertsDaemon
 					minAlertFrequency)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"mininum alert frequency of %s not exceeded",
 					timeFormatter.prettyDuration (
 						minAlertFrequency));
@@ -651,7 +650,7 @@ class AlertsDaemon
 
 			} else {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"minimum alert frequency of %s exceeded",
 					timeFormatter.prettyDuration (
 						minAlertFrequency));
@@ -710,34 +709,48 @@ class AlertsDaemon
 
 	public
 	boolean isSubject (
-			Map<Record<?>,AlertsSubjectRec> subjects,
-			Record<?> object) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <Record <?>, AlertsSubjectRec> subjects,
+			@NonNull Record <?> object) {
 
-		Record<?> parent =
-			objectManager.firstParent (
-				object,
-				subjects.keySet ());
+		try (
 
-		if (parent == null)
-			return false;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"isSubject");
 
-		AlertsSubjectRec alertsSubject =
-			subjects.get (parent);
+		) {
 
-		return alertsSubject.getInclude ();
+			Record <?> parent =
+				objectManager.firstParent (
+					transaction,
+					object,
+					subjects.keySet ());
+
+			if (parent == null)
+				return false;
+
+			AlertsSubjectRec alertsSubject =
+				subjects.get (parent);
+
+			return alertsSubject.getInclude ();
+
+		}
 
 	}
 
+	private
 	int sendAlerts (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull AlertsSettingsRec alertsSettings,
 			@NonNull TextRec messageText) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"sendAlerts");
 
 		) {
@@ -754,17 +767,19 @@ class AlertsDaemon
 				if (! alertsNumber.getEnabled ())
 					continue;
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"sending alert to %s",
 					alertsNumber.getNumber ().getNumber ());
 
 				ServiceRec alertsService =
 					serviceHelper.findByCodeRequired (
+						transaction,
 						alertsSettings,
 						"alerts");
 
 				RouteRec route =
 					routerLogic.resolveRouter (
+						transaction,
 						alertsSettings.getRouter ());
 
 				messageSenderProvider.get ()
@@ -785,7 +800,7 @@ class AlertsDaemon
 						alertsService)
 
 					.send (
-						taskLogger);
+						transaction);
 
 				numSent ++;
 

@@ -88,27 +88,23 @@ class ObjectSearchGetAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectSearchGetAction.goReal",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			UserRec user =
-				userConsoleLogic.userRequired ();
+				userConsoleLogic.userRequired (
+					transaction);
 
 			Optional <Serializable> searchOptional =
 				userSessionLogic.userDataObject (
-					taskLogger,
+					transaction,
 					user,
 					stringFormat (
 						"object_search_%s_fields",
@@ -117,6 +113,7 @@ class ObjectSearchGetAction
 			Optional <List <Long>> objectIdsOptional =
 				optionalMapRequired (
 					userSessionLogic.userDataString (
+						transaction,
 						user,
 						stringFormat (
 							"object_search_%s_results",
@@ -138,7 +135,7 @@ class ObjectSearchGetAction
 			) {
 
 				userSessionLogic.userDataRemove (
-					taskLogger,
+					transaction,
 					user,
 					stringFormat (
 						"object_search_%s_results",

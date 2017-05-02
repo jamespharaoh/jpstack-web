@@ -1,5 +1,7 @@
 package wbs.apn.chat.broadcast.hibernate;
 
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.List;
 
 import lombok.NonNull;
@@ -8,12 +10,17 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.broadcast.model.ChatBroadcastState;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.apn.chat.broadcast.model.ChatBroadcastDao;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.hibernate.HibernateDao;
 
 @SingletonComponent ("chatBroadcastDao")
 public
@@ -21,85 +28,133 @@ class ChatBroadcastDaoHibernate
 	extends HibernateDao
 	implements ChatBroadcastDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<ChatBroadcastRec> findRecentWindow (
+	List <ChatBroadcastRec> findRecentWindow (
+			@NonNull Transaction parentTransaction,
 			@NonNull ChatRec chat,
-			int firstResult,
-			int maxResults) {
+			@NonNull Long firstResult,
+			@NonNull Long maxResults) {
 
-		return findMany (
-			"findManyWindow (chat, firstResult, maxResults)",
-			ChatBroadcastRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findRecentWindow");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatBroadcastRec.class,
-				"_chatBroadcast")
 
-			.add (
-				Restrictions.eq (
-					"_chatBroadcast.chat",
-					chat))
+				createCriteria (
+					transaction,
+					ChatBroadcastRec.class,
+					"_chatBroadcast")
 
-			.addOrder (
-				Order.desc (
-					"_chatBroadcast.createdTime"))
+				.add (
+					Restrictions.eq (
+						"_chatBroadcast.chat",
+						chat))
 
-			.setFirstResult (
-				firstResult)
+				.addOrder (
+					Order.desc (
+						"_chatBroadcast.createdTime"))
 
-			.setMaxResults (
-				maxResults)
+				.setFirstResult (
+					toJavaIntegerRequired (
+						firstResult))
 
-		);
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatBroadcastRec> findSending () {
+	List <ChatBroadcastRec> findSending (
+			@NonNull Transaction parentTransaction) {
 
-		return findMany (
-			"findSending",
-			ChatBroadcastRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findSending");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatBroadcastRec.class,
-				"_chatBroadcast")
 
-			.add (
-				Restrictions.eq (
-					"_chatBroadcast.state",
-					ChatBroadcastState.sending))
+				createCriteria (
+					transaction,
+					ChatBroadcastRec.class,
+					"_chatBroadcast")
 
-		);
+				.add (
+					Restrictions.eq (
+						"_chatBroadcast.state",
+						ChatBroadcastState.sending))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<ChatBroadcastRec> findScheduled (
+	List <ChatBroadcastRec> findScheduled (
+			@NonNull Transaction parentTransaction,
 			@NonNull Instant scheduledTime) {
 
-		return findMany (
-			"findScheduled (scheduledTime)",
-			ChatBroadcastRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findScheduled");
+
+		) {
+
+			return findMany (
+				transaction,
 				ChatBroadcastRec.class,
-				"_chatBroadcast")
 
-			.add (
-				Restrictions.eq (
-					"_chatBroadcast.state",
-					ChatBroadcastState.scheduled))
+				createCriteria (
+					transaction,
+					ChatBroadcastRec.class,
+					"_chatBroadcast")
 
-			.add (
-				Restrictions.le (
-					"_chatBroadcast.scheduledTime",
-					scheduledTime))
+				.add (
+					Restrictions.eq (
+						"_chatBroadcast.state",
+						ChatBroadcastState.scheduled))
 
-		);
+				.add (
+					Restrictions.le (
+						"_chatBroadcast.scheduledTime",
+						scheduledTime))
+
+			);
+
+		}
 
 	}
 

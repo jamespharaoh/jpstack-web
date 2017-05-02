@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import com.google.common.base.Optional;
 
@@ -12,29 +14,47 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("timestampTimezonePairFormFieldNativeMapping")
 public
-class TimestampTimezonePairFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,DateTime,Pair<Instant,String>> {
+class TimestampTimezonePairFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <
+		Container,
+		DateTime,
+		Pair <Instant, String>
+	> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
-	Optional<DateTime> nativeToGeneric (
+	Optional <DateTime> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<Pair<Instant,String>> nativeValue) {
+			@NonNull Optional <Pair <Instant, String>> nativeValue) {
 
-		if (! nativeValue.isPresent ()) {
-			return Optional.<DateTime>absent ();
+		if (
+			optionalIsNotPresent (
+				nativeValue)
+		) {
+			return optionalAbsent ();
 		}
 
 		DateTimeZone timeZone =
 			DateTimeZone.forID (
 				nativeValue.get ().getRight ());
 
-		return Optional.of (
+		return optionalOf (
 			new DateTime (
 				nativeValue.get ().getLeft (),
 				timeZone));
@@ -44,18 +64,29 @@ class TimestampTimezonePairFormFieldNativeMapping<Container>
 	@Override
 	public
 	Optional <Pair <Instant, String>> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <DateTime> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return optionalAbsent ();
-		}
+		try (
 
-		return Optional.of (
-			Pair.of (
-				genericValue.get ().toInstant (),
-				genericValue.get ().getZone ().getID ()));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToNative");
+
+		) {
+
+			if (! genericValue.isPresent ()) {
+				return optionalAbsent ();
+			}
+
+			return optionalOf (
+				Pair.of (
+					genericValue.get ().toInstant (),
+					genericValue.get ().getZone ().getID ()));
+
+		}
 
 	}
 

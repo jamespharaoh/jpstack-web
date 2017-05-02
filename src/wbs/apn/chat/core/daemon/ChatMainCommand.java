@@ -26,10 +26,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -168,24 +169,25 @@ class ChatMainCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"handleSimple");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"handle");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: begin processing",
 				integerToDecimalString (
 					inbox.getId ()));
 
 			commandChatScheme =
 				chatSchemeHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			chat =
@@ -196,17 +198,17 @@ class ChatMainCommand
 
 			fromChatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					smsMessage);
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: full text \"%s\"",
 				integerToDecimalString (
 					inbox.getId ()),
 				smsMessage.getText ().getText ());
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: rest \"%s\"",
 				integerToDecimalString (
 					inbox.getId ()),
@@ -215,6 +217,7 @@ class ChatMainCommand
 			// set chat scheme and adult verify
 
 			chatUserLogic.setScheme (
+				transaction,
 				fromChatUser,
 				commandChatScheme);
 
@@ -224,7 +227,7 @@ class ChatMainCommand
 			) {
 
 				chatUserLogic.adultVerify (
-					taskLogger,
+					transaction,
 					fromChatUser);
 
 			}
@@ -233,7 +236,7 @@ class ChatMainCommand
 
 			Optional <InboxAttemptRec> dobInboxAttempt =
 				tryDob (
-					taskLogger);
+					transaction);
 
 			if (dobInboxAttempt.isPresent ()) {
 				return dobInboxAttempt.get ();
@@ -247,7 +250,7 @@ class ChatMainCommand
 						rest)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: trying keyword \"%s\"",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -258,7 +261,7 @@ class ChatMainCommand
 				if (match.simpleKeyword ().matches ("\\d{6}")) {
 
 					return doCode (
-						taskLogger,
+						transaction,
 						match.simpleKeyword (),
 						match.rest ());
 
@@ -268,7 +271,7 @@ class ChatMainCommand
 
 				Optional <InboxAttemptRec> keywordInboxAttempt =
 					tryKeyword (
-						taskLogger,
+						transaction,
 						match.simpleKeyword (),
 						match.rest ());
 
@@ -283,14 +286,14 @@ class ChatMainCommand
 
 				if (chat.getErrorOnUnrecognised ()) {
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"message %s: ",
 						integerToDecimalString (
 							inbox.getId ()),
 						"no keyword found, new user, sending error");
 
 					chatHelpLogLogic.createChatHelpLogIn (
-						taskLogger,
+						transaction,
 						fromChatUser,
 						smsMessage,
 						rest,
@@ -298,7 +301,7 @@ class ChatMainCommand
 						false);
 
 					chatSendLogic.sendSystemRbFree (
-						taskLogger,
+						transaction,
 						fromChatUser,
 						optionalOf (
 							smsMessage.getThreadId ()),
@@ -307,20 +310,22 @@ class ChatMainCommand
 						emptyMap ());
 
 					return smsInboxLogic.inboxProcessed (
-						taskLogger,
+						transaction,
 						inbox,
 						optionalOf (
 							serviceHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"default")),
 						optionalOf (
 							chatUserLogic.getAffiliate (
+								transaction,
 								fromChatUser)),
 						command);
 
 				} else {
 
-					taskLogger.debugFormat (
+					transaction.debugFormat (
 						"message %s: ",
 						integerToDecimalString (
 							inbox.getId ()),
@@ -344,21 +349,21 @@ class ChatMainCommand
 							rest)
 
 						.handleInbox (
-							taskLogger,
+							transaction,
 							command);
 
 				}
 
 			} else {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
 					"no keyword found, existing user, sent to help");
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					smsMessage,
 					rest,
@@ -366,14 +371,16 @@ class ChatMainCommand
 					true);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						serviceHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"default")),
 					optionalOf (
 						chatUserLogic.getAffiliate (
+							transaction,
 							fromChatUser)),
 					command);
 
@@ -386,21 +393,22 @@ class ChatMainCommand
 	// private implementation
 
 	InboxAttemptRec doCode (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String code,
 			@NonNull String rest) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"doCode");
 
 		) {
 
 			Optional <ChatUserRec> toUserOptional =
 				chatUserHelper.findByCode (
+					transaction,
 					chat,
 					code);
 
@@ -412,21 +420,23 @@ class ChatMainCommand
 					toUserOptional)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: ignoring invalid user code %s",
 					integerToDecimalString (
 						inbox.getId ()),
 					code);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					Optional.of (
 						serviceHelper.findByCodeRequired (
+							transaction,
 							chat,
 							"default")),
 					Optional.of (
 						chatUserLogic.getAffiliate (
+							transaction,
 							fromChatUser)),
 					command);
 
@@ -435,7 +445,7 @@ class ChatMainCommand
 			ChatUserRec toUser =
 				toUserOptional.get ();
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: message to user %s",
 				integerToDecimalString (
 					inbox.getId ()),
@@ -443,7 +453,7 @@ class ChatMainCommand
 					toUser.getId ()));
 
 			chatMessageLogic.chatMessageSendFromUser (
-				taskLogger,
+				transaction,
 				fromChatUser,
 				toUser,
 				rest,
@@ -457,7 +467,7 @@ class ChatMainCommand
 			if (fromChatUser.getFirstJoin () == null) {
 
 				chatSendLogic.sendSystem (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					optionalOf (
 						smsMessage.getThreadId ()),
@@ -471,16 +481,18 @@ class ChatMainCommand
 					Collections.<String,String>emptyMap ());
 
 				chatSendLogic.sendSystemMagic (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					Optional.of (
 						smsMessage.getThreadId ()),
 					"dob_request",
 					commandHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"magic"),
 					IdObject.objectId (
 						commandHelper.findByCodeRequired (
+							transaction,
 							userChatScheme,
 							"chat_dob")),
 					TemplateMissing.error,
@@ -489,14 +501,16 @@ class ChatMainCommand
 			}
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					serviceHelper.findByCodeRequired (
+						transaction,
 						chat,
 						"default")),
 				optionalOf (
 					chatUserLogic.getAffiliate (
+						transaction,
 						fromChatUser)),
 				command);
 
@@ -504,26 +518,23 @@ class ChatMainCommand
 
 	}
 
-	/**
-	 * Tries to find a ChatSchemeKeyword to handle this message. Returns an
-	 * appropriate CommandHandler if so, otherwise returns null.
-	 */
 	Optional <InboxAttemptRec> trySchemeKeyword (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String keyword,
 			@NonNull String rest) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"trySchemeKeyword");
 
 		) {
 
 			Optional <ChatSchemeKeywordRec> chatSchemeKeywordOptional =
 				chatSchemeKeywordHelper.findByCode (
+					transaction,
 					commandChatScheme,
 					keyword);
 
@@ -532,7 +543,7 @@ class ChatMainCommand
 					chatSchemeKeywordOptional)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: no chat scheme keyword \"%s\"",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -547,7 +558,7 @@ class ChatMainCommand
 
 			if (chatSchemeKeyword.getJoinType () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: chat scheme keyword \"%s\" is join type %s",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -558,7 +569,7 @@ class ChatMainCommand
 
 					Optional <InboxAttemptRec> inboxAttempt =
 						performCreditCheck (
-							taskLogger);
+							transaction);
 
 					if (inboxAttempt.isPresent ())
 						return inboxAttempt;
@@ -602,7 +613,7 @@ class ChatMainCommand
 						rest)
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command)
 
 				);
@@ -611,7 +622,7 @@ class ChatMainCommand
 
 			if (chatSchemeKeyword.getCommand () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -625,7 +636,7 @@ class ChatMainCommand
 
 					Optional<InboxAttemptRec> inboxAttempt =
 						performCreditCheck (
-							taskLogger);
+							transaction);
 
 					if (inboxAttempt.isPresent ())
 						return inboxAttempt;
@@ -634,7 +645,7 @@ class ChatMainCommand
 
 				return Optional.of (
 					commandManager.handle (
-						taskLogger,
+						transaction,
 						inbox,
 						chatSchemeKeyword.getCommand (),
 						optionalAbsent (),
@@ -644,7 +655,7 @@ class ChatMainCommand
 
 			// this keyword does nothing?
 
-			taskLogger.warningFormat (
+			transaction.warningFormat (
 				"message %s: chat scheme keyword \"%s\" does nothing",
 				integerToDecimalString (
 					inbox.getId ()),
@@ -656,22 +667,24 @@ class ChatMainCommand
 
 	}
 
+	private
 	Optional <InboxAttemptRec> tryChatKeyword (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String keyword,
 			@NonNull String rest) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"tryChatKeyword");
 
 		) {
 
 			Optional <ChatKeywordRec> chatKeywordOptional =
 				chatKeywordHelper.findByCode (
+					transaction,
 					chat,
 					keyword);
 
@@ -680,7 +693,7 @@ class ChatMainCommand
 					chatKeywordOptional)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: no chat keyword \"%s\"",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -695,7 +708,7 @@ class ChatMainCommand
 
 			if (chatKeyword.getJoinType () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -713,7 +726,7 @@ class ChatMainCommand
 
 					Optional <InboxAttemptRec> inboxAttempt =
 						performCreditCheck (
-							taskLogger);
+							transaction);
 
 					if (inboxAttempt.isPresent ())
 						return inboxAttempt;
@@ -749,7 +762,7 @@ class ChatMainCommand
 						rest)
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command)
 
 				);
@@ -758,7 +771,7 @@ class ChatMainCommand
 
 			if (chatKeyword.getCommand () != null) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: chat keyword \"%s\" is command %s",
 					integerToDecimalString (
 						inbox.getId ()),
@@ -768,7 +781,7 @@ class ChatMainCommand
 
 				return optionalOf (
 					commandManager.handle (
-						taskLogger,
+						transaction,
 						inbox,
 						chatKeyword.getCommand (),
 						optionalAbsent (),
@@ -778,7 +791,7 @@ class ChatMainCommand
 
 			// this keyword does nothing
 
-			taskLogger.warningFormat (
+			transaction.warningFormat (
 				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),
@@ -793,22 +806,22 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> tryKeyword (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String keyword,
 			@NonNull String rest) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"tryKeyword");
 
 		) {
 
 			Optional <InboxAttemptRec> schemeKeywordInboxAttempt =
 				trySchemeKeyword (
-					taskLogger,
+					transaction,
 					keyword,
 					rest);
 
@@ -817,7 +830,7 @@ class ChatMainCommand
 
 			Optional <InboxAttemptRec> chatKeywordInboxAttempt =
 				tryChatKeyword (
-					taskLogger,
+					transaction,
 					keyword,
 					rest);
 
@@ -831,13 +844,13 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> tryDob (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"tryDob");
 
 		) {
@@ -891,7 +904,7 @@ class ChatMainCommand
 					rest)
 
 				.handleInbox (
-					taskLogger,
+					transaction,
 					command)
 
 			);
@@ -901,39 +914,41 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> performCreditCheck (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"performCreditCheck");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: performing credit check",
 				integerToDecimalString (
 					inbox.getId ()));
 
 			if (fromChatUser.getNumber ().getNetwork ().getId () == 0) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: network unknown, ignoring",
 					integerToDecimalString (
 						inbox.getId ()));
 
 				return optionalOf (
 					smsInboxLogic.inboxNotProcessed (
-						taskLogger,
+						transaction,
 						inbox,
-						Optional.of (
+						optionalOf (
 							serviceHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"default")),
-						Optional.of (
+						optionalOf (
 							chatUserLogic.getAffiliate (
+								transaction,
 								fromChatUser)),
 						Optional.of (
 							command),
@@ -944,7 +959,7 @@ class ChatMainCommand
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					true,
 					optionalOf (
@@ -952,14 +967,14 @@ class ChatMainCommand
 
 			if (creditCheckResult.failed ()) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
 					"credit check failed, sending to help");
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					fromChatUser,
 					smsMessage,
 					rest,
@@ -968,20 +983,22 @@ class ChatMainCommand
 
 				return optionalOf (
 					smsInboxLogic.inboxProcessed (
-						taskLogger,
+						transaction,
 						inbox,
 						optionalOf (
 							serviceHelper.findByCodeRequired (
+								transaction,
 								chat,
 								"default")),
 						optionalOf (
 							chatUserLogic.getAffiliate (
+								transaction,
 								fromChatUser)),
 						command));
 
 			}
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),

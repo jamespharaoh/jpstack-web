@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.apache.commons.lang3.Range;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -41,24 +43,33 @@ import wbs.console.forms.UpdatableFormField;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("currencyFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class CurrencyFormFieldBuilder {
+class CurrencyFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -126,200 +137,183 @@ class CurrencyFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		// resolve properties from spec
+		try (
 
-		String name =
-			spec.name ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		String fieldName =
-			ifNull (
-				spec.fieldName (),
-				name);
+		) {
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			// resolve properties from spec
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String name =
+				spec.name ();
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+			String fieldName =
+				ifNull (
+					spec.fieldName (),
+					name);
 
-		Long minimum =
-			ifNull (
-				spec.minimum (),
-				Long.MIN_VALUE);
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		Long maximum =
-			ifNull (
-				spec.maximum (),
-				Long.MAX_VALUE);
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		Class <?> propertyClass =
-			optionalGetRequired (
-				objectManager.dereferenceType (
-					optionalOf (
-						context.containerClass ()),
-					optionalOf (
-						fieldName)));
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		Boolean blankIfZero =
-			ifNull (
-				spec.blankIfZero (),
-				false);
+			Long minimum =
+				ifNull (
+					spec.minimum (),
+					Long.MIN_VALUE);
 
-		// accessor
+			Long maximum =
+				ifNull (
+					spec.maximum (),
+					Long.MAX_VALUE);
 
-		FormFieldAccessor accessor =
-			dereferenceFormFieldAccessorProvider.get ()
+			Class <?> propertyClass =
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						taskLogger,
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							fieldName)));
 
-			.path (
-				fieldName)
+			Boolean blankIfZero =
+				ifNull (
+					spec.blankIfZero (),
+					false);
 
-			.nativeClass (
-				propertyClass);
+			// accessor
 
-		// native mapping
+			FormFieldAccessor accessor =
+				dereferenceFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping nativeMapping;
+				.path (
+					fieldName)
 
-		boolean range;
+				.nativeClass (
+					propertyClass);
 
-		if (propertyClass == Long.class) {
+			// native mapping
 
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+			FormFieldNativeMapping nativeMapping;
 
-			range = false;
+			boolean range;
 
-		} else if (propertyClass == Range.class) {
+			if (propertyClass == Long.class) {
 
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				nativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
 
-			range = true;
+				range = false;
 
-		} else {
+			} else if (propertyClass == Range.class) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map %s as integer for %s.%s",
-					classNameSimple (
-						propertyClass),
-					classNameSimple (
-						context.containerClass ()),
-					name));
+				nativeMapping =
+					identityFormFieldNativeMappingProvider.get ();
 
-		}
+				range = true;
 
-		// value validator
+			} else {
 
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to map %s as integer for %s.%s",
+						classNameSimple (
+							propertyClass),
+						classNameSimple (
+							context.containerClass ()),
+						name));
 
-		if (! nullable) {
+			}
+
+			// value validator
+
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
+
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.get ());
+
+			}
 
 			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+				integerFormFieldValueValidatorProvider.get ()
 
-		}
+				.label (
+					label)
 
-		valueValidators.add (
-			integerFormFieldValueValidatorProvider.get ()
+				.minimum (
+					minimum)
 
-			.label (
-				label)
+				.maximum (
+					maximum)
 
-			.minimum (
-				minimum)
+			);
 
-			.maximum (
-				maximum)
+			// constraint validator
 
-		);
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
 
-		// constraint validator
+			// interface mapping
 
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
+			FormFieldInterfaceMapping interfaceMapping;
 
-		// interface mapping
+			if (range) {
 
-		FormFieldInterfaceMapping interfaceMapping;
+				interfaceMapping =
+					rangeFormFieldInterfaceMappingProvider.get ()
 
-		if (range) {
+					.itemMapping (
+						currencyFormFieldInterfaceMappingProvider.get ()
 
-			interfaceMapping =
-				rangeFormFieldInterfaceMappingProvider.get ()
+						.currencyPath (
+							spec.currencyPath ())
 
-				.itemMapping (
+						.blankIfZero (
+							blankIfZero));
+
+			} else {
+
+				interfaceMapping =
 					currencyFormFieldInterfaceMappingProvider.get ()
 
 					.currencyPath (
 						spec.currencyPath ())
 
 					.blankIfZero (
-						blankIfZero));
+						blankIfZero);
 
-		} else {
+			}
 
-			interfaceMapping =
-				currencyFormFieldInterfaceMappingProvider.get ()
+			// renderer
 
-				.currencyPath (
-					spec.currencyPath ())
-
-				.blankIfZero (
-					blankIfZero);
-
-		}
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			textFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				ifNull (
-					spec.nullable (),
-					false))
-
-			.listAlign (
-				FormField.Align.right);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// field
-
-		if (! readOnly) {
-
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+			FormFieldRenderer renderer =
+				textFormFieldRendererProvider.get ()
 
 				.name (
 					name)
@@ -327,59 +321,90 @@ class CurrencyFormFieldBuilder {
 				.label (
 					label)
 
-				.accessor (
-					accessor)
+				.nullable (
+					ifNull (
+						spec.nullable (),
+						false))
 
-				.nativeMapping (
-					nativeMapping)
+				.listAlign (
+					FormField.Align.right);
 
-				.valueValidators (
-					valueValidators)
+			// update hook
 
-				.constraintValidator (
-					constraintValidator)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					context,
+					context.containerClass (),
+					name);
 
-				.interfaceMapping (
-					interfaceMapping)
+			// field
 
-				.csvMapping (
-					interfaceMapping)
+			if (! readOnly) {
 
-				.renderer (
-					renderer)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.get ()
 
-				.updateHook (
-					updateHook)
+					.name (
+						name)
 
-			);
+					.label (
+						label)
 
-		} else {
+					.accessor (
+						accessor)
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+					.nativeMapping (
+						nativeMapping)
 
-				.name (
-					name)
+					.valueValidators (
+						valueValidators)
 
-				.label (
-					label)
+					.constraintValidator (
+						constraintValidator)
 
-				.accessor (
-					accessor)
+					.interfaceMapping (
+						interfaceMapping)
 
-				.nativeMapping (
-					nativeMapping)
+					.csvMapping (
+						interfaceMapping)
 
-				.interfaceMapping (
-					interfaceMapping)
+					.renderer (
+						renderer)
 
-				.csvMapping (
-					interfaceMapping)
+					.updateHook (
+						updateHook)
 
-				.renderer (
-					renderer)
+				);
 
-			);
+			} else {
+
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.get ()
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						interfaceMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			}
 
 		}
 

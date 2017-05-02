@@ -43,8 +43,9 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -74,15 +75,16 @@ class ChatHelpLogPendingFormResponder
 	// state
 
 	ChatHelpLogRec chatHelpLog;
-	List<ChatHelpTemplateRec> chatHelpTemplates;
+
+	List <ChatHelpTemplateRec> chatHelpTemplates;
 
 	// details
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -104,37 +106,50 @@ class ChatHelpLogPendingFormResponder
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		chatHelpLog =
-			chatHelpLogHelper.findFromContextRequired ();
+		try (
 
-		chatHelpTemplates =
-			chatHelpTemplateHelper.findByParentAndType (
-				chatHelpLog.getChatUser ().getChat (),
-				"help");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		Collections.sort (
-			chatHelpTemplates);
+		) {
+
+			chatHelpLog =
+				chatHelpLogHelper.findFromContextRequired (
+					transaction);
+
+			chatHelpTemplates =
+				chatHelpTemplateHelper.findByParentAndType (
+					transaction,
+					chatHelpLog.getChatUser ().getChat (),
+					"help");
+
+			Collections.sort (
+				chatHelpTemplates);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			htmlScriptBlockOpen ();
 
@@ -217,195 +232,206 @@ class ChatHelpLogPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		requestContext.flushNotices ();
+		try (
 
-		// links
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
+		) {
 
-		htmlLinkWrite (
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
-			"Queues");
+			requestContext.flushNotices ();
 
-		htmlLinkWrite (
-			"javascript:top.show_inbox (false);",
-			"Close");
+			// links
 
-		htmlParagraphClose ();
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
 
-		// heading
+			htmlLinkWrite (
+				requestContext.resolveApplicationUrl (
+					"/queues/queue.home"),
+				"Queues");
 
-		htmlHeadingTwoWrite (
-			"Respond to chat help request");
+			htmlLinkWrite (
+				"javascript:top.show_inbox (false);",
+				"Close");
 
-		// form open
+			htmlParagraphClose ();
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/chatHelpLog.pending.form"));
+			// heading
 
-		// table open
+			htmlHeadingTwoWrite (
+				"Respond to chat help request");
 
-		htmlTableOpenDetails ();
+			// form open
 
-		// request
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/chatHelpLog.pending.form"));
 
-		htmlTableDetailsRowWrite (
-			"Request",
-			chatHelpLog.getText ());
+			// table open
 
-		// options
+			htmlTableOpenDetails ();
 
-		htmlTableDetailsRowWriteHtml (
-			"Options",
-			() -> {
+			// request
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" onclick=\"showReply ()\"",
-				" value=\"reply\"",
-				">");
+			htmlTableDetailsRowWrite (
+				"Request",
+				chatHelpLog.getText ());
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" onclick=\"showInfo ()\"",
-				" value=\"change info\"",
-				">");
+			// options
 
-		});
-
-		// template
-
-		htmlTableDetailsRowWriteHtml (
-			"Template",
-			() -> {
-
-			htmlSelectOpen (
-				htmlIdAttribute (
-					"template_id"));
-
-			htmlOptionWrite ();
-
-			for (
-				ChatHelpTemplateRec chatHelpTemplate
-					: chatHelpTemplates
-			) {
-
-				htmlOptionWrite (
-					integerToDecimalString (
-						chatHelpTemplate.getId ()),
-					chatHelpTemplate.getCode ());
-
-			}
-
-			htmlSelectClose ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"button\"",
-				" onclick=\"useTemplate ()\"",
-				" value=\"ok\"",
-				">");
-
-		});
-
-		// reply
-
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"replyTextRow"));
-
-		htmlTableHeaderCellWrite (
-			"Reply");
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<textarea",
-			" id=\"text\"",
-			" name=\"text\"",
-			" cols=\"64\"",
-			" rows=\"3\"",
-			" onkeyup=\"%h\"",
-			stringFormat (
-				"gsmCharCount (%s, %s, %s)",
-				"this",
-				"document.getElementById ('chars')",
-				"149"),
-			" onfocus=\"%h\"",
-			stringFormat (
-				"gsmCharCount (%s, %s, %s)",
-				"this",
-				"document.getElementById ('chars')",
-				"149"),
-			"></textarea>");
-
-		htmlTableCellClose ();
-
-		htmlTableRowClose ();
-
-		// chars
-
-		htmlTableDetailsRowWriteHtml (
-			"Chars",
-			() -> htmlSpanWrite (
-				"",
-				htmlIdAttribute (
-					"chars")),
-			htmlIdAttribute (
-				"replyCharsRow"));
-
-		// actions
-
-		htmlTableDetailsRowWriteHtml (
-			"Actions",
-			() -> {
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" id=\"replyButton\"",
-				" type=\"submit\"",
-				" name=\"reply\"",
-				" value=\"send reply\"",
-				">");
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" style=\"display: none\"",
-				" id=\"infoButton\"",
-				" type=\"submit\"",
-				" name=\"info\"",
-				" value=\"change info\"",
-				">");
-
-			if (requestContext.canContext ("chat.supervisor")) {
+			htmlTableDetailsRowWriteHtml (
+				"Options",
+				() -> {
 
 				formatWriter.writeLineFormat (
 					"<input",
-					" id=\"ignoreButton\"",
-					" type=\"submit\"",
-					" name=\"ignore\"",
-					" value=\"ignore request\"",
+					" type=\"button\"",
+					" onclick=\"showReply ()\"",
+					" value=\"reply\"",
 					">");
 
-			}
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"button\"",
+					" onclick=\"showInfo ()\"",
+					" value=\"change info\"",
+					">");
 
-		});
+			});
 
-		// table close
+			// template
 
-		htmlTableClose ();
+			htmlTableDetailsRowWriteHtml (
+				"Template",
+				() -> {
 
-		// form close
+				htmlSelectOpen (
+					htmlIdAttribute (
+						"template_id"));
 
-		htmlFormClose ();
+				htmlOptionWrite ();
+
+				for (
+					ChatHelpTemplateRec chatHelpTemplate
+						: chatHelpTemplates
+				) {
+
+					htmlOptionWrite (
+						integerToDecimalString (
+							chatHelpTemplate.getId ()),
+						chatHelpTemplate.getCode ());
+
+				}
+
+				htmlSelectClose ();
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"button\"",
+					" onclick=\"useTemplate ()\"",
+					" value=\"ok\"",
+					">");
+
+			});
+
+			// reply
+
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"replyTextRow"));
+
+			htmlTableHeaderCellWrite (
+				"Reply");
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<textarea",
+				" id=\"text\"",
+				" name=\"text\"",
+				" cols=\"64\"",
+				" rows=\"3\"",
+				" onkeyup=\"%h\"",
+				stringFormat (
+					"gsmCharCount (%s, %s, %s)",
+					"this",
+					"document.getElementById ('chars')",
+					"149"),
+				" onfocus=\"%h\"",
+				stringFormat (
+					"gsmCharCount (%s, %s, %s)",
+					"this",
+					"document.getElementById ('chars')",
+					"149"),
+				"></textarea>");
+
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
+
+			// chars
+
+			htmlTableDetailsRowWriteHtml (
+				"Chars",
+				() -> htmlSpanWrite (
+					"",
+					htmlIdAttribute (
+						"chars")),
+				htmlIdAttribute (
+					"replyCharsRow"));
+
+			// actions
+
+			htmlTableDetailsRowWriteHtml (
+				"Actions",
+				() -> {
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" id=\"replyButton\"",
+					" type=\"submit\"",
+					" name=\"reply\"",
+					" value=\"send reply\"",
+					">");
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" style=\"display: none\"",
+					" id=\"infoButton\"",
+					" type=\"submit\"",
+					" name=\"info\"",
+					" value=\"change info\"",
+					">");
+
+				if (requestContext.canContext ("chat.supervisor")) {
+
+					formatWriter.writeLineFormat (
+						"<input",
+						" id=\"ignoreButton\"",
+						" type=\"submit\"",
+						" name=\"ignore\"",
+						" value=\"ignore request\"",
+						">");
+
+				}
+
+			});
+
+			// table close
+
+			htmlTableClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

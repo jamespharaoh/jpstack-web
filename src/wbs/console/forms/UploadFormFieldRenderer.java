@@ -2,8 +2,14 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,8 +26,9 @@ import org.apache.commons.io.IOUtils;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
@@ -72,7 +79,7 @@ class UploadFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
@@ -81,20 +88,31 @@ class UploadFormFieldRenderer <Container>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"file\"",
-			" name=\"%h.%h\"",
-			formName,
-			name (),
-			">");
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderFormInput");
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"file\"",
+				" name=\"%h.%h\"",
+				formName,
+				name (),
+				">");
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <FileUpload> interfaceValue,
@@ -102,9 +120,9 @@ class UploadFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -184,35 +202,143 @@ class UploadFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <FileUpload>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		return successResult (
-			Optional.fromNullable (
-				formValue (
-					submission,
-					formName)));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formToInterface");
+
+		) {
+
+			return successResult (
+				Optional.fromNullable (
+					formValue (
+						submission,
+						formName)));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <FileUpload> interfaceValue,
 			boolean link) {
 
-		if (interfaceValue.isPresent ()) {
+		try (
 
-			htmlWriter.writeFormat (
-				"%h (%h bytes)",
-				interfaceValue.get ().name (),
-				integerToDecimalString (
-					interfaceValue.get ().data ().length));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlSimple");
+
+		) {
+
+			if (interfaceValue.isPresent ()) {
+
+				htmlWriter.writeFormat (
+					"%h (%h bytes)",
+					interfaceValue.get ().name (),
+					integerToDecimalString (
+						interfaceValue.get ().data ().length));
+
+			}
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <FileUpload> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <FileUpload> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellProperties");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					propertiesAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
 
 		}
 

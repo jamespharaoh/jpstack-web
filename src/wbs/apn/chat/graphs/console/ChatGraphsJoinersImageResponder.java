@@ -15,7 +15,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 
 import wbs.utils.time.TextualInterval;
 
@@ -73,25 +74,26 @@ class ChatGraphsJoinersImageResponder
 	@Override
 	protected
 	void prepareData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Instant minTime,
 			@NonNull Instant maxTime) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepareData");
 
 		) {
 
 			ChatRec chat =
-				chatHelper.findFromContextRequired ();
+				chatHelper.findFromContextRequired (
+					transaction);
 
 			List <Long> chatUserIds =
 				chatUserHelper.searchIds (
-					taskLogger,
+					transaction,
 					new ChatUserSearch ()
 
 				.chatId (
@@ -113,6 +115,7 @@ class ChatGraphsJoinersImageResponder
 
 			timezone =
 				chatMiscLogic.timezone (
+					transaction,
 					chat);
 
 			for (
@@ -122,6 +125,7 @@ class ChatGraphsJoinersImageResponder
 
 				ChatUserRec chatUser =
 					chatUserHelper.findRequired (
+						transaction,
 						chatUserId);
 
 				int index =

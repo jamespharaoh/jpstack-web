@@ -12,10 +12,6 @@
 		<!-- framework -->
 
 		<plugin
-			name="activity-manager"
-			package="wbs.framework.activitymanager"/>
-
-		<plugin
 			name="builder"
 			package="wbs.framework.builder"/>
 

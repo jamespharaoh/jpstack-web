@@ -43,9 +43,6 @@ import wbs.console.module.ConsoleModuleFactory;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecFactory;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.activitymanager.ActivityManagerImplementation;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -72,6 +69,7 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
@@ -105,9 +103,8 @@ class ComponentManagerBuilder {
 
 	// state
 
-	ActivityManager activityManager;
+	List <PluginSpec> plugins;
 
-	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
 	Map <String, Object> singletonComponents =
@@ -137,30 +134,23 @@ class ComponentManagerBuilder {
 	ComponentManager build (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"build");
-
-		activityManager =
-			new ActivityManagerImplementation ();
-
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"setup",
-					"componentManagerBuilder.build ()",
-					this);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
 		) {
 
 			loadPlugins (
 				taskLogger);
 
-			createPluginManager ();
+			createPluginManager (
+				taskLogger);
 
-			registerComponents ();
+			registerComponents (
+				taskLogger);
 
 			return componentRegistry.build ();
 
@@ -174,7 +164,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"loadPlugins");
@@ -254,31 +244,47 @@ class ComponentManagerBuilder {
 	}
 
 	private
-	void createPluginManager () {
+	void createPluginManager (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		pluginManager =
-			new PluginManager.Builder ()
-				.plugins (plugins)
-				.build ();
+		try (
 
-		addSingletonComponent (
-			"pluginManager",
-			pluginManager);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createPluginManager");
+
+		) {
+
+			pluginManager =
+				new PluginManager.Builder ()
+					.plugins (plugins)
+					.build ();
+
+			addSingletonComponent (
+				"pluginManager",
+				pluginManager);
+
+		}
 
 	}
 
 	private
-	void registerComponents () {
+	void registerComponents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
 					"registerComponents");
+
 
 		) {
 
-			createComponentRegistry ();
+			createComponentRegistry (
+				taskLogger);
 
 			registerLayerComponents (
 				taskLogger);
@@ -305,6 +311,7 @@ class ComponentManagerBuilder {
 			) {
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					componentDefinition);
 
 			}
@@ -319,7 +326,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerLayerComponents");
@@ -392,250 +399,288 @@ class ComponentManagerBuilder {
 	}
 
 	void registerLayerAutomaticComponents (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginSpec plugin,
 			@NonNull String layerName) {
 
-		if (
-			stringEqualSafe (
-				layerName,
-				"api")
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerLayerAutomaticComponents");
+
 		) {
 
-			registerApiLayerComponents (
-				taskLog,
-				plugin);
+			if (
+				stringEqualSafe (
+					layerName,
+					"api")
+			) {
 
-			plugin.apiModules ().forEach (
-				apiModule ->
-					registerApiModule (
-						taskLog,
-						apiModule));
+				registerApiLayerComponents (
+					taskLogger,
+					plugin);
 
-		}
+				plugin.apiModules ().forEach (
+					apiModule ->
+						registerApiModule (
+							taskLogger,
+							apiModule));
 
-		if (
-			stringEqualSafe (
-				layerName,
-				"console")
-		) {
+			}
 
-			registerConsoleLayerComponents (
-				taskLog,
-				plugin);
+			if (
+				stringEqualSafe (
+					layerName,
+					"console")
+			) {
 
-			plugin.consoleModules ().forEach (
-				consoleModule ->
-					registerConsoleModule (
-						taskLog,
-						consoleModule));
+				registerConsoleLayerComponents (
+					taskLogger,
+					plugin);
 
-		}
+				plugin.consoleModules ().forEach (
+					consoleModule ->
+						registerConsoleModule (
+							taskLogger,
+							consoleModule));
 
-		if (
-			stringEqualSafe (
-				layerName,
-				"hibernate")
-		) {
+			}
 
-			registerHibernateLayerComponents (
-				taskLog,
-				plugin);
+			if (
+				stringEqualSafe (
+					layerName,
+					"hibernate")
+			) {
 
-		}
+				registerHibernateLayerComponents (
+					taskLogger,
+					plugin);
 
-		if (
-			stringEqualSafe (
-				layerName,
-				"object")
-		) {
+			}
 
-			registerObjectLayerComponents (
-				taskLog,
-				plugin);
+			if (
+				stringEqualSafe (
+					layerName,
+					"object")
+			) {
 
-		}
+				registerObjectLayerComponents (
+					taskLogger,
+					plugin);
 
-		if (
-			stringEqualSafe (
-				layerName,
-				"fixture")
-		) {
+			}
 
-			registerFixtureLayerComponents (
-				taskLog,
-				plugin);
+			if (
+				stringEqualSafe (
+					layerName,
+					"fixture")
+			) {
+
+				registerFixtureLayerComponents (
+					taskLogger,
+					plugin);
+
+			}
 
 		}
 
 	}
 
 	long registerApiModule (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginApiModuleSpec pluginApiModuleSpec) {
 
-		String xmlResourceName =
-			stringFormat (
-				"/%s/api/%s-api.xml",
-				pluginApiModuleSpec
-					.plugin ()
-					.packageName ()
-					.replace (".", "/"),
-				pluginApiModuleSpec
-					.name ());
+		try (
 
-		String apiModuleSpecComponentName =
-			stringFormat (
-				"%sApiModuleSpec",
-				hyphenToCamel (
-					pluginApiModuleSpec.name ()));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerApiModule");
 
-		String apiModuleComponentName =
-			stringFormat (
-				"%sApiModule",
-				hyphenToCamel (
-					pluginApiModuleSpec.name ()));
+		) {
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+			String xmlResourceName =
+				stringFormat (
+					"/%s/api/%s-api.xml",
+					pluginApiModuleSpec
+						.plugin ()
+						.packageName ()
+						.replace (".", "/"),
+					pluginApiModuleSpec
+						.name ());
 
-			.name (
-				apiModuleSpecComponentName)
+			String apiModuleSpecComponentName =
+				stringFormat (
+					"%sApiModuleSpec",
+					hyphenToCamel (
+						pluginApiModuleSpec.name ()));
 
-			.componentClass (
-				ApiModuleSpec.class)
+			String apiModuleComponentName =
+				stringFormat (
+					"%sApiModule",
+					hyphenToCamel (
+						pluginApiModuleSpec.name ()));
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
 
-			.factoryClass (
-				ApiModuleSpecFactory.class)
+				.name (
+					apiModuleSpecComponentName)
 
-			.addValueProperty (
-				"xmlResourceName",
-				xmlResourceName)
+				.componentClass (
+					ApiModuleSpec.class)
 
-		);
+				.scope (
+					"singleton")
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+				.factoryClass (
+					ApiModuleSpecFactory.class)
 
-			.name (
-				apiModuleComponentName)
+				.addValueProperty (
+					"xmlResourceName",
+					xmlResourceName)
 
-			.componentClass (
-				ApiModule.class)
+			);
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
 
-			.factoryClass (
-				ApiModuleFactory.class)
+				.name (
+					apiModuleComponentName)
 
-			.addReferenceProperty (
-				"apiModuleSpec",
-				apiModuleSpecComponentName)
+				.componentClass (
+					ApiModule.class)
 
-		);
+				.scope (
+					"singleton")
 
-		return 0;
+				.factoryClass (
+					ApiModuleFactory.class)
+
+				.addReferenceProperty (
+					"apiModuleSpec",
+					apiModuleSpecComponentName)
+
+			);
+
+			return 0;
+
+		}
 
 	}
 
 	void registerConsoleModule (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
 
-		String xmlResourceName =
-			stringFormat (
-				"/%s/console/%s-console.xml",
-				pluginConsoleModuleSpec
-					.plugin ()
-					.packageName ()
-					.replace (".", "/"),
-				pluginConsoleModuleSpec
-					.name ());
+		try (
 
-		String consoleSpecComponentName =
-			stringFormat (
-				"%sConsoleModuleSpec",
-				hyphenToCamel (
-					pluginConsoleModuleSpec.name ()));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleModule");
 
-		String consoleModuleComponentName =
-			stringFormat (
-				"%sConsoleModule",
-				hyphenToCamel (
-					pluginConsoleModuleSpec.name ()));
+		) {
 
-		String consoleMetaModuleComponentName =
-			stringFormat (
-				"%sConsoleMetaModule",
-				hyphenToCamel (
-					pluginConsoleModuleSpec.name ()));
+			String xmlResourceName =
+				stringFormat (
+					"/%s/console/%s-console.xml",
+					pluginConsoleModuleSpec
+						.plugin ()
+						.packageName ()
+						.replace (".", "/"),
+					pluginConsoleModuleSpec
+						.name ());
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+			String consoleSpecComponentName =
+				stringFormat (
+					"%sConsoleModuleSpec",
+					hyphenToCamel (
+						pluginConsoleModuleSpec.name ()));
 
-			.name (
-				consoleSpecComponentName)
+			String consoleModuleComponentName =
+				stringFormat (
+					"%sConsoleModule",
+					hyphenToCamel (
+						pluginConsoleModuleSpec.name ()));
 
-			.componentClass (
-				ConsoleModuleSpec.class)
+			String consoleMetaModuleComponentName =
+				stringFormat (
+					"%sConsoleMetaModule",
+					hyphenToCamel (
+						pluginConsoleModuleSpec.name ()));
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
 
-			.factoryClass (
-				ConsoleModuleSpecFactory.class)
+				.name (
+					consoleSpecComponentName)
 
-			.addValueProperty (
-				"xmlResourceName",
-				xmlResourceName)
+				.componentClass (
+					ConsoleModuleSpec.class)
 
-		);
+				.scope (
+					"singleton")
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+				.factoryClass (
+					ConsoleModuleSpecFactory.class)
 
-			.name (
-				consoleModuleComponentName)
+				.addValueProperty (
+					"xmlResourceName",
+					xmlResourceName)
 
-			.componentClass (
-				ConsoleModule.class)
+			);
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
 
-			.factoryClass (
-				ConsoleModuleFactory.class)
+				.name (
+					consoleModuleComponentName)
 
-			.addReferenceProperty (
-				"consoleSpec",
-				consoleSpecComponentName)
+				.componentClass (
+					ConsoleModule.class)
 
-		);
+				.scope (
+					"singleton")
 
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
+				.factoryClass (
+					ConsoleModuleFactory.class)
 
-			.name (
-				consoleMetaModuleComponentName)
+				.addReferenceProperty (
+					"consoleSpec",
+					consoleSpecComponentName)
 
-			.componentClass (
-				ConsoleMetaModule.class)
+			);
 
-			.scope (
-				"singleton")
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
 
-			.factoryClass (
-				ConsoleMetaModuleFactory.class)
+				.name (
+					consoleMetaModuleComponentName)
 
-			.addReferenceProperty (
-				"consoleSpec",
-				consoleSpecComponentName)
+				.componentClass (
+					ConsoleMetaModule.class)
 
-		);
+				.scope (
+					"singleton")
+
+				.factoryClass (
+					ConsoleMetaModuleFactory.class)
+
+				.addReferenceProperty (
+					"consoleSpec",
+					consoleSpecComponentName)
+
+			);
+
+		}
 
 	}
 
@@ -645,7 +690,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerFixtureLayerComponents");
@@ -692,6 +737,7 @@ class ComponentManagerBuilder {
 				}
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -782,7 +828,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerLayerComponent");
@@ -833,6 +879,7 @@ class ComponentManagerBuilder {
 					singletonComponent.value ();
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -858,6 +905,7 @@ class ComponentManagerBuilder {
 					prototypeComponent.value ();
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -888,6 +936,7 @@ class ComponentManagerBuilder {
 						componentName);
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -905,6 +954,7 @@ class ComponentManagerBuilder {
 				);
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -977,6 +1027,7 @@ class ComponentManagerBuilder {
 					}
 
 					componentRegistry.registerDefinition (
+						taskLogger,
 						new ComponentDefinition ()
 
 						.name (
@@ -1032,6 +1083,7 @@ class ComponentManagerBuilder {
 					}
 
 					componentRegistry.registerDefinition (
+						taskLogger,
 						new ComponentDefinition ()
 
 						.name (
@@ -1078,7 +1130,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerObjectHooks");
@@ -1105,6 +1157,7 @@ class ComponentManagerBuilder {
 						objectHooksClassName);
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -1121,6 +1174,7 @@ class ComponentManagerBuilder {
 			} catch (ClassNotFoundException exception) {
 
 				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
@@ -1146,7 +1200,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerObjectHelper");
@@ -1170,6 +1224,7 @@ class ComponentManagerBuilder {
 					objectHelperImplementationClassName);
 
 			componentRegistry.registerDefinition (
+				taskLogger,
 				new ComponentDefinition ()
 
 				.name (
@@ -1193,7 +1248,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerObjectHelperMethodsImplementation");
@@ -1235,6 +1290,7 @@ class ComponentManagerBuilder {
 			}
 
 			componentRegistry.registerDefinition (
+				taskLogger,
 				new ComponentDefinition ()
 
 				.name (
@@ -1260,7 +1316,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerDaoHibernate");
@@ -1340,6 +1396,7 @@ class ComponentManagerBuilder {
 			}
 
 			componentRegistry.registerDefinition (
+				taskLogger,
 				new ComponentDefinition ()
 
 				.name (
@@ -1365,7 +1422,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerConsoleHelper");
@@ -1435,6 +1492,7 @@ class ComponentManagerBuilder {
 			// component definition
 
 			componentRegistry.registerDefinition (
+				taskLogger,
 				new ComponentDefinition ()
 
 				.name (
@@ -1458,7 +1516,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerEnumConsoleHelper");
@@ -1496,6 +1554,7 @@ class ComponentManagerBuilder {
 					enumType.name ());
 
 			componentRegistry.registerDefinition (
+				taskLogger,
 				new ComponentDefinition ()
 
 				.name (
@@ -1521,77 +1580,89 @@ class ComponentManagerBuilder {
 	}
 
 	void registerCustomConsoleHelper (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginCustomTypeSpec customType) {
 
-		String customClassName =
-			stringFormat (
-				"%s.model.%s",
-				customType.plugin ().packageName (),
-				capitalise (
-					customType.name ()));
+		try (
 
-		Optional <Class <?>> customClassOptional =
-			classForName (
-				customClassName);
-
-		if (
-			optionalIsNotPresent (
-				customClassOptional)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerCustomConsoleHelper");
 
 		) {
 
-			taskLog.errorFormat (
-				"No such class %s",
-				customClassName);
+			String customClassName =
+				stringFormat (
+					"%s.model.%s",
+					customType.plugin ().packageName (),
+					capitalise (
+						customType.name ()));
 
-			return;
+			Optional <Class <?>> customClassOptional =
+				classForName (
+					customClassName);
+
+			if (
+				optionalIsNotPresent (
+					customClassOptional)
+
+			) {
+
+				taskLogger.errorFormat (
+					"No such class %s",
+					customClassName);
+
+				return;
+
+			}
+
+			if (
+				isNotSubclassOf (
+					Enum.class,
+					customClassOptional.get ())
+			) {
+				return;
+			}
+
+			Class <?> enumClass =
+				customClassOptional.get ();
+
+			String enumConsoleHelperComponentName =
+				stringFormat (
+					"%sConsoleHelper",
+					customType.name ());
+
+			if (
+				componentRegistry.hasName (
+					enumConsoleHelperComponentName)
+			) {
+				return;
+			}
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.name (
+					enumConsoleHelperComponentName)
+
+				.componentClass (
+					EnumConsoleHelper.class)
+
+				.factoryClass (
+					EnumConsoleHelperFactory.class)
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"enumClass",
+					enumClass)
+
+			);
 
 		}
-
-		if (
-			isNotSubclassOf (
-				Enum.class,
-				customClassOptional.get ())
-		) {
-			return;
-		}
-
-		Class <?> enumClass =
-			customClassOptional.get ();
-
-		String enumConsoleHelperComponentName =
-			stringFormat (
-				"%sConsoleHelper",
-				customType.name ());
-
-		if (
-			componentRegistry.hasName (
-				enumConsoleHelperComponentName)
-		) {
-			return;
-		}
-
-		componentRegistry.registerDefinition (
-			new ComponentDefinition ()
-
-			.name (
-				enumConsoleHelperComponentName)
-
-			.componentClass (
-				EnumConsoleHelper.class)
-
-			.factoryClass (
-				EnumConsoleHelperFactory.class)
-
-			.scope (
-				"singleton")
-
-			.addValueProperty (
-				"enumClass",
-				enumClass)
-
-		);
 
 	}
 
@@ -1600,7 +1671,7 @@ class ComponentManagerBuilder {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"registerConfigComponents");
@@ -1634,26 +1705,36 @@ class ComponentManagerBuilder {
 	void registerSingletonComponents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		for (
-			Map.Entry <String,Object> entry
-				: singletonComponents.entrySet ()
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerSingletonComponents");
+
 		) {
 
-			componentRegistry.registerUnmanagedSingleton (
-				entry.getKey (),
-				entry.getValue ());
+			for (
+				Map.Entry <String,Object> entry
+					: singletonComponents.entrySet ()
+			) {
+
+				componentRegistry.registerUnmanagedSingleton (
+					taskLogger,
+					entry.getKey (),
+					entry.getValue ());
+
+			}
 
 		}
 
 	}
 
-	void createComponentRegistry () {
+	void createComponentRegistry (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		componentRegistry =
 			new ComponentRegistryImplementation ()
-
-			.activityManager (
-				activityManager)
 
 			.outputPath (
 				outputPath);

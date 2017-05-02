@@ -19,10 +19,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -126,29 +126,28 @@ class AutoResponderCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			MessageRec receivedMessage =
 				inbox.getMessage ();
 
 			AutoResponderRec autoResponder =
 				autoResponderHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					autoResponder,
 					"default");
 
@@ -156,7 +155,7 @@ class AutoResponderCommand
 
 			AutoResponderRequestRec request =
 				autoResponderRequestHelper.insert (
-					taskLogger,
+					transaction,
 					autoResponderRequestHelper.createInstance ()
 
 				.setAutoResponder (
@@ -177,6 +176,7 @@ class AutoResponderCommand
 
 			MessageSetRec messageSet =
 				messageSetHelper.findByCodeRequired (
+					transaction,
 					autoResponder,
 					"default");
 
@@ -195,7 +195,7 @@ class AutoResponderCommand
 						receivedMessage.getNumber ())
 
 					.messageString (
-						taskLogger,
+						transaction,
 						messageSetMessage.getMessage ())
 
 					.numFrom (
@@ -212,13 +212,14 @@ class AutoResponderCommand
 						|| messageSetMessage.getIndex () == 0)
 
 					.deliveryTypeCode (
+						transaction,
 						"auto_responder")
 
 					.ref (
 						request.getId ())
 
 					.send (
-						taskLogger);
+						transaction);
 
 				request.getSentMessages ().add (
 					sentMessage);
@@ -248,7 +249,7 @@ class AutoResponderCommand
 			) {
 
 				numberListLogic.addDueToMessage (
-					taskLogger,
+					transaction,
 					autoResponder.getAddToNumberList (),
 					receivedMessage.getNumber (),
 					receivedMessage,
@@ -259,7 +260,7 @@ class AutoResponderCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

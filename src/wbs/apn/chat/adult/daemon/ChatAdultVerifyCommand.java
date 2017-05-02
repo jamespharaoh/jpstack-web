@@ -14,10 +14,10 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -118,26 +118,25 @@ class ChatAdultVerifyCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			ChatRec chat =
 				chatHelper.findRequired (
+					transaction,
 					command.getParentId ());
 
 			ServiceRec defaultService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"default");
 
@@ -146,12 +145,13 @@ class ChatAdultVerifyCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					message);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			// ignore if there is no chat scheme
@@ -159,7 +159,7 @@ class ChatAdultVerifyCommand
 			if (chatUser.getChatScheme () == null) {
 
 				return smsInboxLogic.inboxNotProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						defaultService),
@@ -177,13 +177,14 @@ class ChatAdultVerifyCommand
 				chatUser.getAdultVerified ();
 
 			chatUserLogic.adultVerify (
-				taskLogger,
+				transaction,
 				chatUser);
 
 			// credit the user
 
 			ChatSchemeChargesRec chatSchemeCharges =
 				chatSchemeChargesHelper.findRequired (
+					transaction,
 					chatUser.getChatScheme ().getId ());
 
 			long credit =
@@ -192,7 +193,7 @@ class ChatAdultVerifyCommand
 			if (! alreadyVerified && credit > 0) {
 
 				chatUserCreditHelper.insert (
-					taskLogger,
+					transaction,
 					chatUserCreditHelper.createInstance ()
 
 					.setChatUser (
@@ -229,7 +230,7 @@ class ChatAdultVerifyCommand
 			// send them a message to confirm
 
 			chatSendLogic.sendSystemRbFree (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
 					message.getThreadId ()),
@@ -242,7 +243,7 @@ class ChatAdultVerifyCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					defaultService),

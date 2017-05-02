@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -40,24 +41,36 @@ class ConsoleModuleSpecReader {
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		DataFromXmlBuilder builder =
-			new DataFromXmlBuilder ();
+		try (
 
-		for (
-			Map.Entry <Class <?>, Provider <ConsoleModuleSpec>> entry
-				: consoleModuleSpecProviders.entrySet ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
 		) {
 
-			builder.registerBuilder (
-				entry.getKey (),
-				entry.getValue ());
+			DataFromXmlBuilder builder =
+				new DataFromXmlBuilder ();
+
+			for (
+				Map.Entry <Class <?>, Provider <ConsoleModuleSpec>> entry
+					: consoleModuleSpecProviders.entrySet ()
+			) {
+
+				builder.registerBuilder (
+					entry.getKey (),
+					entry.getValue ());
+
+			}
+
+			dataFromXml =
+				builder.build ();
 
 		}
-
-		dataFromXml =
-			builder.build ();
 
 	}
 
@@ -68,7 +81,7 @@ class ConsoleModuleSpecReader {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"readClasspath");

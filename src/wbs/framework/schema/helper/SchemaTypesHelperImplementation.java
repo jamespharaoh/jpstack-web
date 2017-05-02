@@ -6,7 +6,6 @@ import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Types;
@@ -27,8 +26,6 @@ import org.hibernate.usertype.CompositeUserType;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -39,6 +36,7 @@ import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -48,9 +46,6 @@ class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -78,7 +73,7 @@ class SchemaTypesHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"init");
@@ -97,7 +92,7 @@ class SchemaTypesHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"initTypeNames");
@@ -172,18 +167,19 @@ class SchemaTypesHelperImplementation
 
 	@SuppressWarnings ({ "unchecked", "rawtypes" })
 	void initEnumType (
-			TaskLogger taskLog,
-			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
-			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ImmutableMap.Builder <Class <?>, List <String>>
+				fieldTypeNamesBuilder,
+			@NonNull ImmutableMap.Builder <String, List <String>>
+				enumTypesBuilder,
 			PluginEnumTypeSpec enumType) {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"schema",
-					"schemaTypesHelper.initEnumType (...)",
-					this);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initEnumType");
 
 		) {
 
@@ -203,7 +199,7 @@ class SchemaTypesHelperImplementation
 
 			} catch (ClassNotFoundException exception) {
 
-				taskLog.errorFormat (
+				taskLogger.errorFormat (
 					"No such class %s",
 					enumClassName);
 
@@ -258,27 +254,18 @@ class SchemaTypesHelperImplementation
 	}
 
 	void initCustomType (
-			TaskLogger taskLog,
-			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
-			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ImmutableMap.Builder <Class <?>, List <String>>
+				fieldTypeNamesBuilder,
+			ImmutableMap.Builder <String, List <String>> enumTypesBuilder,
 			PluginCustomTypeSpec customType) {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"schema",
-					stringFormat (
-						"schemaTypesHelper.initCustomType (%s)",
-						joinWithCommaAndSpace (
-							", ",
-							"taskLog",
-							"fieldTypeNamesBuilder",
-							"enumTypesBuilder",
-							stringFormat (
-								"customType:%s",
-								customType.name ()))),
-					this);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initCustomType");
 
 		) {
 
@@ -298,7 +285,7 @@ class SchemaTypesHelperImplementation
 					objectClassOptional)
 			) {
 
-				taskLog.errorFormat (
+				taskLogger.errorFormat (
 					"No such class %s",
 					objectClassName);
 
@@ -320,7 +307,7 @@ class SchemaTypesHelperImplementation
 					helperClassOptional)
 			) {
 
-				taskLog.errorFormat (
+				taskLogger.errorFormat (
 					"No such class %s",
 					helperClassName);
 
@@ -353,7 +340,7 @@ class SchemaTypesHelperImplementation
 
 			} catch (Exception exception) {
 
-				taskLog.errorFormatException (
+				taskLogger.errorFormatException (
 					exception,
 					"Error instantiating %s",
 					helperClass.getName ());
@@ -379,7 +366,7 @@ class SchemaTypesHelperImplementation
 
 				if (typeName == null) {
 
-					taskLog.errorFormat (
+					taskLogger.errorFormat (
 						"Don't know how to handle sql type %s for %s",
 						integerToDecimalString (
 							enumHelper.sqlType ()),
@@ -438,7 +425,7 @@ class SchemaTypesHelperImplementation
 
 					if (typeName == null) {
 
-						taskLog.errorFormat (
+						taskLogger.errorFormat (
 							"Don't know how to handle sql type %s for %s",
 							classNameSimple (
 								propertyType.getReturnedClass ()),
@@ -461,7 +448,7 @@ class SchemaTypesHelperImplementation
 
 			}
 
-			taskLog.errorFormat (
+			taskLogger.errorFormat (
 				"Don't know how to handle %s",
 				classNameSimple (
 					helper.getClass ()));

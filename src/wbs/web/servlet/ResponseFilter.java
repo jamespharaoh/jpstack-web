@@ -11,6 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import wbs.framework.component.annotations.SingletonComponent;
+
 import wbs.web.context.RequestContextImplementation;
 
 @SingletonComponent ("responseFilter")

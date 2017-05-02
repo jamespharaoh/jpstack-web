@@ -123,19 +123,11 @@ class FonixRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"updateDatabase");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					stringFormat (
-						"%s.%s ()",
-						getClass ().getSimpleName (),
-						"updateDatabase"),
-					this);
+					logContext,
+					parentTaskLogger,
+					"updateDatabase");
 
 		) {
 
@@ -143,6 +135,7 @@ class FonixRouteInAction
 
 			Optional <RouteRec> smsRouteOptional =
 				smsRouteHelper.find (
+					transaction,
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"smsRouteId")));
@@ -196,6 +189,7 @@ class FonixRouteInAction
 
 			Optional <FonixRouteInRec> fonixRouteInOptional =
 				fonixRouteInHelper.find (
+					transaction,
 					smsRoute.getId ());
 
 			if (
@@ -221,14 +215,14 @@ class FonixRouteInAction
 			// insert message
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalOf (
 					request.guid ()),
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					request.body ()),
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					request.moNumber ()),
 				request.destination (),
 				smsRoute,
@@ -271,26 +265,22 @@ class FonixRouteInAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"storeLog");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ClockworkSmsRouteInAction.storeLog ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"storeLog");
 
 		) {
 
 			fonixInboundLogHelper.insert (
-				taskLogger,
+				transaction,
 				fonixInboundLogHelper.createInstance ()
 
 				.setRoute (
 					smsRouteHelper.findRequired (
-						Long.parseLong (
+						transaction,
+						parseIntegerRequired (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))
 

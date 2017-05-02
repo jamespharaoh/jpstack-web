@@ -23,10 +23,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -150,23 +150,21 @@ class ChatPromoCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"handle");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			ChatPromoRec chatPromo =
 				genericCastUnchecked (
 					objectManager.getParentRequired (
+						transaction,
 						command));
 
 			ChatRec chat =
@@ -177,26 +175,30 @@ class ChatPromoCommand
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					chat,
 					inboundMessage);
 
 			AffiliateRec affiliate =
 				chatUserLogic.getAffiliate (
+					transaction,
 					chatUser);
 
 			CommandRec magicCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"magic");
 
 			CommandRec helpCommand =
 				commandHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"help");
 
 			ServiceRec promoService =
 				serviceHelper.findByCodeRequired (
+					transaction,
 					chat,
 					"promo");
 
@@ -204,7 +206,7 @@ class ChatPromoCommand
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
-					taskLogger,
+					transaction,
 					chatUser,
 					true,
 					optionalOf (
@@ -213,7 +215,7 @@ class ChatPromoCommand
 			if (creditCheckResult.failed ()) {
 
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					inboundMessage,
 					inboundMessage.getText ().getText (),
@@ -222,7 +224,7 @@ class ChatPromoCommand
 					true);
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						promoService),
@@ -236,7 +238,7 @@ class ChatPromoCommand
 
 			ChatHelpLogRec inboundHelpLog =
 				chatHelpLogLogic.createChatHelpLogIn (
-					taskLogger,
+					transaction,
 					chatUser,
 					inboundMessage,
 					inboundMessage.getText ().getText (),
@@ -254,7 +256,7 @@ class ChatPromoCommand
 
 				MessageRec outboundMessage =
 					chatSendLogic.sendMessageMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							inboundMessage.getThreadId ()),
@@ -264,7 +266,7 @@ class ChatPromoCommand
 						helpCommand.getId ());
 
 				chatHelpLogLogic.createChatHelpLogOut (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						inboundHelpLog),
@@ -276,7 +278,7 @@ class ChatPromoCommand
 						helpCommand));
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						promoService),
@@ -296,7 +298,7 @@ class ChatPromoCommand
 
 				MessageRec outboundMessage =
 					chatSendLogic.sendMessageMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							inboundMessage.getThreadId ()),
@@ -306,7 +308,7 @@ class ChatPromoCommand
 						helpCommand.getId ());
 
 				chatHelpLogLogic.createChatHelpLogOut (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						inboundHelpLog),
@@ -318,7 +320,7 @@ class ChatPromoCommand
 						helpCommand));
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						promoService),
@@ -341,7 +343,7 @@ class ChatPromoCommand
 
 				MessageRec outboundMessage =
 					chatSendLogic.sendMessageMagic (
-						taskLogger,
+						transaction,
 						chatUser,
 						optionalOf (
 							inboundMessage.getThreadId ()),
@@ -351,7 +353,7 @@ class ChatPromoCommand
 						helpCommand.getId ());
 
 				chatHelpLogLogic.createChatHelpLogOut (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						inboundHelpLog),
@@ -363,7 +365,7 @@ class ChatPromoCommand
 						helpCommand));
 
 				return smsInboxLogic.inboxProcessed (
-					taskLogger,
+					transaction,
 					inbox,
 					optionalOf (
 						promoService),
@@ -376,7 +378,7 @@ class ChatPromoCommand
 			// claim promo
 
 			chatPromoUserHelper.insert (
-				taskLogger,
+				transaction,
 				chatPromoUserHelper.createInstance ()
 
 				.setChatPromo (
@@ -411,7 +413,7 @@ class ChatPromoCommand
 
 			MessageRec outboundMessage =
 				chatSendLogic.sendMessageMagic (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalOf (
 						inboundMessage.getThreadId ()),
@@ -421,7 +423,7 @@ class ChatPromoCommand
 					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
-				taskLogger,
+				transaction,
 				chatUser,
 				optionalOf (
 					inboundHelpLog),
@@ -459,7 +461,7 @@ class ChatPromoCommand
 						"")
 
 					.handleInbox (
-						taskLogger,
+						transaction,
 						command);
 
 			}
@@ -474,10 +476,11 @@ class ChatPromoCommand
 			) {
 
 				chatMiscLogic.userJoin (
-					taskLogger,
+					transaction,
 					chatUser,
 					sendMessage,
-					inboundMessage.getThreadId (),
+					optionalOf (
+						inboundMessage.getThreadId ()),
 					ChatMessageMethod.sms);
 
 				sendMessage = false;
@@ -495,7 +498,7 @@ class ChatPromoCommand
 			)) {
 
 				chatDateLogic.userDateStuff (
-					taskLogger,
+					transaction,
 					chatUser,
 					optionalAbsent (),
 					optionalOf (
@@ -512,7 +515,7 @@ class ChatPromoCommand
 			// process inbox
 
 			return smsInboxLogic.inboxProcessed (
-				taskLogger,
+				transaction,
 				inbox,
 				optionalOf (
 					promoService),

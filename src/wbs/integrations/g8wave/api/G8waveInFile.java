@@ -13,6 +13,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.model.TextObjectHelper;
@@ -69,7 +70,7 @@ class G8waveInFile
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"doGet");
@@ -90,16 +91,11 @@ class G8waveInFile
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"doPost");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"G8waveInFile.doPost ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"doPost");
 
 		) {
 
@@ -161,24 +157,26 @@ class G8waveInFile
 
 			RouteRec route =
 				routeHelper.findRequired (
+					transaction,
 					routeId);
 
 			NetworkRec network =
 				networkId == null
 					? null
 					: networkHelper.findRequired (
+						transaction,
 						networkId);
 
 			// insert the message
 
 			smsInboxLogic.inboxInsert (
-				taskLogger,
+				transaction,
 				optionalAbsent (),
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					messageParam),
 				smsNumberHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					numFromParam),
 				numToParam,
 				route,

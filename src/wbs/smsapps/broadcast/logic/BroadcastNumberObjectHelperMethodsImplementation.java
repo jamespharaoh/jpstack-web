@@ -14,8 +14,9 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -42,15 +43,15 @@ class BroadcastNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	BroadcastNumberRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
 			@NonNull NumberRec number) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -59,6 +60,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 			BroadcastNumberRec broadcastNumber =
 				broadcastNumberHelper.find (
+					transaction,
 					broadcast,
 					number);
 
@@ -69,7 +71,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 			broadcastNumber =
 				broadcastNumberHelper.insert (
-					taskLogger,
+					transaction,
 					broadcastNumberHelper.createInstance ()
 
 				.setBroadcast (
@@ -101,15 +103,15 @@ class BroadcastNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	List <BroadcastNumberRec> findOrCreateMany (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <NumberRec> numbers) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreateMany");
 
 		) {
@@ -121,6 +123,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 			List <Optional <BroadcastNumberRec>> broadcastNumbers =
 				broadcastNumberHelper.findMany (
+					transaction,
 					broadcast,
 					numbers);
 
@@ -155,7 +158,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 					broadcastNumbersBuilder.add (
 						broadcastNumberHelper.insert (
-							taskLogger,
+							transaction,
 							broadcastNumberHelper.createInstance ()
 
 						.setBroadcast (

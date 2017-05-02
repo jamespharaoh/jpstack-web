@@ -6,8 +6,14 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoNone;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 
 import java.util.Map;
 
@@ -20,8 +26,9 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -86,7 +93,7 @@ class YesNoFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -95,82 +102,93 @@ class YesNoFormFieldRenderer <Container>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional <Boolean> currentValue =
-			formValuePresent (
-					submission,
-					formName)
-				? parseBooleanYesNoNone (
-					formValue (
-						submission,
-						formName))
-				: interfaceValue;
+		try (
 
-		htmlWriter.writeLineFormatIncreaseIndent (
-			"<select",
-			" id=\"%h\"",
-			stringFormat (
-				"%s.%s",
-				formName,
-				name ()),
-			" name=\"%h\"",
-			stringFormat (
-				"%s.%s",
-				formName,
-				name ()),
-			">");
-
-		if (
-
-			nullable ()
-
-			|| optionalIsNotPresent (
-				currentValue)
-
-			|| enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderFormInput");
 
 		) {
 
+			Optional <Boolean> currentValue =
+				formValuePresent (
+						submission,
+						formName)
+					? parseBooleanYesNoNone (
+						formValue (
+							submission,
+							formName))
+					: interfaceValue;
+
+			htmlWriter.writeLineFormatIncreaseIndent (
+				"<select",
+				" id=\"%h\"",
+				stringFormat (
+					"%s.%s",
+					formName,
+					name ()),
+				" name=\"%h\"",
+				stringFormat (
+					"%s.%s",
+					formName,
+					name ()),
+				">");
+
+			if (
+
+				nullable ()
+
+				|| optionalIsNotPresent (
+					currentValue)
+
+				|| enumInSafe (
+					formType,
+					FormType.create,
+					FormType.perform,
+					FormType.search)
+
+			) {
+
+				htmlWriter.writeLineFormat (
+					"<option",
+					" value=\"none\"",
+					currentValue.isPresent ()
+						? ""
+						: " selected",
+					">&mdash;</option>");
+
+			}
+
 			htmlWriter.writeLineFormat (
 				"<option",
-				" value=\"none\"",
-				currentValue.isPresent ()
-					? ""
-					: " selected",
-				">&mdash;</option>");
+				" value=\"yes\"",
+				currentValue.or (false) == true
+					? " selected"
+					: "",
+				">%h</option>",
+				yesLabel ());
+
+			htmlWriter.writeLineFormat (
+				"<option",
+				" value=\"no\"",
+				currentValue.or (true) == false
+					? " selected"
+					: "",
+				">%h</option>",
+				noLabel ());
+
+			htmlWriter.writeLineFormatDecreaseIndent (
+				"</select>");
 
 		}
-
-		htmlWriter.writeLineFormat (
-			"<option",
-			" value=\"yes\"",
-			currentValue.or (false) == true
-				? " selected"
-				: "",
-			">%h</option>",
-			yesLabel ());
-
-		htmlWriter.writeLineFormat (
-			"<option",
-			" value=\"no\"",
-			currentValue.or (true) == false
-				? " selected"
-				: "",
-			">%h</option>",
-			noLabel ());
-
-		htmlWriter.writeLineFormatDecreaseIndent (
-			"</select>");
 
 	}
 
 	@Override
 	public
 	void renderFormReset (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Boolean> interfaceValue,
@@ -178,9 +196,9 @@ class YesNoFormFieldRenderer <Container>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderFormReset");
 
 		) {
@@ -227,38 +245,120 @@ class YesNoFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <Boolean>, String> formToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
-		String formValue =
-			formValue (
-				submission,
-				formName);
+		try (
 
-		return successResult (
-			parseBooleanYesNoNone (
-				formValue));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"formToInterface");
+
+		) {
+
+			String formValue =
+				formValue (
+					submission,
+					formName);
+
+			return successResult (
+				parseBooleanYesNoNone (
+					formValue));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlSimple (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Boolean> genericValue,
 			boolean link) {
 
-		htmlWriter.writeLineFormat (
-			"%h",
-			booleanToString (
-				genericValue,
-				yesLabel (),
-				noLabel (),
-				"—"));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlSimple");
+
+		) {
+
+			htmlWriter.writeLineFormat (
+				"%h",
+				booleanToString (
+					genericValue,
+					yesLabel (),
+					noLabel (),
+					"—"));
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlTableCellList");
+
+		) {
+
+			htmlTableCellOpen (
+				htmlStyleRuleEntry (
+					"text-align",
+					listAlign ().name ()),
+				htmlColumnSpanAttribute (
+					colspan),
+				htmlClassAttribute (
+					presentInstances (
+						htmlClass (
+							interfaceValue))));
+
+			renderHtmlSimple (
+				transaction,
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue,
+				link);
+
+			htmlTableCellClose ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		// TODO Auto-generated method stub
 
 	}
 

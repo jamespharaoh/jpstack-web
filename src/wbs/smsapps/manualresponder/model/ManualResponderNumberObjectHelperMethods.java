@@ -1,6 +1,6 @@
 package wbs.smsapps.manualresponder.model;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -8,7 +8,7 @@ public
 interface ManualResponderNumberObjectHelperMethods {
 
 	ManualResponderNumberRec findOrCreate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			ManualResponderRec manualResponder,
 			NumberRec number);
 

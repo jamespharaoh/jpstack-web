@@ -43,9 +43,12 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -121,160 +124,193 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			prepareCurrentObject ();
+			prepareCurrentObject (
+				transaction);
 
-			prepareAllObjects ();
+			prepareAllObjects (
+				transaction);
 
 			prepareTargetContext (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
-	void prepareCurrentObject () {
+	void prepareCurrentObject (
+			@NonNull Transaction parentTransaction) {
 
-		Optional <Long> objectIdOptional =
-			requestContext.stuffInteger (
-				consoleHelper.objectName () + "Id");
+		try (
 
-		if (
-			optionalIsPresent (
-				objectIdOptional)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareCurrentObject");
+
 		) {
 
-			currentObject =
-				consoleHelper.findRequired (
-					optionalGetRequired (
-						objectIdOptional));
+			Optional <Long> objectIdOptional =
+				requestContext.stuffInteger (
+					consoleHelper.objectName () + "Id");
+
+			if (
+				optionalIsPresent (
+					objectIdOptional)
+			) {
+
+				currentObject =
+					consoleHelper.findRequired (
+						transaction,
+						optionalGetRequired (
+							objectIdOptional));
+
+			}
 
 		}
 
 	}
 
-	void prepareAllObjects () {
+	void prepareAllObjects (
+			@NonNull Transaction parentTransaction) {
 
-		// locate via parent
+		try (
 
-		ConsoleHelper <?> parentHelper =
-			objectManager.findConsoleHelperRequired (
-				consoleHelper.parentClass ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareAllObjects");
 
-		Optional <Long> parentIdOptional =
-			requestContext.stuffInteger (
-				parentHelper.idKey ());
-
-		if (
-			optionalIsPresent (
-				parentIdOptional)
 		) {
 
-			GlobalId parentGlobalId =
-				new GlobalId (
-					parentHelper.objectTypeId (),
-					optionalGetRequired (
-						parentIdOptional));
+			// locate via parent
+
+			ConsoleHelper <?> parentHelper =
+				objectManager.findConsoleHelperRequired (
+					consoleHelper.parentClass ());
+
+			Optional <Long> parentIdOptional =
+				requestContext.stuffInteger (
+					parentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					parentIdOptional)
+			) {
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						optionalGetRequired (
+							parentIdOptional));
+
+				if (typeCode != null) {
+
+					allObjects =
+						consoleHelper.findByParentAndType (
+							transaction,
+							parentGlobalId,
+							typeCode);
+
+				} else {
+
+					allObjects =
+						consoleHelper.findByParent (
+							transaction,
+							parentGlobalId);
+
+				}
+
+				return;
+
+			}
+
+			// locate via grand parent
+
+			ConsoleHelper <?> grandParentHelper =
+				objectManager.findConsoleHelperRequired (
+					parentHelper.parentClass ());
+
+			Optional <Long> grandParentIdOptional =
+				requestContext.stuffInteger (
+					grandParentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					grandParentIdOptional)
+			) {
+
+				GlobalId grandParentGlobalId =
+					GlobalId.of (
+						grandParentHelper.objectTypeId (),
+						optionalGetRequired (
+							grandParentIdOptional));
+
+				List <? extends Record<?>> parentObjects =
+					parentHelper.findByParent (
+						transaction,
+						grandParentGlobalId);
+
+				allObjects =
+					parentObjects.stream ()
+
+					.flatMap (
+						parentObject -> {
+
+						GlobalId parentGlobalId =
+							new GlobalId (
+								parentHelper.objectTypeId (),
+								parentObject.getId ());
+
+						if (typeCode != null) {
+
+							return collectionStream (
+								consoleHelper.findByParentAndType (
+									transaction,
+									parentGlobalId,
+									typeCode));
+
+						} else {
+
+							return collectionStream (
+								consoleHelper.findByParent (
+									transaction,
+									parentGlobalId));
+
+						}
+
+					})
+
+					.collect (
+						Collectors.toList ());
+
+				return;
+
+			}
+
+			// return all
 
 			if (typeCode != null) {
 
-				allObjects =
-					consoleHelper.findByParentAndType (
-						parentGlobalId,
-						typeCode);
+				throw new RuntimeException ();
 
 			} else {
 
 				allObjects =
-					consoleHelper.findByParent (
-						parentGlobalId);
+					consoleHelper.findAll (
+						transaction);
 
 			}
-
-			return;
-
-		}
-
-		// locate via grand parent
-
-		ConsoleHelper <?> grandParentHelper =
-			objectManager.findConsoleHelperRequired (
-				parentHelper.parentClass ());
-
-		Optional <Long> grandParentIdOptional =
-			requestContext.stuffInteger (
-				grandParentHelper.idKey ());
-
-		if (
-			optionalIsPresent (
-				grandParentIdOptional)
-		) {
-
-			GlobalId grandParentGlobalId =
-				GlobalId.of (
-					grandParentHelper.objectTypeId (),
-					optionalGetRequired (
-						grandParentIdOptional));
-
-			List <? extends Record<?>> parentObjects =
-				parentHelper.findByParent (
-					grandParentGlobalId);
-
-			allObjects =
-				parentObjects.stream ()
-
-				.flatMap (
-					parentObject -> {
-
-					GlobalId parentGlobalId =
-						new GlobalId (
-							parentHelper.objectTypeId (),
-							parentObject.getId ());
-
-					if (typeCode != null) {
-
-						return collectionStream (
-							consoleHelper.findByParentAndType (
-								parentGlobalId,
-								typeCode));
-
-					} else {
-
-						return collectionStream (
-							consoleHelper.findByParent (
-								parentGlobalId));
-
-					}
-
-				})
-
-				.collect (
-					Collectors.toList ());
-
-			return;
-
-		}
-
-		// return all
-
-		if (typeCode != null) {
-
-			throw new RuntimeException ();
-
-		} else {
-
-			allObjects =
-				consoleHelper.findAll ();
 
 		}
 
@@ -285,7 +321,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"prepareTargetContext");
@@ -310,13 +346,13 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -364,13 +400,13 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 								targetContext.pathPrefix (),
 								"/%s",
 								consoleHelper.getPathId (
-									taskLogger,
+									transaction,
 									object))))
 
 				);
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					formFieldSet,
 					object,

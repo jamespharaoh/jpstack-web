@@ -57,23 +57,19 @@ class ChatInfoSiteRespondAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goApi");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ChatInfoSiteRespondAction.goApi ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goApi");
 
 		) {
 
 			ChatInfoSiteRec infoSite =
 				chatInfoSiteHelper.findRequired (
+					transaction,
 					requestContext.requestIntegerRequired (
 						"chatInfoSiteId"));
 
@@ -91,11 +87,12 @@ class ChatInfoSiteRespondAction
 
 			ChatUserRec otherUser =
 				chatUserHelper.findRequired (
+					transaction,
 					requestContext.parameterIntegerRequired (
 						"otherUserId"));
 
 			chatMessageLogic.chatMessageSendFromUser (
-				taskLogger,
+				transaction,
 				infoSite.getChatUser (),
 				otherUser,
 				requestContext.parameterRequired (
@@ -107,7 +104,7 @@ class ChatInfoSiteRespondAction
 			transaction.commit ();
 
 			return responder (
-				taskLogger,
+				transaction,
 				"chatInfoSiteMessageSentResponder");
 
 		}

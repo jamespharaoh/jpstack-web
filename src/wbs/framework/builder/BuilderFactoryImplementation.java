@@ -1,7 +1,15 @@
 package wbs.framework.builder;
 
-import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.Misc.fullClassName;
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.classNotEqual;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -12,359 +20,317 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("builderFactory")
+@Accessors (fluent = true)
 public
-class BuilderFactoryImplementation
-	implements BuilderFactory {
+class BuilderFactoryImplementation <Context>
+	implements BuilderFactory <
+		BuilderFactoryImplementation <Context>,
+		Context
+	> {
 
-	List<BuilderInfo> builderInfos =
-		new ArrayList<BuilderInfo> ();
+	// singleton dependencies
 
-	@Override
-	public
-	BuilderFactory addBuilder (
-			Class<?> builderClass,
-			Provider<?> builderProvider) {
+	@ClassSingletonDependency
+	LogContext logContext;
 
-		BuilderInfo builderInfo =
-			new BuilderInfo ();
+	// prototype dependencies
 
-		builderInfo.builderClass =
-			builderClass;
+	@PrototypeDependency
+	Provider <BuilderImplementation <Context>> builderImplementationProvider;
 
-		builderInfo.builderProvider =
-			builderProvider;
+	// properties
 
-		for (
-			Field field
-				: builderClass.getDeclaredFields ()
-		) {
+	@Getter @Setter
+	Class <Context> contextClass;
 
-			BuilderParent builderParentAnnotation =
-				field.getAnnotation (
-					BuilderParent.class);
+	// state
 
-			if (builderParentAnnotation != null) {
+	List <BuilderInfo> builderInfos =
+		new ArrayList<> ();
 
-				if (builderInfo.parentField != null)
-					throw new RuntimeException ();
-
-				builderInfo.parentField =
-					field;
-
-			}
-
-			BuilderSource builderSourceAnnotation =
-				field.getAnnotation (
-					BuilderSource.class);
-
-			if (builderSourceAnnotation != null) {
-
-				if (builderInfo.sourceField != null)
-					throw new RuntimeException ();
-
-				builderInfo.sourceField =
-					field;
-
-			}
-
-			BuilderTarget builderTargetAnnotation =
-				field.getAnnotation (
-					BuilderTarget.class);
-
-			if (builderTargetAnnotation != null) {
-
-				if (builderInfo.targetField != null)
-					throw new RuntimeException ();
-
-				builderInfo.targetField =
-					field;
-
-			}
-
-		}
-
-		for (
-			Method method
-				: builderClass.getDeclaredMethods ()
-		) {
-
-			BuildMethod buildMethodAnnotation =
-				method.getAnnotation (
-					BuildMethod.class);
-
-			if (buildMethodAnnotation == null)
-				continue;
-
-			if (builderInfo.buildMethod != null)
-				throw new RuntimeException ();
-
-			builderInfo.buildMethod =
-				method;
-
-		}
-
-		if (builderInfo.parentField == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No @BuilderParent field for %s",
-					classNameFull (
-						builderClass)));
-
-		}
-
-		if (builderInfo.sourceField == null)
-			throw new RuntimeException ();
-
-		if (builderInfo.targetField == null)
-			throw new RuntimeException ();
-
-		if (builderInfo.buildMethod == null)
-			throw new RuntimeException ();
-
-		if (
-			builderInfo.buildMethod.getParameterTypes ().length < 1
-			|| builderInfo.buildMethod.getParameterTypes ().length > 2
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Build method %s.%s should have one or two arguments",
-					builderClass.getSimpleName (),
-					builderInfo.buildMethod.getName ()));
-
-		}
-
-		builderInfo.parentField.setAccessible (true);
-		builderInfo.sourceField.setAccessible (true);
-		builderInfo.targetField.setAccessible (true);
-
-		builderInfos.add (
-			builderInfo);
-
-		return this;
-
-	}
+	// implementation
 
 	@Override
 	public
-	BuilderFactory addBuilders (
-			Map <Class <?>, Provider <Object>> buildersMap) {
+	BuilderFactoryImplementation <Context> addBuilder (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <?> builderClass,
+			@NonNull Provider <?> builderProvider) {
 
-		for (
-			Map.Entry <Class <?>, Provider <Object>> builderEntry
-				: buildersMap.entrySet ()
-		) {
+		try (
 
-			addBuilder (
-				builderEntry.getKey (),
-				builderEntry.getValue ());
-
-		}
-
-		return this;
-
-	}
-
-	@Override
-	public
-	Builder create () {
-
-		return new BuilderImplementation ();
-
-	}
-
-	BuilderInfo selectBuilder (
-			Class<?> parentClass,
-			Class<?> sourceClass) {
-
-		List<BuilderInfo> candidateBuilderInfos =
-			new ArrayList<BuilderInfo> ();
-
-		for (
-			BuilderInfo builderInfo
-				: builderInfos
-		) {
-
-			if (! builderInfo.parentField.getType ().isAssignableFrom (
-					parentClass))
-				continue;
-
-			if (! builderInfo.sourceField.getType ().isAssignableFrom (
-					sourceClass))
-				continue;
-
-			candidateBuilderInfos.add (
-				builderInfo);
-
-		}
-
-		if (candidateBuilderInfos.isEmpty ()) {
-
-			/*
-			log.warn (sf (
-				"No builder for %s with parent %s",
-				sourceClass.getSimpleName (),
-				parentClass.getSimpleName ()));
-			*/
-
-			return null;
-
-		}
-
-		if (candidateBuilderInfos.size () > 1) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Multiple builders for %s with parent %s",
-					sourceClass.getSimpleName (),
-					parentClass.getSimpleName ()));
-
-		}
-
-		return candidateBuilderInfos.get (0);
-
-	}
-
-	public static
-	class BuilderInfo {
-
-		Class<?> builderClass;
-		Provider<?> builderProvider;
-
-		Field parentField;
-		Field targetField;
-		Field sourceField;
-
-		Method buildMethod;
-
-	}
-
-	class BuilderImplementation
-		implements Builder {
-
-		@Override
-		public
-		void descend (
-				@NonNull TaskLogger parentTaskLogger,
-				Object parentObject,
-				List<?> sourceObjects,
-				Object targetObject,
-				MissingBuilderBehaviour missingBuilderBehaviour) {
-
-			for (
-				Object sourceObject
-					: sourceObjects
-			) {
-
-				build (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					parentObject,
-					sourceObject,
-					targetObject,
-					missingBuilderBehaviour);
+					"addBuilder");
 
-			}
+		) {
 
-		}
-
-		void build (
-				@NonNull TaskLogger parentTaskLogger,
-				@NonNull Object parentObject,
-				@NonNull Object sourceObject,
-				@NonNull Object targetObject,
-				@NonNull MissingBuilderBehaviour missingBuilderBehaviour) {
-
-			// select builder
+			checkContextClassIsNotNull ();
 
 			BuilderInfo builderInfo =
-				selectBuilder (
-					parentObject.getClass (),
-					sourceObject.getClass ());
+				new BuilderInfo ();
 
-			if (builderInfo == null) {
+			builderInfo.builderClass =
+				builderClass;
 
-				switch (missingBuilderBehaviour) {
+			builderInfo.builderProvider =
+				builderProvider;
 
-				case error:
+			for (
+				Field field
+					: builderClass.getDeclaredFields ()
+			) {
 
-					throw new RuntimeException (
-						stringFormat (
+				BuilderParent builderParentAnnotation =
+					field.getAnnotation (
+						BuilderParent.class);
 
-							"No builder found for parent %s ",
-							parentObject.getClass ().getSimpleName (),
+				if (builderParentAnnotation != null) {
 
-							"and source %s",
-							sourceObject.getClass ().getSimpleName ()));
+					if (builderInfo.parentField != null)
+						throw new RuntimeException ();
 
-				case ignore:
+					builderInfo.parentField =
+						field;
 
-					return;
+				}
 
-				default:
+				BuilderSource builderSourceAnnotation =
+					field.getAnnotation (
+						BuilderSource.class);
 
+				if (builderSourceAnnotation != null) {
+
+					if (builderInfo.sourceField != null)
+						throw new RuntimeException ();
+
+					builderInfo.sourceField =
+						field;
+
+				}
+
+				BuilderTarget builderTargetAnnotation =
+					field.getAnnotation (
+						BuilderTarget.class);
+
+				if (builderTargetAnnotation != null) {
+
+					if (builderInfo.targetField != null)
+						throw new RuntimeException ();
+
+					builderInfo.targetField =
+						field;
+
+				}
+
+			}
+
+			for (
+				Method method
+					: builderClass.getDeclaredMethods ()
+			) {
+
+				BuildMethod buildMethodAnnotation =
+					method.getAnnotation (
+						BuildMethod.class);
+
+				if (buildMethodAnnotation == null)
+					continue;
+
+				if (builderInfo.buildMethod != null)
 					throw new RuntimeException ();
 
-				}
-
-			}
-
-			// instantiate
-
-			Object builderObject =
-				builderInfo.builderProvider.get ();
-
-			try {
-
-				// inject context
-
-				builderInfo.parentField.set (
-					builderObject,
-					parentObject);
-
-				builderInfo.sourceField.set (
-					builderObject,
-					sourceObject);
-
-				builderInfo.targetField.set (
-					builderObject,
-					targetObject);
-
-				// call builder
+				List <Class <?>> buildMethodParameters =
+					ImmutableList.copyOf (
+						method.getParameterTypes ());
 
 				if (
-					equalToTwo (
-						builderInfo.buildMethod.getParameterCount ())
+
+					collectionDoesNotHaveTwoElements (
+						buildMethodParameters)
+
+					|| classNotEqual (
+						listFirstElementRequired (
+							buildMethodParameters),
+						contextClass)
+
+					|| classNotEqual (
+						listSecondElementRequired (
+							buildMethodParameters),
+							Builder.class)
+
 				) {
 
-					builderInfo.buildMethod.invoke (
-						builderObject,
-						parentTaskLogger,
-						this);
+					taskLogger.errorFormat (
+						"Build method %s.%s ",
+						fullClassName (
+							builderClass),
+						method.getName (),
+						"has invalid type signature (%s)",
+						joinWithCommaAndSpace (
+							iterableMap (
+								parameterType ->
+									classNameSimple (
+										parameterType),
+								buildMethodParameters)));
 
-				} else {
-
-					builderInfo.buildMethod.invoke (
-						builderObject,
-						this);
+					return this;
 
 				}
 
-			} catch (Exception exception) {
-
-				throw new RuntimeException (exception);
+				builderInfo.buildMethod =
+					method;
 
 			}
+
+			if (builderInfo.parentField == null) {
+
+				taskLogger.errorFormat (
+					"No @BuilderParent field for %s",
+					classNameFull (
+						builderClass));
+
+				return this;
+
+			}
+
+			if (builderInfo.sourceField == null)
+				throw new RuntimeException ();
+
+			if (builderInfo.targetField == null)
+				throw new RuntimeException ();
+
+			if (builderInfo.buildMethod == null)
+				throw new RuntimeException ();
+
+			if (
+				builderInfo.buildMethod.getParameterTypes ().length < 1
+				|| builderInfo.buildMethod.getParameterTypes ().length > 2
+			) {
+
+				taskLogger.errorFormat (
+					"Build method %s.%s should have one or two arguments",
+					builderClass.getSimpleName (),
+					builderInfo.buildMethod.getName ());
+
+				return this;
+
+			}
+
+			builderInfo.parentField.setAccessible (true);
+			builderInfo.sourceField.setAccessible (true);
+			builderInfo.targetField.setAccessible (true);
+
+			builderInfos.add (
+				builderInfo);
+
+			return this;
+
+		}
+
+	}
+
+	@Override
+	public
+	BuilderFactoryImplementation <Context> addBuilders (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Map <Class <?>, Provider <Object>> buildersMap) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addBuilders");
+
+		) {
+
+			checkContextClassIsNotNull ();
+
+			for (
+				Map.Entry <Class <?>, Provider <Object>> builderEntry
+					: buildersMap.entrySet ()
+			) {
+
+				addBuilder (
+					taskLogger,
+					builderEntry.getKey (),
+					builderEntry.getValue ());
+
+			}
+
+			return this;
+
+		}
+
+	}
+
+	@Override
+	public
+	Builder <Context> create (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		checkContextClassIsNotNull ();
+
+		parentTaskLogger.makeException ();
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"create");
+
+		) {
+
+			return builderImplementationProvider.get ()
+
+				.contextClass (
+					contextClass)
+
+				.builderInfos (
+					builderInfos)
+
+			;
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void checkContextClassIsNotNull () {
+
+		if (
+			isNull (
+				contextClass)
+		) {
+
+			throw new NullPointerException (
+				stringFormat (
+					"BuilderFactoryImplementation.contextClass must be ",
+					"specified."));
 
 		}
 

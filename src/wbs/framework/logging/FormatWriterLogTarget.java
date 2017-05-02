@@ -49,12 +49,12 @@ class FormatWriterLogTarget
 	void writeToLog (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull LogSeverity severity,
-			@NonNull String message,
+			@NonNull CharSequence message,
 			@NonNull Optional <Throwable> exception) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"writeToLog");
