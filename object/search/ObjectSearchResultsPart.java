@@ -23,6 +23,7 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToSpaces;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
@@ -67,6 +68,7 @@ import org.joda.time.LocalDate;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FormField;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
@@ -602,6 +604,8 @@ class ObjectSearchResultsPart <
 					: objects
 			) {
 
+				// handle deleted records
+
 				if (
 					optionalIsNotPresent (
 						resultOptional)
@@ -620,6 +624,8 @@ class ObjectSearchResultsPart <
 					continue;
 
 				}
+
+				// handle restricted records
 
 				ResultType result =
 					resultOptional.get ();
@@ -648,6 +654,8 @@ class ObjectSearchResultsPart <
 					continue;
 
 				}
+
+				// output dates
 
 				if (
 
@@ -699,6 +707,8 @@ class ObjectSearchResultsPart <
 
 				}
 
+				// output separator if there are row fields
+
 				if (
 					isNotNull (
 						rowsFormFieldSet)
@@ -707,6 +717,8 @@ class ObjectSearchResultsPart <
 					htmlTableRowSeparatorWrite ();
 
 				}
+
+				// output column fields
 
 				if (result instanceof Record) {
 
@@ -764,68 +776,91 @@ class ObjectSearchResultsPart <
 					emptyMap (),
 					false);
 
+				htmlTableRowClose ();
+
+				// output row fields
+
 				if (
 					isNotNull (
 						rowsFormFieldSet)
 				) {
 
-					htmlTableRowClose ();
+					for (
+						FormField <ResultType, ?, ?, ?> rowField
+							: rowsFormFieldSet.formFields ()
+					) {
 
-					htmlTableRowOpen (
-						presentInstances (
+						htmlTableRowOpen (
+							presentInstances (
 
-						optionalOf (
-							htmlClassAttribute (
-								presentInstances (
+							optionalOf (
+								htmlClassAttribute (
+									presentInstances (
 
-							Optional.of (
-								"magic-table-row"),
+								Optional.of (
+									"magic-table-row"),
 
-							Optional.of (
-								stringFormat (
+								Optional.of (
+									stringFormat (
+										"search-result-%s",
+										integerToDecimalString (
+											result.getId ()))),
+
+								optionalIf (
+									result == currentObject,
+									() -> "selected"),
+
+								getListClass (
+									transaction,
+									result)
+
+							))),
+
+							optionalOf (
+								htmlDataAttributeFormat (
+									"rows-class",
 									"search-result-%s",
 									integerToDecimalString (
 										result.getId ()))),
 
 							optionalIf (
-								result == currentObject,
-								() -> "selected"),
+								result instanceof Record,
+								() -> htmlDataAttribute (
+									"target-href",
+									objectUrl (
+										transaction,
+										genericCastUnchecked (
+											result))))
 
-							getListClass (
+						));
+
+						try {
+
+							rowField.renderTableCellList (
 								transaction,
-								result)
+								formatWriter,
+								result,
+								emptyMap (),
+								false,
+								columnsFormFieldSet.columns ());
 
-						))),
+						} catch (Exception exception) {
 
-						optionalOf (
-							htmlDataAttributeFormat (
-								"rows-class",
-								"search-result-%s",
-								integerToDecimalString (
-									result.getId ()))),
+							throw new RuntimeException (
+								stringFormat (
+									"Error rendering field %s for %s",
+									rowField.name (),
+									objectToString (
+										result)),
+								exception);
 
-						optionalIf (
-							result instanceof Record,
-							() -> htmlDataAttribute (
-								"target-href",
-								objectUrl (
-									transaction,
-									genericCastUnchecked (
-										result))))
+						}
 
-					));
+						htmlTableRowClose ();
 
-					formFieldLogic.outputTableRowsList (
-						transaction,
-						formatWriter,
-						rowsFormFieldSet,
-						result,
-						false,
-						columnsFormFieldSet.columns ());
+					}
 
 				}
-
-				htmlTableRowClose ();
 
 			}
 

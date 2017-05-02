@@ -7,7 +7,7 @@
 
 		<context-stuff
 			name="objectTypeName"
-			field="description"/>
+			field="code"/>
 
 		<priv-key
 			name="objectType.manage"

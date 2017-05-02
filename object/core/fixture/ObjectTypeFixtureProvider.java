@@ -55,7 +55,7 @@ class ObjectTypeFixtureProvider
 						transaction,
 						GlobalId.root,
 						"test",
-						"system"))
+						"internal"))
 
 				.setCode (
 					"object_type")
@@ -67,7 +67,7 @@ class ObjectTypeFixtureProvider
 					"Manage database object types")
 
 				.setLabel (
-					"Object type")
+					"Object types")
 
 				.setTargetPath (
 					"/objectTypes")
