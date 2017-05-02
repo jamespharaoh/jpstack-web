@@ -24,7 +24,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperFindImplementation")
@@ -197,7 +196,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 					objectModel.daoImplementation ().getClass (),
 					"searchIds",
 					ImmutableList.of (
-						TaskLogger.class,
+						Transaction.class,
 						searchClass));
 
 			try {
