@@ -28,7 +28,6 @@ import wbs.web.exceptions.HttpForbiddenException;
 import wbs.web.exceptions.HttpMethodNotAllowedException;
 import wbs.web.file.WebFile;
 
-@SuppressWarnings ("serial")
 public abstract
 class WbsServlet
 	extends HttpServlet {
