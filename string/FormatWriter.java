@@ -14,7 +14,7 @@ interface FormatWriter
 	// necessary methods
 
 	void writeString (
-			String string);
+			CharSequence string);
 
 	void writeCharacter (
 			int character);
@@ -41,7 +41,7 @@ interface FormatWriter
 
 	default
 	void writeFormat (
-			String ... arguments) {
+			CharSequence ... arguments) {
 
 		writeString (
 			stringFormatArray (
@@ -51,7 +51,7 @@ interface FormatWriter
 
 	default
 	void writeFormatArray (
-			String [] arguments) {
+			CharSequence[] arguments) {
 
 		writeString (
 			stringFormatArray (
@@ -61,7 +61,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormat (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		String lineContent =
 			stringFormatArray (
@@ -85,7 +85,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatIncreaseIndent (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		writeIndent ();
 
@@ -101,7 +101,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatDecreaseIndent (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		decreaseIndent ();
 
@@ -117,7 +117,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatDecreaseIncreaseIndent (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		decreaseIndent ();
 
@@ -135,7 +135,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatArray (
-			String [] arguments) {
+			CharSequence[] arguments) {
 
 		writeIndent ();
 

@@ -21,7 +21,7 @@ import org.apache.tools.ant.Task;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.OwnedTaskLogger;
 
 public
 class DatabaseInitTask
@@ -52,7 +52,7 @@ class DatabaseInitTask
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
 					"init");
 

@@ -1,5 +1,7 @@
 package wbs.utils.time;
 
+import com.google.common.base.Optional;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -7,8 +9,6 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
-
-import com.google.common.base.Optional;
 
 public
 interface TimeFormatter {

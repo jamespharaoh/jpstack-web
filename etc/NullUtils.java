@@ -1,8 +1,12 @@
 package wbs.utils.etc;
 
+import static wbs.utils.etc.Misc.isNull;
+
 import java.util.function.Supplier;
 
 import lombok.NonNull;
+
+import wbs.framework.logging.TaskLogger;
 
 public
 class NullUtils {
@@ -91,6 +95,25 @@ class NullUtils {
 			return null;
 
 		return input;
+
+	}
+
+	public static
+	void errorIfNull (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String name,
+			Object value) {
+
+		if (
+			isNull (
+				value)
+		) {
+
+			parentTaskLogger.errorFormat (
+				"Parameter %s is null",
+				name);
+
+		}
 
 	}
 

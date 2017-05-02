@@ -2,14 +2,11 @@ package wbs.utils.string;
 
 import static wbs.web.utils.HtmlUtils.htmlEncode;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
 
 import lombok.NonNull;
 
@@ -30,67 +27,42 @@ class StringFormatter {
 
 	}
 
-	/**
-	 * Finds a series of formats and their args and calls formatReal () with
-	 * them, returning the resulting strings in a list.
-	 */
 	public
-	List <String> formatSpecial (
-			@NonNull List <Object> arguments) {
+	String format (
+			@NonNull Iterable <String> arguments) {
 
-		List <String> stringsToReturn =
-			new ArrayList<> ();
+		StringBuilder stringBuilder =
+			new StringBuilder ();
 
-		for (
-			int argumentIndex = 0;
-			argumentIndex < arguments.size ();
-			argumentIndex ++
-		) {
+		Iterator <String> iterator =
+			arguments.iterator ();
+
+		while (iterator.hasNext ()) {
 
 			String format =
-				(String)
-				arguments.get (
-					argumentIndex);
-
-			/*
-			if (
-				referenceNotEqualSafe (
-					format,
-					format.intern ())
-			) {
-
-				throw new IllegalArgumentException (
-					stringFormat (
-						"Format string at position %s ",
-						argumentIndex,
-						"is not interned, so probably a bug"));
-
-			}
-			*/
+				iterator.next ();
 
 			int numPercents =
-				numPercents (format);
+				numPercents (
+					format);
 
-			stringsToReturn.add (
+			stringBuilder.append (
 				formatReal (
 					format,
-					arguments.subList (
-						argumentIndex + 1,
-						argumentIndex + 1 + numPercents)));
-
-			argumentIndex +=
-				numPercents;
+					() -> Iterators.limit (
+						iterator,
+						numPercents)));
 
 		}
 
-		return stringsToReturn;
+		return stringBuilder.toString ();
 
 	}
 
 	public
 	String formatReal (
 			@NonNull String format,
-			@NonNull List<?> argumenta) {
+			@NonNull Iterable <String> argumenta) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -177,37 +149,6 @@ class StringFormatter {
 				percentPosition + 2;
 
 		}
-
-	}
-
-	public
-	String format (
-			@NonNull Object... arguments) {
-
-		return formatArray (
-			arguments);
-
-	}
-
-	public
-	String formatArray (
-			@NonNull Object[] arguments) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		for (
-			String string
-				: formatSpecial (
-					Arrays.asList (arguments))
-		) {
-
-			stringBuilder.append (
-				string);
-
-		}
-
-		return stringBuilder.toString ();
 
 	}
 
@@ -357,30 +298,10 @@ class StringFormatter {
 
 	public static
 	String standard (
-			@NonNull Object... arguments) {
+			@NonNull Iterable <String> arguments) {
 
-		return standardStringFormatter.formatArray (
+		return standardStringFormatter.format (
 			arguments);
-
-	}
-
-	public static
-	String standardArray (
-			@NonNull Object[] arguments) {
-
-		return standardStringFormatter.formatArray (
-			arguments);
-
-	}
-
-	public static
-	void printWriterFormat (
-			PrintWriter printWriter,
-			Object... arguments) {
-
-		printWriter.print (
-			standardArray (
-				arguments));
 
 	}
 

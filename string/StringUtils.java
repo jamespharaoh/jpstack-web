@@ -1,7 +1,11 @@
 package wbs.utils.string;
 
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.nullIf;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -1066,29 +1070,74 @@ class StringUtils {
 
 	public static
 	String stringFormat (
-			String ... arguments) {
+			@NonNull Iterable <CharSequence> arguments) {
 
-		return StringFormatter.standardArray (
-			arguments);
+		return StringFormatter.standard (
+			iterableMap (
+				CharSequence::toString,
+				arguments));
+
+	}
+
+	public static
+	String stringFormat (
+			@NonNull CharSequence ... arguments) {
+
+		return StringFormatter.standard (
+			iterableMap (
+				CharSequence::toString,
+				Arrays.asList (
+					arguments)));
 
 	}
 
 	public static
 	String stringFormatArray (
-			String[] arguments) {
+			CharSequence[] arguments) {
 
-		return stringFormat (
-			arguments);
+		return StringFormatter.standard (
+			iterableMap (
+				CharSequence::toString,
+				Arrays.asList (
+					arguments)));
 
 	}
 
 	public static
-	String stringFormatList (
-			List <String> arguments) {
+	LazyString stringFormatLazy (
+			Iterable <CharSequence> arguments) {
 
-		return stringFormat (
-			arguments.toArray (
-				new String [] {}));
+		return new LazyString (
+			() -> StringFormatter.standard (
+				iterableMap (
+					CharSequence::toString,
+					arguments)));
+
+	}
+
+	public static
+	LazyString stringFormatLazy (
+			CharSequence ... arguments) {
+
+		return new LazyString (
+			() -> StringFormatter.standard (
+				iterableMap (
+					CharSequence::toString,
+					Arrays.asList (
+						arguments))));
+
+	}
+
+	public static
+	LazyString stringFormatLazyArray (
+			CharSequence[] arguments) {
+
+		return new LazyString (
+			() -> StringFormatter.standard (
+				iterableMap (
+					CharSequence::toString,
+					Arrays.asList (
+						arguments))));
 
 	}
 
@@ -1542,6 +1591,70 @@ class StringUtils {
 
 		return string.toString ().contains (
 			substring);
+
+	}
+
+	public static
+	String keyEqualsString (
+			@NonNull String key,
+			@NonNull String value) {
+
+		return stringFormat (
+			"%s = \"%s\"",
+			key,
+			value);
+
+	}
+
+	public static
+	String keyEqualsDecimalInteger (
+			@NonNull String key,
+			@NonNull Long value) {
+
+		return stringFormat (
+			"%s = %s",
+			key,
+			integerToDecimalString (
+				value));
+
+	}
+
+	public static
+	String keyEqualsDecimalInteger (
+			@NonNull String key,
+			@NonNull Integer value) {
+
+		return stringFormat (
+			"%s = %s",
+			key,
+			integerToDecimalString (
+				value));
+
+	}
+
+	public static
+	String keyEqualsEnum (
+			@NonNull String key,
+			@NonNull Enum <?> value) {
+
+		return stringFormat (
+			"%s = %s",
+			key,
+			enumNameHyphens (
+				value));
+
+	}
+
+	public static
+	String keyEqualsYesNo (
+			@NonNull String key,
+			@NonNull Boolean value) {
+
+		return stringFormat (
+			"%s = %s",
+			key,
+			booleanToYesNo (
+				value));
 
 	}
 

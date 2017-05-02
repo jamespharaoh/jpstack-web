@@ -81,7 +81,7 @@ class BorrowedFormatWriter
 	@Override
 	public
 	void writeString (
-			@NonNull String string) {
+			@NonNull CharSequence string) {
 
 		delegate.writeString (
 			string);

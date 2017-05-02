@@ -1,6 +1,6 @@
 package wbs.utils.cache;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import com.google.common.base.Optional;
 
@@ -9,22 +9,26 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.logging.TaskLogger;
-
 @Accessors (fluent = true)
 public
-class DummyCache <Key, Value>
-	implements AdvancedCache <Key, Value> {
+class DummyCache <Context, Key, Value>
+	implements AdvancedCache <Context, Key, Value> {
+
+	// properties
 
 	@Getter @Setter
-	Function <Key, Optional <Value>> lookupByKeyFunction;
+	BiFunction <Context, Key, Optional <Value>> lookupByKeyFunction;
+
+	// implementation
 
 	@Override
 	public
 	Optional <Value> find (
+			@NonNull Context context,
 			@NonNull Key key) {
 
 		return lookupByKeyFunction.apply (
+			context,
 			key);
 
 	}
@@ -32,7 +36,7 @@ class DummyCache <Key, Value>
 	@Override
 	public
 	Value create (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Context parentTaskLogger,
 			@NonNull Key key) {
 
 		throw new UnsupportedOperationException ();
@@ -42,7 +46,7 @@ class DummyCache <Key, Value>
 	@Override
 	public
 	Value findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Context parentTaskLogger,
 			@NonNull Key key) {
 
 		throw new UnsupportedOperationException ();

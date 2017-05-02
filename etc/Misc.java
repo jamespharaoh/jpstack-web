@@ -116,7 +116,7 @@ class Misc {
 
 	public static
 	int min (
-			int... params) {
+			int ... params) {
 
 		int ret =
 			params [0];
@@ -167,6 +167,53 @@ class Misc {
 
 			if (param > ret)
 				ret = param;
+
+		}
+
+		return ret;
+
+	}
+
+	public static
+	long max (
+			Iterable <Integer> params) {
+
+		Iterator <Integer> iterator =
+			params.iterator ();
+
+		long value =
+			iterator.next ();
+
+		while (iterator.hasNext ()) {
+
+			Integer param =
+				iterator.next ();
+
+			if (param > value) {
+				value = param;
+			}
+
+		}
+
+		return value;
+
+	}
+
+	public static
+	long max (
+			Integer ... params) {
+
+		long ret =
+			params [0];
+
+		for (
+			long param
+				: params
+		) {
+
+			if (param > ret) {
+				ret = param;
+			}
 
 		}
 
@@ -927,6 +974,11 @@ class Misc {
 		throw new RuntimeException (
 			"Should never happen");
 
+	}
+
+	public static
+	boolean disabled () {
+		return true;
 	}
 
 }

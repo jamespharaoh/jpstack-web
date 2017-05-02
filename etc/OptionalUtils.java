@@ -1,5 +1,6 @@
 package wbs.utils.etc;
 
+import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -756,12 +757,22 @@ class OptionalUtils {
 	@SafeVarargs
 	public static <Type>
 	List <Type> presentInstancesList (
-			@NonNull Optional <Type>... arguments) {
+			@NonNull Optional <Type> ... arguments) {
 
 		return ImmutableList.copyOf (
 			Optional.presentInstances (
 				Arrays.asList (
 					arguments)));
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Iterable <Optional <Type>> arguments) {
+
+		return ImmutableList.copyOf (
+			Optional.presentInstances (
+				arguments));
 
 	}
 
@@ -925,7 +936,13 @@ class OptionalUtils {
 
 			} else {
 
-				throw new ClassCastException ();
+				throw new ClassCastException (
+					stringFormat (
+						"Cannot cast %s to %s",
+						classNameFull (
+							optionalValue.get ().getClass ()),
+						classNameFull (
+							classToCastTo)));
 
 			}
 

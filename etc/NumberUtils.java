@@ -559,6 +559,14 @@ class NumberUtils {
 
 	}
 
+	public static
+	boolean notEqualToTwo (
+			long value) {
+
+		return value != 2l;
+
+	}
+
 	// ---------- three
 
 	public static

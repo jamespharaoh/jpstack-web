@@ -42,12 +42,12 @@ class WriterFormatWriter
 	@Override
 	public
 	void writeString (
-			@NonNull String string) {
+			@NonNull CharSequence string) {
 
 		try {
 
 			writer.write (
-				string);
+				string.toString ());
 
 		} catch (IOException exception) {
 

@@ -25,7 +25,7 @@ class NullFormatWriter
 	@Override
 	public
 	void writeString (
-			@NonNull String string) {
+			@NonNull CharSequence string) {
 
 		doNothing ();
 
