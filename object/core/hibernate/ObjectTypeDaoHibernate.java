@@ -83,6 +83,8 @@ class ObjectTypeDaoHibernate
 					ObjectTypeRec::getId,
 					ObjectTypeRec::getCode);
 
+transaction.close ();
+
 		}
 
 	}
