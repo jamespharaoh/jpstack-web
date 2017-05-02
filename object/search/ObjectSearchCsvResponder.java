@@ -36,10 +36,10 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
@@ -102,10 +102,21 @@ class ObjectSearchCsvResponder <ResultType>
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter =
-			requestContext.formatWriter ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
+
+		) {
+
+			formatWriter =
+				requestContext.formatWriter ();
+
+		}
 
 	}
 
@@ -114,13 +125,13 @@ class ObjectSearchCsvResponder <ResultType>
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -129,8 +140,9 @@ class ObjectSearchCsvResponder <ResultType>
 
 			searchObject =
 				userSessionLogic.userDataObjectRequired (
-					taskLogger,
-					userConsoleLogic.userRequired (),
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction),
 					stringFormat (
 						"object_search_%s_fields",
 						sessionKey));
@@ -142,7 +154,9 @@ class ObjectSearchCsvResponder <ResultType>
 					NumberUtils::parseIntegerRequired,
 					stringSplitComma (
 						userSessionLogic.userDataStringRequired (
-							userConsoleLogic.userRequired (),
+							transaction,
+							userConsoleLogic.userRequired (
+								transaction),
 							stringFormat (
 								"object_search_%s_results",
 								sessionKey))));
@@ -158,13 +172,13 @@ class ObjectSearchCsvResponder <ResultType>
 	@Override
 	protected
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -187,19 +201,16 @@ class ObjectSearchCsvResponder <ResultType>
 	@Override
 	protected
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"render ()");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			// form fields
 
@@ -263,6 +274,7 @@ class ObjectSearchCsvResponder <ResultType>
 					objects =
 						genericCastUnchecked (
 							consoleHelper.findMany (
+								transaction,
 								batch));
 
 				}
@@ -276,7 +288,7 @@ class ObjectSearchCsvResponder <ResultType>
 					// write object
 
 					formFieldLogic.outputCsvRow (
-						taskLogger,
+						transaction,
 						formatWriter,
 						formFieldSets,
 						object,

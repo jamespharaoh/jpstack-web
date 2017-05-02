@@ -13,8 +13,9 @@ import wbs.console.forms.FormFieldNativeMapping;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -38,15 +39,15 @@ class TextFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <TextRec> genericToNative (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> genericValue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"genericToNative");
 
 		) {
@@ -57,7 +58,7 @@ class TextFormFieldNativeMapping <Container>
 
 			return Optional.of (
 				textHelper.findOrCreate (
-					taskLogger,
+					transaction,
 					genericValue.get ()));
 
 		}
@@ -67,8 +68,9 @@ class TextFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <String> nativeToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
-			@NonNull Optional<TextRec> nativeValue) {
+			@NonNull Optional <TextRec> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
 			return optionalAbsent ();

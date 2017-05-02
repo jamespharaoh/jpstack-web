@@ -14,6 +14,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.CommonRecord;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.EventRecord;
@@ -22,7 +24,6 @@ import wbs.framework.entity.record.MinorRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -57,7 +58,7 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 	@Override
 	public
 	void onUpdate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull Record <?> linkObject,
@@ -66,9 +67,9 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"onUpdate");
 
 		) {
@@ -108,9 +109,10 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 				if (updateResult.newNativeValue ().isPresent ()) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						adminPrefix + "object_field_updated_in",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						fieldName,
 						objectRef.get (),
 						objectType.get (),
@@ -120,9 +122,10 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 				} else {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						adminPrefix + "object_field_nulled_in",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						fieldName,
 						objectRef.get (),
 						objectType.get (),
@@ -135,9 +138,10 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 				if (updateResult.newNativeValue ().isPresent ()) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						adminPrefix + "object_field_updated",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						fieldName,
 						linkObject,
 						updateResult.newNativeValue ().get ());
@@ -145,9 +149,10 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 				} else {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						adminPrefix + "object_field_nulled",
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						fieldName,
 						linkObject);
 

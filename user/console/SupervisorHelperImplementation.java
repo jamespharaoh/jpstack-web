@@ -7,10 +7,18 @@ import static wbs.utils.string.StringUtils.stringSplitComma;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorHelper;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.scaffold.model.SliceRec;
 
 @SingletonComponent ("supervisorHelper")
@@ -19,6 +27,9 @@ class SupervisorHelperImplementation
 	implements SupervisorHelper {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -30,20 +41,33 @@ class SupervisorHelperImplementation
 
 	@Override
 	public
-	List <String> getSupervisorConfigNames () {
+	List <String> getSupervisorConfigNames (
+			@NonNull Transaction parentTransaction) {
 
-		SliceRec slice =
-			userConsoleLogic.sliceRequired ();
+		try (
 
-		List <String> supervisorConfigNames =
-			ifThenElse (
-				isNotNull (
-					slice.getSupervisorConfigNames ()),
-				() -> stringSplitComma (
-					slice.getSupervisorConfigNames ()),
-				() -> Collections.emptyList ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorConfigNames");
 
-		return supervisorConfigNames;
+		) {
+
+			SliceRec slice =
+				userConsoleLogic.sliceRequired (
+					transaction);
+
+			List <String> supervisorConfigNames =
+				ifThenElse (
+					isNotNull (
+						slice.getSupervisorConfigNames ()),
+					() -> stringSplitComma (
+						slice.getSupervisorConfigNames ()),
+					() -> Collections.emptyList ());
+
+			return supervisorConfigNames;
+
+		}
 
 	}
 

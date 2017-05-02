@@ -18,8 +18,9 @@ import wbs.console.part.PagePartFactory;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPart")
@@ -46,13 +47,13 @@ class ObjectSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -67,14 +68,14 @@ class ObjectSummaryPart
 
 				PagePart pagePart =
 					partFactory.buildPagePart (
-						taskLogger);
+						transaction);
 
 				pagePart.setup (
-					taskLogger,
+					transaction,
 					Collections.emptyMap ());
 
 				pagePart.prepare (
-					taskLogger);
+					transaction);
 
 				parts.add (
 					pagePart);
@@ -109,13 +110,13 @@ class ObjectSummaryPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContent");
 
 		) {
@@ -126,7 +127,7 @@ class ObjectSummaryPart
 			) {
 
 				part.renderHtmlHeadContent (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -137,13 +138,13 @@ class ObjectSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -154,7 +155,7 @@ class ObjectSummaryPart
 			) {
 
 				part.renderHtmlBodyContent (
-					taskLogger);
+					transaction);
 
 			}
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.console.QueueSubjectSorter.SubjectInfo;
 

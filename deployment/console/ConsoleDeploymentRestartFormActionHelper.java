@@ -14,9 +14,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.model.ConsoleDeploymentRec;
 import wbs.platform.event.logic.EventLogic;
@@ -56,23 +56,24 @@ class ConsoleDeploymentRestartFormActionHelper
 	@Override
 	public
 	Permissions canBePerformed (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"canBePerformed");
 
 		) {
 
 			ConsoleDeploymentRec consoleDeployment =
-				consoleDeploymentHelper.findFromContextRequired ();
+				consoleDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			boolean show =
 				userPrivChecker.canRecursive (
-					taskLogger,
+					transaction,
 					consoleDeployment,
 					"restart");
 
@@ -90,24 +91,36 @@ class ConsoleDeploymentRestartFormActionHelper
 	@Override
 	public
 	void writePreamble (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean submit) {
 
-		ConsoleDeploymentRec consoleDeployment =
-			consoleDeploymentHelper.findFromContextRequired ();
+		try (
 
-		if (consoleDeployment.getRestart ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writePreamble");
 
-			htmlParagraphWriteFormat (
-				"There is already a restart scheduled for this console ",
-				"deployment, but it has not yet taken place. If this message ",
-				"persists, please contact support.");
+		) {
 
-		} else {
+			ConsoleDeploymentRec consoleDeployment =
+				consoleDeploymentHelper.findFromContextRequired (
+					transaction);
 
-			htmlParagraphWriteFormat (
-				"Trigger a restart for this console deployment");
+			if (consoleDeployment.getRestart ()) {
+
+				htmlParagraphWriteFormat (
+					"There is already a restart scheduled for this console ",
+					"deployment, but it has not yet taken place. If this message ",
+					"persists, please contact support.");
+
+			} else {
+
+				htmlParagraphWriteFormat (
+					"Trigger a restart for this console deployment");
+
+			}
 
 		}
 
@@ -116,15 +129,14 @@ class ConsoleDeploymentRestartFormActionHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction,
+			@NonNull Transaction parentTransaction,
 			@NonNull Object formState) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processFormSubmission");
 
 		) {
@@ -132,7 +144,8 @@ class ConsoleDeploymentRestartFormActionHelper
 			// load data
 
 			ConsoleDeploymentRec consoleDeployment =
-				consoleDeploymentHelper.findFromContextRequired ();
+				consoleDeploymentHelper.findFromContextRequired (
+					transaction);
 
 			// check state
 
@@ -153,9 +166,10 @@ class ConsoleDeploymentRestartFormActionHelper
 					true);
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"console_deployment_restarted",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				consoleDeployment);
 
 			// commit and return

@@ -4,8 +4,12 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -22,6 +26,9 @@ class DummyQueueCache
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
@@ -33,10 +40,12 @@ class DummyQueueCache
 	@Override
 	public
 	QueueItemRec findQueueItemByIndexRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec subject,
 			@NonNull Long index) {
 
 		return queueItemHelper.findByIndexRequired (
+			parentTransaction,
 			subject,
 			index);
 
@@ -44,19 +53,45 @@ class DummyQueueCache
 
 	@Override
 	public
-	List <QueueSubjectRec> findQueueSubjects () {
+	List <QueueSubjectRec> findQueueSubjects (
+			@NonNull Transaction parentTransaction) {
 
-		return queueSubjectHelper.findActive ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findQueueSubjects");
+
+		) {
+
+			return queueSubjectHelper.findActive (
+				transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <QueueSubjectRec> findQueueSubjects (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue) {
 
-		return queueSubjectHelper.findActive (
-			queue);
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findQueueSubjects");
+
+		) {
+
+			return queueSubjectHelper.findActive (
+				transaction,
+				queue);
+
+		}
 
 	}
 

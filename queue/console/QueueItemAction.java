@@ -56,32 +56,28 @@ class QueueItemAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		Long queueItemId =
-			Long.parseLong (
-				requestContext.parameterRequired (
-					"id"));
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"QueueItemAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			Long queueItemId =
+				Long.parseLong (
+					requestContext.parameterRequired (
+						"id"));
+
 			QueueItemRec queueItem =
 				queueItemHelper.findRequired (
+					transaction,
 					queueItemId);
 
 			return queuePageFactoryManager.getItemResponder (
-				taskLogger,
+				transaction,
 				requestContext,
 				queueItem);
 

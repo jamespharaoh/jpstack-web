@@ -2,9 +2,16 @@ package wbs.platform.media.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.media.model.ContentDao;
 import wbs.platform.media.model.ContentRec;
 
@@ -13,25 +20,45 @@ class ContentDaoHibernate
 	extends HibernateDao
 	implements ContentDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	List <ContentRec> findByShortHash (
-			Long shortHash) {
+			@NonNull Transaction parentTransaction,
+			@NonNull Long shortHash) {
 
-		return findMany (
-			"findByHash (hash)",
-			ContentRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByShortHash");
+
+		) {
+
+			return findMany (
+				transaction,
 				ContentRec.class,
-				"_content")
 
-			.add (
-				Restrictions.eq (
-					"_content.hash",
-					shortHash))
+				createCriteria (
+					transaction,
+					ContentRec.class,
+					"_content")
 
-		);
+				.add (
+					Restrictions.eq (
+						"_content.hash",
+						shortHash))
+
+			);
+
+		}
 
 	}
 

@@ -6,7 +6,12 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.queue.model.QueueItemClaimDaoMethods;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemClaimStatus;
@@ -17,49 +22,82 @@ class QueueItemClaimDaoHibernate
 	extends HibernateDao
 	implements QueueItemClaimDaoMethods {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<QueueItemClaimRec> findClaimed () {
+	List <QueueItemClaimRec> findClaimed (
+			@NonNull Transaction parentTransaction) {
 
-		return findMany (
-			"findClaimed ()",
-			QueueItemClaimRec.class,
+		try (
 
-			createCriteria (
-				QueueItemClaimRec.class)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findClaimed");
 
-			.add (
-				Restrictions.eq (
-					"status",
-					QueueItemClaimStatus.claimed))
+		) {
 
-		);
+			return findMany (
+				transaction,
+				QueueItemClaimRec.class,
+
+				createCriteria (
+					transaction,
+					QueueItemClaimRec.class)
+
+				.add (
+					Restrictions.eq (
+						"status",
+						QueueItemClaimStatus.claimed))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueItemClaimRec> findClaimed (
+	List <QueueItemClaimRec> findClaimed (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user) {
 
-		return findMany (
-			"findClaimed (user)",
-			QueueItemClaimRec.class,
+		try (
 
-			createCriteria (
-				QueueItemClaimRec.class)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findClaimed");
 
-			.add (
-				Restrictions.eq (
-					"user",
-					user))
+		) {
 
-			.add (
-				Restrictions.eq (
-					"status",
-					QueueItemClaimStatus.claimed))
+			return findMany (
+				transaction,
+				QueueItemClaimRec.class,
 
-		);
+				createCriteria (
+					transaction,
+					QueueItemClaimRec.class)
+
+				.add (
+					Restrictions.eq (
+						"user",
+						user))
+
+				.add (
+					Restrictions.eq (
+						"status",
+						QueueItemClaimStatus.claimed))
+
+			);
+
+		}
 
 	}
 

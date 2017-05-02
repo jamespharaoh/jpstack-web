@@ -63,9 +63,12 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.criteria.CriteriaSpec;
@@ -162,30 +165,37 @@ class ObjectListPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
-			prepareBrowserSpec ();
-			prepareTabSpec ();
-			prepareCurrentObject ();
-			prepareAllObjects ();
+			prepareBrowserSpec (
+				transaction);
+
+			prepareTabSpec (
+				transaction);
+
+			prepareCurrentObject (
+				transaction);
+
+			prepareAllObjects (
+				transaction);
 
 			prepareSelectedObjects (
-				taskLogger);
+				transaction);
 
 			prepareTargetContext (
-				taskLogger);
+				transaction);
 
 			prepareFieldSet (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -203,132 +213,42 @@ class ObjectListPart <
 
 	}
 
-	void prepareBrowserSpec () {
+	void prepareBrowserSpec (
+			@NonNull Transaction parentTransaction) {
 
-		if (listBrowserSpecs ().isEmpty ()) {
+		try (
 
-			currentListBrowserSpec =
-				Optional.absent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareBrowserSpec");
 
-		} else if (listBrowserSpecs ().size () > 1) {
-
-			throw new RuntimeException ("TODO");
-
-		} else {
-
-			currentListBrowserSpec =
-				Optional.of (
-					listBrowserSpecs.values ().iterator ().next ());
-
-			dateField =
-				ObsoleteDateField.parse (
-					requestContext.parameterOrNull (
-						"date"));
-
-			if (dateField.date == null) {
-
-				requestContext.addError (
-					"Invalid date");
-
-				return;
-
-			}
-
-		}
-
-	}
-
-	void prepareTabSpec () {
-
-		String currentTabName =
-			requestContext.parameterOrDefault (
-				"tab",
-				listTabSpecs.values ().iterator ().next ().name ());
-
-		currentListTabSpec =
-			listTabSpecs.get (
-				currentTabName);
-
-	}
-
-	void prepareCurrentObject () {
-
-		Long objectId =
-			(Long)
-			requestContext.stuff (
-				consoleHelper.objectName () + "Id");
-
-		if (
-			isNotNull (
-				objectId)
 		) {
 
-			currentObject =
-				consoleHelper.findRequired (
-					objectId);
+			if (listBrowserSpecs ().isEmpty ()) {
 
-		}
+				currentListBrowserSpec =
+					Optional.absent ();
 
-	}
+			} else if (listBrowserSpecs ().size () > 1) {
 
-	void prepareAllObjects () {
+				throw new RuntimeException ("TODO");
 
-		// locate via parent
+			} else {
 
-		if (consoleHelper.parentTypeIsFixed ()) {
+				currentListBrowserSpec =
+					Optional.of (
+						listBrowserSpecs.values ().iterator ().next ());
 
-			ConsoleHelper <ParentType> parentHelper =
-				genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
-						consoleHelper.parentClass ()));
+				dateField =
+					ObsoleteDateField.parse (
+						requestContext.parameterOrNull (
+							"date"));
 
-			Long parentId =
-				(Long)
-				requestContext.stuff (
-					parentHelper.idKey ());
+				if (dateField.date == null) {
 
-			if (
-				isNotNull (
-					parentId)
-			) {
-
-				parent =
-					parentHelper.findRequired (
-						parentId);
-
-				prepareAllObjectsViaParent (
-					parentHelper,
-					parentId);
-
-				return;
-
-			}
-
-			// locate via grand parent
-
-			if (
-				! parentHelper.isRoot ()
-				&& parentHelper.parentTypeIsFixed ()
-			) {
-
-				ConsoleHelper<?> grandParentHelper =
-					objectManager.findConsoleHelperRequired (
-						parentHelper.parentClass ());
-
-				Optional <Long> grandParentIdOptional =
-					requestContext.stuffInteger (
-						grandParentHelper.idKey ());
-
-				if (
-					optionalIsPresent (
-						grandParentIdOptional)
-				) {
-
-					prepareAllObjectsViaGrandParent (
-						parentHelper,
-						grandParentHelper,
-						optionalGetRequired (
-							grandParentIdOptional));
+					requestContext.addError (
+						"Invalid date");
 
 					return;
 
@@ -338,52 +258,210 @@ class ObjectListPart <
 
 		}
 
-		// return all
+	}
 
-		if (typeCode != null) {
+	private
+	void prepareTabSpec (
+			@NonNull Transaction parentTransaction) {
 
-			throw new RuntimeException ();
+		try (
 
-		} else if (currentListBrowserSpec.isPresent ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareTabSpec");
 
-			throw new RuntimeException ("TODO");
+		) {
 
-		} else {
+			String currentTabName =
+				requestContext.parameterOrDefault (
+					"tab",
+					listTabSpecs.values ().iterator ().next ().name ());
 
-			allObjects =
-				consoleHelper.findAll ();
+			currentListTabSpec =
+				listTabSpecs.get (
+					currentTabName);
+
+		}
+
+	}
+
+	void prepareCurrentObject (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareCurrentObject");
+
+		) {
+
+			Long objectId =
+				(Long)
+				requestContext.stuff (
+					consoleHelper.objectName () + "Id");
+
+			if (
+				isNotNull (
+					objectId)
+			) {
+
+				currentObject =
+					consoleHelper.findRequired (
+						transaction,
+						objectId);
+
+			}
+
+		}
+
+	}
+
+	void prepareAllObjects (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareAllObjects");
+
+		) {
+
+			// locate via parent
+
+			if (consoleHelper.parentTypeIsFixed ()) {
+
+				ConsoleHelper <ParentType> parentHelper =
+					genericCastUnchecked (
+						objectManager.findConsoleHelperRequired (
+							consoleHelper.parentClass ()));
+
+				Long parentId =
+					(Long)
+					requestContext.stuff (
+						parentHelper.idKey ());
+
+				if (
+					isNotNull (
+						parentId)
+				) {
+
+					parent =
+						parentHelper.findRequired (
+							transaction,
+							parentId);
+
+					prepareAllObjectsViaParent (
+						transaction,
+						parentHelper,
+						parentId);
+
+					return;
+
+				}
+
+				// locate via grand parent
+
+				if (
+					! parentHelper.isRoot ()
+					&& parentHelper.parentTypeIsFixed ()
+				) {
+
+					ConsoleHelper<?> grandParentHelper =
+						objectManager.findConsoleHelperRequired (
+							parentHelper.parentClass ());
+
+					Optional <Long> grandParentIdOptional =
+						requestContext.stuffInteger (
+							grandParentHelper.idKey ());
+
+					if (
+						optionalIsPresent (
+							grandParentIdOptional)
+					) {
+
+						prepareAllObjectsViaGrandParent (
+							transaction,
+							parentHelper,
+							grandParentHelper,
+							optionalGetRequired (
+								grandParentIdOptional));
+
+						return;
+
+					}
+
+				}
+
+			}
+
+			// return all
+
+			if (typeCode != null) {
+
+				throw new RuntimeException ();
+
+			} else if (currentListBrowserSpec.isPresent ()) {
+
+				throw new RuntimeException ("TODO");
+
+			} else {
+
+				allObjects =
+					consoleHelper.findAll (
+						transaction);
+
+			}
 
 		}
 
 	}
 
 	void prepareAllObjectsViaParent (
-			@NonNull ConsoleHelper<?> parentHelper,
+			@NonNull Transaction parentTransaction,
+			@NonNull ConsoleHelper <?> parentHelper,
 			@NonNull Long parentId) {
 
-		if (currentListBrowserSpec.isPresent ()) {
+		try (
 
-			throw new RuntimeException ("TODO");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareAllObjectsViaParent");
 
-		} else {
+		) {
 
-			GlobalId parentGlobalId =
-				new GlobalId (
-					parentHelper.objectTypeId (),
-					parentId);
+			if (currentListBrowserSpec.isPresent ()) {
 
-			if (typeCode != null) {
-
-				allObjects =
-					consoleHelper.findByParentAndType (
-						parentGlobalId,
-						typeCode);
+				throw new RuntimeException ("TODO");
 
 			} else {
 
-				allObjects =
-					consoleHelper.findByParent (
-						parentGlobalId);
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parentId);
+
+				if (typeCode != null) {
+
+					allObjects =
+						consoleHelper.findByParentAndType (
+							transaction,
+							parentGlobalId,
+							typeCode);
+
+				} else {
+
+					allObjects =
+						consoleHelper.findByParent (
+							transaction,
+							parentGlobalId);
+
+				}
 
 			}
 
@@ -392,130 +470,146 @@ class ObjectListPart <
 	}
 
 	void prepareAllObjectsViaGrandParent (
-			ConsoleHelper <?> parentHelper,
-			ConsoleHelper <?> grandParentHelper,
-			Long grandParentId) {
+			@NonNull Transaction parentTransaction,
+			@NonNull ConsoleHelper <?> parentHelper,
+			@NonNull ConsoleHelper <?> grandParentHelper,
+			@NonNull Long grandParentId) {
 
-		if (currentListBrowserSpec.isPresent ()) {
+		try (
 
-			ObjectListBrowserSpec browserSpec =
-				currentListBrowserSpec.get ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareAllObjectsViaGrandParent");
 
-			Record <?> grandParentObject =
-				grandParentHelper.findOrThrow (
-					grandParentId,
-					() -> new NullPointerException (
-						stringFormat (
-							"Can't find grand parent object %s with id %s",
-							grandParentHelper.objectName (),
-							integerToDecimalString (
-								grandParentId))));
+		) {
 
-			String daoMethodName =
-				stringFormat (
-					"findBy",
-					capitalise (
-						browserSpec.fieldName ()));
+			if (currentListBrowserSpec.isPresent ()) {
 
-			Method daoMethod;
+				ObjectListBrowserSpec browserSpec =
+					currentListBrowserSpec.get ();
 
-			try {
+				Record <?> grandParentObject =
+					grandParentHelper.findOrThrow (
+						transaction,
+						grandParentId,
+						() -> new NullPointerException (
+							stringFormat (
+								"Can't find grand parent object %s with id %s",
+								grandParentHelper.objectName (),
+								integerToDecimalString (
+									grandParentId))));
 
-				daoMethod =
-					consoleHelper.getClass ().getMethod (
-						daoMethodName,
-						grandParentHelper.objectClass (),
-						Interval.class);
-
-			} catch (NoSuchMethodException exception) {
-
-				throw new RuntimeException (
+				String daoMethodName =
 					stringFormat (
-						"DAO method not found: %s.%s (%s, Interval)",
-						stringFormat (
-							"%sHelper",
-							consoleHelper.objectName ()),
-						daoMethodName,
-						grandParentHelper.objectClass ().getSimpleName ()));
+						"findBy",
+						capitalise (
+							browserSpec.fieldName ()));
 
-			}
+				Method daoMethod;
 
-			try {
+				try {
 
-				List <ObjectType> allObjectsTemp =
-					genericCastUnchecked (
-						daoMethod.invoke (
-							consoleHelper,
-							grandParentObject,
-							dateField.date.toInterval ()));
+					daoMethod =
+						consoleHelper.getClass ().getMethod (
+							daoMethodName,
+							grandParentHelper.objectClass (),
+							Interval.class);
 
-				allObjects =
-					allObjectsTemp;
-
-			} catch (InvocationTargetException exception) {
-
-				Throwable targetException =
-					exception.getTargetException ();
-
-				if (targetException instanceof RuntimeException) {
-
-					throw (RuntimeException) targetException;
-
-				} else {
+				} catch (NoSuchMethodException exception) {
 
 					throw new RuntimeException (
-						targetException);
+						stringFormat (
+							"DAO method not found: %s.%s (%s, Interval)",
+							stringFormat (
+								"%sHelper",
+								consoleHelper.objectName ()),
+							daoMethodName,
+							grandParentHelper.objectClass ().getSimpleName ()));
 
 				}
 
-			} catch (IllegalAccessException exception) {
+				try {
 
-				throw new RuntimeException (
-					exception);
+					List <ObjectType> allObjectsTemp =
+						genericCastUnchecked (
+							daoMethod.invoke (
+								consoleHelper,
+								grandParentObject,
+								dateField.date.toInterval ()));
 
-			}
+					allObjects =
+						allObjectsTemp;
 
-		} else {
+				} catch (InvocationTargetException exception) {
 
-			GlobalId grandParentGlobalId =
-				new GlobalId (
-					grandParentHelper.objectTypeId (),
-					grandParentId);
+					Throwable targetException =
+						exception.getTargetException ();
 
-			List <? extends Record <?>> parentObjects =
-				parentHelper.findByParent (
-					grandParentGlobalId);
+					if (targetException instanceof RuntimeException) {
 
-			allObjects =
-				parentObjects.stream ()
-
-				.flatMap (
-					parentObject -> {
-
-					GlobalId parentGlobalId =
-						new GlobalId (
-							parentHelper.objectTypeId (),
-							parentObject.getId ());
-
-					if (typeCode != null) {
-
-						return collectionStream (
-							consoleHelper.findByParentAndType (
-								parentGlobalId,
-								typeCode));
+						throw (RuntimeException) targetException;
 
 					} else {
 
-						return collectionStream (
-							consoleHelper.findByParent (
-								parentGlobalId));
+						throw new RuntimeException (
+							targetException);
 
 					}
 
-				})
+				} catch (IllegalAccessException exception) {
 
-				.collect (
-					Collectors.toList ());
+					throw new RuntimeException (
+						exception);
+
+				}
+
+			} else {
+
+				GlobalId grandParentGlobalId =
+					new GlobalId (
+						grandParentHelper.objectTypeId (),
+						grandParentId);
+
+				List <? extends Record <?>> parentObjects =
+					parentHelper.findByParent (
+						transaction,
+						grandParentGlobalId);
+
+				allObjects =
+					parentObjects.stream ()
+
+					.flatMap (
+						parentObject -> {
+
+						GlobalId parentGlobalId =
+							new GlobalId (
+								parentHelper.objectTypeId (),
+								parentObject.getId ());
+
+						if (typeCode != null) {
+
+							return collectionStream (
+								consoleHelper.findByParentAndType (
+									transaction,
+									parentGlobalId,
+									typeCode));
+
+						} else {
+
+							return collectionStream (
+								consoleHelper.findByParent (
+									transaction,
+									parentGlobalId));
+
+						}
+
+					})
+
+					.collect (
+						Collectors.toList ());
+
+			}
 
 		}
 
@@ -523,13 +617,13 @@ class ObjectListPart <
 
 	private
 	void prepareSelectedObjects (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepareSelectedObjects");
 
 		) {
@@ -548,7 +642,7 @@ class ObjectListPart <
 
 				if (
 					! consoleHelper.canView (
-						taskLogger,
+						transaction,
 						object)
 				) {
 
@@ -563,7 +657,7 @@ class ObjectListPart <
 
 					if (
 						! criteriaSpec.evaluate (
-							taskLogger,
+							transaction,
 							consoleHelper,
 							object)
 					) {
@@ -599,7 +693,7 @@ class ObjectListPart <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"prepareTargetContext");
@@ -624,128 +718,155 @@ class ObjectListPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
-			goBrowser ();
-			goTabs ();
+			goBrowser (
+				transaction);
+
+			goTabs (
+				transaction);
 
 			goList (
-				taskLogger);
+				transaction);
 
 		}
 
 	}
 
-	void goBrowser () {
+	void goBrowser (
+			@NonNull Transaction parentTransaction) {
 
-		if (! currentListBrowserSpec.isPresent ()) {
-			return;
-		}
+		try (
 
-		ObjectListBrowserSpec browserSpec =
-			currentListBrowserSpec.get ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goBrowser");
 
-		String localUrl =
-			requestContext.resolveLocalUrl (
-				"/" + localName);
-
-		htmlFormOpenGetAction (
-			localUrl);
-
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
-
-		formatWriter.writeLineFormat (
-			"%h",
-			ifNull (
-				browserSpec.label (),
-				capitalise (
-					camelToSpaces (
-						browserSpec.fieldName ()))));
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"date\"",
-			" value=\"%h\"",
-			dateField.text,
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"ok\"",
-			">");
-
-		ObsoleteDateLinks.dailyBrowserLinks (
-			formatWriter,
-			localUrl,
-			requestContext.formData (),
-			dateField.date);
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
-
-	}
-
-	void goTabs () {
-
-		if (
-			listTabSpecs == null
-			|| listTabSpecs.size () <= 1
-		) {
-			return;
-		}
-
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
-
-		for (
-			ObjectListTabSpec listTabSpec
-				: listTabSpecs.values ()
 		) {
 
-			htmlLinkWrite (
-				formatWriter,
+			if (! currentListBrowserSpec.isPresent ()) {
+				return;
+			}
+
+			ObjectListBrowserSpec browserSpec =
+				currentListBrowserSpec.get ();
+
+			String localUrl =
 				requestContext.resolveLocalUrl (
-					stringFormat (
-						"/%u",
-						localName,
-						"?tab=%u",
-						listTabSpec.name ())),
-				listTabSpec.label (),
-				presentInstances (
-					optionalIf (
-						listTabSpec == currentListTabSpec,
-						() -> htmlClassAttribute (
-							"selected"))));
+					"/" + localName);
+
+			htmlFormOpenGetAction (
+				localUrl);
+
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
+
+			formatWriter.writeLineFormat (
+				"%h",
+				ifNull (
+					browserSpec.label (),
+					capitalise (
+						camelToSpaces (
+							browserSpec.fieldName ()))));
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"date\"",
+				" value=\"%h\"",
+				dateField.text,
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"ok\"",
+				">");
+
+			ObsoleteDateLinks.dailyBrowserLinks (
+				formatWriter,
+				localUrl,
+				requestContext.formData (),
+				dateField.date);
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 		}
 
-		htmlParagraphClose ();
+	}
+
+	void goTabs (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goTabs");
+
+		) {
+
+			if (
+				listTabSpecs == null
+				|| listTabSpecs.size () <= 1
+			) {
+				return;
+			}
+
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
+
+			for (
+				ObjectListTabSpec listTabSpec
+					: listTabSpecs.values ()
+			) {
+
+				htmlLinkWrite (
+					formatWriter,
+					requestContext.resolveLocalUrl (
+						stringFormat (
+							"/%u",
+							localName,
+							"?tab=%u",
+							listTabSpec.name ())),
+					listTabSpec.label (),
+					presentInstances (
+						optionalIf (
+							listTabSpec == currentListTabSpec,
+							() -> htmlClassAttribute (
+								"selected"))));
+
+			}
+
+			htmlParagraphClose ();
+
+		}
 
 	}
 
 	void goList (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goList");
 
 		) {
@@ -790,13 +911,13 @@ class ObjectListPart <
 								targetContext.pathPrefix (),
 								"/%s",
 								consoleHelper.getPathId (
-									taskLogger,
+									transaction,
 									object))))
 
 				);
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					fields,
 					object,

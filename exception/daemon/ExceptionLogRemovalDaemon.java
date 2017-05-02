@@ -58,16 +58,11 @@ class ExceptionLogRemovalDaemon
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"runOnce ()");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ExceptionLogRemovalDaemon.runOnce ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runOnce");
 
 		) {
 
@@ -81,6 +76,7 @@ class ExceptionLogRemovalDaemon
 
 			List <ExceptionLogRec> oldExceptionLogs =
 				exceptionLogHelper.findOldLimit (
+					transaction,
 					cutoffTime,
 					1000l);
 
@@ -99,13 +95,14 @@ class ExceptionLogRemovalDaemon
 			) {
 
 				exceptionLogHelper.remove (
+					transaction,
 					exceptionLog);
 
 			}
 
 			transaction.commit ();
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Removed %s old exception logs",
 				integerToDecimalString (
 					oldExceptionLogs.size ()));

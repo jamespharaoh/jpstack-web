@@ -6,6 +6,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -33,7 +34,7 @@ class MediaImageScaleResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"getData");
@@ -55,19 +56,19 @@ class MediaImageScaleResponder
 				media.getContent ();
 
 			BufferedImage fullImage =
-				mediaLogic.readImageRequired (
+				rawMediaLogic.readImageRequired (
 					taskLogger,
 					content.getData (),
 					mediaType.getMimeType ());
 
 			BufferedImage scaledImage =
-				mediaLogic.resampleImageToFit (
+				rawMediaLogic.resampleImageToFit (
 					fullImage,
 					maxWidth,
 					maxHeight);
 
 			byte[] scaledImageData =
-				mediaLogic.writeImage (
+				rawMediaLogic.writeImage (
 					scaledImage,
 					mediaType.getMimeType ());
 

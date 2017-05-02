@@ -6,7 +6,11 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserPrivDao;
@@ -18,53 +22,86 @@ class UserPrivDaoHibernate
 	extends HibernateDao
 	implements UserPrivDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	UserPrivRec find (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull PrivRec priv) {
 
-		return findOneOrNull (
-			"find (user, priv)",
-			UserPrivRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				UserPrivRec.class,
-				"_userPriv")
 
-			.add (
-				Restrictions.eq (
-					"_userPriv.user",
-					user))
+				createCriteria (
+					transaction,
+					UserPrivRec.class,
+					"_userPriv")
 
-			.add (
-				Restrictions.eq (
-					"_userPriv.priv",
-					priv))
+				.add (
+					Restrictions.eq (
+						"_userPriv.user",
+						user))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_userPriv.priv",
+						priv))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	List <UserPrivRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull PrivRec priv) {
 
-		return findMany (
-			"find (priv)",
-			UserPrivRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findMany (
+				transaction,
 				UserPrivRec.class,
-				"_userPriv")
 
-			.add (
-				Restrictions.eq (
-					"_userPriv.priv",
-					priv))
+				createCriteria (
+					transaction,
+					UserPrivRec.class,
+					"_userPriv")
 
-		);
+				.add (
+					Restrictions.eq (
+						"_userPriv.priv",
+						priv))
+
+			);
+
+		}
 
 	}
 

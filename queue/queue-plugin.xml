@@ -18,7 +18,7 @@
 
 	<layer name="console">
 		<component class="console.QueueClaimAction"/>
-		<component class="console.QueueConsoleLogic"/>
+		<component class="console.QueueConsoleLogicImplementation"/>
 		<component class="console.QueueDebugPart"/>
 		<component class="console.QueueFilterResponder"/>
 		<component class="console.QueueHomeResponder"/>

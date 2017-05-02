@@ -23,6 +23,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -73,27 +75,29 @@ class ObjectSummaryFieldsPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			object =
 				consoleHelper.lookupObject (
+					transaction,
 					requestContext.consoleContextStuffRequired ());
 
 			if (formFieldsProvider != null) {
 
-				prepareParent ();
+				prepareParent (
+					transaction);
 
 				prepareFieldSet (
-					taskLogger);
+					transaction);
 
 			}
 
@@ -101,39 +105,53 @@ class ObjectSummaryFieldsPart <
 
 	}
 
-	void prepareParent () {
+	void prepareParent (
+			@NonNull Transaction parentTransaction) {
 
-		ConsoleHelper <ParentType> parentHelper =
-			objectManager.findConsoleHelperRequired (
-				consoleHelper.parentClass ());
+		try (
 
-		if (parentHelper.isRoot ()) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareParent");
 
-			parent =
-				parentHelper.findRequired (
-					0l);
-
-			return;
-
-		}
-
-		Optional <Long> parentIdOptional =
-			requestContext.stuffInteger (
-				parentHelper.idKey ());
-
-		if (
-			optionalIsPresent (
-				parentIdOptional)
 		) {
 
-			// use specific parent
+			ConsoleHelper <ParentType> parentHelper =
+				objectManager.findConsoleHelperRequired (
+					consoleHelper.parentClass ());
 
-			parent =
-				parentHelper.findRequired (
-					optionalGetRequired (
-						parentIdOptional));
+			if (parentHelper.isRoot ()) {
 
-			return;
+				parent =
+					parentHelper.findRequired (
+						transaction,
+						0l);
+
+				return;
+
+			}
+
+			Optional <Long> parentIdOptional =
+				requestContext.stuffInteger (
+					parentHelper.idKey ());
+
+			if (
+				optionalIsPresent (
+					parentIdOptional)
+			) {
+
+				// use specific parent
+
+				parent =
+					parentHelper.findRequired (
+						transaction,
+						optionalGetRequired (
+							parentIdOptional));
+
+				return;
+
+			}
 
 		}
 
@@ -152,13 +170,13 @@ class ObjectSummaryFieldsPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -166,7 +184,7 @@ class ObjectSummaryFieldsPart <
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputTableRows (
-				taskLogger,
+				transaction,
 				formatWriter,
 				formFieldSet,
 				object,

@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import org.joda.time.Instant;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.scaffold.model.SliceRec;
 
@@ -12,7 +12,7 @@ public
 interface SliceLogic {
 
 	void updateSliceInactivityTimestamp (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			SliceRec slice,
 			Optional <Instant> timestamp);
 

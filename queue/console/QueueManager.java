@@ -23,8 +23,11 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.metamodel.QueueTypeSpec;
@@ -70,7 +73,7 @@ class QueueManager {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"init");
@@ -133,7 +136,7 @@ class QueueManager {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"getItemResponder");
@@ -178,32 +181,47 @@ class QueueManager {
 
 	public
 	Duration getPreferredUserDelay (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue) {
 
-		Record <?> queueParent =
-			objectManager.getParentRequired (
-				queue);
+		try (
 
-		QueueTypeSpec queueTypeSpec =
-			queueConsoleLogic.queueTypeSpec (
-				queue.getQueueType ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getPreferredUserDelay");
 
-		if (
-			stringEqualSafe (
-				queueTypeSpec.preferredUserDelay (),
-				"0")
 		) {
-			return Duration.ZERO;
+
+			Record <?> queueParent =
+				objectManager.getParentRequired (
+					transaction,
+					queue);
+
+			QueueTypeSpec queueTypeSpec =
+				queueConsoleLogic.queueTypeSpec (
+					transaction,
+					queue.getQueueType ());
+
+			if (
+				stringEqualSafe (
+					queueTypeSpec.preferredUserDelay (),
+					"0")
+			) {
+				return Duration.ZERO;
+			}
+
+			Long preferredUserDelay =
+				genericCastUnchecked (
+					objectManager.dereferenceRequired (
+						transaction,
+						queueParent,
+						queueTypeSpec.preferredUserDelay ()));
+
+			return Duration.standardSeconds (
+				preferredUserDelay);
+
 		}
-
-		Long preferredUserDelay =
-			genericCastUnchecked (
-				objectManager.dereferenceRequired (
-					queueParent,
-					queueTypeSpec.preferredUserDelay ()));
-
-		return Duration.standardSeconds (
-			preferredUserDelay);
 
 	}
 

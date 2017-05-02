@@ -2,6 +2,7 @@ package wbs.platform.media.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 
 import java.util.Map;
 
@@ -11,8 +12,11 @@ import lombok.NonNull;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.model.MediaRec;
 
@@ -20,31 +24,48 @@ import fj.data.Either;
 
 @PrototypeComponent ("imageCsvFormFieldInterfaceMapping")
 public
-class ImageCsvFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,MediaRec,String> {
+class ImageCsvFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, MediaRec, String> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <MediaRec> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResult (
-				Optional.of (
-					""));
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		} else {
+				return successResultPresent (
+					"");
 
-			return successResult (
-				Optional.of (
-					genericValue.get ().getFilename ()));
+			} else {
+
+				return successResult (
+					Optional.of (
+						genericValue.get ().getFilename ()));
+
+			}
 
 		}
 

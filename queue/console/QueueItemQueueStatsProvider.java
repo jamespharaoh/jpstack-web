@@ -24,9 +24,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -62,15 +63,15 @@ class QueueItemQueueStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod statsPeriod,
 			@NonNull Map <String, Object> conditions) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getStats");
 
 		) {
@@ -101,16 +102,21 @@ class QueueItemQueueStatsProvider
 				queueStatsFilterProvider.get ();
 
 			queueStatsFilter.conditions (
+				transaction,
 				conditions);
 
 			List <QueueItemRec> createdQueueItems =
 				queueStatsFilter.filterQueueItems (
+					transaction,
 					queueItemHelper.findByCreatedTime (
+						transaction,
 						statsPeriod.toInterval ()));
 
 			List <QueueItemRec> processedQueueItems =
 				queueStatsFilter.filterQueueItems (
+					transaction,
 					queueItemHelper.findByProcessedTime (
+						transaction,
 						statsPeriod.toInterval ()));
 
 			// aggregate created items
@@ -131,11 +137,12 @@ class QueueItemQueueStatsProvider
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						queue);
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						parent,
 						"supervisor")
 				) {
@@ -204,11 +211,12 @@ class QueueItemQueueStatsProvider
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						queue);
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						parent,
 						"supervisor")
 				) {

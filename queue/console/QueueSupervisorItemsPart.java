@@ -23,9 +23,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
@@ -72,48 +73,61 @@ class QueueSupervisorItemsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		Interval interval =
-			timeFormatter.isoStringToInterval (
-				requestContext.parameterRequired (
-					"interval"));
+		try (
 
-		user =
-			userHelper.findRequired (
-				requestContext.parameterIntegerRequired (
-					"userId"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		queueItems =
-			new TreeSet<QueueItemRec> (
-				QueueItemProcessedTimeComparator.instance);
+		) {
 
-		queueItems.addAll (
-			queueItemHelper.findByProcessedTime (
-				user,
-				interval));
+			Interval interval =
+				timeFormatter.isoStringToInterval (
+					requestContext.parameterRequired (
+						"interval"));
+
+			user =
+				userHelper.findRequired (
+					transaction,
+					requestContext.parameterIntegerRequired (
+						"userId"));
+
+			queueItems =
+				new TreeSet<> (
+					QueueItemProcessedTimeComparator.instance);
+
+			queueItems.addAll (
+				queueItemHelper.findByProcessedTime (
+					transaction,
+					user,
+					interval));
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			renderParameterTable (
-				taskLogger);
+				transaction);
 
 			renderContentTable (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -121,13 +135,13 @@ class QueueSupervisorItemsPart
 
 	private
 	void renderParameterTable (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderParameterTable");
 
 		) {
@@ -142,7 +156,7 @@ class QueueSupervisorItemsPart
 				"User",
 				() ->
 					objectManager.writeTdForObjectMiniLink (
-						taskLogger,
+						transaction,
 						user));
 
 			// close table
@@ -155,13 +169,13 @@ class QueueSupervisorItemsPart
 
 	private
 	void renderContentTable (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderContentTable");
 
 		) {
@@ -195,6 +209,7 @@ class QueueSupervisorItemsPart
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						queue);
 
 				// open table row
@@ -202,29 +217,32 @@ class QueueSupervisorItemsPart
 				htmlTableRowOpen ();
 
 				objectManager.writeTdForObjectLink (
-					taskLogger,
+					transaction,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					queue,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					queueItem,
 					queue);
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
 						queueItem.getCreatedTime ()));
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
 						queueItem.getPendingTime ()));
 
 				htmlTableCellWrite (
 					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
 						queueItem.getProcessedTime ()));
 
 				htmlTableRowClose ();

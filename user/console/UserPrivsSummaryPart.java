@@ -26,9 +26,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.group.model.GroupRec;
@@ -67,13 +68,13 @@ class UserPrivsSummaryPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -82,7 +83,8 @@ class UserPrivsSummaryPart
 				new HashMap<> ();
 
 			UserRec user =
-				userHelper.findFromContextRequired ();
+				userHelper.findFromContextRequired (
+					transaction);
 
 			// load up some info about the acting user
 
@@ -95,7 +97,7 @@ class UserPrivsSummaryPart
 
 				if (
 					! privChecker.canGrant (
-						taskLogger,
+						transaction,
 						userPriv.getPriv ().getId ())
 				) {
 					continue;
@@ -111,12 +113,15 @@ class UserPrivsSummaryPart
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						priv);
 
 				privStuff.path =
 					objectManager.objectPath (
+						transaction,
 						parent,
-						userConsoleLogic.sliceRequired ());
+						userConsoleLogic.sliceRequired (
+							transaction));
 
 				privStuff.privCode =
 					priv.getCode ();
@@ -140,7 +145,7 @@ class UserPrivsSummaryPart
 
 					if (
 						! privChecker.canGrant (
-							taskLogger,
+							transaction,
 							priv.getId ())
 					) {
 						continue;
@@ -159,12 +164,15 @@ class UserPrivsSummaryPart
 
 						Record <?> parent =
 							objectManager.getParentRequired (
+								transaction,
 								priv);
 
 						privStuff.path =
 							objectManager.objectPath (
+								transaction,
 								parent,
-								userConsoleLogic.sliceRequired ());
+								userConsoleLogic.sliceRequired (
+									transaction));
 
 						privStuff.privCode =
 							priv.getCode ();
@@ -195,49 +203,60 @@ class UserPrivsSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"Object",
-			"Priv",
-			"Can",
-			"Grant",
-			"Groups");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		for (
-			PrivStuff privStuff
-				: privStuffs
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableOpenList ();
 
-			htmlTableCellWrite (
-				privStuff.path);
+			htmlTableHeaderRowWrite (
+				"Object",
+				"Priv",
+				"Can",
+				"Grant",
+				"Groups");
 
-			htmlTableCellWrite (
-				privStuff.privCode);
+			for (
+				PrivStuff privStuff
+					: privStuffs
+			) {
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					privStuff.userPriv != null
-					&& privStuff.userPriv.getCan ()));
+				htmlTableRowOpen ();
 
-			htmlTableCellWrite (
-				booleanToYesNo (
-					privStuff.userPriv != null
-					&& privStuff.userPriv.getCanGrant ()));
+				htmlTableCellWrite (
+					privStuff.path);
 
-			htmlTableCellWrite (
-				joinWithCommaAndSpace (
-					privStuff.groups));
+				htmlTableCellWrite (
+					privStuff.privCode);
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					booleanToYesNo (
+						privStuff.userPriv != null
+						&& privStuff.userPriv.getCan ()));
+
+				htmlTableCellWrite (
+					booleanToYesNo (
+						privStuff.userPriv != null
+						&& privStuff.userPriv.getCanGrant ()));
+
+				htmlTableCellWrite (
+					joinWithCommaAndSpace (
+						privStuff.groups));
+
+				htmlTableRowClose ();
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 

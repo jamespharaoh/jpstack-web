@@ -146,22 +146,17 @@ class ObjectSearchPostAction <
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal",
-					true);
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectSearchPostAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			UserRec user =
-				userConsoleLogic.userRequired ();
+				userConsoleLogic.userRequired (
+					transaction);
 
 			// handle new/repeat search buttons
 
@@ -171,11 +166,11 @@ class ObjectSearchPostAction <
 						"new-search"))
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"New search");
 
 				userSessionLogic.userDataRemove (
-					taskLogger,
+					transaction,
 					user,
 					stringFormat (
 						"object_search_%s_results",
@@ -197,11 +192,11 @@ class ObjectSearchPostAction <
 						"repeat-search"))
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Repeat search");
 
 				userSessionLogic.userDataRemove (
-					taskLogger,
+					transaction,
 					user,
 					stringFormat (
 						"object_search_%s_results",
@@ -217,7 +212,7 @@ class ObjectSearchPostAction <
 						"download-csv"))
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Download CSV");
 
 				transaction.commit ();
@@ -240,14 +235,14 @@ class ObjectSearchPostAction <
 
 			// perform search
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Process search form");
 
 			SearchType search =
 				genericCastUnchecked (
 					optionalOrElse (
 						userSessionLogic.userDataObject (
-							taskLogger,
+							transaction,
 							user,
 							stringFormat (
 								"object_search_%s_fields",
@@ -256,12 +251,12 @@ class ObjectSearchPostAction <
 							searchClass)));
 
 			fieldsLogic.implicit (
-				taskLogger,
+				transaction,
 				searchFormFieldSet,
 				search);
 
 			consoleHelper.consoleHooks ().applySearchFilter (
-				taskLogger,
+				transaction,
 				search);
 
 			if (
@@ -295,7 +290,7 @@ class ObjectSearchPostAction <
 
 			UpdateResultSet updateResultSet =
 				fieldsLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					searchFormFieldSet,
 					search,
@@ -303,7 +298,7 @@ class ObjectSearchPostAction <
 					"search");
 
 			userSessionLogic.userDataObjectStore (
-				taskLogger,
+				transaction,
 				user,
 				stringFormat (
 					"object_search_%s_fields",
@@ -312,7 +307,7 @@ class ObjectSearchPostAction <
 
 			if (updateResultSet.errorCount () > 0) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Found %s errors processing search form",
 					integerToDecimalString (
 						updateResultSet.errorCount ()));
@@ -335,7 +330,7 @@ class ObjectSearchPostAction <
 
 			// perform search
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Perform search");
 
 			List <Long> objectIds;
@@ -358,14 +353,14 @@ class ObjectSearchPostAction <
 						methodInvoke (
 							method,
 							consoleHelper,
-							taskLogger,
+							transaction,
 							search));
 
 			} else {
 
 				objectIds =
 					consoleHelper.searchIds (
-						taskLogger,
+						transaction,
 						search);
 
 			}
@@ -374,7 +369,7 @@ class ObjectSearchPostAction <
 
 				// no results
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Search returned no results");
 
 				requestContext.addError (
@@ -396,7 +391,7 @@ class ObjectSearchPostAction <
 
 				// single result
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Search returned single result");
 
 				ConsoleContextType targetContextType =
@@ -406,7 +401,7 @@ class ObjectSearchPostAction <
 
 				Optional <ConsoleContext> targetContext =
 					consoleManager.relatedContext (
-						taskLogger,
+						transaction,
 						requestContext.consoleContextRequired (),
 						targetContextType);
 
@@ -425,7 +420,7 @@ class ObjectSearchPostAction <
 								targetContext.get ().pathPrefix (),
 								"/%s",
 								consoleHelper.getPathId (
-									taskLogger,
+									transaction,
 									objectIds.get (
 										0))));
 
@@ -433,6 +428,7 @@ class ObjectSearchPostAction <
 
 					Record <?> object =
 						consoleHelper.findRequired (
+							transaction,
 							objectIds.get (
 								0));
 
@@ -443,7 +439,7 @@ class ObjectSearchPostAction <
 						.targetUrl (
 							requestContext.resolveLocalUrl (
 								consoleHelper.getDefaultLocalPathGeneric (
-									taskLogger,
+									transaction,
 									object)));
 
 
@@ -453,14 +449,14 @@ class ObjectSearchPostAction <
 
 				// multiple results
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Search returned %s results",
 					integerToDecimalString (
 						collectionSize (
 							objectIds)));
 
 				userSessionLogic.userDataStringStore (
-					taskLogger,
+					transaction,
 					user,
 					stringFormat (
 						"object_search_%s_results",

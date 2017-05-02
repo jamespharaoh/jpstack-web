@@ -14,8 +14,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -43,30 +44,43 @@ class CoreFrameSetResponder
 	@Override
 	public
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		goDocType ();
+		try (
 
-		goHtml ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
+
+			goDocType (
+				transaction);
+
+			goHtml (
+				transaction);
+
+		}
 
 	}
 
 	@Override
 	public
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
 
 			super.setHtmlHeaders (
-				taskLogger);
+				transaction);
 
 			requestContext.setHeader (
 				"Content-Type",
@@ -86,173 +100,251 @@ class CoreFrameSetResponder
 	}
 
 	public
-	void goDocType () {
+	void goDocType (
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<!DOCTYPE html>");
+		try (
 
-	}
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goDocType");
 
-	public
-	void goHtml () {
+		) {
 
-		formatWriter.writeLineFormat (
-			"<html>");
+			formatWriter.writeLineFormat (
+				"<!DOCTYPE html>");
 
-		goHtmlStuff ();
-
-		formatWriter.writeLineFormat (
-			"</html>");
-
-	}
-
-	public
-	void goHtmlStuff () {
-
-		goHead ();
-
-		goFrameset ();
+		}
 
 	}
 
 	public
-	void goHead () {
+	void goHtml (
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<head>");
+		try (
 
-		formatWriter.increaseIndent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHtml");
 
-		goHeadStuff ();
+		) {
 
-		formatWriter.decreaseIndent ();
+			formatWriter.writeLineFormat (
+				"<html>");
 
-		formatWriter.writeLineFormat (
-			"</head>");
+			goHtmlStuff (
+				transaction);
 
-	}
+			formatWriter.writeLineFormat (
+				"</html>");
 
-	public
-	void goHeadStuff () {
-
-		goTitle ();
-
-		goScripts ();
-
-		formatWriter.writeLineFormat (
-			"<link",
-			" rel=\"shortcut icon\"",
-			" href=\"%h\"",
-			requestContext.resolveApplicationUrl (
-				"/favicon.ico"),
-			">");
-
-		formatWriter.writeLineFormat (
-			"<link",
-			" rel=\"icon\"",
-			" href=\"%h\"",
-			requestContext.resolveApplicationUrl (
-				"/favicon.ico"),
-			">");
+		}
 
 	}
 
 	public
-	void goTitle () {
+	void goHtmlStuff (
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<title>");
+		try (
 
-		formatWriter.increaseIndent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHtmlStuff");
 
-		formatWriter.writeLineFormat (
-			"%h",
-			wbsConfig.consoleTitle ());
+		) {
 
-		formatWriter.decreaseIndent ();
+			goHead (
+				transaction);
 
-		formatWriter.writeLineFormat (
-			"</title>");
+			goFrameset (
+				transaction);
 
-	}
-
-	public
-	void goScripts () {
-
-		htmlScriptBlockOpen ();
-
-		formatWriter.writeLineFormat (
-			"function show_inbox (show) {");
-
-		formatWriter.increaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"document.getElementById ('right_frameset').rows =");
-
-		formatWriter.writeLineFormat (
-			"  show ? '2*,1*' : '*,0';");
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"}");
-
-		htmlScriptBlockClose ();
+		}
 
 	}
 
 	public
-	void goFrameset () {
+	void goHead (
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<frameset cols=\"1*,4*\">");
+		try (
 
-		formatWriter.increaseIndent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHead");
 
-		formatWriter.writeLineFormat (
-			"<frameset rows=\"2*,1*\">");
+		) {
 
-		formatWriter.increaseIndent ();
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<head>");
 
-		formatWriter.writeLineFormat (
-			"<frame name=\"sidebar\" src=\"%h\">",
-			requestContext.resolveApplicationUrl (
-				"/sidebar"));
+			goHeadStuff (
+				transaction);
 
-		formatWriter.writeLineFormat (
-			"<frame name=\"status\" src=\"%h\">",
-			requestContext.resolveApplicationUrl (
-				"/status"));
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</head>");
 
-		formatWriter.decreaseIndent ();
+		}
 
-		formatWriter.writeLineFormat (
-			"</frameset>");
+	}
 
-		formatWriter.writeLineFormat (
-			"<frameset rows=\"1*,0\" id=\"right_frameset\">");
+	public
+	void goHeadStuff (
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.increaseIndent ();
+		try (
 
-		formatWriter.writeLineFormat (
-			"<frame name=\"main\" src=\"%h\">",
-			requestContext.resolveApplicationUrl (
-				"/home"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goHeadStuff");
 
-		formatWriter.writeLineFormat (
-			"<frame name=\"inbox\" src=\"%h\">",
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"));
+		) {
 
-		formatWriter.decreaseIndent ();
+			goTitle (
+				transaction);
 
-		formatWriter.writeLineFormat (
-			"</frameset>");
+			goScripts (
+				transaction);
 
-		formatWriter.decreaseIndent ();
+			formatWriter.writeLineFormat (
+				"<link",
+				" rel=\"shortcut icon\"",
+				" href=\"%h\"",
+				requestContext.resolveApplicationUrl (
+					"/favicon.ico"),
+				">");
 
-		formatWriter.writeLineFormat (
-			"</frameset>");
+			formatWriter.writeLineFormat (
+				"<link",
+				" rel=\"icon\"",
+				" href=\"%h\"",
+				requestContext.resolveApplicationUrl (
+					"/favicon.ico"),
+				">");
+
+		}
+
+	}
+
+	public
+	void goTitle (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goTitle");
+
+		) {
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<title>");
+
+			formatWriter.writeLineFormat (
+				"%h",
+				wbsConfig.consoleTitle ());
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</title>");
+
+		}
+
+	}
+
+	public
+	void goScripts (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goScripts");
+
+		) {
+
+			htmlScriptBlockOpen ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"function show_inbox (show) {");
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('right_frameset').rows =");
+
+			formatWriter.writeLineFormat (
+				"  show ? '2*,1*' : '*,0';");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"}");
+
+			htmlScriptBlockClose ();
+
+		}
+
+	}
+
+	public
+	void goFrameset (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goFrameset");
+
+		) {
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<frameset cols=\"1*,4*\">");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<frameset rows=\"2*,1*\">");
+
+			formatWriter.writeLineFormat (
+				"<frame name=\"sidebar\" src=\"%h\">",
+				requestContext.resolveApplicationUrl (
+					"/sidebar"));
+
+			formatWriter.writeLineFormat (
+				"<frame name=\"status\" src=\"%h\">",
+				requestContext.resolveApplicationUrl (
+					"/status"));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</frameset>");
+
+			formatWriter.writeLineFormat (
+				"<frameset rows=\"1*,0\" id=\"right_frameset\">");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<frame name=\"main\" src=\"%h\">",
+				requestContext.resolveApplicationUrl (
+					"/home"));
+
+			formatWriter.writeLineFormat (
+				"<frame name=\"inbox\" src=\"%h\">",
+				requestContext.resolveApplicationUrl (
+					"/queues/queue.home"));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</frameset>");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</frameset>");
+
+		}
 
 	}
 

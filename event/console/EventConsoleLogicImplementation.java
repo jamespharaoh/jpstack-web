@@ -4,7 +4,6 @@ import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 import static wbs.utils.time.TimeUtils.millisecondsToDuration;
@@ -39,7 +38,8 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
@@ -95,66 +95,77 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	PagePart makeEventsPart (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull PermanentRecord <?> object) {
 
-		List <Record <?>> children =
-			objectManager.getMinorChildren (
-				object);
+		try (
 
-		List <GlobalId> objectGlobalIds =
-			new ArrayList<> ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"makeEventsPart");
 
-		objectGlobalIds.add (
-			objectManager.getGlobalId (
-				object));
-
-		for (
-			Record<?> child
-				: children
 		) {
+
+			List <Record <?>> children =
+				objectManager.getMinorChildren (
+					transaction,
+					object);
+
+			List <GlobalId> objectGlobalIds =
+				new ArrayList<> ();
 
 			objectGlobalIds.add (
 				objectManager.getGlobalId (
-					child));
+					transaction,
+					object));
+
+			for (
+				Record<?> child
+					: children
+			) {
+
+				objectGlobalIds.add (
+					objectManager.getGlobalId (
+						transaction,
+						child));
+
+			}
+
+			return objectEventsPart.get ()
+
+				.dataObjectIds (
+					objectGlobalIds);
 
 		}
-
-		return objectEventsPart.get ()
-
-			.dataObjectIds (
-				objectGlobalIds);
 
 	}
 
 	@Override
 	public
 	PagePartFactory makeEventsPartFactory (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectLookup <?> objectLookup) {
 
-		return taskLogger -> {
+		return parentTransaction -> {
 
 			try (
 
-				OwnedTransaction transaction =
-					database.beginReadOnly (
-						taskLogger,
-						stringFormat (
-							"%s.%s.%s ()",
-							"EventConsoleLogic",
-							"makeEventsPartFactory",
-							"buildPagePart"),
-						this);
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"makeEventsPartFactory");
 
 			) {
 
 				PermanentRecord <?> object =
 					genericCastUnchecked (
 						objectLookup.lookupObject (
+							transaction,
 							requestContext.consoleContextStuffRequired ()));
 
 				return makeEventsPart (
-					taskLogger,
+					transaction,
 					object);
 
 			}
@@ -166,15 +177,15 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventHtml (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeEventHtml");
 
 		) {
@@ -233,6 +244,7 @@ class EventConsoleLogicImplementation
 						text.replaceAll (
 							"%" + eventLink.getIndex (),
 							userConsoleLogic.timestampWithTimezoneString (
+								transaction,
 								millisToInstant (
 									eventLink.getRefId ())));
 
@@ -248,6 +260,7 @@ class EventConsoleLogicImplementation
 						text.replaceAll (
 							"%" + eventLink.getIndex (),
 							userConsoleLogic.prettyDuration (
+								transaction,
 								millisecondsToDuration (
 									eventLink.getRefId ())));
 
@@ -257,6 +270,7 @@ class EventConsoleLogicImplementation
 
 					Record <?> object =
 						objectManager.findObject (
+							transaction,
 							new GlobalId (
 								eventLink.getTypeId (),
 								eventLink.getRefId ()));
@@ -271,7 +285,7 @@ class EventConsoleLogicImplementation
 					) {
 
 						writeObjectAsHtml (
-							taskLogger,
+							transaction,
 							objectFormatWriter,
 							object);
 
@@ -309,15 +323,15 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeObjectAsHtml (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeObjectAsHtml");
 
 		) {
@@ -345,10 +359,10 @@ class EventConsoleLogicImplementation
 
 				htmlLinkWriteHtml (
 					objectManager.localLink (
-						taskLogger,
+						transaction,
 						media),
 					() -> mediaConsoleLogic.writeMediaThumb32 (
-						taskLogger,
+						transaction,
 						formatWriter,
 						media));
 
@@ -359,7 +373,7 @@ class EventConsoleLogicImplementation
 					object;
 
 				objectManager.writeHtmlForObject (
-					taskLogger,
+					transaction,
 					formatWriter,
 					dataObject,
 					optionalAbsent (),
@@ -378,15 +392,15 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventsTable (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Iterable <EventRec> events) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeEventsTable");
 
 		) {
@@ -426,6 +440,7 @@ class EventConsoleLogicImplementation
 
 					htmlTableCellWrite (
 						userConsoleLogic.dateStringLong (
+							transaction,
 							event.getTimestamp ()),
 						htmlColumnSpanAttribute (2l));
 
@@ -437,7 +452,7 @@ class EventConsoleLogicImplementation
 				}
 
 				writeEventRow (
-					taskLogger,
+					transaction,
 					htmlWriter,
 					event);
 
@@ -452,15 +467,15 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventRow (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeEventRow");
 
 		) {
@@ -469,6 +484,7 @@ class EventConsoleLogicImplementation
 
 			htmlTableCellWrite (
 				userConsoleLogic.timeString (
+					transaction,
 					event.getTimestamp ()));
 
 			try (
@@ -479,7 +495,7 @@ class EventConsoleLogicImplementation
 			) {
 
 				writeEventHtml (
-					taskLogger,
+					transaction,
 					eventFormatWriter,
 					event);
 
@@ -488,7 +504,7 @@ class EventConsoleLogicImplementation
 
 			} catch (RuntimeException exception) {
 
-				taskLogger.errorFormatException (
+				transaction.errorFormatException (
 					exception,
 					"Error displaying event %s",
 					integerToDecimalString (

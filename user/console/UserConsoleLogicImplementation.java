@@ -7,14 +7,23 @@ import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.ReadableDuration;
+import org.joda.time.ReadableInstant;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.feature.console.FeatureConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -36,6 +45,9 @@ class UserConsoleLogicImplementation
 	@SingletonDependency
 	FeatureConsoleHelper featureHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RandomLogic randomLogic;
 
@@ -55,46 +67,49 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	TimeFormatter timeFormatter () {
-
-		return timeFormatter;
-
-	}
-
-	@Override
-	public
-	Optional <UserRec> user () {
+	Optional <UserRec> user (
+			@NonNull Transaction parentTransaction) {
 
 		return optionalMapOptional (
 			userId (),
-			userHelper::find);
+			userId ->
+				userHelper.find (
+					parentTransaction,
+					userId));
 
 	}
 
 	@Override
 	public
-	UserRec userRequired () {
+	UserRec userRequired (
+			@NonNull Transaction parentTransaction) {
 
 		return userHelper.findRequired (
+			parentTransaction,
 			userIdRequired ());
 
 	}
 
 	@Override
 	public
-	Optional <SliceRec> slice () {
+	Optional <SliceRec> slice (
+			@NonNull Transaction parentTransaction) {
 
 		return optionalMapRequired (
-			user (),
+			user (
+				parentTransaction),
 			UserRec::getSlice);
 
 	}
 
 	@Override
 	public
-	SliceRec sliceRequired () {
+	SliceRec sliceRequired (
+			@NonNull Transaction parentTransaction) {
 
-		return userRequired ().getSlice ();
+		return userRequired (
+			parentTransaction
+		).getSlice ();
 
 	}
 
@@ -120,42 +135,94 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Optional <Long> sliceId () {
+	Optional <Long> sliceId (
+			@NonNull Transaction parentTransaction) {
 
 		return optionalMapRequired (
-			slice (),
+			slice (
+				parentTransaction),
 			SliceRec::getId);
 
 	}
 
 	@Override
 	public
-	Long sliceIdRequired () {
+	Long sliceIdRequired (
+			@NonNull Transaction parentTransaction) {
 
-		return userRequired ().getSlice ().getId ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sliceIdRequired");
+
+		) {
+
+			UserRec user =
+				userRequired (
+					transaction);
+
+			return user.getSlice ().getId ();
+
+		}
 
 	}
 
 	@Override
 	public
-	DateTimeZone timezone () {
+	DateTimeZone timezone (
+			@NonNull Transaction parentTransaction) {
 
-		DateTimeZone timezone =
-			timeFormatter.timezone (
-				ifNull (
-					userRequired ().getDefaultTimezone (),
-					sliceRequired ().getDefaultTimezone (),
-					wbsConfig.defaultTimezone ()));
+		try (
 
-		return timezone;
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"timezone");
+
+		) {
+
+			DateTimeZone timezone =
+				timeFormatter.timezone (
+					ifNull (
+						() ->
+							userRequired (
+								parentTransaction
+							).getDefaultTimezone (),
+						() ->
+							sliceRequired (
+								parentTransaction
+							).getDefaultTimezone (),
+						() -> wbsConfig.defaultTimezone ()));
+
+			return timezone;
+
+		}
 
 	}
 
 	@Override
 	public
-	Long hourOffset () {
+	Long hourOffset (
+			@NonNull Transaction parentTransaction) {
 
-		return sliceRequired ().getDefaultHourOffset ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"hourOffset");
+
+		) {
+
+			SliceRec slice =
+				sliceRequired (
+					transaction);
+
+			return slice.getDefaultHourOffset ();
+
+		}
 
 	}
 
@@ -171,10 +238,136 @@ class UserConsoleLogicImplementation
 		return userIdRequired ();
 	}
 
-	// data
+	// console user helper
+
+	@Override
+	public
+	String dateStringLong (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		return timeFormatter.dateStringLong (
+			timezone (
+				parentTransaction),
+			timestamp);
+
+	}
+
+	@Override
+	public
+	String dateStringShort (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		return timeFormatter.dateStringShort (
+			timezone (
+				parentTransaction),
+			timestamp);
+
+	}
+
+	@Override
+	public
+	String timeString (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		return timeFormatter.timeString (
+			timezone (
+				parentTransaction),
+			timestamp);
+
+	}
+
+	@Override
+	public
+	String timestampWithTimezoneString (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		return timeFormatter.timestampTimezoneString (
+			timezone (
+				parentTransaction),
+			timestamp);
+
+	}
+
+	@Override
+	public
+	String timestampWithoutTimezoneString (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		return timeFormatter.timestampString (
+			timezone (
+				parentTransaction),
+			timestamp);
+
+	}
+
+	@Override
+	public
+	String prettyDuration (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableDuration duration) {
+
+		return timeFormatter.prettyDuration (
+			duration);
+
+	}
+
+	@Override
+	public
+	Instant timestampStringToInstant (
+			@NonNull Transaction parentTransaction,
+			@NonNull String string) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"timestampStringToInstant");
+
+		) {
+
+			return timeFormatter.timestampStringToInstant (
+				timezone (
+					transaction),
+				string);
+
+		}
+
+	}
+
+	@Override
+	public
+	String timezoneString (
+			@NonNull Transaction parentTransaction,
+			@NonNull ReadableInstant timestamp) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"timezoneString");
+
+		) {
+
+			return timeFormatter.timestampString (
+				timezone (
+					transaction),
+				timestamp);
+
+		}
+
+	}
+
+	// constants
 
 	final static
-	String LOGGED_IN_USER_ID_SESSION_KEY =
+	String loggedInUserIdSessionKey =
 		"logged-in-user-id";
 
 }

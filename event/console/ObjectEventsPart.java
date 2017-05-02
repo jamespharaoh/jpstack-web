@@ -15,9 +15,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventRec;
@@ -60,48 +61,60 @@ class ObjectEventsPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		events =
-			dataObjectIds.stream ()
+		try (
 
-			.map (
-				objectId ->
-					eventLinkHelper.findByTypeAndRef (
-						objectId.typeId (),
-						objectId.objectId ()))
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-			.flatMap (
-				eventLinks ->
-					eventLinks.stream ())
+		) {
 
-			.map (
-				eventLink ->
-					eventLink.getEvent ())
+			events =
+				dataObjectIds.stream ()
 
-			.sorted ()
+				.map (
+					objectId ->
+						eventLinkHelper.findByTypeAndRef (
+							transaction,
+							objectId.typeId (),
+							objectId.objectId ()))
 
-			.collect (
-				Collectors.toList ());
+				.flatMap (
+					eventLinks ->
+						eventLinks.stream ())
+
+				.map (
+					eventLink ->
+						eventLink.getEvent ())
+
+				.sorted ()
+
+				.collect (
+					Collectors.toList ());
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
 
 			eventConsoleLogic.writeEventsTable (
-				taskLogger,
+				transaction,
 				formatWriter,
 				events);
 

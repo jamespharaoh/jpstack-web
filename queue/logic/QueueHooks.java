@@ -16,7 +16,9 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -66,27 +68,26 @@ class QueueHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"queueTypeHooks.setup ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"setup");
 
 		) {
 
 			// preload object types
 
-			objectTypeDao.findAll ();
+			objectTypeDao.findAll (
+				transaction);
 
 			// load queue types and construct index
 
 			queueTypeIdsByParentTypeId =
-				queueTypeDao.findAll ().stream ()
+				queueTypeDao.findAll (
+					transaction)
+
+				.stream ()
 
 				.collect (
 					Collectors.groupingBy (
@@ -110,7 +111,7 @@ class QueueHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectHelper <QueueRec> queueHelper,
 			@NonNull ObjectHelper <?> parentHelper,
 			@NonNull Record <?> parent) {
@@ -125,20 +126,22 @@ class QueueHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSingletons");
 
 		) {
 
 			Optional <SliceRec> slice =
 				objectManager.getAncestor (
+					transaction,
 					SliceRec.class,
 					parent);
 
 			ObjectTypeRec parentType =
 				objectTypeDao.findById (
+					transaction,
 					parentHelper.objectTypeId ());
 
 			for (
@@ -149,10 +152,11 @@ class QueueHooks
 
 				QueueTypeRec queueType =
 					queueTypeDao.findRequired (
+						transaction,
 						queueTypeId);
 
 				queueHelper.insert (
-					taskLogger,
+					transaction,
 					queueHelper.createInstance ()
 
 					.setQueueType (

@@ -14,9 +14,12 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -32,7 +35,10 @@ class MasterQueueCache
 
 	// TODO this is probably not needed with generic caching layer
 
-	// dependencies
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
@@ -48,94 +54,145 @@ class MasterQueueCache
 
 	Map <Long, List <QueueSubjectRec>> queueSubjectsByQueue;
 
-	// lifecycle
+	// implementation
 
-	@NormalLifecycleSetup
 	public
-	void setup () {
+	MasterQueueCache setup (
+			@NonNull Transaction parentTransaction) {
 
-		// create queue item index
+		try (
 
-		queueItemsBySubjectAndIndex =
-			ImmutableMap.copyOf (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
 
-			queueItemHelper.find (
-				ImmutableList.of (
-					QueueItemState.pending,
-					QueueItemState.claimed))
+		) {
 
-			.stream ()
+			// create queue item index
 
-			.filter (
-				queueItem ->
-					isNotNull (
-						queueItem.getQueueSubject ()))
+			queueItemsBySubjectAndIndex =
+				ImmutableMap.copyOf (
 
-			.collect (
-				Collectors.toMap (
+				queueItemHelper.find (
+					transaction,
+					ImmutableList.of (
+						QueueItemState.pending,
+						QueueItemState.claimed))
 
-				queueItem ->
-					Pair.of (
-						queueItem.getQueueSubject ().getId (),
-						queueItem.getIndex ()),
+				.stream ()
 
-				queueItem ->
-					queueItem)
+				.filter (
+					queueItem ->
+						isNotNull (
+							queueItem.getQueueSubject ()))
 
-			)
+				.collect (
+					Collectors.toMap (
 
-		);
+					queueItem ->
+						Pair.of (
+							queueItem.getQueueSubject ().getId (),
+							queueItem.getIndex ()),
 
-		// create queue subject indexes
+					queueItem ->
+						queueItem)
 
-		queueSubjects =
-			ImmutableList.copyOf (
-				queueSubjectHelper.findActive ());
+				)
 
-		queueSubjectsByQueue =
-			ImmutableMap.copyOf (
-				queueSubjects.stream ()
+			);
 
-			.collect (
-				Collectors.groupingBy (
-					queueSubject ->
-						queueSubject.getQueue ().getId ()))
+			// create queue subject indexes
 
-		);
+			queueSubjects =
+				ImmutableList.copyOf (
+					queueSubjectHelper.findActive (
+						transaction));
+
+			queueSubjectsByQueue =
+				ImmutableMap.copyOf (
+					queueSubjects.stream ()
+
+				.collect (
+					Collectors.groupingBy (
+						queueSubject ->
+							queueSubject.getQueue ().getId ()))
+
+			);
+
+			// return
+
+			return this;
+
+		}
 
 	}
-
-	// implementation
 
 	@Override
 	public
 	QueueItemRec findQueueItemByIndexRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec subject,
 			@NonNull Long index) {
 
-		return mapItemForKeyRequired (
-			queueItemsBySubjectAndIndex,
-			Pair.of (
-				subject.getId (),
-				index));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findQueueItemByIndexRequired");
+
+		) {
+
+			return mapItemForKeyRequired (
+				queueItemsBySubjectAndIndex,
+				Pair.of (
+					subject.getId (),
+					index));
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueSubjectRec> findQueueSubjects () {
+	List <QueueSubjectRec> findQueueSubjects (
+			@NonNull Transaction parentTransaction) {
 
-		return queueSubjects;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findQueueSubjects");
+
+		) {
+
+			return queueSubjects;
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueSubjectRec> findQueueSubjects (
+	List <QueueSubjectRec> findQueueSubjects (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue) {
 
-		return queueSubjectsByQueue.get (
-			queue.getId ());
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findQueueSubjects");
+
+		) {
+
+			return queueSubjectsByQueue.get (
+				queue.getId ());
+
+		}
 
 	}
 

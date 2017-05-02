@@ -1,10 +1,12 @@
 package wbs.platform.queue.model;
 
-import org.joda.time.Instant;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+
 import wbs.framework.entity.record.IdObject;
+
 import wbs.platform.user.model.UserRec;
 
 @Accessors (fluent = true)

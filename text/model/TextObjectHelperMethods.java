@@ -10,18 +10,18 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface TextObjectHelperMethods {
 
 	TextRec findOrCreate (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			String stringValue);
 
 	default
 	Optional <TextRec> findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Optional <String> stringValue) {
 
 		if (
@@ -31,7 +31,7 @@ interface TextObjectHelperMethods {
 
 			return optionalOf (
 				findOrCreate (
-					parentTaskLogger,
+					parentTransaction,
 					optionalGetRequired (
 						stringValue)));
 
@@ -45,11 +45,11 @@ interface TextObjectHelperMethods {
 
 	default
 	TextRec findOrCreateFormat (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String ... arguments) {
 
 		return findOrCreate (
-			parentTaskLogger,
+			parentTransaction,
 			stringFormatArray (
 				arguments));
 

@@ -16,7 +16,9 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -66,38 +68,39 @@ class ServiceHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"serviceHooks.setup ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"setup");
 
 		) {
 
 			// preload object types
 
-			objectTypeDao.findAll ();
+			objectTypeDao.findAll (
+				transaction);
 
 			// load service types and construct index
 
 			serviceTypeIdsByParentTypeId =
-				serviceTypeDao.findAll ().stream ().collect (
+				serviceTypeDao.findAll (
+					transaction)
+
+				.stream ()
+
+				.collect (
 					Collectors.groupingBy (
 
-				serviceType ->
-					serviceType.getParentType ().getId (),
-
-				Collectors.mapping (
 					serviceType ->
-						serviceType.getId (),
-					Collectors.toList ()))
+						serviceType.getParentType ().getId (),
 
-			);
+					Collectors.mapping (
+						serviceType ->
+							serviceType.getId (),
+						Collectors.toList ()))
+
+				);
 
 		}
 
@@ -108,7 +111,7 @@ class ServiceHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ObjectHelper <ServiceRec> serviceHelper,
 			@NonNull ObjectHelper <?> parentHelper,
 			@NonNull Record <?> parent) {
@@ -123,20 +126,22 @@ class ServiceHooks
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSingletons");
 
 		) {
 
 			Optional <SliceRec> slice =
 				objectManager.getAncestor (
+					transaction,
 					SliceRec.class,
 					parent);
 
 			ObjectTypeRec parentType =
 				objectTypeDao.findById (
+					transaction,
 					parentHelper.objectTypeId ());
 
 			for (
@@ -147,10 +152,11 @@ class ServiceHooks
 
 				ServiceTypeRec serviceType =
 					serviceTypeDao.findRequired (
+						transaction,
 						serviceTypeId);
 
 				serviceHelper.insert (
-					taskLogger,
+					transaction,
 					serviceHelper.createInstance ()
 
 					.setServiceType (

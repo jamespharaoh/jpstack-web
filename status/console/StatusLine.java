@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
 interface StatusLine {
@@ -15,10 +15,10 @@ interface StatusLine {
 	String typeName ();
 
 	PagePart createPagePart (
-			TaskLogger parentTaskLogger);
+			Transaction parentTransaction);
 
 	Future <JsonObject> getUpdateData (
-			TaskLogger parentTaskLogger,
+			Transaction parentTransaction,
 			UserPrivChecker privChecker);
 
 }

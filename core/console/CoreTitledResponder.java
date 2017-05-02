@@ -22,12 +22,14 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.OwnedTaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -79,22 +81,22 @@ class CoreTitledResponder
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setup");
 
 		) {
 
 			super.setup (
-				taskLogger);
+				transaction);
 
 			pagePart.setup (
-				taskLogger,
+				transaction,
 				emptyMap ());
 
 		}
@@ -104,26 +106,26 @@ class CoreTitledResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			if (pagePart != null) {
 
 				try {
 
 					pagePart.prepare (
-						taskLogger);
+						transaction);
 
 				} catch (RuntimeException exception) {
 
@@ -137,7 +139,7 @@ class CoreTitledResponder
 								requestContext.pathInfo ()));
 
 					exceptionLogger.logThrowable (
-						taskLogger,
+						transaction,
 						"console",
 						path,
 						exception,
@@ -163,19 +165,19 @@ class CoreTitledResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			formatWriter.writeLineFormat (
 				"<link",
@@ -186,7 +188,7 @@ class CoreTitledResponder
 				">");
 
 			pagePart.renderHtmlHeadContent (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -199,13 +201,13 @@ class CoreTitledResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger,
+					transaction,
 					"renderHtmlBodyContents");
 
 		) {
@@ -240,7 +242,7 @@ class CoreTitledResponder
 			} else if (pagePart != null) {
 
 				pagePart.renderHtmlBodyContent (
-					taskLogger);
+					transaction);
 
 			}
 

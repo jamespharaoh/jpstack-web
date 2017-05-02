@@ -3,6 +3,7 @@ package wbs.platform.queue.hibernate;
 import java.sql.Types;
 
 import wbs.framework.hibernate.EnumUserType;
+
 import wbs.platform.queue.model.QueueItemState;
 
 public

@@ -8,9 +8,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.feature.model.FeatureRec;
 
@@ -32,26 +33,27 @@ class FeatureCheckerImplementation
 	@Override
 	public
 	boolean checkFeatureAccess (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserPrivChecker privChecker,
 			@NonNull String featureCode) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"checkFeatureAccess");
 
 		) {
 
 			FeatureRec feature =
 				featureHelper.findByCodeRequired (
+					transaction,
 					GlobalId.root,
 					featureCode);
 
 			return privChecker.canRecursive (
-				taskLogger,
+				transaction,
 				feature,
 				"view");
 

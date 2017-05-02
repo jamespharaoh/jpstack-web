@@ -37,11 +37,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.console.TextConsoleHelper;
@@ -102,7 +104,7 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	UserSessionRec userLogon (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull UserRec user,
 			@NonNull Optional <String> userAgent,
@@ -110,27 +112,24 @@ class UserSessionLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userLogon");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			// end any existing session
 
 			userLogoff (
-				taskLogger,
+				transaction,
 				user);
 
 			// start the session log
 
 			UserSessionRec session =
 				userSessionHelper.insert (
-					taskLogger,
+					transaction,
 					userSessionHelper.createInstance ()
 
 				.setUser (
@@ -141,7 +140,7 @@ class UserSessionLogicImplementation
 
 				.setUserAgent (
 					textHelper.findOrCreate (
-						taskLogger,
+						transaction,
 						userAgent.orNull ()))
 
 			);
@@ -150,7 +149,7 @@ class UserSessionLogicImplementation
 
 			UserOnlineRec userOnline =
 				userOnlineHelper.insert (
-					taskLogger,
+					transaction,
 					userOnlineHelper.createInstance ()
 
 				.setUser (
@@ -190,46 +189,59 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	void userLogoff (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user) {
 
-		Optional <UserOnlineRec> userOnlineOptional =
-			userOnlineHelper.find (
-				user.getId ());
+		try (
 
-		if (
-			optionalIsNotPresent (
-				userOnlineOptional)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"userLogoff");
+
 		) {
-			return;
+
+			Optional <UserOnlineRec> userOnlineOptional =
+				userOnlineHelper.find (
+					transaction,
+					user.getId ());
+
+			if (
+				optionalIsNotPresent (
+					userOnlineOptional)
+			) {
+				return;
+			}
+
+			UserOnlineRec userOnline =
+				userOnlineOptional.get ();
+
+			// end the session log
+
+			UserSessionRec userSession =
+				userOnline.getUserSession ();
+
+			if (userSession != null) {
+
+				userSession.setEndTime (
+					userOnline.getTimestamp ());
+
+			}
+
+			// go offline
+
+			userOnlineHelper.remove (
+				transaction,
+				userOnline);
+
 		}
-
-		UserOnlineRec userOnline =
-			userOnlineOptional.get ();
-
-		// end the session log
-
-		UserSessionRec userSession =
-			userOnline.getUserSession ();
-
-		if (userSession != null) {
-
-			userSession.setEndTime (
-				userOnline.getTimestamp ());
-
-		}
-
-		// go offline
-
-		userOnlineHelper.remove (
-			userOnline);
 
 	}
 
 	@Override
 	public
 	Optional <UserSessionRec> userLogonTry (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull String sliceCode,
 			@NonNull String username,
@@ -239,9 +251,9 @@ class UserSessionLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userLogonTry");
 
 		) {
@@ -250,6 +262,7 @@ class UserSessionLogicImplementation
 
 			Optional <UserRec> userOptional =
 				userHelper.findByCode (
+					transaction,
 					GlobalId.root,
 					sliceCode,
 					username);
@@ -280,7 +293,7 @@ class UserSessionLogicImplementation
 
 			UserSessionRec userSession =
 				userLogon (
-					taskLogger,
+					transaction,
 					requestContext,
 					user,
 					userAgent,
@@ -305,7 +318,7 @@ class UserSessionLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"userSessionVerify (sessionId, userId, forceReload)");
@@ -399,15 +412,15 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	boolean userSessionVerify (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull ConsoleRequestContext requestContext) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"userSessionVerify (requestContext)");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"userSessionVerify");
 
 		) {
 
@@ -425,7 +438,7 @@ class UserSessionLogicImplementation
 
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Cookies not found");
 
 				return false;
@@ -446,7 +459,7 @@ class UserSessionLogicImplementation
 					userIdOptional)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"User id is not valid");
 
 				return false;
@@ -464,14 +477,14 @@ class UserSessionLogicImplementation
 
 			Boolean result =
 				userSessionVerify (
-					taskLogger,
+					transaction,
 					sessionId,
 					userId,
 					forceReload);
 
 			if (! result) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Removing session cookies for user %s",
 					integerToDecimalString (
 						userId));
@@ -498,7 +511,7 @@ class UserSessionLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"reloadReal");
@@ -548,11 +561,13 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	Optional <byte[]> userData (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		return optionalMapRequired (
 			userDataHelper.findByCode (
+				parentTransaction,
 				user,
 				code),
 			UserDataRec::getData);
@@ -562,25 +577,23 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	void userDataStore (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code,
 			@NonNull byte[] value) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userDataStore");
 
 		) {
 
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
-
 			Optional <UserDataRec> existingUserDataOptional =
 				userDataHelper.findByCode (
+					transaction,
 					user,
 					code);
 
@@ -589,7 +602,7 @@ class UserSessionLogicImplementation
 					existingUserDataOptional)
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Update %s.%s.%s",
 					user.getSlice ().getCode (),
 					user.getUsername (),
@@ -613,14 +626,14 @@ class UserSessionLogicImplementation
 
 			} else {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Create %s.%s.%s",
 					user.getSlice ().getCode (),
 					user.getUsername (),
 					code);
 
 				userDataHelper.insert (
-					taskLogger,
+					transaction,
 					userDataHelper.createInstance ()
 
 					.setUser (
@@ -651,21 +664,22 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	void userDataRemove (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userDataRemove");
 
 		) {
 
 			Optional <UserDataRec> userDataOptional =
 				userDataHelper.findByCode (
+					transaction,
 					user,
 					code);
 
@@ -674,19 +688,20 @@ class UserSessionLogicImplementation
 					userDataOptional)
 			) {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Remove %s.%s.%s",
 					user.getSlice ().getCode (),
 					user.getUsername (),
 					code);
 
 				userDataHelper.remove (
+					transaction,
 					optionalGetRequired (
 						userDataOptional));
 
 			} else {
 
-				taskLogger.noticeFormat (
+				transaction.noticeFormat (
 					"Remove %s.%s.%s (did not exist)",
 					user.getSlice ().getCode (),
 					user.getUsername (),
@@ -701,15 +716,15 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	Optional <Serializable> userDataObject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"userDataObject");
 
 		) {
@@ -718,13 +733,14 @@ class UserSessionLogicImplementation
 
 				return optionalMapRequired (
 					userData (
+						transaction,
 						user,
 						code),
 					SerializationUtils::deserialize);
 
 			} catch (SerializationException serializationException) {
 
-				taskLogger.warningFormatException (
+				transaction.warningFormatException (
 					serializationException,
 					"Error deserializing user data %s.%s.%s",
 					user.getSlice ().getCode (),
@@ -742,13 +758,13 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	void userDataObjectStore (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull String code,
 			@NonNull Serializable value) {
 
 		userDataStore (
-			parentTaskLogger,
+			parentTransaction,
 			user,
 			code,
 			SerializationUtils.serialize (
@@ -764,16 +780,11 @@ class UserSessionLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"reload");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"UserSessionLogicImplementation.reload ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"reloadReal");
 
 		) {
 
@@ -782,7 +793,8 @@ class UserSessionLogicImplementation
 
 			for (
 				UserOnlineRec online
-					: userOnlineHelper.findAll ()
+					: userOnlineHelper.findAll (
+						transaction)
 			) {
 
 				UserRec user =
@@ -817,7 +829,7 @@ class UserSessionLogicImplementation
 				) {
 
 					userLogoff (
-						taskLogger,
+						transaction,
 						user);
 
 					continue;

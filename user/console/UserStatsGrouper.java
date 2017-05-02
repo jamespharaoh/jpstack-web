@@ -15,8 +15,9 @@ import wbs.console.reporting.StatsGrouper;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
@@ -55,26 +56,27 @@ class UserStatsGrouper
 	@Override
 	public
 	void writeTdForGroup (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeTdForGroup");
 
 		) {
 
 			UserRec user =
 				userHelper.findRequired (
+					transaction,
 					(Long)
 					group);
 
 			consoleObjectManager.writeTdForObjectMiniLink (
-				taskLogger,
+				transaction,
 				formatWriter,
 				user);
 
@@ -84,35 +86,56 @@ class UserStatsGrouper
 
 	@Override
 	public
-	List<Object> sortGroups (
-			Set<Object> groups) {
+	List <Object> sortGroups (
+			@NonNull Transaction parentTransaction,
+			@NonNull Set <Object> groups) {
 
-		List<UserRec> users =
-			new ArrayList<UserRec> (
-				groups.size ());
+		try (
 
-		for (
-			Object group
-				: groups
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sortGroups");
+
 		) {
 
-			users.add (
-				userHelper.findRequired (
-					(Long)
-					group));
+			List <UserRec> users =
+				new ArrayList<> (
+					groups.size ());
+
+			for (
+				Object group
+					: groups
+			) {
+
+				users.add (
+					userHelper.findRequired (
+						transaction,
+						(Long)
+						group));
+
+			}
+
+			Collections.sort (
+				users);
+
+			ArrayList <Object> ret =
+				new ArrayList<> (
+					users.size ());
+
+			for (
+				UserRec user
+					: users
+			) {
+
+				ret.add (
+					user.getId ());
+
+			}
+
+			return ret;
 
 		}
-
-		Collections.sort (users);
-
-		ArrayList<Object> ret =
-			new ArrayList<Object> (
-				users.size ());
-
-		for (UserRec user : users)
-			ret.add (user.getId ());
-
-		return ret;
 
 	}
 

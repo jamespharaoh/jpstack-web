@@ -18,9 +18,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.status.console.StatusLine;
 
@@ -61,7 +62,7 @@ class ExceptionStatusLine
 	@Override
 	public
 	PagePart createPagePart (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		return exceptionStatusLinePart.get ();
 
@@ -70,15 +71,15 @@ class ExceptionStatusLine
 	@Override
 	public
 	Future <JsonObject> getUpdateData (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull UserPrivChecker privChecker) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getUpdateScript");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getUpdateData");
 
 		) {
 
@@ -89,7 +90,7 @@ class ExceptionStatusLine
 
 			if (
 				privChecker.canRecursive (
-					taskLogger,
+					transaction,
 					GlobalId.root,
 					"alert")
 			) {
@@ -97,7 +98,7 @@ class ExceptionStatusLine
 				updateData.addProperty (
 					"exceptions",
 					numExceptionsCache.get (
-						taskLogger));
+						transaction));
 
 			} else {
 
@@ -110,7 +111,7 @@ class ExceptionStatusLine
 			updateData.addProperty (
 				"fatalExceptions",
 				numFatalExceptionsCache.get (
-					taskLogger));
+					transaction));
 
 			return futureValue (
 				updateData);

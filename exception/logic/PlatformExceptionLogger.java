@@ -18,6 +18,7 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.model.ExceptionLogRec;
@@ -56,7 +57,7 @@ class PlatformExceptionLogger
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"logSimple");
@@ -93,7 +94,7 @@ class PlatformExceptionLogger
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"logThrowable");
@@ -135,7 +136,7 @@ class PlatformExceptionLogger
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"logThrowableWithSummary");
@@ -176,7 +177,7 @@ class PlatformExceptionLogger
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"logExceptionWrapped");
@@ -244,24 +245,19 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"realLogException");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"PlatformExceptionLogger.realLogException (...)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"realLogException");
 
 		) {
 
 			ExceptionLogRec exceptionLog =
 				exceptionLogLogic.logException (
-					taskLogger,
+					transaction,
 					typeCode,
 					source,
 					summary,

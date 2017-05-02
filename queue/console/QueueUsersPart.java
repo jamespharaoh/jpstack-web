@@ -35,9 +35,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -82,13 +83,13 @@ class QueueUsersPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
@@ -97,7 +98,8 @@ class QueueUsersPart
 				new HashMap<> ();
 
 			List <QueueItemClaimRec> queueItemClaims =
-				queueItemClaimHelper.findClaimed ();
+				queueItemClaimHelper.findClaimed (
+					transaction);
 
 			for (
 				QueueItemClaimRec queueItemClaim
@@ -112,11 +114,12 @@ class QueueUsersPart
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						queue);
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						parent,
 						"manage")
 				) {
@@ -161,13 +164,13 @@ class QueueUsersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -189,7 +192,7 @@ class QueueUsersPart
 				htmlTableRowOpen ();
 
 				objectManager.writeTdForObjectMiniLink (
-					taskLogger,
+					transaction,
 					userData.user);
 
 				htmlTableCellWrite (
@@ -208,7 +211,8 @@ class QueueUsersPart
 					referenceEqualWithClass (
 						UserRec.class,
 						userData.user,
-						userConsoleLogic.userRequired ())
+						userConsoleLogic.userRequired (
+							transaction))
 				) {
 
 					htmlTableCellWrite (

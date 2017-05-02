@@ -33,8 +33,10 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.OwnedTaskLogger;
 
 @PrototypeComponent ("statusResponder")
 public
@@ -113,19 +115,19 @@ class StatusResponder
 	@Override
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setup");
 
 		) {
 
 			super.setup (
-				taskLogger);
+				transaction);
 
 			for (
 				StatusLine statusLine
@@ -134,10 +136,10 @@ class StatusResponder
 
 				PagePart pagePart =
 					statusLine.createPagePart (
-						taskLogger);
+						transaction);
 
 				pagePart.setup (
-					taskLogger,
+					transaction,
 					Collections.emptyMap ());
 
 				pageParts.add (
@@ -152,24 +154,24 @@ class StatusResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger,
+					transaction,
 					"prepare");
 
 		) {
 
 			super.prepare (
-				taskLogger);
+				transaction);
 
 			pageParts.forEach (
 				pagePart ->
 					pagePart.prepare (
-						taskLogger));
+						transaction));
 
 		}
 
@@ -178,137 +180,166 @@ class StatusResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		super.renderHtmlHeadContents (
-			parentTaskLogger);
+		try (
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.renderHtmlHeadContent (
-					parentTaskLogger));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHeadContents");
+
+		) {
+
+			super.renderHtmlHeadContents (
+				transaction);
+
+			pageParts.forEach (
+				pagePart ->
+					pagePart.renderHtmlHeadContent (
+						transaction));
+
+		}
 
 	}
 
 	@Override
 	protected
 	void renderHtmlBody (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		formatWriter.writeLineFormat (
-			"<body>");
+		try (
 
-		formatWriter.increaseIndent ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBody");
 
-		renderHtmlBodyContents (
-			parentTaskLogger);
+		) {
 
-		formatWriter.decreaseIndent ();
+			formatWriter.writeLineFormatIncreaseIndent (
+				"<body>");
 
-		formatWriter.writeLineFormat (
-			"</body>");
+			renderHtmlBodyContents (
+				transaction);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"</body>");
+
+		}
 
 	}
 
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// table open
+		try (
 
-		htmlTableOpenList (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-			htmlIdAttribute (
-				"statusTable"),
+		) {
 
-			htmlAttribute (
-				"width",
-				"100%")
+			// table open
 
-		);
+			htmlTableOpenList (
 
-		// heading row
+				htmlIdAttribute (
+					"statusTable"),
 
-		htmlTableRowOpen ();
+				htmlAttribute (
+					"width",
+					"100%")
 
-		htmlTableHeaderCellWrite (
-			"Status",
-			htmlIdAttribute (
-				"headerCell"));
+			);
 
-		htmlTableRowClose ();
+			// heading row
 
-		// loading row
+			htmlTableRowOpen ();
 
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"loadingRow"));
+			htmlTableHeaderCellWrite (
+				"Status",
+				htmlIdAttribute (
+					"headerCell"));
 
-		htmlTableCellWrite (
-			"Loading...",
-			htmlIdAttribute (
-				"loadingCell"));
+			htmlTableRowClose ();
 
-		htmlTableRowClose ();
+			// loading row
 
-		// notice row
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"loadingRow"));
 
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"noticeRow"));
+			htmlTableCellWrite (
+				"Loading...",
+				htmlIdAttribute (
+					"loadingCell"));
 
-		htmlTableCellWrite (
-			"—",
-			htmlIdAttribute (
-				"noticeCell"));
+			htmlTableRowClose ();
 
-		htmlTableRowClose ();
+			// notice row
 
-		// time row
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"noticeRow"));
 
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"timeRow"));
+			htmlTableCellWrite (
+				"—",
+				htmlIdAttribute (
+					"noticeCell"));
 
-		htmlTableCellWrite (
-			"—",
-			htmlIdAttribute (
-				"timeCell"));
+			htmlTableRowClose ();
 
-		htmlTableRowClose ();
+			// time row
 
-		// parts
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"timeRow"));
 
-		pageParts.forEach (
-			pagePart ->
-				pagePart.renderHtmlBodyContent (
-					parentTaskLogger));
+			htmlTableCellWrite (
+				"—",
+				htmlIdAttribute (
+					"timeCell"));
 
-		// log out row
+			htmlTableRowClose ();
 
-		htmlTableRowOpen ();
+			// parts
 
-		htmlTableCellOpen ();
+			pageParts.forEach (
+				pagePart ->
+					pagePart.renderHtmlBodyContent (
+						transaction));
 
-		htmlFormOpenPostAction (
-			"logoff");
+			// log out row
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"log out\"",
-			">");
+			htmlTableRowOpen ();
 
-		htmlFormClose ();
+			htmlTableCellOpen ();
 
-		htmlTableCellClose ();
+			htmlFormOpenPostAction (
+				"logoff");
 
-		htmlTableRowClose ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"log out\"",
+				">");
 
-		// table close
+			htmlFormClose ();
 
-		htmlTableClose ();
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
+
+			// table close
+
+			htmlTableClose ();
+
+		}
 
 	}
 

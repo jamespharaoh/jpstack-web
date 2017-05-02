@@ -29,8 +29,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-import org.joda.time.Instant;
-
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
 import wbs.console.priv.UserPrivData.PrivPair;
@@ -45,10 +43,13 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -117,14 +118,26 @@ class PrivDataLoaderImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		privDataCache =
-			updateManager.makeUpdateGetterAdaptor (
-				new PrivDataReloader (),
-				reloadTimeSeconds * 1000,
-				"privs",
-				0);
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			privDataCache =
+				updateManager.makeUpdateGetterAdaptor (
+					new PrivDataReloader (),
+					reloadTimeSeconds * 1000,
+					"privs",
+					0);
+
+		}
 
 	}
 
@@ -160,7 +173,7 @@ class PrivDataLoaderImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"getUserPrivData");
@@ -192,7 +205,7 @@ class PrivDataLoaderImplementation
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"refresh");
@@ -248,33 +261,18 @@ class PrivDataLoaderImplementation
 		SharedData provide (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"privDataReloader.get");
-
-			// create the data
-
-			SharedData newData =
-				new SharedData ();
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnlyJoin (
-						taskLogger,
-						"PrivDataLoaderImplementation.PrivDataReloader.get ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"PrivDataReloader.provide");
 
 			) {
 
-				// start timer
-
-				taskLogger.debugFormat (
-					"Priv reload started");
-
-				Instant startTime =
-					Instant.now ();
+				SharedData newData =
+					new SharedData ();
 
 				// get privs, filter those we can't get parent for
 
@@ -283,11 +281,13 @@ class PrivDataLoaderImplementation
 
 				for (
 					PrivRec priv
-						: privHelper.findAll ()
+						: privHelper.findAll (
+							transaction)
 				) {
 
 					Either <Optional <Record <?>>, String> privParentOrError =
 						objectManager.getParentOrError (
+							transaction,
 							priv);
 
 					if (
@@ -300,7 +300,7 @@ class PrivDataLoaderImplementation
 
 					} else {
 
-						taskLogger.warningFormat (
+						transaction.warningFormat (
 							"Error getting parent for priv %s: ",
 							integerToDecimalString (
 								priv.getId ()),
@@ -353,7 +353,8 @@ class PrivDataLoaderImplementation
 				// sort out objectTypeIdsByClassName
 
 				Collection <ObjectTypeRec> objectTypes =
-					objectTypeHelper.findAll ();
+					objectTypeHelper.findAll (
+						transaction);
 
 				for (
 					ObjectTypeRec objectType
@@ -375,7 +376,7 @@ class PrivDataLoaderImplementation
 
 					} else {
 
-						taskLogger.warningFormat (
+						transaction.warningFormat (
 							"Ignoring unknown object type %s",
 							objectType.getCode ());
 
@@ -392,6 +393,7 @@ class PrivDataLoaderImplementation
 
 					Either <Optional <Record <?>>, String> parentOrError =
 						objectManager.getParentOrError (
+							transaction,
 							priv);
 
 					if (
@@ -399,7 +401,7 @@ class PrivDataLoaderImplementation
 							parentOrError)
 					) {
 
-						taskLogger.warningFormat (
+						transaction.warningFormat (
 							"Error getting parent for priv %s: %s",
 							integerToDecimalString (
 								priv.getId ()),
@@ -421,6 +423,7 @@ class PrivDataLoaderImplementation
 
 						Either <Optional <Record <?>>, String> grandParentOrError =
 							objectManager.getParentOrError (
+								transaction,
 								parent);
 
 						if (
@@ -428,7 +431,7 @@ class PrivDataLoaderImplementation
 								parentOrError)
 						) {
 
-							taskLogger.warningFormat (
+							transaction.warningFormat (
 								"Error getting grandparent for priv %s: %s",
 								integerToDecimalString (
 									priv.getId ()),
@@ -452,7 +455,7 @@ class PrivDataLoaderImplementation
 
 							Optional <Long> chainedPrivIdOptional =
 								getChainedPrivId (
-									taskLogger,
+									transaction,
 									newData,
 									grandParent,
 									priv.getCode ());
@@ -478,6 +481,7 @@ class PrivDataLoaderImplementation
 
 						GlobalId objectId =
 							objectManager.getGlobalId (
+								transaction,
 								parent);
 
 						ObjectData objectData =
@@ -501,7 +505,7 @@ class PrivDataLoaderImplementation
 
 							Optional <Long> managePrivIdOptional =
 								getChainedPrivId (
-									taskLogger,
+									transaction,
 									newData,
 									parent,
 									"manage");
@@ -541,24 +545,19 @@ class PrivDataLoaderImplementation
 
 				newData.objectTypeCodesById =
 					Collections.unmodifiableMap (
-						objectTypeHelper.findAll ().stream ()
+						objectTypeHelper.findAll (
+							transaction)
+
+					.stream ()
 
 					.collect (
 						Collectors.toMap (
 							ObjectTypeRec::getId,
-							ObjectTypeRec::getCode))
+							ObjectTypeRec::getCode)
 
-				);
+				));
 
-				// end timer
-
-				Instant endTime =
-					Instant.now ();
-
-				taskLogger.debugFormat (
-					"Reload complete (%sms)",
-					integerToDecimalString (
-						endTime.getMillis () - startTime.getMillis ()));
+				// return
 
 				return newData;
 
@@ -573,16 +572,16 @@ class PrivDataLoaderImplementation
 		 */
 		private
 		Optional <Long> getChainedPrivId (
-				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction parentTransaction,
 				@NonNull SharedData newData,
 				@NonNull Record <?> object,
 				@NonNull String code) {
 
 			try (
 
-				TaskLogger taskLogger =
-					logContext.nestTaskLogger (
-						parentTaskLogger,
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
 						"getChainedPrivId");
 
 			) {
@@ -602,6 +601,7 @@ class PrivDataLoaderImplementation
 
 					GlobalId currentObjectId =
 						objectManager.getGlobalId (
+							transaction,
 							currentObject);
 
 					ObjectData currentObjectData =
@@ -625,6 +625,7 @@ class PrivDataLoaderImplementation
 
 					Either <Optional <Record <?>>, String> nextObjectOrError =
 						objectManager.getParentOrError (
+							transaction,
 							currentObject);
 
 					if (
@@ -632,12 +633,14 @@ class PrivDataLoaderImplementation
 							nextObjectOrError)
 					) {
 
-						taskLogger.warningFormat (
-							"Error getting parent for object %s of type %s: %s",
+						transaction.warningFormat (
+							"Error getting parent for object %s ",
 							integerToDecimalString (
 								currentObjectId.typeId ()),
+							"of type %s: ",
 							integerToDecimalString (
 								currentObjectId.objectId ()),
+							"%s",
 							getError (
 								nextObjectOrError));
 
@@ -682,40 +685,24 @@ class PrivDataLoaderImplementation
 		UserData provide (
 				@NonNull TaskLogger parentTaskLogger) {
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"userDataReloader.get");
-
-			// create the data
-
-			UserData newData =
-				new UserData ();
-
 			try (
 
 				OwnedTransaction transaction =
 					database.beginReadOnly (
-						taskLogger,
-						"PrivDataLoaderImplementation.UserDataReloader.get ()",
-						this);
+						logContext,
+						parentTaskLogger,
+						"UserDataReloader.provide");
 
 			) {
 
-				// start timer
-
-				taskLogger.debugFormat (
-					"User %s priv reload started",
-					integerToDecimalString (
-						userId));
-
-				Instant startTime =
-					Instant.now ();
+				UserData newData =
+					new UserData ();
 
 				// get user
 
 				UserRec user =
 					userHelper.findRequired (
+						transaction,
 						userId);
 
 				// do user-specific privs
@@ -770,16 +757,6 @@ class PrivDataLoaderImplementation
 				}
 
 				// end timer
-
-				Instant endTime =
-					Instant.now ();
-
-				taskLogger.debugFormat (
-					"User %s priv reload complere (%sms)",
-					integerToDecimalString (
-						userId),
-					integerToDecimalString (
-						endTime.getMillis () - startTime.getMillis ()));
 
 				return newData;
 

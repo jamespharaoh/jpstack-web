@@ -8,9 +8,10 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -48,16 +49,16 @@ class ServiceObjectHelperMethodsImplementation
 	@Override
 	public
 	ServiceRec findOrCreate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Record<?> parent,
 			@NonNull String typeCode,
 			@NonNull String code) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreate");
 
 		) {
@@ -66,6 +67,7 @@ class ServiceObjectHelperMethodsImplementation
 
 			Optional <ServiceRec> existingService =
 				serviceHelper.findByCode (
+					transaction,
 					parent,
 					code);
 
@@ -80,22 +82,26 @@ class ServiceObjectHelperMethodsImplementation
 
 			ObjectTypeRec parentType =
 				objectTypeHelper.findRequired (
+					transaction,
 					objectManager.getObjectTypeId (
+						transaction,
 						parent));
 
 			ServiceTypeRec serviceType =
 				serviceTypeHelper.findByCodeRequired (
+					transaction,
 					parentType,
 					typeCode);
 
 			Optional <SliceRec> parentSlice =
 				objectManager.getAncestor (
+					transaction,
 					SliceRec.class,
 					parent);
 
 			ServiceRec newService =
 				serviceHelper.insert (
-					taskLogger,
+					transaction,
 					serviceHelper.createInstance ()
 
 				.setCode (

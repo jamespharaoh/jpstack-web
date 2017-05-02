@@ -18,9 +18,14 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.postgresql.model.PostgresqlStatActivityObjectHelper;
 import wbs.platform.postgresql.model.PostgresqlStatActivityRec;
 
@@ -30,6 +35,9 @@ class PostgresqlActivityPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PostgresqlStatActivityObjectHelper postgresqlStatActivityHelper;
@@ -45,35 +53,47 @@ class PostgresqlActivityPart
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		List<PostgresqlStatActivityRec> allStatActivities =
-			postgresqlStatActivityHelper.findAll ();
+		try (
 
-		activeStatActivities =
-			new ArrayList<PostgresqlStatActivityRec> ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		idleStatActivities =
-			new ArrayList<PostgresqlStatActivityRec> ();
-
-		for (
-			PostgresqlStatActivityRec statActivity
-				: allStatActivities
 		) {
 
-			if (
-				stringEqualSafe (
-					statActivity.getCurrentQuery (),
-					"<IDLE>")
+			List <PostgresqlStatActivityRec> allStatActivities =
+				postgresqlStatActivityHelper.findAll (
+					transaction);
+
+			activeStatActivities =
+				new ArrayList<PostgresqlStatActivityRec> ();
+
+			idleStatActivities =
+				new ArrayList<PostgresqlStatActivityRec> ();
+
+			for (
+				PostgresqlStatActivityRec statActivity
+					: allStatActivities
 			) {
 
-				idleStatActivities.add (
-					statActivity);
+				if (
+					stringEqualSafe (
+						statActivity.getCurrentQuery (),
+						"<IDLE>")
+				) {
 
-			} else {
+					idleStatActivities.add (
+						statActivity);
 
-				activeStatActivities.add (
-					statActivity);
+				} else {
+
+					activeStatActivities.add (
+						statActivity);
+
+				}
 
 			}
 
@@ -84,16 +104,27 @@ class PostgresqlActivityPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		doList (
-			activeStatActivities);
+		try (
 
-		htmlHeadingTwoWrite (
-			"Idle");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		doList (
-			idleStatActivities);
+		) {
+
+			doList (
+				activeStatActivities);
+
+			htmlHeadingTwoWrite (
+				"Idle");
+
+			doList (
+				idleStatActivities);
+
+		}
 
 	}
 

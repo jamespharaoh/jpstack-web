@@ -4,7 +4,6 @@ import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -15,7 +14,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
-import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -45,16 +43,17 @@ import org.joda.time.Instant;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivCheckerBuilder;
 
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -74,9 +73,6 @@ public
 class QueueSubjectSorter {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ActivityManager activityManager;
 
 	@SingletonDependency
 	Database database;
@@ -135,36 +131,14 @@ class QueueSubjectSorter {
 
 	public
 	SortedQueueSubjects sort (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"sort");
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			ActiveTask activeTask =
-				activityManager.start (
-					"logic",
-					stringFormat (
-						"%s.%s (%s)",
-						getClass ().getSimpleName (),
-						"sort",
-						joinWithCommaAndSpace (
-							stringFormat (
-								"queue=%s",
-								ifNotNullThenElse (
-									queue,
-									() -> queue.toString (),
-									() -> "null"),
-							stringFormat (
-								"effectiveUser=%s",
-								ifNotNullThenElse (
-									effectiveUser,
-									() -> effectiveUser.toString (),
-									() -> "null"))))),
-					this);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sort");
 
 		) {
 
@@ -175,7 +149,7 @@ class QueueSubjectSorter {
 					loggedInUser.getId ())
 
 				.build (
-					taskLogger);
+					transaction);
 
 			if (
 				isNotNull (
@@ -189,12 +163,9 @@ class QueueSubjectSorter {
 						effectiveUser.getId ())
 
 					.build (
-						taskLogger);
+						transaction);
 
 			}
-
-			transaction =
-				database.currentTransaction ();
 
 			// process queue subjects
 
@@ -205,17 +176,19 @@ class QueueSubjectSorter {
 
 				() ->
 					queueCache.findQueueSubjects (
+						transaction,
 						queue),
 
 				() ->
-					queueCache.findQueueSubjects ()
+					queueCache.findQueueSubjects (
+						transaction)
 
 			);
 
 			queueSubjects.forEach (
 				queueSubject ->
 					processSubject (
-						taskLogger,
+						transaction,
 						queueSubject));
 
 			// convert subjects to list, filter and sort
@@ -286,14 +259,14 @@ class QueueSubjectSorter {
 
 	public
 	void processSubject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec subject) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processSubject");
 
 		) {
@@ -305,7 +278,7 @@ class QueueSubjectSorter {
 					subject.getQueue (),
 					queue ->
 						createQueueInfo (
-							taskLogger,
+							transaction,
 							queue));
 
 			// check we can see this queue
@@ -321,7 +294,7 @@ class QueueSubjectSorter {
 
 			SubjectInfo subjectInfo =
 				createSubjectInfo (
-					parentTaskLogger,
+					transaction,
 					queueInfo,
 					subject);
 
@@ -385,15 +358,15 @@ class QueueSubjectSorter {
 
 	private
 	SubjectInfo createSubjectInfo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueInfo queueInfo,
 			@NonNull QueueSubjectRec subject) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createSubjectInfo");
 
 		) {
@@ -402,6 +375,7 @@ class QueueSubjectSorter {
 
 			QueueItemRec item =
 				getNextItem (
+					transaction,
 					subject);
 
 			// create subject info
@@ -452,17 +426,17 @@ class QueueSubjectSorter {
 						subjectInfo.preferredUser.getId ())
 
 					.build (
-						taskLogger);
+						transaction);
 
 				subjectInfo.preferredByOverflowOperator = (
 
 					preferredUserPrivChecker.canRecursive (
-						taskLogger,
+						transaction,
 						queueInfo.queue,
 						"reply_overflow")
 
 					&& ! preferredUserPrivChecker.canSimple (
-						taskLogger,
+						transaction,
 						queueInfo.queue,
 						"reply")
 
@@ -568,14 +542,14 @@ class QueueSubjectSorter {
 
 	private
 	QueueInfo createQueueInfo (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createQueueInfo");
 
 		) {
@@ -591,31 +565,32 @@ class QueueSubjectSorter {
 
 			queueInfo.configuredPreferredUserDelay =
 				queueManager.getPreferredUserDelay (
+					transaction,
 					queue);
 
 			// check permissions
 
 			queueInfo.canReplyExplicit =
 				checkPrivExplicit (
-					taskLogger,
+					transaction,
 					queue,
 					"reply");
 
 			queueInfo.canReplyImplicit =
 				checkPrivImplicit (
-					taskLogger,
+					transaction,
 					queue,
 					"reply");
 
 			queueInfo.canReplyOverflowExplicit =
 				checkPrivExplicit (
-					taskLogger,
+					transaction,
 					queue,
 					"reply_overflow");
 
 			queueInfo.canReplyOverflowImplicit =
 				checkPrivImplicit (
-					taskLogger,
+					transaction,
 					queue,
 					"reply_overflow");
 
@@ -627,6 +602,7 @@ class QueueSubjectSorter {
 
 			queueInfo.ownOperatorsActive =
 				queueLogic.sliceHasQueueActivity (
+					transaction,
 					queueInfo.slice);
 
 			// return
@@ -645,7 +621,7 @@ class QueueSubjectSorter {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"checkPrivExplicit");
@@ -689,7 +665,7 @@ class QueueSubjectSorter {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"checkPrivImplicit");
@@ -761,35 +737,48 @@ class QueueSubjectSorter {
 
 	private
 	QueueItemRec getNextItem (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec subject) {
 
-		long nextItemIndex =
-			+ subject.getTotalItems ()
-			- subject.getActiveItems ();
+		try (
 
-		QueueItemRec item =
-			queueCache.findQueueItemByIndexRequired (
-				subject,
-				nextItemIndex);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getNextItem");
 
-		if (
-			enumNotInSafe (
-				item.getState (),
-				QueueItemState.pending,
-				QueueItemState.claimed)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Queue item %s in invalid state \"%s\"",
-					integerToDecimalString (
-						item.getId ()),
-					enumNameSpaces (
-						item.getState ())));
+			long nextItemIndex =
+				+ subject.getTotalItems ()
+				- subject.getActiveItems ();
+
+			QueueItemRec item =
+				queueCache.findQueueItemByIndexRequired (
+					transaction,
+					subject,
+					nextItemIndex);
+
+			if (
+				enumNotInSafe (
+					item.getState (),
+					QueueItemState.pending,
+					QueueItemState.claimed)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Queue item %s in invalid state \"%s\"",
+						integerToDecimalString (
+							item.getId ()),
+						enumNameSpaces (
+							item.getState ())));
+
+			}
+
+			return item;
 
 		}
-
-		return item;
 
 	}
 

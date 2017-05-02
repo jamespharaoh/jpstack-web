@@ -21,8 +21,11 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.updatelog.model.UpdateLogObjectHelper;
@@ -82,21 +85,22 @@ class UpdateManager {
 
 	private
 	long getDatabaseVersion (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String table,
 			@NonNull Long ref) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getDatabaseVersion");
 
 		) {
 
 			UpdateLogRec updateLog =
 				updateLogHelper.findByTableAndRef (
+					transaction,
 					table,
 					ref);
 
@@ -105,7 +109,7 @@ class UpdateManager {
 					? updateLog.getVersion ()
 					: -1l;
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"getDatabaseVersion (\"%s\", %s) = %s",
 				table,
 				integerToDecimalString (
@@ -121,25 +125,22 @@ class UpdateManager {
 
 	private
 	void refreshMaster (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"refreshMaster");
 
 		) {
 
 			// check it is time
 
-			Instant now =
-				Instant.now ();
-
 			if (
 				earlierThan (
-					now,
+					transaction.now (),
 					reloadTime)
 			) {
 				return;
@@ -147,14 +148,14 @@ class UpdateManager {
 
 			reloadTime =
 				instantSumDuration (
-					now,
+					transaction.now (),
 					reloadFrequency);
 
 			// hit the db
 
 			long newMasterVersion =
 				getDatabaseVersion (
-					taskLogger,
+					transaction,
 					"master",
 					0l);
 
@@ -191,14 +192,14 @@ class UpdateManager {
 
 	private
 	void refreshSecondary (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String table) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"refreshSecondary");
 
 		) {
@@ -231,7 +232,7 @@ class UpdateManager {
 
 			long newSecondaryVersion =
 				getDatabaseVersion (
-					taskLogger,
+					transaction,
 					table,
 					0l);
 
@@ -268,15 +269,15 @@ class UpdateManager {
 
 	public
 	long refreshTertiary (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String table,
 			@NonNull Long ref) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"refreshTertiary");
 
 		) {
@@ -324,7 +325,7 @@ class UpdateManager {
 
 			long newTertiaryVersion =
 				getDatabaseVersion (
-					taskLogger,
+					transaction,
 					table,
 					ref);
 
@@ -355,28 +356,23 @@ class UpdateManager {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getVersionDb");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"UpdateManager.getVersionDb (table, ref)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"UpdateManager.getVersionDb (table, ref)");
 
 		) {
 
 			refreshMaster (
-				taskLogger);
+				transaction);
 
 			refreshSecondary (
-				taskLogger,
+				transaction,
 				table);
 
 			refreshTertiary (
-				taskLogger,
+				transaction,
 				table,
 				ref);
 
@@ -401,7 +397,7 @@ class UpdateManager {
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"getVersion");
@@ -476,21 +472,22 @@ class UpdateManager {
 
 	private
 	void realSignalUpdate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String table,
 			@NonNull Long ref) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"realSignalUpdate");
 
 		) {
 
 			UpdateLogRec updateLog =
 				updateLogHelper.findByTableAndRef (
+					transaction,
 					table,
 					ref);
 
@@ -498,7 +495,7 @@ class UpdateManager {
 
 				updateLog =
 					updateLogHelper.insert (
-						taskLogger,
+						transaction,
 						updateLogHelper.createInstance ()
 
 					.setCode (
@@ -523,31 +520,31 @@ class UpdateManager {
 
 	public
 	void signalUpdate (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull String table,
 			@NonNull Long ref) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"signalUpdate");
 
 		) {
 
 			realSignalUpdate (
-				taskLogger,
+				transaction,
 				table,
 				ref);
 
 			realSignalUpdate (
-				taskLogger,
+				transaction,
 				table,
 				0l);
 
 			realSignalUpdate (
-				taskLogger,
+				transaction,
 				"master",
 				0l);
 
@@ -594,7 +591,7 @@ class UpdateManager {
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLoggerFormat (
 						parentTaskLogger,
 						"Watcher (%s).isUpdated (%s)",
@@ -603,9 +600,6 @@ class UpdateManager {
 							ref));
 
 			) {
-
-				taskLogger.debugFormat (
-					"Watcher (\"%s" + table + "\").isUpdated (" + ref + ")");
 
 				long newVersion =
 					getVersion (
@@ -700,7 +694,7 @@ class UpdateManager {
 
 			try (
 
-				TaskLogger taskLogger =
+				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
 						"UpdateGetterAdaptor.provide ()");

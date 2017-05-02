@@ -16,10 +16,6 @@
 		<model name="mediaType"/>
 	</models>
 
-	<layer name="logic">
-		<component class="logic.MediaLogicImplementation"/>
-	</layer>
-
 	<layer name="console">
 		<component class="console.ImageCsvFormFieldInterfaceMapping"/>
 		<component class="console.ImageFormFieldBuilder"/>
@@ -33,6 +29,11 @@
 		<component class="console.MediaThumb100Responder"/>
 		<component class="console.MediaThumb32Responder"/>
 		<component class="console.MediaVideoResponder"/>
+	</layer>
+
+	<layer name="logic">
+		<component class="logic.MediaLogicImplementation"/>
+		<component class="logic.RawMediaLogicImplementation"/>
 	</layer>
 
 	<fixtures>

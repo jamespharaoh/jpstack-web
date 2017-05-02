@@ -72,8 +72,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -190,20 +193,22 @@ class QueueHomeResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			myClaimedItems =
 				queueItemClaimHelper.findClaimed (
-					userConsoleLogic.userRequired ());
+					transaction,
+					userConsoleLogic.userRequired (
+						transaction));
 
 			// load queue list
 
@@ -214,13 +219,15 @@ class QueueHomeResponder
 					dummyQueueCache)
 
 				.loggedInUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.effectiveUser (
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 
 				.sort (
-					taskLogger)
+					transaction)
 
 				.availableQueues ();
 
@@ -285,19 +292,19 @@ class QueueHomeResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlHeadContents");
 
 		) {
 
 			super.renderHtmlHeadContents (
-				taskLogger);
+				transaction);
 
 			htmlScriptBlockWrite (
 				"top.show_inbox (true)");
@@ -381,7 +388,7 @@ class QueueHomeResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"goQueues");
@@ -504,7 +511,7 @@ class QueueHomeResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"renderQueueItems");
@@ -554,19 +561,23 @@ class QueueHomeResponder
 
 				Record <?> parent =
 					objectManager.getParentRequired (
+						transaction,
 						queue);
 
 				Optional <SliceRec> slice =
 					objectManager.getAncestor (
+						transaction,
 						SliceRec.class,
 						queue);
 
 				String parentTypeCode =
 					objectManager.getObjectTypeCode (
+						transaction,
 						parent);
 
 				String parentCode =
 					objectManager.getCode (
+						transaction,
 						parent);
 
 				// table row open
@@ -654,8 +665,10 @@ class QueueHomeResponder
 
 				htmlTableCellWrite (
 					objectManager.objectPathMini (
+						transaction,
 						parent,
-						userConsoleLogic.sliceRequired ()));
+						userConsoleLogic.sliceRequired (
+							transaction)));
 
 				// queue code
 
@@ -674,6 +687,7 @@ class QueueHomeResponder
 					privChecker.canRecursive (
 						taskLogger,
 						objectManager.getParentRequired (
+							transaction,
 							queueInfo.queue ()),
 						"supervisor")
 				) {
@@ -694,6 +708,7 @@ class QueueHomeResponder
 				htmlTableCellWriteHtml (
 					htmlEncodeNonBreakingWhitespace (
 						userConsoleLogic.prettyDuration (
+							transaction,
 							queueInfo.oldestAvailable (),
 							transaction.now ())),
 					htmlClassAttribute (
@@ -714,170 +729,200 @@ class QueueHomeResponder
 	}
 
 	protected
-	void goMyItems () {
+	void goMyItems (
+			@NonNull Transaction parentTransaction) {
 
-		if (
-			collectionIsEmpty (
-				myClaimedItems)
-		) {
-			return;
-		}
+		try (
 
-		htmlHeadingTwoWrite (
-			"My items");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goMyItems");
 
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Unclaim",
-			"Object",
-			"Queue",
-			"Timestamp",
-			"Source",
-			"Details");
-
-		int maxItems = 100;
-
-		for (
-			QueueItemClaimRec queueItemClaim
-				: myClaimedItems
 		) {
 
-			QueueItemRec queueItem =
-				queueItemClaim.getQueueItem ();
+			if (
+				collectionIsEmpty (
+					myClaimedItems)
+			) {
+				return;
+			}
 
-			QueueSubjectRec queueSubject =
-				queueItem.getQueueSubject ();
+			htmlHeadingTwoWrite (
+				"My items");
 
-			QueueRec queue =
-				queueSubject.getQueue ();
+			htmlTableOpenList ();
 
-			htmlTableRowOpen (
+			htmlTableHeaderRowWrite (
+				"Unclaim",
+				"Object",
+				"Queue",
+				"Timestamp",
+				"Source",
+				"Details");
 
-				htmlClassAttribute (
-					"magic-table-row",
-					stringFormat (
-						"queue-%h",
-						integerToDecimalString (
-							queue.getId ()))),
+			int maxItems = 100;
 
-				htmlDataAttribute (
-					"target-href",
-					requestContext.resolveApplicationUrlFormat (
-						"/queues",
-						"/queue.item",
-						"?id=%s",
-						integerToDecimalString (
-							queueItem.getId ())))
+			for (
+				QueueItemClaimRec queueItemClaim
+					: myClaimedItems
+			) {
 
-			);
+				QueueItemRec queueItem =
+					queueItemClaim.getQueueItem ();
 
-			htmlTableCellOpen ();
+				QueueSubjectRec queueSubject =
+					queueItem.getQueueSubject ();
 
-			htmlFormOpenPostAction (
-				requestContext.resolveApplicationUrl (
-					"/queues/queue.unclaim"));
+				QueueRec queue =
+					queueSubject.getQueue ();
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"queueItemId\"",
-				" value=\"%h\"",
-				integerToDecimalString (
-					queueItem.getId ()),
-				">");
+				htmlTableRowOpen (
 
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"unclaim\"",
-				">");
+					htmlClassAttribute (
+						"magic-table-row",
+						stringFormat (
+							"queue-%h",
+							integerToDecimalString (
+								queue.getId ()))),
 
-			htmlFormClose ();
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveApplicationUrlFormat (
+							"/queues",
+							"/queue.item",
+							"?id=%s",
+							integerToDecimalString (
+								queueItem.getId ())))
 
-			htmlTableCellClose ();
+				);
 
-			htmlTableCellWrite (
-				objectManager.objectPath (
-					objectManager.getParentRequired (
-						queue),
-					userConsoleLogic.sliceRequired ()));
+				htmlTableCellOpen ();
 
-			htmlTableCellWrite (
-				queue.getCode ());
+				htmlFormOpenPostAction (
+					requestContext.resolveApplicationUrl (
+						"/queues/queue.unclaim"));
 
-			htmlTableCellWrite (
-				userConsoleLogic.timestampWithTimezoneString (
-					queueItem.getCreatedTime ()));
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"queueItemId\"",
+					" value=\"%h\"",
+					integerToDecimalString (
+						queueItem.getId ()),
+					">");
 
-			htmlTableCellWrite (
-				queueItem.getSource ());
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"unclaim\"",
+					">");
 
-			htmlTableCellWrite (
-				queueItem.getDetails ());
+				htmlFormClose ();
 
-			htmlTableRowClose ();
+				htmlTableCellClose ();
 
-			if (maxItems -- == 0)
-				break;
+				htmlTableCellWrite (
+					objectManager.objectPath (
+						transaction,
+						objectManager.getParentRequired (
+							transaction,
+							queue),
+						userConsoleLogic.sliceRequired (
+							transaction)));
+
+				htmlTableCellWrite (
+					queue.getCode ());
+
+				htmlTableCellWrite (
+					userConsoleLogic.timestampWithTimezoneString (
+						transaction,
+						queueItem.getCreatedTime ()));
+
+				htmlTableCellWrite (
+					queueItem.getSource ());
+
+				htmlTableCellWrite (
+					queueItem.getDetails ());
+
+				htmlTableRowClose ();
+
+				if (maxItems -- == 0)
+					break;
+
+			}
+
+			htmlTableClose ();
 
 		}
-
-		htmlTableClose ();
 
 	}
 
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
 
-			renderLinks ();
+			renderLinks (
+				transaction);
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			goQueues (
-				taskLogger);
+				transaction);
 
-			goMyItems ();
+			goMyItems (
+				transaction);
 
 		}
 
 	}
 
 	private
-	void renderLinks () {
+	void renderLinks (
+			@NonNull Transaction parentTransaction) {
 
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"links"));
+		try (
 
-		htmlLinkWrite (
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
-			"Refresh");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderLinks");
 
-		htmlLinkWrite (
-			"#",
-			"Close",
+		) {
 
-			htmlAttribute (
-				"onclick",
-				"top.show_inbox (false);")
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
 
-		);
+			htmlLinkWrite (
+				requestContext.resolveApplicationUrl (
+					"/queues/queue.home"),
+				"Refresh");
 
-		htmlParagraphClose ();
+			htmlLinkWrite (
+				"#",
+				"Close",
+
+				htmlAttribute (
+					"onclick",
+					"top.show_inbox (false);")
+
+			);
+
+			htmlParagraphClose ();
+
+		}
 
 	}
 

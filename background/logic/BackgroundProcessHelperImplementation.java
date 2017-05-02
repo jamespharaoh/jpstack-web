@@ -108,23 +108,19 @@ class BackgroundProcessHelperImplementation
 	boolean setBackgroundProcessStart (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"setBackgroundProcessStart");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SleepingDaemonService.setBackgroundProcessStart",
-					this);
+					logContext,
+					parentTaskLogger,
+					"setBackgroundProcessStart");
 
 		) {
 
 			BackgroundProcessRec backgroundProcess =
 				backgroundProcessHelper.findRequired (
+					transaction,
 					backgroundProcessId);
 
 			if (
@@ -194,21 +190,17 @@ class BackgroundProcessHelperImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setBackgroundProcessStop");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"SleepingDaemonService.setBackgroundProcessStop",
-					this);
+					logContext,
+					parentTaskLogger,
+					"setBackgroundProcessStop");
 
 		) {
 
 			BackgroundProcessRec backgroundProcess =
 				backgroundProcessHelper.findRequired (
+					transaction,
 					backgroundProcessId);
 
 			if (
@@ -227,7 +219,7 @@ class BackgroundProcessHelperImplementation
 
 				.setNumConsecutiveFailures (
 					ifThenElse (
-						taskLogger.findRoot ().errors (),
+						transaction.findRoot ().errors (),
 						() -> 1l +
 							backgroundProcess.getNumConsecutiveFailures (),
 						() -> 0l))
@@ -236,7 +228,7 @@ class BackgroundProcessHelperImplementation
 					backgroundProcess.getRunningStartTime ())
 
 				.setLastRunSuccess (
-					! taskLogger.findRoot ().errors ())
+					! transaction.findRoot ().errors ())
 
 				.setLastRunDuration (
 					new Duration (
@@ -245,7 +237,7 @@ class BackgroundProcessHelperImplementation
 
 				.setLastTaskLog (
 					taskLog (
-						taskLogger.findRoot ()))
+						transaction.findRoot ()))
 
 				.setRunning (
 					false)

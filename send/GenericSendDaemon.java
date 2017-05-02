@@ -1,10 +1,10 @@
 package wbs.platform.send;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -15,6 +15,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -62,35 +63,19 @@ class GenericSendDaemon <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"GenericSendDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
 			taskLogger.debugFormat (
 				"Looking for jobs in sending state");
 
-			List <Job> jobs =
-				helper ().findSendingJobs ();
-
 			List <Long> jobIds =
-				jobs.stream ()
-
-				.map (
-					Job::getId)
-
-				.collect (
-					Collectors.toList ());
-
-			transaction.close ();
+				getJobIds (
+					taskLogger);
 
 			jobIds.forEach (
 				jobId ->
@@ -102,47 +87,66 @@ class GenericSendDaemon <
 
 	}
 
+	private
+	List <Long> getJobIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"getJobIds");
+
+		) {
+
+			return iterableMapToList (
+				Job::getId,
+				helper ().findSendingJobs (
+					transaction));
+
+		}
+
+	}
+
 	void runJob (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"runJob (%s)",
-					integerToDecimalString (
-						jobId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"GenericSendDaemon.runJob (jobId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runJob");
 
 		) {
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Performing send for %s",
 				integerToDecimalString (
 					jobId));
 
 			Job job =
 				helper ().jobHelper ().findRequired (
+					transaction,
 					jobId);
 
 			Service service =
 				helper ().getService (
+					transaction,
 					job);
 
 			if (
 				! helper ().jobSending (
+					transaction,
 					service,
 					job)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Not sending job %s",
 					integerToDecimalString (
 						jobId));
@@ -153,11 +157,12 @@ class GenericSendDaemon <
 
 			if (
 				! helper ().jobConfigured (
+					transaction,
 					service,
 					job)
 			) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Not configured job %s",
 					integerToDecimalString (
 						jobId));
@@ -168,9 +173,10 @@ class GenericSendDaemon <
 
 			List <Item> items =
 				helper ().findItemsLimit (
+					transaction,
 					service,
 					job,
-					100);
+					100l);
 
 			if (
 				items.isEmpty ()
@@ -178,13 +184,13 @@ class GenericSendDaemon <
 
 				// handle completion
 
-				taskLogger.debugFormat (
+				transaction.debugFormat (
 					"Triggering completion for job %s",
 					integerToDecimalString (
 						jobId));
 
 				helper ().sendComplete (
-					taskLogger,
+					transaction,
 					service,
 					job);
 
@@ -201,14 +207,14 @@ class GenericSendDaemon <
 
 					boolean itemVerified =
 						helper ().verifyItem (
-							taskLogger,
+							transaction,
 							service,
 							job,
 							item);
 
 					if (itemVerified) {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Sending item %s",
 							integerToDecimalString (
 								item.getId ()));
@@ -216,14 +222,14 @@ class GenericSendDaemon <
 						// send item
 
 						helper ().sendItem (
-							taskLogger,
+							transaction,
 							service,
 							job,
 							item);
 
 					} else {
 
-						taskLogger.debugFormat (
+						transaction.debugFormat (
 							"Rejecting item %s",
 							integerToDecimalString (
 								item.getId ()));
@@ -231,6 +237,7 @@ class GenericSendDaemon <
 						// reject it
 
 						helper ().rejectItem (
+							transaction,
 							service,
 							job,
 							item);
@@ -245,7 +252,7 @@ class GenericSendDaemon <
 
 			transaction.commit ();
 
-			taskLogger.debugFormat (
+			transaction.debugFormat (
 				"Finished send for job %s",
 				integerToDecimalString (
 					jobId));

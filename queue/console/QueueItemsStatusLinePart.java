@@ -16,13 +16,23 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("queueItemsStatusLinePart")
 public
 class QueueItemsStatusLinePart
 	extends AbstractPagePart {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// details
 
 	@Override
 	public
@@ -37,24 +47,37 @@ class QueueItemsStatusLinePart
 
 	}
 
+	// implementation
+
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableRowOpen (
-			htmlIdAttribute (
-				"queue-row"),
-			htmlStyleRuleEntry (
-				"display",
-				"none"));
+		try (
 
-		htmlTableCellWrite (
-			"—",
-			htmlIdAttribute (
-				"queue-cell"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlTableRowClose ();
+		) {
+
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"queue-row"),
+				htmlStyleRuleEntry (
+					"display",
+					"none"));
+
+			htmlTableCellWrite (
+				"—",
+				htmlIdAttribute (
+					"queue-cell"));
+
+			htmlTableRowClose ();
+
+		}
 
 	}
 

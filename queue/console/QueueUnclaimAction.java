@@ -65,34 +65,31 @@ class QueueUnclaimAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		long queueItemId =
-			requestContext.parameterIntegerRequired (
-				"queueItemId");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"QueueUnclaimAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			long queueItemId =
+				requestContext.parameterIntegerRequired (
+					"queueItemId");
+
 			QueueItemRec queueItem =
 				queueItemHelper.findRequired (
+					transaction,
 					queueItemId);
 
 			if (
 				referenceNotEqualWithClass (
 					UserRec.class,
 					queueItem.getQueueItemClaim ().getUser (),
-					userConsoleLogic.userRequired ())
+					userConsoleLogic.userRequired (
+						transaction))
 			) {
 
 				requestContext.addError (
@@ -103,9 +100,10 @@ class QueueUnclaimAction
 			}
 
 			queueConsoleLogic.unclaimQueueItem (
-				taskLogger,
+				transaction,
 				queueItem,
-				userConsoleLogic.userRequired ());
+				userConsoleLogic.userRequired (
+					transaction));
 
 			transaction.commit ();
 

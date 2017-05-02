@@ -2,6 +2,8 @@ package wbs.platform.event.console;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
@@ -14,25 +16,35 @@ import wbs.console.forms.HtmlFormFieldRenderer;
 import wbs.console.forms.IdentityFormFieldAccessor;
 import wbs.console.forms.IdentityFormFieldNativeMapping;
 import wbs.console.forms.ReadOnlyFormField;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("eventDetailsFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class EventDetailsFormFieldBuilder {
+class EventDetailsFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -69,70 +81,83 @@ class EventDetailsFormFieldBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		String name =
-			"details";
+		try (
 
-		String label =
-			"Details";
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		// accessor
+		) {
 
-		FormFieldAccessor accessor =
-			identityFormFieldAccessorProvider.get ()
+			String name =
+				"details";
 
-			.containerClass (
-				context.containerClass ());
+			String label =
+				"Details";
 
-		// native mapping
+			// accessor
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			FormFieldAccessor accessor =
+				identityFormFieldAccessorProvider.get ()
 
-		// interface mapping
+				.containerClass (
+					context.containerClass ());
 
-		FormFieldInterfaceMapping interfaceMapping =
-			eventDetailsFormFieldInterfaceMappingProvider.get ();
+			// native mapping
 
-		// renderer
+			FormFieldNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
-		FormFieldRenderer renderer =
-			htmlFormFieldRendererProvider.get ()
+			// interface mapping
 
-			.name (
-				name)
+			FormFieldInterfaceMapping interfaceMapping =
+				eventDetailsFormFieldInterfaceMappingProvider.get ();
 
-			.label (
-				label);
+			// renderer
 
-		// form field
+			FormFieldRenderer renderer =
+				htmlFormFieldRendererProvider.get ()
 
-		formFieldSet.addFormItem (
-			readOnlyFormFieldProvider.get ()
+				.name (
+					name)
 
-			.name (
-				name)
+				.label (
+					label);
 
-			.label (
-				label)
+			// form field
 
-			.accessor (
-				accessor)
+			formFieldSet.addFormItem (
+				readOnlyFormFieldProvider.get ()
 
-			.nativeMapping (
-				nativeMapping)
+				.name (
+					name)
 
-			.interfaceMapping (
-				interfaceMapping)
+				.label (
+					label)
 
-			.renderer (
-				renderer)
+				.accessor (
+					accessor)
 
-		);
+				.nativeMapping (
+					nativeMapping)
+
+				.interfaceMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+			);
+
+		}
 
 	}
 

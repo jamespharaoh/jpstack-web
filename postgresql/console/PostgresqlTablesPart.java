@@ -8,29 +8,51 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("postgresqlTablesPart")
 public
 class PostgresqlTablesPart
 	extends AbstractPagePart {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlTableOpenList ();
+		try (
 
-		htmlTableHeaderRowWrite (
-			"Table",
-			"Size");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		htmlTableClose ();
+		) {
 
-		htmlParagraphWrite (
-			"TODO");
+			htmlTableOpenList ();
+
+			htmlTableHeaderRowWrite (
+				"Table",
+				"Size");
+
+			htmlTableClose ();
+
+			htmlParagraphWrite (
+				"TODO");
+
+		}
 
 	}
 

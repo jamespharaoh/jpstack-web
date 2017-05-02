@@ -3,8 +3,10 @@ package wbs.platform.core.console;
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
@@ -32,11 +34,16 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -48,6 +55,9 @@ class CoreLogonResponder
 	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -100,7 +110,7 @@ class CoreLogonResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		Optional <String> sliceCode =
 			requestContext.header (
@@ -112,15 +122,16 @@ class CoreLogonResponder
 		) {
 
 			slice =
-				Optional.of (
+				optionalOf (
 					sliceHelper.findByCodeRequired (
+						transaction,
 						GlobalId.root,
 						sliceCode.get ()));
 
 		} else {
 
 			slice =
-				Optional.absent ();
+				optionalAbsent ();
 
 		}
 
@@ -129,201 +140,239 @@ class CoreLogonResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		htmlHeadingOneWrite (
-			wbsConfig.consoleTitle ());
+		try (
 
-		goTestUsers ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContents");
 
-		goLoginForm ();
+		) {
+
+			htmlHeadingOneWrite (
+				wbsConfig.consoleTitle ());
+
+			goTestUsers (
+				transaction);
+
+			goLoginForm (
+				transaction);
+
+		}
 
 	}
 
-	void goTestUsers () {
+	void goTestUsers (
+			@NonNull Transaction parentTransaction) {
 
-		if (
-			collectionIsEmpty (
-				wbsConfig.testUsers ())
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goTestUsers");
+
 		) {
-			return;
-		}
-
-		htmlHeadingTwoWrite (
-			"Quick login");
-
-		htmlParagraphWrite (
-			"Login shortcuts for development mode only");
-
-		htmlParagraphOpen (
-			htmlClassAttribute (
-				"login-buttons"));
-
-		for (
-			String username
-				: wbsConfig.testUsers ()
-		) {
-
-			List <String> usernameParts =
-				stringSplitFullStop (
-					username);
 
 			if (
-				collectionDoesNotHaveTwoElements (
-					usernameParts)
+				collectionIsEmpty (
+					wbsConfig.testUsers ())
 			) {
-				continue;
+				return;
 			}
 
-			String sliceCode =
-				listItemAtIndexRequired (
-					usernameParts,
-					0l);
+			htmlHeadingTwoWrite (
+				"Quick login");
 
-			String userCode =
-				listItemAtIndexRequired (
-					usernameParts,
-					1l);
+			htmlParagraphWrite (
+				"Login shortcuts for development mode only");
 
-			Optional <UserRec> userOptional =
-				userHelper.findByCode (
-					GlobalId.root,
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"login-buttons"));
+
+			for (
+				String username
+					: wbsConfig.testUsers ()
+			) {
+
+				List <String> usernameParts =
+					stringSplitFullStop (
+						username);
+
+				if (
+					collectionDoesNotHaveTwoElements (
+						usernameParts)
+				) {
+					continue;
+				}
+
+				String sliceCode =
+					listItemAtIndexRequired (
+						usernameParts,
+						0l);
+
+				String userCode =
+					listItemAtIndexRequired (
+						usernameParts,
+						1l);
+
+				Optional <UserRec> userOptional =
+					userHelper.findByCode (
+						transaction,
+						GlobalId.root,
+						sliceCode,
+						userCode);
+
+				if (
+					optionalIsNotPresent (
+						userOptional)
+				) {
+					continue;
+				}
+
+				formatWriter.writeLineFormat (
+					"<button",
+					" class=\"login-button\"",
+					" data-slice-code=\"%h\"",
 					sliceCode,
-					userCode);
+					" data-user-code=\"%h\"",
+					userCode,
+					" disabled>%h</button>",
+					username);
+
+			}
+
+			htmlParagraphClose ();
+
+		}
+
+	}
+
+	void goLoginForm (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goLoginForm");
+
+		) {
+
+			htmlHeadingTwoWrite (
+				"Please log in");
+
+			requestContext.flushNotices ();
+
+			// form open
+
+			htmlFormOpenPostAction (
+				requestContext.resolveApplicationUrl (
+					"/"),
+				htmlIdAttribute (
+					"login-form"));
+
+			// form hidden
+
+			if (
+				optionalIsPresent (
+					slice)
+			) {
+
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"slice\"",
+					" value=\"%h\"",
+					slice.get ().getCode (),
+					">");
+
+			}
+
+			// table open
+
+			htmlTableOpenDetails ();
+
+			// slice row
 
 			if (
 				optionalIsNotPresent (
-					userOptional)
+					slice)
 			) {
-				continue;
+
+				htmlTableDetailsRowWriteHtml (
+					"Slice",
+					() -> formatWriter.writeLineFormat (
+						"<input",
+						" class=\"slice-input\"",
+						" type=\"text\"",
+						" name=\"slice\"",
+						" value=\"%h\"",
+						requestContext.parameterOrDefault (
+							"slice",
+							wbsConfig.defaultSlice ()),
+						" size=\"32\"",
+						">"));
+
 			}
 
-			formatWriter.writeLineFormat (
-				"<button",
-				" class=\"login-button\"",
-				" data-slice-code=\"%h\"",
-				sliceCode,
-				" data-user-code=\"%h\"",
-				userCode,
-				" disabled>%h</button>",
-				username);
-
-		}
-
-		htmlParagraphClose ();
-
-	}
-
-	void goLoginForm () {
-
-		htmlHeadingTwoWrite (
-			"Please log in");
-
-		requestContext.flushNotices ();
-
-		// form open
-
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
-				"/"),
-			htmlIdAttribute (
-				"login-form"));
-
-		// form hidden
-
-		if (
-			optionalIsPresent (
-				slice)
-		) {
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"slice\"",
-				" value=\"%h\"",
-				slice.get ().getCode (),
-				">");
-
-		}
-
-		// table open
-
-		htmlTableOpenDetails ();
-
-		// slice row
-
-		if (
-			optionalIsNotPresent (
-				slice)
-		) {
+			// username row
 
 			htmlTableDetailsRowWriteHtml (
-				"Slice",
+				"Username",
 				() -> formatWriter.writeLineFormat (
 					"<input",
-					" class=\"slice-input\"",
+					" class=\"username-input\"",
 					" type=\"text\"",
-					" name=\"slice\"",
+					" name=\"username\"",
 					" value=\"%h\"",
 					requestContext.parameterOrDefault (
-						"slice",
-						wbsConfig.defaultSlice ()),
+						"username",
+						""),
 					" size=\"32\"",
+					" disabled",
 					">"));
 
+			// password row
+
+			htmlTableDetailsRowWriteHtml (
+				"Password",
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" class=\"password-input\"",
+					" type=\"password\"",
+					" name=\"password\"",
+					" value=\"\"",
+					" size=\"32\"",
+					" disabled",
+					">"));
+
+			// table close
+
+			htmlTableClose ();
+
+			// form controls
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"log in\"",
+				" disabled",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
 		}
-
-		// username row
-
-		htmlTableDetailsRowWriteHtml (
-			"Username",
-			() -> formatWriter.writeLineFormat (
-				"<input",
-				" class=\"username-input\"",
-				" type=\"text\"",
-				" name=\"username\"",
-				" value=\"%h\"",
-				requestContext.parameterOrDefault (
-					"username",
-					""),
-				" size=\"32\"",
-				" disabled",
-				">"));
-
-		// password row
-
-		htmlTableDetailsRowWriteHtml (
-			"Password",
-			() -> formatWriter.writeLineFormat (
-				"<input",
-				" class=\"password-input\"",
-				" type=\"password\"",
-				" name=\"password\"",
-				" value=\"\"",
-				" size=\"32\"",
-				" disabled",
-				">"));
-
-		// table close
-
-		htmlTableClose ();
-
-		// form controls
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"log in\"",
-			" disabled",
-			">");
-
-		htmlParagraphClose ();
-
-		// form close
-
-		htmlFormClose ();
 
 	}
 

@@ -12,6 +12,7 @@ import lombok.NonNull;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldPluginProvider;
 import wbs.console.helper.core.ConsoleHelper;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.Record;

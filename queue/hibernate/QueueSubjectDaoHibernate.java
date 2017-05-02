@@ -6,8 +6,13 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectDaoMethods;
 import wbs.platform.queue.model.QueueSubjectRec;
@@ -17,79 +22,125 @@ class QueueSubjectDaoHibernate
 	extends HibernateDao
 	implements QueueSubjectDaoMethods {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
-	List<QueueSubjectRec> findActive (
+	List <QueueSubjectRec> findActive (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue) {
 
-		return findMany (
-			"findActive (queue)",
-			QueueSubjectRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findActive");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueSubjectRec.class,
-				"_queueSubject")
 
-			.add (
-				Restrictions.gt (
-					"_queueSubject.activeItems",
-					0l))
+				createCriteria (
+					transaction,
+					QueueSubjectRec.class,
+					"_queueSubject")
 
-			.add (
-				Restrictions.eq (
-					"_queueSubject.queue",
-					queue))
+				.add (
+					Restrictions.gt (
+						"_queueSubject.activeItems",
+						0l))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_queueSubject.queue",
+						queue))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	QueueSubjectRec find (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue,
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
-		return findOneOrNull (
-			"find (queue, object)",
-			QueueSubjectRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findOneOrNull (
+				transaction,
 				QueueSubjectRec.class,
-				"_queueSubject")
 
-			.add (
-				Restrictions.eq (
-					"_queueSubject.queue",
-					queue))
+				createCriteria (
+					transaction,
+					QueueSubjectRec.class,
+					"_queueSubject")
 
-			.add (
-				Restrictions.eq (
-					"_queueSubject.objectId",
-					object.getId ()))
+				.add (
+					Restrictions.eq (
+						"_queueSubject.queue",
+						queue))
 
-		);
+				.add (
+					Restrictions.eq (
+						"_queueSubject.objectId",
+						object.getId ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueSubjectRec> findActive () {
+	List <QueueSubjectRec> findActive (
+			@NonNull Transaction parentTransaction) {
 
-		return findMany (
-			"findActive ()",
-			QueueSubjectRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findActive");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueSubjectRec.class,
-				"_queueSubject")
 
-			.add (
-				Restrictions.gt (
-					"_queueSubject.activeItems",
-					0l))
+				createCriteria (
+					transaction,
+					QueueSubjectRec.class,
+					"_queueSubject")
 
-		);
+				.add (
+					Restrictions.gt (
+						"_queueSubject.activeItems",
+						0l))
+
+			);
+
+		}
 
 	}
 

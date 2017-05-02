@@ -12,7 +12,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -74,30 +76,27 @@ class QueueItemActionsAction
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"goReal");
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"QueueItemActionsAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			// load data
 
 			user =
-				userConsoleLogic.userRequired ();
+				userConsoleLogic.userRequired (
+					transaction);
 
 			queueItem =
-				queueItemHelper.findFromContextRequired ();
+				queueItemHelper.findFromContextRequired (
+					transaction);
 
 			canSupervise =
 				queueConsoleLogic.canSupervise (
-					taskLogger,
+					transaction,
 					queueItem.getQueue ());
 
 			if (! canSupervise) {
@@ -118,7 +117,6 @@ class QueueItemActionsAction
 			) {
 
 				return unclaimQueueItem (
-					taskLogger,
 					transaction);
 
 			} else if (
@@ -128,7 +126,6 @@ class QueueItemActionsAction
 			) {
 
 				return reclaimQueueItem (
-					taskLogger,
 					transaction);
 
 			} else {
@@ -143,14 +140,13 @@ class QueueItemActionsAction
 
 	private
 	Responder unclaimQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"unclaimQueueItem");
 
 		) {
@@ -171,7 +167,7 @@ class QueueItemActionsAction
 			}
 
 			queueConsoleLogic.unclaimQueueItem (
-				taskLogger,
+				transaction,
 				queueItem,
 				user);
 
@@ -188,14 +184,13 @@ class QueueItemActionsAction
 
 	private
 	Responder reclaimQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OwnedTransaction transaction) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"reclaimQueueItem");
 
 		) {
@@ -232,7 +227,7 @@ class QueueItemActionsAction
 			}
 
 			queueConsoleLogic.reclaimQueueItem (
-				taskLogger,
+				transaction,
 				queueItem,
 				queueItem.getQueueItemClaim ().getUser (),
 				user);

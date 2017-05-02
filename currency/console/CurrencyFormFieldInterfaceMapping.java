@@ -1,11 +1,15 @@
 package wbs.platform.currency.console;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.ResultUtils.errorResult;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -19,9 +23,12 @@ import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -40,6 +47,9 @@ class CurrencyFormFieldInterfaceMapping <Container>
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -56,126 +66,158 @@ class CurrencyFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <Long>, String> interfaceToGeneric (
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
 
-		if (! interfaceValue.isPresent ()) {
+		try (
 
-			return successResult (
-				optionalAbsent ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"interfaceToGeneric");
 
-		}
-
-		if (interfaceValue.get ().isEmpty ()) {
-
-			return successResult (
-				optionalAbsent ());
-
-		}
-
-		CurrencyRec currency =
-			(CurrencyRec)
-			objectManager.dereferenceObsolete (
-				container,
-				currencyPath,
-				hints);
-
-		if (
-			isNull (
-				currency)
 		) {
 
-			try {
+			if (! interfaceValue.isPresent ()) {
 
 				return successResult (
-					Optional.of (
-						Long.parseLong (
-							interfaceValue.get ())));
-
-			} catch (NumberFormatException exception) {
-
-				return errorResult (
-					"This currency value must be a whole number");
+					optionalAbsent ());
 
 			}
 
-		}
+			if (interfaceValue.get ().isEmpty ()) {
 
-		Optional<Long> parseResult =
-			currencyLogic.parseText (
-				currency,
-				interfaceValue.get ());
+				return successResult (
+					optionalAbsent ());
 
-		if (
-			optionalIsNotPresent (
-				parseResult)
-		) {
+			}
 
-			return errorResult (
-				stringFormat (
-					"A currency value must be numeric and include the ",
-					"appropriate decimal places"));
+			Optional <CurrencyRec> currencyOptional =
+				optionalCast (
+					CurrencyRec.class,
+					objectManager.dereference (
+						transaction,
+						container,
+						currencyPath,
+						hints));
 
-		}
+			if (
+				optionalIsNotPresent (
+					currencyOptional)
+			) {
 
-		return successResult (
-			Optional.of (
-				currencyLogic.parseTextRequired (
+				try {
+
+					return successResultPresent (
+						parseIntegerRequired (
+							interfaceValue.get ()));
+
+				} catch (NumberFormatException exception) {
+
+					return errorResult (
+						"This currency value must be a whole number");
+
+				}
+
+			}
+
+			CurrencyRec currency =
+				optionalGetRequired (
+					currencyOptional);
+
+			Optional <Long> parseResult =
+				currencyLogic.parseText (
 					currency,
-					interfaceValue.get ())));
+					interfaceValue.get ());
+
+			if (
+				optionalIsNotPresent (
+					parseResult)
+			) {
+
+				return errorResult (
+					stringFormat (
+						"A currency value must be numeric and include the ",
+						"appropriate decimal places"));
+
+			}
+
+			return successResult (
+				Optional.of (
+					currencyLogic.parseTextRequired (
+						currency,
+						interfaceValue.get ())));
+
+		}
 
 	}
 
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Long> genericValue) {
 
-		if (
-			optionalIsNotPresent (
-				genericValue)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"genericToInterface");
+
 		) {
 
-			return successResultAbsent ();
+			if (
+				optionalIsNotPresent (
+					genericValue)
+			) {
 
-		}
+				return successResultAbsent ();
 
-		CurrencyRec currency =
-			(CurrencyRec)
-			objectManager.dereferenceObsolete (
-				container,
-				currencyPath,
-				hints);
+			}
 
-		if (genericValue.get () == 0 && blankIfZero) {
+			if (genericValue.get () == 0 && blankIfZero) {
 
-			return successResult (
-				Optional.of (
-					""));
+				return successResult (
+					Optional.of (
+						""));
 
-		}
+			}
 
-		if (currency != null) {
+			Optional <CurrencyRec> currencyOptional =
+				optionalCast (
+					CurrencyRec.class,
+					objectManager.dereference (
+						transaction,
+						container,
+						currencyPath,
+						hints));
 
-			return successResult (
-				Optional.of (
+			if (
+				optionalIsPresent (
+					currencyOptional)
+			) {
+
+				return successResultPresent (
 					currencyLogic.formatText (
-						currency,
-						genericValue.get ())));
+						optionalGetRequired (
+							currencyOptional),
+						genericValue.get ()));
 
-		} else {
+			} else {
 
-			return successResult (
-				Optional.of (
-					Long.toString (
-						genericValue.get ())));
+				return successResult (
+					Optional.of (
+						Long.toString (
+							genericValue.get ())));
+
+			}
 
 		}
-
 
 	}
 

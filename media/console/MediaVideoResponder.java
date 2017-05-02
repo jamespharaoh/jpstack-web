@@ -1,9 +1,9 @@
 package wbs.platform.media.console;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.Misc.runFilter;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import lombok.NonNull;
@@ -14,12 +14,11 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
-
-import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("mediaVideoResponder")
 public
@@ -45,33 +44,45 @@ class MediaVideoResponder
 	@Override
 	public
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		out =
-			requestContext.outputStream ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"setup");
+
+		) {
+
+			out =
+				requestContext.outputStream ();
+
+		}
 
 	}
 
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepare");
 
 		) {
 
 			MediaRec media =
-				mediaHelper.findFromContextRequired ();
+				mediaHelper.findFromContextRequired (
+					transaction);
 
 			data =
 				runFilter (
-					taskLogger,
+					transaction,
 					media.getContent ().getData (),
 					".3gp",
 					".flv",
@@ -95,13 +106,13 @@ class MediaVideoResponder
 	@Override
 	public
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -122,17 +133,20 @@ class MediaVideoResponder
 	@Override
 	public
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		try {
+		try (
 
-			out.write (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
+
+			writeBytes (
+				out,
 				data);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
 
 		}
 

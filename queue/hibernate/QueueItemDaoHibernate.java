@@ -23,9 +23,10 @@ import org.hibernate.type.Type;
 import org.joda.time.Interval;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
@@ -50,189 +51,201 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	Criteria searchCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemSearch search) {
 
-		Criteria criteria =
-			createCriteria (
-				QueueItemRec.class,
-				"_queueItem")
+		try (
 
-			.createAlias (
-				"_queueItem.queueSubject",
-				"_queueSubject")
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchCriteria");
 
-			.createAlias (
-				"_queueSubject.queue",
-				"_queue")
-
-			.createAlias (
-				"_queueItem.processedUser",
-				"_processedUser",
-				JoinType.LEFT_OUTER_JOIN)
-
-			.createAlias (
-				"_processedUser.slice",
-				"_processedUserSlice",
-				JoinType.LEFT_OUTER_JOIN)
-
-			.createAlias (
-				"_queueItem.queueItemClaim",
-				"_queueItemClaim",
-				JoinType.LEFT_OUTER_JOIN)
-
-			.createAlias (
-				"_queueItemClaim.user",
-				"_claimedUser",
-				JoinType.LEFT_OUTER_JOIN);
-
-		if (
-			isNotNull (
-				search.sliceId ())
 		) {
 
-			criteria.add (
-				Restrictions.eq (
-					"_queue.slice.id",
-					search.sliceId ()));
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
 
-		}
+				.createAlias (
+					"_queueItem.queueSubject",
+					"_queueSubject")
 
-		if (
-			isNotNull (
-				search.queueParentTypeId ())
-		) {
+				.createAlias (
+					"_queueSubject.queue",
+					"_queue")
 
-			criteria.add (
-				Restrictions.eq (
-					"_queue.parentType.id",
-					search.queueParentTypeId ()));
+				.createAlias (
+					"_queueItem.processedUser",
+					"_processedUser",
+					JoinType.LEFT_OUTER_JOIN)
 
-		}
+				.createAlias (
+					"_processedUser.slice",
+					"_processedUserSlice",
+					JoinType.LEFT_OUTER_JOIN)
 
-		if (
-			isNotNull (
-				search.queueTypeId ())
-		) {
+				.createAlias (
+					"_queueItem.queueItemClaim",
+					"_queueItemClaim",
+					JoinType.LEFT_OUTER_JOIN)
 
-			criteria.add (
-				Restrictions.eq (
-					"_queue.queueType.id",
-					search.queueTypeId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.queueId ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_queue.id",
-					search.queueId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.createdTime ())
-		) {
-
-			criteria.add (
-				Restrictions.ge (
-					"_queueItem.createdTime",
-					search.createdTime ().start ()));
-
-			criteria.add (
-				Restrictions.lt (
-					"_queueItem.createdTime",
-					search.createdTime ().end ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.claimedUserId ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_claimedUser.id",
-					search.claimedUserId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.processedUserId ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_processedUser.id",
-					search.processedUserId ()));
-
-		}
-
-		if (
-			isNotNull (
-				search.state ())
-		) {
-
-			criteria.add (
-				Restrictions.eq (
-					"_queueItem.state",
-					search.state ()));
-
-		}
-
-		if (search.filter ()) {
-
-			List <Criterion> filterCriteria =
-				new ArrayList<> ();
+				.createAlias (
+					"_queueItemClaim.user",
+					"_claimedUser",
+					JoinType.LEFT_OUTER_JOIN);
 
 			if (
-				collectionIsNotEmpty (
-					search.filterQueueIds ())
+				isNotNull (
+					search.sliceId ())
 			) {
 
-				filterCriteria.add (
-					Restrictions.in (
-						"_queue.id",
-						search.filterQueueIds ()));
+				criteria.add (
+					Restrictions.eq (
+						"_queue.slice.id",
+						search.sliceId ()));
 
 			}
 
-			criteria.add (
-				Restrictions.or (
-					filterCriteria.toArray (
-						new Criterion [] {})));
+			if (
+				isNotNull (
+					search.queueParentTypeId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_queue.parentType.id",
+						search.queueParentTypeId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.queueTypeId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_queue.queueType.id",
+						search.queueTypeId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.queueId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_queue.id",
+						search.queueId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.createdTime ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_queueItem.createdTime",
+						search.createdTime ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_queueItem.createdTime",
+						search.createdTime ().end ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.claimedUserId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_claimedUser.id",
+						search.claimedUserId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.processedUserId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_processedUser.id",
+						search.processedUserId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.state ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_queueItem.state",
+						search.state ()));
+
+			}
+
+			if (search.filter ()) {
+
+				List <Criterion> filterCriteria =
+					new ArrayList<> ();
+
+				if (
+					collectionIsNotEmpty (
+						search.filterQueueIds ())
+				) {
+
+					filterCriteria.add (
+						Restrictions.in (
+							"_queue.id",
+							search.filterQueueIds ()));
+
+				}
+
+				criteria.add (
+					Restrictions.or (
+						filterCriteria.toArray (
+							new Criterion [] {})));
+
+			}
+
+			return criteria;
 
 		}
-
-		return criteria;
 
 	}
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.addOrder (
@@ -243,7 +256,7 @@ class QueueItemDaoHibernate
 				Projections.id ());
 
 			return findMany (
-				"searchIds (search)",
+				transaction,
 				Long.class,
 				criteria);
 
@@ -254,167 +267,232 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <QueueItemRec> find (
+			@NonNull Transaction parentTransaction,
 			@NonNull List <QueueItemState> states) {
 
-		return findMany (
-			"findActive ()",
-			QueueItemRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"find");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueItemRec.class,
-				"_queueItem")
 
-			.add (
-				Restrictions.in (
-					"_queueItem.state",
-					states))
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
 
-		);
+				.add (
+					Restrictions.in (
+						"_queueItem.state",
+						states))
 
-	}
+			);
 
-	@Override
-	public
-	List<QueueItemRec> findByCreatedTime (
-			@NonNull Interval createdTime) {
-
-		return findMany (
-			"findByCreatedTime (createdTime)",
-			QueueItemRec.class,
-
-			createCriteria (
-				QueueItemRec.class,
-				"_queueItem")
-
-			.add (
-				Restrictions.ge (
-					"_queueItem.createdTime",
-					createdTime.getStart ()))
-
-			.add (
-				Restrictions.lt (
-					"_queueItem.createdTime",
-					createdTime.getEnd ()))
-
-		);
+		}
 
 	}
 
 	@Override
 	public
 	List <QueueItemRec> findByCreatedTime (
+			@NonNull Transaction parentTransaction,
+			@NonNull Interval createdTime) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCreatedTime");
+
+		) {
+
+			return findMany (
+				transaction,
+				QueueItemRec.class,
+
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
+
+				.add (
+					Restrictions.ge (
+						"_queueItem.createdTime",
+						createdTime.getStart ()))
+
+				.add (
+					Restrictions.lt (
+						"_queueItem.createdTime",
+						createdTime.getEnd ()))
+
+			);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <QueueItemRec> findByCreatedTime (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue,
 			@NonNull Interval createdTime) {
 
-		return findMany (
-			"findByCreatedTime (queue, createdTime)",
-			QueueItemRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByCreatedTime");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueItemRec.class,
-				"_queueItem")
 
-			.createAlias (
-				"_queueItem.queueSubject",
-				"_queueSubject")
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
 
-			.add (
-				Restrictions.eq (
-					"_queueSubject.queue",
-					queue))
+				.createAlias (
+					"_queueItem.queueSubject",
+					"_queueSubject")
 
-			.add (
-				Restrictions.ge (
-					"_queueItem.createdTime",
-					createdTime.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_queueSubject.queue",
+						queue))
 
-			.add (
-				Restrictions.lt (
-					"_queueItem.createdTime",
-					createdTime.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_queueItem.createdTime",
+						createdTime.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_queueItem.createdTime",
+						createdTime.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueItemRec> findByProcessedTime (
+	List <QueueItemRec> findByProcessedTime (
+			@NonNull Transaction parentTransaction,
 			@NonNull Interval processedTime) {
 
-		return findMany (
-			"findByProcessedTime (processedTime)",
-			QueueItemRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByProcessedTime");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueItemRec.class,
-				"_queueItem")
 
-			.add (
-				Restrictions.ge (
-					"_queueItem.processedTime",
-					processedTime.getStart ()))
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
 
-			.add (
-				Restrictions.lt (
-					"_queueItem.processedTime",
-					processedTime.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_queueItem.processedTime",
+						processedTime.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_queueItem.processedTime",
+						processedTime.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
-	List<QueueItemRec> findByProcessedTime (
+	List <QueueItemRec> findByProcessedTime (
+			@NonNull Transaction parentTransaction,
 			@NonNull UserRec user,
 			@NonNull Interval processedTime) {
 
-		return findMany (
-			"findByProcessedTime (user, processedTime)",
-			QueueItemRec.class,
+		try (
 
-			createCriteria (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findByProcessedTime");
+
+		) {
+
+			return findMany (
+				transaction,
 				QueueItemRec.class,
-				"_queueItem")
 
-			.add (
-				Restrictions.eq (
-					"_queueItem.processedUser",
-					user))
+				createCriteria (
+					transaction,
+					QueueItemRec.class,
+					"_queueItem")
 
-			.add (
-				Restrictions.ge (
-					"_queueItem.processedTime",
-					processedTime.getStart ()))
+				.add (
+					Restrictions.eq (
+						"_queueItem.processedUser",
+						user))
 
-			.add (
-				Restrictions.lt (
-					"_queueItem.processedTime",
-					processedTime.getEnd ()))
+				.add (
+					Restrictions.ge (
+						"_queueItem.processedTime",
+						processedTime.getStart ()))
 
-		);
+				.add (
+					Restrictions.lt (
+						"_queueItem.processedTime",
+						processedTime.getEnd ()))
+
+			);
+
+		}
 
 	}
 
 	@Override
 	public
 	Criteria searchUserQueueReportCriteria (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchUserQueueReportCriteria");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -478,21 +556,21 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <Long> searchUserQueueReportIds (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemSearch search) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchUserQueueReportIds");
 
 		) {
 
 			Criteria criteria =
 				searchCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -539,22 +617,22 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <Optional <UserQueueReport>> searchUserQueueReports (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemSearch search,
 			@NonNull List<Long> objectIds) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"searchUserQueueReports");
 
 		) {
 
 			Criteria criteria =
 				searchUserQueueReportCriteria (
-					taskLogger,
+					transaction,
 					search);
 
 			criteria.add (
@@ -563,7 +641,7 @@ class QueueItemDaoHibernate
 					objectIds));
 
 			return findOrdered (
-				taskLogger,
+				transaction,
 				UserQueueReport.class,
 				objectIds,
 				criteria.list ());

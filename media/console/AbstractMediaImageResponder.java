@@ -1,8 +1,7 @@
 package wbs.platform.media.console;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-
-import java.io.IOException;
 
 import lombok.NonNull;
 
@@ -11,14 +10,16 @@ import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
-
-import wbs.utils.io.RuntimeIoException;
 
 public abstract
 class AbstractMediaImageResponder
@@ -34,6 +35,9 @@ class AbstractMediaImageResponder
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
+
+	@SingletonDependency
+	RawMediaLogic rawMediaLogic;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -60,24 +64,25 @@ class AbstractMediaImageResponder
 	@Override
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"prepare ()");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
 		) {
 
 			media =
 				mediaHelper.findRequired (
+					transaction,
 					requestContext.stuffIntegerRequired (
 						"mediaId"));
 
 			transform (
-				taskLogger);
+				transaction);
 
 		}
 
@@ -89,7 +94,7 @@ class AbstractMediaImageResponder
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
 					"transform ()");
@@ -107,12 +112,12 @@ class AbstractMediaImageResponder
 			) {
 
 				data =
-					mediaLogic.writeImage (
-						mediaLogic.rotateImage90 (
-							mediaLogic.readImageRequired (
-								taskLogger,
+					rawMediaLogic.writeImage (
+						rawMediaLogic.rotateImage90 (
+							rawMediaLogic.readImageRequired (
+								transaction,
 								getData (
-									taskLogger,
+									transaction,
 									media),
 								getMimeType (
 									media))),
@@ -125,9 +130,9 @@ class AbstractMediaImageResponder
 			) {
 
 				data =
-					mediaLogic.writeImage (
-						mediaLogic.rotateImage180 (
-							mediaLogic.readImageRequired (
+					rawMediaLogic.writeImage (
+						rawMediaLogic.rotateImage180 (
+							rawMediaLogic.readImageRequired (
 								taskLogger,
 								getData (
 									taskLogger,
@@ -144,9 +149,9 @@ class AbstractMediaImageResponder
 			) {
 
 				data =
-					mediaLogic.writeImage (
-						mediaLogic.rotateImage270 (
-							mediaLogic.readImageRequired (
+					rawMediaLogic.writeImage (
+						rawMediaLogic.rotateImage270 (
+							rawMediaLogic.readImageRequired (
 								taskLogger,
 								getData (
 									taskLogger,
@@ -172,13 +177,13 @@ class AbstractMediaImageResponder
 	@Override
 	protected
 	void setHtmlHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"setHtmlHeaders");
 
 		) {
@@ -199,17 +204,20 @@ class AbstractMediaImageResponder
 	@Override
 	protected
 	void render (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		try {
+		try (
 
-			requestContext.outputStream ().write (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
+
+			writeBytes (
+				requestContext.outputStream (),
 				data);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
 
 		}
 

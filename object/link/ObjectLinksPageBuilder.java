@@ -17,22 +17,25 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
@@ -43,7 +46,7 @@ public
 class ObjectLinksPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	TargetType extends Record <TargetType>
-> {
+> implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -52,6 +55,9 @@ class ObjectLinksPageBuilder <
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -109,10 +115,12 @@ class ObjectLinksPageBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
-			@NonNull Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder <TaskLogger> builder) {
 
 		setDefaults ();
 
@@ -208,12 +216,16 @@ class ObjectLinksPageBuilder <
 	void buildResponder () {
 
 		PagePartFactory partFactory =
-			new PagePartFactory () {
+			parentTransaction -> {
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			try (
+
+				NestedTransaction transaction =
+					parentTransaction.nestTransaction (
+						logContext,
+						"buildResponder");
+
+			) {
 
 				return objectLinksPart.get ()
 					.consoleHelper (container.consoleHelper ())

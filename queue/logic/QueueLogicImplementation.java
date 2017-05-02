@@ -23,11 +23,11 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -84,10 +84,12 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueRec findQueue (
-			@NonNull Record<?> parentObject,
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parentObject,
 			@NonNull String code) {
 
 		return queueHelper.findByCodeRequired (
+			parentTransaction,
 			parentObject,
 			code);
 
@@ -96,7 +98,7 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueItemRec createQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec queueSubject,
 			@NonNull Record<?> refObject,
 			@NonNull String source,
@@ -104,15 +106,12 @@ class QueueLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createQueueItem");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			QueueRec queue =
 				queueSubject.getQueue ();
@@ -125,6 +124,7 @@ class QueueLogicImplementation
 			if (
 				integerNotEqualSafe (
 					objectManager.getObjectTypeId (
+						transaction,
 						refObject),
 					queueType.getRefType ().getId ())
 			) {
@@ -140,7 +140,7 @@ class QueueLogicImplementation
 
 			QueueItemRec queueItem =
 				queueItemHelper.insert (
-					taskLogger,
+					transaction,
 					queueItemHelper.createInstance ()
 
 				.setQueueSubject (
@@ -195,6 +195,7 @@ class QueueLogicImplementation
 
 			Optional<SliceRec> optionalSlice =
 				objectManager.getAncestor (
+					transaction,
 					SliceRec.class,
 					queue);
 
@@ -203,7 +204,7 @@ class QueueLogicImplementation
 					optionalSlice)
 			) {
 
-				taskLogger.warningFormat (
+				transaction.warningFormat (
 					"Unable to determine slice for queue %s",
 					integerToDecimalString (
 						queue.getId ()));
@@ -211,7 +212,7 @@ class QueueLogicImplementation
 			}
 
 			sliceLogic.updateSliceInactivityTimestamp (
-				taskLogger,
+				transaction,
 				optionalSlice.get (),
 				Optional.of (
 					transaction.now ()));
@@ -227,7 +228,7 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueItemRec createQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue,
 			@NonNull Record<?> subjectObject,
 			@NonNull Record<?> refObject,
@@ -236,21 +237,21 @@ class QueueLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"createQueueItem");
 
 		) {
 
 			QueueSubjectRec queueSubject =
 				findOrCreateQueueSubject (
-					taskLogger,
+					transaction,
 					queue,
 					subjectObject);
 
 			return createQueueItem (
-				taskLogger,
+				transaction,
 				queueSubject,
 				refObject,
 				source,
@@ -263,15 +264,15 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueSubjectRec findOrCreateQueueSubject (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueRec queue,
 			@NonNull Record<?> object) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"findOrCreateQueueSubject");
 
 		) {
@@ -284,6 +285,7 @@ class QueueLogicImplementation
 			if (
 				integerNotEqualSafe (
 					objectManager.getObjectTypeId (
+						transaction,
 						object),
 					queueType.getSubjectType ().getId ())
 			) {
@@ -292,9 +294,11 @@ class QueueLogicImplementation
 					stringFormat (
 						"Queue %s expected subject type %s, got %s",
 						objectManager.objectPath (
+							transaction,
 							queue),
 						queueType.getSubjectType ().getCode (),
 						objectManager.getObjectTypeCode (
+							transaction,
 							object)));
 
 			}
@@ -303,6 +307,7 @@ class QueueLogicImplementation
 
 			QueueSubjectRec queueSubject =
 				queueSubjectHelper.find (
+					transaction,
 					queue,
 					object);
 
@@ -313,7 +318,7 @@ class QueueLogicImplementation
 
 			queueSubject =
 				queueSubjectHelper.insert (
-					taskLogger,
+					transaction,
 					queueSubjectHelper.createInstance ()
 
 				.setQueue (
@@ -333,20 +338,17 @@ class QueueLogicImplementation
 	@Override
 	public
 	void cancelQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemRec queueItem) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"cancelQueueItem");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			QueueSubjectRec queueSubject =
 				queueItem.getQueueSubject ();
@@ -419,6 +421,7 @@ class QueueLogicImplementation
 
 				QueueItemRec nextQueueItem =
 					queueItemHelper.findByIndexRequired (
+						transaction,
 						queueSubject,
 						nextItemIndex);
 
@@ -442,21 +445,18 @@ class QueueLogicImplementation
 	@Override
 	public
 	void processQueueItem (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueItemRec queueItem,
 			@NonNull UserRec user) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"processQueueItem");
 
 		) {
-
-			BorrowedTransaction transaction =
-				database.currentTransaction ();
 
 			QueueSubjectRec queueSubject =
 				queueItem.getQueueSubject ();
@@ -555,7 +555,7 @@ class QueueLogicImplementation
 			// update slice
 
 			sliceLogic.updateSliceInactivityTimestamp (
-				taskLogger,
+				transaction,
 				user.getSlice (),
 				optionalAbsent ());
 
@@ -569,6 +569,7 @@ class QueueLogicImplementation
 
 				QueueItemRec nextQueueItem =
 					queueItemHelper.findByIndexRequired (
+						transaction,
 						queueSubject,
 						nextItemIndex);
 
@@ -591,57 +592,80 @@ class QueueLogicImplementation
 
 	@Override
 	public
-	List<QueueItemRec> getActiveQueueItems (
+	List <QueueItemRec> getActiveQueueItems (
+			@NonNull Transaction parentTransaction,
 			@NonNull QueueSubjectRec queueSubject) {
 
-		return queueSubject.getQueueItems ().subList (
-			toJavaIntegerRequired (
-				+ queueSubject.getTotalItems ()
-				- queueSubject.getActiveItems ()),
-			toJavaIntegerRequired (
-				queueSubject.getTotalItems ()));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getActiveQueueItems");
+
+		) {
+
+			return queueSubject.getQueueItems ().subList (
+				toJavaIntegerRequired (
+					+ queueSubject.getTotalItems ()
+					- queueSubject.getActiveItems ()),
+				toJavaIntegerRequired (
+					queueSubject.getTotalItems ()));
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean sliceHasQueueActivity (
+			@NonNull Transaction parentTransaction,
 			@NonNull SliceRec slice) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		// active if no config or stats
-
-		if (
-
-			isNull (
-				slice.getQueueOverflowInactivityTime ())
-
-			|| isNull (
-				slice.getCurrentQueueInactivityTime ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"sliceHasQueueActivity");
 
 		) {
-			return true;
+
+			// active if no config or stats
+
+			if (
+
+				isNull (
+					slice.getQueueOverflowInactivityTime ())
+
+				|| isNull (
+					slice.getCurrentQueueInactivityTime ())
+
+			) {
+				return true;
+			}
+
+			// check for recent activity
+
+			return laterThan (
+				slice.getCurrentQueueInactivityTime ().plus (
+					Duration.standardSeconds (
+						slice.getQueueOverflowInactivityTime ())),
+				transaction.now ());
+
 		}
-
-		// check for recent activity
-
-		return laterThan (
-			slice.getCurrentQueueInactivityTime ().plus (
-				Duration.standardSeconds (
-					slice.getQueueOverflowInactivityTime ())),
-			transaction.now ());
 
 	}
 
 	@Override
 	public
 	QueueRec findQueueByCodeRequired (
+			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> queueParent,
 			@NonNull String queueCode) {
 
 		return queueHelper.findByCodeRequired (
+			parentTransaction,
 			queueParent,
 			queueCode);
 

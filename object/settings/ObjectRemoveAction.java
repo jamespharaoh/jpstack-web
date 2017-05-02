@@ -100,37 +100,36 @@ class ObjectRemoveAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectRemoveAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			Record <?> ephemeralObject =
 				objectHelper.lookupObject (
+					transaction,
 					requestContext.consoleContextStuffRequired ());
 
 			objectHelper.remove (
+				transaction,
 				ephemeralObject);
 
 			Record <?> parentObject =
 				objectHelper.getParentRequired (
+					transaction,
 					genericCastUnchecked (
 						ephemeralObject));
 
 			eventLogic.createEvent (
-				taskLogger,
+				transaction,
 				"object_removed_in",
-				userConsoleLogic.userRequired (),
+				userConsoleLogic.userRequired (
+					transaction),
 				objectHelper.getCode (
 					genericCastUnchecked (
 						ephemeralObject)),
@@ -152,12 +151,12 @@ class ObjectRemoveAction
 
 			ConsoleContext targetContext =
 				consoleManager.relatedContextRequired (
-					taskLogger,
+					transaction,
 					requestContext.consoleContextRequired (),
 					targetContextType);
 
 			consoleManager.changeContext (
-				taskLogger,
+				transaction,
 				targetContext,
 				"/" + parentObject.getId ());
 

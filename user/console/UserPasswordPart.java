@@ -8,72 +8,94 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 @PrototypeComponent ("userPasswordPart")
 public
 class UserPasswordPart
 	extends AbstractPagePart {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		// form open
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/user.password"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
 
-		// password
+		) {
 
-		htmlParagraphOpen ();
+			// form open
 
-		formatWriter.writeLineFormat (
-			"Enter new password<br>");
+			htmlFormOpenPostAction (
+				requestContext.resolveLocalUrl (
+					"/user.password"));
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"password\"",
-			" name=\"password_1\"",
-			" size=\"32\"",
-			">");
+			// password
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
 
-		// password confirmation
+			formatWriter.writeLineFormat (
+				"Enter new password<br>");
 
-		htmlParagraphOpen ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"password\"",
+				" name=\"password_1\"",
+				" size=\"32\"",
+				">");
 
-		formatWriter.writeLineFormat (
-			"Enter again to confirm<br>");
+			htmlParagraphClose ();
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"password\"",
-			" name=\"password_2\"",
-			" size=\"32\"",
-			">");
+			// password confirmation
 
-		htmlParagraphClose ();
+			htmlParagraphOpen ();
 
-		// form controls
+			formatWriter.writeLineFormat (
+				"Enter again to confirm<br>");
 
-		htmlParagraphOpen ();
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"password\"",
+				" name=\"password_2\"",
+				" size=\"32\"",
+				">");
 
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
+			htmlParagraphClose ();
 
-		htmlParagraphClose ();
+			// form controls
 
-		// form close
+			htmlParagraphOpen ();
 
-		htmlFormClose ();
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
+
+			// form close
+
+			htmlFormClose ();
+
+		}
 
 	}
 

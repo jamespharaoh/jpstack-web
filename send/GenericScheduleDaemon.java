@@ -1,9 +1,9 @@
 package wbs.platform.send;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.NonNull;
@@ -17,6 +17,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -64,40 +65,19 @@ class GenericScheduleDaemon <
 
 		try (
 
-			TaskLogger taskLogger =
+			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
-
-			OwnedTransaction transaction =
-				database.beginReadOnly (
-					taskLogger,
-					"GenericScheduleDaemon.runOnce ()",
-					this);
+					"runOnce");
 
 		) {
 
 			taskLogger.debugFormat (
 				"Looking for scheduled broadcasts to send");
 
-			List <Job> jobs =
-				helper ().findScheduledJobs (
-					transaction.now ());
-
 			List <Long> jobIds =
-				new ArrayList<> ();
-
-			for (
-				Job job
-					: jobs
-			) {
-
-				jobIds.add (
-					job.getId ());
-
-			}
-
-			transaction.close ();
+				findJobs (
+					taskLogger);
 
 			jobIds.forEach (
 				jobId ->
@@ -109,44 +89,64 @@ class GenericScheduleDaemon <
 
 	}
 
+	private
+	List <Long> findJobs (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			return iterableMapToList (
+				Job::getId,
+				helper ().findScheduledJobs (
+					transaction,
+					transaction.now ()));
+
+		}
+
+	}
+
 	void runJob (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
-					parentTaskLogger,
-					"runJob (%s)",
-					integerToDecimalString (
-						jobId));
-
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"GenericScheduleDaemon.runJob (jobId)",
-					this);
+					logContext,
+					parentTaskLogger,
+					"runJob");
 
 		) {
 
 			Job job =
 				helper ().jobHelper ().findRequired (
+					transaction,
 					jobId);
 
 			Service service =
 				helper ().getService (
+					transaction,
 					job);
 
 			// check state is still "scheduled"
 
 			if (
 				! helper ().jobScheduled (
+					transaction,
 					service,
 					job)
 			) {
 
-				taskLogger.debugFormat (
+				transaction.logicFormat (
 					"Not sending %s because it is not scheduled",
 					integerToDecimalString (
 						jobId));
@@ -159,6 +159,7 @@ class GenericScheduleDaemon <
 
 			Instant scheduledTime =
 				helper ().getScheduledTime (
+					transaction,
 					service,
 					job);
 
@@ -167,7 +168,7 @@ class GenericScheduleDaemon <
 					transaction.now ())
 			) {
 
-				taskLogger.warningFormat (
+				transaction.logicFormat (
 					"Not sending %s because it is scheduled in the future",
 					integerToDecimalString (
 						jobId));
@@ -178,13 +179,13 @@ class GenericScheduleDaemon <
 
 			// move to sending state
 
-			taskLogger.noticeFormat (
+			transaction.noticeFormat (
 				"Sending %s",
 				integerToDecimalString (
 					jobId));
 
 			helper ().sendStart (
-				taskLogger,
+				transaction,
 				service,
 				job);
 

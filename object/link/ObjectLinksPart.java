@@ -40,9 +40,10 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.model.UserObjectHelper;
 
@@ -109,36 +110,49 @@ class ObjectLinksPart <
 	@Override
 	public
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
-		contextObject =
-			consoleHelper.lookupObject (
-				requestContext.consoleContextStuffRequired ());
+		try (
 
-		contextLinks =
-			genericCastUnchecked (
-				PropertyUtils.propertyGetAuto (
-					contextObject,
-					contextLinksField));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
 
-		targetObjects =
-			targetHelper.findAll ();
+		) {
 
-		Collections.sort (
-			targetObjects);
+			contextObject =
+				consoleHelper.lookupObject (
+					transaction,
+					requestContext.consoleContextStuffRequired ());
+
+			contextLinks =
+				genericCastUnchecked (
+					PropertyUtils.propertyGetAuto (
+						contextObject,
+						contextLinksField));
+
+			targetObjects =
+				targetHelper.findAll (
+					transaction);
+
+			Collections.sort (
+				targetObjects);
+
+		}
 
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContent");
 
 		) {
@@ -187,7 +201,7 @@ class ObjectLinksPart <
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						targetObject,
 						"manage")
 				) {
@@ -199,7 +213,7 @@ class ObjectLinksPart <
 				formatWriter.increaseIndent ();
 
 				formFieldLogic.outputTableCellsList (
-					taskLogger,
+					transaction,
 					formatWriter,
 					targetFields,
 					targetObject,
@@ -252,7 +266,7 @@ class ObjectLinksPart <
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						targetObject,
 						"manage")
 				) {

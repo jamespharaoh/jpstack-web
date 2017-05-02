@@ -21,8 +21,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -60,14 +61,14 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	String mediaUrl (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull MediaRec media) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"mediaUrl");
 
 		) {
@@ -80,7 +81,7 @@ class MediaConsoleLogicImplementation
 				return stringFormat (
 					"%s",
 					mediaHelper.getDefaultContextPath (
-						taskLogger,
+						transaction,
 						media),
 					"/media.image");
 
@@ -100,16 +101,16 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaContent (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaContent");
 
 		) {
@@ -156,7 +157,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.video"),
 
@@ -214,7 +215,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.audio.mp3"),
 
@@ -265,7 +266,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.image",
 						ifThenElse (
@@ -294,16 +295,16 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	String mediaUrlScaled (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull MediaRec media,
 			@NonNull Integer width,
 			@NonNull Integer height) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"mediaUrlScaled");
 
 		) {
@@ -311,7 +312,10 @@ class MediaConsoleLogicImplementation
 			MediaTypeRec mediaType =
 				media.getMediaType ();
 
-			if (! mediaLogic.isImage (media)) {
+			if (
+				! mediaLogic.isImage (
+					media)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -323,7 +327,7 @@ class MediaConsoleLogicImplementation
 			return stringFormat (
 				"%s",
 				mediaHelper.getDefaultContextPath (
-					taskLogger,
+					transaction,
 					media),
 				"/media.imageScale",
 				"?width=%u",
@@ -340,7 +344,7 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaContentScaled (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull Integer width,
@@ -348,9 +352,9 @@ class MediaConsoleLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaContentScaled");
 
 		) {
@@ -378,7 +382,7 @@ class MediaConsoleLogicImplementation
 				formatWriter.writeLineFormat (
 					"<img src=\"%h\">",
 					mediaUrlScaled (
-						taskLogger,
+						transaction,
 						media,
 						width,
 						height));
@@ -398,16 +402,16 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100 (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaThumb100");
 
 		) {
@@ -440,7 +444,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.thumb100",
 						ifThenElse (
@@ -463,15 +467,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100OrText (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaThumb100OrText");
 
 		) {
@@ -491,7 +495,7 @@ class MediaConsoleLogicImplementation
 			} else {
 
 				writeMediaThumb100 (
-					taskLogger,
+					transaction,
 					formatWriter,
 					media,
 					"");
@@ -505,15 +509,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100Rot90 (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaThumb100Rot90");
 
 		) {
@@ -533,7 +537,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.thumb100Rot90"),
 
@@ -551,15 +555,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb32 (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaThumb32");
 
 		) {
@@ -579,7 +583,7 @@ class MediaConsoleLogicImplementation
 					stringFormat (
 						"%s",
 						mediaHelper.getDefaultContextPath (
-							taskLogger,
+							transaction,
 							media),
 						"/media.thumb32"),
 
@@ -597,15 +601,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb32OrText (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"writeMediaThumb32OrText");
 
 		) {
@@ -625,7 +629,7 @@ class MediaConsoleLogicImplementation
 			} else {
 
 				writeMediaThumb32 (
-					taskLogger,
+					transaction,
 					formatWriter,
 					media);
 

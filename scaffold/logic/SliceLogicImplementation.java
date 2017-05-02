@@ -27,12 +27,14 @@ import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.BackgroundProcess;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -84,12 +86,24 @@ class SliceLogicImplementation
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		backgroundThread =
-			threadManager.startThread (
-				this::mainLoop,
-				"SliceLogic");
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			backgroundThread =
+				threadManager.startThread (
+					this::mainLoop,
+					"SliceLogic");
+
+		}
 
 	}
 
@@ -144,21 +158,14 @@ class SliceLogicImplementation
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"runOnce ()");
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
+					"runOnce");
 
 		) {
 
-			try (
-
-				OwnedTransaction transaction =
-					database.beginReadWrite (
-						taskLogger,
-						"SliceLogicImplementation.runNow ()",
-						this);
-
-			) {
+			try {
 
 				// iterate slices
 
@@ -169,6 +176,7 @@ class SliceLogicImplementation
 
 					SliceRec slice =
 						sliceHelper.findRequired (
+							transaction,
 							sliceId);
 
 					// perform update
@@ -197,7 +205,7 @@ class SliceLogicImplementation
 			} catch (Exception exception) {
 
 				exceptionLogger.logThrowable (
-					taskLogger,
+					transaction,
 					"unknown",
 					"sliceLogic",
 					exception,
@@ -213,43 +221,51 @@ class SliceLogicImplementation
 	@Override
 	public synchronized
 	void updateSliceInactivityTimestamp (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull SliceRec slice,
 			@NonNull Optional <Instant> timestamp) {
 
-		BorrowedTransaction transaction =
-			database.currentTransaction ();
+		try (
 
-		Optional<Instant> nextUpdateTimestamp =
-			nextUpdateTimestampBySlice.getOrDefault (
-				slice.getId (),
-				Optional.absent ());
-
-		// skip if we have a more recent update
-
-		if (
-
-			optionalIsPresent (
-				nextUpdateTimestamp)
-
-			&& laterThan (
-				transaction.now (),
-				nextUpdateTimestamp.get ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"updateSliceInactivitTimeout");
 
 		) {
-			return;
+
+			Optional <Instant> nextUpdateTimestamp =
+				nextUpdateTimestampBySlice.getOrDefault (
+					slice.getId (),
+					Optional.absent ());
+
+			// skip if we have a more recent update
+
+			if (
+
+				optionalIsPresent (
+					nextUpdateTimestamp)
+
+				&& laterThan (
+					transaction.now (),
+					nextUpdateTimestamp.get ())
+
+			) {
+				return;
+			}
+
+			// remember this update
+
+			nextUpdateTimestampBySlice.put (
+				slice.getId (),
+				Optional.of (
+					transaction.now ()));
+
+			nextTimestampBySlice.put (
+				slice.getId (),
+				timestamp);
+
 		}
-
-		// remember this update
-
-		nextUpdateTimestampBySlice.put (
-			slice.getId (),
-			Optional.of (
-				transaction.now ()));
-
-		nextTimestampBySlice.put (
-			slice.getId (),
-			timestamp);
 
 	}
 

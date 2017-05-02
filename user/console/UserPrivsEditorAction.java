@@ -82,23 +82,19 @@ class UserPrivsEditorAction
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"UserPrivsEditorAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
 			UserRec user =
-				userHelper.findFromContextRequired ();
+				userHelper.findFromContextRequired (
+					transaction);
 
 			Matcher matcher =
 				privDataPattern.matcher (
@@ -120,10 +116,12 @@ class UserPrivsEditorAction
 
 				PrivRec priv =
 					privHelper.findRequired (
+						transaction,
 						privId);
 
 				UserPrivRec userPriv =
 					userPrivHelper.find (
+						transaction,
 						user,
 						priv);
 
@@ -131,7 +129,7 @@ class UserPrivsEditorAction
 
 				if (
 					! privChecker.canGrant (
-						taskLogger,
+						transaction,
 						priv.getId ())
 				) {
 					continue;
@@ -177,7 +175,7 @@ class UserPrivsEditorAction
 						}
 
 						userPrivHelper.insert (
-							taskLogger,
+							transaction,
 							userPriv);
 
 						changed = true;
@@ -210,6 +208,7 @@ class UserPrivsEditorAction
 							&& ! userPriv.getCanGrant ()) {
 
 						userPrivHelper.remove (
+							transaction,
 							userPriv);
 
 					}
@@ -221,7 +220,7 @@ class UserPrivsEditorAction
 				if (changed) {
 
 					eventLogic.createEvent (
-						taskLogger,
+						transaction,
 						can
 							? (grant
 								? "user_grant_grant"
@@ -229,7 +228,8 @@ class UserPrivsEditorAction
 							: (grant
 								? "user_revoke_grant"
 								: "user_revoke"),
-						userConsoleLogic.userRequired (),
+						userConsoleLogic.userRequired (
+							transaction),
 						priv,
 						user);
 
@@ -240,12 +240,12 @@ class UserPrivsEditorAction
 			// signal the privs have been updated
 
 			updateManager.signalUpdate (
-				taskLogger,
+				transaction,
 				"user_privs",
 				user.getId ());
 
 			updateManager.signalUpdate (
-				taskLogger,
+				transaction,
 				"privs",
 				0l);
 

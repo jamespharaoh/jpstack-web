@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -47,7 +48,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -173,31 +176,27 @@ class ObjectCreateAction <
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"goReal");
-
-		parentHelper =
-			genericCastUnchecked (
-				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ()));
-
 		// begin transaction
 
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					taskLogger,
-					"ObjectCreateAction.goReal ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"goReal");
 
 		) {
 
+			parentHelper =
+				genericCastUnchecked (
+					objectManager.findConsoleHelperRequired (
+						consoleHelper.parentClass ()));
+
 			// determine parent
 
-			determineParent ();
+			determineParent (
+				transaction);
 
 			if (
 				isNull (
@@ -214,15 +213,18 @@ class ObjectCreateAction <
 			) {
 
 				Record <?> createDelegate =
-					createPrivDelegate != null
-						? (Record <?>) objectManager.dereferenceObsolete (
-							parent,
-							createPrivDelegate)
-						: parent;
+					ifNotNullThenElse (
+						createPrivDelegate,
+						() -> (Record <?>)
+							objectManager.dereferenceRequired (
+								transaction,
+								parent,
+								createPrivDelegate),
+						() -> parent);
 
 				if (
 					! privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						createDelegate,
 						createPrivCode)
 				) {
@@ -274,13 +276,13 @@ class ObjectCreateAction <
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
-					taskLogger);
+					transaction);
 
 			}
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
-					taskLogger,
+					transaction,
 					requestContext,
 					formFieldSet,
 					object,
@@ -341,24 +343,27 @@ class ObjectCreateAction <
 				PropertyUtils.propertySetAuto (
 					object,
 					createUserFieldName,
-					userConsoleLogic.userRequired ());
+					userConsoleLogic.userRequired (
+						transaction));
 
 			}
 
 			// before create hook
 
 			consoleHelper ().consoleHooks ().beforeCreate (
+				transaction,
 				object);
 
 			// insert
 
 			consoleHelper.insert (
-				taskLogger,
+				transaction,
 				object);
 
 			// after create hook
 
 			consoleHelper ().consoleHooks ().afterCreate (
+				transaction,
 				object);
 
 			// create event
@@ -371,9 +376,10 @@ class ObjectCreateAction <
 			if (consoleHelper.ephemeral ()) {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_created_in",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					objectRef,
 					consoleHelper.shortName (),
 					parent);
@@ -381,9 +387,10 @@ class ObjectCreateAction <
 			} else {
 
 				eventLogic.createEvent (
-					taskLogger,
+					transaction,
 					"object_created",
-					userConsoleLogic.userRequired (),
+					userConsoleLogic.userRequired (
+						transaction),
 					object,
 					parent);
 
@@ -394,7 +401,7 @@ class ObjectCreateAction <
 			if (object instanceof PermanentRecord) {
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					formFieldSet,
 					updateResultSet,
 					object,
@@ -406,7 +413,7 @@ class ObjectCreateAction <
 			} else {
 
 				formFieldLogic.runUpdateHooks (
-					taskLogger,
+					transaction,
 					formFieldSet,
 					updateResultSet,
 					object,
@@ -422,12 +429,12 @@ class ObjectCreateAction <
 			// signal update
 
 			updateManager.signalUpdate (
-				taskLogger,
+				transaction,
 				"user_privs",
 				userConsoleLogic.userIdRequired ());
 
 			updateManager.signalUpdate (
-				taskLogger,
+				transaction,
 				"privs",
 				0l);
 
@@ -446,7 +453,7 @@ class ObjectCreateAction <
 			requestContext.setEmptyFormData ();
 
 			privChecker.refresh (
-				taskLogger);
+				transaction);
 
 			List <String> targetContextTypeNameParts =
 				stringSplitSlash (
@@ -464,12 +471,12 @@ class ObjectCreateAction <
 
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
-						taskLogger,
+						transaction,
 						requestContext.consoleContextRequired (),
 						targetContextType);
 
 				consoleManager.changeContext (
-					taskLogger,
+					transaction,
 					targetContext,
 					"/" + object.getId ());
 
@@ -486,7 +493,7 @@ class ObjectCreateAction <
 
 				ConsoleContext targetParentContext =
 					consoleManager.relatedContextRequired (
-						taskLogger,
+						transaction,
 						requestContext.consoleContextRequired (),
 						targetParentContextType);
 
@@ -498,12 +505,12 @@ class ObjectCreateAction <
 
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
-						taskLogger,
+						transaction,
 						targetParentContext,
 						targetContextType);
 
 				consoleManager.changeContext (
-					taskLogger,
+					transaction,
 					targetContext,
 					"/" + object.getId ());
 
@@ -516,77 +523,90 @@ class ObjectCreateAction <
 
 	}
 
-	void determineParent () {
+	void determineParent (
+			@NonNull Transaction parentTransaction) {
 
-		if (parentHelper.isRoot ()) {
+		try (
 
-			@SuppressWarnings ("unchecked")
-			ParentType parentTemp1 =
-				(ParentType)
-				rootHelper.findRequired (
-					0l);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"determineParent");
 
-			parent =
-				parentTemp1;
-
-			return;
-
-		}
-
-		// get parent id from context
-
-		Optional <Long> parentIdOptional =
-			requestContext.stuffInteger (
-				parentHelper.idKey ());
-
-		// or from form
-
-		if (
-			optionalIsNotPresent (
-				parentIdOptional)
 		) {
 
-			String parentIdString =
-				optionalOrNull (
-					requestContext.form (
-						stringFormat (
-							"create.%s",
-							consoleHelper.parentFieldName ())));
+			if (parentHelper.isRoot ()) {
 
-			if (
-				isNotNull (
-					parentIdString)
-			) {
+				ParentType parentTemp1 =
+					genericCastUnchecked (
+						rootHelper.findRequired (
+							transaction,
+							0l));
 
-				parentIdOptional =
-					optionalOf (
-						Long.parseLong (
-							parentIdString));
+				parent =
+					parentTemp1;
+
+				return;
 
 			}
 
+			// get parent id from context
+
+			Optional <Long> parentIdOptional =
+				requestContext.stuffInteger (
+					parentHelper.idKey ());
+
+			// or from form
+
+			if (
+				optionalIsNotPresent (
+					parentIdOptional)
+			) {
+
+				String parentIdString =
+					optionalOrNull (
+						requestContext.form (
+							stringFormat (
+								"create.%s",
+								consoleHelper.parentFieldName ())));
+
+				if (
+					isNotNull (
+						parentIdString)
+				) {
+
+					parentIdOptional =
+						optionalOf (
+							Long.parseLong (
+								parentIdString));
+
+				}
+
+			}
+
+			// error if not found
+
+			if (
+				optionalIsNotPresent (
+					parentIdOptional)
+			) {
+
+				requestContext.addError (
+					"Must set parent");
+
+				return;
+
+			}
+
+			// retrieve from database
+
+			parent =
+				parentHelper.findRequired (
+					transaction,
+					optionalGetRequired (
+						parentIdOptional));
+
 		}
-
-		// error if not found
-
-		if (
-			optionalIsNotPresent (
-				parentIdOptional)
-		) {
-
-			requestContext.addError (
-				"Must set parent");
-
-			return;
-
-		}
-
-		// retrieve from database
-
-		parent =
-			parentHelper.findRequired (
-				optionalGetRequired (
-					parentIdOptional));
 
 	}
 
