@@ -25,8 +25,8 @@ class BorrowedTransaction
 
 	@Override
 	public
-	long getId () {
-		return ownedTransaction.getId ();
+	long transactionId () {
+		return ownedTransaction.transactionId ();
 	}
 
 	@Override

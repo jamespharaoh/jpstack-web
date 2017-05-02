@@ -2,7 +2,7 @@ package wbs.framework.database;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.stringFormatLazyArray;
 
 import com.google.common.base.Optional;
 
@@ -17,26 +17,20 @@ interface Database {
 	OwnedTransaction beginTransaction (
 			LogContext parentLogContext,
 			Optional <TaskLogger> parentTaskLogger,
-			String summary,
-			boolean readWrite,
-			boolean canJoin,
-			boolean canCreateNew,
-			boolean makeCurrent);
+			CharSequence summary,
+			boolean readWrite);
 
 	default
 	OwnedTransaction beginReadWrite (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String summary) {
+			@NonNull CharSequence summary) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
 			summary,
-			true,
-			false,
-			true,
 			true);
 
 	}
@@ -45,17 +39,14 @@ interface Database {
 	OwnedTransaction beginReadWriteFormat (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String ... summaryArguments) {
+			@NonNull CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			true,
-			false,
-			true,
 			true);
 
 	}
@@ -69,9 +60,6 @@ interface Database {
 			parentLogContext,
 			optionalAbsent (),
 			summary,
-			true,
-			false,
-			true,
 			true);
 
 	}
@@ -79,16 +67,13 @@ interface Database {
 	default
 	OwnedTransaction beginReadWriteFormat (
 			@NonNull LogContext parentLogContext,
-			@NonNull String ... summaryArguments) {
+			@NonNull CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			true,
-			false,
-			true,
 			true);
 
 	}
@@ -97,17 +82,14 @@ interface Database {
 	OwnedTransaction beginReadOnly (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String summary) {
+			@NonNull CharSequence summary) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
 			summary,
-			false,
-			true,
-			true,
-			true);
+			false);
 
 	}
 
@@ -115,51 +97,42 @@ interface Database {
 	OwnedTransaction beginReadOnlyFormat (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String ... summaryArguments) {
+			@NonNull CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			false,
-			true,
-			true,
-			true);
+			false);
 
 	}
 
 	default
 	OwnedTransaction beginReadOnly (
 			@NonNull LogContext parentLogContext,
-			@NonNull String summary) {
+			@NonNull CharSequence summary) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
 			summary,
-			false,
-			true,
-			true,
-			true);
+			false);
 
 	}
 
 	default
 	OwnedTransaction beginReadOnlyFormat (
 			@NonNull LogContext parentLogContext,
-			@NonNull String ... summaryArguments) {
+			@NonNull CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			false,
-			true,
-			true,
-			true);
+			false);
 
 	}
 
@@ -167,17 +140,14 @@ interface Database {
 	OwnedTransaction beginReadOnlyJoin (
 			LogContext parentLogContext,
 			TaskLogger parentTaskLogger,
-			String summary) {
+			CharSequence summary) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
 			summary,
-			false,
-			false,
-			true,
-			true);
+			false);
 
 	}
 
@@ -185,51 +155,42 @@ interface Database {
 	OwnedTransaction beginReadOnlyJoinFormat (
 			LogContext parentLogContext,
 			TaskLogger parentTaskLogger,
-			String ... summaryArguments) {
+			CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			false,
-			false,
-			true,
-			true);
+			false);
 
 	}
 
 	default
 	OwnedTransaction beginReadOnlyJoin (
 			@NonNull LogContext parentLogContext,
-			@NonNull String summary) {
+			@NonNull CharSequence summary) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
 			summary,
-			false,
-			false,
-			true,
-			true);
+			false);
 
 	}
 
 	default
 	OwnedTransaction beginReadOnlyJoinFormat (
 			@NonNull LogContext parentLogContext,
-			@NonNull String ... summaryArguments) {
+			@NonNull CharSequence ... summaryArguments) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			stringFormatArray (
+			stringFormatLazyArray (
 				summaryArguments),
-			false,
-			false,
-			true,
-			true);
+			false);
 
 	}
 

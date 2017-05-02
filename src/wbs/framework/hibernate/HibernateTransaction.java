@@ -7,7 +7,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
@@ -46,9 +45,6 @@ class HibernateTransaction
 	// properties
 
 	@Getter @Setter
-	TaskLogger parentTaskLogger;
-
-	@Getter @Setter
 	HibernateDatabase hibernateDatabase;
 
 	@Getter @Setter
@@ -59,9 +55,6 @@ class HibernateTransaction
 
 	@Getter @Setter
 	HibernateTransaction realTransaction;
-
-	@Getter @Setter
-	List <HibernateTransaction> stack;
 
 	@Getter @Setter
 	CloseableTaskLogger transactionTaskLogger;
@@ -118,7 +111,7 @@ class HibernateTransaction
 				return;
 			}
 
-			taskLogger.debugFormat (
+			transactionTaskLogger.debugFormat (
 				"BEGIN %s %s",
 				integerToDecimalString (
 					id),
@@ -181,7 +174,8 @@ class HibernateTransaction
 
 	@Override
 	public
-	void commit () {
+	void commit (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
@@ -222,22 +216,13 @@ class HibernateTransaction
 
 			}
 
-			taskLogger.debugFormat (
+			transactionTaskLogger.debugFormat (
 				"COMMIT %s %s",
 				integerToDecimalString (
 					id),
 				isReadWrite
 					? "rw"
 					: "ro");
-
-			// remove us from the transaction stack
-
-			if (stack != null) {
-
-				stack.remove (
-					this);
-
-			}
 
 			// verify unsaved records
 
@@ -269,42 +254,44 @@ class HibernateTransaction
 	public
 	void close () {
 
+		closeTransaction ();
+
+		transactionTaskLogger.close ();
+
+	}
+
+	@Override
+	public
+	void closeTransaction () {
+
+		// handle repeated close
+
+		if (closed) {
+
+			if (this.hibernateDatabase.allowRepeatedClose) {
+
+				return;
+
+			} else {
+
+				throw new RuntimeException (
+					"Tried to close transaction twice");
+
+			}
+
+		}
+
+
 		try (
 
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"close");
+					transactionTaskLogger,
+					"closeTransaction");
 
 		) {
 
-			// handle repeated close
-
-			if (closed) {
-
-				if (this.hibernateDatabase.allowRepeatedClose) {
-
-					return;
-
-				} else {
-
-					throw new RuntimeException (
-						"Tried to close transaction twice");
-
-				}
-
-			}
-
 			closed = true;
-
-			// remove us from the transaction stack
-
-			if (stack != null) {
-
-				stack.remove (
-					this);
-
-			}
 
 			try {
 
@@ -339,20 +326,6 @@ class HibernateTransaction
 					taskLogger.fatalFormatException (
 						exception,
 						"Error teardown session");
-
-				}
-
-				// always close the active task
-
-				try {
-
-					transactionTaskLogger.close ();
-
-				} catch (Exception exception) {
-
-					taskLogger.fatalFormatException (
-						exception,
-						"Error closing transaction trask logger");
 
 				}
 
@@ -409,7 +382,7 @@ class HibernateTransaction
 
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger,
+					transactionTaskLogger,
 					"finalize");
 
 		) {
@@ -431,7 +404,7 @@ class HibernateTransaction
 
 	@Override
 	public
-	long getId () {
+	long transactionId () {
 
 		return id;
 

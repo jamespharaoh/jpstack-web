@@ -3,10 +3,6 @@ package wbs.framework.hibernate;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -55,22 +51,6 @@ class HibernateDatabase
 	@Getter @Setter
 	boolean allowRepeatedClose = true;
 
-	// state
-
-	ThreadLocal <List <HibernateTransaction>> currentTransactionStackLocal =
-		new ThreadLocal <List <HibernateTransaction>> () {
-
-		@Override
-		protected
-		List <HibernateTransaction> initialValue () {
-
-			return Collections.synchronizedList (
-				new ArrayList<> ());
-
-		}
-
-	};
-
 	// implementation
 
 	@Override
@@ -78,11 +58,8 @@ class HibernateDatabase
 	OwnedTransaction beginTransaction (
 			@NonNull LogContext parentLogContext,
 			@NonNull Optional <TaskLogger> parentTaskLogger,
-			@NonNull String summary,
-			boolean readWrite,
-			boolean canJoin,
-			boolean canCreateNew,
-			boolean makeCurrent) {
+			@NonNull CharSequence summary,
+			boolean readWrite) {
 
 		OwnedTaskLogger transactionTaskLogger;
 
@@ -92,16 +69,16 @@ class HibernateDatabase
 		) {
 
 			transactionTaskLogger =
-				logContext.nestTaskLogger (
+				parentLogContext.nestTaskLogger (
 					optionalGetRequired (
 						parentTaskLogger),
-					"beginTransaction");
+					summary);
 
 		} else {
 
 			transactionTaskLogger =
-				logContext.createTaskLogger (
-					"beginTransaction");
+				parentLogContext.createTaskLogger (
+					summary);
 
 		}
 
@@ -117,24 +94,17 @@ class HibernateDatabase
 			return beginTransactionReal (
 				taskLogger,
 				transactionTaskLogger,
-				readWrite,
-				canJoin,
-				canCreateNew,
-				makeCurrent);
+				readWrite);
 
 		}
 
 	}
 
-	@SuppressWarnings ("resource")
 	private
 	HibernateTransaction beginTransactionReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull CloseableTaskLogger transactionTaskLogger,
-			boolean readWrite,
-			boolean canJoin,
-			boolean canCreateNew,
-			boolean makeCurrent) {
+			boolean readWrite) {
 
 		try (
 
@@ -145,115 +115,25 @@ class HibernateDatabase
 
 		) {
 
-			// check args
+			HibernateTransaction newTransaction =
+				hibernateTransactionProvider.get ()
 
-			if (! canCreateNew && ! canJoin) {
+				.hibernateDatabase (
+					this)
 
-				throw new IllegalArgumentException (
-					"Must specify one of canCreateNew or canJoin");
+				.id (
+					TransactionMethods.IdGenerator.nextId ())
 
-			}
+				.isReadWrite (
+					readWrite)
 
-			// get current transaction & stack
+				.transactionTaskLogger (
+					transactionTaskLogger);
 
-			List <HibernateTransaction> currentTransactionStack =
-				currentTransactionStackLocal.get ();
+			newTransaction.begin (
+				taskLogger);
 
-			HibernateTransaction currentTransaction =
-				currentTransactionStack.size () > 0
-					? currentTransactionStack.get (
-						currentTransactionStack.size () - 1)
-					: null;
-
-			// join an existing transaction
-
-			if (
-				currentTransaction != null
-				&& canJoin
-				&& (
-					! readWrite
-					|| ! currentTransaction.isReadWrite
-				)
-			) {
-
-				HibernateTransaction newTransaction =
-					hibernateTransactionProvider.get ()
-
-					.parentTaskLogger (
-						taskLogger)
-
-					.hibernateDatabase (
-						this)
-
-					.isReadWrite (
-						readWrite)
-
-					.realTransaction (
-						currentTransaction)
-
-					.stack (
-						currentTransactionStack)
-
-					.transactionTaskLogger (
-						transactionTaskLogger);
-
-				newTransaction.begin (
-					taskLogger);
-
-				if (makeCurrent) {
-
-					currentTransactionStack.add (
-						newTransaction);
-
-				}
-
-				return newTransaction;
-
-			}
-
-			// create a new transaction
-
-			if (canCreateNew) {
-
-				HibernateTransaction newTransaction =
-					hibernateTransactionProvider.get ()
-
-					.parentTaskLogger (
-						taskLogger)
-
-					.hibernateDatabase (
-						this)
-
-					.id (
-						TransactionMethods.IdGenerator.nextId ())
-
-					.isReadWrite (
-						readWrite)
-
-					.stack (
-						currentTransactionStack)
-
-					.transactionTaskLogger (
-						transactionTaskLogger);
-
-				newTransaction.begin (
-					taskLogger);
-
-				if (makeCurrent) {
-
-					currentTransactionStack.add (
-						newTransaction);
-
-				}
-
-				return newTransaction;
-
-			}
-
-			// throw an appropriate error
-
-			throw new RuntimeException (
-				"Unable to begin transaction");
+			return newTransaction;
 
 		}
 

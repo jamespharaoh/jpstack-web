@@ -15,13 +15,9 @@ interface TransactionMethods {
 	OwnedTransaction ownedTransaction ();
 
 	default
-	long getId () {
-
-		return ownedTransaction ().getId ();
-
+	long transactionId () {
+		return ownedTransaction ().transactionId ();
 	}
-
-	void commit ();
 
 	default
 	Instant now () {

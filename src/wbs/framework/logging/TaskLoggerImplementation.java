@@ -34,7 +34,15 @@ public
 class TaskLoggerImplementation
 	implements OwnedTaskLogger {
 
+	// static state
+
+	private static
+	Long nextId = 0l;
+
 	// state
+
+	private final
+	Long id = nextId ++;
 
 	private final
 	Optional <TaskLoggerImplementation> parentOptional;
@@ -137,6 +145,14 @@ class TaskLoggerImplementation
 		this.startTime =
 			Instant.now ();
 
+		debugFormat (
+			"Task logger %s.%s (%s) started at %s",
+			staticContext,
+			dynamicContext,
+			integerToDecimalString (
+				id),
+			startTime.toString ());
+
 	}
 
 	// life cycle
@@ -152,8 +168,19 @@ class TaskLoggerImplementation
 			return;
 		}
 
-		this.endTime =
+		Instant endTime =
 			Instant.now ();
+
+		debugFormat (
+			"Task logger %s.%s (%s) ended at %s",
+			staticContext,
+			dynamicContext,
+			integerToDecimalString (
+				id),
+			endTime.toString ());
+
+		this.endTime =
+			endTime;
 
 	}
 
@@ -223,6 +250,21 @@ class TaskLoggerImplementation
 	public
 	void addChild (
 			@NonNull OwnedTaskLogger child) {
+
+		if (
+			isNotNull (
+				endTime)
+		) {
+
+			throw new IllegalStateException (
+				stringFormat (
+					"Cannot add children to closed task logger (%s.%s) %s",
+					staticContext,
+					dynamicContext,
+					integerToDecimalString (
+						id)));
+
+		}
 
 		events.add (
 			child);

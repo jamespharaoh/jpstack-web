@@ -8,4 +8,12 @@ interface Transaction
 		TaskLogger,
 		TransactionMethods {
 
+	default
+	void commit () {
+
+		ownedTransaction ().commit (
+			this);
+
+	}
+
 }

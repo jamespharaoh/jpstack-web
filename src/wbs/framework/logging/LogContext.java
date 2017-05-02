@@ -12,12 +12,12 @@ public
 interface LogContext {
 
 	OwnedTaskLogger createTaskLogger (
-			String dynamicContext,
+			CharSequence dynamicContext,
 			Optional <Boolean> debugEnabled);
 
 	default
 	OwnedTaskLogger createTaskLogger (
-			@NonNull String dynamicContext) {
+			@NonNull CharSequence dynamicContext) {
 
 		return createTaskLogger (
 			dynamicContext,
@@ -27,7 +27,7 @@ interface LogContext {
 
 	default
 	OwnedTaskLogger createTaskLoggerFormat (
-			@NonNull String ... arguments) {
+			@NonNull CharSequence ... arguments) {
 
 		return createTaskLogger (
 			stringFormatArray (
@@ -38,7 +38,7 @@ interface LogContext {
 
 	default
 	OwnedTaskLogger createTaskLogger (
-			@NonNull String dynamicContext,
+			@NonNull CharSequence dynamicContext,
 			@NonNull Boolean debugEnabled) {
 
 		return createTaskLogger (
@@ -50,13 +50,13 @@ interface LogContext {
 
 	OwnedTaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
-			String dynamicContext,
+			CharSequence dynamicContext,
 			Optional <Boolean> debugEnabled);
 
 	default
 	OwnedTaskLogger nestTaskLogger (
 			@NonNull Optional <TaskLogger> parent,
-			@NonNull String dynamicContext,
+			@NonNull CharSequence dynamicContext,
 			@NonNull Boolean debugEnabled) {
 
 		return nestTaskLogger (
@@ -70,7 +70,7 @@ interface LogContext {
 	default
 	OwnedTaskLogger nestTaskLogger (
 			@NonNull TaskLogger parent,
-			@NonNull String dynamicContext,
+			@NonNull CharSequence dynamicContext,
 			@NonNull Boolean debugEnabled) {
 
 		return nestTaskLogger (
@@ -85,7 +85,7 @@ interface LogContext {
 	default
 	OwnedTaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
-			String dynamicContext) {
+			CharSequence dynamicContext) {
 
 		return nestTaskLogger (
 			parent,
@@ -97,7 +97,7 @@ interface LogContext {
 	default
 	OwnedTaskLogger nestTaskLogger (
 			TaskLogger parent,
-			String dynamicContext) {
+			CharSequence dynamicContext) {
 
 		return nestTaskLogger (
 			optionalOf (
@@ -110,7 +110,7 @@ interface LogContext {
 	default
 	OwnedTaskLogger nestTaskLoggerFormat (
 			@NonNull TaskLogger parent,
-			@NonNull String ... dynamicContextArguments) {
+			@NonNull CharSequence ... dynamicContextArguments) {
 
 		return nestTaskLogger (
 			optionalOf (

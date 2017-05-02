@@ -49,7 +49,10 @@ class NestedTransaction
 	@Override
 	public
 	void commit () {
-		ownedTransaction.commit ();
+
+		ownedTransaction.commit (
+			this);
+
 	}
 
 	@Override
@@ -70,9 +73,7 @@ class NestedTransaction
 	@Override
 	public
 	void close () {
-
 		taskLoggerImplementation.close ();
-
 	}
 
 }

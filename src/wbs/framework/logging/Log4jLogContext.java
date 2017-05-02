@@ -21,12 +21,12 @@ class Log4jLogContext
 	Log4jLogTarget logTarget;
 
 	private
-	String staticContext;
+	CharSequence staticContext;
 
 	public
 	Log4jLogContext (
 			@NonNull Logger logger,
-			@NonNull String staticContext) {
+			@NonNull CharSequence staticContext) {
 
 		this.logger =
 			logger;
@@ -43,7 +43,7 @@ class Log4jLogContext
 	@Override
 	public
 	OwnedTaskLogger createTaskLogger (
-			@NonNull String dynamicContext,
+			@NonNull CharSequence dynamicContext,
 			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new TaskLoggerImplementation (
@@ -59,7 +59,7 @@ class Log4jLogContext
 	public
 	OwnedTaskLogger nestTaskLogger (
 			@NonNull Optional <TaskLogger> parent,
-			@NonNull String dynamicContext,
+			@NonNull CharSequence dynamicContext,
 			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new TaskLoggerImplementation (
