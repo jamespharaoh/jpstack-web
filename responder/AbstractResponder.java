@@ -8,6 +8,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -32,7 +33,7 @@ class AbstractResponder
 
 	protected
 	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -40,7 +41,7 @@ class AbstractResponder
 
 	protected
 	void tearDown (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -48,7 +49,7 @@ class AbstractResponder
 
 	protected
 	void prepare (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -56,7 +57,7 @@ class AbstractResponder
 
 	protected
 	void goHeaders (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -64,7 +65,7 @@ class AbstractResponder
 
 	protected
 	void goContent (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		doNothing ();
 
@@ -77,37 +78,32 @@ class AbstractResponder
 
 		try (
 
-			TaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"execute");
-
 			OwnedTransaction transaction =
 				database.beginReadOnly (
-					taskLogger,
-					"AbstractResponder.execute ()",
-					this);
+					logContext,
+					parentTaskLogger,
+					"execute");
 
 		) {
 
 			setup (
-				taskLogger);
+				transaction);
 
 			try {
 
 				prepare (
-					taskLogger);
+					transaction);
 
 				goHeaders (
-					taskLogger);
+					transaction);
 
 				goContent (
-					taskLogger);
+					transaction);
 
 			} finally {
 
 				tearDown (
-					taskLogger);
+					transaction);
 
 			}
 
