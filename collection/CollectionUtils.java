@@ -422,6 +422,14 @@ class CollectionUtils {
 
 	}
 
+	public static
+	boolean collectionHasLessThanTwoElements (
+			@NonNull Collection <?> collection) {
+
+		return collection.size () < 2;
+
+	}
+
 	// three elements
 
 	public static
