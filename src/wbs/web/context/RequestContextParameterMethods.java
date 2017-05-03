@@ -8,7 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.lowercase;
@@ -159,7 +159,7 @@ interface RequestContextParameterMethods
 	List <String> parameterValues (
 			@NonNull String name) {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalFromNullable (
 				parameterMap ().get (
 					name)),
@@ -222,8 +222,8 @@ interface RequestContextParameterMethods
 
 	default
 	String parameterOrDefault (
-			String key,
-			String defaultValue) {
+			@NonNull String key,
+			@NonNull String defaultValue) {
 
 		return optionalOr (
 			parameter (
@@ -274,7 +274,7 @@ interface RequestContextParameterMethods
 			@NonNull String key,
 			@NonNull Supplier <String> orElse) {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			parameter (
 				key),
 			orElse);
@@ -321,7 +321,7 @@ interface RequestContextParameterMethods
 	default
 	State requestContextParameterMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

@@ -2,7 +2,7 @@ package wbs.console.request;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.List;
@@ -156,7 +156,7 @@ interface ConsoleRequestContextNoticeMethods
 	default
 	State consoleRequestContextNoticeMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

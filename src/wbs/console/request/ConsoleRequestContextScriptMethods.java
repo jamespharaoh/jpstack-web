@@ -3,7 +3,7 @@ package wbs.console.request;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
@@ -99,7 +99,7 @@ interface ConsoleRequestContextScriptMethods
 	default
 	State consoleRequestContextScriptMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

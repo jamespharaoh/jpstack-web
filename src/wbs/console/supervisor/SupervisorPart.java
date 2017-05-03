@@ -1,9 +1,21 @@
 package wbs.console.supervisor;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasLessThanTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseOptional;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -11,6 +23,7 @@ import static wbs.utils.time.TimeUtils.localTime;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
 import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
@@ -19,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -92,11 +106,14 @@ class SupervisorPart
 
 	// state
 
-	List<String> supervisorConfigNames;
-	List<SupervisorConfig> supervisorConfigs;
+	String localUrl;
 
-	String selectedSupervisorConfigName;
-	SupervisorConfig supervisorConfig;
+	List <String> supervisorConfigNames;
+	List <SupervisorConfig> supervisorConfigs;
+
+	Optional <String> selectedSupervisorConfigName;
+
+	Optional <SupervisorConfig> supervisorConfig;
 
 	ObsoleteDateField dateField;
 
@@ -127,13 +144,22 @@ class SupervisorPart
 
 		) {
 
+			localUrl =
+				requestContext.resolveLocalUrl (
+					stringFormat (
+						"/%s",
+						fileName ()));
+
 			prepareSupervisorConfig (
 				transaction);
 
 			prepareDate (
 				transaction);
 
-			if (supervisorConfig != null) {
+			if (
+				optionalIsPresent (
+					supervisorConfig)
+			) {
 
 				createStatsPeriod (
 					transaction);
@@ -168,7 +194,8 @@ class SupervisorPart
 			if (fixedSupervisorConfigName != null) {
 
 				selectedSupervisorConfigName =
-					fixedSupervisorConfigName;
+					optionalOfFormat (
+						fixedSupervisorConfigName);
 
 				supervisorConfigNames =
 					Collections.singletonList (
@@ -211,18 +238,25 @@ class SupervisorPart
 					supervisorConfigsBuilder.build ();
 
 				selectedSupervisorConfigName =
-					requestContext.parameterOrDefault (
-						"config",
-						supervisorConfigNames.isEmpty ()
-							? null
-							: supervisorConfigNames.get (0));
+					optionalOrElseOptional (
+						requestContext.parameter (
+							"config"),
+						() -> ifThenElse (
+							supervisorConfigNames.isEmpty (),
+							() -> optionalAbsent (),
+							() -> optionalOf (
+								listFirstElementRequired (
+									supervisorConfigNames))));
 
 				if (
 
-					selectedSupervisorConfigName != null
-
-					&& ! supervisorConfigNames.contains (
+					optionalIsPresent (
 						selectedSupervisorConfigName)
+
+					&& doesNotContain (
+						supervisorConfigNames,
+						optionalGetRequired (
+							selectedSupervisorConfigName))
 
 				) {
 					throw new RuntimeException ();
@@ -230,20 +264,34 @@ class SupervisorPart
 
 			}
 
-			if (selectedSupervisorConfigName != null) {
+			if (
+				optionalIsPresent (
+					selectedSupervisorConfigName)
+			) {
 
 				supervisorConfig =
-					consoleManager.supervisorConfig (
-						selectedSupervisorConfigName);
+					optionalOf (
+						consoleManager.supervisorConfig (
+							optionalGetRequired (
+								selectedSupervisorConfigName)));
 
-				if (supervisorConfig == null) {
+				if (
+					optionalIsNotPresent (
+						supervisorConfig)
+				) {
 
 					throw new RuntimeException (
 						stringFormat (
 							"Supervisor config not found: %s",
-							selectedSupervisorConfigName));
+							optionalGetRequired (
+								selectedSupervisorConfigName)));
 
 				}
+
+			} else {
+
+				supervisorConfig =
+					optionalAbsent ();
 
 			}
 
@@ -265,7 +313,8 @@ class SupervisorPart
 
 			dateField =
 				ObsoleteDateField.parse (
-					requestContext.parameterOrNull ("date"));
+					requestContext.parameterOrNull (
+						"date"));
 
 			if (dateField.date == null) {
 
@@ -276,29 +325,56 @@ class SupervisorPart
 
 			}
 
-			startTime =
-				dateField.date
+			if (
+				optionalIsPresent (
+					supervisorConfig)
+			) {
 
-				.toDateTime (
-					localTime (
-						ifNull (
-							supervisorConfig.spec ().offsetHours (),
-							0l)),
-					consoleUserHelper.timezone (
-						transaction));
+				startTime =
+					dateField.date
 
-			endTime =
-				dateField.date
+					.toDateTime (
+						localTime (
+							ifNull (
+								supervisorConfig.get ().spec ().offsetHours (),
+								0l)),
+						consoleUserHelper.timezone (
+							transaction));
 
-				.plusDays (1)
+				endTime =
+					dateField.date
 
-				.toDateTime (
-					localTime (
-						ifNull (
-							supervisorConfig.spec ().offsetHours (),
-							0l)),
-					consoleUserHelper.timezone (
-						transaction));
+					.plusDays (1)
+
+					.toDateTime (
+						localTime (
+							ifNull (
+								supervisorConfig.get ().spec ().offsetHours (),
+								0l)),
+						consoleUserHelper.timezone (
+							transaction));
+
+			} else {
+
+				startTime =
+					dateField.date
+
+					.toDateTime (
+						localTime (0l),
+						consoleUserHelper.timezone (
+							transaction));
+
+				endTime =
+					dateField.date
+
+					.plusDays (1)
+
+					.toDateTime (
+						localTime (0l),
+						consoleUserHelper.timezone (
+							transaction));
+
+			}
 
 		}
 
@@ -322,7 +398,7 @@ class SupervisorPart
 					startTime,
 					endTime,
 					ifNull (
-						supervisorConfig.spec ().offsetHours (),
+						supervisorConfig.get ().spec ().offsetHours (),
 						0l));
 
 		}
@@ -346,7 +422,7 @@ class SupervisorPart
 
 			for (
 				Object object
-					: supervisorConfig.spec ().builders ()
+					: supervisorConfig.get ().spec ().builders ()
 			) {
 
 				if (object instanceof SupervisorConditionSpec) {
@@ -413,7 +489,7 @@ class SupervisorPart
 
 			for (
 				Object object
-					: supervisorConfig.spec ().builders ()
+					: supervisorConfig.get ().spec ().builders ()
 			) {
 
 				if (! (object instanceof SupervisorDataSetSpec))
@@ -479,7 +555,7 @@ class SupervisorPart
 
 			for (
 				PagePartFactory pagePartFactory
-					: supervisorConfig.pagePartFactories ()
+					: supervisorConfig.get ().pagePartFactories ()
 			) {
 
 				PagePart pagePart =
@@ -547,45 +623,114 @@ class SupervisorPart
 
 		) {
 
-			String localUrl =
-				requestContext.resolveLocalUrl (
-					stringFormat (
-						"/%s",
-						fileName ()));
+			renderLinks (
+				transaction);
 
-			if (supervisorConfigNames.size () > 1) {
+			renderDateForm (
+				transaction);
 
-				htmlParagraphOpen (
-					htmlClassAttribute (
-						"links"));
+			ObsoleteDateLinks.dailyBrowserParagraph (
+				formatWriter,
+				localUrl,
+				requestContext.formData (),
+				dateField.date);
+
+			renderTimeChangeWarning (
+				transaction);
+
+			if (
+				collectionIsEmpty (
+					pageParts)
+			) {
+
+				htmlParagraphWriteFormat (
+					"There is no configured data to display on this page.");
+
+			} else {
 
 				for (
-					SupervisorConfig oneSupervisorConfig
-						: supervisorConfigs
-				)  {
+					PagePart pagePart
+						: pageParts
+				) {
 
-					htmlLinkWrite (
-						stringFormat (
-							"%s",
-							localUrl,
-							"?config=%u",
-							oneSupervisorConfig.name (),
-							"&date=%u",
-							dateField.text),
-						oneSupervisorConfig.label (),
-						htmlClassAttribute (
-							presentInstances (
-								optionalIf (
-									stringEqualSafe (
-										oneSupervisorConfig.name (),
-										selectedSupervisorConfigName),
-									() -> "selected"))));
+					pagePart.renderHtmlBodyContent (
+						transaction);
 
 				}
 
-				htmlParagraphClose ();
+			}
+
+		}
+
+	}
+
+	private
+	void renderLinks (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderLinks");
+
+		) {
+
+			if (
+				collectionHasLessThanTwoElements (
+					supervisorConfigNames)
+			) {
+				return;
+			}
+
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
+
+			for (
+				SupervisorConfig oneSupervisorConfig
+					: supervisorConfigs
+			)  {
+
+				htmlLinkWrite (
+					stringFormat (
+						"%s",
+						localUrl,
+						"?config=%u",
+						oneSupervisorConfig.name (),
+						"&date=%u",
+						dateField.text),
+					oneSupervisorConfig.label (),
+					htmlClassAttribute (
+						presentInstances (
+							optionalIf (
+								stringEqualSafe (
+									oneSupervisorConfig.name (),
+									optionalGetRequired (
+										selectedSupervisorConfigName)),
+								() -> "selected"))));
 
 			}
+
+			htmlParagraphClose ();
+
+		}
+
+	}
+
+	private
+	void renderDateForm (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"htmlFormOpenGetAction");
+
+		) {
 
 			htmlFormOpenGetAction (
 				localUrl);
@@ -613,11 +758,22 @@ class SupervisorPart
 
 			htmlFormClose ();
 
-			ObsoleteDateLinks.dailyBrowserParagraph (
-				formatWriter,
-				localUrl,
-				requestContext.formData (),
-				dateField.date);
+		}
+
+	}
+
+	private
+	void renderTimeChangeWarning (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderTimeChangeWarning");
+
+		) {
 
 			// warning if time change
 
@@ -628,43 +784,31 @@ class SupervisorPart
 				.toStandardHours ().getHours ();
 
 			if (
-				integerNotEqualSafe (
+				integerEqualSafe (
 					hoursInDay,
 					24l)
 			) {
-
-				htmlParagraphOpen (
-					htmlClassAttribute (
-						"warning"));
-
-				formatWriter.writeLineFormat (
-					"This day contains %h ",
-					integerToDecimalString (
-						hoursInDay),
-					"hours due to a time change from %h ",
-					consoleUserHelper.timezoneString (
-						transaction,
-						startTime),
-					"to %h",
-					consoleUserHelper.timezoneString (
-						transaction,
-						endTime));
-
-				htmlParagraphClose ();
-
+				return;
 			}
 
-			// page parts
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"warning"));
 
-			for (
-				PagePart pagePart
-					: pageParts
-			) {
+			formatWriter.writeLineFormat (
+				"This day contains %h ",
+				integerToDecimalString (
+					hoursInDay),
+				"hours due to a time change from %h ",
+				consoleUserHelper.timezoneString (
+					transaction,
+					startTime),
+				"to %h",
+				consoleUserHelper.timezoneString (
+					transaction,
+					endTime));
 
-				pagePart.renderHtmlBodyContent (
-					transaction);
-
-			}
+			htmlParagraphClose ();
 
 		}
 

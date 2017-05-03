@@ -3,7 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -141,7 +141,7 @@ class ObjectSearchPart <
 					transaction);
 
 			currentSearch =
-				optionalOrElse (
+				optionalOrElseRequired (
 					genericCastUnchecked (
 						userSessionLogic.userDataObject (
 							transaction,

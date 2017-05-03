@@ -22,7 +22,6 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -594,7 +593,6 @@ class ChatUserDaoHibernate
 	public
 	List <Long> searchIds (
 			@NonNull Transaction parentTransaction,
-			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserSearch search) {
 
 		try (
@@ -1076,15 +1074,23 @@ class ChatUserDaoHibernate
 					search.firstJoin ())
 			) {
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatUser.firstJoin",
-						search.firstJoin ().start ()));
+				if (search.firstJoin ().hasStart ()) {
 
-				criteria.add (
-					Restrictions.lt (
-						"_chatUser.firstJoin",
-						search.firstJoin ().end ()));
+					criteria.add (
+						Restrictions.ge (
+							"_chatUser.firstJoin",
+							search.firstJoin ().start ()));
+
+				}
+
+				if (search.firstJoin ().hasEnd ()) {
+
+					criteria.add (
+						Restrictions.lt (
+							"_chatUser.firstJoin",
+							search.firstJoin ().end ()));
+
+				}
 
 			}
 
@@ -1093,15 +1099,23 @@ class ChatUserDaoHibernate
 					search.lastAction ())
 			) {
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatUser.lastAction",
-						search.lastAction ().start ()));
+				if (search.lastAction ().hasStart ()) {
 
-				criteria.add (
-					Restrictions.lt (
-						"_chatUser.lastAction",
-						search.lastAction ().end ()));
+					criteria.add (
+						Restrictions.ge (
+							"_chatUser.lastAction",
+							search.lastAction ().start ()));
+
+				}
+
+				if (search.lastAction ().hasEnd ()) {
+
+					criteria.add (
+						Restrictions.lt (
+							"_chatUser.lastAction",
+							search.lastAction ().end ()));
+
+				}
 
 			}
 
@@ -1110,15 +1124,23 @@ class ChatUserDaoHibernate
 					search.lastJoin ())
 			) {
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatUser.lastJoin",
-						search.lastJoin ().start ()));
+				if (search.lastJoin ().hasStart ()) {
 
-				criteria.add (
-					Restrictions.lt (
-						"_chatUser.lastJoin",
-						search.lastJoin ().end ()));
+					criteria.add (
+						Restrictions.ge (
+							"_chatUser.lastJoin",
+							search.lastJoin ().start ()));
+
+				}
+
+				if (search.lastJoin ().hasEnd ()) {
+
+					criteria.add (
+						Restrictions.lt (
+							"_chatUser.lastJoin",
+							search.lastJoin ().end ()));
+
+				}
 
 			}
 

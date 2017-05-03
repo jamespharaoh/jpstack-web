@@ -3,7 +3,7 @@ package wbs.web.context;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import java.util.List;
 import java.util.Map;
@@ -166,7 +166,7 @@ interface RequestContextMultipartMethods
 	default
 	State requestContextMultipartMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

@@ -11,7 +11,7 @@ import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -131,7 +131,7 @@ class ChatRebillSendPart
 						"formUpdates"));
 
 			formValues =
-				optionalOrElse (
+				optionalOrElseRequired (
 					optionalCast (
 						ChatRebillSearch.class,
 						requestContext.request (

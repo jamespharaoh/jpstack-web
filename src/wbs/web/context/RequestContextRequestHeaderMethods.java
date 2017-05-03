@@ -5,7 +5,7 @@ import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -143,7 +143,7 @@ interface RequestContextRequestHeaderMethods
 	default
 	State requestContextHeaderMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

@@ -228,7 +228,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 				Record <?> delegate =
 					genericCastUnchecked (
-						objectManager.dereference (
+						objectManager.dereferenceRequired (
 							transaction,
 							container,
 							delegatePath,

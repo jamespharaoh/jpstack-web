@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.CollectionUtils.listThirdElementRequired;
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.lessThanOne;
 import static wbs.utils.etc.NumberUtils.parseInteger;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
@@ -944,8 +945,26 @@ class TextualInterval
 	}
 
 	public
+	boolean hasStart () {
+
+		return integerNotEqualSafe (
+			value.getStartMillis (),
+			Long.MIN_VALUE);
+
+	}
+
+	public
 	Instant end () {
 		return value.getEnd ().toInstant ();
+	}
+
+	public
+	boolean hasEnd () {
+
+		return integerNotEqualSafe (
+			value.getEndMillis (),
+			Long.MAX_VALUE);
+
 	}
 
 	// data

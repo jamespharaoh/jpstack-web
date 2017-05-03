@@ -547,13 +547,30 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Type optionalOrElse (
+	Type optionalOrElseRequired (
 			@NonNull Optional <Type> optional,
 			@NonNull Supplier <Type> orElse) {
 
 		if (optional.isPresent ()) {
 
 			return optional.get ();
+
+		} else {
+
+			return orElse.get ();
+
+		}
+
+	}
+
+	public static <Type>
+	Optional <Type> optionalOrElseOptional (
+			@NonNull Optional <Type> optional,
+			@NonNull Supplier <Optional <Type>> orElse) {
+
+		if (optional.isPresent ()) {
+
+			return optional;
 
 		} else {
 

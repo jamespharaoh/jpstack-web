@@ -3,7 +3,7 @@ package wbs.apn.chat.user.core.logic;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import com.google.common.base.Optional;
 
@@ -158,7 +158,7 @@ class ChatUserObjectHelperMethodsImplementation
 
 		) {
 
-			return optionalOrElse (
+			return optionalOrElseRequired (
 				chatUserHelper.find (
 					transaction,
 					chat,

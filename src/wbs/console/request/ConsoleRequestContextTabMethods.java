@@ -3,7 +3,7 @@ package wbs.console.request;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import com.google.common.base.Optional;
 
@@ -89,7 +89,7 @@ interface ConsoleRequestContextTabMethods
 	default
 	State consoleRequestContextTabMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (

@@ -2,7 +2,7 @@ package wbs.console.request;
 
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -125,7 +125,7 @@ interface ConsoleRequestContextFormMethods
 			@NonNull String key,
 			@NonNull Supplier <String> defaultSupplier) {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			form (key),
 			defaultSupplier);
 
@@ -136,7 +136,7 @@ interface ConsoleRequestContextFormMethods
 			@NonNull String key,
 			@NonNull String defaultValue) {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			form (key),
 			() -> defaultValue);
 

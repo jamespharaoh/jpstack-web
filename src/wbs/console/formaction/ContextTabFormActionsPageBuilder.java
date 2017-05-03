@@ -3,7 +3,7 @@ package wbs.console.formaction;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
@@ -225,7 +225,7 @@ class ContextTabFormActionsPageBuilder
 					actionSpec.fieldsName (),
 					() -> consoleModule.formFieldSetRequired (
 						actionSpec.fieldsName ()),
-					() -> optionalOrElse (
+					() -> optionalOrElseRequired (
 						consoleModule.formFieldSet (
 							stringFormat (
 								"%s-form",
