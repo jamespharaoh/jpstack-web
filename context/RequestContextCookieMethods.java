@@ -8,7 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +131,7 @@ interface RequestContextCookieMethods
 	default
 	State requestContextCookieMethodsState () {
 
-		return optionalOrElse (
+		return optionalOrElseRequired (
 			optionalCast (
 				State.class,
 				optionalFromNullable (
