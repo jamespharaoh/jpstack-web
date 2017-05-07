@@ -1,5 +1,5 @@
 <plugin
-	name="scaffold"
+	name="platform-scaffold"
 	package="wbs.platform.scaffold">
 
 	<models>

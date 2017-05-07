@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -25,18 +26,27 @@ import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.NonNull;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.BootstrapComponentManager;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.tools.ComponentManagerBuilder;
 import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
-import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.Log4jLogTargetFactory;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggingLogic;
+import wbs.framework.logging.LoggingLogicImplementation;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+import wbs.framework.servlet.ComponentFilterProxy;
 
 import wbs.utils.random.RandomLogic;
 
@@ -49,12 +59,18 @@ class WbsServletListener
 		ServletContextListener,
 		ServletRequestListener {
 
-	// logging
+	// singleton dependencies
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			WbsServletListener.class);
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	LoggingLogic loggingLogic;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ComponentManagerBuilder> componentManagerBuilderProvider;
 
 	// state
 
@@ -73,89 +89,38 @@ class WbsServletListener
 	void contextInitialized (
 			@NonNull ServletContextEvent event) {
 
+		LoggingLogic loggingLogic =
+			new LoggingLogicImplementation (
+				false,
+				ImmutableList.of (
+					new Log4jLogTargetFactory ()));
+
 		try (
 
+			BootstrapComponentManager bootstrapComponentManager =
+				new BootstrapComponentManager (
+					loggingLogic);
+
 			OwnedTaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"contextInitialized");
+				bootstrapComponentManager.bootstrapTaskLogger (
+					this);
 
 		) {
 
-			// setup components
+			bootstrapComponentManager.registerStandardClasses (
+				taskLogger);
 
-			taskLogger.noticeFormat (
-				"Initialising components");
+			bootstrapComponentManager.bootstrapComponent (
+				taskLogger,
+				this);
 
-			SDNotify.sendStatus (
-				"Initialising components");
+			registerWebComponents (
+				taskLogger,
+				bootstrapComponentManager);
 
-			servletContext =
-				event.getServletContext ();
-
-			String primaryProjectName =
-				servletContext.getInitParameter (
-					"primaryProjectName");
-
-			String primaryProjectPackageName =
-				servletContext.getInitParameter (
-					"primaryProjectPackageName");
-
-			String beanDefinitionOutputPath =
-				servletContext.getInitParameter (
-					"beanDefinitionOutputPath");
-
-			List <String> layerNames =
-				stringSplitComma (
-					servletContext.getInitParameter (
-						"layerNames"));
-
-			componentManager =
-				new ComponentManagerBuilder ()
-
-				.primaryProjectName (
-					primaryProjectName)
-
-				.primaryProjectPackageName (
-					primaryProjectPackageName)
-
-				.layerNames (
-					layerNames)
-
-				.configNames (
-					Collections.emptyList ())
-
-				.outputPath (
-					beanDefinitionOutputPath)
-
-				.addSingletonComponent (
-					"servletContext",
-					event.getServletContext ())
-
-				.build (
-					taskLogger);
-
-			servletContext.setAttribute (
-				"wbs-application-context",
-				componentManager);
-
-			randomLogic =
-				componentManager.getComponentRequired (
-					taskLogger,
-					"randomLogic",
-					RandomLogic.class);
-
-			// systemd integration
-
-			SDNotify.sendNotify ();
-
-			watchdogThread =
-				new Thread (
-					this::watchdogThread);
-
-			watchdogThread.start ();
-
-			SDNotify.sendStatus (
-				"Running");
+			contextInitializedReal (
+				taskLogger,
+				event);
 
 		}
 
@@ -278,6 +243,122 @@ class WbsServletListener
 	// private implementation
 
 	private
+	void registerWebComponents (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull BootstrapComponentManager bootstrapComponentManager) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerWebComponents");
+
+		) {
+
+			bootstrapComponentManager.registerClass (
+				taskLogger,
+				ComponentFilterProxy.class,
+				ComponentFilterProxy.class);
+
+		}
+
+	}
+
+	private
+	void contextInitializedReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ServletContextEvent event) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"contextInitializedReal");
+
+		) {
+
+			taskLogger.noticeFormat (
+				"Initialising components");
+
+			SDNotify.sendStatus (
+				"Initialising components");
+
+			servletContext =
+				event.getServletContext ();
+
+			String primaryProjectName =
+				servletContext.getInitParameter (
+					"primaryProjectName");
+
+			String primaryProjectPackageName =
+				servletContext.getInitParameter (
+					"primaryProjectPackageName");
+
+			String componentDefinitionOutputPath =
+				servletContext.getInitParameter (
+					"componentDefinitionOutputPath");
+
+			List <String> layerNames =
+				stringSplitComma (
+					servletContext.getInitParameter (
+						"layerNames"));
+
+			componentManager =
+				componentManagerBuilderProvider.get ()
+
+				.primaryProjectName (
+					primaryProjectName)
+
+				.primaryProjectPackageName (
+					primaryProjectPackageName)
+
+				.layerNames (
+					layerNames)
+
+				.configNames (
+					Collections.emptyList ())
+
+				.outputPath (
+					componentDefinitionOutputPath)
+
+				.addSingletonComponent (
+					"servletContext",
+					ServletContext.class,
+					event.getServletContext ())
+
+				.build (
+					taskLogger);
+
+			servletContext.setAttribute (
+				"wbs-application-context",
+				componentManager);
+
+			randomLogic =
+				componentManager.getComponentRequired (
+					taskLogger,
+					"randomLogic",
+					RandomLogic.class);
+
+			// systemd integration
+
+			SDNotify.sendNotify ();
+
+			watchdogThread =
+				new Thread (
+					this::watchdogThread);
+
+			watchdogThread.start ();
+
+			SDNotify.sendStatus (
+				"Running");
+
+		}
+
+	}
+
+	private
 	void requestInitializedReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ServletRequestEvent event) {
@@ -294,7 +375,7 @@ class WbsServletListener
 			boolean setServletContext = false;
 			boolean setServletRequest = false;
 
-			List <String> setRequestBeanNames =
+			List <String> setRequestComponentNames =
 				new ArrayList<> ();
 
 			boolean success = false;
@@ -313,7 +394,7 @@ class WbsServletListener
 				setServletRequest = true;
 
 				for (
-					String requestBeanName
+					String requestComponentName
 						: componentManager.requestComponentNames ()
 				) {
 
@@ -321,25 +402,25 @@ class WbsServletListener
 						genericCastUnchecked (
 							componentManager.getComponentRequired (
 								taskLogger,
-								requestBeanName,
+								requestComponentName,
 								Object.class));
 
-					String targetBeanName =
+					String targetComponentName =
 						stringFormat (
 							"%sTarget",
-							requestBeanName);
+							requestComponentName);
 
-					Object targetBean =
+					Object targetComponent =
 						componentManager.getComponentRequired (
 							taskLogger,
-							targetBeanName,
+							targetComponentName,
 							Object.class);
 
 					control.threadLocalProxySet (
-						targetBean);
+						targetComponent);
 
-					setRequestBeanNames.add (
-						requestBeanName);
+					setRequestComponentNames.add (
+						requestComponentName);
 
 				}
 
@@ -350,15 +431,15 @@ class WbsServletListener
 				if (! success) {
 
 					for (
-						String requestBeanName
-							: setRequestBeanNames
+						String requestComponentName
+							: setRequestComponentNames
 					) {
 
 						ThreadLocalProxyComponentFactory.Control control =
 							genericCastUnchecked (
 								componentManager.getComponentRequired (
 									taskLogger,
-									requestBeanName,
+									requestComponentName,
 									Object.class));
 
 						control.threadLocalProxyReset ();
@@ -404,7 +485,7 @@ class WbsServletListener
 		) {
 
 			for (
-				String requestBeanName
+				String requestComponentName
 					: componentManager.requestComponentNames ()
 			) {
 
@@ -412,7 +493,7 @@ class WbsServletListener
 					genericCastUnchecked (
 						componentManager.getComponentRequired (
 							taskLogger,
-							requestBeanName,
+							requestComponentName,
 							Object.class));
 
 				control.threadLocalProxyReset ();

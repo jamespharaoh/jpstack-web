@@ -1,5 +1,5 @@
 <plugin
-	name="rpc"
+	name="platform-rpc"
 	package="wbs.platform.rpc">
 
 	<layer name="api">

@@ -270,7 +270,6 @@ class ObjectSearchResultsPart <
 
 			List <Long> allObjectIds =
 				iterableMapToList (
-					NumberUtils::parseIntegerRequired,
 					stringSplitComma (
 						userSessionLogic.userDataStringRequired (
 							transaction,
@@ -278,7 +277,8 @@ class ObjectSearchResultsPart <
 								transaction),
 							stringFormat (
 								"object_search_%s_results",
-								sessionKey))));
+								sessionKey))),
+					NumberUtils::parseIntegerRequired);
 
 			totalObjects =
 				allObjectIds.size ();
@@ -350,11 +350,11 @@ class ObjectSearchResultsPart <
 				objects =
 					genericCastUnchecked (
 						iterableMapToList (
+							pageObjectIds,
 							pageObjectId ->
 								consoleHelper.find (
 									transaction,
-									pageObjectId),
-							pageObjectIds));
+									pageObjectId)));
 
 			}
 

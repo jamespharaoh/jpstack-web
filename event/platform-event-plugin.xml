@@ -1,5 +1,5 @@
 <plugin
-	name="event"
+	name="platform-event"
 	package="wbs.platform.event">
 
 	<plugin-dependencies>

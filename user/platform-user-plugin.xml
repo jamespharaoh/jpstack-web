@@ -1,5 +1,5 @@
 <plugin
-	name="user"
+	name="platform-user"
 	package="wbs.platform.user">
 
 	<sql-scripts>

@@ -1,5 +1,5 @@
 <plugin
-	name="postgresql"
+	name="platform-postgresql"
 	package="wbs.platform.postgresql">
 
 	<plugin-dependencies>

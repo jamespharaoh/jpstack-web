@@ -1,5 +1,5 @@
 <plugin
-	name="priv"
+	name="platform-priv"
 	package="wbs.platform.priv">
 
 	<models>

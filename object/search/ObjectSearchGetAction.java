@@ -120,9 +120,9 @@ class ObjectSearchGetAction
 							sessionKey)),
 					objectIdStrings ->
 						iterableMapToList (
-							NumberUtils::parseIntegerRequired,
 							stringSplitComma (
-								objectIdStrings)));
+								objectIdStrings),
+							NumberUtils::parseIntegerRequired));
 
 			if (
 

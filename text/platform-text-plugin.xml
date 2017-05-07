@@ -1,5 +1,5 @@
 <plugin
-	name="text"
+	name="platform-text"
 	package="wbs.platform.text">
 
 	<sql-scripts>

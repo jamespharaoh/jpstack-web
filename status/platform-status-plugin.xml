@@ -1,5 +1,5 @@
 <plugin
-	name="status"
+	name="platform-status"
 	package="wbs.platform.status">
 
 	<layer name="console">

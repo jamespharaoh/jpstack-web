@@ -1,5 +1,5 @@
 <plugin
-	name="service"
+	name="platform-service"
 	package="wbs.platform.service">
 
 	<models>

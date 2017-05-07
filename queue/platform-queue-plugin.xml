@@ -1,5 +1,5 @@
 <plugin
-	name="queue"
+	name="platform-queue"
 	package="wbs.platform.queue">
 
 	<plugin-dependencies>

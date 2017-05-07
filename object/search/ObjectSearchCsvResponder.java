@@ -151,7 +151,6 @@ class ObjectSearchCsvResponder <ResultType>
 
 			List <Long> objectIdsTemp =
 				iterableMapToList (
-					NumberUtils::parseIntegerRequired,
 					stringSplitComma (
 						userSessionLogic.userDataStringRequired (
 							transaction,
@@ -159,7 +158,8 @@ class ObjectSearchCsvResponder <ResultType>
 								transaction),
 							stringFormat (
 								"object_search_%s_results",
-								sessionKey))));
+								sessionKey))),
+					NumberUtils::parseIntegerRequired);
 
 			objectIds =
 				objectIdsTemp;
