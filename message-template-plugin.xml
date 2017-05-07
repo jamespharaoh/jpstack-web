@@ -4,7 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="sms-apps-common"/>
-		<plugin-dependency name="scaffold"/>
+		<plugin-dependency name="platform-scaffold"/>
 	</plugin-dependencies>
 
 	<models>
@@ -34,6 +34,7 @@
 	</layer>
 
 	<layer name="logic">
+		<component class="logic.MessageTemplateDatabaseLoader"/>
 		<component class="logic.MessageTemplateLogicImplementation"/>
 	</layer>
 

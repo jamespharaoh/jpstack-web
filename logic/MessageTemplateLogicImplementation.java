@@ -1,6 +1,5 @@
 package wbs.services.messagetemplate.logic;
 
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
@@ -9,8 +8,6 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -42,6 +39,9 @@ class MessageTemplateLogicImplementation
 
 	@SingletonDependency
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
+
+	@SingletonDependency
+	MessageTemplateDatabaseLoader messageTemplateDatabaseLoader;
 
 	@SingletonDependency
 	MessageTemplateEntryTypeObjectHelper messageTemplateEntryTypeHelper;
@@ -76,10 +76,9 @@ class MessageTemplateLogicImplementation
 			// load data
 
 			MessageTemplateDatabaseSpec databaseSpec =
-				genericCastUnchecked (
-					dataFromXml.readClasspath (
-						transaction,
-						resourceName));
+				messageTemplateDatabaseLoader.loadFromClasspath (
+					transaction,
+					resourceName);
 
 			// create database
 
@@ -209,17 +208,5 @@ class MessageTemplateLogicImplementation
 		}
 
 	}
-
-	private final static
-	DataFromXml dataFromXml =
-		new DataFromXmlBuilder ()
-
-		.registerBuilderClasses (
-			MessageTemplateDatabaseSpec.class,
-			MessageTemplateEntryTypeSpec.class,
-			MessageTemplateFieldTypeSpec.class,
-			MessageTemplateParameterSpec.class)
-
-		.build ();
 
 }
