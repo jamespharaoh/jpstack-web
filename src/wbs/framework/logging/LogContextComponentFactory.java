@@ -1,5 +1,7 @@
 package wbs.framework.logging;
 
+import static wbs.utils.etc.TypeUtils.classNameFull;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -10,9 +12,12 @@ import wbs.framework.component.tools.ComponentFactory;
 @Accessors (fluent = true)
 public
 class LogContextComponentFactory
-	implements ComponentFactory {
+	implements ComponentFactory <LogContext> {
 
 	// properties
+
+	@Getter @Setter
+	LoggingLogic loggingLogic;
 
 	@Getter @Setter
 	Class <?> componentClass;
@@ -21,11 +26,12 @@ class LogContextComponentFactory
 
 	@Override
 	public
-	Object makeComponent (
+	LogContext makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return DefaultLogContext.forClass (
-			componentClass);
+		return loggingLogic.findOrCreateLogContext (
+			classNameFull (
+				componentClass));
 
 	}
 

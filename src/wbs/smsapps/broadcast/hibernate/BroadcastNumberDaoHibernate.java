@@ -133,14 +133,14 @@ class BroadcastNumberDaoHibernate
 					BroadcastNumberRec::getNumber);
 
 			return iterableMapToList (
+				numbers,
 				number ->
 					mapItemForKey (
 						broadcastNumbersMap,
-						number),
-				numbers);
-
+						number));
 
 		}
+
 	}
 
 	@Override

@@ -48,7 +48,7 @@ class FixturesTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Map <Class <?>, Provider <FixtureProvider>> fixtureProviderProvidersByClass;
+	Map <Class <?>, Provider <FixtureProvider>> fixtureProviderProviders;
 
 	// implementation
 
@@ -155,7 +155,7 @@ class FixturesTool {
 					fixtureProviderClassOptional);
 
 			Provider <FixtureProvider> fixtureProviderProvider =
-				fixtureProviderProvidersByClass.get (
+				fixtureProviderProviders.get (
 					fixtureProviderClass);
 
 			FixtureProvider fixtureProvider =

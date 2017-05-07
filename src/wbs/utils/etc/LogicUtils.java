@@ -40,10 +40,29 @@ class LogicUtils {
 
 	}
 
+	public static
+	boolean anyOf (
+			@NonNull Iterable <Supplier <Boolean>> conditions) {
+
+		for (
+			Supplier <Boolean> condition
+				: conditions
+		) {
+
+			if (condition.get ()) {
+				return true;
+			}
+
+		}
+
+		return false;
+
+	}
+
 	@SafeVarargs
 	public static
 	boolean anyOf (
-			@NonNull Supplier <Boolean>... conditions) {
+			@NonNull Supplier <Boolean> ... conditions) {
 
 		for (
 			Supplier <Boolean> condition

@@ -1380,12 +1380,12 @@ class FormFieldLogic {
 			.put (
 				"Form hints",
 				iterableMapToList (
+					hints.entrySet (),
 					hintEntry ->
 						stringFormat (
 							"%s = %s",
 							hintEntry.getKey (),
-							hintEntry.getValue ().toString ()),
-					hints.entrySet ()))
+							hintEntry.getValue ().toString ())))
 
 			.build ();
 

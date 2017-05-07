@@ -5,21 +5,33 @@ import java.util.List;
 import java.util.Properties;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @DataClass ("properties-property")
 public
 class ComponentsPropertiesPropertySpec
 	implements ComponentsComponentPropertySpec {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	@DataAncestor
 	@Getter @Setter
@@ -35,31 +47,45 @@ class ComponentsPropertiesPropertySpec
 
 	@DataChildren (direct = true)
 	@Getter @Setter
-	List<ComponentPropertyValueSpec> properties =
-		new ArrayList<ComponentPropertyValueSpec> ();
+	List <ComponentPropertyValueSpec> properties =
+		new ArrayList<> ();
+
+	// public implementation
 
 	@Override
 	public
-	int register (
-			ComponentDefinition beanDefinition) {
+	void register (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentDefinition beanDefinition) {
 
-		Properties properties =
-			new Properties ();
+		try (
 
-		for (ComponentPropertyValueSpec propertyValue
-				: this.properties) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"register");
 
-			properties.setProperty (
-				propertyValue.name (),
-				propertyValue.value ());
+		) {
+
+			Properties properties =
+				new Properties ();
+
+			for (
+				ComponentPropertyValueSpec propertyValue
+					: this.properties
+			) {
+
+				properties.setProperty (
+					propertyValue.name (),
+					propertyValue.value ());
+
+			}
+
+			beanDefinition.addValueProperty (
+				name,
+				properties);
 
 		}
-
-		beanDefinition.addValueProperty (
-			name,
-			properties);
-
-		return 0;
 
 	}
 

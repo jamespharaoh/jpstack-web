@@ -23,7 +23,7 @@ import wbs.framework.data.annotations.DataParent;
 @DataClass ("plugin")
 public
 class PluginSpec
-	implements Comparable<PluginSpec> {
+	implements Comparable <PluginSpec> {
 
 	// attributes
 

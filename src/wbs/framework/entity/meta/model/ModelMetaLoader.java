@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -27,7 +28,6 @@ import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -39,17 +39,18 @@ import wbs.utils.io.RuntimeIoException;
 public
 class ModelMetaLoader {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ModelMetaLoader.class);
-
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
 
 	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	@PrototypeDependency
 	@ModelMetaData
@@ -108,28 +109,13 @@ class ModelMetaLoader {
 
 		) {
 
-			DataFromXmlBuilder dataFromXmlBuilder =
-				new DataFromXmlBuilder ();
-
-			for (
-				Map.Entry <Class <?>, Provider <Object>> modelMetaDataEntry
-					: modelMetaDataProviders.entrySet ()
-			) {
-
-				Class <?> modelMetaDataClass =
-					modelMetaDataEntry.getKey ();
-
-				Provider <?> modelMetaDataProvider =
-					modelMetaDataEntry.getValue ();
-
-				dataFromXmlBuilder.registerBuilder (
-					modelMetaDataClass,
-					modelMetaDataProvider);
-
-			}
-
 			dataFromXml =
-				dataFromXmlBuilder.build ();
+				dataFromXmlBuilderProvider.get ()
+
+				.registerBuilders (
+					modelMetaDataProviders)
+
+				.build ();
 
 		}
 

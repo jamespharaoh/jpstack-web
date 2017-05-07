@@ -123,10 +123,10 @@ class ChatUserOnlineDaemon
 		) {
 
 			return iterableMapToList (
-				ChatUserRec::getId,
 				chatUserHelper.findOnline (
 					transaction,
-					ChatUserType.user));
+					ChatUserType.user),
+				ChatUserRec::getId);
 
 		}
 

@@ -102,9 +102,9 @@ class GenericSendDaemon <
 		) {
 
 			return iterableMapToList (
-				Job::getId,
 				helper ().findSendingJobs (
-					transaction));
+					transaction),
+				Job::getId);
 
 		}
 

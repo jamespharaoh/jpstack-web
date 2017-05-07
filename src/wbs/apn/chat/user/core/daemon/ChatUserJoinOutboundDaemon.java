@@ -113,10 +113,10 @@ class ChatUserJoinOutboundDaemon
 		) {
 
 			return iterableMapToList (
-				ChatUserRec::getId,
 				chatUserHelper.findWantingJoinOutbound (
 					transaction,
-					transaction.now ()));
+					transaction.now ()),
+				ChatUserRec::getId);
 
 		}
 

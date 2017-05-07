@@ -110,9 +110,9 @@ class ChatSpendWarningDaemon
 				"Looking for users to send spend warning to");
 
 			return iterableMapToList (
-				ChatUserRec::getId,
 				chatUserHelper.findWantingWarning (
-					transaction));
+					transaction),
+				ChatUserRec::getId);
 
 		}
 

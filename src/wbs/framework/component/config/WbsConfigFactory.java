@@ -2,28 +2,42 @@ package wbs.framework.component.config;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableList;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("wbsConfigLoader")
 public
-class WbsConfigFactory {
+class WbsConfigFactory
+	implements ComponentFactory <WbsConfig> {
 
 	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// components
+	// prototype dependencies
 
-	@SingletonComponent ("wbsConfig")
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+
+	// publc interface
+
+	@Override
 	public
-	WbsConfig wbsConfig (
+	WbsConfig makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -31,7 +45,7 @@ class WbsConfigFactory {
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"wbsConfig");
+					"makeComponent");
 
 		) {
 
@@ -48,9 +62,50 @@ class WbsConfigFactory {
 			}
 
 			WbsConfig wbsConfig =
-				WbsConfig.readFilename (
+				readFilename (
 					taskLogger,
 					configFilename);
+
+			return wbsConfig;
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	WbsConfig readFilename (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String filename) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"readFilename");
+
+		) {
+
+			DataFromXml dataFromXml =
+				dataFromXmlBuilderProvider.get ()
+
+				.registerBuilderClasses (
+					ImmutableList.of (
+						WbsConfig.class,
+						WbsConfigConsoleServer.class,
+						WbsConfigDatabase.class,
+						WbsConfigEmail.class,
+						WbsConfigProcessApi.class))
+
+				.build ();
+
+			WbsConfig wbsConfig =
+				(WbsConfig)
+				dataFromXml.readFilename (
+					taskLogger,
+					filename);
 
 			return wbsConfig;
 

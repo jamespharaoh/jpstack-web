@@ -21,11 +21,11 @@ declare variable $config external;
 	<context-param>
 
 		<param-name>{
-			'beanDefinitionOutputPath'
+			'componentDefinitionOutputPath'
 		}</param-name>
 
 		<param-value>{
-			'work/console/bean-definitions'
+			'work/console/component-definitions'
 		}</param-value>
 
 	</context-param>
@@ -72,12 +72,12 @@ declare variable $config external;
 
 	<filter>
 		<filter-name>responseFilter</filter-name>
-		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
+		<filter-class>wbs.framework.servlet.ComponentFilterProxy</filter-class>
 	</filter>
 
 	<filter>
 		<filter-name>coreAuthFilter</filter-name>
-		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
+		<filter-class>wbs.framework.servlet.ComponentFilterProxy</filter-class>
 	</filter>
 
 	<!-- filter mappings -->
@@ -112,7 +112,7 @@ declare variable $config external;
 	<servlet>
 		<display-name>default</display-name>
 		<servlet-name>pathHandlerServlet</servlet-name>
-		<servlet-class>wbs.framework.servlet.BeanServletProxy</servlet-class>
+		<servlet-class>wbs.framework.servlet.ComponentServletProxy</servlet-class>
 	</servlet>
 
 	<!-- servlet mappings -->

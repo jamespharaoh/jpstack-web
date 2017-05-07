@@ -1,0 +1,27 @@
+<plugin
+	name="platform-text"
+	package="wbs.platform.text">
+
+	<sql-scripts>
+		<sql-schema name="text"/>
+	</sql-scripts>
+
+	<models>
+		<model name="text"/>
+	</models>
+
+	<layer name="web">
+		<component class="web.TextResponder"/>
+	</layer>
+
+	<layer name="console">
+		<component class="console.TextConsoleConfig"/>
+		<component class="console.TextFormFieldNativeMapping"/>
+		<component class="console.TextFormFieldPluginProvider"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="text"/>
+	</console-modules>
+
+</plugin>

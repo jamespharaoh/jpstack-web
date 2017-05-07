@@ -4,7 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="test-common"/>
-		<plugin-dependency name="user"/>
+		<plugin-dependency name="platform-user"/>
 	</plugin-dependencies>
 
 	<models>

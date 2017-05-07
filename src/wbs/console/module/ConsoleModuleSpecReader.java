@@ -33,6 +33,9 @@ class ConsoleModuleSpecReader {
 	@ConsoleModuleData
 	Map <Class <?>, Provider <ConsoleModuleSpec>> consoleModuleSpecProviders;
 
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+
 	// state
 
 	DataFromXml dataFromXml;
@@ -53,22 +56,13 @@ class ConsoleModuleSpecReader {
 
 		) {
 
-			DataFromXmlBuilder builder =
-				new DataFromXmlBuilder ();
-
-			for (
-				Map.Entry <Class <?>, Provider <ConsoleModuleSpec>> entry
-					: consoleModuleSpecProviders.entrySet ()
-			) {
-
-				builder.registerBuilder (
-					entry.getKey (),
-					entry.getValue ());
-
-			}
-
 			dataFromXml =
-				builder.build ();
+				dataFromXmlBuilderProvider.get ()
+
+				.registerBuilders (
+					consoleModuleSpecProviders)
+
+				.build ();
 
 		}
 

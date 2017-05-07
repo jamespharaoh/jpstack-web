@@ -180,9 +180,9 @@ class ChatStatsDaemon
 		) {
 
 			return iterableMapToList (
-				ChatRec::getId,
 				chatHelper.findAll (
-					transaction));
+					transaction),
+				ChatRec::getId);
 
 		}
 

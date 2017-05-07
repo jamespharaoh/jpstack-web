@@ -1,0 +1,10 @@
+<plugin
+	name="framework-builder"
+	package="wbs.framework.builder">
+
+	<layer name="utils">
+		<component class="BuilderFactoryImplementation"/>
+		<component class="BuilderImplementation"/>
+	</layer>
+
+</plugin>

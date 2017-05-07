@@ -119,13 +119,13 @@ class StatusUpdateAsyncHelper
 
 			List <Pair <String, Future <JsonObject>>> futures =
 				iterableMapToList (
+					statusLineManager.getStatusLines (),
 					statusLine ->
 						Pair.of (
 							statusLine.typeName (),
 							statusLine.getUpdateData (
 								transaction,
-								privChecker)),
-					statusLineManager.getStatusLines ());
+								privChecker)));
 
 			JsonObject payload =
 				new JsonObject ();

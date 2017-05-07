@@ -113,10 +113,10 @@ class ChatUserAlarmDaemon
 		) {
 
 			return iterableMapToList (
-				ChatUserAlarmRec::getId,
 				chatUserAlarmHelper.findPending (
 					transaction,
-					transaction.now ()));
+					transaction.now ()),
+				ChatUserAlarmRec::getId);
 
 		}
 

@@ -18,7 +18,7 @@ import wbs.framework.logging.TaskLogger;
 @Accessors (fluent = true)
 public
 class ConsoleModuleSpecFactory
-	implements ComponentFactory {
+	implements ComponentFactory <ConsoleModuleSpec> {
 
 	// singleton dependencies
 
@@ -37,7 +37,7 @@ class ConsoleModuleSpecFactory
 
 	@Override
 	public
-	Object makeComponent (
+	ConsoleModuleSpec makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

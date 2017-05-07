@@ -1,11 +1,16 @@
 package wbs.framework.component.tools;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -15,11 +20,14 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -28,6 +36,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
@@ -43,12 +53,13 @@ import wbs.console.module.ConsoleModuleFactory;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecFactory;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.ProxiedRequestComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.registry.ComponentDefinition;
-import wbs.framework.component.registry.ComponentRegistry;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
 import wbs.framework.component.scaffold.BuildPluginSpec;
 import wbs.framework.component.scaffold.BuildSpec;
@@ -62,25 +73,48 @@ import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginFixtureSpec;
 import wbs.framework.component.scaffold.PluginLayerSpec;
 import wbs.framework.component.scaffold.PluginManager;
+import wbs.framework.component.scaffold.PluginManagerBuilder;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginModelsSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
+@PrototypeComponent ("componentManagerBuilder")
 @Accessors (fluent = true)
 public
 class ComponentManagerBuilder {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ComponentManagerBuilder.class);
+	// singleton dependencies
+
+	@SingletonDependency
+	AnnotatedClassComponentTools annotatedClassComponentTools;
+
+	@SingletonDependency
+	ComponentManager bootstrapComponentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	LoggingLogic logginglogic;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ComponentRegistryImplementation>
+		componentRegistryImplementationProvider;
+
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+
+	@PrototypeDependency
+	Provider <PluginManagerBuilder> pluginManagerBuilderProvider;
 
 	// properties
 
@@ -107,24 +141,27 @@ class ComponentManagerBuilder {
 
 	PluginManager pluginManager;
 
-	Map <String, Object> singletonComponents =
+	Map <String, Pair <Class <?>, Object>> singletonComponents =
 		new LinkedHashMap<> ();
 
 	List <ComponentDefinition> componentDefinitionsToRegister =
 		new ArrayList<> ();
 
-	ComponentRegistry componentRegistry;
+	ComponentRegistryImplementation componentRegistry;
 
 	// implementation
 
 	public
 	ComponentManagerBuilder addSingletonComponent (
-			@NonNull String singletonName,
-			@NonNull Object singletonComponent) {
+			@NonNull String componentName,
+			@NonNull Class <?> interfaceClass,
+			@NonNull Object component) {
 
 		singletonComponents.put (
-			singletonName,
-			singletonComponent);
+			componentName,
+			Pair.of (
+				interfaceClass,
+				component));
 
 		return this;
 
@@ -175,7 +212,7 @@ class ComponentManagerBuilder {
 				"/wbs-build.xml";
 
 			DataFromXml buildDataFromXml =
-				new DataFromXmlBuilder ()
+				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
 					BuildSpec.class,
@@ -193,7 +230,7 @@ class ComponentManagerBuilder {
 				ImmutableList.builder ();
 
 			DataFromXml pluginDataFromXml =
-				new DataFromXmlBuilder ()
+				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
 					PluginApiModuleSpec.class,
@@ -210,6 +247,9 @@ class ComponentManagerBuilder {
 					PluginSpec.class)
 
 				.build ();
+
+			Set <String> pluginNames =
+				new HashSet<> ();
 
 			for (
 				BuildPluginSpec buildPlugin
@@ -231,10 +271,47 @@ class ComponentManagerBuilder {
 						ImmutableList.of (
 							build));
 
+				if (
+					stringNotEqualSafe (
+						buildPlugin.name (),
+						plugin.name ())
+				) {
+
+					taskLogger.errorFormat (
+						"Plugin name mismatch for %s ",
+						pluginPath,
+						"(should be %s ",
+						buildPlugin.name (),
+						"but was %s)",
+						plugin.name ());
+
+					continue;
+
+				}
+
+				if (
+					contains (
+						pluginNames,
+						plugin.name ())
+				) {
+
+					taskLogger.errorFormat (
+						"Duplicated plugin name: %s",
+						plugin.name ());
+
+					continue;
+
+				}
+
 				pluginsBuilder.add (
 					plugin);
 
+				pluginNames.add (
+					plugin.name ());
+
 			}
+
+			taskLogger.makeException ();
 
 			plugins =
 				pluginsBuilder.build ();
@@ -257,12 +334,17 @@ class ComponentManagerBuilder {
 		) {
 
 			pluginManager =
-				new PluginManager.Builder ()
-					.plugins (plugins)
-					.build ();
+				pluginManagerBuilderProvider.get ()
+
+				.plugins (
+					plugins)
+
+				.build (
+					taskLogger);
 
 			addSingletonComponent (
 				"pluginManager",
+				PluginManager.class,
 				pluginManager);
 
 		}
@@ -284,6 +366,9 @@ class ComponentManagerBuilder {
 		) {
 
 			createComponentRegistry (
+				taskLogger);
+
+			registerBootstrapComponents (
 				taskLogger);
 
 			registerLayerComponents (
@@ -315,6 +400,51 @@ class ComponentManagerBuilder {
 					componentDefinition);
 
 			}
+
+		}
+
+	}
+
+	private
+	void registerBootstrapComponents (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerLayerComponents");
+
+		) {
+
+			bootstrapComponentManager.allSingletonComponents (
+				taskLogger)
+
+				.forEach (
+					(componentName, componentClassAndValue) -> {
+
+					Class <?> interfaceClass =
+						componentClassAndValue.getLeft ();
+
+					if (
+						classEqualSafe (
+							interfaceClass,
+							ComponentManager.class)
+					) {
+						return;
+					}
+
+					Object component =
+						componentClassAndValue.getRight ();
+
+					componentRegistry.registerUnmanagedSingleton (
+						taskLogger,
+						componentName,
+						interfaceClass,
+						component);
+
+				});
 
 		}
 
@@ -867,130 +997,35 @@ class ComponentManagerBuilder {
 
 			}
 
-			String componentName = null;
-
-			SingletonComponent singletonComponent =
-				componentClass.getAnnotation (
-					SingletonComponent.class);
-
-			if (singletonComponent != null) {
-
-				componentName =
-					singletonComponent.value ();
-
-				componentRegistry.registerDefinition (
+			List <ComponentDefinition> componentDefinitions =
+				annotatedClassComponentTools.definitionsForClass (
 					taskLogger,
-					new ComponentDefinition ()
+					componentClass);
 
-					.name (
-						componentName)
-
-					.componentClass (
-						componentClass)
-
-					.scope (
-						"singleton")
-
-				);
-
+			if (taskLogger.errors ()) {
+				return;
 			}
 
-			PrototypeComponent prototypeComponent =
-				componentClass.getAnnotation (
-					PrototypeComponent.class);
+			componentDefinitions.forEach (
+				componentDefinition ->
+					componentRegistry.registerDefinition (
+						taskLogger,
+						componentDefinition));
 
-			if (prototypeComponent != null) {
+			ComponentDefinition componentDefinition =
+				listLastItemRequired (
+					componentDefinitions);
 
-				componentName =
-					prototypeComponent.value ();
+			String componentName =
+				componentDefinition.name ();
 
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						componentName)
-
-					.componentClass (
-						componentClass)
-
-					.scope (
-						"prototype")
-
-				);
-
-			}
-
-			ProxiedRequestComponent proxiedRequestComponent =
-				componentClass.getAnnotation (
-					ProxiedRequestComponent.class);
-
-			if (proxiedRequestComponent != null) {
-
-				componentName =
-					proxiedRequestComponent.value ();
-
-				String targetComponentName =
-					stringFormat (
-						"%sTarget",
-						componentName);
-
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						targetComponentName)
-
-					.componentClass (
-						componentClass)
-
-					.scope (
-						"prototype")
-
-					.hide (
-						true)
-
-				);
-
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						componentName)
-
-					.componentClass (
-						proxiedRequestComponent.proxyInterface ())
-
-					.factoryClass (
-						ThreadLocalProxyComponentFactory.class)
-
-					.scope (
-						"singleton")
-
-					.addValueProperty (
-						"componentName",
-						componentName)
-
-					.addValueProperty (
-						"componentClass",
-						proxiedRequestComponent.proxyInterface ())
-
-				);
+			if (
+				collectionHasTwoElements (
+					componentDefinitions)
+			) {
 
 				componentRegistry.addRequestComponentName (
 					componentName);
-
-			}
-
-			if (componentName == null) {
-
-				taskLogger.errorFormat (
-					"Could not find component annotation on %s",
-					componentClass.getName ());
-
-				return;
 
 			}
 
@@ -1040,7 +1075,8 @@ class ComponentManagerBuilder {
 							"singleton")
 
 						.factoryClass (
-							MethodComponentFactory.class)
+							genericCastUnchecked (
+								MethodComponentFactory.class))
 
 						.addReferenceProperty (
 							"factoryComponent",
@@ -1096,7 +1132,8 @@ class ComponentManagerBuilder {
 							"prototype")
 
 						.factoryClass (
-							MethodComponentFactory.class)
+							genericCastUnchecked (
+								MethodComponentFactory.class))
 
 						.addReferenceProperty (
 							"factoryComponent",
@@ -1564,7 +1601,8 @@ class ComponentManagerBuilder {
 					EnumConsoleHelper.class)
 
 				.factoryClass (
-					EnumConsoleHelperFactory.class)
+					genericCastUnchecked (
+						EnumConsoleHelperFactory.class))
 
 				.scope (
 					"singleton")
@@ -1651,7 +1689,8 @@ class ComponentManagerBuilder {
 					EnumConsoleHelper.class)
 
 				.factoryClass (
-					EnumConsoleHelperFactory.class)
+					genericCastUnchecked (
+						EnumConsoleHelperFactory.class))
 
 				.scope (
 					"singleton")
@@ -1714,17 +1753,22 @@ class ComponentManagerBuilder {
 
 		) {
 
-			for (
-				Map.Entry <String,Object> entry
-					: singletonComponents.entrySet ()
-			) {
+			singletonComponents.forEach (
+				(componentName, componentClassAndValue) -> {
+
+				Class <?> interfaceClass =
+					componentClassAndValue.getLeft ();
+
+				Object component =
+					componentClassAndValue.getRight ();
 
 				componentRegistry.registerUnmanagedSingleton (
 					taskLogger,
-					entry.getKey (),
-					entry.getValue ());
+					componentName,
+					interfaceClass,
+					component);
 
-			}
+			});
 
 		}
 
@@ -1733,11 +1777,22 @@ class ComponentManagerBuilder {
 	void createComponentRegistry (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		componentRegistry =
-			new ComponentRegistryImplementation ()
+		try (
 
-			.outputPath (
-				outputPath);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createComponentRegistry");
+
+		) {
+
+			componentRegistry =
+				componentRegistryImplementationProvider.get ()
+
+				.outputPath (
+					outputPath);
+
+		}
 
 	}
 

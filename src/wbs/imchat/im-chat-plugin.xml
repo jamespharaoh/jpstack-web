@@ -4,7 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="paypal"/>
-		<plugin-dependency name="scaffold"/>
+		<plugin-dependency name="platform-scaffold"/>
 		<plugin-dependency name="sms-apps-common"/>
 	</plugin-dependencies>
 

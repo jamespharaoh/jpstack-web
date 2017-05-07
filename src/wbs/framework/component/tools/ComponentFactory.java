@@ -3,9 +3,9 @@ package wbs.framework.component.tools;
 import wbs.framework.logging.TaskLogger;
 
 public
-interface ComponentFactory {
+interface ComponentFactory <ComponentType> {
 
-	Object makeComponent (
-			TaskLogger taskLogger);
+	ComponentType makeComponent (
+			TaskLogger parentTaskLogger);
 
 }

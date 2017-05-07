@@ -33,6 +33,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -41,7 +42,6 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -75,11 +75,6 @@ public
 class ChatDateDaemon
 	extends AbstractDaemonService {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ChatDateDaemon.class);
-
 	// singleton dependencies
 
 	@SingletonDependency
@@ -108,6 +103,9 @@ class ChatDateDaemon
 
 	@SingletonDependency
 	LocatorLogic locatorLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -233,9 +231,9 @@ class ChatDateDaemon
 		) {
 
 			return iterableMapToList (
-				ChatRec::getId,
 				chatHelper.findNotDeleted (
-					transaction));
+					transaction),
+				ChatRec::getId);
 
 		}
 

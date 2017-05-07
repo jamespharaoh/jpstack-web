@@ -217,8 +217,8 @@ class ChatRebillSendAction
 
 			List <Long> billChatUserIds =
 				iterableMapToList (
-					ChatUserRec::getId,
-					billChatUsers);
+					billChatUsers,
+					ChatUserRec::getId);
 
 			List <Pair <Long, String>> nonBillChatUsers =
 				allChatUsers.stream ()

@@ -174,6 +174,7 @@ class ChatRebillSendPart
 					nonBillSearchResultsTemp,
 					list ->
 						iterableMapToList (
+							list,
 							chatUserWithReason ->
 								new ChatRebillNonBillResult ()
 									.chatUser (
@@ -183,8 +184,7 @@ class ChatRebillSendPart
 											chatUserWithReason.getLeft ()))
 									.reason (
 										(String)
-										chatUserWithReason.getRight ()),
-							list));
+										chatUserWithReason.getRight ())));
 
 		}
 

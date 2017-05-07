@@ -59,7 +59,7 @@ class NestedTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull String dynamicContext) {
+			@NonNull CharSequence dynamicContext) {
 
 		return new NestedTransaction (
 			ownedTransaction (),

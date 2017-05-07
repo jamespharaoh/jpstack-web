@@ -1,0 +1,14 @@
+<plugin
+	name="framework-hibernate"
+	package="wbs.framework.hibernate">
+
+	<layer name="hibernate">
+		<component class="HibernateComponents"/>
+		<component class="HibernateDatabase"/>
+		<component class="HibernateInterceptor"/>
+		<component class="HibernateObjectDatabaseHelper"/>
+		<component class="HibernateSessionFactoryBuilder"/>
+		<component class="HibernateTransaction"/>
+	</layer>
+
+</plugin>

@@ -113,7 +113,7 @@ class BorrowedTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull String dynamicContext) {
+			@NonNull CharSequence dynamicContext) {
 
 		throw todo ();
 

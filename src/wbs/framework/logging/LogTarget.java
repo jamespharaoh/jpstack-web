@@ -11,6 +11,6 @@ interface LogTarget {
 			CharSequence message,
 			Optional <Throwable> exception);
 
-	boolean debugEnabled ();
+	Boolean debugEnabled ();
 
 }

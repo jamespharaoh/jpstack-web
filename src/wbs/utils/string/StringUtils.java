@@ -1,11 +1,14 @@
 package wbs.utils.string;
 
 import static wbs.utils.collection.IterableUtils.iterableMap;
-import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.EnumUtils.enumNameHyphensLazy;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.nullIf;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.integerToDecimalStringLazy;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -1595,11 +1598,37 @@ class StringUtils {
 	}
 
 	public static
-	String keyEqualsString (
-			@NonNull String key,
-			@NonNull String value) {
+	CharSequence keyEqualsClassSimple (
+			@NonNull CharSequence key,
+			@NonNull Class <?> value) {
 
-		return stringFormat (
+		return stringFormatLazy (
+			"%s = %s",
+			key,
+			classNameSimple (
+				value));
+
+	}
+
+	public static
+	CharSequence keyEqualsClassFull (
+			@NonNull CharSequence key,
+			@NonNull Class <?> value) {
+
+		return stringFormatLazy (
+			"%s = %s",
+			key,
+			classNameFull (
+				value));
+
+	}
+
+	public static
+	CharSequence keyEqualsString (
+			@NonNull CharSequence key,
+			@NonNull CharSequence value) {
+
+		return stringFormatLazy (
 			"%s = \"%s\"",
 			key,
 			value);
@@ -1607,11 +1636,11 @@ class StringUtils {
 	}
 
 	public static
-	String keyEqualsDecimalInteger (
-			@NonNull String key,
+	CharSequence keyEqualsDecimalInteger (
+			@NonNull CharSequence key,
 			@NonNull Long value) {
 
-		return stringFormat (
+		return stringFormatLazy (
 			"%s = %s",
 			key,
 			integerToDecimalString (
@@ -1620,37 +1649,37 @@ class StringUtils {
 	}
 
 	public static
-	String keyEqualsDecimalInteger (
-			@NonNull String key,
+	CharSequence keyEqualsDecimalInteger (
+			@NonNull CharSequence key,
 			@NonNull Integer value) {
 
-		return stringFormat (
+		return stringFormatLazy (
 			"%s = %s",
 			key,
-			integerToDecimalString (
+			integerToDecimalStringLazy (
 				value));
 
 	}
 
 	public static
-	String keyEqualsEnum (
-			@NonNull String key,
+	CharSequence keyEqualsEnum (
+			@NonNull CharSequence key,
 			@NonNull Enum <?> value) {
 
-		return stringFormat (
+		return stringFormatLazy (
 			"%s = %s",
 			key,
-			enumNameHyphens (
+			enumNameHyphensLazy (
 				value));
 
 	}
 
 	public static
-	String keyEqualsYesNo (
-			@NonNull String key,
+	CharSequence keyEqualsYesNo (
+			@NonNull CharSequence key,
 			@NonNull Boolean value) {
 
-		return stringFormat (
+		return stringFormatLazy (
 			"%s = %s",
 			key,
 			booleanToYesNo (

@@ -1,54 +1,60 @@
 package wbs.web.servlet;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.servlet.ComponentFilterChain;
+import wbs.framework.servlet.FilterComponent;
 
 import wbs.web.context.RequestContextImplementation;
 
 @SingletonComponent ("responseFilter")
 public
 class ResponseFilter
-	implements Filter {
+	implements FilterComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
 	void doFilter (
-			ServletRequest request,
-			ServletResponse response,
-			FilterChain chain)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ServletRequest request,
+			@NonNull ServletResponse response,
+			@NonNull ComponentFilterChain chain) {
 
-		RequestContextImplementation.servletResponseThreadLocal.set (
-			(HttpServletResponse)
-			response);
+		try (
 
-		chain.doFilter (
-			request,
-			response);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doFilter");
 
-	}
+		) {
 
-	@Override
-	public
-	void destroy () {
-	}
+			RequestContextImplementation.servletResponseThreadLocal.set (
+				(HttpServletResponse)
+				response);
 
-	@Override
-	public
-	void init (
-			FilterConfig filterConfig)
-		throws ServletException {
+			chain.doFilter (
+				taskLogger,
+				request,
+				response);
+
+		}
 
 	}
 

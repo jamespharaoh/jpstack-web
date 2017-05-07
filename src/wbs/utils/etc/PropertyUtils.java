@@ -221,14 +221,16 @@ class PropertyUtils {
 
 		try {
 
-			Class<?> objectClass =
+			Class <?> objectClass =
 				object.getClass ();
 
 			Method[] methods =
 				objectClass.getMethods ();
 
-			for (Method method
-					: methods) {
+			for (
+				Method method
+					: methods
+			) {
 
 				if (method.getParameterTypes ().length != 1)
 					continue;

@@ -1,5 +1,5 @@
 <plugin
-	name="chat-info"
+	name="chat-user-info"
 	package="wbs.apn.chat.user.info">
 
 	<models>

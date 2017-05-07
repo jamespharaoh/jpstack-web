@@ -61,6 +61,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
@@ -70,7 +72,6 @@ import wbs.framework.data.annotations.DataContent;
 import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -84,15 +85,16 @@ import wbs.utils.io.RuntimeIoException;
  * TODO separate registry which builds worker
  * TODO read annotations first for efficiency
  */
+@PrototypeComponent ("dataFromXmlImplementation")
 @Accessors (fluent = true)
 public
 class DataFromXmlImplementation
 	implements DataFromXml {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			DataFromXmlImplementation.class);
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 

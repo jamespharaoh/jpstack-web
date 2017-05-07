@@ -1,5 +1,5 @@
 <plugin
-	name="category"
+	name="chat-category"
 	package="wbs.apn.chat.category">
 
 	<models>

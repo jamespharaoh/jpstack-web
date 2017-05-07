@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -383,6 +384,62 @@ class MapUtils {
 		map.put (
 			key,
 			value);
+
+	}
+
+	// transform
+
+	public static <InKey, InValue, OutKey, OutValue>
+	Map <OutKey, OutValue> mapTransformToMap (
+			@NonNull Map <InKey, InValue> inMap,
+			@NonNull BiFunction <InKey, InValue, OutKey> keyFunction,
+			@NonNull BiFunction <InKey, InValue, OutValue> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> outMapBuilder =
+			ImmutableMap.builder ();
+
+		for (
+			Map.Entry <InKey, InValue> inEntry
+				: inMap.entrySet ()
+		) {
+
+			outMapBuilder.put (
+				keyFunction.apply (
+					inEntry.getKey (),
+					inEntry.getValue ()),
+				valueFunction.apply (
+					inEntry.getKey (),
+					inEntry.getValue ()));
+
+		}
+
+		return outMapBuilder.build ();
+
+	}
+
+	public static <InItem, OutKey, OutValue>
+	Map <OutKey, OutValue> iterableTransformToMap (
+			@NonNull Iterable <InItem> inIterable,
+			@NonNull Function <InItem, OutKey> keyFunction,
+			@NonNull Function <InItem, OutValue> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> outMapBuilder =
+			ImmutableMap.builder ();
+
+		for (
+			InItem inItem
+				: inIterable
+		) {
+
+			outMapBuilder.put (
+				keyFunction.apply (
+					inItem),
+				valueFunction.apply (
+					inItem));
+
+		}
+
+		return outMapBuilder.build ();
 
 	}
 

@@ -41,6 +41,17 @@ interface TaskLoggerMethods {
 	}
 
 	default
+	LoggedErrorsException errorFormatThrow (
+			@NonNull CharSequence ... arguments) {
+
+		taskLoggerImplementation ().errorFormat (
+			arguments);
+
+		throw taskLoggerImplementation ().makeException ();
+
+	}
+
+	default
 	void errorFormatException (
 			@NonNull Throwable exception,
 			@NonNull CharSequence ... arguments) {
@@ -48,6 +59,19 @@ interface TaskLoggerMethods {
 		taskLoggerImplementation ().errorFormatException (
 			exception,
 			arguments);
+
+	}
+
+	default
+	LoggedErrorsException errorFormatExceptionThrow (
+			@NonNull Throwable exception,
+			@NonNull CharSequence ... arguments) {
+
+		taskLoggerImplementation ().errorFormatException (
+			exception,
+			arguments);
+
+		throw taskLoggerImplementation ().makeException ();
 
 	}
 

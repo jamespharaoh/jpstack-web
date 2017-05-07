@@ -38,7 +38,7 @@ class ComponentDefinition {
 
 	@DataAttribute
 	@Getter @Setter
-	Class <? extends ComponentFactory> factoryClass;
+	Class <? extends ComponentFactory <?>> factoryClass;
 
 	@DataAttribute
 	@Getter @Setter
@@ -47,6 +47,10 @@ class ComponentDefinition {
 	@DataAttribute
 	@Getter @Setter
 	Boolean owned = true;
+
+	@DataAttribute
+	@Getter @Setter
+	Boolean fromAnnotatedClass = false;
 
 	@DataChildren
 	@Getter @Setter

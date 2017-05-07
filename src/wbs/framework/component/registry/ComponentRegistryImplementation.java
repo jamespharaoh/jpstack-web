@@ -3,7 +3,9 @@ package wbs.framework.component.registry;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.IterableUtils.iterableCount;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
@@ -19,6 +21,7 @@ import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.classNotInSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -41,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -64,6 +68,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleTeardown;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.UninitializedDependency;
@@ -83,22 +88,33 @@ import wbs.framework.component.xml.ComponentsValuePropertySpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LogContextComponentFactory;
 import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+@PrototypeComponent ("componentRegistry")
 @Accessors (fluent = true)
 public
 class ComponentRegistryImplementation
-	implements ComponentRegistry {
+	implements
+		ComponentRegistry,
+		ComponentRegistryBuilder {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ComponentRegistryImplementation.class);
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	LoggingLogic loggingLogic;
+
+	// prototype depdendencies
+
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// properties
 
@@ -106,6 +122,8 @@ class ComponentRegistryImplementation
 	String outputPath;
 
 	// state
+
+	DataFromXml dataFromXml;
 
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
@@ -138,6 +156,9 @@ class ComponentRegistryImplementation
 		new HashMap<> ();
 
 	Map <Annotation, List <ComponentDefinition>> prototypesByQualifier =
+		new HashMap<> ();
+
+	Map <Class <?>, ComponentDefinition> annotatedByClass =
 		new HashMap<> ();
 
 	List <String> requestComponentNames =
@@ -192,7 +213,7 @@ class ComponentRegistryImplementation
 
 	@Override
 	public
-	Map <String, ComponentDefinition> singletonsByClass (
+	Map <String, ComponentDefinition> singletonsForClass (
 			@NonNull Class <?> targetClass) {
 
 		return singletonsByClass.get (
@@ -202,7 +223,7 @@ class ComponentRegistryImplementation
 
 	@Override
 	public
-	Map <String, ComponentDefinition> prototypesByClass (
+	Map <String, ComponentDefinition> prototypesForClass (
 			@NonNull Class <?> targetClass) {
 
 		return prototypesByClass.get (
@@ -249,6 +270,59 @@ class ComponentRegistryImplementation
 
 	}
 
+	@Override
+	public
+	String nameForAnnotatedClass (
+			@NonNull Class <?> componentClass) {
+
+		ComponentDefinition componentDefinition =
+			mapItemForKeyOrThrow (
+				annotatedByClass,
+				componentClass,
+				() -> new NoSuchElementException (
+					stringFormat (
+						"Annotated class not registered: %s",
+						fullClassName (
+							componentClass))));
+
+		return componentDefinition.name ();
+
+	}
+
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
+		) {
+
+			dataFromXml =
+				dataFromXmlBuilderProvider.get ()
+
+			.registerBuilderClasses (
+				ComponentsSpec.class,
+				ComponentsComponentSpec.class,
+				ComponentsValuePropertySpec.class,
+				ComponentsReferencePropertySpec.class,
+				ComponentsPropertiesPropertySpec.class,
+				ComponentPropertyValueSpec.class)
+
+			.build ();
+
+
+		}
+
+	}
+
 	// public implementation
 
 	@Override
@@ -267,7 +341,8 @@ class ComponentRegistryImplementation
 
 			@SuppressWarnings ("resource")
 			ComponentManagerImplementation componentManager =
-				new ComponentManagerImplementation ()
+				new ComponentManagerImplementation (
+					loggingLogic)
 
 				.registry (
 					this)
@@ -279,6 +354,7 @@ class ComponentRegistryImplementation
 			registerUnmanagedSingleton (
 				taskLogger,
 				"componentManager",
+				ComponentManager.class,
 				componentManager);
 
 			// register scoped singletons
@@ -526,6 +602,16 @@ class ComponentRegistryImplementation
 
 			}
 
+			if (componentDefinition.fromAnnotatedClass ()) {
+
+				annotatedByClass.put (
+					ifNull (
+						componentDefinition.factoryClass (),
+						componentDefinition.componentClass ()),
+					componentDefinition);
+
+			}
+
 			// index by name
 
 			byName.put (
@@ -647,7 +733,8 @@ class ComponentRegistryImplementation
 	ComponentRegistryImplementation registerUnmanagedSingleton (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Object object) {
+			@NonNull Class <?> interfaceClass,
+			@NonNull Object component) {
 
 		try (
 
@@ -668,17 +755,18 @@ class ComponentRegistryImplementation
 					componentName)
 
 				.componentClass (
-					object.getClass ())
+					component.getClass ())
 
 				.scope (
 					"singleton")
 
 				.factoryClass (
-					SingletonComponentFactory.class)
+					genericCastUnchecked (
+						SingletonComponentFactory.class))
 
 				.addValueProperty (
-					"object",
-					object)
+					"component",
+					component)
 
 				.owned (
 					false);
@@ -1105,7 +1193,17 @@ class ComponentRegistryImplementation
 						field.getType (),
 						LogContext.class)
 				) {
-					throw new RuntimeException ();
+
+					throw new RuntimeException (
+						stringFormat (
+							"Don't know how to handle class singleton ",
+							"dependency %s.%s ",
+							componentDefinition.name (),
+							field.getName (),
+							"of type %s",
+							classNameFull (
+								field.getType ())));
+
 				}
 
 				String scopedComponentName =
@@ -1124,8 +1222,7 @@ class ComponentRegistryImplementation
 					continue;
 				}
 
-				registerDefinition (
-					taskLogger,
+				ComponentDefinition scopedComponentDefinition =
 					new ComponentDefinition ()
 
 					.name (
@@ -1144,10 +1241,18 @@ class ComponentRegistryImplementation
 						true)
 
 					.addValueProperty (
+						"loggingLogic",
+						loggingLogic)
+
+					.addValueProperty (
 						"componentClass",
 						field.getDeclaringClass ())
 
-				);
+				;
+
+				registerDefinition (
+					taskLogger,
+					scopedComponentDefinition);
 
 			}
 
@@ -1987,21 +2092,5 @@ class ComponentRegistryImplementation
 		}
 
 	}
-
-	// data
-
-	private static final
-	DataFromXml dataFromXml =
-		new DataFromXmlBuilder ()
-
-		.registerBuilderClasses (
-			ComponentsSpec.class,
-			ComponentsComponentSpec.class,
-			ComponentsValuePropertySpec.class,
-			ComponentsReferencePropertySpec.class,
-			ComponentsPropertiesPropertySpec.class,
-			ComponentPropertyValueSpec.class)
-
-		.build ();
 
 }

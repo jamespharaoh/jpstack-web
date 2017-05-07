@@ -12,52 +12,60 @@
 		<!-- framework -->
 
 		<plugin
-			name="builder"
+			name="framework-builder"
 			package="wbs.framework.builder"/>
 
 		<plugin
-			name="codegen"
+			name="framework-codegen"
 			package="wbs.framework.codegen"/>
 
 		<plugin
-			name="database"
+			name="framework-component"
+			package="wbs.framework.component"/>
+
+		<plugin
+			name="framework-data"
+			package="wbs.framework.data"/>
+
+		<plugin
+			name="framework-database"
 			package="wbs.framework.database"/>
 
 		<plugin
-			name="entity"
+			name="framework-entity"
 			package="wbs.framework.entity"/>
-
-		<plugin
-			name="fixtures"
-			package="wbs.framework.fixtures"/>
 
 		<plugin
 			name="framework-exception"
 			package="wbs.framework.exception"/>
 
 		<plugin
+			name="framework-fixtures"
+			package="wbs.framework.fixtures"/>
+
+		<plugin
 			name="framework-process-api"
 			package="wbs.framework.processapi"/>
 
 		<plugin
-			name="hibernate"
+			name="framework-servlet"
+			package="wbs.framework.servlet"/>
+
+		<plugin
+			name="framework-hibernate"
 			package="wbs.framework.hibernate"/>
 
 		<plugin
-			name="object"
+			name="framework-object"
 			package="wbs.framework.object"/>
 
 		<plugin
-			name="schema"
+			name="framework-schema"
 			package="wbs.framework.schema"/>
 
 		<plugin
-			name="sql"
+			name="framework-sql"
 			package="wbs.framework.sql"/>
-
-		<plugin
-			name="component-config"
-			package="wbs.framework.component.config"/>
 
 		<!-- api -->
 
@@ -178,10 +186,6 @@
 			package="wbs.platform.deployment"/>
 
 		<plugin
-			name="event"
-			package="wbs.platform.event"/>
-
-		<plugin
 			name="exception"
 			package="wbs.platform.exception"/>
 
@@ -255,43 +259,51 @@
 			package="wbs.platform.common"/>
 
 		<plugin
-			name="postgresql"
+			name="platform-event"
+			package="wbs.platform.event"/>
+
+		<plugin
+			name="platform-logging"
+			package="wbs.platform.logging"/>
+
+		<plugin
+			name="platform-postgresql"
 			package="wbs.platform.postgresql"/>
 
 		<plugin
-			name="priv"
+			name="platform-priv"
 			package="wbs.platform.priv"/>
 
 		<plugin
-			name="queue"
+			name="platform-queue"
 			package="wbs.platform.queue"/>
 
 		<plugin
-			name="rpc"
+			name="platform-rpc"
 			package="wbs.platform.rpc"/>
 
 		<plugin
-			name="scaffold"
+			name="platform-scaffold"
 			package="wbs.platform.scaffold"/>
 
 		<plugin
-			name="service"
+			name="platform-service"
 			package="wbs.platform.service"/>
 
 		<plugin
-			name="status"
+			name="platform-status"
 			package="wbs.platform.status"/>
 
 		<plugin
-			name="text"
+			name="platform-text"
 			package="wbs.platform.text"/>
 
 		<plugin
-			name="update-log"
+			name="platform-update-log"
 			package="wbs.platform.updatelog"/>
 
 		<plugin
-			name="user"
+			name="platform-user"
 			package="wbs.platform.user"/>
 
 		<!-- sms -->
@@ -361,7 +373,7 @@
 			package="wbs.sms.message.batch"/>
 
 		<plugin
-			name="message-core"
+			name="sms-message-core"
 			package="wbs.sms.message.core"/>
 
 		<plugin

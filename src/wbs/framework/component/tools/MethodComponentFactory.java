@@ -4,6 +4,7 @@ import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.ReflectionUtils.methodGetByNameRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.lang.reflect.Method;
 
@@ -16,8 +17,10 @@ import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
-class MethodComponentFactory
-	implements ComponentFactory {
+class MethodComponentFactory <ComponentType>
+	implements ComponentFactory <ComponentType> {
+
+	// properties
 
 	@Getter @Setter
 	Object factoryComponent;
@@ -28,9 +31,11 @@ class MethodComponentFactory
 	@Getter @Setter
 	Boolean initialized;
 
+	// implementation
+
 	@Override
 	public
-	Object makeComponent (
+	ComponentType makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		Method method =
@@ -43,19 +48,21 @@ class MethodComponentFactory
 				method.getParameterCount ())
 		) {
 
-			return methodInvoke (
-				method,
-				factoryComponent);
+			return genericCastUnchecked (
+				methodInvoke (
+					method,
+					factoryComponent));
 
 		} else if (
 			equalToOne (
 				method.getParameterCount ())
 		) {
 
-			return methodInvoke (
-				method,
-				factoryComponent,
-				parentTaskLogger);
+			return genericCastUnchecked (
+				methodInvoke (
+					method,
+					factoryComponent,
+					parentTaskLogger));
 
 		} else {
 

@@ -1,5 +1,6 @@
 package wbs.utils.ant;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,30 +13,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 import lombok.Data;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.component.manager.BootstrapComponentManager;
+import wbs.framework.logging.Log4jLogTargetFactory;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggingLogic;
+import wbs.framework.logging.LoggingLogicImplementation;
 import wbs.framework.logging.OwnedTaskLogger;
 
 public
 class DatabaseInitTask
 	extends Task {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			DatabaseInitTask.class);
+	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
-	List<ScriptElement> scriptElements =
-		new ArrayList<ScriptElement> ();
+	// state
+
+	List <ScriptElement> scriptElements =
+		new ArrayList<> ();
+
+	// implementation
 
 	public
 	void addScript (
@@ -50,30 +62,32 @@ class DatabaseInitTask
 	public
 	void init () {
 
+		LoggingLogic loggingLogic =
+			new LoggingLogicImplementation (
+				false,
+				ImmutableList.of (
+					new Log4jLogTargetFactory ()));
+
 		try (
 
+			BootstrapComponentManager bootstrapComponentManager =
+				new BootstrapComponentManager (
+					loggingLogic);
+
 			OwnedTaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"init");
+				bootstrapComponentManager.bootstrapTaskLogger (
+					this);
 
 		) {
 
-			String configFilename =
-				System.getenv (
-					"WBS_CONFIG_XML");
+			bootstrapComponentManager.registerStandardClasses (
+				taskLogger);
 
-			if (configFilename == null) {
+			bootstrapComponentManager.bootstrapComponent (
+				taskLogger,
+				this);
 
-				throw new RuntimeException (
-					stringFormat (
-						"Please set WBS_CONFIG_XML"));
-
-			}
-
-			wbsConfig =
-				WbsConfig.readFilename (
-					taskLogger,
-					configFilename);
+			doNothing ();
 
 		}
 
@@ -151,8 +165,8 @@ class DatabaseInitTask
 	void initDatabase ()
 		throws InterruptedException {
 
-		List<String> parts =
-			new ArrayList<String> ();
+		List <String> parts =
+			new ArrayList<> ();
 
 		for (
 			ScriptElement scriptElement
@@ -245,10 +259,12 @@ class DatabaseInitTask
 			try {
 
 				InputStreamReader inputStreamReader =
-					new InputStreamReader (inputStream);
+					new InputStreamReader (
+						inputStream);
 
 				BufferedReader bufferedReader =
-					new BufferedReader (inputStreamReader);
+					new BufferedReader (
+						inputStreamReader);
 
 				String line =
 					null;

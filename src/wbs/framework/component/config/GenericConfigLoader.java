@@ -1,9 +1,12 @@
 package wbs.framework.component.config;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -15,10 +18,15 @@ import wbs.framework.logging.TaskLogger;
 public
 class GenericConfigLoader {
 
-	// singleotn components
+	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	// prototype depdendencies
+
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// state
 
@@ -41,7 +49,7 @@ class GenericConfigLoader {
 		) {
 
 			dataFromXml =
-				new DataFromXmlBuilder ()
+				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
 					GenericConfigSpec.class,

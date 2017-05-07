@@ -5,7 +5,7 @@
 	<plugin-dependencies>
 		<plugin-dependency name="integrations-common"/>
 		<plugin-dependency name="network"/>
-		<plugin-dependency name="scaffold"/>
+		<plugin-dependency name="platform-scaffold"/>
 	</plugin-dependencies>
 
 	<models>

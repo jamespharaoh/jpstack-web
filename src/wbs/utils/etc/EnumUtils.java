@@ -5,6 +5,8 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 
 import lombok.NonNull;
 
+import wbs.utils.string.LazyString;
+
 public
 class EnumUtils {
 
@@ -731,6 +733,16 @@ class EnumUtils {
 
 		return camelToHyphen (
 			enumValue.name ());
+
+	}
+
+	public static
+	CharSequence enumNameHyphensLazy (
+			@NonNull Enum <?> enumValue) {
+
+		return new LazyString (
+			() -> camelToHyphen (
+				enumValue.name ()));
 
 	}
 

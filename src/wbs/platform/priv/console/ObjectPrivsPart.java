@@ -170,12 +170,6 @@ class ObjectPrivsPart <
 
 				objectPrivDatasBuilder.addAll (
 					iterableMapToList (
-						priv ->
-							preparePrivData (
-								transaction,
-								currentObjectType,
-								currentObject,
-								priv),
 						listSorted (
 							iterableFilter (
 								priv ->
@@ -183,7 +177,13 @@ class ObjectPrivsPart <
 										priv.getCode ()),
 								privHelper.findByParent (
 									transaction,
-									currentObject)))));
+									currentObject))),
+						priv ->
+							preparePrivData (
+								transaction,
+								currentObjectType,
+								currentObject,
+								priv)));
 
 			}
 
@@ -222,12 +222,12 @@ class ObjectPrivsPart <
 
 				.users (
 					iterableMapToList (
-						UserPrivRec::getUser,
 						iterableFilter (
 							UserPrivRec::getCan,
 							userPrivHelper.find (
 								transaction,
-								priv))))
+								priv)),
+						UserPrivRec::getUser))
 
 				.groups (
 					listSorted (

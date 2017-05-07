@@ -1,6 +1,6 @@
 package wbs.framework.database;
 
-import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.stringFormatLazyArray;
 
 import lombok.NonNull;
 
@@ -88,16 +88,16 @@ interface TransactionMethods {
 
 	NestedTransaction nestTransaction (
 			LogContext logContext,
-			String dynamicContext);
+			CharSequence dynamicContext);
 
 	default
 	NestedTransaction nestTransactionFormat (
 			@NonNull LogContext logContext,
-			@NonNull String ... dynamicContextArguments) {
+			@NonNull CharSequence ... dynamicContextArguments) {
 
 		return nestTransaction (
 			logContext,
-			stringFormatArray (
+			stringFormatLazyArray (
 				dynamicContextArguments));
 
 	}

@@ -98,10 +98,10 @@ class ImChatConversationEmailDaemon
 		) {
 
 			return iterableMapToList (
-				ImChatConversationRec::getId,
 				imChatConversationHelper.findPendingEmailLimit (
 					transaction,
-					1000l));
+					1000l),
+				ImChatConversationRec::getId);
 
 		}
 

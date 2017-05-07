@@ -119,10 +119,10 @@ class ChatUserQuietDaemon
 		) {
 
 			return iterableMapToList (
-				ChatUserRec::getId,
 				chatUserHelper.findWantingQuietOutbound (
 					transaction,
-					transaction.now ()));
+					transaction.now ()),
+				ChatUserRec::getId);
 
 		}
 

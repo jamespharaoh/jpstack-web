@@ -17,26 +17,33 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.data.tools.DataFromXmlImplementation.DataClassInfo;
-import wbs.framework.logging.TaskLogger;
 
+@PrototypeComponent ("dataFromXmlBuilder")
 @Accessors (fluent = true)
 public
 class DataFromXmlBuilder {
 
-	@Setter
-	TaskLogger taskLogger;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <DataFromXmlImplementation> dataFromXmlImplementationProvider;
+
+	// state
 
 	Map <String, List <DataClassInfo>> dataClassesMap =
 		new HashMap<> ();
 
 	Map <String, Map <String, ?>> namedObjectCollections =
 		new HashMap<> ();
+
+	// implementation
 
 	public
 	DataFromXmlBuilder addNamedObjectCollection (
@@ -120,6 +127,20 @@ class DataFromXmlBuilder {
 		registerBuilder (
 			builderClass,
 			builderProvider);
+
+		return this;
+
+	}
+
+	public <Type>
+	DataFromXmlBuilder registerBuilders (
+			@NonNull Map <Class <?>, Provider <Type>> builders) {
+
+		builders.entrySet ().forEach (
+			builder ->
+				registerBuilder (
+					builder.getKey (),
+					builder.getValue ()));
 
 		return this;
 
@@ -226,7 +247,7 @@ class DataFromXmlBuilder {
 	public
 	DataFromXml build () {
 
-		return new DataFromXmlImplementation ()
+		return dataFromXmlImplementationProvider.get ()
 
 			.dataClassesMap (
 				ImmutableMap.copyOf (

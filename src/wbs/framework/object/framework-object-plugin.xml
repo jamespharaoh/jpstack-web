@@ -1,0 +1,17 @@
+<plugin
+	name="framework-object"
+	package="wbs.framework.object">
+
+	<layer name="object">
+		<component class="ObjectHelperChildrenImplementation"/>
+		<component class="ObjectHelperCodeImplementation"/>
+		<component class="ObjectHelperFindImplementation"/>
+		<component class="ObjectHelperIdImplementation"/>
+		<component class="ObjectHelperIndexImplementation"/>
+		<component class="ObjectHelperModelImplementation"/>
+		<component class="ObjectHelperPropertyImplementation"/>
+		<component class="ObjectHelperUpdateImplementation"/>
+		<component class="ObjectManagerImplementation"/>
+	</layer>
+
+</plugin>

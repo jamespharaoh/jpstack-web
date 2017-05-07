@@ -131,14 +131,14 @@ class ChatMonitorSwapDaemon
 		) {
 
 			return iterableMapToList (
-				ChatRec::getId,
 				iterableFilter (
 					chat ->
 						chatNeedsMonitorSwap (
 							transaction,
 							chat),
 					chatHelper.findNotDeleted (
-						transaction)));
+						transaction)),
+				ChatRec::getId);
 
 		}
 

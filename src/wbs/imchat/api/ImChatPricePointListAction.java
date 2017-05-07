@@ -114,11 +114,11 @@ class ImChatPricePointListAction
 
 			List <ImChatPricePointData> pricePointDatas =
 				iterableMapToList (
+					pricePoints,
 					pricePoint ->
 						imChatApiLogic.pricePointData (
 							transaction,
-							pricePoint),
-					pricePoints);
+							pricePoint));
 
 			return jsonResponderProvider.get ()
 

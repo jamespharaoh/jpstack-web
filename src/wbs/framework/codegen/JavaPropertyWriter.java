@@ -333,7 +333,7 @@ class JavaPropertyWriter
 		formatWriter.writeLineFormat (
 			"}");
 
-		formatWriter.writeLineFormat ();
+		formatWriter.writeNewline ();
 
 		// write setter
 

@@ -9,18 +9,22 @@ import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
-class SingletonComponentFactory
-	implements ComponentFactory {
+class SingletonComponentFactory <ComponentType>
+	implements ComponentFactory <ComponentType> {
+
+	// properties
 
 	@Getter @Setter
-	Object object;
+	ComponentType component;
+
+	// public implementation
 
 	@Override
 	public
-	Object makeComponent (
+	ComponentType makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return object;
+		return component;
 
 	}
 

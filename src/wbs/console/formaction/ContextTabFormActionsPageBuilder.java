@@ -172,11 +172,11 @@ class ContextTabFormActionsPageBuilder
 
 			formActions =
 				iterableMapToList (
+					spec.actions (),
 					actionSpec ->
 						initFormAction (
 							parentTaskLogger,
-							actionSpec),
-					spec.actions ());
+							actionSpec));
 
 		}
 

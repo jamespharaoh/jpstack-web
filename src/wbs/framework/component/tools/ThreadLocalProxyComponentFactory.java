@@ -1,5 +1,6 @@
 package wbs.framework.component.tools;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,36 +13,64 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+@PrototypeComponent ("threadLoaclProxyComponentFactory")
 @Accessors (fluent = true)
 public
-class ThreadLocalProxyComponentFactory
+class ThreadLocalProxyComponentFactory <ComponentType>
 	implements
-		ComponentFactory,
+		ComponentFactory <ComponentType>,
 		InvocationHandler {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	@Getter @Setter
 	String componentName;
 
 	@Getter @Setter
-	Class <?> componentClass;
+	Class <ComponentType> componentClass;
+
+	// state
 
 	ThreadLocal <Object> targets =
 		new ThreadLocal<> ();
 
+	// public implementation
+
 	@Override
 	public
-	Object makeComponent (
+	ComponentType makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return Proxy.newProxyInstance (
-			componentClass.getClassLoader (),
-			new Class <?> [] {
-				componentClass,
-				Control.class,
-			},
-			this);
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeComponent");
+
+		) {
+
+			return genericCastUnchecked (
+				Proxy.newProxyInstance (
+					componentClass.getClassLoader (),
+					new Class <?> [] {
+						componentClass,
+						Control.class,
+					},
+					this));
+
+		}
 
 	}
 

@@ -2,13 +2,14 @@ package wbs.framework.component.manager;
 
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
+import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
-import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -16,6 +17,7 @@ import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notEqualToOne;
@@ -25,14 +27,20 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseOptional;
+import static wbs.utils.etc.PropertyUtils.propertySetSimple;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.keyEqualsClassSimple;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -44,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -72,6 +79,7 @@ import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
 import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.manager.ComponentMetaData.ComponentState;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistry;
 import wbs.framework.component.registry.InjectedProperty;
@@ -80,9 +88,9 @@ import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.NoSuchComponentException;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
@@ -93,11 +101,6 @@ public
 class ComponentManagerImplementation
 	implements ComponentManager {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ComponentManagerImplementation.class);
-
 	// properties
 
 	@Getter @Setter
@@ -105,13 +108,17 @@ class ComponentManagerImplementation
 
 	// state
 
+	LoggingLogic loggingLogic;
+
+	LogContext logContext;
+
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
 
 	State state =
 		State.creation;
 
-	Map <String, Object> singletonComponents =
+	Map <String, ComponentData> singletonComponents =
 		new HashMap<> ();
 
 	Set <String> singletonComponentsInCreation =
@@ -120,7 +127,7 @@ class ComponentManagerImplementation
 	Set <String> singletonComponentsFailed =
 		new HashSet<> ();
 
-	Map <Object, ComponentMetaDataImplementation> componentMetaDatas =
+	Map <Object, ComponentData> componentDatas =
 		new MapMaker ()
 			.weakKeys ()
 			.makeMap ();
@@ -128,7 +135,23 @@ class ComponentManagerImplementation
 	Map <String, List <Injection>> pendingInjectionsByDependencyName =
 		new HashMap<> ();
 
-	// public implementation
+	// constructors
+
+	public
+	ComponentManagerImplementation (
+			@NonNull LoggingLogic loggingLogic) {
+
+		this.loggingLogic =
+			loggingLogic;
+
+		logContext =
+			loggingLogic.findOrCreateLogContext (
+				classNameFull (
+					getClass ()));
+
+	}
+
+	// component manager implementation
 
 	@Override
 	public
@@ -281,6 +304,67 @@ class ComponentManagerImplementation
 
 	@Override
 	public <ComponentType>
+	Optional <Provider <ComponentType>> getComponentProvider (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponentProviderRequired");
+
+		try (
+
+			HeldLock heldlock =
+				lock.read ();
+
+		) {
+
+			Optional <ComponentDefinition> componentDefinitionOptional =
+				registry.byName (
+					componentName);
+
+			if (
+				optionalIsNotPresent (
+					componentDefinitionOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ComponentDefinition componentDefinition =
+				optionalGetRequired (
+					componentDefinitionOptional);
+
+			if (
+				isNotSubclassOf (
+					componentClass,
+					componentDefinition.componentClass ())
+			) {
+
+				throw new NoSuchComponentException (
+					stringFormat (
+						"Component definition with name %s ",
+						componentName,
+						"is of type %s ",
+						componentDefinition.componentClass ().getName (),
+						"instead of %s",
+						componentClass.getName ()));
+
+			}
+
+			return optionalOf (
+				genericCastUnchecked (
+					getComponentProvider (
+						taskLogger,
+						componentDefinition)));
+
+		}
+
+	}
+
+	@Override
+	public <ComponentType>
 	Provider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
@@ -344,42 +428,27 @@ class ComponentManagerImplementation
 
 	}
 
+	@Override
 	public
-	Map <String, Object> getAllSingletonComponents (
+	Map <String, Pair <Class <?>, Object>> allSingletonComponents (
 			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getAllSingletonComponents");
 
 		try (
 
-			HeldLock heldlock =
-				lock.read ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"allSingletonComponents");
 
 		) {
 
-			return registry.all ().stream ()
-
-				.filter (
-					componentDefinition ->
-						stringEqualSafe (
-							componentDefinition.scope (),
-							"singleton"))
-
-				.collect (
-					Collectors.toMap (
-						ComponentDefinition::name,
-						componentDefinition ->
-							getComponent (
-								taskLogger,
-								componentDefinition,
-								true)));
+			throw todo ();
 
 		}
 
 	}
+
+	// private implementation
 
 	private
 	Object getComponent (
@@ -405,7 +474,7 @@ class ComponentManagerImplementation
 					"prototype")
 			) {
 
-				return instantiateComponent (
+				return getPrototypeComponent (
 					taskLogger,
 					componentDefinition,
 					initialize);
@@ -416,16 +485,106 @@ class ComponentManagerImplementation
 					"singleton")
 			) {
 
-				if (! initialize) {
-					throw new IllegalArgumentException ();
-				}
+				return getSingletonComponent (
+					taskLogger,
+					componentDefinition,
+					initialize);
 
-				Object component =
-					singletonComponents.get (
-						componentDefinition.name ());
+			} else {
 
-				if (component != null)
-					return component;
+				throw taskLogger.fatalFormat (
+					"Unrecognised scope %s for component %s",
+					componentDefinition.scope (),
+					componentDefinition.name ());
+
+			}
+
+		}
+
+	}
+
+	private
+	Object getPrototypeComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Boolean initialize) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getPrototypeComponent");
+
+		) {
+
+			ComponentData componentData =
+				instantiateComponent (
+					taskLogger,
+					componentDefinition,
+					initialize);
+
+			Object component =
+				optionalGetRequired (
+					componentData.component ());
+
+			if (
+				optionalIsPresent (
+					componentData.optionalComponent)
+			) {
+
+				componentData.weakComponent =
+					new WeakReference<> (
+						optionalGetRequired (
+							componentData.optionalComponent));
+
+				componentData.optionalComponent =
+					optionalAbsent ();
+
+			}
+
+			return component;
+
+		}
+
+	}
+
+	private
+	Object getSingletonComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Boolean initialize) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getSingletonComponent");
+
+		) {
+
+			if (! initialize) {
+				throw new IllegalArgumentException ();
+			}
+
+			Optional <ComponentData> componentDataOptional =
+				mapItemForKey (
+					singletonComponents,
+					componentDefinition.name ());
+
+			ComponentData componentData;
+
+			if (
+				optionalIsPresent (
+					componentDataOptional)
+			) {
+
+				componentData =
+					optionalGetRequired (
+						componentDataOptional);
+
+			} else {
 
 				if (
 					singletonComponentsInCreation.contains (
@@ -454,9 +613,11 @@ class ComponentManagerImplementation
 				singletonComponentsInCreation.add (
 					componentDefinition.name ());
 
+				componentData = null;
+
 				try {
 
-					component =
+					componentData =
 						instantiateComponent (
 							taskLogger,
 							componentDefinition,
@@ -464,14 +625,21 @@ class ComponentManagerImplementation
 
 					singletonComponents.put (
 						componentDefinition.name (),
-						component);
+						componentData);
 
 				} finally {
 
 					singletonComponentsInCreation.remove (
 						componentDefinition.name ());
 
-					if (component == null) {
+					if (
+						isNull (
+							componentData)
+					) {
+
+						taskLogger.errorFormat (
+							"Failed to instantiate component %s",
+							componentDefinition.name ());
 
 						singletonComponentsFailed.add (
 							componentDefinition.name ());
@@ -480,23 +648,17 @@ class ComponentManagerImplementation
 
 				}
 
-				return component;
-
-			} else {
-
-				throw taskLogger.fatalFormat (
-					"Unrecognised scope %s for component %s",
-					componentDefinition.scope (),
-					componentDefinition.name ());
-
 			}
+
+			return optionalGetRequired (
+				componentData.component ());
 
 		}
 
 	}
 
 	private
-	Object instantiateComponent (
+	ComponentData instantiateComponent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
@@ -542,16 +704,16 @@ class ComponentManagerImplementation
 			// call factory
 
 			Object component;
-			ComponentMetaDataImplementation componentMetaData;
+			ComponentData componentData;
 
 			if (
 				isNotNull (
 					componentDefinition.factoryClass ())
 			) {
 
-				ComponentFactory componentFactory =
-					(ComponentFactory)
-					protoComponent;
+				ComponentFactory <?> componentFactory =
+					genericCastUnchecked (
+						protoComponent);
 
 				component =
 					componentFactory.makeComponent (
@@ -568,8 +730,8 @@ class ComponentManagerImplementation
 
 				}
 
-				componentMetaData =
-					findOrCreateMetaDataForComponent (
+				componentData =
+					findOrCreateDataForComponent (
 						componentDefinition,
 						component);
 
@@ -578,8 +740,8 @@ class ComponentManagerImplementation
 				component =
 					protoComponent;
 
-				componentMetaData =
-					findOrCreateMetaDataForComponent (
+				componentData =
+					findOrCreateDataForComponent (
 						componentDefinition,
 						component);
 
@@ -592,7 +754,7 @@ class ComponentManagerImplementation
 				initialize
 
 				&& enumEqualSafe (
-					componentMetaData.state,
+					componentData.state (),
 					ComponentState.uninitialized)
 
 			) {
@@ -601,7 +763,7 @@ class ComponentManagerImplementation
 					taskLogger,
 					componentDefinition,
 					component,
-					componentMetaData);
+					componentData);
 
 			}
 
@@ -611,7 +773,15 @@ class ComponentManagerImplementation
 				"Component %s instantiated successfully",
 				componentDefinition.name ());
 
-			return component;
+			return componentData;
+
+		} catch (Exception exception) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Error instantiating %s",
+					componentDefinition.name ()),
+				exception);
 
 		}
 
@@ -622,7 +792,7 @@ class ComponentManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
-			@NonNull ComponentMetaDataImplementation componentMetaData) {
+			@NonNull ComponentData componentData) {
 
 		try (
 
@@ -633,20 +803,20 @@ class ComponentManagerImplementation
 
 		) {
 
-			synchronized (componentMetaData) {
+			synchronized (componentData) {
 
 				if (
 					enumNotEqualSafe (
-						componentMetaData.state,
+						componentData.state (),
 						ComponentState.uninitialized)
 				) {
 
 					throw new IllegalStateException (
 						stringFormat (
 							"Tried to initialize component %s ",
-							componentMetaData.definition.name (),
+							componentData.definition.name (),
 							"in %s state",
-							componentMetaData.state.name ()));
+							componentData.state.name ()));
 
 				}
 
@@ -656,20 +826,20 @@ class ComponentManagerImplementation
 						taskLogger,
 						NormalLifecycleSetup.class,
 						"Eager lifecycle setup",
-						component);
+						componentData);
 
-					componentMetaData.state =
+					componentData.state =
 						ComponentState.active;
 
 				} finally {
 
 					if (
 						enumNotEqualSafe (
-							componentMetaData.state,
+							componentData.state,
 							ComponentState.active)
 					) {
 
-						componentMetaData.state =
+						componentData.state =
 							ComponentState.error;
 
 					}
@@ -682,33 +852,105 @@ class ComponentManagerImplementation
 
 	}
 
+	@Override
+	public
+	void bootstrapComponent (
+			@NonNull Object component) {
+
+		bootstrapComponent (
+			component,
+			registry.nameForAnnotatedClass (
+				component.getClass ()));
+
+	}
+
+	@Override
+	public
+	void bootstrapComponent (
+			@NonNull Object component,
+			@NonNull String componentName) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"bootstrapComponent");
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				registry.byNameRequired (
+					componentName);
+
+			if (
+				isNotInstanceOf (
+					componentDefinition.componentClass (),
+					component)
+			) {
+				throw new ClassCastException ();
+			}
+
+			ComponentData componentData =
+				findOrCreateDataForComponent (
+					componentDefinition,
+					component);
+
+			// set properties
+
+			setComponentValueProperties (
+				taskLogger,
+				componentDefinition,
+				component);
+
+			setComponentReferenceProperties (
+				taskLogger,
+				componentDefinition,
+				component);
+
+			setComponentInjectedProperties (
+				taskLogger,
+				componentDefinition,
+				component);
+
+			// initialize component
+
+			initializeComponent (
+				taskLogger,
+				componentDefinition,
+				component,
+				componentData);
+
+		}
+
+	}
+
 	private
-	ComponentMetaDataImplementation findOrCreateMetaDataForComponent (
+	ComponentData findOrCreateDataForComponent (
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
 		// create component info
 
-		return componentMetaDatas.computeIfAbsent (
+		return componentDatas.computeIfAbsent (
 			component,
 			_component -> {
 
-			ComponentMetaDataImplementation newComponentMetaData =
-				new ComponentMetaDataImplementation ();
+			ComponentData newComponentData =
+				new ComponentData ();
 
-			newComponentMetaData.definition =
+			newComponentData.definition =
 				componentDefinition;
 
-			newComponentMetaData.component =
-				new WeakReference <Object> (
+			newComponentData.optionalComponent =
+				optionalOf (
 					component);
 
-			newComponentMetaData.state =
+			newComponentData.state =
 				componentDefinition.owned ()
 					? ComponentState.uninitialized
 					: ComponentState.unmanaged;
 
-			return newComponentMetaData;
+			return newComponentData;
 
 		});
 
@@ -742,7 +984,7 @@ class ComponentManagerImplementation
 					componentDefinition.name (),
 					valuePropertyEntry.getKey ());
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					component,
 					valuePropertyEntry.getKey (),
 					valuePropertyEntry.getValue ());
@@ -836,9 +1078,7 @@ class ComponentManagerImplementation
 	private static
 	class Injection {
 
-		@SuppressWarnings ("unused")
 		String componentName;
-
 		Object component;
 
 		InjectedProperty injectedProperty;
@@ -887,8 +1127,8 @@ class ComponentManagerImplementation
 
 			injection.targetComponents =
 				iterableMapToList (
-					registry::byNameRequired,
-					injectedProperty.targetComponentNames ());
+					injectedProperty.targetComponentNames (),
+					registry::byNameRequired);
 
 			// define transformer
 
@@ -913,25 +1153,13 @@ class ComponentManagerImplementation
 			) {
 
 				injection.aggregator =
-					targetComponents -> {
-
-					Map <Class <?>, Object> componentClassMap =
-						new LinkedHashMap<> ();
-
-					for (
-						Pair <ComponentDefinition, Object> pair
-							: targetComponents
-					) {
-
-						componentClassMap.put (
-							pair.getLeft ().componentClass (),
-							pair.getRight ());
-
-					}
-
-					return componentClassMap;
-
-				};
+					targetComponents ->
+						iterableTransformToMap (
+							targetComponents,
+							item ->
+								item.getLeft ().componentClass (),
+							item ->
+								item.getRight ());
 
 			} else if (
 				enumEqualSafe (
@@ -940,25 +1168,13 @@ class ComponentManagerImplementation
 			) {
 
 				injection.aggregator =
-					targetComponents -> {
-
-					Map <String, Object> componentNameMap =
-						new LinkedHashMap<> ();
-
-					for (
-						Pair <ComponentDefinition, Object> pair
-							: targetComponents
-					) {
-
-						componentNameMap.put (
-							pair.getLeft ().name (),
-							pair.getRight ());
-
-					}
-
-					return componentNameMap;
-
-				};
+					targetComponents ->
+						iterableTransformToMap (
+							targetComponents,
+							item ->
+								item.getLeft ().name (),
+							item ->
+								item.getRight ());
 
 			} else if (
 				enumEqualSafe (
@@ -967,24 +1183,11 @@ class ComponentManagerImplementation
 			) {
 
 				injection.aggregator =
-					targetComponents -> {
-
-					List <Object> componentsList =
-						new ArrayList <> ();
-
-					for (
-						Pair <ComponentDefinition, Object> pair
-							: targetComponents
-					) {
-
-						componentsList.add (
-							pair.getRight ());
-
-					}
-
-					return componentsList;
-
-				};
+					targetComponents ->
+						iterableMapToList (
+							targetComponents,
+							item ->
+								item.getRight ());
 
 			} else if (
 				enumEqualSafe (
@@ -1090,21 +1293,92 @@ class ComponentManagerImplementation
 
 		) {
 
+			List <Pair <ComponentDefinition, Provider <?>>> targetProviders =
+				iterableMapToList (
+					injection.targetComponents,
+					targetDefinition ->
+						Pair.of (
+							targetDefinition,
+							getComponentProvider (
+								taskLogger,
+								targetDefinition,
+								injection
+									.injectedProperty
+									.initialized ())));
+
+			List <String> missingRawValueNames =
+				iterableMapToList (
+					iterableFilter (
+						(defintion, rawValue) ->
+							isNull (
+								rawValue),
+						targetProviders),
+					unaggregatedValue ->
+						unaggregatedValue.getLeft ().name ());
+
+			if (
+				collectionIsNotEmpty (
+					missingRawValueNames)
+			) {
+
+				throw taskLogger.errorFormatThrow (
+					"Missing target components for %s.%s: %s",
+					injection.componentName,
+					injection.injectedProperty.field ().getName (),
+					joinWithCommaAndSpace (
+						missingRawValueNames));
+
+			}
+
 			List <Pair <ComponentDefinition, Object>> unaggregatedValues =
 				iterableMapToList (
-					targetComponentDefinition ->
+					targetProviders,
+					(targetDefinition, targetProvider) ->
 						Pair.of (
-							targetComponentDefinition,
+							targetDefinition,
 							injection.transformer.apply (
-								getComponentProvider (
-									taskLogger,
-									targetComponentDefinition,
-									injection.injectedProperty.initialized ()))),
-					injection.targetComponents);
+								targetProvider)));
+
+			/*
+			List <String> missingValueNames =
+				iterableMapToList (
+					iterableFilter (
+						unaggregatedValue ->
+							isNull (
+								unaggregatedValue.getRight ()),
+						unaggregatedValues),
+					unaggregatedValue ->
+						unaggregatedValue.getLeft ().name ());
+
+			if (
+				collectionIsNotEmpty (
+					missingValueNames)
+			) {
+
+				throw taskLogger.errorFormatThrow (
+					"Missing target components for %s.%s: %s",
+					injection.componentName,
+					injection.injectedProperty.field ().getName (),
+					joinWithCommaAndSpace (
+						missingValueNames));
+
+			}*/
 
 			Object aggregatedValue =
 				injection.aggregator.apply (
 					unaggregatedValues);
+
+			if (
+				isNull (
+					aggregatedValue)
+			) {
+
+				throw taskLogger.errorFormatThrow (
+					"Aggregator for %s.%s returned null",
+					injection.componentName,
+					injection.injectedProperty.field ().getName ());
+
+			}
 
 			Field field =
 				injection.injectedProperty.field ();
@@ -1272,21 +1546,16 @@ class ComponentManagerImplementation
 	void invokeLifecycleMethods (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <AnnotationType> annotationClass,
-			@NonNull String name,
-			@NonNull Iterable <Object> components) {
+			@NonNull String label,
+			@NonNull Iterable <ComponentData> componentDatas) {
 
-		for (
-			Object component
-				: components
-		) {
-
-			invokeLifecycleMethods (
-				parentTaskLogger,
-				annotationClass,
-				name,
-				component);
-
-		}
+		componentDatas.forEach (
+			componentData ->
+				invokeLifecycleMethods (
+					parentTaskLogger,
+					annotationClass,
+					label,
+					componentData));
 
 	}
 
@@ -1294,21 +1563,47 @@ class ComponentManagerImplementation
 	void invokeLifecycleMethods (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <AnnotationType> annotationClass,
-			@NonNull String name,
-			@NonNull Object component) {
+			@NonNull String label,
+			@NonNull ComponentData componentData) {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
+				logContext.nestTaskLoggerFormat (
 					parentTaskLogger,
-					"invokeLifecycleMethods");
+					"invokeLifecycleMethods (%s, %s, %s)",
+					keyEqualsClassSimple (
+						"annotationClass",
+						annotationClass),
+					keyEqualsString (
+						"label",
+						label),
+					keyEqualsString (
+						"componentName",
+						componentData.name ()));
 
 		) {
 
+			Optional <Object> componentOptional =
+				componentData.component ();
+
+			if (
+				optionalIsNotPresent (
+					componentOptional)
+			) {
+				return;
+			}
+
+			Object component =
+				optionalGetRequired (
+					componentData.component ());
+
+			Class <?> componentClass =
+				component.getClass ();
+
 			for (
 				Method method
-					: component.getClass ().getMethods ()
+					: componentClass.getMethods ()
 			) {
 
 				AnnotationType annotation =
@@ -1341,7 +1636,7 @@ class ComponentManagerImplementation
 					taskLogger.errorFormat (
 						"Build method %s.%s ",
 						fullClassName (
-							component.getClass ()),
+							componentClass),
 						method.getName (),
 						"has invalid type signature (%s)",
 						joinWithCommaAndSpace (
@@ -1365,10 +1660,10 @@ class ComponentManagerImplementation
 
 					taskLogger.errorFormat (
 						"%s ",
-						name,
+						componentData.definition.name (),
 						"method %s.%s ",
 						classNameSimple (
-							component.getClass ()),
+							componentClass),
 						method.getName (),
 						"must have exactly one parameter");
 
@@ -1438,22 +1733,39 @@ class ComponentManagerImplementation
 					: singletonDefinitions
 			) {
 
-				if (
-					mapDoesNotContainKey (
+				Optional <ComponentData> componentDataOptional =
+					mapItemForKey (
 						singletonComponents,
-						singletonDefinition.name ())
+						singletonDefinition.name ());
+
+				if (
+					optionalIsNotPresent (
+						componentDataOptional)
 				) {
 					continue;
 				}
 
+				ComponentData componentData =
+					optionalGetRequired (
+						componentDataOptional);
+
+				Optional <Object> componentOptional =
+					componentData.component ();
+
+				if (
+					optionalIsNotPresent (
+						componentOptional)
+				) {
+					continue;
+				}
+
+				Object component =
+					optionalGetRequired (
+						componentOptional);
+
 				taskLogger.debugFormat (
 					"Tearing down component: %s",
 					singletonDefinition.name ());
-
-				Object component =
-					mapItemForKeyRequired (
-						singletonComponents,
-						singletonDefinition.name ());
 
 				for (
 					Method teardownMethod
@@ -1544,7 +1856,7 @@ class ComponentManagerImplementation
 			@NonNull Object component) {
 
 		return requiredValue (
-			componentMetaDatas.get (
+			componentDatas.get (
 				component));
 
 	}
@@ -1559,12 +1871,19 @@ class ComponentManagerImplementation
 	}
 
 	public static
-	class ComponentMetaDataImplementation
+	class ComponentData
 		implements ComponentMetaData {
 
 		ComponentDefinition definition;
-		WeakReference <Object> component;
+		Optional <Object> optionalComponent;
+		WeakReference <Object> weakComponent;
 		ComponentState state;
+
+		@Override
+		public
+		String name () {
+			return definition.name ();
+		}
 
 		@Override
 		public
@@ -1576,8 +1895,10 @@ class ComponentManagerImplementation
 		public
 		Optional <Object> component () {
 
-			return optionalFromNullable (
-				component.get ());
+			return optionalOrElseOptional (
+				optionalComponent,
+				() -> optionalFromNullable (
+					weakComponent.get ()));
 
 		}
 
@@ -1587,15 +1908,6 @@ class ComponentManagerImplementation
 			return state;
 		}
 
-	}
-
-	public static
-	enum ComponentState {
-		uninitialized,
-		active,
-		tornDown,
-		error,
-		unmanaged;
 	}
 
 }

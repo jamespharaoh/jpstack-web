@@ -22,6 +22,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -29,7 +30,6 @@ import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
-import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.model.MediaRec;
@@ -77,11 +77,6 @@ public
 class ChatMainCommand
 	implements CommandHandler {
 
-	private final
-	LogContext logContext =
-		Log4jLogContext.forClass (
-			ChatMainCommand.class);
-
 	// dependencies
 
 	@SingletonDependency
@@ -116,6 +111,9 @@ class ChatMainCommand
 
 	@WeakSingletonDependency
 	CommandManager commandManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;

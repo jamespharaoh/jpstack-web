@@ -131,9 +131,9 @@ class TicketStateTimeDaemon
 		) {
 
 			return iterableMapToList (
-				TicketRec::getId,
 				ticketHelper.findUnqueuedTickets (
-					transaction));
+					transaction),
+				TicketRec::getId);
 
 		}
 

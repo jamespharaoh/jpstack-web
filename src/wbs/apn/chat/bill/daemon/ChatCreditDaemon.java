@@ -114,9 +114,9 @@ class ChatCreditDaemon
 				"Checking for all users with negative credit");
 
 			return iterableMapToList (
-				ChatRec::getId,
 				chatHelper.findNotDeleted (
-					transaction));
+					transaction),
+				ChatRec::getId);
 
 		}
 
@@ -192,11 +192,11 @@ class ChatCreditDaemon
 					cutoffTime));
 
 			return iterableMapToList (
-				ChatUserRec::getId,
 				chatUserHelper.findWantingBill (
 					transaction,
 					chat,
-					cutoffTime));
+					cutoffTime),
+				ChatUserRec::getId);
 
 		}
 

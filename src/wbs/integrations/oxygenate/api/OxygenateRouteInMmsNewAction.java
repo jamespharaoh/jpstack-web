@@ -245,11 +245,11 @@ class OxygenateRouteInMmsNewAction
 
 			List <MediaRec> medias =
 				iterableMapToList (
+					request.attachments (),
 					attachment ->
 						processAttachment (
 							transaction,
-							attachment),
-					request.attachments ());
+							attachment));
 
 			// combine text parts
 

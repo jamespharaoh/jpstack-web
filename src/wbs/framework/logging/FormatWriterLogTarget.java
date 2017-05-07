@@ -103,7 +103,7 @@ class FormatWriterLogTarget
 
 	@Override
 	public
-	boolean debugEnabled () {
+	Boolean debugEnabled () {
 		return true;
 	}
 

@@ -104,10 +104,10 @@ class GenericScheduleDaemon <
 		) {
 
 			return iterableMapToList (
-				Job::getId,
 				helper ().findScheduledJobs (
 					transaction,
-					transaction.now ()));
+					transaction.now ()),
+				Job::getId);
 
 		}
 

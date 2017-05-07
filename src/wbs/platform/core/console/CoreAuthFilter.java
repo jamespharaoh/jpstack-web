@@ -1,15 +1,8 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
-import java.io.IOException;
-
 import javax.inject.Provider;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
@@ -26,24 +19,21 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
-import wbs.framework.logging.BorrowedTaskLogger;
-import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+import wbs.framework.servlet.ComponentFilterChain;
+import wbs.framework.servlet.FilterComponent;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
-
-import wbs.utils.etc.ImplicitArgument.BorrowedArgument;
-import wbs.utils.io.RuntimeIoException;
 
 import wbs.web.responder.Responder;
 
 @SingletonComponent ("coreAuthFilter")
 public
 class CoreAuthFilter
-	implements Filter {
+	implements FilterComponent {
 
 	// singleton dependencies
 
@@ -68,44 +58,21 @@ class CoreAuthFilter
 	@SingletonDependency
 	UserSessionLogic userSessionLogic;
 
-	// constants
-
-	@Override
-	public
-	void init (
-			@NonNull FilterConfig filterConfig) {
-
-		doNothing ();
-
-	}
-
-	@Override
-	public
-	void destroy () {
-
-		doNothing ();
-
-	}
+	// implementation
 
 	@Override
 	public
 	void doFilter (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ServletRequest request,
 			@NonNull ServletResponse response,
-			@NonNull FilterChain chain)
-		throws
-			ServletException,
-			IOException {
+			@NonNull ComponentFilterChain chain) {
 
 		try (
 
-			BorrowedArgument <CloseableTaskLogger, BorrowedTaskLogger>
-				parentTaskLogger =
-					TaskLogger.implicitArgument.borrow ();
-
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
-					parentTaskLogger.get (),
+					parentTaskLogger,
 					"doFilter");
 
 		) {
@@ -130,11 +97,10 @@ class CoreAuthFilter
 
 				// and show the page
 
-				chainFilter (
+				chain.doFilter (
 					taskLogger,
 					request,
-					response,
-					chain);
+					response);
 
 			} else {
 
@@ -149,11 +115,10 @@ class CoreAuthFilter
 
 					if (requestContext.post ()) {
 
-						chainFilter (
+						chain.doFilter (
 							taskLogger,
 							request,
-							response,
-							chain);
+							response);
 
 					} else {
 
@@ -183,11 +148,10 @@ class CoreAuthFilter
 
 					// these paths are available before login
 
-					chainFilter (
+					chain.doFilter (
 						taskLogger,
 						request,
-						response,
-						chain);
+						response);
 
 				} else {
 
@@ -206,39 +170,6 @@ class CoreAuthFilter
 	}
 
 	// private implementation
-
-	private
-	void chainFilter (
-			@NonNull OwnedTaskLogger parentTaskLogger,
-			@NonNull ServletRequest request,
-			@NonNull ServletResponse response,
-			@NonNull FilterChain chain) {
-
-		TaskLogger.implicitArgument.storeAndInvokeVoid (
-			parentTaskLogger,
-			() -> {
-
-			try {
-
-				chain.doFilter (
-					request,
-					response);
-
-			} catch (ServletException exception) {
-
-				throw new RuntimeException (
-					exception);
-
-			} catch (IOException ioException) {
-
-				throw new RuntimeIoException (
-					ioException);
-
-			}
-
-		});
-
-	}
 
 	private
 	boolean userSessionVerify (

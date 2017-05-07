@@ -16,10 +16,10 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -30,11 +30,6 @@ import wbs.web.responder.Responder;
 public abstract
 class ConsoleAction
 	implements Action {
-
-	private final static
-	LogContext logContext =
-		Log4jLogContext.forClass (
-			ConsoleAction.class);
 
 	// singleton dependencies
 
@@ -53,6 +48,9 @@ class ConsoleAction
 	@SingletonDependency
 	protected
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	protected

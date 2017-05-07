@@ -4,23 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-
 import lombok.Data;
-import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.data.tools.DataFromXmlBuilder;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Data
@@ -29,10 +22,10 @@ import wbs.framework.logging.TaskLogger;
 public
 class WbsConfig {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			WbsConfig.class);
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// general information
 
@@ -109,46 +102,5 @@ class WbsConfig {
 		direct = true)
 	List <Object> otherElements =
 		new ArrayList<> ();
-
-	// implementation
-
-	public static
-	WbsConfig readFilename (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String filename) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"readFilename");
-
-		) {
-
-			DataFromXml dataFromXml =
-				new DataFromXmlBuilder ()
-
-				.registerBuilderClasses (
-					ImmutableList.of (
-						WbsConfig.class,
-						WbsConfigConsoleServer.class,
-						WbsConfigDatabase.class,
-						WbsConfigEmail.class,
-						WbsConfigProcessApi.class))
-
-				.build ();
-
-			WbsConfig wbsConfig =
-				(WbsConfig)
-				dataFromXml.readFilename (
-					taskLogger,
-					filename);
-
-			return wbsConfig;
-
-		}
-
-	}
 
 }

@@ -7,9 +7,6 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.logging.TaskLogger;
-
 public
 interface ComponentRegistry {
 
@@ -28,39 +25,20 @@ interface ComponentRegistry {
 	boolean hasName (
 			String componentName);
 
-	Map <String, ComponentDefinition> singletonsByClass (
-			Class <?> targetClass);
+	Map <String, ComponentDefinition> singletonsForClass (
+			Class <?> componentClass);
 
-	Map <String, ComponentDefinition> prototypesByClass (
-			Class <?> targetClass);
+	Map <String, ComponentDefinition> prototypesForClass (
+			Class <?> componentClass);
 
 	List <ComponentDefinition> withAnnotation (
 			Class <? extends Annotation> annotationClass);
 
-	// component registration
-
-	ComponentRegistry registerDefinition (
-			TaskLogger parentTaskLogger,
-			ComponentDefinition componentDefinition);
-
-	ComponentRegistry registerUnmanagedSingleton (
-			TaskLogger parentTaskLogger,
-			String key,
-			Object value);
-
-	ComponentRegistry registerXmlFilename (
-			TaskLogger parentTaskLogger,
-			String filename);
+	String nameForAnnotatedClass (
+			Class <?> componentClass);
 
 	// request components (messy)
 
-	ComponentRegistry addRequestComponentName (
-			String name);
-
 	List <String> requestComponentNames ();
-
-	// build
-
-	ComponentManager build ();
 
 }

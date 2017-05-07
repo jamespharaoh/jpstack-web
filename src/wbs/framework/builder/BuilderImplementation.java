@@ -1,6 +1,8 @@
 package wbs.framework.builder;
 
-import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -98,48 +100,33 @@ class BuilderImplementation <Context>
 		Object builderObject =
 			builderInfo.builderProvider.get ();
 
-		try {
+		// inject context
 
-			// inject context
+		fieldSet (
+			builderInfo.parentField,
+			builderObject,
+			optionalOf (
+				parentObject));
 
-			builderInfo.parentField.set (
-				builderObject,
-				parentObject);
+		fieldSet (
+			builderInfo.sourceField,
+			builderObject,
+			optionalOf (
+				sourceObject));
 
-			builderInfo.sourceField.set (
-				builderObject,
-				sourceObject);
+		fieldSet (
+			builderInfo.targetField,
+			builderObject,
+			optionalOf (
+				targetObject));
 
-			builderInfo.targetField.set (
-				builderObject,
-				targetObject);
+		// call builder
 
-			// call builder
-
-			if (
-				equalToTwo (
-					builderInfo.buildMethod.getParameterCount ())
-			) {
-
-				builderInfo.buildMethod.invoke (
-					builderObject,
-					context,
-					this);
-
-			} else {
-
-				builderInfo.buildMethod.invoke (
-					builderObject,
-					this);
-
-			}
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
+		methodInvoke (
+			builderInfo.buildMethod,
+			builderObject,
+			context,
+			this);
 
 	}
 

@@ -152,10 +152,10 @@ class ObjectHelperIdImplementation <
 			@NonNull List <Long> ids) {
 
 		return iterableMapToList (
-			OptionalUtils::optionalFromNullable,
 			objectDatabaseHelper.findMany (
 				parentTransaction,
-				ids));
+				ids),
+			OptionalUtils::optionalFromNullable);
 
 	}
 

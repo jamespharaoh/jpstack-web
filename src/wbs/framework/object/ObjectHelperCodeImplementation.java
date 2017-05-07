@@ -142,6 +142,9 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 						record ->
 							record.getId ())
 
+					.wrapperFunction (
+						CloseableTransaction::genericWrapper)
+
 					.build (
 						taskLogger);
 
@@ -243,10 +246,10 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 					objectModel::getCode);
 
 			return iterableMapToList (
+				codes,
 				code -> mapItemForKey (
 					recordsByCode,
-					code),
-				codes);
+					code));
 
 		}
 

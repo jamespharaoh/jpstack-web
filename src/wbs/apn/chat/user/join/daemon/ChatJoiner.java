@@ -29,13 +29,13 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
-import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectManager;
 
@@ -92,11 +92,6 @@ import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 @PrototypeComponent ("chatJoiner")
 public
 class ChatJoiner {
-
-	private final
-	LogContext logContext =
-		Log4jLogContext.forClass (
-			ChatJoiner.class);
 
 	// singleton dependencies
 
@@ -159,6 +154,9 @@ class ChatJoiner {
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;

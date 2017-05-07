@@ -522,7 +522,7 @@ class HibernateTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull String dynamicContext) {
+			@NonNull CharSequence dynamicContext) {
 
 		return new NestedTransaction (
 			this,

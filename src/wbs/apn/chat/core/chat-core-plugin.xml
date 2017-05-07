@@ -5,7 +5,7 @@
 	<plugin-dependencies>
 		<plugin-dependency name="network"/>
 		<plugin-dependency name="sms-apps-common"/>
-		<plugin-dependency name="user"/>
+		<plugin-dependency name="platform-user"/>
 	</plugin-dependencies>
 
 	<sql-scripts>

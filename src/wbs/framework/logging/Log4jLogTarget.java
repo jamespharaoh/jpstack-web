@@ -104,10 +104,8 @@ class Log4jLogTarget
 
 	@Override
 	public
-	boolean debugEnabled () {
-
+	Boolean debugEnabled () {
 		return logger.isDebugEnabled ();
-
 	}
 
 }

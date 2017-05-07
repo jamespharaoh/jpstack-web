@@ -23,6 +23,8 @@ import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -31,7 +33,6 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -60,11 +61,6 @@ public
 class ClockworkSmsRouteInAction
 	extends ApiLoggingAction {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			ClockworkSmsRouteInAction.class);
-
 	// singleton dependencies
 
 	@SingletonDependency
@@ -78,6 +74,9 @@ class ClockworkSmsRouteInAction
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -99,10 +98,45 @@ class ClockworkSmsRouteInAction
 	@PrototypeDependency
 	Provider <TextResponder> textResponderProvider;
 
+	@PrototypeDependency
+	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+
 	// state
 
+	DataFromXml dataFromXml;
+
 	ClockworkSmsRouteInRequest request;
+
 	Boolean success = false;
+
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processRequest");
+
+		) {
+
+			dataFromXml =
+				dataFromXmlBuilderProvider.get ()
+
+				.registerBuilderClasses (
+					ClockworkSmsRouteInRequest.class)
+
+				.build ();
+
+
+		}
+
+	}
 
 	// implementation
 
@@ -195,17 +229,6 @@ class ClockworkSmsRouteInAction
 			debugWriter.writeNewline ();
 
 			// decode request
-
-			DataFromXml dataFromXml =
-				new DataFromXmlBuilder ()
-
-				.taskLogger (
-					taskLogger)
-
-				.registerBuilderClasses (
-					ClockworkSmsRouteInRequest.class)
-
-				.build ();
 
 			taskLogger.makeException ();
 

@@ -11,7 +11,7 @@ import wbs.framework.logging.TaskLogger;
 @Accessors (fluent = true)
 public
 class EnumConsoleHelperFactory <EnumType extends Enum <EnumType>>
-	implements ComponentFactory {
+	implements ComponentFactory <EnumConsoleHelper <EnumType>> {
 
 	// properties
 
@@ -22,7 +22,7 @@ class EnumConsoleHelperFactory <EnumType extends Enum <EnumType>>
 
 	@Override
 	public
-	Object makeComponent (
+	EnumConsoleHelper <EnumType> makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return new EnumConsoleHelper <EnumType> ()
