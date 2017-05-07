@@ -5,6 +5,8 @@ import static wbs.utils.etc.NullUtils.errorIfNull;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Data;
@@ -15,6 +17,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsSpecialConfig;
 import wbs.framework.logging.LogContext;
@@ -36,6 +39,11 @@ class IdCacheBuilder <Context extends SafeCloseable, Key, Id, Value> {
 
 	@SingletonDependency
 	WbsSpecialConfig wbsSpecialConfig;
+
+	// protootype dependencies
+
+	@PrototypeDependency
+	Provider <IdLookupCache <Context, Key, Id, Value>> idLookupCacheProvider;
 
 	// properties
 
@@ -101,7 +109,7 @@ class IdCacheBuilder <Context extends SafeCloseable, Key, Id, Value> {
 
 				taskLogger.makeException ();
 
-				return new IdLookupCache <Context, Key, Id, Value> ()
+				return idLookupCacheProvider.get ()
 
 					.assumeNegatives (
 						wbsSpecialConfig.assumeNegativeCache ())

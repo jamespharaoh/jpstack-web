@@ -6,9 +6,11 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,8 +20,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 
 import lombok.NonNull;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public
 class IterableUtils {
@@ -46,35 +51,69 @@ class IterableUtils {
 	Iterable <OutputType> iterableMap (
 			@NonNull Function <
 				? super InputType,
-				? extends OutputType
+				OutputType
 			> mapFunction,
-			@NonNull Iterable <InputType> input) {
+			@NonNull Iterable <? extends InputType> iterable) {
 
-		List <OutputType> output =
-			new ArrayList<> ();
+		return () ->
+			Streams.stream (
+				iterable)
 
-		for (
-			InputType inputItem
-				: input
-		) {
+			.map (
+				item ->
+					mapFunction.apply (
+						item))
 
-			output.add (
-				mapFunction.apply (
-					inputItem));
+			.iterator ();
 
-		}
+	}
 
-		return output;
+	public static <InLeftType, InRightType, OutType>
+	Iterable <OutType> iterableMap (
+			@NonNull BiFunction <
+				? super InLeftType,
+				? super InRightType,
+				OutType
+			> mapFunction,
+			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.map (
+				pair ->
+					mapFunction.apply (
+						pair.getLeft (),
+						pair.getRight ()))
+
+			.iterator ();
 
 	}
 
 	public static <InputType, OutputType>
 	List <OutputType> iterableMapToList (
+			@NonNull Iterable <InputType> input,
 			@NonNull Function <
 				? super InputType,
 				? extends OutputType
-			> mapFunction,
-			@NonNull Iterable <InputType> input) {
+			> mapFunction) {
+
+		return ImmutableList.copyOf (
+			iterableMap (
+				mapFunction,
+				input));
+
+	}
+
+	public static <InputLeftType, InputRightType, OutputType>
+	List <OutputType> iterableMapToList (
+			@NonNull Iterable <Pair <InputLeftType, InputRightType>> input,
+			@NonNull BiFunction <
+				? super InputLeftType,
+				? super InputRightType,
+				? extends OutputType
+			> mapFunction) {
 
 		return ImmutableList.copyOf (
 			iterableMap (
@@ -104,10 +143,33 @@ class IterableUtils {
 			@NonNull Iterable <ItemType> input) {
 
 		return () ->
-			iterableStream (input)
+			iterableStream (
+				input)
 
 			.filter (
 				predicate)
+
+			.iterator ();
+
+	}
+
+	public static <LeftType, RightType>
+	Iterable <Pair <LeftType, RightType>> iterableFilter (
+			@NonNull BiPredicate <
+				? super LeftType,
+				? super RightType
+			> predicate,
+			@NonNull Iterable <Pair <LeftType, RightType>> input) {
+
+		return () ->
+			iterableStream (
+				input)
+
+			.filter (
+				pair ->
+					predicate.test (
+						pair.getLeft (),
+						pair.getRight ()))
 
 			.iterator ();
 
@@ -208,6 +270,28 @@ class IterableUtils {
 
 		return optionalGetRequired (
 			value);
+
+	}
+
+	public static <ItemType>
+	ItemType iterableOnlyItemRequired (
+			@NonNull Iterable <ItemType> iterable) {
+
+		Iterator <ItemType> iterator =
+			iterable.iterator ();
+
+		if (! iterator.hasNext ()) {
+			throw new IllegalArgumentException ();
+		}
+
+		ItemType item =
+			iterator.next ();
+
+		if (iterator.hasNext ()) {
+			throw new IllegalArgumentException ();
+		}
+
+		return item;
 
 	}
 

@@ -5,6 +5,7 @@
 	<layer name="utils">
 
 		<component class="cache.IdCacheBuilder"/>
+		<component class="cache.IdLookupCache"/>
 
 		<component class="random.RandomLogicImplementation"/>
 

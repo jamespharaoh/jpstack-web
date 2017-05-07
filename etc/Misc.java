@@ -4,6 +4,7 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -23,6 +24,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -580,6 +584,29 @@ class Misc {
 		return new RuntimeException ("TODO");
 	}
 
+	public static
+	RuntimeException todo (
+			@NonNull CharSequence message) {
+
+		return new RuntimeException (
+			stringFormat (
+				"TODO %s",
+				message));
+
+	}
+
+	public static
+	RuntimeException todoFormat (
+			@NonNull CharSequence ... messageArguments) {
+
+		return new RuntimeException (
+			stringFormat (
+				"TODO %s",
+				stringFormatArray (
+					messageArguments)));
+
+	}
+
 	@SneakyThrows (NoSuchAlgorithmException.class)
 	public static
 	String hashSha1Base64 (
@@ -979,6 +1006,41 @@ class Misc {
 	public static
 	boolean disabled () {
 		return true;
+	}
+
+	public static <First, Second>
+	BiConsumer <First, Second> castToConsumer (
+			@NonNull BiFunction <First, Second, ?> function) {
+
+		return (first, second) -> {
+
+			function.apply (
+				first,
+				second);
+
+		};
+
+	}
+
+	public static <Argument>
+	Consumer <Argument> castToConsumer (
+			@NonNull Function <Argument, ?> function) {
+
+		return argument -> {
+
+			function.apply (
+				argument);
+
+		};
+
+	}
+
+	public static
+	void castToVoid (
+			Object object) {
+
+		doNothing ();
+
 	}
 
 }

@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.utils.exception.RuntimeNumberFormatException;
+import wbs.utils.string.LazyString;
 
 public
 class NumberUtils {
@@ -79,10 +80,30 @@ class NumberUtils {
 	}
 
 	public static
+	CharSequence integerToDecimalStringLazy (
+			@NonNull Long integerValue) {
+
+		return new LazyString (
+			() -> integerToDecimalString (
+				integerValue));
+
+	}
+
+	public static
 	String integerToDecimalString (
 			@NonNull Integer integerValue) {
 
 		return integerValue.toString ();
+
+	}
+
+	public static
+	CharSequence integerToDecimalStringLazy (
+			@NonNull Integer integerValue) {
+
+		return new LazyString (
+			() -> integerToDecimalString (
+				integerValue));
 
 	}
 

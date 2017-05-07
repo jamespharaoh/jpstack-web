@@ -23,8 +23,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 
 import wbs.utils.etc.SafeCloseable;
@@ -35,10 +35,10 @@ public
 class IdLookupCache <Context extends SafeCloseable, Key, Id, Value>
 	implements AdvancedCache <Context, Key, Value> {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			IdLookupCache.class);
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// constants
 
