@@ -1,5 +1,6 @@
 package wbs.utils.string;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -89,7 +90,6 @@ class AtomicFileWriter
 
 	}
 
-	@Override
 	public
 	void commit () {
 
@@ -118,12 +118,6 @@ class AtomicFileWriter
 
 	}
 
-	@Override
-	public
-	void close () {
-
-	}
-
 	private
 	boolean contentHasChanged (
 			@NonNull String newContents) {
@@ -149,6 +143,14 @@ class AtomicFileWriter
 				exception);
 
 		}
+
+	}
+
+	@Override
+	public
+	void close () {
+
+		doNothing ();
 
 	}
 

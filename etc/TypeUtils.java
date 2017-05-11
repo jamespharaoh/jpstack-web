@@ -11,6 +11,8 @@ import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -30,6 +32,9 @@ import wbs.framework.codegen.JavaImportRegistry;
 
 import wbs.utils.exception.RuntimeIllegalAccessException;
 import wbs.utils.exception.RuntimeInstantiationException;
+import wbs.utils.exception.RuntimeInvocationTargetException;
+import wbs.utils.exception.RuntimeNoSuchMethodException;
+import wbs.utils.exception.RuntimeSecurityException;
 
 public
 class TypeUtils {
@@ -572,6 +577,51 @@ class TypeUtils {
 
 			throw new RuntimeInstantiationException (
 				instantiationException);
+
+		}
+
+	}
+
+	public static <ClassType>
+	ClassType classInstantiate (
+			@NonNull Class <ClassType> classToInstantiate,
+			@NonNull List <Class <?>> constructorParameterTypes,
+			@NonNull List <Object> constructorParameters) {
+
+		try {
+
+			Constructor <ClassType> constructor =
+				classToInstantiate.getConstructor (
+					constructorParameterTypes.toArray (
+						new Class <?> [] {}));
+
+			return constructor.newInstance (
+				constructorParameters.toArray ());
+
+		} catch (NoSuchMethodException noSuchMethodException) {
+
+			throw new RuntimeNoSuchMethodException (
+				noSuchMethodException);
+
+		} catch (SecurityException securityException) {
+
+			throw new RuntimeSecurityException (
+				securityException);
+
+		} catch (IllegalAccessException illegalAccessException) {
+
+			throw new RuntimeIllegalAccessException (
+				illegalAccessException);
+
+		} catch (InstantiationException instantiationException) {
+
+			throw new RuntimeInstantiationException (
+				instantiationException);
+
+		} catch (InvocationTargetException invocationTargetException) {
+
+			throw new RuntimeInvocationTargetException (
+				invocationTargetException);
 
 		}
 
