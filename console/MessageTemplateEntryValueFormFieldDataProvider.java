@@ -2,7 +2,7 @@ package wbs.services.messagetemplate.console;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldDataProvider;
+import wbs.console.forms.types.FormFieldDataProvider;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 

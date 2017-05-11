@@ -82,7 +82,7 @@ class MessageTemplateDatabaseLoader {
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"enclosing_method");
+					"loadFromClasspath");
 
 		) {
 
