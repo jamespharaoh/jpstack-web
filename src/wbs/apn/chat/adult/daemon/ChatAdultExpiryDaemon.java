@@ -65,7 +65,7 @@ class ChatAdultExpiryDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -105,10 +105,10 @@ class ChatAdultExpiryDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
-					"ChatAdultExpiryDaemon.runOnce ()");
+					"runOnce");
 
 		) {
 

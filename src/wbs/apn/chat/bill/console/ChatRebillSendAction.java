@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -22,12 +20,11 @@ import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -59,8 +56,8 @@ class ChatRebillSendAction
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatRebillConsoleModule;
+	@NamedDependency
+	FormContextBuilder <ChatRebillSearch> chatRebillFormContextBuilder;
 
 	@SingletonDependency
 	ChatRebillLogConsoleHelper chatRebillLogHelper;
@@ -71,9 +68,6 @@ class ChatRebillSendAction
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -82,10 +76,7 @@ class ChatRebillSendAction
 
 	// state
 
-	FormFieldSet <?> formFields;
-	ChatRebillSearch formValues;
-	Map <String, Object> formHints;
-	UpdateResultSet formUpdates;
+	FormContext <ChatRebillSearch> formContext;
 
 	// details
 
@@ -109,7 +100,7 @@ class ChatRebillSendAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -122,14 +113,7 @@ class ChatRebillSendAction
 
 			// process form submission
 
-			formFields =
-				chatRebillConsoleModule.formFieldSets ().get (
-					"search");
-
-			formValues =
-				new ChatRebillSearch ();
-
-			formHints =
+			Map <String, Object> formHints =
 				ImmutableMap.<String, Object> builder ()
 
 				.put (
@@ -138,26 +122,20 @@ class ChatRebillSendAction
 
 				.build ();
 
-			formUpdates =
-				formFieldLogic.update (
+			formContext =
+				chatRebillFormContextBuilder.build (
 					transaction,
-					requestContext,
-					formFields,
-					formValues,
-					formHints,
-					"rebill");
+					formHints);
 
-			requestContext.request (
-				"formValues",
-				formValues);
+			formContext.update (
+				transaction);
 
-			requestContext.request (
-				"formUpdates",
-				formUpdates);
-
-			if (formUpdates.errors ()) {
+			if (formContext.errors ()) {
 				return null;
 			}
+
+			ChatRebillSearch formValue =
+				formContext.object ();
 
 			// search for users
 
@@ -168,18 +146,18 @@ class ChatRebillSendAction
 					true)
 
 				.includeBlocked (
-					formValues.includeBlocked ())
+					formValue.includeBlocked ())
 
 				.includeFailed (
-					formValues.includeFailed ());
+					formValue.includeFailed ());
 
 			List <Pair <ChatUserRec, Optional <String>>> allChatUsers =
 				chatUserHelper.findWantingBill (
 					transaction,
 					chat,
-					formValues.lastAction (),
+					formValue.lastAction (),
 					ifNull (
-						- formValues.minimumCreditOwed () + 1,
+						- formValue.minimumCreditOwed () + 1,
 						0l))
 
 				.stream ()
@@ -268,16 +246,16 @@ class ChatRebillSendAction
 							transaction))
 
 					.setLastAction (
-						formValues.lastAction ())
+						formValue.lastAction ())
 
 					.setMinimumCreditOwed (
-						formValues.minimumCreditOwed ())
+						formValue.minimumCreditOwed ())
 
 					.setIncludeBlocked (
-						formValues.includeBlocked ())
+						formValue.includeBlocked ())
 
 					.setIncludeFailed (
-						formValues.includeFailed ())
+						formValue.includeFailed ())
 
 					.setNumChatUsers (
 						collectionSize (

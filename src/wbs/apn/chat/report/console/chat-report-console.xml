@@ -46,7 +46,7 @@
 	</simple-context>
 
 	<field-set
-		name="monthReportSearch"
+		name="rev-share-search"
 		class="wbs.apn.chat.report.console.ChatReportRevShareForm">
 
 		<text-field
@@ -55,7 +55,7 @@
 	</field-set>
 
 	<field-set
-		name="simpleReportResults"
+		name="rev-share-results"
 		class="wbs.apn.chat.report.console.ChatReportRevShareItem">
 
 		<text-field
@@ -285,5 +285,21 @@
 			name="reason"/>
 
 	</field-set>
+
+	<form-contexts>
+
+		<form-context
+			name="rev-share-search"
+			class="wbs.apn.chat.report.console.ChatReportRevShareForm"
+			type="search"
+			fields="rev-share-search"/>
+
+		<form-context
+			name="rev-share-results"
+			class="wbs.apn.chat.report.console.ChatReportRevShareItem"
+			type="read-only"
+			fields="rev-share-results"/>
+
+	</form-contexts>
 
 </console-module>

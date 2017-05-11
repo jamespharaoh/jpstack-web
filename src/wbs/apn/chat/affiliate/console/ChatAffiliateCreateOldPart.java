@@ -26,8 +26,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
@@ -36,6 +34,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -55,14 +54,14 @@ class ChatAffiliateCreateOldPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
 	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> genderConsoleHelper;
 
 	@ClassSingletonDependency
@@ -72,7 +71,7 @@ class ChatAffiliateCreateOldPart
 	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> orientConsoleHelper;
 
 	@SingletonDependency

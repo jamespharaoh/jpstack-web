@@ -22,7 +22,15 @@ class PluginLayerSpec {
 	String name;
 
 	@DataChildren (
-		direct = true)
+		direct = true,
+		childElement = "bootstrap-component")
+	@Getter @Setter
+	List <PluginBootstrapComponentSpec> bootstrapComponents =
+		new ArrayList<> ();
+
+	@DataChildren (
+		direct = true,
+		childElement = "component")
 	@Getter @Setter
 	List <PluginComponentSpec> components =
 		new ArrayList<> ();

@@ -140,7 +140,7 @@ class DialogueMmsApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"doPost");
@@ -305,7 +305,7 @@ class DialogueMmsApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"reportFile.doPost");

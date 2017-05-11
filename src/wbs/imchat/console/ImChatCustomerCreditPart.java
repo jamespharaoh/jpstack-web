@@ -2,28 +2,18 @@ package wbs.imchat.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.max;
-import static wbs.utils.etc.OptionalUtils.ifNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 
 import java.util.List;
 
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
-
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -41,11 +31,8 @@ class ImChatCustomerCreditPart
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
-	@SingletonDependency
-	@Named
-	ConsoleModule imChatCustomerConsoleModule;
+	@NamedDependency ("imChatCustomerCreditHistoryFormContextBuilder")
+	FormContextBuilder <ImChatCustomerCreditRec> historyFormContextBuilder;
 
 	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
@@ -56,17 +43,21 @@ class ImChatCustomerCreditPart
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	@SingletonDependency
+	@NamedDependency ("imChatCustomerCreditRequestFormContextBuilder")
+	FormContextBuilder <ImChatCustomerCreditRequest> requestFormContextBuilder;
+
+	@SingletonDependency
+	@NamedDependency ("imChatCustomerCreditSummaryContextBuilder")
+	FormContextBuilder <ImChatCustomerRec> summaryFormContextBuilder;
+
 	// state
 
-	FormFieldSet <ImChatCustomerRec> customerFormFields;
-	FormFieldSet <ImChatCustomerCreditRequest> creditFormFields;
-	FormFieldSet <ImChatCustomerCreditRec> creditHistoryFormFields;
+	FormContext <ImChatCustomerRec> summaryFormContext;
+	FormContext <ImChatCustomerCreditRequest> requestFormContext;
+	FormContext <ImChatCustomerCreditRec> historyFormContext;
 
 	ImChatCustomerRec customer;
-	List <ImChatCustomerCreditRec> creditHistory;
-
-	ImChatCustomerCreditRequest request;
-	Optional <UpdateResultSet> updateResultSet;
 
 	// implementation
 
@@ -84,50 +75,37 @@ class ImChatCustomerCreditPart
 
 		) {
 
-			customerFormFields =
-				imChatCustomerConsoleModule.formFieldSetRequired (
-					"credit-summary",
-					ImChatCustomerRec.class);
+			summaryFormContext =
+				summaryFormContextBuilder.build (
+					transaction,
+					emptyMap ());
 
-			creditFormFields =
-				imChatCustomerConsoleModule.formFieldSetRequired (
-					"credit-request",
-					ImChatCustomerCreditRequest.class);
+			requestFormContext =
+				requestFormContextBuilder.build (
+					transaction,
+					emptyMap ());
 
-			creditHistoryFormFields =
-				imChatCustomerConsoleModule.formFieldSetRequired (
-					"credit-history",
-					ImChatCustomerCreditRec.class);
+			ImChatCustomerCreditRequest request =
+				requestFormContext.object ();
 
-			request =
-				ifNotPresent (
+			request
 
-				optionalCast (
-					ImChatCustomerCreditRequest.class,
-					requestContext.request (
-						"imChatCustomerCreditRequest")),
+				.customer (
+					imChatCustomerHelper.findFromContextRequired (
+						transaction));
 
-				Optional.of (
-					new ImChatCustomerCreditRequest ())
-
-			);
-
-			request.customer (
-				imChatCustomerHelper.findFromContextRequired (
-					transaction));
-
-			updateResultSet =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"imChatCustomerCreditUpdateResults"));
-
-			creditHistory =
+			List <ImChatCustomerCreditRec> creditHistory =
 				imChatCustomerCreditHelper.findByIndexRange (
 					transaction,
 					request.customer (),
 					max (0l, request.customer.getNumCredits () - 10l),
 					request.customer.getNumCredits ());
+
+			historyFormContext =
+				historyFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					creditHistory);
 
 		}
 
@@ -152,42 +130,24 @@ class ImChatCustomerCreditPart
 			htmlHeadingTwoWrite (
 				"Customer details");
 
-			formFieldLogic.outputDetailsTable (
-				transaction,
-				formatWriter,
-				customerFormFields,
-				request.customer (),
-				emptyMap ());
+			summaryFormContext.outputDetailsTable (
+				transaction);
 
 			htmlHeadingTwoWrite (
 				"Apply credit");
 
-			formFieldLogic.outputFormTable (
+			requestFormContext.outputFormTable (
 				transaction,
-				requestContext,
-				formatWriter,
-				creditFormFields,
-				updateResultSet,
-				request,
-				emptyMap (),
 				"post",
 				requestContext.resolveLocalUrl (
 					"/imChatCustomer.credit"),
-				"apply credit",
-				FormType.perform,
-				"credit");
+				"apply credit");
 
 			htmlHeadingTwoWrite (
 				"Recent credit history");
 
-			formFieldLogic.outputListTable (
+			historyFormContext.outputListTable (
 				transaction,
-				formatWriter,
-				creditHistoryFormFields,
-				optionalAbsent (),
-				Lists.reverse (
-					creditHistory),
-				emptyMap (),
 				true);
 
 		}

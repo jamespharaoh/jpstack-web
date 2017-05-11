@@ -9,6 +9,7 @@ import wbs.console.module.ConsoleManager;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -28,7 +29,7 @@ class ChatHelpQueueConsolePlugin
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@SingletonDependency
+	@WeakSingletonDependency
 	ConsoleManager consoleManager;
 
 	@ClassSingletonDependency

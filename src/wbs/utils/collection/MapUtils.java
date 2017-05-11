@@ -2,6 +2,8 @@ package wbs.utils.collection;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.objectToString;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -230,6 +232,18 @@ class MapUtils {
 		} else if (map.containsKey (key)) {
 
 			throw new NullPointerException ();
+
+		} else if (
+			key instanceof CharSequence
+			|| key instanceof Number
+			|| key instanceof Boolean
+		) {
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"No such element: %s",
+					objectToString (
+						key)));
 
 		} else {
 

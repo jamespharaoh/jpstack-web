@@ -1,13 +1,14 @@
 package wbs.console.formaction;
 
 import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,8 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.context.FormContext;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -39,9 +39,6 @@ class ConsoleFormActionsAction
 
 	@SingletonDependency
 	Database database;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -77,7 +74,7 @@ class ConsoleFormActionsAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -105,16 +102,18 @@ class ConsoleFormActionsAction
 				genericCastUnchecked (
 					formState));
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
+			FormContext <?> formContext =
+				formAction.actionFormContextBuilder ().build (
 					transaction,
-					requestContext,
-					formAction.formFields (),
-					formState,
-					ImmutableMap.of (),
-					formName);
+					emptyMap (),
+					Collections.singletonList (
+						genericCastUnchecked (
+							formState)));
 
-			if (updateResultSet.errorCount () > 0) {
+			formContext.update (
+				transaction);
+
+			if (formContext.errors ()) {
 				return null;
 			}
 

@@ -1,6 +1,5 @@
 package wbs.platform.object.browse;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -15,10 +14,12 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.CodeFormFieldSpec;
-import wbs.console.forms.DescriptionFormFieldSpec;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.NameFormFieldSpec;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.object.CodeFormFieldSpec;
+import wbs.console.forms.object.DescriptionFormFieldSpec;
+import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -62,6 +63,9 @@ class ObjectBrowsePageBuilder <
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
+	@SingletonDependency
+	FormContextManager formContextManager;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -96,7 +100,7 @@ class ObjectBrowsePageBuilder <
 
 	String typeCode;
 
-	FormFieldSet <ObjectType> formFieldSet;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	// build
 
@@ -204,8 +208,8 @@ class ObjectBrowsePageBuilder <
 					.localName (
 						container.pathPrefix () + ".browse")
 
-					.formFieldSet (
-						formFieldSet)
+					.formContextBuilder (
+						formContextBuilder)
 
 					.targetContextTypeName (
 						ifNull (
@@ -252,14 +256,11 @@ class ObjectBrowsePageBuilder <
 			typeCode =
 				spec.typeCode ();
 
-			formFieldSet =
-				ifNotNullThenElse (
-					spec.fieldsName (),
-					() -> consoleModule.formFieldSetRequired (
-						spec.fieldsName (),
-						consoleHelper.objectClass ()),
-					() -> defaultFields (
-						taskLogger));
+			formContextBuilder =
+				formContextManager.formContextBuilderRequired (
+					consoleModule.name (),
+					spec.formContextName (),
+					consoleHelper.objectClass ());
 
 		}
 

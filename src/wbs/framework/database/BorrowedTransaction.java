@@ -2,6 +2,10 @@ package wbs.framework.database;
 
 import static wbs.utils.etc.Misc.todo;
 
+import java.util.List;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.framework.logging.LogContext;
@@ -113,7 +117,9 @@ class BorrowedTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull CharSequence dynamicContext) {
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
+			@NonNull Optional <Boolean> debugEnabled) {
 
 		throw todo ();
 

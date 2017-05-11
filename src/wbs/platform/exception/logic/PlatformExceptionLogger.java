@@ -248,7 +248,7 @@ class PlatformExceptionLogger
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"realLogException");

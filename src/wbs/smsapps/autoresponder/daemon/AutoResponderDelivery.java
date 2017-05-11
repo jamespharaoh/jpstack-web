@@ -82,10 +82,10 @@ class AutoResponderDelivery
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteFormat (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"handle (%s, %s)",
+					"handle",
 					keyEqualsDecimalInteger (
 						"deliveryId",
 						deliveryId),

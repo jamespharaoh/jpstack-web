@@ -694,6 +694,54 @@
 
 	</plugins>
 
+	<layers>
+
+		<layer name="config"/>
+
+		<layer name="console">
+			<plugin class="wbs.console.component.ConsoleComponentPlugin"/>
+		</layer>
+
+		<layer name="data"/>
+
+		<layer name="entity"/>
+
+		<layer name="fixture">
+			<plugin class="wbs.framework.fixtures.FixtureComponentPlugin"/>
+		</layer>
+
+		<layer name="generate"/>
+
+		<layer name="hibernate">
+			<plugin class="wbs.framework.hibernate.HibernateComponentPlugin"/>
+		</layer>
+
+		<layer name="logic"/>
+
+		<layer name="model"/>
+
+		<layer name="model-meta"/>
+
+		<layer name="model-generate"/>
+
+		<layer name="object">
+			<plugin class="wbs.framework.object.ObjectComponentPlugin"/>
+		</layer>
+
+		<layer name="object-generate"/>
+
+		<layer name="schema"/>
+
+		<layer name="schema-tool"/>
+
+		<layer name="sql"/>
+
+		<layer name="utils"/>
+
+		<layer name="web"/>
+
+	</layers>
+
 	<git-links>
 
 		<git-link

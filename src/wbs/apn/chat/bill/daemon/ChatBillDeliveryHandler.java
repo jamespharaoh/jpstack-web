@@ -17,6 +17,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -51,7 +52,7 @@ class ChatBillDeliveryHandler
 	ChatCreditLogic chatCreditLogic;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	SymbolicLock <Long> chatUserDeliveryLocks;
 
 	@SingletonDependency
@@ -173,10 +174,10 @@ class ChatBillDeliveryHandler
 					ref);
 
 			OwnedTransaction transaction =
-				database.beginReadWriteFormat (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"handle (%s, %s)",
+					"handle",
 					keyEqualsDecimalInteger (
 						"deliveryId",
 						deliveryId),

@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldInterfaceMapping;
+import wbs.console.forms.types.FormFieldInterfaceMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;

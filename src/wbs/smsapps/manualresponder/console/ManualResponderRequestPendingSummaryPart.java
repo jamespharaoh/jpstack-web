@@ -9,6 +9,7 @@ import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -41,8 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -56,17 +55,17 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -118,9 +117,6 @@ class ManualResponderRequestPendingSummaryPart
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -131,8 +127,8 @@ class ManualResponderRequestPendingSummaryPart
 	ManualResponderRequestConsoleHelper manualResponderRequestHelper;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule manualResponderRequestPendingConsoleModule;
+	@NamedDependency ("manualResponderRequestPendingCustomerFormContextBuilder")
+	FormContextBuilder <SmsCustomerRec> customerFormContextBuilder;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -166,7 +162,7 @@ class ManualResponderRequestPendingSummaryPart
 
 	// state
 
-	FormFieldSet <SmsCustomerRec> customerDetailsFields;
+	FormContext <SmsCustomerRec> customerFormContext;
 
 	ManualResponderRequestRec manualResponderRequest;
 	ManualResponderNumberRec manualResponderNumber;
@@ -225,11 +221,6 @@ class ManualResponderRequestPendingSummaryPart
 
 		) {
 
-			customerDetailsFields =
-				manualResponderRequestPendingConsoleModule.formFieldSetRequired (
-					"customer-details",
-					SmsCustomerRec.class);
-
 			manualResponderRequest =
 				manualResponderRequestHelper.findFromContextRequired (
 					transaction);
@@ -249,21 +240,46 @@ class ManualResponderRequestPendingSummaryPart
 			network =
 				number.getNetwork ();
 
-			smsCustomer =
-				manualResponderNumber != null
-					? manualResponderNumber.getSmsCustomer ()
-					: null;
+			if (
+				isNotNull (
+					manualResponderNumber)
+			) {
 
-			smsCustomerSession =
-				smsCustomer != null
-				&& smsCustomer.getNumSessions () > 0
+				smsCustomer =
+					manualResponderNumber.getSmsCustomer ();
 
-				? smsCustomerSessionHelper.findByIndexRequired (
-					transaction,
-					smsCustomer,
-					smsCustomer.getNumSessions () - 1)
+			}
 
-				: null;
+			if (
+
+				isNotNull (
+					smsCustomer)
+
+				&& moreThanZero (
+					smsCustomer.getNumSessions ())
+
+			) {
+
+				smsCustomerSession =
+					smsCustomerSessionHelper.findByIndexRequired (
+						transaction,
+						smsCustomer,
+						smsCustomer.getNumSessions () - 1);
+
+			}
+
+			if (
+				isNotNull (
+					smsCustomer)
+			) {
+
+				customerFormContext =
+					customerFormContextBuilder.build (
+						transaction,
+						emptyMap (),
+						smsCustomer);
+
+			}
 
 			// get routes
 
@@ -678,12 +694,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
-			formFieldLogic.outputDetailsTable (
-				transaction,
-				formatWriter,
-				customerDetailsFields,
-				smsCustomer,
-				emptyMap ());
+			customerFormContext.outputDetailsTable (
+				transaction);
 
 		}
 

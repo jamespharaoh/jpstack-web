@@ -12,7 +12,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContextStuff;
-import wbs.console.forms.EntityFinder;
+import wbs.console.forms.object.EntityFinder;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.helper.provider.ConsoleHelperProvider;
 import wbs.console.lookup.ObjectLookup;

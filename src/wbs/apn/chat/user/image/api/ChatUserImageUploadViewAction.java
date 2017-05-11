@@ -46,7 +46,7 @@ class ChatUserImageUploadViewAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goApi");

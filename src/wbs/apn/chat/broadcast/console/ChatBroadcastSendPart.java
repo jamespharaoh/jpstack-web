@@ -11,32 +11,25 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.MultiFormContextBuilder;
+import wbs.console.forms.context.MultiFormContexts;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-
-import wbs.utils.etc.OptionalUtils;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -49,8 +42,9 @@ class ChatBroadcastSendPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatBroadcastConsoleModule;
+	@NamedDependency
+	MultiFormContextBuilder <ChatBroadcastSendForm>
+		chatBroadcastSendFormContextsBuilder;
 
 	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
@@ -58,23 +52,12 @@ class ChatBroadcastSendPart
 	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	// state
 
-	FormFieldSet <ChatBroadcastSendForm> searchFields;
-	FormFieldSet <ChatBroadcastSendForm> numbersFields;
-	FormFieldSet <ChatBroadcastSendForm> commonFields;
-	FormFieldSet <ChatBroadcastSendForm> messageUserFields;
-	FormFieldSet <ChatBroadcastSendForm> messageMessageFields;
-
-	ChatBroadcastSendForm form;
-	Optional <UpdateResultSet> updateResults;
-	Map <String, Object> formHints;
+	MultiFormContexts <ChatBroadcastSendForm> formContext;
 
 	// details
 
@@ -118,46 +101,7 @@ class ChatBroadcastSendPart
 
 		) {
 
-			searchFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-search",
-					ChatBroadcastSendForm.class);
-
-			numbersFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-numbers",
-					ChatBroadcastSendForm.class);
-
-			commonFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-common",
-					ChatBroadcastSendForm.class);
-
-			messageUserFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-message-user",
-					ChatBroadcastSendForm.class);
-
-			messageMessageFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-message-message",
-					ChatBroadcastSendForm.class);
-
-			form =
-				(ChatBroadcastSendForm)
-				OptionalUtils.ifNotPresent (
-					requestContext.request (
-						"chatBroadcastForm"),
-					Optional.<ChatBroadcastSendForm>of (
-						new ChatBroadcastSendForm ()));
-
-			updateResults =
-				OptionalUtils.optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"chatBroadcastUpdates"));
-
-			formHints =
+			Map <String, Object> formHints =
 				ImmutableMap.<String, Object> builder ()
 
 				.put (
@@ -165,7 +109,14 @@ class ChatBroadcastSendPart
 					chatHelper.findFromContextRequired (
 						transaction))
 
-				.build ();
+				.build ()
+
+			;
+
+			formContext =
+				chatBroadcastSendFormContextsBuilder.build (
+					transaction,
+					formHints);
 
 		}
 
@@ -190,86 +141,22 @@ class ChatBroadcastSendPart
 			htmlHeadingThreeWrite (
 				"Recipients");
 
-			formFieldLogic.outputFormAlwaysHidden (
+			formContext.outputFormAlwaysHidden (
 				transaction,
-				requestContext,
-				formatWriter,
-				searchFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"search",
+				"numbers",
+				"common",
+				"message-user",
+				"message-message");
 
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				numbersFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				commonFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				messageUserFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				messageMessageFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			if (! form.search ()) {
+			if (! formContext.object ().search ()) {
 
 				htmlTableOpenDetails ();
 
-				formFieldLogic.outputFormRows (
+				formContext.outputFormRows (
 					transaction,
-					requestContext,
-					formatWriter,
-					numbersFields,
-					updateResults,
-					form,
-					formHints,
-					FormType.search,
-					"send");
-
-				formFieldLogic.outputFormRows (
-					transaction,
-					requestContext,
-					formatWriter,
-					commonFields,
-					updateResults,
-					form,
-					formHints,
-					FormType.search,
-					"send");
+					"numbers",
+					"common");
 
 				htmlTableClose ();
 
@@ -284,43 +171,20 @@ class ChatBroadcastSendPart
 
 				htmlParagraphClose ();
 
-				formFieldLogic.outputFormTemporarilyHidden (
+				formContext.outputFormTemporarilyHidden (
 					transaction,
-					requestContext,
-					formatWriter,
-					searchFields,
-					form,
-					formHints,
-					FormType.search,
-					"send");
+					"search");
 
 			}
 
-			if (form.search ()) {
+			if (formContext.object ().search ()) {
 
 				htmlTableOpenDetails ();
 
-				formFieldLogic.outputFormRows (
+				formContext.outputFormRows (
 					transaction,
-					requestContext,
-					formatWriter,
-					searchFields,
-					updateResults,
-					form,
-					formHints,
-					FormType.search,
-					"send");
-
-				formFieldLogic.outputFormRows (
-					transaction,
-					requestContext,
-					formatWriter,
-					commonFields,
-					updateResults,
-					form,
-					formHints,
-					FormType.search,
-					"send");
+					"search",
+					"common");
 
 				htmlTableClose ();
 
@@ -333,15 +197,9 @@ class ChatBroadcastSendPart
 					" value=\"disable search\"",
 					">");
 
-				formFieldLogic.outputFormTemporarilyHidden (
+				formContext.outputFormTemporarilyHidden (
 					transaction,
-					requestContext,
-					formatWriter,
-					numbersFields,
-					form,
-					formHints,
-					FormType.search,
-					"send");
+					"numbers");
 
 			}
 
@@ -350,16 +208,9 @@ class ChatBroadcastSendPart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
+			formContext.outputFormRows (
 				transaction,
-				requestContext,
-				formatWriter,
-				messageUserFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"message-user");
 
 			htmlTableClose ();
 
@@ -374,15 +225,9 @@ class ChatBroadcastSendPart
 
 			htmlParagraphClose ();
 
-			formFieldLogic.outputFormTemporarilyHidden (
+			formContext.outputFormTemporarilyHidden (
 				transaction,
-				requestContext,
-				formatWriter,
-				messageMessageFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"message-message");
 
 			htmlFormClose ();
 

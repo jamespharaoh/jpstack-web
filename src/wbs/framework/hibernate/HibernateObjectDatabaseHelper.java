@@ -1391,9 +1391,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		try (
 
 			NestedTransaction transaction =
-				parentTransaction.nestTransactionFormat (
+				parentTransaction.nestTransaction (
 					logContext,
-					"insertSpecial (%s)",
+					"insertSpecial",
 					keyEqualsDecimalInteger (
 						"id",
 						object.getId ()));
@@ -1430,9 +1430,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		try (
 
 			NestedTransaction transaction =
-				parentTransaction.nestTransactionFormat (
+				parentTransaction.nestTransaction (
 					logContext,
-					"update (%s)",
+					"update",
 					keyEqualsDecimalInteger (
 						"id",
 						object.getId ()));
@@ -1459,9 +1459,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		try (
 
 			NestedTransaction transaction =
-				parentTransaction.nestTransactionFormat (
+				parentTransaction.nestTransaction (
 					logContext,
-					"remove (%s)",
+					"remove",
 					keyEqualsDecimalInteger (
 						"id",
 						object.getId ()));
@@ -1684,9 +1684,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		try (
 
 			NestedTransaction transaction =
-				parentTransaction.nestTransactionFormat (
+				parentTransaction.nestTransaction (
 					logContext,
-					"update (%s)",
+					"update",
 					keyEqualsDecimalInteger (
 						"id",
 						object.getId ()));

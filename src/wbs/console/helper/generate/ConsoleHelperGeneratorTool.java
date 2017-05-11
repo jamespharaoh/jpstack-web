@@ -3,7 +3,7 @@ package wbs.console.helper.generate;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 
 import java.util.List;
 
@@ -74,8 +74,9 @@ class ConsoleHelperGeneratorTool {
 					OwnedTaskLogger nestedTaskLogger =
 						logContext.nestTaskLogger (
 							taskLogger,
-							stringFormat (
-								"generateConsoleHelpers.forEachModel (%s)",
+							"generateConsoleHelpers.loop",
+							keyEqualsString (
+								"model.objectName",
 								model.objectName ()));
 
 				) {

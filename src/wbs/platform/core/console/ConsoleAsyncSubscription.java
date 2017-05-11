@@ -291,7 +291,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"sendUpdates");

@@ -274,7 +274,7 @@ class QueueItemsStatusLine
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					"updateAllUsers");
 

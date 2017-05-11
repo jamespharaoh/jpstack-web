@@ -22,8 +22,8 @@
 		<component class="console.ImageFormFieldRenderer"/>
 		<component class="console.ImageFormFieldSpec"/>
 		<component class="console.MediaAudioResponder"/>
-		<component class="console.MediaConsoleConfig"/>
 		<component class="console.MediaConsoleLogicImplementation"/>
+		<component class="console.MediaCryptor"/>
 		<component class="console.MediaImageResponder"/>
 		<component class="console.MediaImageScaleResponder"/>
 		<component class="console.MediaThumb100Responder"/>

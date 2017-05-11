@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -37,6 +36,7 @@ import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -111,11 +111,11 @@ class ForwarderApiModule
 	ForwarderQueryExMessageChecker forwarderQueryExMessageChecker;
 
 	@SingletonDependency
-	@Named ("forwarderPeekExRequestDef")
+	@NamedDependency
 	RpcDefinition forwarderPeekExRequestDef;
 
 	@SingletonDependency
-	@Named ("forwarderQueryExRequestDef")
+	@NamedDependency
 	RpcDefinition forwarderQueryExRequestDef;
 
 	@ClassSingletonDependency
@@ -503,7 +503,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"SendRpcHandler.handle");
@@ -917,7 +917,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"SendExRpcHandler.handle");
@@ -1933,7 +1933,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"QueryExRpcHandler.handle");
@@ -2351,7 +2351,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnly (
+					database.beginReadOnlyWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"PeekExRpcHandler.handle");

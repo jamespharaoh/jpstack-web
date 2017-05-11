@@ -29,8 +29,8 @@ class ObjectSummaryPageSpec {
 	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
+		name = "form")
+	String formContextName;
 
 	@DataAttribute (
 		name = "fields-provider")

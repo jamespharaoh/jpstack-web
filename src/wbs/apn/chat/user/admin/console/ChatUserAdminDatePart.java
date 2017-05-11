@@ -25,6 +25,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -49,7 +50,7 @@ class ChatUserAdminDatePart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> chatUserDateModeConsoleHelper;
 
 	@SingletonDependency

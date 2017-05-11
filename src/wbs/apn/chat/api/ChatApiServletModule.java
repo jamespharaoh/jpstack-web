@@ -54,6 +54,7 @@ import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -228,7 +229,7 @@ class ChatApiServletModule
 	WebApiManager webApiManager;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	MercatorProjection ukNationalGrid;
 
 	// prototype dependencies
@@ -292,7 +293,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnly (
+					database.beginReadOnlyWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"MediaFile.doGet");
@@ -520,8 +521,8 @@ class ChatApiServletModule
 	// ================================= actions
 
 	private static
-	List<Class<? extends RpcHandler>> handlerClasses =
-		new ArrayList<Class<? extends RpcHandler>> ();
+	List <Class <? extends RpcHandler>> handlerClasses =
+		new ArrayList<> ();
 
 	private
 	void registerRpcHandlerClasses (
@@ -849,7 +850,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnly (
+					database.beginReadOnlyWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"ProfilesRpcHandler.handle");
@@ -1463,7 +1464,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnly (
+					database.beginReadOnlyWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"MediaRpcHandler.handle");
@@ -1785,7 +1786,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"ProfileRpcHandler.handle");
@@ -2508,7 +2509,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"ProfileDeleteRpcHandler.handle");
@@ -2737,7 +2738,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"MessageSendRpcHandler.handle");
@@ -3063,7 +3064,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"MessagePollRpcHandler.handle");
@@ -3538,15 +3539,10 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
-						stringFormat (
-							"%s.%s.%s (%s)",
-							"ChatApiServletModule",
-							"ImageUpdateRpcHandler",
-							"handle",
-							"source"));
+						"ImageUpdateRpcHandler.handle");
 
 			) {
 
@@ -4209,7 +4205,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"CreditRpcHandler.handle");

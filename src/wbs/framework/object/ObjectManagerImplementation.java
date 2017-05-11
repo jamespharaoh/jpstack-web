@@ -46,8 +46,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -55,6 +53,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -90,7 +89,7 @@ class ObjectManagerImplementation
 	ObjectTypeRegistry objectTypeRegistry;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	ObjectHelper <?> rootObjectHelper;
 
 	// collection dependencies

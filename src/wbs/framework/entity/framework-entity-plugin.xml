@@ -54,7 +54,8 @@
 	</layer>
 
 	<layer name="generate">
-		<component class="generate.ModelGenerateComponents"/>
+		<component class="generate.ModelGenerateExceptionLogger"/>
+		<component class="generate.ModelGenerateSpecialConfig"/>
 	</layer>
 
 	<layer name="model-generate">

@@ -1,29 +1,17 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.toEnum;
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
-import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostActionMultipart;
-import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
-import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
-
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -40,18 +28,15 @@ class ChatUserImageUploadPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatUserImageConsoleModule;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("chatUserImageUploadFormContextBuilder")
+	FormContextBuilder <ChatUserImageUploadForm> formContextBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	// state
 
-	FormFieldSet <ChatUserImageUploadForm> formFieldSet;
+	FormContext <ChatUserImageUploadForm> formContext;
 
 	ChatUserImageType chatUserImageType;
 
@@ -73,29 +58,24 @@ class ChatUserImageUploadPart
 
 		) {
 
-			formFieldSet =
-				chatUserImageConsoleModule.formFieldSetRequired (
-					"uploadForm",
-					ChatUserImageUploadForm.class);
-
 			chatUserImageType =
 				toEnum (
 					ChatUserImageType.class,
 					requestContext.stuffString (
 						"chatUserImageType"));
 
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
+
 			uploadForm =
 				new ChatUserImageUploadForm ();
 
 			if (requestContext.post ()) {
 
-				formFieldLogic.update (
-					transaction,
-					requestContext,
-					formFieldSet,
-					uploadForm,
-					ImmutableMap.of (),
-					"upload");
+				formContext.update (
+					transaction);
 
 			}
 
@@ -120,46 +100,13 @@ class ChatUserImageUploadPart
 			htmlParagraphWrite (
 				"Please upload the photo or video.");
 
-			// form open
-
-			htmlFormOpenPostActionMultipart (
-				requestContext.resolveLocalUrl (
-					stringFormat (
-						"/chatUser.%s.upload",
-						chatUserImageType.name ())));
-
-			// form fields
-
-			htmlTableOpenDetails ();
-
-			formFieldLogic.outputFormRows (
+			formContext.outputFormTable (
 				transaction,
-				requestContext,
-				formatWriter,
-				formFieldSet,
-				Optional.absent (),
-				uploadForm,
-				ImmutableMap.of (),
-				FormType.perform,
-				"upload");
-
-			htmlTableClose ();
-
-			// form controls
-
-			htmlParagraphOpen ();
-
-			formatWriter.writeLineFormat (
-				"<input",
-				" type=\"submit\"",
-				" value=\"upload file\"",
-				">");
-
-			htmlParagraphClose ();
-
-			// form close
-
-			htmlFormClose ();
+				"post",
+				requestContext.resolveLocalUrlFormat (
+					"/chatUser.%s.upload",
+					chatUserImageType.name ()),
+				"upload file");
 
 		}
 

@@ -3,6 +3,8 @@ package wbs.framework.logging;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 
+import java.util.List;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -11,36 +13,52 @@ public
 class LogContextImplementation
 	implements LogContext {
 
-	private
-	CharSequence staticContext;
+	// state
 
-	private
+	private final
+	LoggingLogic loggingLogic;
+
+	private final
+	String staticContextName;
+
+	private final
 	LogTarget logTarget;
+
+	// constructors
 
 	public
 	LogContextImplementation (
-			@NonNull CharSequence staticContext,
+			@NonNull LoggingLogic loggingLogic,
+			@NonNull String staticContextName,
 			@NonNull LogTarget logTarget) {
 
-		this.staticContext =
-			staticContext;
+		this.loggingLogic =
+			loggingLogic;
+
+		this.staticContextName =
+			staticContextName;
 
 		this.logTarget =
 			logTarget;
 
 	}
 
+	// log context implementation
+
 	@Override
 	public
 	OwnedTaskLogger createTaskLogger (
-			@NonNull CharSequence dynamicContext,
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
 			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new TaskLoggerImplementation (
+			loggingLogic,
 			optionalAbsent (),
 			logTarget,
-			staticContext,
-			dynamicContext,
+			staticContextName,
+			dynamicContextName,
+			dynamicContextParameters,
 			debugEnabled);
 
 	}
@@ -49,16 +67,19 @@ class LogContextImplementation
 	public
 	OwnedTaskLogger nestTaskLogger (
 			@NonNull Optional <TaskLogger> parent,
-			@NonNull CharSequence dynamicContext,
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
 			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new TaskLoggerImplementation (
+			loggingLogic,
 			optionalMapRequired (
 				parent,
 				TaskLogger::taskLoggerImplementation),
 			logTarget,
-			staticContext,
-			dynamicContext,
+			staticContextName,
+			dynamicContextName,
+			dynamicContextParameters,
 			debugEnabled);
 
 	}

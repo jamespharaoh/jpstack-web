@@ -8,7 +8,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldNativeMapping;
+import wbs.console.forms.types.FormFieldNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;

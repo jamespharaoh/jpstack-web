@@ -1,13 +1,11 @@
 package wbs.platform.object.create;
 
-import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +18,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -39,7 +34,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.RootObjectHelper;
 
@@ -53,9 +47,6 @@ class ObjectCreatePart <
 	extends AbstractPagePart {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -75,7 +66,7 @@ class ObjectCreatePart <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String parentPrivCode;
@@ -83,12 +74,7 @@ class ObjectCreatePart <
 	@Getter @Setter
 	String localFile;
 
-	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
-
 	// state
-
-	Optional <UpdateResultSet> updateResultSet;
 
 	ConsoleHelper <ParentType> parentHelper;
 	List <ParentType> parents;
@@ -96,8 +82,8 @@ class ObjectCreatePart <
 
 	ObjectType object;
 
-	Map <String, Object> hints =
-		new LinkedHashMap<> ();
+	Map <String, Object> formHints;
+	FormContext <ObjectType> formContext;
 
 	// implementation
 
@@ -109,7 +95,7 @@ class ObjectCreatePart <
 			new LinkedHashSet<> ();
 
 		scriptRefs.addAll (
-			formFieldSet.scriptRefs ());
+			formContext.allFields ().scriptRefs ());
 
 		return scriptRefs;
 
@@ -134,20 +120,21 @@ class ObjectCreatePart <
 
 			// if a field provider was provided
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
 					transaction);
 
 			}
+			*/
 
 			// get update results
 
-			updateResultSet =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"objectCreateUpdateResultSet"));
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					formHints);
 
 			// create dummy instance
 
@@ -257,23 +244,23 @@ class ObjectCreatePart <
 						optionalGetRequired (
 							grandParentIdOptional));
 
-				hints.put (
+				formHints.put (
 					"grandparent",
 					grandparent);
 
-				hints.put (
+				formHints.put (
 					stringFormat (
 						"%s.parent",
 						consoleHelper.parentFieldName ()),
 					grandparent);
 
-				hints.put (
+				formHints.put (
 					stringFormat (
 						"parent.%s",
 						parentHelper.parentFieldName ()),
 					grandparent);
 
-				hints.put (
+				formHints.put (
 					stringFormat (
 						"%s.%s",
 						consoleHelper.parentFieldName (),
@@ -294,6 +281,7 @@ class ObjectCreatePart <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -305,6 +293,7 @@ class ObjectCreatePart <
 				: formFieldsProvider.getStaticFields ();
 
 	}
+	*/
 
 	@Override
 	public
@@ -324,22 +313,14 @@ class ObjectCreatePart <
 				"Please enter the details for the new %h",
 				consoleHelper.shortName ());
 
-			formFieldLogic.outputFormTable (
+			formContext.outputFormTable (
 				transaction,
-				requestContext,
-				formatWriter,
-				formFieldSet,
-				updateResultSet,
-				object,
-				hints,
 				"post",
 				requestContext.resolveLocalUrl (
 					"/" + localFile),
 				stringFormat (
 					"create %h",
-					consoleHelper.shortName ()),
-				FormType.create,
-				"create");
+					consoleHelper.shortName ()));
 
 		}
 

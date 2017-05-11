@@ -28,8 +28,11 @@
 
 	<layer name="console">
 		<component class="console.MessageTemplateDatabaseSettingsCopyFormHelper"/>
+		<component class="console.MessageTemplateEntryValueCreateFieldsProvider"/>
 		<component class="console.MessageTemplateEntryValueFieldsProvider"/>
-		<component class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
+		<component class="console.MessageTemplateEntryValueListFieldsProvider"/>
+		<component class="console.MessageTemplateEntryValueSettingsFieldsProvider"/>
+		<component class="console.MessageTemplateEntryValueSummaryFieldsProvider"/>
 		<component class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
 	</layer>
 

@@ -105,4 +105,14 @@
 
 	</field-set>
 
+	<form-contexts>
+
+		<form-context
+			name="search"
+			class="wbs.apn.chat.bill.console.chatRebillSearch"
+			type="perform"
+			column-fields="search"/>
+
+	</form-contexts>
+
 </console-module>

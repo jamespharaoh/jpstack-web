@@ -7,7 +7,6 @@ import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -26,7 +25,6 @@ import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -35,15 +33,15 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -68,7 +66,8 @@ class QueueDebugPart
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("queueDebugFormContextBuilder")
+	FormContextBuilder <QueueDebugForm> formContextBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -80,7 +79,7 @@ class QueueDebugPart
 	ObjectTypeConsoleHelper objectTypeHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	ConsoleModule queueConsoleModule;
 
 	@SingletonDependency
@@ -102,7 +101,7 @@ class QueueDebugPart
 
 	// state
 
-	FormFieldSet <QueueDebugForm> formFields;
+	FormContext <QueueDebugForm> formContext;
 
 	QueueDebugForm form;
 
@@ -124,24 +123,20 @@ class QueueDebugPart
 
 		) {
 
-			formFields =
-				queueConsoleModule.formFieldSetRequired (
-					"queue-debug-form",
-					QueueDebugForm.class);
-
 			form =
 				new QueueDebugForm ()
 
 				.userId (
 					userConsoleLogic.userIdRequired ());
 
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				formFields,
-				form,
-				emptyMap (),
-				"search");
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap (),
+					form);
+
+			formContext.update (
+				transaction);
 
 			SortedQueueSubjects sortedQueueSubjects =
 				queueSubjectSorterProvider.get ()
@@ -193,20 +188,12 @@ class QueueDebugPart
 
 		) {
 
-			formFieldLogic.outputFormTable (
+			formContext.outputFormTable (
 				transaction,
-				requestContext,
-				formatWriter,
-				formFields,
-				optionalAbsent (),
-				form,
-				emptyMap (),
 				"get",
 				requestContext.resolveLocalUrl (
 					"/queue.debug"),
-				"update",
-				FormType.search,
-				"search");
+				"update");
 
 			htmlTableOpenList ();
 

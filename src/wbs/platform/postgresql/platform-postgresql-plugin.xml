@@ -20,8 +20,8 @@
 	</models>
 
 	<layer name="data">
-		<component class="data.PostgresqlPoolDataComponents"/>
-		<component class="data.PostgresqlRootDataComponents"/>
+		<component class="data.PostgresqlDataSource"/>
+		<component class="data.PostgresqlRootDataSource"/>
 	</layer>
 
 	<layer name="daemon">

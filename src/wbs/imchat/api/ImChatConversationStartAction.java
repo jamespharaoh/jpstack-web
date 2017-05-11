@@ -90,7 +90,7 @@ class ImChatConversationStartAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					"handle");
 

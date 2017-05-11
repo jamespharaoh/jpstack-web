@@ -48,8 +48,10 @@
 		<component class="api.ImChatDetailsUpdateAction"/>
 		<component class="api.ImChatEventPostAction"/>
 		<component class="api.ImChatForgotPasswordAction"/>
-		<component class="api.ImChatMediaConfig"/>
 		<component class="api.ImChatMediaJpegAction"/>
+		<component class="api.ImChatMediaMiniatureJpegAction"/>
+		<component class="api.ImChatMediaOriginalJpegAction"/>
+		<component class="api.ImChatMediaThumbnailJpegAction"/>
 		<component class="api.ImChatMediaResponder"/>
 		<component class="api.ImChatMessageListAction"/>
 		<component class="api.ImChatMessageSendAction"/>

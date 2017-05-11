@@ -20,7 +20,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.data.tools.DataFromXmlImplementation.DataClassInfo;
@@ -32,7 +32,7 @@ class DataFromXmlBuilder {
 
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Provider <DataFromXmlImplementation> dataFromXmlImplementationProvider;
 
 	// state

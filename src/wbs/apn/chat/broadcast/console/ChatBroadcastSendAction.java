@@ -6,7 +6,6 @@ import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -17,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -28,14 +25,13 @@ import lombok.NonNull;
 import org.apache.commons.lang3.Range;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.MultiFormContextBuilder;
+import wbs.console.forms.context.MultiFormContexts;
 import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -96,10 +92,6 @@ class ChatBroadcastSendAction
 	BatchLogic batchLogic;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatBroadcastConsoleModule;
-
-	@SingletonDependency
 	ChatBroadcastObjectHelper chatBroadcastHelper;
 
 	@SingletonDependency
@@ -107,6 +99,11 @@ class ChatBroadcastSendAction
 
 	@SingletonDependency
 	ChatBroadcastNumberObjectHelper chatBroadcastNumberHelper;
+
+	@SingletonDependency
+	@NamedDependency
+	MultiFormContextBuilder <ChatBroadcastSendForm>
+		chatBroadcastSendFormContextsBuilder;
 
 	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
@@ -128,9 +125,6 @@ class ChatBroadcastSendAction
 
 	@SingletonDependency
 	Database database;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -198,7 +192,7 @@ class ChatBroadcastSendAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -215,35 +209,6 @@ class ChatBroadcastSendAction
 				requestContext.formIsPresent (
 					"send");
 
-			FormFieldSet <?> searchFields =
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-search");
-
-			FormFieldSet <?> numbersFields =
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-numbers");
-
-			FormFieldSet <?> commonFields =
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-common");
-
-			FormFieldSet <?> messageUserFields =
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-message-user");
-
-			FormFieldSet <?> messageMessageFields =
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-message-message");
-
-			ChatBroadcastSendForm form =
-				new ChatBroadcastSendForm ()
-
-				.includeBlocked (
-					false)
-
-				.includeOptedOut (
-					false);
-
 			Map <String, Object> formHints =
 				ImmutableMap.<String, Object> builder ()
 
@@ -254,67 +219,18 @@ class ChatBroadcastSendAction
 
 				.build ();
 
-			UpdateResultSet updateResults =
-				new UpdateResultSet ();
+			MultiFormContexts <ChatBroadcastSendForm> formContext =
+				chatBroadcastSendFormContextsBuilder.build (
+					transaction,
+					formHints);
 
-			formFieldLogic.update (
+			formContext.update (
 				transaction,
-				requestContext,
-				searchFields,
-				verify
-					? updateResults
-					: new UpdateResultSet (),
-				form,
-				formHints,
-				"send");
-
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				numbersFields,
-				verify
-					? updateResults
-					: new UpdateResultSet (),
-				form,
-				formHints,
-				"send");
-
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				commonFields,
-				verify
-					? updateResults
-					: new UpdateResultSet (),
-				form,
-				formHints,
-				"send");
-
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				messageUserFields,
-				verify
-					? updateResults
-					: new UpdateResultSet (),
-				form,
-				formHints,
-				"send");
-
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				messageMessageFields,
-				send
-					? updateResults
-					: new UpdateResultSet (),
-				form,
-				formHints,
-				"send");
-
-			requestContext.request (
-				"chatBroadcastForm",
-				form);
+				"search",
+				"numbers",
+				"common",
+				"message-user",
+				"message-message");
 
 			// enable or disable search
 
@@ -323,7 +239,7 @@ class ChatBroadcastSendAction
 					"searchOn")
 			) {
 
-				form.search (
+				formContext.object ().search (
 					true);
 
 				requestContext.formData (
@@ -339,7 +255,7 @@ class ChatBroadcastSendAction
 					"searchOff")
 			) {
 
-				form.search (
+				formContext.object ().search (
 					false);
 
 				requestContext.formData (
@@ -352,15 +268,10 @@ class ChatBroadcastSendAction
 
 			// report errors
 
-			if (
-				moreThanZero (
-					updateResults.errorCount ())
-			) {
+			if (formContext.errors ()) {
 
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResults,
-					"send");
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 
@@ -382,7 +293,7 @@ class ChatBroadcastSendAction
 					chatUserHelper.findByCode (
 						transaction,
 						chat,
-						form.fromUser ());
+						formContext.object ().fromUser ());
 
 				if (
 					optionalIsNotPresent (
@@ -392,7 +303,7 @@ class ChatBroadcastSendAction
 					requestContext.addError (
 						stringFormat (
 							"Chat user not found: %s",
-							form.fromUser ()));
+							formContext.object ().fromUser ()));
 
 					return responder (
 						"chatBroadcastSendResponder");
@@ -402,7 +313,7 @@ class ChatBroadcastSendAction
 				ChatUserRec fromChatUser =
 					fromChatUserOptional.get ();
 
-				form.prefix (
+				formContext.object ().prefix (
 					fromChatUser.getName () != null
 						? stringFormat (
 							"From %s %s: ",
@@ -429,7 +340,7 @@ class ChatBroadcastSendAction
 				List <Long> allChatUserIds =
 					new ArrayList<> ();
 
-				if (form.search ()) {
+				if (formContext.object ().search ()) {
 
 					ChatUserSearch search =
 						new ChatUserSearch ()
@@ -455,34 +366,34 @@ class ChatBroadcastSendAction
 									userConsoleLogic.timezone (
 										transaction),
 									Optional.fromNullable (
-										form.lastAction ()))))
+										formContext.object ().lastAction ()))))
 
 						.gender (
-							form.gender ())
+							formContext.object ().gender ())
 
 						.orient (
-							form.orient ())
+							formContext.object ().orient ())
 
 						.hasCategory (
 							isNotNull (
-								form.categoryId))
+								formContext.object ().categoryId))
 
 						.categoryId (
-							form.categoryId ())
+							formContext.object ().categoryId ())
 
 						.hasPicture (
-							form.hasPicture ())
+							formContext.object ().hasPicture ())
 
 						.adultVerified (
-							form.isAdult ())
+							formContext.object ().isAdult ())
 
 						.valueSinceEver (
 							Range.between (
 								ifNull (
-									form.minimumSpend (),
+									formContext.object ().minimumSpend (),
 									Long.MIN_VALUE),
 								ifNull (
-									form.maximumSpend (),
+									formContext.object ().maximumSpend (),
 									Long.MAX_VALUE)));
 
 					allChatUserIds =
@@ -499,14 +410,14 @@ class ChatBroadcastSendAction
 
 				// check numbers
 
-				if (! form.search ()) {
+				if (! formContext.object ().search ()) {
 
 					try {
 
 						List <String> allNumbers =
 							numberFormatLogic.parseLines (
 								chat.getNumberFormat (),
-								form.numbers ());
+								formContext.object ().numbers ());
 
 						int loop0 = 0;
 
@@ -584,7 +495,7 @@ class ChatBroadcastSendAction
 					() -> requestContext.canContext (
 						"chat.manage"),
 
-					() -> form.includeBlocked ()
+					() -> formContext.object ().includeBlocked ()
 
 				);
 
@@ -593,7 +504,7 @@ class ChatBroadcastSendAction
 					() -> requestContext.canContext (
 						"chat.manage"),
 
-					() -> form.includeOptedOut ()
+					() -> formContext.object ().includeOptedOut ()
 
 				);
 
@@ -677,8 +588,8 @@ class ChatBroadcastSendAction
 
 				String messageString =
 					joinWithoutSeparator (
-						form.prefix (),
-						form.message ());
+						formContext.object ().prefix (),
+						formContext.object ().message ());
 
 				long messageLength =
 					GsmUtils.gsmStringLength (
@@ -732,39 +643,39 @@ class ChatBroadcastSendAction
 							remainingChatUserIds.size ()))
 
 					.setSearch (
-						form.search ());
+						formContext.object ().search ());
 
-				if (form.search ()) {
+				if (formContext.object ().search ()) {
 
 					chatBroadcast
 
 						.setSearchLastActionFrom (
-							form.lastAction () != null
-								? form.lastAction ().getStart ()
+							formContext.object ().lastAction () != null
+								? formContext.object ().lastAction ().getStart ()
 								: null)
 
 						.setSearchLastActionTo (
-							form.lastAction () != null
-								? form.lastAction ().getEnd ()
+							formContext.object ().lastAction () != null
+								? formContext.object ().lastAction ().getEnd ()
 								: null)
 
 						.setSearchGender (
-							form.gender ())
+							formContext.object ().gender ())
 
 						.setSearchOrient (
-							form.orient ())
+							formContext.object ().orient ())
 
 						.setSearchPicture (
-							form.hasPicture ())
+							formContext.object ().hasPicture ())
 
 						.setSearchAdult (
-							form.isAdult ())
+							formContext.object ().isAdult ())
 
 						.setSearchSpendMin (
-							form.minimumSpend ())
+							formContext.object ().minimumSpend ())
 
 						.setSearchSpendMax (
-							form.maximumSpend ());
+							formContext.object ().maximumSpend ());
 
 				}
 
@@ -863,17 +774,8 @@ class ChatBroadcastSendAction
 					integerToDecimalString (
 						remainingChatUserIds.size ()));
 
-				requestContext.request (
-					"chatBroadcastForm",
-					new ChatBroadcastSendForm ()
-
-					.includeBlocked (
-						false)
-
-					.includeOptedOut (
-						false)
-
-				);
+				formContext.object (
+					new ChatBroadcastSendForm ());
 
 				requestContext.setEmptyFormData ();
 

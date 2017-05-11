@@ -1,21 +1,29 @@
 package wbs.framework.logging;
 
-import static wbs.utils.string.StringUtils.stringFormatLazyArray;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 public
 interface LoggingLogicMethods {
 
+	Long nextEventId ();
+
 	LogContext findOrCreateLogContext (
-			CharSequence staticContextName);
+			String staticContextName);
 
 	default
 	LogContext findOrCreateLogContextFormat (
-			CharSequence ... staticContextNameArguments) {
+			String ... staticContextNameArguments) {
 
 		return findOrCreateLogContext (
-			stringFormatLazyArray (
+			stringFormatArray (
 				staticContextNameArguments));
 
 	}
+
+	void rootTaskBegin (
+			TaskLogger taskLogger);
+
+	void rootTaskEnd (
+			TaskLogger taskLogger);
 
 }

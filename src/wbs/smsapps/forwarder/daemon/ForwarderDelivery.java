@@ -71,7 +71,7 @@ class ForwarderDelivery
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					"handle");
 

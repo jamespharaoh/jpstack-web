@@ -1,6 +1,5 @@
 package wbs.console.formaction;
 
-import static wbs.utils.collection.MapUtils.mapItemForKeyOrElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -15,7 +14,8 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
@@ -54,6 +54,9 @@ class ContextTabFormActionPageBuilder
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@SingletonDependency
+	FormContextManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -100,8 +103,8 @@ class ContextTabFormActionPageBuilder
 
 	Provider <ConsoleFormActionHelper> formActionHelperProvider;
 
-	FormFieldSet formFields;
-	FormFieldSet historyFields;
+	FormContextBuilder <?> actionFormContextBuilder;
+	FormContextBuilder <?> historyFormContextBuilder;
 
 	PagePartFactory pagePartFactory;
 	Provider <Action> actionProvider;
@@ -157,25 +160,25 @@ class ContextTabFormActionPageBuilder
 
 	void initFormFields () {
 
-		formFields =
-			mapItemForKeyOrElse (
-				consoleModule.formFieldSets (),
+		actionFormContextBuilder =
+			formContextManager.formContextBuilderRequired (
+				consoleModule.name (),
 				ifNull (
-					spec.fieldsName (),
+					spec.actionFormContextName (),
 					stringFormat (
 						"%s-form",
 						spec.name ())),
-				() -> new FormFieldSet ());
+				Object.class);
 
-		historyFields =
-			mapItemForKeyOrElse (
-				consoleModule.formFieldSets (),
+		historyFormContextBuilder =
+			formContextManager.formContextBuilderRequired (
+				consoleModule.name (),
 				ifNull (
-					spec.historyFieldsName (),
+					spec.historyFormContextName (),
 					stringFormat (
 						"%s-history",
 						spec.name ())),
-				() -> (FormFieldSet) null);
+				Object.class);
 
 	}
 
@@ -231,11 +234,11 @@ class ContextTabFormActionPageBuilder
 							consoleModule.name ()),
 						spec.name ())))
 
-			.formActionHelper (
+			.helper (
 				formActionHelperProvider.get ())
 
-			.formFields (
-				formFields)
+			.actionFormContextBuilder (
+				actionFormContextBuilder)
 
 			.helpText (
 				spec.helpText ())
@@ -249,8 +252,10 @@ class ContextTabFormActionPageBuilder
 			.historyHeading (
 				spec.historyHeading ())
 
-			.historyFields (
-				historyFields);
+			.historyFormContextBuilder (
+				historyFormContextBuilder)
+
+		;
 
 	}
 
@@ -262,8 +267,8 @@ class ContextTabFormActionPageBuilder
 			.name (
 				"action")
 
-			.fields (
-				formFields)
+			.formContextBuilder (
+				actionFormContextBuilder)
 
 			.formActionHelper (
 				formActionHelperProvider.get ())

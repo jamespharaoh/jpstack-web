@@ -48,9 +48,9 @@ class ChatMessageHooks
 		try (
 
 			NestedTransaction transaction =
-				parentTransaction.nestTransactionFormat (
+				parentTransaction.nestTransaction (
 					logContext,
-					"beforeInsert (chatMessage)");
+					"beforeInsert");
 
 		) {
 

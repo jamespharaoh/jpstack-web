@@ -99,13 +99,14 @@ class ConsoleFormActionsPart
 					.name (
 						showSubmitFormAction.getRight ().name ())
 
-					.formActionHelper (
+					.helper (
 						genericCastUnchecked (
 							showSubmitFormAction.getRight ().helper ()))
 
-					.formFields (
+					.actionFormContextBuilder (
 						genericCastUncheckedNullSafe (
-							showSubmitFormAction.getRight ().formFields ()))
+							showSubmitFormAction.getRight ()
+								.actionFormContextBuilder ()))
 
 					.heading (
 						showSubmitFormAction.getRight ().heading ())

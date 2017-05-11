@@ -34,9 +34,8 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -77,9 +76,6 @@ class ObjectSearchPostAction <
 
 	@SingletonDependency
 	Database database;
-
-	@SingletonDependency
-	FormFieldLogic fieldsLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -126,7 +122,7 @@ class ObjectSearchPostAction <
 	String parentIdName;
 
 	@Getter @Setter
-	FormFieldSet <SearchType> searchFormFieldSet;
+	FormContextBuilder <SearchType> searchFormContextBuilder;
 
 	@Getter @Setter
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
@@ -147,7 +143,7 @@ class ObjectSearchPostAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -250,10 +246,14 @@ class ObjectSearchPostAction <
 						() -> classInstantiate (
 							searchClass)));
 
-			fieldsLogic.implicit (
-				transaction,
-				searchFormFieldSet,
-				search);
+			FormContext <SearchType> searchFormContext =
+				searchFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					search);
+
+			searchFormContext.implicit (
+				transaction);
 
 			consoleHelper.consoleHooks ().applySearchFilter (
 				transaction,
@@ -288,14 +288,8 @@ class ObjectSearchPostAction <
 
 			// update search details
 
-			UpdateResultSet updateResultSet =
-				fieldsLogic.update (
-					transaction,
-					requestContext,
-					searchFormFieldSet,
-					search,
-					emptyMap (),
-					"search");
+			searchFormContext.update (
+				transaction);
 
 			userSessionLogic.userDataObjectStore (
 				transaction,
@@ -305,21 +299,10 @@ class ObjectSearchPostAction <
 					sessionKey),
 				search);
 
-			if (updateResultSet.errorCount () > 0) {
+			if (searchFormContext.errors ()) {
 
-				transaction.debugFormat (
-					"Found %s errors processing search form",
-					integerToDecimalString (
-						updateResultSet.errorCount ()));
-
-				fieldsLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					"search");
-
-				requestContext.request (
-					"objectSearchUpdateResultSet",
-					updateResultSet);
+				searchFormContext.reportErrors (
+					transaction);
 
 				transaction.commit ();
 

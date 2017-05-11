@@ -20,6 +20,9 @@ interface ComponentRegistryBuilder {
 			TaskLogger parentTaskLogger,
 			String filename);
 
+	boolean hasName (
+			String componentName);
+
 	// request components (messy)
 
 	ComponentRegistry addRequestComponentName (

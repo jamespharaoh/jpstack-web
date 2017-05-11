@@ -163,7 +163,7 @@ class FixturesTool {
 
 			try {
 
-				runFixtureProvider (
+				runFixtureProviderReal (
 					taskLogger,
 					fixtureProvider);
 
@@ -182,17 +182,17 @@ class FixturesTool {
 	}
 
 	private
-	void runFixtureProvider (
+	void runFixtureProviderReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FixtureProvider fixtureProvider) {
 
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
-					"runFixtureProviders (fixtureProvider)");
+					"runFixtureProviderReal");
 
 		) {
 

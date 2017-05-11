@@ -92,7 +92,7 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnly (
+					database.beginReadOnlyWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"MainThread.doQuery");
@@ -527,10 +527,10 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteFormat (
+					database.beginReadWriteWithParameters (
 						logContext,
 						parentTaskLogger,
-						"getMessage (%s)",
+						"getMessage",
 						keyEqualsDecimalInteger (
 							"forwarderMessageInId",
 							forwarderMessageInId));
@@ -596,10 +596,10 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteFormat (
+					database.beginReadWriteWithParameters (
 						logContext,
 						parentTaskLogger,
-						"WorkerThread.doResult (%s, %s)",
+						"WorkerThread.doResult",
 						keyEqualsDecimalInteger (
 							"forwarderMessageInId",
 							forwarderMessageInId),

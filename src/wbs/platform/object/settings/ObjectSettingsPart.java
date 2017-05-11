@@ -1,6 +1,6 @@
 package wbs.platform.object.settings;
 
-import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -12,22 +12,17 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostActionEncoding;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -41,7 +36,6 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.RootObjectHelper;
 
@@ -55,9 +49,6 @@ class ObjectSettingsPart <
 	extends AbstractPagePart {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -83,34 +74,27 @@ class ObjectSettingsPart <
 	String localName;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String removeLocalName;
 
-	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
-
 	// state
 
-	Optional <UpdateResultSet> updateResultSet;
 	ObjectType object;
 	ParentType parent;
+
 	boolean canEdit;
+
+	FormContext <ObjectType> formContext;
 
 	// implementation
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		Set<ScriptRef> scriptRefs =
-			new LinkedHashSet<ScriptRef> ();
-
-		scriptRefs.addAll (
-			formFieldSet.scriptRefs ());
-
-		return scriptRefs;
+		return formContext.allFields ().scriptRefs ();
 
 	}
 
@@ -128,12 +112,6 @@ class ObjectSettingsPart <
 
 		) {
 
-			updateResultSet =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"objectSettingsUpdateResultSet"));
-
 			object =
 				objectLookup.lookupObject (
 					transaction,
@@ -148,6 +126,7 @@ class ObjectSettingsPart <
 
 			);
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareParent (
@@ -157,6 +136,12 @@ class ObjectSettingsPart <
 					transaction);
 
 			}
+			*/
+
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 		}
 
@@ -214,6 +199,7 @@ class ObjectSettingsPart <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -223,6 +209,7 @@ class ObjectSettingsPart <
 				object);
 
 	}
+	*/
 
 	@Override
 	public
@@ -245,7 +232,7 @@ class ObjectSettingsPart <
 
 				try {
 
-					if (formFieldSet.fileUpload ()) {
+					if (formContext.fileUpload ()) {
 
 						enctype =
 							"multipart/form-data";
@@ -268,16 +255,9 @@ class ObjectSettingsPart <
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
+			formContext.outputFormRows (
 				transaction,
-				requestContext,
-				formatWriter,
-				formFieldSet,
-				updateResultSet,
-				object,
-				ImmutableMap.of (),
-				FormType.update,
-				"settings");
+				object);
 
 			htmlTableClose ();
 

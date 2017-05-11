@@ -7,8 +7,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormField.UpdateResult;
-import wbs.console.forms.FormFieldUpdateHook;
+import wbs.console.forms.types.FormFieldUpdateHook;
+import wbs.console.forms.types.FormUpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -43,9 +43,6 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 	LogContext logContext;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties
@@ -59,7 +56,8 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 	public
 	void onUpdate (
 			@NonNull Transaction parentTransaction,
-			@NonNull UpdateResult <Generic, Native> updateResult,
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormUpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull Record <?> linkObject,
 			@NonNull Optional <Object> objectRef,

@@ -84,7 +84,7 @@ class ChatStatsDaemon
 
 				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
-						"runService ()");
+						"runService");
 
 			) {
 
@@ -172,7 +172,7 @@ class ChatStatsDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"getChatIds");
@@ -197,7 +197,7 @@ class ChatStatsDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"doChat");

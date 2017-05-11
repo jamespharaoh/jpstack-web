@@ -6,9 +6,7 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -29,7 +27,8 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
@@ -75,6 +74,9 @@ class ObjectSearchPageBuilder <
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@SingletonDependency
+	FormContextManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -130,7 +132,7 @@ class ObjectSearchPageBuilder <
 	Class <SearchType> searchClass;
 	Class <ResultType> resultClass;
 
-	FormFieldSet <SearchType> searchFormFieldSet;
+	FormContextBuilder <SearchType> searchFormContextBuilder;
 
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
@@ -262,8 +264,8 @@ class ObjectSearchPageBuilder <
 			.parentIdName (
 				parentIdName)
 
-			.searchFormFieldSet (
-				searchFormFieldSet)
+			.searchFormContextBuilder (
+				searchFormContextBuilder)
 
 			.resultsModes (
 				resultsModes)
@@ -326,8 +328,8 @@ class ObjectSearchPageBuilder <
 					.sessionKey (
 						sessionKey)
 
-					.fields (
-						searchFormFieldSet)
+					.searchFormContextBuilder (
+						searchFormContextBuilder)
 
 					.fileName (
 						fileName);
@@ -478,33 +480,25 @@ class ObjectSearchPageBuilder <
 						spec.resultsClassName ()),
 					() -> consoleHelper.objectClass ()));
 
-		searchFormFieldSet =
-			consoleModule.formFieldSetRequired (
-				spec.searchFieldsName (),
+		searchFormContextBuilder =
+			formContextManager.formContextBuilderRequired (
+				consoleModule.name (),
+				spec.searchFormContextName (),
 				searchClass);
 
-		boolean haveResultsColumnsFieldsName =
+		boolean haveResultsFormContextName =
 			isNotNull (
-				spec.resultsFieldsName ());
-
-		boolean haveResultsRowsFieldName =
-			isNotNull (
-				spec.resultsRowsFieldsName ());
-
-		boolean haveResultsFieldsNames = (
-			haveResultsColumnsFieldsName
-			|| haveResultsRowsFieldName
-		);
+				spec.resultsFormContextName ());
 
 		boolean haveResultsModes =
 			collectionIsNotEmpty (
 				spec.resultsModes ());
 
-		if (haveResultsFieldsNames && haveResultsModes) {
+		if (haveResultsFormContextName && haveResultsModes) {
 			throw new RuntimeException ();
 		}
 
-		if (haveResultsFieldsNames) {
+		if (haveResultsFormContextName) {
 
 			resultsModes =
 				ImmutableMap.<String, ObjectSearchResultsMode <ResultType>> of (
@@ -514,15 +508,11 @@ class ObjectSearchPageBuilder <
 				.name (
 					"normal")
 
-				.columns (
-					formFieldSet (
-						optionalFromNullable (
-							spec.resultsFieldsName ())))
-
-				.rows (
-					formFieldSet (
-						optionalFromNullable (
-							spec.resultsRowsFieldsName ())))
+				.formContextBuilder (
+					formContextManager.formContextBuilderRequired (
+						consoleModule.name (),
+						spec.resultsFormContextName (),
+						resultClass))
 
 			);
 
@@ -537,23 +527,11 @@ class ObjectSearchPageBuilder <
 						.name (
 							resultsModeSpec.name ())
 
-						.columns (
-							formFieldSet (
-								optionalFromNullable (
-									ifNull (
-										resultsModeSpec.columnsFieldsName (),
-										stringFormat (
-											"results-%s-columns",
-											resultsModeSpec.name ())))))
-
-						.rows (
-							formFieldSet (
-								optionalFromNullable (
-									ifNull (
-										resultsModeSpec.rowsFieldsName (),
-										stringFormat (
-											"results-%s-rows",
-											resultsModeSpec.name ()))))),
+						.formContextBuilder (
+							formContextManager.formContextBuilderRequired (
+								consoleModule.name (),
+								resultsModeSpec.formContextName (),
+								resultClass)),
 
 					spec.resultsModes ()),
 				ObjectSearchResultsMode::name);
@@ -621,19 +599,6 @@ class ObjectSearchPageBuilder <
 
 		itemsPerPage =
 			100l;
-
-	}
-
-	private
-	Optional <FormFieldSet <ResultType>> formFieldSet (
-			@NonNull Optional <String> formFieldSetNameOptional) {
-
-		return optionalMapOptional (
-			formFieldSetNameOptional,
-			formFieldSetName ->
-				consoleModule.formFieldSet (
-					formFieldSetName,
-					resultClass));
 
 	}
 

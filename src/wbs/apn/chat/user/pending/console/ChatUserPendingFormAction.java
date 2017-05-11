@@ -137,7 +137,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					"backupResponder");
 
@@ -314,7 +314,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goDismiss");
@@ -347,7 +347,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goApproveName");
@@ -451,7 +451,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goApproveInfo");
@@ -564,7 +564,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goApproveImage");
@@ -738,7 +738,7 @@ class ChatUserPendingFormAction
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"goRejectName");
@@ -860,7 +860,7 @@ class ChatUserPendingFormAction
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"goRejectInfo");
@@ -1089,7 +1089,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goRejectImage");

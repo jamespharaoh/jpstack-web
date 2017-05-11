@@ -15,8 +15,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -223,7 +222,7 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"getChatIds");
@@ -246,10 +245,11 @@ class ChatDateDaemon
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"doChat (%s)",
-					integerToDecimalString (
+					"doChat",
+					keyEqualsDecimalInteger (
+						"chatId",
 						chatId));
 
 		) {
@@ -349,16 +349,13 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithParameters (
 					logContext,
 					parentTaskLogger,
-					stringFormat (
-						"%s.%s (%s)",
-						classNameSimple (
-							getClass ()),
-						"getChatData",
-						integerToDecimalString (
-							chatId)));
+					"getChatData",
+					keyEqualsDecimalInteger (
+						"chatId",
+						chatId));
 
 		) {
 
@@ -631,10 +628,13 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"doUser (otherUserInfos, thisUserId)");
+					"doUser",
+					keyEqualsDecimalInteger (
+						"thisUserId",
+						thisUserId));
 
 		) {
 

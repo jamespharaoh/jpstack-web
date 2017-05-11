@@ -3,11 +3,16 @@ package wbs.framework.hibernate;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -522,13 +527,18 @@ class HibernateTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull CharSequence dynamicContext) {
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
+			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new NestedTransaction (
 			this,
 			logContext.nestTaskLogger (
-				transactionTaskLogger,
-				dynamicContext
+				optionalOf (
+					transactionTaskLogger),
+				dynamicContextName,
+				dynamicContextParameters,
+				optionalAbsent ()
 			).taskLoggerImplementation ());
 
 	}

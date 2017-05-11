@@ -46,9 +46,9 @@ import org.joda.time.Interval;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
@@ -87,9 +87,6 @@ class ObjectListPart <
 	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -117,7 +114,7 @@ class ObjectListPart <
 	Map <String, ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -138,6 +135,8 @@ class ObjectListPart <
 
 	ConsoleContext targetContext;
 	ParentType parent;
+
+	FormContext <ObjectType> formContext;
 
 	// details
 
@@ -194,13 +193,37 @@ class ObjectListPart <
 			prepareTargetContext (
 				transaction);
 
-			prepareFieldSet (
+			prepareFormContext (
 				transaction);
 
 		}
 
 	}
 
+	private
+	void prepareFormContext (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareFormContext");
+
+		) {
+
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap (),
+					allObjects);
+
+		}
+
+	}
+
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -212,6 +235,7 @@ class ObjectListPart <
 				: formFieldsProvider.getStaticFields ();
 
 	}
+	*/
 
 	void prepareBrowserSpec (
 			@NonNull Transaction parentTransaction) {
@@ -875,9 +899,8 @@ class ObjectListPart <
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				fields);
+			formContext.outputTableHeadings (
+				transaction);
 
 			htmlTableRowClose ();
 
@@ -916,12 +939,9 @@ class ObjectListPart <
 
 				);
 
-				formFieldLogic.outputTableCellsList (
+				formContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					fields,
 					object,
-					emptyMap (),
 					false);
 
 				htmlTableRowClose (

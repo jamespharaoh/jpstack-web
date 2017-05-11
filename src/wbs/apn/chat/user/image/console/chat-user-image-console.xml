@@ -58,7 +58,7 @@
 	</extend-context>
 
 	<field-set
-		name="uploadForm"
+		name="upload-form"
 		class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm">
 
 		<upload-field
@@ -69,5 +69,15 @@
 			name="setAsPrimary"/>
 
 	</field-set>
+
+	<form-contexts>
+
+		<form-context
+			name="upload"
+			class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm"
+			type="perform"
+			fields="upload-form"/>
+
+	</form-contexts>
 
 </console-module>

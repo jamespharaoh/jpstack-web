@@ -20,9 +20,9 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -55,7 +55,7 @@ class QueueManager {
 
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Map <String, Provider <QueueConsolePlugin>> queueHelpersByBeanName =
 		Collections.emptyMap ();
 

@@ -1,9 +1,9 @@
 package wbs.utils.thread;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.keyEqualsClassSimple;
+import static wbs.utils.string.StringUtils.keyEqualsEnum;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Getter;
@@ -79,11 +79,13 @@ class ThreadManagerImplementation
 			try (
 
 				OwnedTaskLogger taskLogger =
-					logContext.createTaskLoggerFormat (
-						"logThrowable (%s, %s)",
-						classNameSimple (
+					logContext.createTaskLogger (
+						"logThrowable",
+						keyEqualsClassSimple (
+							"throwableClass",
 							throwable.getClass ()),
-						enumNameHyphens (
+						keyEqualsEnum (
+							"resolution",
 							resolution));
 
 			) {

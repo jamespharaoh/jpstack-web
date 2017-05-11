@@ -2,7 +2,6 @@ package wbs.platform.object.list;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -20,12 +19,12 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.CodeFormFieldSpec;
-import wbs.console.forms.DescriptionFormFieldSpec;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.NameFormFieldSpec;
-import wbs.console.forms.StaticFieldsProvider;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.object.CodeFormFieldSpec;
+import wbs.console.forms.object.DescriptionFormFieldSpec;
+import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -77,6 +76,9 @@ class ObjectListPageBuilder <
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
+	@SingletonDependency
+	FormContextManager formContextManager;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -123,9 +125,10 @@ class ObjectListPageBuilder <
 
 	String typeCode;
 
-	FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
-	FormFieldSet <ObjectType> formFieldSet;
+	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	//FormFieldSet <ObjectType> formFieldSet;
 
 	Map <String, ObjectListBrowserSpec> listBrowsersByFieldName;
 
@@ -240,8 +243,8 @@ class ObjectListPageBuilder <
 					.listTabSpecs (
 						listTabsByName)
 
-					.formFieldsProvider (
-						fieldsProvider)
+					.formContextBuilder (
+						formContextBuilder)
 
 					.listBrowserSpecs (
 						listBrowsersByFieldName)
@@ -289,6 +292,7 @@ class ObjectListPageBuilder <
 			typeCode =
 				spec.typeCode ();
 
+			/*
 			// if a provider name is provided
 
 			if (spec.fieldsProviderName () != null) {
@@ -323,8 +327,13 @@ class ObjectListPageBuilder <
 						defaultFields (
 							taskLogger));
 
-			}
+			}*/
 
+			formContextBuilder =
+				formContextManager.formContextBuilderRequired (
+					consoleModule.name (),
+					spec.formFieldContextName (),
+					consoleHelper.objectClass ());
 
 			listBrowsersByFieldName =
 				ifNull (

@@ -7,9 +7,11 @@ import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalDo;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringFormatLazy;
@@ -34,15 +36,13 @@ public
 class TaskLoggerImplementation
 	implements OwnedTaskLogger {
 
-	// static state
-
-	private static
-	Long nextId = 0l;
-
 	// state
 
 	private final
-	Long id = nextId ++;
+	LoggingLogic loggingLogic;
+
+	private final
+	Long eventId;
 
 	private final
 	Optional <TaskLoggerImplementation> parentOptional;
@@ -51,10 +51,13 @@ class TaskLoggerImplementation
 	LogTarget logTarget;
 
 	private final
-	CharSequence staticContext;
+	String staticContextName;
 
 	private final
-	CharSequence dynamicContext;
+	String dynamicContextName;
+
+	private final
+	List <CharSequence> dynamicContextParameters;
 
 	private final
 	long nesting;
@@ -92,11 +95,19 @@ class TaskLoggerImplementation
 
 	public
 	TaskLoggerImplementation (
+			@NonNull LoggingLogic loggingLogic,
 			@NonNull Optional <TaskLoggerImplementation> parentOptional,
 			@NonNull LogTarget logTarget,
-			@NonNull CharSequence staticContext,
-			@NonNull CharSequence dynamicContext,
+			@NonNull String staticContextName,
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
 			@NonNull Optional <Boolean> debugEnabled) {
+
+		this.loggingLogic =
+			loggingLogic;
+
+		this.eventId =
+			loggingLogic.nextEventId ();
 
 		this.parentOptional =
 			parentOptional;
@@ -111,11 +122,14 @@ class TaskLoggerImplementation
 		this.logTarget =
 			logTarget;
 
-		this.staticContext =
-			staticContext;
+		this.staticContextName =
+			staticContextName;
 
-		this.dynamicContext =
-			dynamicContext;
+		this.dynamicContextName =
+			dynamicContextName;
+
+		this.dynamicContextParameters =
+			dynamicContextParameters;
 
 		if (
 			optionalIsPresent (
@@ -145,13 +159,21 @@ class TaskLoggerImplementation
 		this.startTime =
 			Instant.now ();
 
+		if (
+			optionalIsNotPresent (
+				parentOptional)
+		) {
+
+			loggingLogic.rootTaskBegin (
+				this);
+
+		}
+
 		debugFormat (
-			"Task logger %s.%s (%s) started at %s",
-			staticContext,
-			dynamicContext,
-			integerToDecimalString (
-				id),
-			startTime.toString ());
+			"Task logger %s started at %s",
+			toStringLazy (),
+			new LazyString (
+				() -> startTime.toString ()));
 
 	}
 
@@ -171,13 +193,21 @@ class TaskLoggerImplementation
 		Instant endTime =
 			Instant.now ();
 
+		if (
+			optionalIsNotPresent (
+				parentOptional)
+		) {
+
+			loggingLogic.rootTaskEnd (
+				this);
+
+		}
+
 		debugFormat (
-			"Task logger %s.%s (%s) ended at %s",
-			staticContext,
-			dynamicContext,
-			integerToDecimalString (
-				id),
-			endTime.toString ());
+			"Task logger %s ended at %s",
+			toStringLazy (),
+			new LazyString (
+				() -> endTime.toString ()));
 
 		this.endTime =
 			endTime;
@@ -258,16 +288,36 @@ class TaskLoggerImplementation
 
 			throw new IllegalStateException (
 				stringFormat (
-					"Cannot add children to closed task logger (%s.%s) %s",
-					staticContext,
-					dynamicContext,
-					integerToDecimalString (
-						id)));
+					"Cannot add children to closed task logger %s",
+					toString ()));
 
 		}
 
 		events.add (
 			child);
+
+	}
+
+	@Override
+	public
+	String toString () {
+
+		return stringFormat (
+			"%s.%s (%s) (%s)",
+			dynamicContextName,
+			staticContextName,
+			joinWithCommaAndSpace (
+				dynamicContextParameters),
+			integerToDecimalString (
+				eventId));
+
+	}
+
+	public
+	CharSequence toStringLazy () {
+
+		return new LazyString (
+			() -> toString ());
 
 	}
 
@@ -348,6 +398,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.fatal,
 				message));
 
@@ -376,6 +427,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.fatal,
 				message));
 
@@ -405,6 +457,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.error,
 				message));
 
@@ -433,6 +486,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.error,
 				message));
 
@@ -457,6 +511,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.warning,
 				message));
 
@@ -483,6 +538,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.warning,
 				message));
 
@@ -507,6 +563,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.notice,
 				message));
 
@@ -533,6 +590,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.notice,
 				message));
 
@@ -557,6 +615,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.logic,
 				message));
 
@@ -581,6 +640,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.debug,
 				message));
 
@@ -607,6 +667,7 @@ class TaskLoggerImplementation
 
 		events.add (
 			new TaskLogEntryEvent (
+				loggingLogic.nextEventId (),
 				LogSeverity.debug,
 				message));
 
@@ -636,6 +697,7 @@ class TaskLoggerImplementation
 
 			events.add (
 				new TaskLogEntryEvent (
+					loggingLogic.nextEventId (),
 					LogSeverity.error,
 					message));
 
@@ -749,6 +811,7 @@ class TaskLoggerImplementation
 
 			events.add (
 				new TaskLogEntryEvent (
+					loggingLogic.nextEventId (),
 					LogSeverity.error,
 					firstError));
 
@@ -848,6 +911,12 @@ class TaskLoggerImplementation
 
 	@Override
 	public
+	Long eventId () {
+		return eventId;
+	}
+
+	@Override
+	public
 	LogSeverity eventSeverity () {
 
 		return severity;
@@ -859,9 +928,11 @@ class TaskLoggerImplementation
 	String eventText () {
 
 		return stringFormat (
-			"%s.%s",
-			staticContext,
-			dynamicContext);
+			"%s.%s (%s)",
+			staticContextName,
+			dynamicContextName,
+			joinWithCommaAndSpace (
+				dynamicContextParameters));
 
 	}
 

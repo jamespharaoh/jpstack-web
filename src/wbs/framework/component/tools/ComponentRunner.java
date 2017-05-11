@@ -112,6 +112,10 @@ class ComponentRunner {
 				taskLogger,
 				arguments);
 
+			bootstrapComponentManager.registerPluginBootstrapComponents (
+				taskLogger,
+				layerNames);
+
 			runnerClass =
 				classForNameRequired (
 					runnerName);
@@ -290,8 +294,8 @@ class ComponentRunner {
 					.scope (
 						"singleton"))
 
-				//.outputPath (
-				//	"work/runner/components")
+				.outputPath (
+					"work/runner/components")
 
 				.build (
 					taskLogger);

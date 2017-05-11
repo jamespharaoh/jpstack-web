@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
@@ -11,20 +12,17 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -58,10 +56,6 @@ class ChatUserImageUploadAction
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatUserImageConsoleModule;
-
-	@SingletonDependency
 	ChatUserImageObjectHelper chatUserImageHelper;
 
 	@SingletonDependency
@@ -71,7 +65,8 @@ class ChatUserImageUploadAction
 	Database database;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("chatUserImageUploadFormContextBuilder")
+	FormContextBuilder <ChatUserImageUploadForm> formContextBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -93,7 +88,7 @@ class ChatUserImageUploadAction
 
 	// state
 
-	FormFieldSet <ChatUserImageUploadForm> fields;
+	FormContext <ChatUserImageUploadForm> formContext;
 
 	ChatUserImageType chatUserImageType;
 
@@ -121,17 +116,20 @@ class ChatUserImageUploadAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
 
 		) {
 
-			fields =
-				chatUserImageConsoleModule.formFieldSetRequired (
-					"uploadForm",
-					ChatUserImageUploadForm.class);
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
+
+			uploadForm =
+				formContext.object ();
 
 			chatUserImageType =
 				toEnum (
@@ -140,16 +138,8 @@ class ChatUserImageUploadAction
 					requestContext.stuff (
 						"chatUserImageType"));
 
-			uploadForm =
-				new ChatUserImageUploadForm ();
-
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				fields,
-				uploadForm,
-				ImmutableMap.of (),
-				"upload");
+			formContext.update (
+				transaction);
 
 			String resultType;
 			String extension;

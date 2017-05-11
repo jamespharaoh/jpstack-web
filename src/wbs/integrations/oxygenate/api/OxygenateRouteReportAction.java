@@ -114,7 +114,7 @@ class OxygenateRouteReportAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"updateDatabase");
@@ -209,7 +209,7 @@ class OxygenateRouteReportAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"storeLog");

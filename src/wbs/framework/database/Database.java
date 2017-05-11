@@ -1,8 +1,11 @@
 package wbs.framework.database;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.StringUtils.stringFormatLazyArray;
+
+import java.util.Arrays;
+import java.util.List;
 
 import com.google.common.base.Optional;
 
@@ -17,179 +20,134 @@ interface Database {
 	OwnedTransaction beginTransaction (
 			LogContext parentLogContext,
 			Optional <TaskLogger> parentTaskLogger,
-			CharSequence summary,
+			String dynamicContextName,
+			List <CharSequence> dynamicContextParameters,
 			boolean readWrite);
 
 	default
-	OwnedTransaction beginReadWrite (
+	OwnedTransaction beginReadWriteWithoutParameters (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull CharSequence summary) {
+			@NonNull String dynamicContextName) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			summary,
+			dynamicContextName,
+			emptyList (),
 			true);
 
 	}
 
 	default
-	OwnedTransaction beginReadWriteFormat (
+	OwnedTransaction beginReadWriteWithParameters (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull CharSequence ... summaryArguments) {
+			@NonNull String dynamicContextName,
+			@NonNull CharSequence ... dynamicContextParameters) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			stringFormatLazyArray (
-				summaryArguments),
+			dynamicContextName,
+			Arrays.asList (
+				dynamicContextParameters),
 			true);
 
 	}
 
 	default
-	OwnedTransaction beginReadWrite (
+	OwnedTransaction beginReadWriteWithoutParameters (
 			@NonNull LogContext parentLogContext,
-			@NonNull String summary) {
+			@NonNull String dynamicContextName) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			summary,
+			dynamicContextName,
+			emptyList (),
 			true);
 
 	}
 
 	default
-	OwnedTransaction beginReadWriteFormat (
+	OwnedTransaction beginReadWriteWithParameters (
 			@NonNull LogContext parentLogContext,
-			@NonNull CharSequence ... summaryArguments) {
+			@NonNull String dynamicContextName,
+			@NonNull CharSequence ... dynamicContextParameters) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			stringFormatLazyArray (
-				summaryArguments),
+			dynamicContextName,
+			Arrays.asList (
+				dynamicContextParameters),
 			true);
 
 	}
 
 	default
-	OwnedTransaction beginReadOnly (
+	OwnedTransaction beginReadOnlyWithoutParameters (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull CharSequence summary) {
+			@NonNull String dynamicContextName) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			summary,
+			dynamicContextName,
+			emptyList (),
 			false);
 
 	}
 
 	default
-	OwnedTransaction beginReadOnlyFormat (
+	OwnedTransaction beginReadOnlyWithParameters (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull CharSequence ... summaryArguments) {
+			@NonNull String dynamicContextName,
+			@NonNull CharSequence ... dynamicContextParameters) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			stringFormatLazyArray (
-				summaryArguments),
+			dynamicContextName,
+			Arrays.asList (
+				dynamicContextParameters),
 			false);
 
 	}
 
 	default
-	OwnedTransaction beginReadOnly (
+	OwnedTransaction beginReadOnlyWithoutParameters (
 			@NonNull LogContext parentLogContext,
-			@NonNull CharSequence summary) {
+			@NonNull String dynamicContextName) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			summary,
+			dynamicContextName,
+			emptyList (),
 			false);
 
 	}
 
 	default
-	OwnedTransaction beginReadOnlyFormat (
+	OwnedTransaction beginReadOnlyWithParameters (
 			@NonNull LogContext parentLogContext,
-			@NonNull CharSequence ... summaryArguments) {
+			@NonNull String dynamicContextName,
+			@NonNull CharSequence ... dynamicContextParameters) {
 
 		return beginTransaction (
 			parentLogContext,
 			optionalAbsent (),
-			stringFormatLazyArray (
-				summaryArguments),
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyJoin (
-			LogContext parentLogContext,
-			TaskLogger parentTaskLogger,
-			CharSequence summary) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalOf (
-				parentTaskLogger),
-			summary,
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyJoinFormat (
-			LogContext parentLogContext,
-			TaskLogger parentTaskLogger,
-			CharSequence ... summaryArguments) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalOf (
-				parentTaskLogger),
-			stringFormatLazyArray (
-				summaryArguments),
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyJoin (
-			@NonNull LogContext parentLogContext,
-			@NonNull CharSequence summary) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
-			summary,
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyJoinFormat (
-			@NonNull LogContext parentLogContext,
-			@NonNull CharSequence ... summaryArguments) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
-			stringFormatLazyArray (
-				summaryArguments),
+			dynamicContextName,
+			Arrays.asList (
+				dynamicContextParameters),
 			false);
 
 	}

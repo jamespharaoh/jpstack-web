@@ -9,13 +9,15 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.FormField;
-import wbs.console.forms.FormFieldBuilderContext;
-import wbs.console.forms.FormFieldBuilderContextImplementation;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormFieldSetSpec;
-import wbs.console.forms.FormItem;
+import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.FormFieldBuilderContextImplementation;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.core.FormFieldSetImplementation;
+import wbs.console.forms.core.FormFieldSetSpec;
+import wbs.console.forms.types.FormField;
+import wbs.console.forms.types.FormItem;
 import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
@@ -23,6 +25,8 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,9 +41,12 @@ class ConsoleModuleBuilder
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
@@ -112,8 +119,8 @@ class ConsoleModuleBuilder
 				.consoleHelper (
 					consoleHelper);
 
-			FormFieldSet <Container> formFieldSet =
-				new FormFieldSet <Container> ();
+			FormFieldSetImplementation <Container> formFieldSet =
+				new FormFieldSetImplementation<> ();
 
 			builder.descend (
 				taskLogger,

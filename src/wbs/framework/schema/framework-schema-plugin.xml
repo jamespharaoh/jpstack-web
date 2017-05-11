@@ -11,7 +11,8 @@
 		<component class="builder.SchemaFromModel"/>
 		<component class="builder.SchemaTableFromModel"/>
 		<component class="tool.SchemaToSqlImplementation"/>
-		<component class="tool.SchemaToolComponents"/>
+		<component class="tool.SchemaToolExceptionLogger"/>
+		<component class="tool.SchemaToolSpecialConfig"/>
 	</layer>
 
 </plugin>

@@ -1,24 +1,19 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -33,18 +28,15 @@ class SubscriptionNumberAddRemovePart
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("subscriptionNumberAddRemoveFormContextBuilder")
+	FormContextBuilder <SubscriptionNumberAddRemoveForm> formContextBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	@SingletonDependency
-	@Named
-	ConsoleModule subscriptionNumberConsoleModule;
-
 	// state
 
-	FormFieldSet <SubscriptionNumberAddRemoveForm> addRemoveFormFieldSet;
+	FormContext <SubscriptionNumberAddRemoveForm> formContext;
 
 	SubscriptionNumberAddRemoveForm addRemoveForm;
 
@@ -64,21 +56,16 @@ class SubscriptionNumberAddRemovePart
 
 		) {
 
-			addRemoveFormFieldSet =
-				subscriptionNumberConsoleModule.formFieldSetRequired (
-					"addRemoveForm",
-					SubscriptionNumberAddRemoveForm.class);
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 			addRemoveForm =
-				new SubscriptionNumberAddRemoveForm ();
+				formContext.object ();
 
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				addRemoveFormFieldSet,
-				addRemoveForm,
-				ImmutableMap.of (),
-				"update");
+			formContext.update (
+				transaction);
 
 		}
 
@@ -104,16 +91,8 @@ class SubscriptionNumberAddRemovePart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
-				transaction,
-				requestContext,
-				formatWriter,
-				addRemoveFormFieldSet,
-				Optional.absent (),
-				addRemoveForm,
-				ImmutableMap.of (),
-				FormType.perform,
-				"update");
+			formContext.outputFormRows (
+				transaction);
 
 			htmlTableOpenDetails ();
 

@@ -4,14 +4,10 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -26,8 +22,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -35,14 +29,12 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -67,24 +59,26 @@ class ChatRebillSendPart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatRebillConsoleModule;
+	@NamedDependency ("chatRebillSearchFormContextBuilder")
+	FormContextBuilder <ChatRebillSearch> searchFormContextBuilder;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("chatRebillBillResultsFormContextBuilder")
+	FormContextBuilder <ChatUserRec> billResultsFormContextBuilder;
+
+	@SingletonDependency
+	@NamedDependency ("chatRebillNonBillResultsFormContextBuilder")
+	FormContextBuilder <ChatRebillNonBillResult>
+		nonBillResultsFormContextBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	// state
 
-	FormFieldSet <ChatRebillSearch> searchFormFields;
-	FormFieldSet <ChatUserRec> billResultsFormFields;
-	FormFieldSet <ChatRebillNonBillResult> nonBillResultsFormFields;
-
-	Optional <UpdateResultSet> formUpdates;
-	ChatRebillSearch formValues;
-	Map <String, Object> formHints;
+	FormContext <ChatRebillSearch> searchFormContext;
+	FormContext <ChatUserRec> billResultsFormContext;
+	FormContext <ChatRebillNonBillResult> nonBillResultsFormContext;
 
 	Optional <List <ChatUserRec>> billSearchResults;
 	Optional <List <ChatRebillNonBillResult>> nonBillSearchResults;
@@ -104,49 +98,6 @@ class ChatRebillSendPart
 					"prepare");
 
 		) {
-
-			// get form fields
-
-			searchFormFields =
-				chatRebillConsoleModule.formFieldSetRequired (
-					"search",
-					ChatRebillSearch.class);
-
-			billResultsFormFields =
-				chatRebillConsoleModule.formFieldSetRequired (
-					"bill-results",
-					ChatUserRec.class);
-
-			nonBillResultsFormFields =
-				chatRebillConsoleModule.formFieldSetRequired (
-					"non-bill-results",
-					ChatRebillNonBillResult.class);
-
-			// get form data
-
-			formUpdates =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"formUpdates"));
-
-			formValues =
-				optionalOrElseRequired (
-					optionalCast (
-						ChatRebillSearch.class,
-						requestContext.request (
-							"formValues")),
-					() -> new ChatRebillSearch ());
-
-			formHints =
-				ImmutableMap.<String, Object> builder ()
-
-				.put (
-					"chat",
-					chatHelper.findFromContextRequired (
-						transaction))
-
-				.build ();
 
 			// get search results
 
@@ -185,6 +136,35 @@ class ChatRebillSendPart
 									.reason (
 										(String)
 										chatUserWithReason.getRight ())));
+
+			// setup forms
+
+			Map <String, Object> formHints =
+				ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"chat",
+					chatHelper.findFromContextRequired (
+						transaction))
+
+				.build ();
+
+			searchFormContext =
+				searchFormContextBuilder.build (
+					transaction,
+					formHints);
+
+			billResultsFormContext =
+				billResultsFormContextBuilder.build (
+					transaction,
+					formHints,
+					billSearchResults);
+
+			nonBillResultsFormContext =
+				nonBillResultsFormContextBuilder.build (
+					transaction,
+					formHints,
+					nonBillSearchResults);
 
 		}
 
@@ -240,16 +220,8 @@ class ChatRebillSendPart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
-				transaction,
-				requestContext,
-				formatWriter,
-				searchFormFields,
-				formUpdates,
-				formValues,
-				formHints,
-				FormType.search,
-				"rebill");
+			searchFormContext.outputFormRows (
+				transaction);
 
 			htmlTableClose ();
 
@@ -317,8 +289,9 @@ class ChatRebillSendPart
 				integerToDecimalString (
 					collectionSize (
 						billSearchResults.get ())),
-				"specified. Please note that these results are not saved and so ",
-				"the list of actual users billed may be slightly different.");
+				"specified. Please note that these results are not saved and ",
+				"so the list of actual users billed may be slightly ",
+				"different.");
 
 			if (
 
@@ -339,13 +312,8 @@ class ChatRebillSendPart
 
 			}
 
-			formFieldLogic.outputListTable (
+			billResultsFormContext.outputListTable (
 				transaction,
-				formatWriter,
-				billResultsFormFields,
-				optionalAbsent (),
-				billSearchResults.get (),
-				emptyMap (),
 				true);
 
 		}
@@ -390,13 +358,8 @@ class ChatRebillSendPart
 				"built into the system. Some of these may be bypassed with ",
 				"settings on the search form.");
 
-			formFieldLogic.outputListTable (
+			nonBillResultsFormContext.outputListTable (
 				transaction,
-				formatWriter,
-				nonBillResultsFormFields,
-				optionalAbsent (),
-				nonBillSearchResults.get (),
-				emptyMap (),
 				true);
 
 		}

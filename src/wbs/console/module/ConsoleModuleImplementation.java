@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.core.FormFieldSet;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;

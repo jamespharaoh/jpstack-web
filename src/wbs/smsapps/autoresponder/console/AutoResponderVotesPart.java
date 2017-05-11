@@ -4,7 +4,6 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.simplify;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
@@ -17,19 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.misc.ConsoleUserHelper;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -48,7 +44,6 @@ import wbs.sms.message.core.model.MessageSearch;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 
 import wbs.utils.time.DurationFormatter;
-import wbs.utils.time.TextualInterval;
 
 @PrototypeComponent ("autoResponderVotesPart")
 public
@@ -58,17 +53,15 @@ class AutoResponderVotesPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
-	ConsoleModule autoResponderVotesConsoleModule;
+	@NamedDependency
+	FormContextBuilder <AutoResponderVotesForm>
+		autoResponderVotesFormContextBuilder;
 
 	@SingletonDependency
 	AutoResponderConsoleHelper autoResponderHelper;
 
 	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@SingletonDependency
 	DurationFormatter intervalFormatter;
@@ -85,11 +78,12 @@ class AutoResponderVotesPart
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	@SingletonDependency
+	UserPrivChecker privChecker;
+
 	// state
 
-	FormFieldSet <AutoResponderVotesForm> formFields;
-	AutoResponderVotesForm formValue;
-	UpdateResultSet formUpdate;
+	FormContext <AutoResponderVotesForm> formContext;
 
 	Map <String, Long> votes;
 
@@ -109,36 +103,19 @@ class AutoResponderVotesPart
 
 		) {
 
-			// get fields
+			// setup form context
 
-			formFields =
-				autoResponderVotesConsoleModule.formFieldSetRequired (
-					"auto-responder-votes",
-					AutoResponderVotesForm.class);
+			formContext =
+				autoResponderVotesFormContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 			// process form
 
-			formValue =
-				new AutoResponderVotesForm ()
+			formContext.update (
+				transaction);
 
-				.timePeriod (
-					TextualInterval.parseRequired (
-						consoleUserHelper.timezone (
-							transaction),
-						"last 12 hours",
-						consoleUserHelper.hourOffset (
-							transaction)));
-
-			formUpdate =
-				formFieldLogic.update (
-					transaction,
-					requestContext,
-					formFields,
-					formValue,
-					emptyMap (),
-					"votes");
-
-			if (formUpdate.errors ()) {
+			if (formContext.errors ()) {
 				return;
 			}
 
@@ -163,7 +140,7 @@ class AutoResponderVotesPart
 					autoResponderService.getId ())
 
 				.createdTime (
-					formValue.timePeriod ())
+					formContext.object ().timePeriod ())
 
 				.direction (
 					MessageDirection.in);
@@ -189,7 +166,8 @@ class AutoResponderVotesPart
 
 				Long oldVal =
 					ifNull (
-						votes.get (body),
+						votes.get (
+							body),
 						0l);
 
 				votes.put (
@@ -218,21 +196,12 @@ class AutoResponderVotesPart
 
 			// form
 
-			formFieldLogic.outputFormTable (
+			formContext.outputFormTable (
 				transaction,
-				requestContext,
-				formatWriter,
-				formFields,
-				optionalOf (
-					formUpdate),
-				formValue,
-				emptyMap (),
 				"get",
 				requestContext.resolveLocalUrl (
 					"/autoResponder.votes"),
-				"search",
-				FormType.search,
-				"votes");
+				"search");
 
 			// votes
 

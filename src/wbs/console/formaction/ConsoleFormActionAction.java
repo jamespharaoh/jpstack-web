@@ -10,9 +10,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -36,9 +35,6 @@ class ConsoleFormActionAction <FormState, History>
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -51,7 +47,7 @@ class ConsoleFormActionAction <FormState, History>
 	String name;
 
 	@Getter @Setter
-	FormFieldSet <FormState> fields;
+	FormContextBuilder <FormState> formContextBuilder;
 
 	@Getter @Setter
 	ConsoleFormActionHelper <FormState, History> formActionHelper;
@@ -79,7 +75,7 @@ class ConsoleFormActionAction <FormState, History>
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -98,25 +94,19 @@ class ConsoleFormActionAction <FormState, History>
 				transaction,
 				formState);
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
+			FormContext <FormState> formContext =
+				formContextBuilder.build (
 					transaction,
-					requestContext,
-					fields,
-					formState,
 					formHints,
-					name);
+					formState);
 
-			if (updateResultSet.errorCount () > 0) {
+			formContext.update (
+				transaction);
 
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					name);
+			if (formContext.errors ()) {
 
-				requestContext.request (
-					"console-form-action-update-result-set",
-					updateResultSet);
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 

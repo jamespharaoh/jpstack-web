@@ -1,8 +1,13 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.ArrayUtils.arrayStream;
+import static wbs.utils.collection.IterableUtils.iterableStream;
 import static wbs.utils.etc.Misc.isNull;
 
+import java.util.List;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -114,6 +119,81 @@ class NullUtils {
 				name);
 
 		}
+
+	}
+
+	public static <Type>
+	Iterable <Type> filterNotNull (
+			@NonNull Iterable <Type> iterable) {
+
+		return () ->
+			iterableStream (
+				iterable)
+
+			.filter (
+				item ->
+					item != null)
+
+			.iterator ();
+
+	}
+
+	@SafeVarargs
+	public static <OutType, InType extends OutType>
+	Iterable <OutType> filterNotNull (
+			@NonNull InType ... array) {
+
+		return () ->
+			arrayStream (
+				array)
+
+			.filter (
+				item ->
+					item != null)
+
+			.map (
+				item ->
+					(OutType)
+					item)
+
+			.iterator ();
+
+	}
+
+	public static <Type>
+	List <Type> filterNotNullToList (
+			@NonNull Iterable <? extends Type> iterable) {
+
+		return ImmutableList.<Type> copyOf (
+			iterableStream (
+				iterable)
+
+			.filter (
+				item ->
+					item != null)
+
+			.iterator ()
+
+		);
+
+	}
+
+	@SuppressWarnings ("unchecked")
+	public static <OutType, InType extends OutType>
+	List <OutType> filterNotNullToList (
+			@NonNull InType ... array) {
+
+		return ImmutableList.<OutType> copyOf (
+			arrayStream (
+				array)
+
+			.filter (
+				item ->
+					item != null)
+
+			.iterator ()
+
+		);
 
 	}
 

@@ -814,10 +814,10 @@ class Misc {
 
 	}
 
-	public static <Type>
+	public static <KeyType>
 	boolean contains (
-			@NonNull Map<Type,?> map,
-			@NonNull Type value) {
+			@NonNull Map <KeyType, ?> map,
+			@NonNull KeyType value) {
 
 		return map.keySet ().contains (
 			value);
@@ -830,6 +830,16 @@ class Misc {
 			@NonNull Type value) {
 
 		return ! collection.contains (
+			value);
+
+	}
+
+	public static <KeyType>
+	boolean doesNotContain (
+			@NonNull Map <KeyType, ?> map,
+			@NonNull KeyType value) {
+
+		return ! map.containsKey (
 			value);
 
 	}
@@ -1000,6 +1010,16 @@ class Misc {
 
 		throw new RuntimeException (
 			"Should never happen");
+
+	}
+
+	public static
+	RuntimeException shouldNeverHappenFormat (
+			@NonNull String ... arguments) {
+
+		throw new RuntimeException (
+			stringFormatArray (
+				arguments));
 
 	}
 

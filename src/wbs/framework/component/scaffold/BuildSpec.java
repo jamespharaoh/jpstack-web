@@ -1,6 +1,5 @@
 package wbs.framework.component.scaffold;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -23,8 +22,11 @@ class BuildSpec {
 
 	@DataChildren
 	@Getter @Setter
-	List<BuildPluginSpec> plugins =
-		new ArrayList<BuildPluginSpec> ();
+	List <BuildPluginSpec> plugins;
+
+	@DataChildren
+	@Getter @Setter
+	List <BuildLayerSpec> layers;
 
 	@DataIgnore
 	Object gitLinks = null;

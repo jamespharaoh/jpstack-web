@@ -159,4 +159,41 @@
 
 	</field-set>
 
+	<form-contexts>
+
+		<multi-form-context
+			name="send"
+			class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm"
+			type="perform">
+
+			<fields
+				name="search"
+				fields="send-search"/>
+
+			<fields
+				name="numbers"
+				fields="send-numbers"/>
+
+			<fields
+				name="common"
+				fields="send-common"/>
+
+			<fields
+				name="message-user"
+				fields="send-message-user"/>
+
+			<fields
+				name="message-message"
+				fields="send-message-message"/>
+
+		</multi-form-context>
+
+		<object-form-context
+			name="verify"
+			object-name="chat-user"
+			type="read-only"
+			fields="verify-user"/>
+
+	</form-contexts>
+
 </console-module>

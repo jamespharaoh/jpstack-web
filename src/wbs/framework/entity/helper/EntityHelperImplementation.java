@@ -73,7 +73,7 @@ class EntityHelperImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init (
+	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -81,7 +81,7 @@ class EntityHelperImplementation
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"init");
+					"setup");
 
 		) {
 

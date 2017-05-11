@@ -44,8 +44,8 @@ class ObjectSearchPageSpec {
 	String searchClassName;
 
 	@DataAttribute (
-		name = "search-fields")
-	String searchFieldsName;
+		name = "search-form")
+	String searchFormContextName;
 
 	@DataAttribute (
 		name = "search-dao-method")
@@ -56,12 +56,8 @@ class ObjectSearchPageSpec {
 	String resultsClassName;
 
 	@DataAttribute (
-		name = "results-fields")
-	String resultsFieldsName;
-
-	@DataAttribute (
-		name = "results-rows-fields")
-	String resultsRowsFieldsName;
+		name = "results-form")
+	String resultsFormContextName;
 
 	@DataAttribute (
 		name = "results-dao-method")

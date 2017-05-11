@@ -15,13 +15,4 @@ interface ComponentMetaData {
 
 	ComponentState state ();
 
-	public static
-	enum ComponentState {
-		uninitialized,
-		active,
-		tornDown,
-		error,
-		unmanaged;
-	}
-
 }

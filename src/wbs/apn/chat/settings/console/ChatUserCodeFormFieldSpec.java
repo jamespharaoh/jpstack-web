@@ -3,7 +3,7 @@ package wbs.apn.chat.settings.console;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormField;
+import wbs.console.forms.types.FormField;
 import wbs.console.module.ConsoleModuleData;
 
 import wbs.framework.component.annotations.PrototypeComponent;

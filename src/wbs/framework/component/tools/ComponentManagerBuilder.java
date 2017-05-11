@@ -2,34 +2,24 @@ package wbs.framework.component.tools;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
-import static wbs.utils.etc.Misc.contains;
-import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
-import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
-import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
-import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -44,8 +34,6 @@ import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
 import wbs.api.module.ApiModuleSpecFactory;
 
-import wbs.console.helper.enums.EnumConsoleHelper;
-import wbs.console.helper.enums.EnumConsoleHelperFactory;
 import wbs.console.module.ConsoleMetaModule;
 import wbs.console.module.ConsoleMetaModuleFactory;
 import wbs.console.module.ConsoleModule;
@@ -56,34 +44,24 @@ import wbs.console.module.ConsoleModuleSpecFactory;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
-import wbs.framework.component.scaffold.BuildPluginSpec;
+import wbs.framework.component.scaffold.BuildLayerPluginSpec;
+import wbs.framework.component.scaffold.BuildLayerSpec;
 import wbs.framework.component.scaffold.BuildSpec;
 import wbs.framework.component.scaffold.PluginApiModuleSpec;
 import wbs.framework.component.scaffold.PluginComponentSpec;
-import wbs.framework.component.scaffold.PluginComponentTypeSpec;
 import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
-import wbs.framework.component.scaffold.PluginCustomTypeSpec;
-import wbs.framework.component.scaffold.PluginDependencySpec;
-import wbs.framework.component.scaffold.PluginEnumTypeSpec;
-import wbs.framework.component.scaffold.PluginFixtureSpec;
 import wbs.framework.component.scaffold.PluginLayerSpec;
 import wbs.framework.component.scaffold.PluginManager;
-import wbs.framework.component.scaffold.PluginManagerBuilder;
-import wbs.framework.component.scaffold.PluginModelSpec;
-import wbs.framework.component.scaffold.PluginModelsSpec;
 import wbs.framework.component.scaffold.PluginSpec;
-import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectHooks;
 
 @PrototypeComponent ("componentManagerBuilder")
 @Accessors (fluent = true)
@@ -98,11 +76,17 @@ class ComponentManagerBuilder {
 	@SingletonDependency
 	ComponentManager bootstrapComponentManager;
 
+	@SingletonDependency
+	BuildSpec buildSpec;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
-	LoggingLogic logginglogic;
+	LoggingLogic loggingLogic;
+
+	@SingletonDependency
+	PluginManager pluginManager;
 
 	// prototype dependencies
 
@@ -112,9 +96,6 @@ class ComponentManagerBuilder {
 
 	@PrototypeDependency
 	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
-
-	@PrototypeDependency
-	Provider <PluginManagerBuilder> pluginManagerBuilderProvider;
 
 	// properties
 
@@ -137,11 +118,9 @@ class ComponentManagerBuilder {
 
 	// state
 
-	List <PluginSpec> plugins;
+	Map <String, BuildLayerSpec> layers;
 
-	PluginManager pluginManager;
-
-	Map <String, Pair <Class <?>, Object>> singletonComponents =
+	Map <String, Pair <Class <?>, Object>> unmanagedSingletons =
 		new LinkedHashMap<> ();
 
 	List <ComponentDefinition> componentDefinitionsToRegister =
@@ -157,7 +136,7 @@ class ComponentManagerBuilder {
 			@NonNull Class <?> interfaceClass,
 			@NonNull Object component) {
 
-		singletonComponents.put (
+		unmanagedSingletons.put (
 			componentName,
 			Pair.of (
 				interfaceClass,
@@ -183,9 +162,6 @@ class ComponentManagerBuilder {
 			loadPlugins (
 				taskLogger);
 
-			createPluginManager (
-				taskLogger);
-
 			registerComponents (
 				taskLogger);
 
@@ -208,144 +184,12 @@ class ComponentManagerBuilder {
 
 		) {
 
-			String buildPath =
-				"/wbs-build.xml";
-
-			DataFromXml buildDataFromXml =
-				dataFromXmlBuilderProvider.get ()
-
-				.registerBuilderClasses (
-					BuildSpec.class,
-					BuildPluginSpec.class)
-
-				.build ();
-
-			BuildSpec build =
-				(BuildSpec)
-				buildDataFromXml.readClasspath (
-					taskLogger,
-					buildPath);
-
-			ImmutableList.Builder <PluginSpec> pluginsBuilder =
-				ImmutableList.builder ();
-
-			DataFromXml pluginDataFromXml =
-				dataFromXmlBuilderProvider.get ()
-
-				.registerBuilderClasses (
-					PluginApiModuleSpec.class,
-					PluginComponentSpec.class,
-					PluginComponentTypeSpec.class,
-					PluginConsoleModuleSpec.class,
-					PluginCustomTypeSpec.class,
-					PluginEnumTypeSpec.class,
-					PluginFixtureSpec.class,
-					PluginLayerSpec.class,
-					PluginModelSpec.class,
-					PluginModelsSpec.class,
-					PluginDependencySpec.class,
-					PluginSpec.class)
-
-				.build ();
-
-			Set <String> pluginNames =
-				new HashSet<> ();
-
-			for (
-				BuildPluginSpec buildPlugin
-					: build.plugins ()
-			) {
-
-				String pluginPath =
-					stringFormat (
-						"/%s",
-						buildPlugin.packageName ().replace (".", "/"),
-						"/%s-plugin.xml",
-						buildPlugin.name ());
-
-				PluginSpec plugin =
-					(PluginSpec)
-					pluginDataFromXml.readClasspath (
-						taskLogger,
-						pluginPath,
-						ImmutableList.of (
-							build));
-
-				if (
-					stringNotEqualSafe (
-						buildPlugin.name (),
-						plugin.name ())
-				) {
-
-					taskLogger.errorFormat (
-						"Plugin name mismatch for %s ",
-						pluginPath,
-						"(should be %s ",
-						buildPlugin.name (),
-						"but was %s)",
-						plugin.name ());
-
-					continue;
-
-				}
-
-				if (
-					contains (
-						pluginNames,
-						plugin.name ())
-				) {
-
-					taskLogger.errorFormat (
-						"Duplicated plugin name: %s",
-						plugin.name ());
-
-					continue;
-
-				}
-
-				pluginsBuilder.add (
-					plugin);
-
-				pluginNames.add (
-					plugin.name ());
-
-			}
+			layers =
+				mapWithDerivedKey (
+					buildSpec.layers (),
+					BuildLayerSpec::name);
 
 			taskLogger.makeException ();
-
-			plugins =
-				pluginsBuilder.build ();
-
-		}
-
-	}
-
-	private
-	void createPluginManager (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"createPluginManager");
-
-		) {
-
-			pluginManager =
-				pluginManagerBuilderProvider.get ()
-
-				.plugins (
-					plugins)
-
-				.build (
-					taskLogger);
-
-			addSingletonComponent (
-				"pluginManager",
-				PluginManager.class,
-				pluginManager);
 
 		}
 
@@ -377,7 +221,7 @@ class ComponentManagerBuilder {
 			registerConfigComponents (
 				taskLogger);
 
-			registerSingletonComponents (
+			registerUnmanagedSingletons (
 				taskLogger);
 
 			if (taskLogger.errors ()) {
@@ -468,41 +312,42 @@ class ComponentManagerBuilder {
 					: layerNames
 			) {
 
+				BuildLayerSpec buildLayer =
+					mapItemForKeyRequired (
+						layers,
+						layerName);
+
 				taskLogger.noticeFormat (
 					"Loading components for layer %s",
 					layerName);
 
 				for (
 					PluginSpec plugin
-						: plugins
+						: pluginManager.plugins ()
 				) {
 
-					PluginLayerSpec layer =
+					PluginLayerSpec pluginLayer =
 						plugin.layersByName ().get (
 							layerName);
 
-					if (layer != null) {
+					if (
+						isNotNull (
+							pluginLayer)
+					) {
 
-						registerLayerComponents (
+						registerPluginLayerComponents (
 							taskLogger,
 							plugin,
-							layer);
+							pluginLayer);
 
 					}
 
 				}
 
-				for (
-					PluginSpec plugin
-						: plugins
-				) {
-
-					registerLayerAutomaticComponents (
-						taskLogger,
-						plugin,
-						layerName);
-
-				}
+				registerLayerAutomaticComponents (
+					taskLogger,
+					buildLayer,
+					pluginManager.plugins ());
 
 			}
 
@@ -510,7 +355,7 @@ class ComponentManagerBuilder {
 
 	}
 
-	void registerLayerComponents (
+	void registerPluginLayerComponents (
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginSpec plugin,
 			@NonNull PluginLayerSpec layer) {
@@ -530,8 +375,8 @@ class ComponentManagerBuilder {
 
 	void registerLayerAutomaticComponents (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginSpec plugin,
-			@NonNull String layerName) {
+			@NonNull BuildLayerSpec buildLayer,
+			@NonNull List <PluginSpec> plugins) {
 
 		try (
 
@@ -542,75 +387,33 @@ class ComponentManagerBuilder {
 
 		) {
 
-			if (
-				stringEqualSafe (
-					layerName,
-					"api")
+			for (
+				BuildLayerPluginSpec buildLayerPlugin
+					: buildLayer.plugins ()
 			) {
 
-				registerApiLayerComponents (
-					taskLogger,
-					plugin);
+				ComponentPlugin componentPlugin =
+					dynamicCast (
+						ComponentPlugin.class,
+						classInstantiate (
+							classForNameRequired (
+								buildLayerPlugin.className ()),
+							ImmutableList.<Class <?>> of (
+								LoggingLogic.class),
+							ImmutableList.<Object> of (
+								loggingLogic)));
 
-				plugin.apiModules ().forEach (
-					apiModule ->
-						registerApiModule (
-							taskLogger,
-							apiModule));
+				for (
+					PluginSpec plugin
+						: plugins
+				) {
 
-			}
+					componentPlugin.registerComponents (
+						taskLogger,
+						componentRegistry,
+						plugin);
 
-			if (
-				stringEqualSafe (
-					layerName,
-					"console")
-			) {
-
-				registerConsoleLayerComponents (
-					taskLogger,
-					plugin);
-
-				plugin.consoleModules ().forEach (
-					consoleModule ->
-						registerConsoleModule (
-							taskLogger,
-							consoleModule));
-
-			}
-
-			if (
-				stringEqualSafe (
-					layerName,
-					"hibernate")
-			) {
-
-				registerHibernateLayerComponents (
-					taskLogger,
-					plugin);
-
-			}
-
-			if (
-				stringEqualSafe (
-					layerName,
-					"object")
-			) {
-
-				registerObjectLayerComponents (
-					taskLogger,
-					plugin);
-
-			}
-
-			if (
-				stringEqualSafe (
-					layerName,
-					"fixture")
-			) {
-
-				registerFixtureLayerComponents (
-					taskLogger,
-					plugin);
+				}
 
 			}
 
@@ -814,144 +617,6 @@ class ComponentManagerBuilder {
 
 	}
 
-	void registerFixtureLayerComponents (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginSpec plugin) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerFixtureLayerComponents");
-
-		) {
-
-			for (
-				PluginFixtureSpec fixture
-					: plugin.fixtures ()
-			) {
-
-				String fixtureProviderComponentName =
-					stringFormat (
-						"%sFixtureProvider",
-						fixture.name ());
-
-				String fixtureProviderClassName =
-					stringFormat (
-						"%s.fixture.%sFixtureProvider",
-						plugin.packageName (),
-						capitalise (
-							fixture.name ()));
-
-				Class<?> fixtureProviderClass;
-
-				try {
-
-					fixtureProviderClass =
-						Class.forName (
-							fixtureProviderClassName);
-
-				} catch (ClassNotFoundException exception) {
-
-					taskLogger.errorFormat (
-						"Can't find fixture provider of type %s ",
-						fixtureProviderClassName,
-						"for fixture %s ",
-						fixture.name (),
-						"from %s",
-						plugin.name ());
-
-					continue;
-
-				}
-
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						fixtureProviderComponentName)
-
-					.componentClass (
-						fixtureProviderClass)
-
-					.scope (
-						"prototype"));
-
-			}
-
-		}
-
-	}
-
-	void registerHibernateLayerComponents (
-			@NonNull TaskLogger taskLog,
-			@NonNull PluginSpec plugin) {
-
-		plugin.models ().models ().forEach (
-			projectModelSpec ->
-				registerDaoHibernate (
-					taskLog,
-					projectModelSpec));
-
-	}
-
-	void registerObjectLayerComponents (
-			@NonNull TaskLogger taskLog,
-			@NonNull PluginSpec plugin) {
-
-		plugin.models ().models ().forEach (
-			projectModelSpec -> {
-
-			registerObjectHooks (
-				taskLog,
-				projectModelSpec);
-
-			registerObjectHelper (
-				taskLog,
-				projectModelSpec);
-
-			registerObjectHelperMethodsImplementation (
-				taskLog,
-				projectModelSpec);
-
-		});
-
-	}
-
-	void registerApiLayerComponents (
-			@NonNull TaskLogger taskLog,
-			@NonNull PluginSpec plugin) {
-
-		doNothing ();
-
-	}
-
-	void registerConsoleLayerComponents (
-			@NonNull TaskLogger taskLog,
-			@NonNull PluginSpec plugin) {
-
-		plugin.models ().models ().forEach (
-			pluginModelSpec ->
-				registerConsoleHelper (
-					taskLog,
-					pluginModelSpec));
-
-		plugin.models ().enumTypes ().forEach (
-			pluginEnumTypeSpec ->
-				registerEnumConsoleHelper (
-					taskLog,
-					pluginEnumTypeSpec));
-
-		plugin.models ().customTypes ().forEach (
-			pluginCustomTypeSpec ->
-				registerCustomConsoleHelper (
-					taskLog,
-					pluginCustomTypeSpec));
-
-	}
-
 	void registerLayerComponent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginComponentSpec componentSpec) {
@@ -1029,678 +694,6 @@ class ComponentManagerBuilder {
 
 			}
 
-			for (
-				Method method
-					: componentClass.getDeclaredMethods ()
-			) {
-
-				Named namedAnnotation =
-					method.getAnnotation (
-						Named.class);
-
-				SingletonComponent singletonComponentAnnotation =
-					method.getAnnotation (
-						SingletonComponent.class);
-
-				if (
-					isNotNull (
-						singletonComponentAnnotation)
-				) {
-
-					if (
-						stringNotEqualSafe (
-							method.getName (),
-							singletonComponentAnnotation.value ())
-					) {
-
-						taskLogger.warningFormat (
-							"Factory method name '%s' ",
-							method.getName (),
-							"does not match component name '%s'",
-							singletonComponentAnnotation.value ());
-
-					}
-
-					componentRegistry.registerDefinition (
-						taskLogger,
-						new ComponentDefinition ()
-
-						.name (
-							singletonComponentAnnotation.value ())
-
-						.componentClass (
-							method.getReturnType ())
-
-						.scope (
-							"singleton")
-
-						.factoryClass (
-							genericCastUnchecked (
-								MethodComponentFactory.class))
-
-						.addReferenceProperty (
-							"factoryComponent",
-							componentName)
-
-						.addValueProperty (
-							"factoryMethodName",
-							method.getName ())
-
-						.addValueProperty (
-							"initialized",
-							false)
-
-						.hide (
-							isNotNull (
-								namedAnnotation))
-
-					);
-
-				}
-
-				PrototypeComponent prototypeComponentAnnotation =
-					method.getAnnotation (
-						PrototypeComponent.class);
-
-				if (prototypeComponentAnnotation != null) {
-
-					if (
-						stringNotEqualSafe (
-							method.getName (),
-							prototypeComponentAnnotation.value ())
-					) {
-
-						taskLogger.warningFormat (
-							"Factory method name '%s' ",
-							method.getName (),
-							"does not match component name '%s' ",
-							prototypeComponentAnnotation.value ());
-
-					}
-
-					componentRegistry.registerDefinition (
-						taskLogger,
-						new ComponentDefinition ()
-
-						.name (
-							prototypeComponentAnnotation.value ())
-
-						.componentClass (
-							method.getReturnType ())
-
-						.scope (
-							"prototype")
-
-						.factoryClass (
-							genericCastUnchecked (
-								MethodComponentFactory.class))
-
-						.addReferenceProperty (
-							"factoryComponent",
-							componentName)
-
-						.addValueProperty (
-							"factoryMethodName",
-							method.getName ())
-
-						.addValueProperty (
-							"initialized",
-							false)
-
-						.hide (
-							isNotNull (
-								namedAnnotation))
-
-					);
-
-				}
-
-			}
-
-		}
-
-	}
-
-	void registerObjectHooks (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginModelSpec model) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerObjectHooks");
-
-		) {
-
-			String objectHooksComponentName =
-				stringFormat (
-					"%sHooks",
-					model.name ());
-
-			String objectHooksClassName =
-				stringFormat (
-					"%s.logic.%sHooks",
-					model.plugin ().packageName (),
-					capitalise (model.name ()));
-
-			Class <?> objectHooksClass;
-
-			try {
-
-				objectHooksClass =
-					Class.forName (
-						objectHooksClassName);
-
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						objectHooksComponentName)
-
-					.componentClass (
-						objectHooksClass)
-
-					.scope (
-						"singleton")
-
-				);
-
-			} catch (ClassNotFoundException exception) {
-
-				componentRegistry.registerDefinition (
-					taskLogger,
-					new ComponentDefinition ()
-
-					.name (
-						objectHooksComponentName)
-
-					.componentClass (
-						ObjectHooks.DefaultImplementation.class)
-
-					.scope (
-						"singleton")
-
-				);
-
-			}
-
-		}
-
-	}
-
-	void registerObjectHelper (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginModelSpec model) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerObjectHelper");
-
-		) {
-
-			String objectHelperComponentName =
-				stringFormat (
-					"%sObjectHelper",
-					model.name ());
-
-			String objectHelperImplementationClassName =
-				stringFormat (
-					"%s.logic.%sObjectHelperImplementation",
-					model.plugin ().packageName (),
-					capitalise (
-						model.name ()));
-
-			Class <?> objectHelperImplementationClass =
-				classForNameRequired (
-					objectHelperImplementationClassName);
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					objectHelperComponentName)
-
-				.componentClass (
-					objectHelperImplementationClass)
-
-				.scope (
-					"singleton")
-
-			);
-
-		}
-
-	}
-
-	void registerObjectHelperMethodsImplementation (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginModelSpec model) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerObjectHelperMethodsImplementation");
-
-		) {
-
-			String objectHelperMethodsImplementationComponentName =
-				stringFormat (
-					"%sObjectHelperMethodsImplementation",
-					model.name ());
-
-			String objectHelperMethodsImplementationClassName =
-				stringFormat (
-					"%s.logic.%sObjectHelperMethodsImplementation",
-					model.plugin ().packageName (),
-					capitalise (
-						model.name ()));
-
-			Class <?> objectHelperMethodsImplementationClass;
-
-			try {
-
-				objectHelperMethodsImplementationClass =
-					Class.forName (
-						objectHelperMethodsImplementationClassName);
-
-			} catch (ClassNotFoundException exception) {
-
-				/*
-				log.warn (sf (
-					"No object helper implementation for %s.%s.%s",
-					model.project ().packageName (),
-					model.plugin ().packageName (),
-					model.name ()));
-				*/
-
-				return;
-
-			}
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					objectHelperMethodsImplementationComponentName)
-
-				.componentClass (
-					objectHelperMethodsImplementationClass)
-
-				.scope (
-					"singleton")
-
-			);
-
-			return;
-
-		}
-
-	}
-
-	void registerDaoHibernate (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginModelSpec pluginModelSpec) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerDaoHibernate");
-
-		) {
-
-			String daoComponentName =
-				stringFormat (
-					"%sDao",
-					pluginModelSpec.name ());
-
-			String daoClassName =
-				stringFormat (
-					"%s.model.%sDao",
-					pluginModelSpec.plugin ().packageName (),
-					capitalise (
-						pluginModelSpec.name ()));
-
-			boolean gotDaoClass;
-
-			try {
-
-				Class.forName (
-					daoClassName);
-
-				gotDaoClass = true;
-
-			} catch (ClassNotFoundException exception) {
-
-				gotDaoClass = false;
-
-			}
-
-			String daoHibernateClassName =
-				stringFormat (
-					"%s.hibernate.%sDaoHibernate",
-					pluginModelSpec.plugin ().packageName (),
-					capitalise (
-						pluginModelSpec.name ()));
-
-			Class<?> daoHibernateClass = null;
-			boolean gotDaoHibernateClass;
-
-			try {
-
-				daoHibernateClass =
-					Class.forName (
-						daoHibernateClassName);
-
-				gotDaoHibernateClass = true;
-
-			} catch (ClassNotFoundException exception) {
-
-				gotDaoHibernateClass = false;
-
-			}
-
-			if (
-				! gotDaoClass
-				&& ! gotDaoHibernateClass
-			) {
-				return;
-			}
-
-			if (
-				! gotDaoClass
-				|| ! gotDaoHibernateClass
-			) {
-
-				taskLogger.errorFormat (
-					"DAO methods or implementation missing for %s in %s",
-					pluginModelSpec.name (),
-					pluginModelSpec.plugin ().name ());
-
-				return;
-
-			}
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					daoComponentName)
-
-				.componentClass (
-					daoHibernateClass)
-
-				.scope (
-					"singleton")
-
-			);
-
-			return;
-
-		}
-
-	}
-
-	void registerConsoleHelper (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginModelSpec model) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerConsoleHelper");
-
-		) {
-
-			String consoleHelperComponentName =
-				stringFormat (
-					"%sConsoleHelper",
-					model.name ());
-
-			// console helper
-
-			String consoleHelperClassName =
-				stringFormat (
-					"%s.console.%sConsoleHelper",
-					model.plugin ().packageName (),
-					capitalise (
-						model.name ()));
-
-			Optional <Class <?>> consoleHelperClassOptional =
-				classForName (
-					consoleHelperClassName);
-
-			if (
-				optionalIsNotPresent (
-					consoleHelperClassOptional)
-			) {
-
-				taskLogger.errorFormat (
-					"No such class %s",
-					consoleHelperClassName);
-
-				return;
-
-			}
-
-			// console helper implemenation
-
-			String consoleHelperImplementationClassName =
-				stringFormat (
-					"%s.console.%sConsoleHelperImplementation",
-					model.plugin ().packageName (),
-					capitalise (
-						model.name ()));
-
-			Optional <Class <?>> consoleHelperImplementationClassOptional =
-				classForName (
-					consoleHelperImplementationClassName);
-
-			if (
-				optionalIsNotPresent (
-					consoleHelperImplementationClassOptional)
-			) {
-
-				taskLogger.errorFormat (
-					"No such class %s",
-					consoleHelperImplementationClassName);
-
-				return;
-
-			}
-
-			Class <?> consoleHelperImplementationClass =
-				consoleHelperImplementationClassOptional.get ();
-
-			// component definition
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					consoleHelperComponentName)
-
-				.componentClass (
-					consoleHelperImplementationClass)
-
-				.scope (
-					"singleton")
-
-			);
-
-		}
-
-	}
-
-	void registerEnumConsoleHelper (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginEnumTypeSpec enumType) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerEnumConsoleHelper");
-
-		) {
-
-			String enumClassName =
-				stringFormat (
-					"%s.model.%s",
-					enumType.plugin ().packageName (),
-					capitalise (
-						enumType.name ()));
-
-			Class <?> enumClass;
-
-			try {
-
-				enumClass =
-					Class.forName (
-						enumClassName);
-
-			} catch (ClassNotFoundException exception) {
-
-				taskLogger.errorFormat (
-					"No such class %s",
-					enumClassName);
-
-				return;
-
-			}
-
-			String enumConsoleHelperComponentName =
-				stringFormat (
-					"%sConsoleHelper",
-					enumType.name ());
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					enumConsoleHelperComponentName)
-
-				.componentClass (
-					EnumConsoleHelper.class)
-
-				.factoryClass (
-					genericCastUnchecked (
-						EnumConsoleHelperFactory.class))
-
-				.scope (
-					"singleton")
-
-				.addValueProperty (
-					"enumClass",
-					enumClass)
-
-			);
-
-		}
-
-	}
-
-	void registerCustomConsoleHelper (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginCustomTypeSpec customType) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerCustomConsoleHelper");
-
-		) {
-
-			String customClassName =
-				stringFormat (
-					"%s.model.%s",
-					customType.plugin ().packageName (),
-					capitalise (
-						customType.name ()));
-
-			Optional <Class <?>> customClassOptional =
-				classForName (
-					customClassName);
-
-			if (
-				optionalIsNotPresent (
-					customClassOptional)
-
-			) {
-
-				taskLogger.errorFormat (
-					"No such class %s",
-					customClassName);
-
-				return;
-
-			}
-
-			if (
-				isNotSubclassOf (
-					Enum.class,
-					customClassOptional.get ())
-			) {
-				return;
-			}
-
-			Class <?> enumClass =
-				customClassOptional.get ();
-
-			String enumConsoleHelperComponentName =
-				stringFormat (
-					"%sConsoleHelper",
-					customType.name ());
-
-			if (
-				componentRegistry.hasName (
-					enumConsoleHelperComponentName)
-			) {
-				return;
-			}
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					enumConsoleHelperComponentName)
-
-				.componentClass (
-					EnumConsoleHelper.class)
-
-				.factoryClass (
-					genericCastUnchecked (
-						EnumConsoleHelperFactory.class))
-
-				.scope (
-					"singleton")
-
-				.addValueProperty (
-					"enumClass",
-					enumClass)
-
-			);
-
 		}
 
 	}
@@ -1741,7 +734,7 @@ class ComponentManagerBuilder {
 
 	}
 
-	void registerSingletonComponents (
+	void registerUnmanagedSingletons (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -1753,7 +746,7 @@ class ComponentManagerBuilder {
 
 		) {
 
-			singletonComponents.forEach (
+			unmanagedSingletons.forEach (
 				(componentName, componentClassAndValue) -> {
 
 				Class <?> interfaceClass =

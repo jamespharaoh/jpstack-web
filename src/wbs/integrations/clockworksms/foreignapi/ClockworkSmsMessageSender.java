@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
@@ -53,7 +54,7 @@ class ClockworkSmsMessageSender {
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	DataFromXml clockworkSmsForeignApiDataFromXml;
 
 	@ClassSingletonDependency

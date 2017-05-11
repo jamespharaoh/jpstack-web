@@ -25,11 +25,7 @@ class ObjectSearchResultsModeSpec {
 	String name;
 
 	@DataAttribute (
-		name = "columns-fields")
-	String columnsFieldsName;
-
-	@DataAttribute (
-		name = "rows-fields")
-	String rowsFieldsName;
+		name = "form")
+	String formContextName;
 
 }

@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldConstraintValidator;
+import wbs.console.forms.types.FormFieldConstraintValidator;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;

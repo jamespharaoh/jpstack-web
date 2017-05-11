@@ -23,8 +23,11 @@
 	</fixtures>
 
 	<layer name="console">
+		<component class="console.TicketCreateFieldsProvider"/>
 		<component class="console.TicketFieldsProvider"/>
-		<component class="console.TicketFieldsProvider$Config"/>
+		<component class="console.TicketListFieldsProvider"/>
+		<component class="console.TicketSettingsFieldsProvider"/>
+		<component class="console.TicketSummaryFieldsProvider"/>
 		<component class="console.TicketManagerQueueConsole"/>
 		<component class="console.TicketPendingFormAction"/>
 		<component class="console.TicketPendingFormResponder"/>

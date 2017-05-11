@@ -11,9 +11,9 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.config.WbsConfig;
 
 @SingletonComponent ("cryptorFactory")
@@ -25,9 +25,9 @@ class CryptorFactory {
 	@SingletonDependency
 	WbsConfig wbsConfig;
 
-	// prototype dependencies
+	// unitialized dependencies
 
-	@PrototypeDependency
+	@UninitializedDependency
 	Provider <CryptorImplementation> cryptorProvider;
 
 	// implementation

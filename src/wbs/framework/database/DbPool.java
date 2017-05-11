@@ -284,7 +284,7 @@ class DbPool
 
 			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
-					"closeIdle ()");
+					"closeIdle");
 
 		) {
 

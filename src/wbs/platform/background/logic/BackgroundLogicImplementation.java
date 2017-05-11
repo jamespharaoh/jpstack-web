@@ -175,7 +175,7 @@ class BackgroundLogicImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"lookupBackgroundProcess");

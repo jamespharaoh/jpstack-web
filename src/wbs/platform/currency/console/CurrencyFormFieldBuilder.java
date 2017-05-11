@@ -18,28 +18,28 @@ import lombok.NonNull;
 import org.apache.commons.lang3.Range;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.DereferenceFormFieldAccessor;
-import wbs.console.forms.FormField;
-import wbs.console.forms.FormFieldAccessor;
-import wbs.console.forms.FormFieldBuilderContext;
-import wbs.console.forms.FormFieldConstraintValidator;
-import wbs.console.forms.FormFieldInterfaceMapping;
-import wbs.console.forms.FormFieldNativeMapping;
-import wbs.console.forms.FormFieldPluginManagerImplementation;
-import wbs.console.forms.FormFieldRenderer;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormFieldUpdateHook;
-import wbs.console.forms.FormFieldValueValidator;
-import wbs.console.forms.IdentityFormFieldNativeMapping;
-import wbs.console.forms.IntegerFormFieldInterfaceMapping;
-import wbs.console.forms.IntegerFormFieldValueValidator;
-import wbs.console.forms.NullFormFieldConstraintValidator;
-import wbs.console.forms.RangeFormFieldInterfaceMapping;
-import wbs.console.forms.ReadOnlyFormField;
-import wbs.console.forms.RequiredFormFieldValueValidator;
-import wbs.console.forms.TextFormFieldRenderer;
-import wbs.console.forms.TextualRangeFormFieldInterfaceMapping;
-import wbs.console.forms.UpdatableFormField;
+import wbs.console.forms.basic.IdentityFormFieldNativeMapping;
+import wbs.console.forms.basic.NullFormFieldConstraintValidator;
+import wbs.console.forms.basic.RangeFormFieldInterfaceMapping;
+import wbs.console.forms.basic.RequiredFormFieldValueValidator;
+import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.FormFieldSetImplementation;
+import wbs.console.forms.core.ReadOnlyFormField;
+import wbs.console.forms.core.UpdatableFormField;
+import wbs.console.forms.logic.FormFieldPluginManagerImplementation;
+import wbs.console.forms.number.IntegerFormFieldInterfaceMapping;
+import wbs.console.forms.number.IntegerFormFieldValueValidator;
+import wbs.console.forms.object.DereferenceFormFieldAccessor;
+import wbs.console.forms.text.TextFormFieldRenderer;
+import wbs.console.forms.text.TextualRangeFormFieldInterfaceMapping;
+import wbs.console.forms.types.FormField;
+import wbs.console.forms.types.FormFieldAccessor;
+import wbs.console.forms.types.FormFieldConstraintValidator;
+import wbs.console.forms.types.FormFieldInterfaceMapping;
+import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.FormFieldRenderer;
+import wbs.console.forms.types.FormFieldUpdateHook;
+import wbs.console.forms.types.FormFieldValueValidator;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
@@ -133,7 +133,7 @@ class CurrencyFormFieldBuilder
 	CurrencyFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSetImplementation formFieldSet;
 
 	// build
 

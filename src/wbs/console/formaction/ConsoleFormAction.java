@@ -3,7 +3,7 @@ package wbs.console.formaction;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
 
 @Accessors (fluent = true)
 @Data
@@ -16,10 +16,10 @@ class ConsoleFormAction <FormState, History> {
 
 	String heading;
 	String helpText;
-	FormFieldSet <FormState> formFields;
+	FormContextBuilder <FormState> actionFormContextBuilder;
 	String submitLabel;
 
 	String historyHeading;
-	FormFieldSet <History> historyFields;
+	FormContextBuilder <History> historyFormContextBuilder;
 
 }

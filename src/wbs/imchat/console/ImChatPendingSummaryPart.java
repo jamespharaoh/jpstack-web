@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -40,18 +38,18 @@ import com.google.common.collect.Lists;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -74,29 +72,34 @@ class ImChatPendingSummaryPart
 	// dependencies
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	@NamedDependency ("imChatPendingSummaryCustomerFormContextBuilder")
+	FormContextBuilder <ImChatCustomerRec> customerFormContextBuilder;
+
+	@SingletonDependency
+	ImChatMessageConsoleHelper imChatMessageHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
+	@NamedDependency ("imChatPendingSummaryMessageFormContextBuilder")
+	FormContextBuilder <ImChatMessageRec> messageFormContextBuilder;
+
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
-	@Named
-	ConsoleModule imChatPendingConsoleModule;
-
-	@SingletonDependency
-	ImChatMessageConsoleHelper imChatMessageHelper;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
+	@SingletonDependency
+	@NamedDependency ("imChatPendingSummaryProfileFormContextBuilder")
+	FormContextBuilder <ImChatProfileRec> profileFormContextBuilder;
+
 	// state
 
-	FormFieldSet <ImChatCustomerRec> customerFields;
-	FormFieldSet <ImChatProfileRec> profileFields;
-	FormFieldSet <ImChatMessageRec> messageFields;
+	FormContext <ImChatCustomerRec> customerFormContext;
+	FormContext <ImChatProfileRec> profileFormContext;
+	FormContext <ImChatMessageRec> messageFormContext;
 
 	ImChatMessageRec message;
 	ImChatConversationRec conversation;
@@ -153,23 +156,6 @@ class ImChatPendingSummaryPart
 
 		) {
 
-			// get field sets
-
-			customerFields =
-				imChatPendingConsoleModule.formFieldSetRequired (
-					"customerFields",
-					ImChatCustomerRec.class);
-
-			profileFields =
-				imChatPendingConsoleModule.formFieldSetRequired (
-					"profileFields",
-					ImChatProfileRec.class);
-
-			messageFields =
-				imChatPendingConsoleModule.formFieldSetRequired (
-					"messageFields",
-					ImChatMessageRec.class);
-
 			// load data
 
 			message =
@@ -187,6 +173,26 @@ class ImChatPendingSummaryPart
 
 			imChat =
 				customer.getImChat ();
+
+			// setup forms
+
+			customerFormContext =
+				customerFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					customer);
+
+			profileFormContext =
+				profileFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					profile);
+
+			messageFormContext =
+				messageFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					message);
 
 			// misc
 
@@ -317,12 +323,8 @@ class ImChatPendingSummaryPart
 			htmlHeadingThreeWrite (
 				"Customer summary");
 
-			formFieldLogic.outputDetailsTable (
-				transaction,
-				formatWriter,
-				customerFields,
-				customer,
-				emptyMap ());
+			customerFormContext.outputDetailsTable (
+				transaction);
 
 		}
 
@@ -344,12 +346,8 @@ class ImChatPendingSummaryPart
 			htmlHeadingThreeWrite (
 				"Profile summary");
 
-			formFieldLogic.outputDetailsTable (
-				transaction,
-				formatWriter,
-				profileFields,
-				profile,
-				emptyMap ());
+			profileFormContext.outputDetailsTable (
+				transaction);
 
 		}
 
@@ -422,9 +420,8 @@ class ImChatPendingSummaryPart
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				messageFields);
+			messageFormContext.outputTableHeadings (
+				transaction);
 
 			htmlTableRowClose ();
 
@@ -448,12 +445,9 @@ class ImChatPendingSummaryPart
 							classForMessage (
 								historyReply)));
 
-					formFieldLogic.outputTableCellsList (
+					messageFormContext.outputTableCellsList (
 						transaction,
-						formatWriter,
-						messageFields,
 						historyReply,
-						emptyMap (),
 						true);
 
 					htmlTableRowClose ();
@@ -477,12 +471,9 @@ class ImChatPendingSummaryPart
 
 				)));
 
-				formFieldLogic.outputTableCellsList (
+				messageFormContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					messageFields,
 					historyRequest,
-					emptyMap (),
 					true);
 
 				htmlTableRowClose ();

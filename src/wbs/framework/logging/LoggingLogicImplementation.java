@@ -2,6 +2,8 @@ package wbs.framework.logging;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrElseSet;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.doesNotContain;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,8 @@ class LoggingLogicImplementation
 
 	// state
 
+	Long nextEventId = 0l;
+
 	Boolean debugEnabled;
 
 	List <LogTargetFactory> logTargetFactories;
@@ -31,6 +35,9 @@ class LoggingLogicImplementation
 
 	Map <String, LogContext> logContexts =
 		new HashMap<> ();
+
+	private
+	Long nextId = 0l;
 
 	// constructors
 
@@ -53,7 +60,7 @@ class LoggingLogicImplementation
 	@Override
 	public synchronized
 	LogContext findOrCreateLogContext (
-			@NonNull CharSequence staticContextName) {
+			@NonNull String staticContextName) {
 
 		return mapItemForKeyOrElseSet (
 			logContexts,
@@ -64,6 +71,12 @@ class LoggingLogicImplementation
 	}
 
 	// log target implementation
+
+	@Override
+	public
+	Long nextEventId () {
+		return nextEventId ++;
+	}
 
 	@Override
 	public
@@ -83,11 +96,48 @@ class LoggingLogicImplementation
 		return debugEnabled;
 	}
 
+	@Override
+	public synchronized
+	void rootTaskBegin (
+			@NonNull TaskLogger taskLogger) {
+
+		if (
+			contains (
+				activeRootTasks,
+				taskLogger.eventId ())
+		) {
+			throw new IllegalStateException ();
+		}
+
+		activeRootTasks.put (
+			taskLogger.eventId (),
+			taskLogger);
+
+	}
+
+	@Override
+	public synchronized
+	void rootTaskEnd (
+			TaskLogger taskLogger) {
+
+		if (
+			doesNotContain (
+				activeRootTasks,
+				taskLogger.eventId ())
+		) {
+			throw new IllegalStateException ();
+		}
+
+		activeRootTasks.remove (
+			taskLogger.eventId ());
+
+	}
+
 	// private implementation
 
 	private
 	LogContext createLogContext (
-			@NonNull CharSequence staticContextName) {
+			@NonNull String staticContextName) {
 
 		LogTarget logTarget =
 			new MultipleLogTarget (
@@ -98,6 +148,7 @@ class LoggingLogicImplementation
 							staticContextName)));
 
 		return new LogContextImplementation (
+			this,
 			staticContextName,
 			logTarget);
 

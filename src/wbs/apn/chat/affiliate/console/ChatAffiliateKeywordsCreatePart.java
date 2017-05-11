@@ -17,6 +17,7 @@ import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -36,14 +37,14 @@ class ChatAffiliateKeywordsCreatePart
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> genderConsoleHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> orientConsoleHelper;
 
 	// implementation

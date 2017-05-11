@@ -532,7 +532,9 @@ class ObjectHelperGenerator {
 			"void setup (");
 
 		formatWriter.writeLineFormat (
-			"\t\t%s parentTaskLogger) {",
+			"\t\t@%s %s parentTaskLogger) {",
+			imports.register (
+				NonNull.class),
 			imports.register (
 				TaskLogger.class));
 

@@ -114,7 +114,7 @@ class SimulatorSenderHelper
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"performSend");

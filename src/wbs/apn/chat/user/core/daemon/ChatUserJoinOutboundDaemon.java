@@ -4,6 +4,7 @@ import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -105,7 +106,7 @@ class ChatUserJoinOutboundDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"getChatUsers");
@@ -168,15 +169,13 @@ class ChatUserJoinOutboundDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					stringFormat (
-						"doChatUserReal (%s)",
-						stringFormat (
-							"chatUserId = %s",
-							integerToDecimalString (
-								chatUserId))));
+					"doChatUserReal",
+					keyEqualsDecimalInteger (
+						"chatUserId",
+						chatUserId));
 
 		) {
 

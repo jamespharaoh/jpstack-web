@@ -1,5 +1,6 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -10,19 +11,15 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-
-import com.google.common.collect.ImmutableMap;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -55,9 +52,6 @@ class SubscriptionNumberAddRemoveAction
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -74,8 +68,8 @@ class SubscriptionNumberAddRemoveAction
 	SubscriptionConsoleHelper subscriptionHelper;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule subscriptionNumberConsoleModule;
+	@NamedDependency ("subscriptionNumberAddRemoveFormContextBuilder")
+	FormContextBuilder <SubscriptionNumberAddRemoveForm> formContextBuilder;
 
 	@SingletonDependency
 	SubscriptionNumberConsoleHelper subscriptionNumberHelper;
@@ -108,7 +102,7 @@ class SubscriptionNumberAddRemoveAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -121,26 +115,20 @@ class SubscriptionNumberAddRemoveAction
 
 			// process form
 
-			FormFieldSet <SubscriptionNumberAddRemoveForm>
-				addRemoveFormFieldSet =
-					subscriptionNumberConsoleModule.formFieldSetRequired (
-						"addRemoveForm",
-						SubscriptionNumberAddRemoveForm.class);
+			FormContext <SubscriptionNumberAddRemoveForm> formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 			SubscriptionNumberAddRemoveForm addRemoveForm =
-				new SubscriptionNumberAddRemoveForm ();
+				formContext.object ();
 
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				addRemoveFormFieldSet,
-				addRemoveForm,
-				ImmutableMap.of (),
-				"update");
+			formContext.update (
+				transaction);
 
 			// parse numbers
 
-			List<String> numberStrings;
+			List <String> numberStrings;
 
 			try {
 

@@ -153,7 +153,7 @@ class ModelRecordGenerator {
 
 			try (
 
-				FormatWriter formatWriter =
+				AtomicFileWriter formatWriter =
 					new AtomicFileWriter (
 						filename);
 

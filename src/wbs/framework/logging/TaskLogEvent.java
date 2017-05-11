@@ -7,6 +7,8 @@ import org.joda.time.Instant;
 public
 interface TaskLogEvent {
 
+	Long eventId ();
+
 	LogSeverity eventSeverity ();
 
 	String eventText ();

@@ -22,8 +22,8 @@ class ConsoleFormActionSpec {
 	String name;
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
+		name = "action-form")
+	String actionFormContextName;
 
 	@DataAttribute
 	String helpText;
@@ -39,7 +39,7 @@ class ConsoleFormActionSpec {
 	String historyHeading;
 
 	@DataAttribute (
-		name = "history-fields")
-	String historyFieldsName;
+		name = "history-form")
+	String historyFormContextName;
 
 }

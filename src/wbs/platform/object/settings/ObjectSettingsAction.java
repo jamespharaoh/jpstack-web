@@ -17,10 +17,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
@@ -56,9 +54,6 @@ class ObjectSettingsAction <
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -92,10 +87,7 @@ class ObjectSettingsAction <
 	String objectType;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
-
-	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	// state
 
@@ -123,7 +115,7 @@ class ObjectSettingsAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -151,6 +143,7 @@ class ObjectSettingsAction <
 
 			// perform update
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareParent (
@@ -160,32 +153,27 @@ class ObjectSettingsAction <
 					transaction);
 
 			}
+			*/
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
+			FormContext <ObjectType> formContext =
+				formContextBuilder.build (
 					transaction,
-					requestContext,
-					formFieldSet,
-					object,
 					emptyMap (),
-					"settings");
+					object);
 
-			if (updateResultSet.errorCount () > 0) {
+			formContext.update (
+				transaction);
 
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					"settings");
+			if (formContext.errors ()) {
 
-				requestContext.request (
-					"objectSettingsUpdateResultSet",
-					updateResultSet);
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 
 			}
 
-			if (updateResultSet.updateCount () == 0) {
+			if (! formContext.updates ()) {
 
 				requestContext.addWarning (
 					"No changes made");
@@ -198,15 +186,11 @@ class ObjectSettingsAction <
 
 			if (object instanceof PermanentRecord) {
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					formFieldSet,
-					updateResultSet,
-					object,
 					(PermanentRecord <?>) object,
 					optionalAbsent (),
-					optionalAbsent (),
-					"settings");
+					optionalAbsent ());
 
 			} else {
 
@@ -221,17 +205,13 @@ class ObjectSettingsAction <
 						object,
 						objectRefName);
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					formFieldSet,
-					updateResultSet,
-					object,
 					linkObject,
 					optionalOf (
 						objectRef),
 					optionalOf (
-						objectType),
-					"settings");
+						objectType));
 
 			}
 
@@ -300,6 +280,7 @@ class ObjectSettingsAction <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -309,5 +290,6 @@ class ObjectSettingsAction <
 				object);
 
 	}
+	*/
 
 }

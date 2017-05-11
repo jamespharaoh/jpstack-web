@@ -15,8 +15,10 @@ import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.ReflectionUtils.methodInvokeByName;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.parameterSourceTypeName;
 import static wbs.utils.etc.TypeUtils.typeSourceName;
 import static wbs.utils.etc.TypeUtils.typeVariableSourceDeclaration;
@@ -28,6 +30,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -59,6 +62,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -106,6 +110,10 @@ class JavaClassWriter
 
 	@Getter @Setter
 	List <Dependency> prototypeDependencies =
+		new ArrayList<> ();
+
+	@Getter @Setter
+	List <Dependency> uninitializedDependencies =
 		new ArrayList<> ();
 
 	@Getter @Setter
@@ -230,6 +238,9 @@ class JavaClassWriter
 			.memberName (
 				variableName)
 
+			.provider (
+				false)
+
 			.named (
 				named)
 
@@ -348,72 +359,6 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addPrototypeDependency (
-			@NonNull String typeName,
-			@NonNull String variableName) {
-
-		return addPrototypeDependency (
-			typeName,
-			variableName,
-			false);
-
-	}
-
-	public
-	JavaClassWriter addPrototypeDependency (
-			@NonNull String typeName,
-			@NonNull String variableName,
-			@NonNull Boolean named) {
-
-		prototypeDependencies.add (
-			new Dependency ()
-
-			.annotationClass (
-				PrototypeDependency.class)
-
-			.classNameSupplier (
-				imports ->
-					imports.register (
-						typeName))
-
-			.memberName (
-				variableName)
-
-			.named (
-				named)
-
-		);
-
-		return this;
-
-	}
-
-	public
-	JavaClassWriter addPrototypeDependency (
-			@NonNull Class <?> dependencyClass) {
-
-		PrototypeComponent prototypeComponentAnnotation =
-			(PrototypeComponent)
-			dependencyClass.getAnnotation (
-				PrototypeComponent.class);
-
-		String variableName =
-			ifThenElse (
-				isNotNull (
-					prototypeComponentAnnotation),
-				() ->
-					prototypeComponentAnnotation.value (),
-				() ->
-					uncapitalise (
-						dependencyClass.getSimpleName ()));
-
-		return addPrototypeDependency (
-			dependencyClass.getName (),
-			variableName);
-
-	}
-
-	public
-	JavaClassWriter addPrototypeDependency (
 			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
 			@NonNull String variableName,
 			@NonNull Boolean named) {
@@ -430,6 +375,9 @@ class JavaClassWriter
 			.memberName (
 				variableName)
 
+			.provider (
+				true)
+
 			.named (
 				named)
 
@@ -441,10 +389,140 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addPrototypeDependency (
+			@NonNull String typeName,
+			@NonNull String variableName) {
+
+		return addPrototypeDependency (
+			imports ->
+				imports.register (
+					typeName),
+			variableName,
+			false);
+
+	}
+
+	public
+	JavaClassWriter addNamedPrototypeDependency (
+			@NonNull String typeName,
+			@NonNull String variableName) {
+
+		return addPrototypeDependency (
+			imports ->
+				imports.register (
+					typeName),
+			variableName,
+			true);
+
+	}
+
+	public
+	JavaClassWriter addPrototypeDependency (
+			@NonNull Class <?> dependencyClass) {
+
+		return addPrototypeDependency (
+			imports ->
+				imports.register (
+					dependencyClass),
+			variableNameForDependency (
+				PrototypeComponent.class,
+				dependencyClass),
+			false);
+
+	}
+
+	public
+	JavaClassWriter addPrototypeDependency (
 			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
 			@NonNull String variableName) {
 
 		return addPrototypeDependency (
+			classNameSupplier,
+			variableName,
+			false);
+
+	}
+
+	// prototype dependencies
+
+	public
+	JavaClassWriter addUninitializedDependency (
+			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
+			@NonNull String variableName,
+			@NonNull Boolean named) {
+
+		uninitializedDependencies.add (
+			new Dependency ()
+
+			.annotationClass (
+				UninitializedDependency.class)
+
+			.classNameSupplier (
+				classNameSupplier)
+
+			.memberName (
+				variableName)
+
+			.provider (
+				true)
+
+			.named (
+				named)
+
+		);
+
+		return this;
+
+	}
+
+	public
+	JavaClassWriter addUninitializedDependency (
+			@NonNull String typeName,
+			@NonNull String variableName) {
+
+		return addUninitializedDependency (
+			imports ->
+				imports.register (
+					typeName),
+			variableName,
+			false);
+
+	}
+
+	public
+	JavaClassWriter addNamedUninitializedDependency (
+			@NonNull String typeName,
+			@NonNull String variableName) {
+
+		return addUninitializedDependency (
+			imports ->
+				imports.register (
+					typeName),
+			variableName,
+			true);
+
+	}
+
+	public
+	JavaClassWriter addUninitializedDependency (
+			@NonNull Class <?> dependencyClass) {
+
+		return addUninitializedDependency (
+			imports ->
+				imports.register (
+					dependencyClass),
+			variableNameForDependency (
+				PrototypeComponent.class,
+				dependencyClass),
+			false);
+
+	}
+
+	public
+	JavaClassWriter addUninitializedDependency (
+			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
+			@NonNull String variableName) {
+
+		return addUninitializedDependency (
 			classNameSupplier,
 			variableName,
 			false);
@@ -744,13 +822,23 @@ class JavaClassWriter
 				imports,
 				formatWriter);
 
-			writeSingletonDependencies (
+			writeDependencies (
 				imports,
-				formatWriter);
+				formatWriter,
+				"singleton dependencies",
+				singletonDependencies);
 
-			writePrototypeDependencies (
+			writeDependencies (
 				imports,
-				formatWriter);
+				formatWriter,
+				"prototype dependencies",
+				prototypeDependencies);
+
+			writeDependencies (
+				imports,
+				formatWriter,
+				"uninitialized dependencies",
+				uninitializedDependencies);
 
 			writeState (
 				imports,
@@ -809,25 +897,28 @@ class JavaClassWriter
 	}
 
 	public
-	JavaClassWriter writeSingletonDependencies (
+	JavaClassWriter writeDependencies (
 			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull String comment,
+			@NonNull List <Dependency> dependencies) {
 
 		if (
 			collectionIsEmpty (
-				singletonDependencies)
+				dependencies)
 		) {
 			return this;
 		}
 
 		formatWriter.writeLineFormat (
-			"// singleton dependencies");
+			"// %s",
+			comment);
 
 		formatWriter.writeNewline ();
 
 		for (
 			Dependency dependency
-				: singletonDependencies
+				: dependencies
 		) {
 
 			formatWriter.writeLineFormat (
@@ -835,54 +926,25 @@ class JavaClassWriter
 				imports.register (
 					dependency.annotationClass ()));
 
-			formatWriter.writeLineFormat (
-				"%s %s;",
-				dependency.classNameSupplier ().apply (
-					imports),
-				dependency.memberName);
+			if (dependency.provider ()) {
 
-			formatWriter.writeNewline ();
+				formatWriter.writeLineFormat (
+					"%s <%s> %sProvider;",
+					imports.register (
+						Provider.class),
+					dependency.classNameSupplier ().apply (
+						imports),
+					dependency.memberName);
 
-		}
+			} else {
 
-		return this;
+				formatWriter.writeLineFormat (
+					"%s %s;",
+					dependency.classNameSupplier ().apply (
+						imports),
+					dependency.memberName);
 
-	}
-
-	public
-	JavaClassWriter writePrototypeDependencies (
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
-
-		if (
-			collectionIsEmpty (
-				prototypeDependencies)
-		) {
-			return this;
-		}
-
-		formatWriter.writeLineFormat (
-			"// prototype dependencies");
-
-		formatWriter.writeNewline ();
-
-		for (
-			Dependency dependency
-				: prototypeDependencies
-		) {
-
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					PrototypeDependency.class));
-
-			formatWriter.writeLineFormat (
-				"%s <%s> %sProvider;",
-				imports.register (
-					Provider.class),
-				dependency.classNameSupplier ().apply (
-					imports),
-				dependency.memberName);
+			}
 
 			formatWriter.writeNewline ();
 
@@ -1304,6 +1366,33 @@ class JavaClassWriter
 
 	}
 
+	// private implmentation
+
+	private <ComponentAnnotationType extends Annotation>
+	String variableNameForDependency (
+			@NonNull Class <ComponentAnnotationType> componentAnnotationClass,
+			@NonNull Class <?> dependencyClass) {
+
+		ComponentAnnotationType componentAnnotation =
+			dependencyClass.getAnnotation (
+				componentAnnotationClass);
+
+		return ifThenElse (
+			isNotNull (
+				componentAnnotation),
+			() ->
+				genericCastUnchecked (
+					methodInvokeByName (
+						componentAnnotation,
+						"value")),
+			() ->
+				uncapitalise (
+					dependencyClass.getSimpleName ()));
+
+	}
+
+	// data classes
+
 	@Accessors (fluent = true)
 	@Data
 	public static
@@ -1312,6 +1401,7 @@ class JavaClassWriter
 		Function <JavaImportRegistry, String> classNameSupplier;
 		String memberName;
 		Class <?> annotationClass;
+		Boolean provider;
 		Boolean named = false;
 
 	}

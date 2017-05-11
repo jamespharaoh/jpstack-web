@@ -70,7 +70,7 @@ class DigitalSelectRouteReportFile
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"doPost");

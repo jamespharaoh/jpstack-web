@@ -1,23 +1,16 @@
 package wbs.imchat.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.OptionalUtils.ifNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalCast;
-
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -41,11 +34,8 @@ class ImChatCustomerCreditAction
 	Database database;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
-	@SingletonDependency
-	@Named
-	ConsoleModule imChatCustomerConsoleModule;
+	@NamedDependency ("imChatCustomerCreditFormContextBuilder")
+	FormContextBuilder <ImChatCustomerCreditRequest> formContextBuilder;
 
 	@SingletonDependency
 	ImChatCustomerCreditConsoleHelper imChatCustomerCreditHelper;
@@ -87,7 +77,7 @@ class ImChatCustomerCreditAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -96,47 +86,27 @@ class ImChatCustomerCreditAction
 
 			// process form fields
 
-			FormFieldSet <ImChatCustomerCreditRequest> formFields =
-				imChatCustomerConsoleModule.formFieldSetRequired (
-					"credit-request",
-					ImChatCustomerCreditRequest.class);
+			FormContext <ImChatCustomerCreditRequest> formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 			ImChatCustomerCreditRequest request =
-				ifNotPresent (
+				formContext.object ();
 
-				optionalCast (
-					ImChatCustomerCreditRequest.class,
-					requestContext.request (
-						"imChatCustomerCreditRequest")),
+			request
 
-				Optional.of (
-					new ImChatCustomerCreditRequest ())
+				.customer (
+					imChatCustomerHelper.findFromContextRequired (
+						transaction));
 
-			);
+			formContext.update (
+					transaction);
 
-			request.customer (
-				imChatCustomerHelper.findFromContextRequired (
-					transaction));
+			if (formContext.errors ()) {
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
-					transaction,
-					requestContext,
-					formFields,
-					request,
-					emptyMap (),
-					"credit");
-
-			if (updateResultSet.errorCount () > 0) {
-
-				requestContext.request (
-					"imChatCustomerCreditUpdateResults",
-					updateResultSet);
-
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					"credit");
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 

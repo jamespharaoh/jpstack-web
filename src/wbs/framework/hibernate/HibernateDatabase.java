@@ -1,7 +1,9 @@
 package wbs.framework.hibernate;
 
-import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -58,7 +60,8 @@ class HibernateDatabase
 	OwnedTransaction beginTransaction (
 			@NonNull LogContext parentLogContext,
 			@NonNull Optional <TaskLogger> parentTaskLogger,
-			@NonNull CharSequence summary,
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
 			boolean readWrite) {
 
 		OwnedTaskLogger transactionTaskLogger;
@@ -70,15 +73,18 @@ class HibernateDatabase
 
 			transactionTaskLogger =
 				parentLogContext.nestTaskLogger (
-					optionalGetRequired (
-						parentTaskLogger),
-					summary);
+					parentTaskLogger,
+					dynamicContextName,
+					dynamicContextParameters,
+					optionalAbsent ());
 
 		} else {
 
 			transactionTaskLogger =
 				parentLogContext.createTaskLogger (
-					summary);
+					dynamicContextName,
+					dynamicContextParameters,
+					optionalAbsent ());
 
 		}
 

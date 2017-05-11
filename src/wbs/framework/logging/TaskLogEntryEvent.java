@@ -15,6 +15,9 @@ class TaskLogEntryEvent
 	// state
 
 	private final
+	Long eventId;
+
+	private final
 	LogSeverity severity;
 
 	private final
@@ -29,8 +32,12 @@ class TaskLogEntryEvent
 	// constructors
 
 	TaskLogEntryEvent (
+			@NonNull Long eventId,
 			@NonNull LogSeverity severity,
 			@NonNull CharSequence text) {
+
+		this.eventId =
+			eventId;
 
 		this.severity =
 			severity;
@@ -46,7 +53,13 @@ class TaskLogEntryEvent
 
 	}
 
-	// accessors
+	// task log event implementation
+
+	@Override
+	public
+	Long eventId () {
+		return eventId;
+	}
 
 	@Override
 	public

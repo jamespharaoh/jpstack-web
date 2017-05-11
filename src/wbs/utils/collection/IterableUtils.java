@@ -190,6 +190,27 @@ class IterableUtils {
 
 	}
 
+	public static <InputType, OutputType>
+	Iterable <OutputType> iterableFilterMap (
+			@NonNull Iterable <? extends InputType> iterable,
+			@NonNull Predicate <? super InputType> predicate,
+			@NonNull Function <? super InputType, OutputType> mapping) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.filter (
+				predicate)
+
+			.map (
+				mapping::apply)
+
+			.iterator ();
+
+	}
+
+
 	public static <ItemType>
 	Stream <ItemType> iterableStream (
 			@NonNull Iterable <ItemType> iterable) {

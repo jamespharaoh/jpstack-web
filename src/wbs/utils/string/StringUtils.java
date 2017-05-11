@@ -64,10 +64,10 @@ class StringUtils {
 
 	public static
 	String joinWithSeparator (
-			@NonNull String separator,
-			@NonNull String prefix,
-			@NonNull Iterable<String> parts,
-			@NonNull String suffix) {
+			@NonNull CharSequence separator,
+			@NonNull CharSequence prefix,
+			@NonNull Iterable <? extends CharSequence> parts,
+			@NonNull CharSequence suffix) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -75,7 +75,7 @@ class StringUtils {
 		boolean first = true;
 
 		for (
-			String part
+			CharSequence part
 				: parts
 		) {
 
@@ -107,7 +107,7 @@ class StringUtils {
 
 	public static
 	String joinWithoutSeparator (
-			@NonNull Iterable <String> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			"",
@@ -133,7 +133,7 @@ class StringUtils {
 	public static
 	String joinWithSeparator (
 			String separator,
-			Iterable<String> parts) {
+			Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			separator,
@@ -146,7 +146,7 @@ class StringUtils {
 	public static
 	String joinWithSeparator (
 			@NonNull String separator,
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			separator,
@@ -158,7 +158,7 @@ class StringUtils {
 
 	public static
 	String joinWithNewline (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <CharSequence> parts) {
 
 		return joinWithSeparator (
 			"\n",
@@ -170,7 +170,7 @@ class StringUtils {
 
 	public static
 	String joinWithNewline (
-			@NonNull String ... parts) {
+			@NonNull CharSequence ... parts) {
 
 		return joinWithSeparator (
 			"\n",
@@ -183,7 +183,7 @@ class StringUtils {
 
 	public static
 	String joinWithSpace (
-			@NonNull Iterable <String> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			" ",
@@ -208,7 +208,7 @@ class StringUtils {
 
 	public static
 	String joinWithFullStop (
-			@NonNull Iterable <String> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			".",
@@ -233,7 +233,7 @@ class StringUtils {
 
 	public static
 	String joinWithSlash (
-			@NonNull Iterable <String> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			"/",
@@ -283,7 +283,7 @@ class StringUtils {
 
 	public static
 	String joinWithCommaAndSpace (
-			@NonNull Iterable <String> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return joinWithSeparator (
 			", ",
@@ -295,7 +295,7 @@ class StringUtils {
 
 	public static
 	String joinWithCommaAndSpace (
-			@NonNull String ... parts) {
+			@NonNull CharSequence ... parts) {
 
 		return joinWithSeparator (
 			", ",
@@ -303,6 +303,33 @@ class StringUtils {
 			Arrays.asList (
 				parts),
 			"");
+
+	}
+
+	public static
+	CharSequence joinWithCommaAndSpaceLazy (
+			@NonNull Iterable <CharSequence> parts) {
+
+		return new LazyString (
+			() -> joinWithSeparator (
+				", ",
+				"",
+				parts,
+				""));
+
+	}
+
+	public static
+	CharSequence joinWithCommaAndSpaceLazy (
+			@NonNull String ... parts) {
+
+		return new LazyString (
+			() -> joinWithSeparator (
+				", ",
+				"",
+				Arrays.asList (
+					parts),
+				""));
 
 	}
 

@@ -12,19 +12,21 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.IntegerFormFieldSpec;
-import wbs.console.forms.ObjectFormFieldSpec;
-import wbs.console.forms.TextFormFieldSpec;
-import wbs.console.forms.YesNoFormFieldSpec;
+import wbs.console.forms.basic.YesNoFormFieldSpec;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.number.IntegerFormFieldSpec;
+import wbs.console.forms.object.ObjectFormFieldSpec;
+import wbs.console.forms.text.TextFormFieldSpec;
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.module.ConsoleModuleBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.HiddenComponent;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -241,63 +243,6 @@ class TicketFieldsProvider
 			modeSet;
 
 		return this;
-
-	}
-
-	@SingletonComponent ("ticketFieldsProviderConfig")
-	public static
-	class Config {
-
-		@PrototypeDependency
-		Provider <TicketFieldsProvider> ticketFieldsProvider;
-
-		@PrototypeComponent ("ticketListFieldsProvider")
-		@Named
-		public
-		TicketFieldsProvider ticketListFieldsProvider () {
-
-			return ticketFieldsProvider.get ()
-
-				.setMode (
-					"list");
-
-		}
-
-		@PrototypeComponent ("ticketCreateFieldsProvider")
-		@Named
-		public
-		TicketFieldsProvider ticketCreateFieldsProvider () {
-
-			return ticketFieldsProvider.get ()
-
-				.setMode (
-					"create");
-
-		}
-
-		@PrototypeComponent ("ticketSettingsFieldsProvider")
-		@Named
-		public
-		TicketFieldsProvider ticketSettingsFieldsProvider () {
-
-			return ticketFieldsProvider.get ()
-
-				.setMode (
-					"settings");
-
-		}
-
-		@PrototypeComponent ("ticketSummaryFieldsProvider")
-		@Named
-		public
-		TicketFieldsProvider ticketSummaryFieldsProvider () {
-
-			return ticketFieldsProvider.get ()
-
-				.setMode (
-					"summary");
-
-		}
 
 	}
 

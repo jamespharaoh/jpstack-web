@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
@@ -28,7 +29,7 @@ class ConsoleModuleFactory
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	Builder <TaskLogger> consoleModuleBuilder;
 
 	@ClassSingletonDependency

@@ -1,10 +1,7 @@
 package wbs.apn.chat.broadcast.console;
 
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
@@ -19,25 +16,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Named;
-
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.MultiFormContextBuilder;
+import wbs.console.forms.context.MultiFormContexts;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -61,8 +55,14 @@ class ChatBroadcastVerifyPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
-	ConsoleModule chatBroadcastConsoleModule;
+	@NamedDependency
+	MultiFormContextBuilder <ChatBroadcastSendForm>
+		chatBroadcastSendFormContextsBuilder;
+
+	@SingletonDependency
+	@NamedDependency
+	FormContextBuilder <ChatUserRec>
+		chatBroadcastVerifyFormContextsBuilder;
 
 	@SingletonDependency
 	ChatConsoleHelper chatHelper;
@@ -76,9 +76,6 @@ class ChatBroadcastVerifyPart
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -90,17 +87,11 @@ class ChatBroadcastVerifyPart
 	ChatRec chat;
 	ChatUserRec fromUser;
 
-	FormFieldSet <ChatBroadcastSendForm> searchFields;
-	FormFieldSet <ChatBroadcastSendForm> numbersFields;
-	FormFieldSet <ChatBroadcastSendForm> commonFields;
-	FormFieldSet <ChatBroadcastSendForm> messageUserFields;
-	FormFieldSet <ChatBroadcastSendForm> messageMessageFields;
+	MultiFormContexts <ChatBroadcastSendForm> sendFormContexts;
+	FormContext <ChatUserRec> verifyFormContext;
 
-	FormFieldSet <ChatUserRec> verifyUserFields;
-
-	ChatBroadcastSendForm form;
-	Map<String,Object> formHints;
-	Optional<UpdateResultSet> updateResults;
+	ChatBroadcastSendForm sendForm;
+	List <ChatUserRec> recipients;
 
 	// details
 
@@ -148,58 +139,45 @@ class ChatBroadcastVerifyPart
 				chatHelper.findFromContextRequired (
 					transaction);
 
-			searchFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-search",
-					ChatBroadcastSendForm.class);
+			Map <String, Object> formHints =
+				ImmutableMap.<String, Object> builder ()
 
-			numbersFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-numbers",
-					ChatBroadcastSendForm.class);
+				.put (
+					"chat",
+					chatHelper.findFromContextRequired (
+						transaction))
 
-			commonFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-common",
-					ChatBroadcastSendForm.class);
+				.build ();
 
-			messageUserFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-message-user",
-					ChatBroadcastSendForm.class);
+			sendFormContexts =
+				chatBroadcastSendFormContextsBuilder.build (
+					transaction,
+					formHints);
 
-			messageMessageFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"send-message-message",
-					ChatBroadcastSendForm.class);
-
-			verifyUserFields =
-				chatBroadcastConsoleModule.formFieldSetRequired (
-					"verify-user",
-					ChatUserRec.class);
-
-			form =
-				(ChatBroadcastSendForm)
-				requestContext.requestRequired (
-					"chatBroadcastForm");
-
-			formHints =
-				ImmutableMap.of (
-				"chat",
-				chatHelper.findFromContextRequired (
-					transaction));
-
-			updateResults =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"chatBroadcastUpdates"));
+			sendForm =
+				sendFormContexts.object ();
 
 			fromUser =
 				chatUserHelper.findByCodeRequired (
 					transaction,
 					chat,
-					form.fromUser ());
+					sendForm.fromUser ());
+
+			List <Long> chatUserIds =
+				genericCastUnchecked (
+					requestContext.requestRequired (
+						"chatBroadcastChatUserIds"));
+
+			recipients =
+				chatUserHelper.findManyRequired (
+					transaction,
+					chatUserIds);
+
+			verifyFormContext =
+				chatBroadcastVerifyFormContextsBuilder.build (
+					transaction,
+					formHints,
+					recipients);
 
 		}
 
@@ -225,102 +203,22 @@ class ChatBroadcastVerifyPart
 
 			// always hidden
 
-			formFieldLogic.outputFormAlwaysHidden (
+			sendFormContexts.outputFormAlwaysHidden (
 				transaction,
-				requestContext,
-				formatWriter,
-				searchFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				numbersFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				commonFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				messageUserFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormAlwaysHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				messageMessageFields,
-				updateResults,
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"search",
+				"numbers",
+				"common",
+				"mesage-user",
+				"message-message");
 
 			// temporarily hidden
 
-			formFieldLogic.outputFormTemporarilyHidden (
+			sendFormContexts.outputFormTemporarilyHidden (
 				transaction,
-				requestContext,
-				formatWriter,
-				searchFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormTemporarilyHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				numbersFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormTemporarilyHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				commonFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
-
-			formFieldLogic.outputFormTemporarilyHidden (
-				transaction,
-				requestContext,
-				formatWriter,
-				messageUserFields,
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"search",
+				"numbers",
+				"common",
+				"message-user");
 
 			// message info
 
@@ -343,16 +241,9 @@ class ChatBroadcastVerifyPart
 					fromUser.getInfoText (),
 					() -> fromUser.getInfoText ().getText ()));
 
-			formFieldLogic.outputFormRows (
+			sendFormContexts.outputFormRows (
 				transaction,
-				requestContext,
-				formatWriter,
-				messageMessageFields,
-				optionalAbsent (),
-				form,
-				formHints,
-				FormType.search,
-				"send");
+				"message-message");
 
 			htmlTableClose ();
 
@@ -385,42 +276,27 @@ class ChatBroadcastVerifyPart
 			htmlHeadingThreeWrite (
 				"Recipients");
 
-			List <Long> chatUserIds =
-				genericCastUnchecked (
-					requestContext.requestRequired (
-						"chatBroadcastChatUserIds"));
-
 			htmlParagraphOpen ();
 
 			formatWriter.writeLineFormat (
 				"%s recipients in total.",
 				integerToDecimalString (
-					chatUserIds.size ()));
+					recipients.size ()));
 
-			if (form.search ()) {
+			if (sendForm.search ()) {
 
 				htmlParagraphOpen ();
 
 				formatWriter.writeLineFormat (
-					"The actual number of recipients may change slightly on send ",
-					"as the search will be performed again.");
+					"The actual number of recipients may change slightly on ",
+					"send as the search will be performed again.");
 
 				htmlParagraphClose ();
 
 			}
 
-			List <ChatUserRec> chatUsers =
-				chatUserHelper.findManyRequired (
-					transaction,
-					chatUserIds);
-
-			formFieldLogic.outputListTable (
+			verifyFormContext.outputListTable (
 				transaction,
-				formatWriter,
-				verifyUserFields,
-				optionalAbsent (),
-				chatUsers,
-				emptyMap (),
 				false);
 
 		}

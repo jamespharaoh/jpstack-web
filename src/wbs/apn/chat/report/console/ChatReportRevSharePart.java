@@ -21,26 +21,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -107,7 +104,7 @@ class ChatReportRevSharePart
 	ChatMonthCostConsoleHelper chatMonthCostHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	ConsoleModule chatReportConsoleModule;
 
 	@SingletonDependency
@@ -131,9 +128,6 @@ class ChatReportRevSharePart
 	@SingletonDependency
 	HibernateDatabase database;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -144,14 +138,22 @@ class ChatReportRevSharePart
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	@NamedDependency ("chatReportRevShareResultsFormContextBuilder")
+	FormContextBuilder <ChatReportRevShareItem> resultsFormContextBuilder;
+
+	@SingletonDependency
+	@NamedDependency ("chatReportRevShareSearchFormContextBuilder")
+	FormContextBuilder <ChatReportRevShareForm> searchFormContextBuilder;
+
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
 
-	FormFieldSet <ChatReportRevShareForm> searchFields;
-	FormFieldSet <ChatReportRevShareItem> resultsFields;
+	FormContext <ChatReportRevShareForm> searchFormContext;
+	FormContext <ChatReportRevShareItem> resultsFormContext;
 
-	ChatReportRevShareForm form;
+	ChatReportRevShareForm searchForm;
 
 	LocalDate startDate;
 	LocalDate endDate;
@@ -179,35 +181,29 @@ class ChatReportRevSharePart
 
 		) {
 
-			searchFields =
-				chatReportConsoleModule.formFieldSetRequired (
-					"monthReportSearch",
-					ChatReportRevShareForm.class);
+			// prepare search form
 
-			resultsFields =
-				chatReportConsoleModule.formFieldSetRequired (
-					"simpleReportResults",
-					ChatReportRevShareItem.class);
+			searchFormContext =
+				searchFormContextBuilder.build (
+					transaction,
+					emptyMap ());
 
-			// get search form
+			searchForm =
+				searchFormContext.object ();
 
 			LocalDate today =
 				LocalDate.now ();
 
-			form =
-				new ChatReportRevShareForm ()
+			searchForm
 
 				.month (
 					today.toString (
-						"YYYY-MM"));
+						"YYYY-MM"))
 
-			formFieldLogic.update (
-				transaction,
-				requestContext,
-				searchFields,
-				form,
-				ImmutableMap.of (),
-				"search");
+			;
+
+			searchFormContext.update (
+				transaction);
 
 			chat =
 				chatHelper.findFromContextRequired (
@@ -226,7 +222,7 @@ class ChatReportRevSharePart
 				LocalDate.parse (
 					stringFormat (
 						"%s-01",
-						form.month ()));
+						searchForm.month ()));
 
 			endDate =
 				startDate.plusMonths (1);
@@ -257,6 +253,14 @@ class ChatReportRevSharePart
 			chatReportsSorted =
 				ImmutableList.copyOf (
 					chatReportsTemp);
+
+			// prepare results form
+
+			resultsFormContext =
+				resultsFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					chatReportsSorted);
 
 		}
 
@@ -757,7 +761,7 @@ class ChatReportRevSharePart
 				chatMonthCostHelper.findByCode (
 					transaction,
 					chat,
-					form.month ());
+					searchForm.month ());
 
 			if (
 				optionalIsNotPresent (
@@ -861,16 +865,8 @@ class ChatReportRevSharePart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
-				transaction,
-				requestContext,
-				formatWriter,
-				searchFields,
-				Optional.absent (),
-				form,
-				ImmutableMap.of (),
-				FormType.search,
-				"search");
+			searchFormContext.outputFormRows (
+				transaction);
 
 			htmlTableDetailsRowWriteHtml (
 				"Actions",
@@ -911,9 +907,8 @@ class ChatReportRevSharePart
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				resultsFields);
+			resultsFormContext.outputTableHeadings (
+				transaction);
 
 			htmlTableRowClose ();
 
@@ -926,12 +921,9 @@ class ChatReportRevSharePart
 
 				htmlTableRowOpen ();
 
-				formFieldLogic.outputTableCellsList (
+				resultsFormContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					resultsFields,
 					chatReport,
-					emptyMap (),
 					true);
 
 				htmlTableRowClose ();
@@ -942,12 +934,9 @@ class ChatReportRevSharePart
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableCellsList (
+			resultsFormContext.outputTableCellsList (
 				transaction,
-				formatWriter,
-				resultsFields,
 				totalReport,
-				ImmutableMap.of (),
 				true);
 
 			htmlTableRowClose ();

@@ -1,30 +1,23 @@
 package wbs.console.formaction;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Optional;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -40,16 +33,13 @@ class ConsoleFormActionPart <FormState, History>
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	// properties
 
 	@Getter @Setter
-	FormFieldSet <FormState> formFields;
+	ConsoleFormActionHelper <FormState, History> helper;
 
 	@Getter @Setter
-	ConsoleFormActionHelper <FormState, History> formActionHelper;
+	FormContextBuilder <FormState> actionFormContextBuilder;
 
 	@Getter @Setter
 	String name;
@@ -70,15 +60,12 @@ class ConsoleFormActionPart <FormState, History>
 	String historyHeading;
 
 	@Getter @Setter
-	FormFieldSet <History> historyFields;
+	FormContextBuilder <History> historyFormContextBuilder;
 
 	// state
 
-	FormState formState;
-
-	Map <String, Object> formHints;
-
-	Optional <UpdateResultSet> updateResultSet;
+	FormContext <FormState> actionFormContext;
+	FormContext <History> historyFormContext;
 
 	List <History> history;
 
@@ -98,26 +85,41 @@ class ConsoleFormActionPart <FormState, History>
 
 		) {
 
-			formState =
-				formActionHelper.constructFormState (
+			// prepare action
+
+			Map <String, Object> formHints =
+				helper.formHints (
 					transaction);
 
-			formActionHelper.updatePassiveFormState (
+			FormState formState =
+				helper.constructFormState (
+					transaction);
+
+			helper.updatePassiveFormState (
 				transaction,
 				formState);
 
-			formHints =
-				formActionHelper.formHints (
-					transaction);
+			actionFormContext =
+				actionFormContextBuilder.build (
+					transaction,
+					formHints,
+					formState);
 
-			updateResultSet =
-				genericCastUnchecked (
-					requestContext.request (
-						"console-form-action-update-result-set"));
+			// prepare history
 
-			history =
-				formActionHelper.history (
-					transaction);
+			if (
+				isNotNull (
+					historyFormContextBuilder)
+			) {
+
+				historyFormContext =
+					historyFormContextBuilder.build (
+						transaction,
+						formHints,
+						helper.history (
+							transaction));
+
+			}
 
 		}
 
@@ -156,7 +158,7 @@ class ConsoleFormActionPart <FormState, History>
 
 			// write preamble
 
-			formActionHelper.writePreamble (
+			helper.writePreamble (
 				transaction,
 				formatWriter,
 				isNotNull (
@@ -169,20 +171,12 @@ class ConsoleFormActionPart <FormState, History>
 					submitLabel)
 			) {
 
-				formFieldLogic.outputFormTable (
+				actionFormContext.outputFormTable (
 					transaction,
-					requestContext,
-					formatWriter,
-					formFields,
-					updateResultSet,
-					formState,
-					formHints,
 					"post",
 					requestContext.resolveLocalUrl (
 						localFile),
-					submitLabel,
-					FormType.perform,
-					name);
+					submitLabel);
 
 			}
 
@@ -190,19 +184,14 @@ class ConsoleFormActionPart <FormState, History>
 
 			if (
 				isNotNull (
-					historyFields)
+					historyFormContext)
 			) {
 
 				htmlHeadingTwoWrite (
 					historyHeading);
 
-				formFieldLogic.outputListTable (
+				historyFormContext.outputListTable (
 					transaction,
-					formatWriter,
-					historyFields,
-					optionalAbsent (),
-					history,
-					formHints,
 					true);
 
 			}

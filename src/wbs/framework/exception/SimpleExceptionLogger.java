@@ -20,7 +20,7 @@ class SimpleExceptionLogger
 	// singleton dependencies
 
 	@SingletonDependency
-	ExceptionUtils exceptionLogic;
+	ExceptionUtils exceptionUtils;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -70,7 +70,7 @@ class SimpleExceptionLogger
 				throwable,
 				"%s: %s",
 				source,
-				exceptionLogic.throwableSummary (
+				exceptionUtils.throwableSummary (
 					taskLogger,
 					throwable));
 
@@ -104,7 +104,7 @@ class SimpleExceptionLogger
 				throwable,
 				"%s: %s",
 				source,
-				exceptionLogic.throwableSummary (
+				exceptionUtils.throwableSummary (
 					taskLogger,
 					throwable));
 

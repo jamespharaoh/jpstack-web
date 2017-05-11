@@ -2,7 +2,7 @@ package wbs.apn.chat.bill.daemon;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.List;
 
@@ -103,7 +103,7 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -164,15 +164,13 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithParameters (
 					logContext,
 					parentTaskLogger,
-					stringFormat (
-						"doChat (%s)",
-						stringFormat (
-							"chatId = %s",
-							integerToDecimalString (
-								chatId))));
+					"getChatUserIds",
+					keyEqualsDecimalInteger (
+						"chatId",
+						chatId));
 
 		) {
 
@@ -210,15 +208,13 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					stringFormat (
-						"doChatUser (%s)",
-						stringFormat (
-							"chatUserId = %s",
-							integerToDecimalString (
-								chatUserId))));
+					"doChatUser",
+					keyEqualsDecimalInteger (
+						"chatUserId",
+						chatUserId));
 
 		) {
 

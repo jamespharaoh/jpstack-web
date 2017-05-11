@@ -76,7 +76,7 @@ class ImChatMessageTemplateSetGetAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					"handle");
 

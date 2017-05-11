@@ -2,6 +2,7 @@ package wbs.framework.component.registry;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.IterableUtils.iterableCount;
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -47,12 +48,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
@@ -66,11 +67,13 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
@@ -414,11 +417,19 @@ class ComponentRegistryImplementation
 
 			// order component definitions
 
-			singletons =
+			List <ComponentDefinition> orderedDefinitions =
 				ImmutableList.copyOf (
 					orderByStrongDepedendencies (
 						taskLogger,
-						singletons));
+						definitions));
+
+			singletons =
+				iterableFilterToList (
+					orderedDefinition ->
+						stringEqualSafe (
+							orderedDefinition.scope (),
+							"singleton"),
+					orderedDefinitions);
 
 			// output component definitions
 
@@ -1101,24 +1112,20 @@ class ComponentRegistryImplementation
 
 			// register dependencies
 
-			if (! injectedProperty.prototype ()) {
+			for (
+				ComponentDefinition targetComponentDefinition
+					: targetComponentDefinitions
+			) {
 
-				for (
-					ComponentDefinition targetComponentDefinition
-						: targetComponentDefinitions
-				) {
+				if (weak) {
 
-					if (weak) {
+					componentDefinition.weakDependencies ().add (
+						targetComponentDefinition.name ());
 
-						componentDefinition.weakDependencies ().add (
-							targetComponentDefinition.name ());
+				} else {
 
-					} else {
-
-						componentDefinition.strongDependencies ().add (
-							targetComponentDefinition.name ());
-
-					}
+					componentDefinition.strongDependencies ().add (
+						targetComponentDefinition.name ());
 
 				}
 
@@ -1322,9 +1329,13 @@ class ComponentRegistryImplementation
 						instantiateClass)
 			) {
 
-				PrototypeDependency prototypeDependencyAnnotation =
+				PrototypeDependency weakPrototypeDependencyAnnotation =
 					field.getAnnotation (
 						PrototypeDependency.class);
+
+				StrongPrototypeDependency strongPrototypeDependencyAnnotation =
+					field.getAnnotation (
+						StrongPrototypeDependency.class);
 
 				SingletonDependency singletonDependencyAnnotation =
 					field.getAnnotation (
@@ -1346,15 +1357,17 @@ class ComponentRegistryImplementation
 					iterableCount (
 						presentInstances (
 							optionalFromNullable (
-								prototypeDependencyAnnotation),
+								classSingletonDependencyAnnotation),
+							optionalFromNullable (
+								weakPrototypeDependencyAnnotation),
 							optionalFromNullable (
 								singletonDependencyAnnotation),
 							optionalFromNullable (
-								classSingletonDependencyAnnotation),
+								strongPrototypeDependencyAnnotation),
 							optionalFromNullable (
-								weakSingletonDependencyAnnotation),
+								uninitializedDependencyAnnotation),
 							optionalFromNullable (
-								uninitializedDependencyAnnotation)));
+								weakSingletonDependencyAnnotation)));
 
 				if (
 					equalToZero (
@@ -1375,9 +1388,11 @@ class ComponentRegistryImplementation
 
 				Boolean prototype =
 					isNotNull (
-						prototypeDependencyAnnotation)
+						weakPrototypeDependencyAnnotation)
 					|| isNotNull (
-						uninitializedDependencyAnnotation);
+						uninitializedDependencyAnnotation)
+					|| isNotNull (
+						strongPrototypeDependencyAnnotation);
 
 				Boolean scoped =
 					isNotNull (
@@ -1389,15 +1404,17 @@ class ComponentRegistryImplementation
 
 				Boolean weak =
 					isNotNull (
+						weakPrototypeDependencyAnnotation)
+					|| isNotNull (
 						weakSingletonDependencyAnnotation);
 
-				Named namedAnnotation =
+				NamedDependency namedDependencyAnnotation =
 					field.getAnnotation (
-						Named.class);
+						NamedDependency.class);
 
 				if (
 					isNotNull (
-						namedAnnotation)
+						namedDependencyAnnotation)
 				) {
 
 					if (scoped) {
@@ -1407,7 +1424,7 @@ class ComponentRegistryImplementation
 					String targetComponentName =
 						ifNull (
 							nullIfEmptyString (
-								namedAnnotation.value ()),
+								namedDependencyAnnotation.value ()),
 							field.getName ());
 
 					initInjectedFieldByName (
@@ -1447,9 +1464,6 @@ class ComponentRegistryImplementation
 						Annotation annotation
 							: field.getDeclaredAnnotations ()
 					) {
-
-						if (annotation instanceof Named)
-							continue;
 
 						Qualifier metaAnnotation =
 							annotation.annotationType ().getAnnotation (
@@ -1666,19 +1680,7 @@ class ComponentRegistryImplementation
 				optionalGetRequired (
 					targetComponentDefinitionOptional);
 
-			if (weak) {
-
-				componentDefinition.weakDependencies ().add (
-					targetComponentDefinition.name ());
-
-			} else {
-
-				componentDefinition.strongDependencies ().add (
-					targetComponentDefinition.name ());
-
-			}
-
-			componentDefinition.injectedProperties ().add (
+			InjectedProperty injectedProperty =
 				new InjectedProperty ()
 
 				.componentDefinition (
@@ -1700,7 +1702,22 @@ class ComponentRegistryImplementation
 				.weak (
 					weak)
 
-			);
+			;
+
+			if (weak) {
+
+				componentDefinition.weakDependencies ().add (
+					targetComponentDefinition.name ());
+
+			} else {
+
+				componentDefinition.strongDependencies ().add (
+					targetComponentDefinition.name ());
+
+			}
+
+			componentDefinition.injectedProperties ().add (
+				injectedProperty);
 
 			return;
 
@@ -1949,24 +1966,20 @@ class ComponentRegistryImplementation
 
 			// register dependencies
 
-			if (! injectedProperty.prototype ()) {
+			for (
+				ComponentDefinition targetComponentDefinition
+					: targetComponentDefinitions.values ()
+			) {
 
-				for (
-					ComponentDefinition targetComponentDefinition
-						: targetComponentDefinitions.values ()
-				) {
+				if (weak) {
 
-					if (weak) {
+					componentDefinition.weakDependencies ().add (
+						targetComponentDefinition.name ());
 
-						componentDefinition.weakDependencies ().add (
-							targetComponentDefinition.name ());
+				} else {
 
-					} else {
-
-						componentDefinition.strongDependencies ().add (
-							targetComponentDefinition.name ());
-
-					}
+					componentDefinition.strongDependencies ().add (
+						targetComponentDefinition.name ());
 
 				}
 
@@ -2058,6 +2071,11 @@ class ComponentRegistryImplementation
 				}
 
 				if (! madeProgress) {
+
+					Collections.sort (
+						unorderedDefinitions,
+						Ordering.natural ().onResultOf (
+							ComponentDefinition::name));
 
 					for (
 						ComponentDefinition definition

@@ -2,6 +2,8 @@ package wbs.platform.updatelog.logic;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.instantSumDuration;
 import static wbs.utils.time.TimeUtils.millisToInstant;
@@ -357,10 +359,16 @@ class UpdateManager {
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithParameters (
 					logContext,
 					parentTaskLogger,
-					"UpdateManager.getVersionDb (table, ref)");
+					"UpdateManager.getVersionDb",
+					keyEqualsString (
+						"table",
+						table),
+					keyEqualsDecimalInteger (
+						"ref",
+						ref));
 
 		) {
 
@@ -592,11 +600,14 @@ class UpdateManager {
 			try (
 
 				OwnedTaskLogger taskLogger =
-					logContext.nestTaskLoggerFormat (
+					logContext.nestTaskLogger (
 						parentTaskLogger,
-						"Watcher (%s).isUpdated (%s)",
-						table,
-						integerToDecimalString (
+						"Watcher.isUpdated",
+						keyEqualsString (
+							"table",
+							table),
+						keyEqualsDecimalInteger (
+							"ref",
 							ref));
 
 			) {
@@ -697,7 +708,7 @@ class UpdateManager {
 				OwnedTaskLogger taskLogger =
 					logContext.nestTaskLogger (
 						parentTaskLogger,
-						"UpdateGetterAdaptor.provide ()");
+						"UpdateGetterAdaptor.provide");
 
 			) {
 

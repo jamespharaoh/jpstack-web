@@ -18,6 +18,7 @@ import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -36,7 +37,7 @@ class ChatUserAdminCreditModePart
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
 	@SingletonDependency

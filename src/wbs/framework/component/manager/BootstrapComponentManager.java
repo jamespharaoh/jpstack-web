@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneEleme
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.doesNotImplement;
@@ -26,6 +27,7 @@ import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -53,11 +55,18 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.component.config.WbsConfigFactory;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
+import wbs.framework.component.scaffold.BuildSpec;
+import wbs.framework.component.scaffold.BuildSpecFactory;
+import wbs.framework.component.scaffold.PluginBootstrapComponentSpec;
+import wbs.framework.component.scaffold.PluginLayerSpec;
 import wbs.framework.component.scaffold.PluginManager;
-import wbs.framework.component.scaffold.PluginManagerBuilder;
+import wbs.framework.component.scaffold.PluginManagerFactory;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.AnnotatedClassComponentTools;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.ComponentManagerBuilder;
@@ -83,6 +92,8 @@ class BootstrapComponentManager
 
 	Map <Class <?>, ComponentData> componentsByInterface =
 		new HashMap<> ();
+
+	BuildSpec buildSpec;
 
 	// constructors
 
@@ -124,7 +135,7 @@ class BootstrapComponentManager
 
 	// public implemetation
 
-	public
+	public synchronized
 	OwnedTaskLogger bootstrapTaskLogger (
 			@NonNull Object object) {
 
@@ -134,7 +145,7 @@ class BootstrapComponentManager
 
 	}
 
-	public <Type>
+	public synchronized <Type>
 	BootstrapComponentManager registerSingleton (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
@@ -227,7 +238,7 @@ class BootstrapComponentManager
 
 	}
 
-	public
+	public synchronized
 	BootstrapComponentManager registerClass (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?> interfaceClass,
@@ -300,7 +311,399 @@ class BootstrapComponentManager
 
 	}
 
-	private
+	public synchronized
+	void bootstrapComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object component) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"bootstrapComponent");
+
+		) {
+
+			initialiseComponent (
+				taskLogger,
+				component);
+
+		}
+
+	}
+
+	public synchronized
+	void bootstrapComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object component,
+			@NonNull String componentName) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"bootstrapComponent");
+
+		) {
+
+			initialiseComponent (
+				taskLogger,
+				component);
+
+		}
+
+	}
+
+	public synchronized
+	BootstrapComponentManager setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			componentsByName.values ().stream ()
+
+				.filter (
+					componentData ->
+						enumEqualSafe (
+							componentData.scope (),
+							ComponentScope.singleton))
+
+				.forEach (
+					componentData ->
+						getComponentReal (
+							componentData))
+
+			;
+
+			return this;
+
+		}
+
+	}
+
+	public
+	BootstrapComponentManager registerStandardClasses (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerStandardClasses");
+
+		) {
+
+			registerClass (
+				taskLogger,
+				AnnotatedClassComponentTools.class,
+				AnnotatedClassComponentTools.class);
+
+			registerClass (
+				taskLogger,
+				ComponentManagerBuilder.class,
+				ComponentManagerBuilder.class);
+
+			registerClass (
+				taskLogger,
+				ComponentRegistryImplementation.class,
+				ComponentRegistryImplementation.class);
+
+			registerClass (
+				taskLogger,
+				DataFromXmlBuilder.class,
+				DataFromXmlBuilder.class);
+
+			registerClass (
+				taskLogger,
+				DataFromXmlImplementation.class,
+				DataFromXmlImplementation.class);
+
+			registerClass (
+				taskLogger,
+				PluginManager.class,
+				PluginManagerFactory.class);
+
+			registerClass (
+				taskLogger,
+				WbsConfig.class,
+				WbsConfigFactory.class);
+
+			registerClass (
+				taskLogger,
+				BuildSpec.class,
+				BuildSpecFactory.class);
+
+			return this;
+
+		}
+
+	}
+
+	public
+	BootstrapComponentManager registerPluginBootstrapComponents (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Iterable <String> layerNames) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerPluginBootstrapComponents");
+
+		) {
+
+			layerNames.forEach (
+				layerName ->
+					registerPluginBootstrapComponents (
+						taskLogger,
+						layerName));
+
+			return this;
+
+		}
+
+	}
+
+	public
+	BootstrapComponentManager registerPluginBootstrapComponents (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String layerName) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerPluginBootstrapComponents",
+					keyEqualsString (
+						"layerName",
+						layerName));
+
+		) {
+
+			PluginManager pluginManager =
+				getComponentRequired (
+					taskLogger,
+					"pluginManager",
+					PluginManager.class);
+
+			for (
+				PluginSpec pluginSpec
+					: pluginManager.plugins ()
+			) {
+
+				for (
+					PluginLayerSpec pluginLayerSpec
+						: pluginSpec.layers ()
+				) {
+
+					if (
+						stringNotEqualSafe (
+							pluginLayerSpec.name (),
+							layerName)
+					) {
+						continue;
+					}
+
+					for (
+						PluginBootstrapComponentSpec pluginComponentSpec
+							: pluginLayerSpec.bootstrapComponents ()
+					) {
+
+						debugFormat (
+							"Load bootstrap component: %s",
+							pluginComponentSpec.className ());
+
+					}
+
+				}
+
+			}
+
+			return this;
+
+		}
+
+	}
+
+	// component manager implementation
+
+	@Override
+	public <ComponentType>
+	Optional <Provider <ComponentType>> getComponentProvider (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentProvider");
+
+		) {
+
+			Optional <ComponentData> componentDataOptional =
+				mapItemForKey (
+					componentsByName,
+					componentName);
+
+			if (
+				optionalIsNotPresent (
+					componentDataOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ComponentData componentData =
+				optionalGetRequired (
+					componentDataOptional);
+
+			if (
+				isNotSubclassOf (
+					componentClass,
+					componentData.interfaceClass ())
+			) {
+				throw new ClassCastException ();
+			}
+
+			return optionalOf (
+				() ->
+					componentClass.cast (
+						getComponentReal (
+							componentData)));
+
+		}
+
+	}
+
+	@Override
+	public
+	Map <String, Pair <Class <?>, Object>> allSingletonComponents (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"allSingletonComponents");
+
+		) {
+
+			return componentsByName.values ().stream ()
+
+				.filter (
+					componentData ->
+						enumEqualSafe (
+							componentData.scope (),
+							ComponentScope.singleton))
+
+				.collect (
+					Collectors.toMap (
+						componentData ->
+							componentData.name (),
+						componentData ->
+							Pair.of (
+								componentData.interfaceClass (),
+								getComponentReal (
+									componentData))))
+
+			;
+
+		}
+
+
+	}
+
+	@Override
+	public
+	List <String> requestComponentNames () {
+
+		throw todo ();
+
+	}
+
+	@Override
+	public
+	void bootstrapComponent (
+			@NonNull Object component) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"bootstrapComponent");
+
+		) {
+
+			initialiseComponent (
+				taskLogger,
+				component);
+
+		}
+
+	}
+
+	@Override
+	public
+	void bootstrapComponent (
+			@NonNull Object component,
+			@NonNull String componentName) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"bootstrapComponent",
+					keyEqualsString (
+						"componentName",
+						componentName));
+
+		) {
+
+			initialiseComponent (
+				taskLogger,
+				component);
+
+		}
+
+	}
+
+	@Override
+	public
+	ComponentMetaData componentMetaData (
+			@NonNull Object component) {
+
+		throw todo ();
+
+	}
+
+	// safe closeable implementation
+
+	@Override
+	public
+	void close () {
+
+		doNothing ();
+
+	}
+
+	// private implementation
+
+	private synchronized
 	void registerSingletonClass (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SingletonComponent singletonComponentAnnotation,
@@ -447,311 +850,7 @@ class BootstrapComponentManager
 
 	}
 
-	public
-	void bootstrapComponent (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Object component) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"bootstrapComponent");
-
-		) {
-
-			initialiseComponent (
-				taskLogger,
-				component);
-
-		}
-
-	}
-
-	public
-	void bootstrapComponent (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Object component,
-			@NonNull String componentName) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"bootstrapComponent");
-
-		) {
-
-			initialiseComponent (
-				taskLogger,
-				component);
-
-		}
-
-	}
-
-	public
-	BootstrapComponentManager setup (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
-		) {
-
-			componentsByName.values ().stream ()
-
-				.filter (
-					componentData ->
-						enumEqualSafe (
-							componentData.scope (),
-							ComponentScope.singleton))
-
-				.forEach (
-					componentData ->
-						getComponentReal (
-							componentData))
-
-			;
-
-			return this;
-
-		}
-
-	}
-
-	@Override
-	public
-	ComponentMetaData componentMetaData (
-			@NonNull Object component) {
-
-		throw todo ();
-
-	}
-
-	public
-	BootstrapComponentManager registerStandardClasses (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerStandardClasses");
-
-		) {
-
-			registerClass (
-				taskLogger,
-				AnnotatedClassComponentTools.class,
-				AnnotatedClassComponentTools.class);
-
-			registerClass (
-				taskLogger,
-				ComponentManagerBuilder.class,
-				ComponentManagerBuilder.class);
-
-			registerClass (
-				taskLogger,
-				ComponentRegistryImplementation.class,
-				ComponentRegistryImplementation.class);
-
-			registerClass (
-				taskLogger,
-				DataFromXmlBuilder.class,
-				DataFromXmlBuilder.class);
-
-			registerClass (
-				taskLogger,
-				DataFromXmlImplementation.class,
-				DataFromXmlImplementation.class);
-
-			registerClass (
-				taskLogger,
-				PluginManager.class,
-				PluginManager.class);
-
-			registerClass (
-				taskLogger,
-				PluginManagerBuilder.class,
-				PluginManagerBuilder.class);
-
-			registerClass (
-				taskLogger,
-				WbsConfig.class,
-				WbsConfigFactory.class);
-
-			return this;
-
-		}
-
-	}
-
-	// component manager implementation
-
-	@Override
-	public <ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"getComponentProvider");
-
-		) {
-
-			Optional <ComponentData> componentDataOptional =
-				mapItemForKey (
-					componentsByName,
-					componentName);
-
-			if (
-				optionalIsNotPresent (
-					componentDataOptional)
-			) {
-				return optionalAbsent ();
-			}
-
-			ComponentData componentData =
-				optionalGetRequired (
-					componentDataOptional);
-
-			if (
-				isNotSubclassOf (
-					componentClass,
-					componentData.interfaceClass ())
-			) {
-				throw new ClassCastException ();
-			}
-
-			return optionalOf (
-				() ->
-					componentClass.cast (
-						getComponentReal (
-							componentData)));
-
-		}
-
-	}
-
-	@Override
-	public
-	Map <String, Pair <Class <?>, Object>> allSingletonComponents (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"allSingletonComponents");
-
-		) {
-
-			return componentsByName.values ().stream ()
-
-				.filter (
-					componentData ->
-						enumEqualSafe (
-							componentData.scope (),
-							ComponentScope.singleton))
-
-				.collect (
-					Collectors.toMap (
-						componentData ->
-							componentData.name (),
-						componentData ->
-							Pair.of (
-								componentData.interfaceClass (),
-								getComponentReal (
-									componentData))))
-
-			;
-
-		}
-
-
-	}
-
-	@Override
-	public
-	List <String> requestComponentNames () {
-
-		throw todo ();
-
-	}
-
-	@Override
-	public
-	void bootstrapComponent (
-			@NonNull Object component) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.createTaskLogger (
-					"bootstrapComponent ()");
-
-		) {
-
-			initialiseComponent (
-				taskLogger,
-				component);
-
-		}
-
-	}
-
-	@Override
-	public
-	void bootstrapComponent (
-			@NonNull Object component,
-			@NonNull String componentName) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.createTaskLoggerFormat (
-					"bootstrapComponent (%s)",
-					keyEqualsString (
-						"componentName",
-						componentName));
-
-		) {
-
-			initialiseComponent (
-				taskLogger,
-				component);
-
-		}
-
-	}
-
-	// safe closeable implementation
-
-	@Override
-	public
-	void close () {
-
-		doNothing ();
-
-	}
-
-	// private implementation
-
-	private
+	private synchronized
 	Object getComponentReal (
 			@NonNull ComponentData componentData) {
 
@@ -799,7 +898,7 @@ class BootstrapComponentManager
 
 	}
 
-	private
+	private synchronized
 	Object createComponentReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentData componentData) {
@@ -807,9 +906,9 @@ class BootstrapComponentManager
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"createComponentReal (%s)",
+					"createComponentReal",
 					keyEqualsString (
 						"componentName",
 						componentData.name ()));
@@ -846,7 +945,7 @@ class BootstrapComponentManager
 
 	}
 
-	private
+	private synchronized
 	void initialiseComponent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object component) {
@@ -878,15 +977,27 @@ class BootstrapComponentManager
 					field.getAnnotation (
 						PrototypeDependency.class);
 
+				StrongPrototypeDependency strongPrototypeDependencyAnnotation =
+					field.getAnnotation (
+						StrongPrototypeDependency.class);
+
+				UninitializedDependency uninitializedDependencyAnnotation =
+					field.getAnnotation (
+						UninitializedDependency.class);
+
 				List <Annotation> allAnnotations =
 					ImmutableList.<Annotation> copyOf (
 						presentInstances (
 							optionalFromNullable (
-								singletonDependencyAnnotation),
-							optionalFromNullable (
 								classSingletonDependencyAnnotation),
 							optionalFromNullable (
-								prototypeDependencyAnnotation)));
+								prototypeDependencyAnnotation),
+							optionalFromNullable (
+								singletonDependencyAnnotation),
+							optionalFromNullable (
+								strongPrototypeDependencyAnnotation),
+							optionalFromNullable (
+								uninitializedDependencyAnnotation)));
 
 				if (
 					collectionIsEmpty (
@@ -971,6 +1082,64 @@ class BootstrapComponentManager
 				} else if (
 					isNotNull (
 						prototypeDependencyAnnotation)
+					|| isNotNull (
+						strongPrototypeDependencyAnnotation)
+				) {
+
+					if (
+						classNotEqual (
+							field.getType (),
+							Provider.class)
+					) {
+						throw new RuntimeException ();
+					}
+
+					ParameterizedType parameterizedType =
+						(ParameterizedType)
+						field.getGenericType ();
+
+					Class <?> targetClass =
+						(Class <?>)
+						parameterizedType.getActualTypeArguments () [0];
+
+					Optional <ComponentData> componentDataOptional =
+						mapItemForKey (
+							componentsByInterface,
+							targetClass);
+
+					if (
+						optionalIsNotPresent (
+							componentDataOptional)
+					) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Prototype dependency %s.%s ",
+								classNameFull (
+									component.getClass ()),
+								field.getName (),
+								"of type %s ",
+								classNameFull (
+									targetClass),
+								"not found"));
+
+					}
+
+					ComponentData componentData =
+						optionalGetRequired (
+							componentDataOptional);
+
+					fieldSet (
+						field,
+						component,
+						optionalOf (
+							(Provider <?>)
+							() -> getComponentReal (
+								componentData)));
+
+				} else if (
+					isNotNull (
+						uninitializedDependencyAnnotation)
 				) {
 
 					if (

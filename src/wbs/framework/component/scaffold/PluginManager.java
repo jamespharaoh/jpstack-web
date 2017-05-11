@@ -7,9 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.component.annotations.PrototypeComponent;
-
-@PrototypeComponent ("pluginManager")
 @Accessors (fluent = true)
 public
 class PluginManager {

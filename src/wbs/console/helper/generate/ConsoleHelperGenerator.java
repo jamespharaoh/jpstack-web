@@ -8,9 +8,11 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classPackageName;
 import static wbs.utils.io.FileUtils.directoryCreateWithParents;
+import static wbs.utils.io.FileUtils.fileExistsFormat;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
@@ -30,7 +32,7 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.console.forms.EntityFinder;
+import wbs.console.forms.object.EntityFinder;
 import wbs.console.helper.core.ConsoleHelperImplementation;
 import wbs.console.helper.core.ConsoleHelperMethods;
 import wbs.console.helper.core.ConsoleHooks;
@@ -60,7 +62,6 @@ import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeRegistry;
 
-import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
 
@@ -123,6 +124,8 @@ class ConsoleHelperGenerator {
 	String extraImplementationClassName;
 	Class <?> extraMethodsInterface;
 
+	boolean hasHooks;
+	String consoleHooksClassName;
 	String consoleHooksComponentName;
 
 	//Class <?> consoleHelperInterface;
@@ -294,6 +297,7 @@ class ConsoleHelperGenerator {
 					packageName,
 					capitalise (
 						model.objectName ()));
+
 		} else {
 
 			hasExtra =
@@ -303,10 +307,36 @@ class ConsoleHelperGenerator {
 
 		// hooks
 
+		consoleHooksClassName =
+			stringFormat (
+				"%s.console.%sConsoleHooks",
+				packageName,
+				capitalise (
+					model.objectName ()));
+
 		consoleHooksComponentName =
 			stringFormat (
 				"%sConsoleHooks",
 				model.objectName ());
+
+		if (
+			fileExistsFormat (
+				"src/%s.java",
+				stringReplaceAllSimple (
+					".",
+					"/",
+					consoleHooksClassName))
+		) {
+
+			hasHooks =
+				true;
+
+		} else {
+
+			hasHooks =
+				false;
+
+		}
 
 		// create directory
 
@@ -331,7 +361,7 @@ class ConsoleHelperGenerator {
 
 		try (
 
-			FormatWriter formatWriter =
+			AtomicFileWriter formatWriter =
 				new AtomicFileWriter (
 					filename);
 
@@ -466,14 +496,22 @@ class ConsoleHelperGenerator {
 
 		}
 
+		if (hasHooks) {
+
+			classWriter.addNamedSingletonDependency (
+				consoleHooksClassName,
+				consoleHooksComponentName);
+
+		}
+
 	}
 
 	void addPrototypeDependencies () {
 
-		classWriter.addPrototypeDependency (
+		classWriter.addUninitializedDependency (
 			GenericConsoleHelperProvider.class);
 
-		classWriter.addPrototypeDependency (
+		classWriter.addUninitializedDependency (
 			imports ->
 				stringFormat (
 					"%s <%s>",
@@ -698,50 +736,6 @@ class ConsoleHelperGenerator {
 				.write (
 					formatWriter);
 
-			// hooks
-
-			javaAssignmentWriterProvider.get ()
-
-				.variableName (
-					"consoleHooksImplementation")
-
-				.valueFormat (
-					"%s.%s (%s (%s, \"%s\", %s.class))",
-					imports.register (
-						OptionalUtils.class),
-					"optionalOrNull",
-					"componentManager.getComponent",
-					"taskLogger",
-					consoleHooksComponentName,
-					imports.register (
-						ConsoleHooks.class))
-
-				.write (
-					formatWriter);
-
-			formatWriter.writeLineFormatIncreaseIndent (
-				"if (consoleHooksImplementation == null) {");
-
-			formatWriter.writeNewline ();
-
-			javaAssignmentWriterProvider.get ()
-
-				.variableName (
-					"consoleHooksImplementation")
-
-				.valueFormat (
-					"new %s.DefaultImplementation ()",
-					imports.register (
-						ConsoleHooks.class))
-
-				.write (
-					formatWriter);
-
-			formatWriter.writeLineFormatDecreaseIndent (
-				"}");
-
-			formatWriter.writeNewline ();
-
 			// console helper implementation
 
 			javaAssignmentWriterProvider.get ()
@@ -762,7 +756,10 @@ class ConsoleHelperGenerator {
 
 				.property (
 					"consoleHooks",
-					"consoleHooksImplementation")
+					ifThenElse (
+						hasHooks,
+						() -> "consoleHooksImplementation",
+						() -> "null"))
 
 				.write (
 					formatWriter);

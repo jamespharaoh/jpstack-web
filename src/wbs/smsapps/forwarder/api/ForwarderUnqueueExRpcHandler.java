@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -59,7 +58,7 @@ class ForwarderUnqueueExRpcHandler
 	ForwarderMessageOutReportObjectHelper forwarderMessageOutReportHelper;
 
 	@SingletonDependency
-	@Named
+	@NamedDependency
 	RpcDefinition forwarderUnqueueExRequestDef;
 
 	@ClassSingletonDependency
@@ -91,7 +90,7 @@ class ForwarderUnqueueExRpcHandler
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"handle");

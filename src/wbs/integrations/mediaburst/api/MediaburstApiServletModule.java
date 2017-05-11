@@ -200,7 +200,7 @@ class MediaburstApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"inFile.doPost");
@@ -399,7 +399,7 @@ class MediaburstApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"reportFile.doGet");

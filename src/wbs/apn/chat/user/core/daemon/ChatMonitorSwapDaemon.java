@@ -123,7 +123,7 @@ class ChatMonitorSwapDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"getChatIds");
@@ -231,10 +231,10 @@ class ChatMonitorSwapDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteFormat (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"doMonitorSwapReal (%s, %s, %s)",
+					"doMonitorSwapReal",
 					keyEqualsDecimalInteger (
 						"chatId",
 						chatId),

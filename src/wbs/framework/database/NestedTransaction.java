@@ -1,5 +1,11 @@
 package wbs.framework.database;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
+import java.util.List;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.framework.logging.LogContext;
@@ -59,13 +65,18 @@ class NestedTransaction
 	public
 	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull CharSequence dynamicContext) {
+			@NonNull String dynamicContextName,
+			@NonNull List <CharSequence> dynamicContextParameters,
+			@NonNull Optional <Boolean> debugEnabled) {
 
 		return new NestedTransaction (
 			ownedTransaction (),
 			logContext.nestTaskLogger (
-				ownedTransaction (),
-				dynamicContext
+				optionalOf (
+					ownedTransaction ()),
+				dynamicContextName,
+				dynamicContextParameters,
+				debugEnabled
 			).taskLoggerImplementation ());
 
 	}

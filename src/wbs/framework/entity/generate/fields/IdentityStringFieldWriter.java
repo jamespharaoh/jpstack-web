@@ -1,3 +1,4 @@
+
 package wbs.framework.entity.generate.fields;
 
 import lombok.NonNull;

@@ -5,21 +5,16 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.ScriptRefFormFieldSpec;
-import wbs.console.forms.TextAreaFormFieldSpec;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.scriptref.ScriptRefFormFieldSpec;
+import wbs.console.forms.text.TextAreaFormFieldSpec;
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.module.ConsoleModuleBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -192,68 +187,6 @@ class MessageTemplateEntryValueFieldsProvider
 			mode;
 
 		return this;
-
-	}
-
-	@SingletonComponent ("messageTemplateSetFieldsProviderConfig")
-	public static
-	class Config {
-
-		@PrototypeDependency
-		Provider <MessageTemplateEntryValueFieldsProvider>
-		messageTemplateEntryValueFieldsProvider;
-
-		@PrototypeComponent ("messageTemplateEntryValueListFieldsProvider")
-		@Named
-		public
-		MessageTemplateEntryValueFieldsProvider
-		messageTemplateEntryValueListFieldsProvider () {
-
-			return messageTemplateEntryValueFieldsProvider.get ()
-
-				.setMode (
-					"list");
-
-		}
-
-		@PrototypeComponent ("messageTemplateEntryValueCreateFieldsProvider")
-		@Named
-		public
-		MessageTemplateEntryValueFieldsProvider
-		messageTemplateEntryValueCreateFieldsProvider () {
-
-			return messageTemplateEntryValueFieldsProvider.get ()
-
-				.setMode (
-					"create");
-
-		}
-
-		@PrototypeComponent ("messageTemplateEntryValueSettingsFieldsProvider")
-		@Named
-		public
-		MessageTemplateEntryValueFieldsProvider
-		messageTemplateEntryValueSettingsFieldsProvider () {
-
-			return messageTemplateEntryValueFieldsProvider.get ()
-
-				.setMode (
-					"settings");
-
-		}
-
-		@PrototypeComponent ("messageTemplateEntryValueSummaryFieldsProvider")
-		@Named
-		public
-		MessageTemplateEntryValueFieldsProvider
-		messageTemplateEntryValueSummaryFieldsProvider () {
-
-			return messageTemplateEntryValueFieldsProvider.get ()
-
-				.setMode (
-					"summary");
-
-		}
 
 	}
 

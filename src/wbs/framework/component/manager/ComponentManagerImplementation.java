@@ -5,14 +5,16 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
+import static wbs.utils.collection.IterableUtils.iterableFilterMap;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -51,8 +53,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -79,7 +79,6 @@ import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
 import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
-import wbs.framework.component.manager.ComponentMetaData.ComponentState;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistry;
 import wbs.framework.component.registry.InjectedProperty;
@@ -120,12 +119,6 @@ class ComponentManagerImplementation
 
 	Map <String, ComponentData> singletonComponents =
 		new HashMap<> ();
-
-	Set <String> singletonComponentsInCreation =
-		new LinkedHashSet<> ();
-
-	Set <String> singletonComponentsFailed =
-		new HashSet<> ();
 
 	Map <Object, ComponentData> componentDatas =
 		new MapMaker ()
@@ -199,10 +192,11 @@ class ComponentManagerImplementation
 
 			return optionalOf (
 				componentClass.cast (
-					getComponent (
+					getComponentReal (
 						taskLogger,
 						componentDefinition,
-						true)));
+						true,
+						false)));
 
 		}
 
@@ -248,10 +242,11 @@ class ComponentManagerImplementation
 					componentDefinitionOptional);
 
 			return componentClass.cast (
-				getComponent (
+				getComponentReal (
 					taskLogger,
 					componentDefinition,
-					true));
+					true,
+					false));
 
 		}
 
@@ -293,10 +288,11 @@ class ComponentManagerImplementation
 					componentDefinitionOptional);
 
 			return componentClass.cast (
-				getComponent (
+				getComponentReal (
 					taskLogger,
 					componentDefinition,
-					true));
+					true,
+					false));
 
 		}
 
@@ -451,10 +447,11 @@ class ComponentManagerImplementation
 	// private implementation
 
 	private
-	Object getComponent (
+	Object getComponentReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialize) {
+			@NonNull Boolean initialize,
+			@NonNull Boolean weak) {
 
 		try (
 
@@ -474,7 +471,7 @@ class ComponentManagerImplementation
 					"prototype")
 			) {
 
-				return getPrototypeComponent (
+				return getPrototypeComponentReal (
 					taskLogger,
 					componentDefinition,
 					initialize);
@@ -485,10 +482,10 @@ class ComponentManagerImplementation
 					"singleton")
 			) {
 
-				return getSingletonComponent (
+				return getSingletonComponentReal (
 					taskLogger,
 					componentDefinition,
-					initialize);
+					weak);
 
 			} else {
 
@@ -504,7 +501,7 @@ class ComponentManagerImplementation
 	}
 
 	private
-	Object getPrototypeComponent (
+	Object getPrototypeComponentReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
@@ -514,34 +511,40 @@ class ComponentManagerImplementation
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"getPrototypeComponent");
+					"getPrototypeComponentReal");
 
 		) {
 
 			ComponentData componentData =
-				instantiateComponent (
+				createComponentData (
+					componentDefinition);
+
+			if (
+				! instantiateComponent (
 					taskLogger,
-					componentDefinition,
-					initialize);
+					componentData)
+			) {
+				throw taskLogger.makeException ();
+			}
+
+			if (
+				! initializeComponent (
+					taskLogger,
+					componentData)
+			) {
+				throw taskLogger.makeException ();
+			}
 
 			Object component =
 				optionalGetRequired (
-					componentData.component ());
+					componentData.optionalComponent);
 
-			if (
-				optionalIsPresent (
-					componentData.optionalComponent)
-			) {
+			componentData.weakComponent =
+				new WeakReference<> (
+					component);
 
-				componentData.weakComponent =
-					new WeakReference<> (
-						optionalGetRequired (
-							componentData.optionalComponent));
-
-				componentData.optionalComponent =
-					optionalAbsent ();
-
-			}
+			componentData.optionalComponent =
+				optionalAbsent ();
 
 			return component;
 
@@ -550,248 +553,382 @@ class ComponentManagerImplementation
 	}
 
 	private
-	Object getSingletonComponent (
+	Object getSingletonComponentReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialize) {
+			@NonNull Boolean weak) {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"getSingletonComponent");
+					"getSingletonComponentReal");
 
 		) {
 
-			if (! initialize) {
-				throw new IllegalArgumentException ();
-			}
-
-			Optional <ComponentData> componentDataOptional =
-				mapItemForKey (
+			ComponentData componentData =
+				mapItemForKeyRequired (
 					singletonComponents,
 					componentDefinition.name ());
 
-			ComponentData componentData;
-
 			if (
-				optionalIsPresent (
-					componentDataOptional)
+				enumNotEqualSafe (
+					componentData.state (),
+					ComponentState.active)
 			) {
 
-				componentData =
-					optionalGetRequired (
-						componentDataOptional);
-
-			} else {
-
-				if (
-					singletonComponentsInCreation.contains (
-						componentDefinition.name ())
-				) {
-
-					throw taskLogger.fatalFormat (
-						"Singleton component %s already in creation (%s)",
+				throw new IllegalStateException (
+					stringFormat (
+						"Can't get singleton %s ",
 						componentDefinition.name (),
-						joinWithCommaAndSpace (
-							singletonComponentsInCreation));
-
-				}
-
-				if (
-					singletonComponentsFailed.contains (
-						componentDefinition.name ())
-				) {
-
-					throw taskLogger.fatalFormat (
-						"Singleton component %s already failed",
-						componentDefinition.name ());
-
-				}
-
-				singletonComponentsInCreation.add (
-					componentDefinition.name ());
-
-				componentData = null;
-
-				try {
-
-					componentData =
-						instantiateComponent (
-							taskLogger,
-							componentDefinition,
-							true);
-
-					singletonComponents.put (
-						componentDefinition.name (),
-						componentData);
-
-				} finally {
-
-					singletonComponentsInCreation.remove (
-						componentDefinition.name ());
-
-					if (
-						isNull (
-							componentData)
-					) {
-
-						taskLogger.errorFormat (
-							"Failed to instantiate component %s",
-							componentDefinition.name ());
-
-						singletonComponentsFailed.add (
-							componentDefinition.name ());
-
-					}
-
-				}
+						"in state: %s",
+						enumNameHyphens (
+							componentData.state ())));
 
 			}
 
 			return optionalGetRequired (
-				componentData.component ());
+				componentData.optionalComponent);
 
 		}
 
 	}
 
 	private
-	ComponentData instantiateComponent (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialize) {
+	void initSingletonsReal (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"instantiateComponent (%s)",
+					"initSingletonsReal");
+
+		) {
+
+			// create data for singletons
+
+			List <ComponentData> singletonDatas =
+				new ArrayList<> ();
+
+			for (
+				ComponentDefinition componentDefinition
+					: registry.singletons ()
+			) {
+
+				ComponentData componentData =
+					createComponentData (
+						componentDefinition);
+
+				singletonComponents.put (
+					componentDefinition.name (),
+					componentData);
+
+				singletonDatas.add (
+					componentData);
+
+			}
+
+			// create singletons
+
+			for (
+				ComponentData componentData
+					: singletonDatas
+			) {
+
+				instantiateSingletonComponentReal (
+					taskLogger,
+					componentData);
+
+				initializeComponent (
+					taskLogger,
+					componentData);
+
+				performPendingWeakInjectionsReal (
+					taskLogger,
+					componentData);
+
+			}
+
+			// check we filled all weak dependencies
+
+			if (
+				mapIsNotEmpty (
+					pendingInjectionsByDependencyName)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Pending injections not satisfied: %s",
+						joinWithCommaAndSpace (
+							pendingInjectionsByDependencyName.keySet ())));
+
+			}
+
+			// run late setup
+
+			invokeLifecycleMethods (
+				taskLogger,
+				LateLifecycleSetup.class,
+				"Late lifecycle setup",
+				singletonComponents.values ());
+
+			taskLogger.makeException ();
+
+			// run startup complete
+
+			invokeLifecycleMethods (
+				taskLogger,
+				ComponentManagerStartupComplete.class,
+				"Component manager startup complete",
+				singletonComponents.values ());
+
+			taskLogger.makeException ();
+
+		}
+
+	}
+
+	private
+	void instantiateSingletonComponentReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"instantiateSingletonComponentReal");
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
+			if (
+				enumEqualSafe (
+					componentData.state (),
+					ComponentState.creation)
+			) {
+
+				throw taskLogger.fatalFormat (
+					"Singleton component %s already in creation (%s)",
+					componentDefinition.name (),
+					joinWithCommaAndSpace (
+						iterableFilterMap (
+							singletonComponents.values (),
+							nestComponentData ->
+								enumEqualSafe (
+									nestComponentData.state (),
+									ComponentState.creation),
+							nestComponentData ->
+								nestComponentData.name ())));
+
+			}
+
+			if (
+				enumEqualSafe (
+					componentData.state (),
+					ComponentState.error)
+			) {
+
+				throw taskLogger.fatalFormat (
+					"Singleton component %s already failed",
 					componentDefinition.name ());
+
+			}
+
+			instantiateComponent (
+				taskLogger,
+				componentData);
+
+		}
+
+	}
+
+	private
+	void performPendingWeakInjectionsReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"performPendingWeakInjectionsReal");
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
+			// fill in weak links as we go
+
+			Optional <List <Injection>> pendingInjectionsOptional =
+				mapItemForKey (
+					pendingInjectionsByDependencyName,
+					componentDefinition.name ());
+
+			if (
+				optionalIsPresent (
+					pendingInjectionsOptional)
+			) {
+
+				ListIterator <Injection> pendingInjectionIterator =
+					pendingInjectionsOptional.get ().listIterator ();
+
+				while (pendingInjectionIterator.hasNext ()) {
+
+					Injection pendingInjection =
+						pendingInjectionIterator.next ();
+
+					pendingInjection.missingComponents.remove (
+						componentDefinition.name ());
+
+					if (
+						collectionIsEmpty (
+							pendingInjection.missingComponents)
+					) {
+
+						performInjection (
+							taskLogger,
+							pendingInjection);
+
+						pendingInjectionIterator.remove ();
+
+					}
+
+				}
+
+				pendingInjectionsByDependencyName.remove (
+					componentDefinition.name ());
+
+			}
+
+		}
+
+	}
+
+	private
+	boolean instantiateComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"instantiateComponent",
+					keyEqualsString (
+						"componentData.name",
+						componentData.name ()));
 
 			HeldLock heldlock =
 				lock.read ();
 
 		) {
 
-			// instantiate
-
-			Object protoComponent =
-				classInstantiate (
-					ifNull (
-						componentDefinition.factoryClass (),
-						componentDefinition.componentClass ()));
-
-			// set properties
-
-			setComponentValueProperties (
-				taskLogger,
-				componentDefinition,
-				protoComponent);
-
-			setComponentReferenceProperties (
-				taskLogger,
-				componentDefinition,
-				protoComponent);
-
-			setComponentInjectedProperties (
-				taskLogger,
-				componentDefinition,
-				protoComponent);
-
-			// call factory
-
-			Object component;
-			ComponentData componentData;
-
 			if (
-				isNotNull (
-					componentDefinition.factoryClass ())
+				enumNotEqualSafe (
+					componentData.state (),
+					ComponentState.none)
 			) {
 
-				ComponentFactory <?> componentFactory =
-					genericCastUnchecked (
-						protoComponent);
+				throw new IllegalStateException (
+					stringFormat (
+						"Cannot instantiate component %s ",
+						componentData.name (),
+						"in state: %s",
+						enumNameHyphens (
+							componentData.state ())));
 
-				component =
-					componentFactory.makeComponent (
-						taskLogger);
+			}
+
+			componentData.state =
+				ComponentState.creation;
+
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
+			try {
+
+				// instantiate
+
+				componentData.optionalComponent =
+					optionalOf (
+						classInstantiate (
+							ifNull (
+								componentDefinition.factoryClass (),
+								componentDefinition.componentClass ())));
+
+				// set properties
+
+				setComponentValueProperties (
+					taskLogger,
+					componentData);
+
+				setComponentReferenceProperties (
+					taskLogger,
+					componentData);
+
+				setComponentInjectedProperties (
+					taskLogger,
+					componentData);
+
+				// call factory
 
 				if (
-					isNull (
-						component)
+					isNotNull (
+						componentDefinition.factoryClass ())
 				) {
 
-					throw taskLogger.fatalFormat (
-						"Factory component returned null for %s",
-						componentDefinition.name ());
+					ComponentFactory <?> componentFactory =
+						componentDefinition.factoryClass ().cast (
+							optionalGetRequired (
+								componentData.optionalComponent));
+
+					componentData.optionalComponent =
+						optionalOf (
+							componentFactory.makeComponent (
+								taskLogger));
 
 				}
 
-				componentData =
-					findOrCreateDataForComponent (
-						componentDefinition,
-						component);
+			} catch (Exception exception) {
 
-			} else {
+				taskLogger.errorFormatException (
+					exception,
+					"Error instantiating %s",
+					componentData.name ());
 
-				component =
-					protoComponent;
+				componentData.state =
+					ComponentState.error;
 
-				componentData =
-					findOrCreateDataForComponent (
-						componentDefinition,
-						component);
+				return false;
 
 			}
 
-			// initialize
-
-			if (
-
-				initialize
-
-				&& enumEqualSafe (
-					componentData.state (),
-					ComponentState.uninitialized)
-
-			) {
-
-				initializeComponent (
-					taskLogger,
-					componentDefinition,
-					component,
-					componentData);
-
-			}
-
-			// and finish
+			componentData.state =
+				ComponentState.uninitialized;
 
 			taskLogger.debugFormat (
 				"Component %s instantiated successfully",
-				componentDefinition.name ());
+				componentData.name ());
 
-			return componentData;
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Error instantiating %s",
-					componentDefinition.name ()),
-				exception);
+			return true;
 
 		}
 
 	}
 
 	private
-	void initializeComponent (
+	boolean initializeComponent (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component,
 			@NonNull ComponentData componentData) {
 
 		try (
@@ -820,31 +957,39 @@ class ComponentManagerImplementation
 
 				}
 
-				try {
+				ComponentDefinition componentDefinition =
+					componentData.definition ();
 
-					invokeLifecycleMethods (
-						taskLogger,
-						NormalLifecycleSetup.class,
-						"Eager lifecycle setup",
-						componentData);
+				if (componentDefinition.owned ()) {
 
-					componentData.state =
-						ComponentState.active;
+					try {
 
-				} finally {
+						invokeLifecycleMethods (
+							taskLogger,
+							NormalLifecycleSetup.class,
+							"Normal lifecycle setup",
+							componentData);
 
-					if (
-						enumNotEqualSafe (
-							componentData.state,
-							ComponentState.active)
-					) {
+					} catch (Exception exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"Error initialising %s",
+							componentData.name ());
 
 						componentData.state =
 							ComponentState.error;
 
+						return false;
+
 					}
 
 				}
+
+				componentData.state =
+					ComponentState.active;
+
+				return true;
 
 			}
 
@@ -891,33 +1036,37 @@ class ComponentManagerImplementation
 			}
 
 			ComponentData componentData =
-				findOrCreateDataForComponent (
-					componentDefinition,
+				createComponentData (
+					componentDefinition);
+
+			componentData.optionalComponent =
+				optionalOf (
 					component);
+
+			componentData.state =
+				ComponentState.creation;
 
 			// set properties
 
 			setComponentValueProperties (
 				taskLogger,
-				componentDefinition,
-				component);
+				componentData);
 
 			setComponentReferenceProperties (
 				taskLogger,
-				componentDefinition,
-				component);
+				componentData);
 
 			setComponentInjectedProperties (
 				taskLogger,
-				componentDefinition,
-				component);
+				componentData);
+
+			componentData.state =
+				ComponentState.uninitialized;
 
 			// initialize component
 
 			initializeComponent (
 				taskLogger,
-				componentDefinition,
-				component,
 				componentData);
 
 		}
@@ -925,42 +1074,26 @@ class ComponentManagerImplementation
 	}
 
 	private
-	ComponentData findOrCreateDataForComponent (
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component) {
+	ComponentData createComponentData (
+			@NonNull ComponentDefinition componentDefinition) {
 
-		// create component info
+		ComponentData componentData =
+			new ComponentData ();
 
-		return componentDatas.computeIfAbsent (
-			component,
-			_component -> {
+		componentData.definition =
+			componentDefinition;
 
-			ComponentData newComponentData =
-				new ComponentData ();
+		componentData.state =
+			ComponentState.none;
 
-			newComponentData.definition =
-				componentDefinition;
-
-			newComponentData.optionalComponent =
-				optionalOf (
-					component);
-
-			newComponentData.state =
-				componentDefinition.owned ()
-					? ComponentState.uninitialized
-					: ComponentState.unmanaged;
-
-			return newComponentData;
-
-		});
+		return componentData;
 
 	}
 
 	private
 	void setComponentValueProperties (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component) {
+			@NonNull ComponentData componentData) {
 
 		try (
 
@@ -974,6 +1107,9 @@ class ComponentManagerImplementation
 
 		) {
 
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
 			for (
 				Map.Entry <String,Object> valuePropertyEntry
 					: componentDefinition.valueProperties ().entrySet ()
@@ -985,7 +1121,8 @@ class ComponentManagerImplementation
 					valuePropertyEntry.getKey ());
 
 				propertySetSimple (
-					component,
+					optionalGetRequired (
+						componentData.optionalComponent),
 					valuePropertyEntry.getKey (),
 					valuePropertyEntry.getValue ());
 
@@ -998,8 +1135,7 @@ class ComponentManagerImplementation
 	private
 	void setComponentReferenceProperties (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component) {
+			@NonNull ComponentData componentData) {
 
 		try (
 
@@ -1013,8 +1149,11 @@ class ComponentManagerImplementation
 
 		) {
 
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
 			for (
-				Map.Entry <String,String> entry
+				Map.Entry <String, String> entry
 					: componentDefinition.referenceProperties ().entrySet ()
 			) {
 
@@ -1030,7 +1169,8 @@ class ComponentManagerImplementation
 						Object.class);
 
 				PropertyUtils.propertySetSimple (
-					component,
+					optionalGetRequired (
+						componentData.optionalComponent),
 					entry.getKey (),
 					target);
 
@@ -1043,8 +1183,7 @@ class ComponentManagerImplementation
 	private
 	void setComponentInjectedProperties (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component) {
+			@NonNull ComponentData componentData) {
 
 		try (
 
@@ -1060,13 +1199,12 @@ class ComponentManagerImplementation
 
 			for (
 				InjectedProperty injectedProperty
-					: componentDefinition.injectedProperties ()
+					: componentData.definition ().injectedProperties ()
 			) {
 
 				injectProperty (
 					taskLogger,
-					componentDefinition,
-					component,
+					componentData,
 					injectedProperty);
 
 			}
@@ -1078,8 +1216,7 @@ class ComponentManagerImplementation
 	private static
 	class Injection {
 
-		String componentName;
-		Object component;
+		ComponentData componentData;
 
 		InjectedProperty injectedProperty;
 		List <ComponentDefinition> targetComponents;
@@ -1094,8 +1231,7 @@ class ComponentManagerImplementation
 	private
 	void injectProperty (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component,
+			@NonNull ComponentData componentData,
 			@NonNull InjectedProperty injectedProperty) {
 
 		try (
@@ -1116,11 +1252,8 @@ class ComponentManagerImplementation
 			Injection injection =
 				new Injection ();
 
-			injection.componentName =
-				componentDefinition.name ();
-
-			injection.component =
-				component;
+			injection.componentData =
+				componentData;
 
 			injection.injectedProperty =
 				injectedProperty;
@@ -1135,12 +1268,14 @@ class ComponentManagerImplementation
 			if (injectedProperty.prototype ()) {
 
 				injection.transformer =
-					provider -> provider;
+					provider ->
+						provider;
 
 			} else {
 
 				injection.transformer =
-					provider -> provider.get ();
+					provider ->
+						provider.get ();
 
 			}
 
@@ -1227,15 +1362,31 @@ class ComponentManagerImplementation
 				injection.missingComponents =
 					injection.targetComponents.stream ()
 
+					.map (
+						targetComponentDefinition ->
+							mapItemForKey (
+								singletonComponents,
+								targetComponentDefinition.name ()))
+
 					.filter (
-						definition ->
-							doesNotContain (
-								singletonComponents.keySet (),
-								definition.name ()))
+						targetComponentDataOptional ->
+							optionalIsPresent (
+								targetComponentDataOptional))
 
 					.map (
-						definition ->
-							definition.name ())
+						targetComponentDataOptional ->
+							optionalGetRequired (
+								targetComponentDataOptional))
+
+					.filter (
+						targetComponentData ->
+							enumNotEqualSafe (
+								targetComponentData.state (),
+								ComponentState.active))
+
+					.map (
+						targetComponentData ->
+							targetComponentData.name ())
 
 					.collect (
 						Collectors.toSet ());
@@ -1304,7 +1455,10 @@ class ComponentManagerImplementation
 								targetDefinition,
 								injection
 									.injectedProperty
-									.initialized ())));
+									.initialized (),
+								injection
+									.injectedProperty
+									.weak ())));
 
 			List <String> missingRawValueNames =
 				iterableMapToList (
@@ -1323,7 +1477,7 @@ class ComponentManagerImplementation
 
 				throw taskLogger.errorFormatThrow (
 					"Missing target components for %s.%s: %s",
-					injection.componentName,
+					injection.componentData.name (),
 					injection.injectedProperty.field ().getName (),
 					joinWithCommaAndSpace (
 						missingRawValueNames));
@@ -1375,7 +1529,7 @@ class ComponentManagerImplementation
 
 				throw taskLogger.errorFormatThrow (
 					"Aggregator for %s.%s returned null",
-					injection.componentName,
+					injection.componentData.name (),
 					injection.injectedProperty.field ().getName ());
 
 			}
@@ -1383,11 +1537,33 @@ class ComponentManagerImplementation
 			Field field =
 				injection.injectedProperty.field ();
 
-			fieldSet (
-				field,
-				injection.component,
-				optionalOf (
-					aggregatedValue));
+			Optional <Object> componentOptional =
+				injection.componentData.component ();
+
+			if (
+				optionalIsPresent (
+					componentOptional)
+			) {
+
+				fieldSet (
+					field,
+					optionalGetRequired (
+						componentOptional),
+					optionalOf (
+						aggregatedValue));
+
+			}
+
+		} catch (Exception exception) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Error injecting %s.%s (%s)",
+					injection.componentData.name (),
+					injection.injectedProperty.field ().getName (),
+					classNameSimple (
+						injection.injectedProperty.field ().getType ())),
+				exception);
 
 		}
 
@@ -1439,97 +1615,8 @@ class ComponentManagerImplementation
 
 			}
 
-			// instantiate singletons
-
-			for (
-				ComponentDefinition componentDefinition
-					: registry.singletons ()
-			) {
-
-				getComponentRequired (
-					taskLogger,
-					componentDefinition.name (),
-					Object.class);
-
-				// fill in weak links as we go
-
-				Optional <List <Injection>> pendingInjectionsOptional =
-					mapItemForKey (
-						pendingInjectionsByDependencyName,
-						componentDefinition.name ());
-
-				if (
-					optionalIsPresent (
-						pendingInjectionsOptional)
-				) {
-
-					ListIterator <Injection> pendingInjectionIterator =
-						pendingInjectionsOptional.get ().listIterator ();
-
-					while (pendingInjectionIterator.hasNext ()) {
-
-						Injection pendingInjection =
-							pendingInjectionIterator.next ();
-
-						pendingInjection.missingComponents.remove (
-							componentDefinition.name ());
-
-						if (
-							collectionIsEmpty (
-								pendingInjection.missingComponents)
-						) {
-
-							performInjection (
-								taskLogger,
-								pendingInjection);
-
-							pendingInjectionIterator.remove ();
-
-						}
-
-					}
-
-					pendingInjectionsByDependencyName.remove (
-						componentDefinition.name ());
-
-				}
-
-			}
-
-			// check we filled all weak dependencies
-
-			if (
-				mapIsNotEmpty (
-					pendingInjectionsByDependencyName)
-			) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Pending injections not satisfied: %s",
-						joinWithCommaAndSpace (
-							pendingInjectionsByDependencyName.keySet ())));
-
-			}
-
-			// run late setup
-
-			invokeLifecycleMethods (
-				taskLogger,
-				LateLifecycleSetup.class,
-				"Late lifecycle setup",
-				singletonComponents.values ());
-
-			taskLogger.makeException ();
-
-			// run startup complete
-
-			invokeLifecycleMethods (
-				taskLogger,
-				ComponentManagerStartupComplete.class,
-				"Component manager startup complete",
-				singletonComponents.values ());
-
-			taskLogger.makeException ();
+			initSingletonsReal (
+				taskLogger);
 
 			// return
 
@@ -1569,9 +1656,9 @@ class ComponentManagerImplementation
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"invokeLifecycleMethods (%s, %s, %s)",
+					"invokeLifecycleMethods",
 					keyEqualsClassSimple (
 						"annotationClass",
 						annotationClass),
@@ -1690,7 +1777,7 @@ class ComponentManagerImplementation
 
 			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
-					"close ()");
+					"close");
 
 			HeldLock heldlock =
 				lock.write ();
@@ -1810,7 +1897,8 @@ class ComponentManagerImplementation
 		return getComponentProvider (
 			parentTaskLogger,
 			componentDefinition,
-			true);
+			true,
+			false);
 
 	}
 
@@ -1818,7 +1906,8 @@ class ComponentManagerImplementation
 	Provider <?> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialized) {
+			@NonNull Boolean initialized,
+			@NonNull Boolean weak) {
 
 		try (
 
@@ -1837,10 +1926,11 @@ class ComponentManagerImplementation
 
 				) {
 
-					return getComponent (
+					return getComponentReal (
 						taskLogger,
 						componentDefinition,
-						initialized);
+						initialized,
+						weak);
 
 				}
 

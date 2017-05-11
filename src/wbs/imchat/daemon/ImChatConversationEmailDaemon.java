@@ -62,7 +62,7 @@ class ImChatConversationEmailDaemon
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runOnce ()");
+					"runOnce");
 
 		) {
 
@@ -90,7 +90,7 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -140,10 +140,10 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteFormat (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"doConversationUpdate (%s)",
+					"doConversationUpdate",
 					keyEqualsDecimalInteger (
 						"conversationId",
 						conversationId));
@@ -181,10 +181,10 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyFormat (
+				database.beginReadOnlyWithParameters (
 					logContext,
 					parentTaskLogger,
-					"doConversationEmail (%s)",
+					"doConversationEmail",
 					keyEqualsDecimalInteger (
 						"conversationId",
 						conversationId));

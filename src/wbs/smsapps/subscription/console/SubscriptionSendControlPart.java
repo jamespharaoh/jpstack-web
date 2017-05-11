@@ -265,8 +265,9 @@ class SubscriptionSendControlPart
 				"Unschedule");
 
 			htmlParagraphWriteFormat (
-				"Unscheduling a send will prevent it from being sent. You will be ",
-				"able to add and remove numbers and send or schedule it again");
+				"Unscheduling a send will prevent it from being sent. You ",
+				"will be able to add and remove numbers and send or schedule ",
+				"it again");
 
 			htmlFormOpenPost ();
 

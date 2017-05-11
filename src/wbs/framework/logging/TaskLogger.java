@@ -16,34 +16,32 @@ interface TaskLogger
 
 	@Override
 	default
+	Long eventId () {
+		return taskLoggerImplementation ().eventId ();
+	}
+
+	@Override
+	default
 	LogSeverity eventSeverity () {
-
 		return taskLoggerImplementation ().eventSeverity ();
-
 	}
 
 	@Override
 	default
 	String eventText () {
-
 		return taskLoggerImplementation ().eventText ();
-
 	}
 
 	@Override
 	default
 	Instant eventStartTime () {
-
 		return taskLoggerImplementation ().eventStartTime ();
-
 	}
 
 	@Override
 	default
 	Instant eventEndTime () {
-
 		return taskLoggerImplementation ().eventEndTime ();
-
 	}
 
 	@Override

@@ -132,7 +132,7 @@ class UnwiredPlazaApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWrite (
+					database.beginReadWriteWithoutParameters (
 						logContext,
 						parentTaskLogger,
 						"reportFile.doGet");

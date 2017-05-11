@@ -33,7 +33,7 @@
 	</layer>
 
 	<layer name="logic">
-		<component class="foreignapi.ClockworkSmsForeignApiConfig"/>
+		<component class="foreignapi.ClockworkSmsForeignApiDataFromXml"/>
 		<component class="foreignapi.ClockworkSmsMessageSender"/>
 	</layer>
 

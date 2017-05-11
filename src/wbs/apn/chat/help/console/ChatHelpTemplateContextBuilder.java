@@ -114,7 +114,7 @@ class ChatHelpTemplateContextBuilder
 	String beanName;
 	String objectTitle;
 
-	List<String> parentContextTypeNames;
+	List <String> parentContextTypeNames;
 	String parentContextName;
 	String parentContextTabName;
 	String parentContextTabLocation;
@@ -124,11 +124,11 @@ class ChatHelpTemplateContextBuilder
 
 	String settingsResponderName;
 
-	List<Object> listChildren =
-		new ArrayList<Object> ();
+	List <Object> listChildren =
+		new ArrayList<> ();
 
-	List<Object> objectBuilders =
-		new ArrayList<Object> ();
+	List <Object> objectBuilders =
+		new ArrayList<> ();
 
 	// build
 
@@ -361,7 +361,7 @@ class ChatHelpTemplateContextBuilder
 			.typeCode (
 				typeCode)
 
-			.fieldsName (
+			.formFieldContextName (
 				"list")
 
 			.targetContextTypeName (
@@ -384,8 +384,8 @@ class ChatHelpTemplateContextBuilder
 			.typeCode (
 				typeCode)
 
-			.fieldsName (
-				"list")
+			.formContextName (
+				"create")
 
 			.targetContextTypeName (
 				contextTypeNameCombined)
@@ -403,7 +403,7 @@ class ChatHelpTemplateContextBuilder
 			.consoleSpec (
 				spec.consoleSpec ())
 
-			.fieldsName (
+			.formContextName (
 				"settings")
 
 			.listContextTypeName (

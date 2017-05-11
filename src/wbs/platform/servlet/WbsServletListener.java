@@ -4,7 +4,9 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
@@ -198,18 +200,23 @@ class WbsServletListener
 
 		TaskLogger.implicitArgument.store (
 			logContext.createTaskLogger (
-				stringFormat (
-					"%s %s",
-					request.getMethod (),
-					request.getRequestURI ()),
-				Arrays.stream (request.getCookies ())
-					.anyMatch (cookie ->
-						stringEqualSafe (
-							cookie.getName (),
-							"wbs-debug")
-						&& stringEqualSafe (
-							cookie.getValue (),
-							"yes"))));
+				"requestInitialized",
+				ImmutableList.of (
+					keyEqualsString (
+						"method",
+						request.getMethod ()),
+					keyEqualsString (
+						"requestUri",
+						request.getRequestURI ())),
+				optionalOf (
+					Arrays.stream (request.getCookies ()).anyMatch (
+						cookie ->
+							stringEqualSafe (
+								cookie.getName (),
+								"wbs-debug")
+							&& stringEqualSafe (
+								cookie.getValue (),
+								"yes")))));
 
 		TaskLogger.implicitArgument.retrieveAndInvokeVoid (
 			taskLogger ->
@@ -549,7 +556,7 @@ class WbsServletListener
 
 			OwnedTaskLogger taskLogger =
 				logContext.createTaskLogger (
-					"shutdown ()");
+					"shutdown");
 
 		) {
 

@@ -1,6 +1,11 @@
 package wbs.framework.database;
 
-import static wbs.utils.string.StringUtils.stringFormatLazyArray;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -88,17 +93,22 @@ interface TransactionMethods {
 
 	NestedTransaction nestTransaction (
 			LogContext logContext,
-			CharSequence dynamicContext);
+			String dynamicContextName,
+			List <CharSequence> dynamicContextParameters,
+			Optional <Boolean> debugEnabled);
 
 	default
-	NestedTransaction nestTransactionFormat (
+	NestedTransaction nestTransaction (
 			@NonNull LogContext logContext,
-			@NonNull CharSequence ... dynamicContextArguments) {
+			@NonNull String dynamicContextName,
+			@NonNull CharSequence ... dynamicContextParameters) {
 
 		return nestTransaction (
 			logContext,
-			stringFormatLazyArray (
-				dynamicContextArguments));
+			dynamicContextName,
+			Arrays.asList (
+				dynamicContextParameters),
+			optionalAbsent ());
 
 	}
 

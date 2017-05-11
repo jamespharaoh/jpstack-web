@@ -3,15 +3,18 @@
 	package="wbs.console.module">
 
 	<layer name="console">
+
+		<bootstrap-component class="ConsoleModuleSpec"/>
+		<bootstrap-component class="ConsoleModuleSpecReader"/>
+
 		<component class="ConsoleManagerImplementation"/>
 		<component class="ConsoleMetaManagerImplementation"/>
 		<component class="ConsoleMetaModuleBuilder"/>
 		<component class="ConsoleMetaModuleImplementation"/>
 		<component class="ConsoleModuleBuilder"/>
 		<component class="ConsoleModuleImplementation"/>
-		<component class="ConsoleModuleSpec"/>
-		<component class="ConsoleModuleSpecReader"/>
 		<component class="ResolvedConsoleContextLink"/>
+
 	</layer>
 
 </plugin>
