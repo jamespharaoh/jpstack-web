@@ -131,7 +131,7 @@ class SleepingDaemonService
 
 				OwnedTaskLogger taskLogger =
 					logContext.createTaskLogger (
-						"runService ()",
+						"runService",
 						helper.debugEnabled ());
 
 			) {

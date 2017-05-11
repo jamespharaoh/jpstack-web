@@ -5,7 +5,6 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -27,8 +26,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
@@ -57,9 +56,6 @@ class ObjectSearchCsvResponder <ResultType>
 
 	@SingletonDependency
 	Database database;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -96,6 +92,8 @@ class ObjectSearchCsvResponder <ResultType>
 
 	Object searchObject;
 	List <Long> objectIds;
+
+	FormContext <ResultType> formContext;
 
 	// implementation
 
@@ -164,6 +162,25 @@ class ObjectSearchCsvResponder <ResultType>
 			objectIds =
 				objectIdsTemp;
 
+			// results mode
+
+			String resultsModeName =
+				requestContext.parameterOrDefault (
+					"mode",
+					resultsModes.keySet ().iterator ().next ());
+
+			ObjectSearchResultsMode <ResultType> resultsMode =
+				mapItemForKeyRequired (
+					resultsModes,
+					resultsModeName);
+
+			// form context
+
+			formContext =
+				resultsMode.formContextBuilder ().build (
+					transaction,
+					emptyMap ());
+
 		}
 
 	}
@@ -212,28 +229,10 @@ class ObjectSearchCsvResponder <ResultType>
 
 		) {
 
-			// form fields
-
-			String resultsModeName =
-				requestContext.parameterOrDefault (
-					"mode",
-					resultsModes.keySet ().iterator ().next ());
-
-			ObjectSearchResultsMode <ResultType> resultsMode =
-				mapItemForKeyRequired (
-					resultsModes,
-					resultsModeName);
-
-			formFieldSets =
-				presentInstancesList (
-					resultsMode.columns,
-					resultsMode.rows);
-
 			// write headers
 
-			formFieldLogic.outputCsvHeadings (
-				formatWriter,
-				formFieldSets);
+			formContext.outputCsvHeadings (
+				transaction);
 
 			// iterate through objects
 
@@ -287,12 +286,9 @@ class ObjectSearchCsvResponder <ResultType>
 
 					// write object
 
-					formFieldLogic.outputCsvRow (
+					formContext.outputCsvRow (
 						transaction,
-						formatWriter,
-						formFieldSets,
-						object,
-						emptyMap ());
+						object);
 
 				}
 

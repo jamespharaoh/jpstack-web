@@ -33,8 +33,8 @@ class ObjectListPageSpec {
 	String typeCode;
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
+		name = "form")
+	String formFieldContextName;
 
 	@DataAttribute (
 		name = "fields-provider")

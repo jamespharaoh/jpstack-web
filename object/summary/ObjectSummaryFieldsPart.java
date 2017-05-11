@@ -1,21 +1,20 @@
 package wbs.platform.object.summary;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
@@ -27,7 +26,6 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.RootObjectHelper;
 
@@ -41,9 +39,6 @@ class ObjectSummaryFieldsPart <
 	extends AbstractPagePart {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -60,15 +55,14 @@ class ObjectSummaryFieldsPart <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
-
-	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	// state
 
 	ObjectType object;
 	ParentType parent;
+
+	FormContext <ObjectType> formContext;
 
 	// implementation
 
@@ -91,6 +85,7 @@ class ObjectSummaryFieldsPart <
 					transaction,
 					requestContext.consoleContextStuffRequired ());
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareParent (
@@ -100,6 +95,13 @@ class ObjectSummaryFieldsPart <
 					transaction);
 
 			}
+			*/
+
+			formContext =
+				formContextBuilder.build (
+					transaction,
+					emptyMap (),
+					object);
 
 		}
 
@@ -157,6 +159,7 @@ class ObjectSummaryFieldsPart <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -166,6 +169,7 @@ class ObjectSummaryFieldsPart <
 				object);
 
 	}
+	*/
 
 	@Override
 	public
@@ -183,12 +187,8 @@ class ObjectSummaryFieldsPart <
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputTableRows (
-				transaction,
-				formatWriter,
-				formFieldSet,
-				object,
-				ImmutableMap.of ());
+			formContext.outputTableRows (
+				transaction);
 
 			htmlTableClose ();
 

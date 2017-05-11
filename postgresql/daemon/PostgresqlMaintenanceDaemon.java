@@ -4,6 +4,7 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.localTime;
@@ -113,9 +114,11 @@ class PostgresqlMaintenanceDaemon
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.createTaskLoggerFormat (
-					"doTasks (%s)",
-					frequency);
+				logContext.createTaskLogger (
+					"doTasks",
+					keyEqualsString (
+						"frequency",
+						frequency));
 
 		) {
 

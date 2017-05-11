@@ -12,6 +12,9 @@ import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualWithClass;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsString;
+import static wbs.utils.string.StringUtils.keyEqualsYesNo;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -321,7 +324,16 @@ class UserSessionLogicImplementation
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"userSessionVerify (sessionId, userId, forceReload)");
+					"userSessionVerify",
+					keyEqualsString (
+						"sessionId",
+						sessionId),
+					keyEqualsDecimalInteger (
+						"userId",
+						userId),
+					keyEqualsYesNo (
+						"forceReload",
+						forceReload));
 
 		) {
 
@@ -781,7 +793,7 @@ class UserSessionLogicImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"reloadReal");

@@ -28,8 +28,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
@@ -60,9 +60,6 @@ class ObjectLinksPart <
 
 	// singleton dependencies
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -89,7 +86,7 @@ class ObjectLinksPart <
 	ConsoleHelper <TargetType> targetHelper;
 
 	@Getter @Setter
-	FormFieldSet <TargetType> targetFields;
+	FormContextBuilder <TargetType> targetFormContextBuilder;
 
 	@Getter @Setter
 	String localFile;
@@ -100,6 +97,10 @@ class ObjectLinksPart <
 	Set <?> contextLinks;
 
 	List <TargetType> targetObjects;
+
+	FormContext <TargetType> formContext;
+
+	// details
 
 	@Override
 	public
@@ -138,6 +139,12 @@ class ObjectLinksPart <
 
 			Collections.sort (
 				targetObjects);
+
+			formContext =
+				targetFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					targetObjects);
 
 		}
 
@@ -183,9 +190,8 @@ class ObjectLinksPart <
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				targetFields);
+			formContext.outputTableHeadings (
+				transaction);
 
 			htmlTableHeaderCellWrite (
 				"Member");
@@ -210,14 +216,9 @@ class ObjectLinksPart <
 
 				htmlTableRowOpen ();
 
-				formatWriter.increaseIndent ();
-
-				formFieldLogic.outputTableCellsList (
+				formContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					targetFields,
 					targetObject,
-					emptyMap (),
 					true);
 
 				htmlTableCheckWriterProvider.get ()
@@ -234,8 +235,6 @@ class ObjectLinksPart <
 
 					.write (
 						formatWriter);
-
-				formatWriter.decreaseIndent ();
 
 				htmlTableRowClose ();
 

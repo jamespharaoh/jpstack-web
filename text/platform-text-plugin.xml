@@ -15,7 +15,8 @@
 	</layer>
 
 	<layer name="console">
-		<component class="console.TextConsoleConfig"/>
+		<component class="console.TextConsoleHooks"/>
+		<component class="console.TextCryptor"/>
 		<component class="console.TextFormFieldNativeMapping"/>
 		<component class="console.TextFormFieldPluginProvider"/>
 	</layer>

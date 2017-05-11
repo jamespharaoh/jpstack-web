@@ -11,7 +11,8 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
@@ -55,6 +56,9 @@ class ObjectLinksPageBuilder <
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@SingletonDependency
+	FormContextManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -111,7 +115,7 @@ class ObjectLinksPageBuilder <
 	String updateSignalName;
 	String targetUpdateSignalName;
 	String successNotice;
-	FormFieldSet <TargetType> targetFields;
+	FormContextBuilder <TargetType> targetFormContextBuilder;
 
 	// build
 
@@ -228,11 +232,23 @@ class ObjectLinksPageBuilder <
 			) {
 
 				return objectLinksPart.get ()
-					.consoleHelper (container.consoleHelper ())
-					.contextLinksField (linksField.name ())
-					.targetHelper (targetConsoleHelper)
-					.targetFields (targetFields)
-					.localFile (localFile);
+
+					.consoleHelper (
+						container.consoleHelper ())
+
+					.contextLinksField (
+						linksField.name ())
+
+					.targetHelper (
+						targetConsoleHelper)
+
+					.targetFormContextBuilder (
+						targetFormContextBuilder)
+
+					.localFile (
+						localFile)
+
+				;
 
 			}
 
@@ -334,8 +350,9 @@ class ObjectLinksPageBuilder <
 		successNotice =
 			spec.successNotice ();
 
-		targetFields =
-			consoleModule.formFieldSetRequired (
+		targetFormContextBuilder =
+			formContextManager.formContextBuilderRequired (
+				consoleModule.name (),
 				spec.fieldsName (),
 				targetConsoleHelper.objectClass ());
 

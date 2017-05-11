@@ -16,6 +16,7 @@
 
 		<model name="loggingGlobalRule"/>
 		<model name="loggingDynamicContext"/>
+		<model name="loggingDynamicContextInvocation"/>
 		<model name="loggingDynamicContextRule"/>
 		<model name="loggingEvent"/>
 		<model name="loggingStaticContext"/>

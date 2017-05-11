@@ -111,7 +111,7 @@ class BackgroundProcessHelperImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"setBackgroundProcessStart");
@@ -191,7 +191,7 @@ class BackgroundProcessHelperImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"setBackgroundProcessStop");

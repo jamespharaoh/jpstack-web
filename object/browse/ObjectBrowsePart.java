@@ -1,7 +1,6 @@
 package wbs.platform.object.browse;
 
 import static wbs.utils.collection.CollectionUtils.collectionStream;
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -29,8 +28,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
@@ -62,9 +61,6 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -86,7 +82,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	String localName;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -95,6 +91,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	ObjectType currentObject;
 	List <ObjectType> allObjects;
+
+	FormContext <Object> formContext;
 
 	ConsoleContext targetContext;
 
@@ -365,9 +363,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				formFieldSet);
+			formContext.outputTableHeadings (
+				transaction);
 
 			htmlTableRowClose ();
 
@@ -405,12 +402,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 				);
 
-				formFieldLogic.outputTableCellsList (
+				formContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					formFieldSet,
-					object,
-					emptyMap (),
 					false);
 
 				htmlTableRowClose ();

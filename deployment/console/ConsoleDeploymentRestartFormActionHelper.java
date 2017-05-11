@@ -112,8 +112,8 @@ class ConsoleDeploymentRestartFormActionHelper
 
 				htmlParagraphWriteFormat (
 					"There is already a restart scheduled for this console ",
-					"deployment, but it has not yet taken place. If this message ",
-					"persists, please contact support.");
+					"deployment, but it has not yet taken place. If this ",
+					"message persists, please contact support.");
 
 			} else {
 

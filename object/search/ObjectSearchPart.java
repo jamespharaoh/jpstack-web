@@ -1,12 +1,8 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -29,10 +25,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -61,9 +55,6 @@ class ObjectSearchPart <
 
 	// singleton dependencies
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -88,19 +79,21 @@ class ObjectSearchPart <
 	String sessionKey;
 
 	@Getter @Setter
-	FormFieldSet <SearchType> fields;
+	FormContextBuilder <SearchType> searchFormContextBuilder;
 
 	@Getter @Setter
 	String fileName;
+
+	@Getter @Setter
 
 	// state
 
 	SearchType cleanSearch;
 	SearchType currentSearch;
 
-	Optional <UpdateResultSet> updateResultSet;
-
 	Map <String, Object> formHints;
+
+	FormContext <SearchType> searchFormContext;
 
 	// details
 
@@ -135,29 +128,6 @@ class ObjectSearchPart <
 					"prepare");
 
 		) {
-
-			cleanSearch =
-				instantiateSearch (
-					transaction);
-
-			currentSearch =
-				optionalOrElseRequired (
-					genericCastUnchecked (
-						userSessionLogic.userDataObject (
-							transaction,
-							userConsoleLogic.userRequired (
-								transaction),
-							stringFormat (
-								"object_search_%s_fields",
-								sessionKey))),
-					() -> instantiateSearch (
-						transaction));
-
-			updateResultSet =
-				optionalCast (
-					UpdateResultSet.class,
-					requestContext.request (
-						"objectSearchUpdateResultSet"));
 
 			ImmutableMap.Builder <String, Object> formHintsBuilder =
 				ImmutableMap.builder ();
@@ -194,33 +164,21 @@ class ObjectSearchPart <
 			formHints =
 				formHintsBuilder.build ();
 
-		}
+			searchFormContext =
+				searchFormContextBuilder.build (
+					transaction,
+					formHints);
 
-	}
+			currentSearch =
+				searchFormContext.object ();
 
-	private
-	SearchType instantiateSearch (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"instantiateSearch");
-
-		) {
-
-			SearchType search =
+			cleanSearch =
 				classInstantiate (
-					searchClass);
+					searchFormContext.containerClass ());
 
-			formFieldLogic.setDefaults (
+			searchFormContext.setDefaults (
 				transaction,
-				fields,
-				search);
-
-			return search;
+				cleanSearch);
 
 		}
 
@@ -250,16 +208,8 @@ class ObjectSearchPart <
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
-				transaction,
-				requestContext,
-				formatWriter,
-				fields,
-				updateResultSet,
-				currentSearch,
-				formHints,
-				FormType.search,
-				"search");
+			searchFormContext.outputFormRows (
+				transaction);
 
 			htmlTableClose ();
 
@@ -293,14 +243,9 @@ class ObjectSearchPart <
 			formatWriter.writeLineFormatIncreaseIndent (
 				"function resetSearchForm () {");
 
-			formFieldLogic.outputFormReset (
+			searchFormContext.outputFormReset (
 				transaction,
-				formatWriter,
-				fields,
-				FormType.search,
-				cleanSearch,
-				formHints,
-				"search");
+				cleanSearch);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}");

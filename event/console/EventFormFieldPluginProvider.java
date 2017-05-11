@@ -9,8 +9,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldBuilderContext;
-import wbs.console.forms.FormFieldPluginProvider;
+import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.types.FormFieldPluginProvider;
 import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.PrototypeDependency;

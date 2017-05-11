@@ -108,7 +108,7 @@ class QueueConsoleLogicImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"setup");

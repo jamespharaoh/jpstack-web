@@ -6,7 +6,7 @@
 		<component class="console.StatusKeepaliveAsyncEndpoint"/>
 		<component class="console.StatusLineManager"/>
 		<component class="console.StatusResponder"/>
-		<component class="console.StatusUpdateAsyncConfig"/>
+		<component class="console.StatusUpdateAsyncEndpoint"/>
 		<component class="console.StatusUpdateAsyncHelper"/>
 	</layer>
 

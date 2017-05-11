@@ -21,11 +21,11 @@
 		<!-- data -->
 
 		<enum-field
-			name="severity" 
+			name="severity"
 			type="loggingEventSeverity"/>
 
 		<string-field
-			name="text"/>
+			name="parameters"/>
 
 		<string-field
 			name="additionalData"

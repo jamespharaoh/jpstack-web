@@ -28,8 +28,8 @@ class ObjectBrowsePageSpec {
 	String typeCode;
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
+		name = "form")
+	String formContextName;
 
 	@DataAttribute (
 		name = "target-context-type")

@@ -7,8 +7,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormField.UpdateResult;
-import wbs.console.forms.FormFieldUpdateHook;
+import wbs.console.forms.types.FormFieldUpdateHook;
+import wbs.console.forms.types.FormUpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -36,9 +36,6 @@ class NameFormFieldUpdateHook
 	LogContext logContext;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// implementation
@@ -47,7 +44,8 @@ class NameFormFieldUpdateHook
 	public
 	void onUpdate (
 			@NonNull Transaction parentTransaction,
-			@NonNull UpdateResult <String, String> updateResult,
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormUpdateResult <String, String> updateResult,
 			@NonNull Record <?> container,
 			@NonNull Record <?> linkObject,
 			@NonNull Optional <Object> objectRef,

@@ -1,8 +1,6 @@
 package wbs.platform.object.create;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -16,12 +14,13 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.CodeFormFieldSpec;
-import wbs.console.forms.DescriptionFormFieldSpec;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.NameFormFieldSpec;
-import wbs.console.forms.ParentFormFieldSpec;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.object.CodeFormFieldSpec;
+import wbs.console.forms.object.DescriptionFormFieldSpec;
+import wbs.console.forms.object.NameFormFieldSpec;
+import wbs.console.forms.object.ParentFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -70,6 +69,9 @@ class ObjectCreatePageBuilder <
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
+	@SingletonDependency
+	FormContextManager formContextManager;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -115,8 +117,8 @@ class ObjectCreatePageBuilder <
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FieldsProvider <ObjectType, ParentType> fieldsProvider;
-	FormFieldSet <ObjectType> formFieldSet;
+	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -216,11 +218,8 @@ class ObjectCreatePageBuilder <
 			.createPrivCode (
 				createPrivCode)
 
-			.formFieldSet (
-				formFieldSet)
-
-			.formFieldsProvider (
-				fieldsProvider)
+			.formContextBuilder (
+				formContextBuilder)
 
 			.createTimeFieldName (
 				createTimeFieldName)
@@ -266,11 +265,8 @@ class ObjectCreatePageBuilder <
 					.consoleHelper (
 						consoleHelper)
 
-					.formFieldSet (
-						formFieldSet)
-
-					.formFieldsProvider (
-						fieldsProvider)
+					.formContextBuilder (
+						formContextBuilder)
 
 					.parentPrivCode (
 						createPrivCode)
@@ -374,17 +370,15 @@ class ObjectCreatePageBuilder <
 						"%s_create",
 						consoleHelper.objectTypeCode ()));
 
-			formFieldSet =
-				ifNotNullThenElse (
-					spec.fieldsName (),
-					() -> consoleModule.formFieldSetRequired (
-						spec.fieldsName (),
-						consoleHelper.objectClass ()),
-					() -> defaultFields (
-						taskLogger));
+			formContextBuilder =
+				formContextManager.formContextBuilderRequired (
+					consoleModule.name (),
+					spec.formContextName (),
+					consoleHelper.objectClass ());
 
 			// if a provider name is provided
 
+			/*
 			if (spec.fieldsProviderName () != null) {
 
 				fieldsProvider =
@@ -395,13 +389,7 @@ class ObjectCreatePageBuilder <
 							FieldsProvider.class));
 
 			}
-
-			else {
-
-				fieldsProvider =
-					null;
-
-			}
+			*/
 
 			createTimeFieldName =
 				spec.createTimeFieldName ();

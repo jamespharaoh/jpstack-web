@@ -25,9 +25,9 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
-import wbs.console.forms.FormFieldRenderer;
-import wbs.console.forms.FormFieldSubmission;
-import wbs.console.forms.FormType;
+import wbs.console.forms.types.FormFieldRenderer;
+import wbs.console.forms.types.FormFieldSubmission;
+import wbs.console.forms.types.FormType;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;

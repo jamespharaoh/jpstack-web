@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -22,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,10 +34,8 @@ import org.joda.time.Instant;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -86,9 +84,6 @@ class ObjectCreateAction <
 
 	@SingletonDependency
 	EventLogic eventLogic;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -141,7 +136,7 @@ class ObjectCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormFieldSet <ObjectType> formFieldSet;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -149,13 +144,12 @@ class ObjectCreateAction <
 	@Getter @Setter
 	String createUserFieldName;
 
-	@Getter @Setter
-	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
-
 	// state
 
 	ConsoleHelper <ParentType> parentHelper;
 	ParentType parent;
+
+	FormContext <ObjectType> formContext;
 
 	ConsoleContext targetContext;
 
@@ -181,7 +175,7 @@ class ObjectCreateAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -273,32 +267,26 @@ class ObjectCreateAction <
 
 			// perform updates
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
 					transaction);
 
-			}
+			}*/
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
+			formContext =
+				formContextBuilder.build (
 					transaction,
-					requestContext,
-					formFieldSet,
-					object,
-					ImmutableMap.of (),
-					"create");
+					emptyMap ());
 
-			if (updateResultSet.errorCount () > 0) {
+			formContext.update (
+				transaction);
 
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					"create");
+			if (formContext.errors ()) {
 
-				requestContext.request (
-					"objectCreateUpdateResultSet",
-					updateResultSet);
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 
@@ -400,29 +388,21 @@ class ObjectCreateAction <
 
 			if (object instanceof PermanentRecord) {
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					formFieldSet,
-					updateResultSet,
-					object,
 					(PermanentRecord <?>) object,
 					optionalAbsent (),
-					optionalAbsent (),
-					"create");
+					optionalAbsent ());
 
 			} else {
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					formFieldSet,
-					updateResultSet,
-					object,
 					(PermanentRecord<?>) parent,
 					optionalOf (
 						objectRef),
 					optionalOf (
-						consoleHelper.shortName ()),
-					"create");
+						consoleHelper.shortName ()));
 
 			}
 
@@ -610,6 +590,7 @@ class ObjectCreateAction <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -621,5 +602,6 @@ class ObjectCreateAction <
 				: formFieldsProvider.getStaticFields ();
 
 	}
+	*/
 
 }

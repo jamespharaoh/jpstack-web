@@ -61,7 +61,7 @@ class PrivHooks
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					"setup");
 

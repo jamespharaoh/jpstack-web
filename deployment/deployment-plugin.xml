@@ -19,7 +19,8 @@
 	</fixtures>
 
 	<layer name="agent">
-		<component class="daemon.AgentMiscComponents"/>
+		<component class="daemon.AgentSpecialConfig"/>
+		<component class="daemon.AgentThreadManager"/>
 		<component class="daemon.DeploymentAgent"/>
 	</layer>
 

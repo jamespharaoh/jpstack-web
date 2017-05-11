@@ -97,7 +97,7 @@ class AbstractMediaImageResponder
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"transform ()");
+					"transform");
 
 		) {
 

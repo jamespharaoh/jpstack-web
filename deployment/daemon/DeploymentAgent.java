@@ -1,7 +1,8 @@
 package wbs.platform.deployment.daemon;
 
 import static wbs.utils.etc.NetworkUtils.runHostname;
-import static wbs.utils.string.StringUtils.objectToString;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -81,7 +82,7 @@ class DeploymentAgent
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -149,11 +150,12 @@ class DeploymentAgent
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runApiDeployment (%s)",
-					objectToString (
-						apiDeployment));
+					"runApiDeployment",
+					keyEqualsDecimalInteger (
+						"apiDeploymentId",
+						apiDeployment.getId ()));
 
 		) {
 
@@ -214,11 +216,12 @@ class DeploymentAgent
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runConsoleDeployment (%s)",
-					objectToString (
-						consoleDeployment));
+					"runConsoleDeployment",
+					keyEqualsDecimalInteger (
+						"consoleDeploymentId",
+						consoleDeployment.getId ()));
 
 		) {
 
@@ -279,11 +282,12 @@ class DeploymentAgent
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runDaemonDeployment (%s)",
-					objectToString (
-						daemonDeployment));
+					"runDaemonDeployment",
+					keyEqualsDecimalInteger (
+						"daemonDeploymentId",
+						daemonDeployment.getId ()));
 
 		) {
 
@@ -373,10 +377,12 @@ class DeploymentAgent
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLoggerFormat (
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"getServiceState (%s)",
-					serviceName);
+					"getServiceState",
+					keyEqualsString (
+						"serviceName",
+						serviceName));
 
 		) {
 

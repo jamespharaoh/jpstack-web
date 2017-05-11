@@ -1,7 +1,6 @@
 package wbs.platform.object.search;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
-import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
@@ -14,7 +13,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
@@ -68,9 +66,8 @@ import org.joda.time.LocalDate;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.FormField;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.types.FormField;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -112,9 +109,6 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -158,9 +152,6 @@ class ObjectSearchResultsPart <
 
 	// state
 
-	FormFieldSet <ResultType> columnsFormFieldSet;
-	FormFieldSet <ResultType> rowsFormFieldSet;
-
 	IdObject currentObject;
 	List <Optional <ResultType>> objects;
 	Integer totalObjects;
@@ -170,6 +161,8 @@ class ObjectSearchResultsPart <
 	Long pageCount;
 
 	Optional <ConsoleContext> targetContext;
+
+	FormContext <ResultType> formContext;
 
 	// details
 
@@ -220,13 +213,10 @@ class ObjectSearchResultsPart <
 					resultsModes,
 					resultsModeName);
 
-			columnsFormFieldSet =
-				optionalOrNull (
-					resultsMode.columns);
-
-			rowsFormFieldSet =
-				optionalOrNull (
-					resultsMode.rows);
+			formContext =
+				resultsMode.formContextBuilder ().build (
+					transaction,
+					emptyMap ());
 
 			// current object
 
@@ -590,9 +580,8 @@ class ObjectSearchResultsPart <
 
 			htmlTableRowOpen ();
 
-			formFieldLogic.outputTableHeadings (
-				formatWriter,
-				columnsFormFieldSet);
+			formContext.outputTableHeadings (
+				transaction);
 
 			htmlTableRowClose ();
 
@@ -616,8 +605,7 @@ class ObjectSearchResultsPart <
 					htmlTableCellWrite (
 						"(deleted)",
 						htmlColumnSpanAttribute (
-							collectionSize (
-								columnsFormFieldSet.formItems ())));
+							formContext.columnFields ().columns ()));
 
 					htmlTableRowClose ();
 
@@ -646,8 +634,7 @@ class ObjectSearchResultsPart <
 					htmlTableCellWrite (
 						"(restricted)",
 						htmlColumnSpanAttribute (
-							collectionSize (
-								columnsFormFieldSet.formItems ())));
+							formContext.columnFields ().columns ()));
 
 					htmlTableRowClose ();
 
@@ -698,8 +685,7 @@ class ObjectSearchResultsPart <
 								transaction,
 								rowTimestamp),
 							htmlColumnSpanAttribute (
-								collectionSize (
-									columnsFormFieldSet.formItems ())));
+								formContext.columnFields ().columns ()));
 
 						htmlTableRowClose ();
 
@@ -711,7 +697,7 @@ class ObjectSearchResultsPart <
 
 				if (
 					isNotNull (
-						rowsFormFieldSet)
+						formContext.rowFields ())
 				) {
 
 					htmlTableRowSeparatorWrite ();
@@ -768,12 +754,9 @@ class ObjectSearchResultsPart <
 
 				}
 
-				formFieldLogic.outputTableCellsList (
+				formContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					columnsFormFieldSet,
 					result,
-					emptyMap (),
 					false);
 
 				htmlTableRowClose ();
@@ -782,12 +765,12 @@ class ObjectSearchResultsPart <
 
 				if (
 					isNotNull (
-						rowsFormFieldSet)
+						formContext.rowFields ())
 				) {
 
 					for (
 						FormField <ResultType, ?, ?, ?> rowField
-							: rowsFormFieldSet.formFields ()
+							: formContext.rowFields ().formFields ()
 					) {
 
 						htmlTableRowOpen (
@@ -838,11 +821,10 @@ class ObjectSearchResultsPart <
 
 							rowField.renderTableCellList (
 								transaction,
-								formatWriter,
+								formContext,
 								result,
-								emptyMap (),
 								false,
-								columnsFormFieldSet.columns ());
+								formContext.columnFields ().columns ());
 
 						} catch (Exception exception) {
 

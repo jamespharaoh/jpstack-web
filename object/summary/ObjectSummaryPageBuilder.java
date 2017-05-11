@@ -1,7 +1,5 @@
 package wbs.platform.object.summary;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -18,13 +16,14 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.CodeFormFieldSpec;
-import wbs.console.forms.DescriptionFormFieldSpec;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.IdFormFieldSpec;
-import wbs.console.forms.NameFormFieldSpec;
-import wbs.console.forms.ParentFormFieldSpec;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.FormFieldSet;
+import wbs.console.forms.object.CodeFormFieldSpec;
+import wbs.console.forms.object.DescriptionFormFieldSpec;
+import wbs.console.forms.object.IdFormFieldSpec;
+import wbs.console.forms.object.NameFormFieldSpec;
+import wbs.console.forms.object.ParentFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
@@ -76,6 +75,9 @@ class ObjectSummaryPageBuilder <
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
+	@SingletonDependency
+	FormContextManager formContextManager;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -119,9 +121,7 @@ class ObjectSummaryPageBuilder <
 	@Getter
 	ConsoleHelper <ObjectType> consoleHelper;
 
-	FormFieldSet <ObjectType> formFieldSet;
-
-	FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	FormContextBuilder <ObjectType> formContextBuilder;
 
 	String privKey;
 
@@ -304,11 +304,10 @@ class ObjectSummaryPageBuilder <
 					.consoleHelper (
 						consoleHelper)
 
-					.formFieldSet (
-						formFieldSet)
+					.formContextBuilder (
+						formContextBuilder)
 
-					.formFieldsProvider (
-						fieldsProvider);
+				;
 
 			}
 
@@ -422,18 +421,16 @@ class ObjectSummaryPageBuilder <
 			consoleHelper =
 				container.consoleHelper ();
 
-			formFieldSet =
-				ifNotNullThenElse (
-					spec.fieldsName (),
-					() -> consoleModule.formFieldSetRequired (
-						spec.fieldsName (),
-						consoleHelper.objectClass ()),
-					() -> defaultFields (
-						taskLogger));
+			formContextBuilder =
+				formContextManager.formContextBuilderRequired (
+					consoleModule.name (),
+					spec.formContextName (),
+					consoleHelper.objectClass ());
 
 			privKey =
 				spec.privKey ();
 
+			/*
 			if (spec.builders ().isEmpty ()) {
 
 				addFieldsPart (
@@ -460,6 +457,7 @@ class ObjectSummaryPageBuilder <
 					null;
 
 			}
+			*/
 
 		}
 

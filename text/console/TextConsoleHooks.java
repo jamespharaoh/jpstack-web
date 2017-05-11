@@ -8,15 +8,19 @@ import lombok.NonNull;
 
 import wbs.console.helper.core.ConsoleHooks;
 
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Transaction;
 
 import wbs.platform.text.model.TextRec;
 
 import wbs.web.utils.HtmlUtils;
 
+@SingletonComponent ("textConsoleHooks")
 public
 class TextConsoleHooks
 	implements ConsoleHooks <TextRec> {
+
+	// implemntation
 
 	@Override
 	public

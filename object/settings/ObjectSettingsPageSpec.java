@@ -30,12 +30,8 @@ class ObjectSettingsPageSpec {
 	String objectName;
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
-
-	@DataAttribute (
-		name = "fields-provider")
-	String fieldsProviderName;
+		name = "form")
+	String formContextName;
 
 	@DataAttribute
 	String privKey;

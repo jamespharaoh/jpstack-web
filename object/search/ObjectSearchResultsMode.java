@@ -1,11 +1,9 @@
 package wbs.platform.object.search;
 
-import com.google.common.base.Optional;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
 
 @Accessors (fluent = true)
 @Data
@@ -14,7 +12,6 @@ class ObjectSearchResultsMode <Container> {
 
 	String name;
 
-	Optional <FormFieldSet <Container>> columns;
-	Optional <FormFieldSet <Container>> rows;
+	FormContextBuilder <Container> formContextBuilder;
 
 }
