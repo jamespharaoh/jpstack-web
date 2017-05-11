@@ -123,7 +123,7 @@ class TicketStateTimeDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnly (
+				database.beginReadOnlyWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"getTicketIds");
@@ -147,10 +147,10 @@ class TicketStateTimeDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteFormat (
+				database.beginReadWriteWithParameters (
 					logContext,
 					parentTaskLogger,
-					"doTicketTImeCheck (%s)",
+					"doTicketTImeCheck",
 					keyEqualsDecimalInteger (
 						"ticketId",
 						ticketId));

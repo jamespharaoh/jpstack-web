@@ -15,8 +15,9 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -66,6 +67,9 @@ class ObjectTicketCreatePageBuilder
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@SingletonDependency
+	FormContextManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -127,7 +131,7 @@ class ObjectTicketCreatePageBuilder
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FormFieldSet <TicketRec> fields;
+	FormContextBuilder <TicketRec> formContextBuilder;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -232,11 +236,8 @@ class ObjectTicketCreatePageBuilder
 			.createPrivCode (
 				createPrivCode)
 
-			.fields (
-				fields)
-
-			.formFieldsProvider (
-				fieldsProvider)
+			.formContextBuilder (
+				formContextBuilder)
 
 			.ticketFieldSpecs(
 					ticketFields)
@@ -288,14 +289,11 @@ class ObjectTicketCreatePageBuilder
 					.consoleHelper (
 						consoleHelper)
 
-					.localFile(
-						localFile )
+					.localFile (
+						localFile)
 
-					.ticketFieldSpecs (
-						ticketFields)
-
-					.fieldsProvider (
-						fieldsProvider)
+					.formContextBuilder (
+						formContextBuilder)
 
 					.ticketManagerPath (
 						ticketManagerPath);

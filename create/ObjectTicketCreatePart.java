@@ -1,7 +1,5 @@
 package wbs.services.ticket.create;
 
-import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -11,17 +9,13 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -34,13 +28,10 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
 
@@ -57,9 +48,6 @@ class ObjectTicketCreatePart <
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -79,16 +67,13 @@ class ObjectTicketCreatePart <
 	// properties
 
 	@Getter @Setter
-	List <ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
+	FormContextBuilder <TicketRec> formContextBuilder;
 
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
 
 	@Getter @Setter
 	String localFile;
-
-	@Getter @Setter
-	FieldsProvider <TicketRec, TicketManagerRec> fieldsProvider;
 
 	@Getter @Setter
 	String ticketManagerPath;
@@ -98,7 +83,8 @@ class ObjectTicketCreatePart <
 	ObjectTicketCreateSetFieldSpec currentTicketFieldSpec;
 	TicketRec ticket;
 	TicketManagerRec ticketManager;
-	FormFieldSet <TicketRec> formFieldSet;
+
+	FormContext <TicketRec> formContext;
 
 	// implementation
 
@@ -129,8 +115,10 @@ class ObjectTicketCreatePart <
 						contextObject,
 						ticketManagerPath));
 
+			/*
 			prepareFieldSet (
 				transaction);
+			*/
 
 			// create dummy instance
 
@@ -140,6 +128,7 @@ class ObjectTicketCreatePart <
 				.setTicketManager (
 					ticketManager);
 
+/*
 			for (
 				ObjectTicketCreateSetFieldSpec ticketFieldSpec
 					: ticketFieldSpecs
@@ -230,11 +219,13 @@ class ObjectTicketCreatePart <
 					ticketFieldValue);
 
 			}
+			*/
 
 		}
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -244,6 +235,7 @@ class ObjectTicketCreatePart <
 				ticketManager);
 
 	}
+	*/
 
 	@Override
 	public
@@ -268,16 +260,8 @@ class ObjectTicketCreatePart <
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputFormRows (
-				transaction,
-				requestContext,
-				formatWriter,
-				formFieldSet,
-				optionalAbsent (),
-				ticket,
-				emptyMap (),
-				FormType.create,
-				"create");
+			formContext.outputFormRows (
+				transaction);
 
 			htmlTableClose ();
 

@@ -8,18 +8,16 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -37,9 +35,6 @@ class TicketPendingHistoryPart
 
 	// singleton dependencies
 
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -47,8 +42,16 @@ class TicketPendingHistoryPart
 	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
-	@Named
-	ConsoleModule ticketPendingConsoleModule;
+	@NamedDependency ("ticketPendingHistoryTicketFormContextBuilder")
+	FormContextBuilder <TicketRec> ticketFormContextBuilder;
+
+	@SingletonDependency
+	@NamedDependency ("ticketPendingHistoryNoteFormContextBuilder")
+	FormContextBuilder <TicketNoteRec> ticketNoteFormContextBuilder;
+
+	@SingletonDependency
+	@NamedDependency ("ticketPendingHistorySateFormContextBuilder")
+	FormContextBuilder <TicketStateRec> ticketStateFormContextBuilder;
 
 	@SingletonDependency
 	TicketStateConsoleHelper ticketStateHelper;
@@ -61,9 +64,9 @@ class TicketPendingHistoryPart
 
 	// state
 
-	FormFieldSet <TicketRec> ticketFields;
-	FormFieldSet <TicketNoteRec> ticketNoteFields;
-	FormFieldSet <TicketStateRec> ticketStateFields;
+	FormContext <TicketRec> ticketFormContext;
+	FormContext <TicketNoteRec> ticketNoteFormContext;
+	FormContext <TicketStateRec> ticketStateFormContext;
 
 	TicketRec ticket;
 
@@ -83,28 +86,29 @@ class TicketPendingHistoryPart
 
 		) {
 
-			// get field sets
-
-			ticketFields =
-				ticketPendingConsoleModule.formFieldSetRequired (
-					"ticketFields",
-					TicketRec.class);
-
-			ticketNoteFields =
-				ticketPendingConsoleModule.formFieldSetRequired (
-					"ticketNoteFields",
-					TicketNoteRec.class);
-
-			ticketStateFields =
-				ticketPendingConsoleModule.formFieldSetRequired (
-					"ticketStateFields",
-					TicketStateRec.class);
-
 			// load data
 
 			ticket =
 				ticketHelper.findFromContextRequired (
 					transaction);
+
+			// form contexts
+
+			ticketFormContext =
+				ticketFormContextBuilder.build (
+					transaction,
+					emptyMap (),
+					ticket);
+
+			ticketNoteFormContext =
+				ticketNoteFormContextBuilder.build (
+					transaction,
+					emptyMap ());
+
+			ticketStateFormContext =
+				ticketStateFormContextBuilder.build (
+					transaction,
+					emptyMap ());
 
 		}
 
@@ -154,12 +158,8 @@ class TicketPendingHistoryPart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputTableRows (
-				transaction,
-				formatWriter,
-				ticketFields,
-				ticket,
-				emptyMap ());
+			ticketFormContext.outputTableRows (
+				transaction);
 
 			htmlTableClose ();
 
@@ -196,12 +196,9 @@ class TicketPendingHistoryPart
 
 				htmlTableRowOpen ();
 
-				formFieldLogic.outputTableCellsList (
+				ticketNoteFormContext.outputTableCellsList (
 					transaction,
-					formatWriter,
-					ticketNoteFields,
 					ticketNote,
-					emptyMap (),
 					true);
 
 				htmlTableRowClose ();
@@ -231,12 +228,9 @@ class TicketPendingHistoryPart
 
 			htmlTableOpenDetails ();
 
-			formFieldLogic.outputTableRows (
+			ticketStateFormContext.outputTableRows (
 				transaction,
-				formatWriter,
-				ticketStateFields,
-				ticket.getTicketState (),
-				emptyMap ());
+				ticket.getTicketState ());
 
 			htmlTableClose ();
 

@@ -19,10 +19,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.context.FormContext;
+import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -76,9 +74,6 @@ class ObjectTicketCreateAction <
 
 	@SingletonDependency
 	EventLogic eventLogic;
-
-	@SingletonDependency
-	FormFieldLogic formFieldLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -140,7 +135,7 @@ class ObjectTicketCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormFieldSet <TicketRec> fields;
+	FormContextBuilder <TicketRec> formContextBuilder;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -152,15 +147,14 @@ class ObjectTicketCreateAction <
 	String ticketManagerPath;
 
 	@Getter @Setter
-	FieldsProvider <TicketRec, TicketManagerRec> formFieldsProvider;
-
-	@Getter @Setter
 	List <ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
 	// state
 
 	ConsoleHelper <ParentType> parentHelper;
 	TicketManagerRec ticketManager;
+
+	FormContext <ObjectType> formContext;
 
 	// details
 
@@ -182,7 +176,7 @@ class ObjectTicketCreateAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWrite (
+				database.beginReadWriteWithoutParameters (
 					logContext,
 					parentTaskLogger,
 					"goReal");
@@ -353,28 +347,28 @@ class ObjectTicketCreateAction <
 
 			// perform updates
 
+			/*
 			if (formFieldsProvider != null) {
 
 				prepareFieldSet (
 					transaction);
 
 			}
+			*/
 
-			UpdateResultSet updateResultSet =
-				formFieldLogic.update (
+			FormContext <TicketRec> formContext =
+				formContextBuilder.build (
 					transaction,
-					requestContext,
-					fields,
-					ticket,
 					emptyMap (),
-					"create");
+					ticket);
 
-			if (updateResultSet.errorCount () > 0) {
+			formContext.update (
+				transaction);
 
-				formFieldLogic.reportErrors (
-					requestContext,
-					updateResultSet,
-					"create");
+			if (formContext.errors ()) {
+
+				formContext.reportErrors (
+					transaction);
 
 				return null;
 
@@ -443,29 +437,21 @@ class ObjectTicketCreateAction <
 
 			if (ticket instanceof PermanentRecord) {
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					fields,
-					updateResultSet,
-					ticket,
 					(PermanentRecord <?>) ticket,
 					optionalAbsent (),
-					optionalAbsent (),
-					"create");
+					optionalAbsent ());
 
 			} else {
 
-				formFieldLogic.runUpdateHooks (
+				formContext.runUpdateHooks (
 					transaction,
-					fields,
-					updateResultSet,
-					ticket,
 					(PermanentRecord <?>) ticketManager,
 					optionalOf (
 						objectRef),
 					optionalOf (
-						consoleHelper.shortName ()),
-					"create");
+						consoleHelper.shortName ()));
 
 			}
 
@@ -489,6 +475,7 @@ class ObjectTicketCreateAction <
 
 	}
 
+	/*
 	void prepareFieldSet (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -498,5 +485,6 @@ class ObjectTicketCreateAction <
 				ticketManager);
 
 	}
+	*/
 
 }
