@@ -4,12 +4,12 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
-import javax.inject.Named;
 import javax.servlet.ServletException;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
@@ -31,8 +31,8 @@ class PathHandlerServlet
 	// singleton dependencies
 
 	@SingletonDependency
-	@Named ("rootPathHandler")
-	PathHandler pathHandler;
+	@NamedDependency
+	PathHandler rootPathHandler;
 
 	@SingletonDependency
 	WebExceptionHandler exceptionHandler;
@@ -81,7 +81,7 @@ class PathHandlerServlet
 
 			// and call the relevant pathhandler
 
-			return pathHandler.processPath (
+			return rootPathHandler.processPath (
 				taskLogger,
 				path);
 
