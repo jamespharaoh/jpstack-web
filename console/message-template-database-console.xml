@@ -62,7 +62,7 @@
 
 				<context-tab-form-action-page
 					name="copy"
-					fields="copy"
+					action-form="copy"
 					submit-label="copy"/>
 
 			</section>
@@ -131,5 +131,15 @@
 			object-type="messageTemplateDatabase"/>
 
 	</field-set>
+
+	<form-contexts>
+
+		<form-context
+			name="copy"
+			class="wbs.services.messagetemplate.console.MessageTemplateCopyForm"
+			type="perform"
+			column-fields="copy"/>
+
+	</form-contexts>
 
 </console-module>
