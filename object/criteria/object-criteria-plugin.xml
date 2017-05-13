@@ -3,12 +3,14 @@
 	package="wbs.platform.object.criteria">
 
 	<layer name="console">
-		<component class="WhereDeletedCriteriaSpec"/>
-		<component class="WhereNotDeletedCriteriaSpec"/>
-		<component class="WhereNullCriteriaSpec"/>
-		<component class="WhereNotNullCriteriaSpec"/>
-		<component class="WhereICanManageCriteriaSpec"/>
-		<component class="WhereInCriteriaSpec"/>
+
+		<bootstrap-component class="WhereDeletedCriteriaSpec"/>
+		<bootstrap-component class="WhereNotDeletedCriteriaSpec"/>
+		<bootstrap-component class="WhereNullCriteriaSpec"/>
+		<bootstrap-component class="WhereNotNullCriteriaSpec"/>
+		<bootstrap-component class="WhereICanManageCriteriaSpec"/>
+		<bootstrap-component class="WhereInCriteriaSpec"/>
+
 	</layer>
 
 </plugin>

@@ -3,11 +3,14 @@
 	package="wbs.platform.object.list">
 
 	<layer name="console">
-		<component class="ObjectListBrowserSpec"/>
+
+		<bootstrap-component class="ObjectListPageSpec"/>
+		<bootstrap-component class="ObjectListBrowserSpec"/>
+		<bootstrap-component class="ObjectListTabSpec"/>
+
 		<component class="ObjectListPageBuilder"/>
-		<component class="ObjectListPageSpec"/>
 		<component class="ObjectListPart"/>
-		<component class="ObjectListTabSpec"/>
+
 	</layer>
 
 </plugin>

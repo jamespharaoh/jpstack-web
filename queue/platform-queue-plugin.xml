@@ -7,16 +7,22 @@
 	</plugin-dependencies>
 
 	<models>
+
 		<custom-type name="queueItemState"/>
 		<custom-type name="queueItemClaimStatus"/>
+
 		<model name="queue"/>
 		<model name="queueItem"/>
 		<model name="queueItemClaim"/>
 		<model name="queueSubject"/>
 		<model name="queueType"/>
+
 	</models>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.QueueSupervisorStatsGrouperSpec"/>
+
 		<component class="console.QueueClaimAction"/>
 		<component class="console.QueueConsoleLogicImplementation"/>
 		<component class="console.QueueDebugPart"/>
@@ -39,10 +45,10 @@
 		<component class="console.QueueSubjectSorter"/>
 		<component class="console.QueueSupervisorItemsPart"/>
 		<component class="console.QueueSupervisorStatsGrouperBuilder"/>
-		<component class="console.QueueSupervisorStatsGrouperSpec"/>
 		<component class="console.QueueUnclaimAction"/>
 		<component class="console.QueueUsersAction"/>
 		<component class="console.QueueUsersPart"/>
+
 	</layer>
 
 	<layer name="fixture">

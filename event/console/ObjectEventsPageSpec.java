@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-events-page")
 @PrototypeComponent ("objectEventsPageSpec")
-@ConsoleModuleData
 public
-class ObjectEventsPageSpec {
+class ObjectEventsPageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

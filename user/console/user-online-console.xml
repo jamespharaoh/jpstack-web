@@ -1,5 +1,5 @@
 <console-module
-	name="userOnline">
+	name="user-online">
 
 	<console-helper-provider
 		object-name="userOnline"

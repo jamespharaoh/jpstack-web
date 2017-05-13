@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-links-page")
 @PrototypeComponent ("objectLinksPageSpec")
-@ConsoleModuleData
 public
-class ObjectLinksPageSpec {
+class ObjectLinksPageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

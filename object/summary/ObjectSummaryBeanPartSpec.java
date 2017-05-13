@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("bean-part")
 @PrototypeComponent ("objectSummaryBeanPartSpec")
-@ConsoleModuleData
 public
-class ObjectSummaryBeanPartSpec {
+class ObjectSummaryBeanPartSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

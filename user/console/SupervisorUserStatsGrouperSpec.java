@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("user-stats-grouper")
 @PrototypeComponent ("supervisorUserStatsGrouperSpec")
-@ConsoleModuleData
 public
-class SupervisorUserStatsGrouperSpec {
+class SupervisorUserStatsGrouperSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

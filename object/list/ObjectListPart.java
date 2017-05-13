@@ -682,6 +682,8 @@ class ObjectListPart <
 					if (
 						! criteriaSpec.evaluate (
 							transaction,
+							requestContext,
+							privChecker,
 							consoleHelper,
 							object)
 					) {

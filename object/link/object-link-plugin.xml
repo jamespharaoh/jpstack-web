@@ -3,10 +3,13 @@
 	package="wbs.platform.object.link">
 
 	<layer name="console">
+
+		<bootstrap-component class="ObjectLinksPageSpec"/>
+
 		<component class="ObjectLinksAction"/>
 		<component class="ObjectLinksPart"/>
 		<component class="ObjectLinksPageBuilder"/>
-		<component class="ObjectLinksPageSpec"/>
+
 	</layer>
 
 </plugin>

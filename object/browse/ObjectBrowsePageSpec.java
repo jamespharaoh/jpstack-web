@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-browse-page")
 @PrototypeComponent ("objectBrowsePageSpec")
-@ConsoleModuleData
 public
-class ObjectBrowsePageSpec {
+class ObjectBrowsePageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

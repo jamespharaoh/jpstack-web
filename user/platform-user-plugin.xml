@@ -15,6 +15,9 @@
 	</models>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.SupervisorUserStatsGrouperSpec"/>
+
 		<component class="console.UserConsoleLogicImplementation"/>
 		<component class="console.UserPasswordAction"/>
 		<component class="console.UserPasswordPart"/>
@@ -25,7 +28,7 @@
 		<component class="console.UserStatsGrouper"/>
 		<component class="console.SupervisorHelperImplementation"/>
 		<component class="console.SupervisorUserStatsGrouperBuilder"/>
-		<component class="console.SupervisorUserStatsGrouperSpec"/>
+
 	</layer>
 
 	<fixtures>

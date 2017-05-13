@@ -16,9 +16,12 @@
 	</layer>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.CurrencyFormFieldSpec"/>
+
 		<component class="console.CurrencyFormFieldBuilder"/>
 		<component class="console.CurrencyFormFieldInterfaceMapping"/>
-		<component class="console.CurrencyFormFieldSpec"/>
+
 	</layer>
 
 	<fixtures>

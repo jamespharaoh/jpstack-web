@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-create-page")
 @PrototypeComponent ("objectCreatePageSpec")
-@ConsoleModuleData
 public
-class ObjectCreatePageSpec {
+class ObjectCreatePageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 
@@ -50,8 +50,8 @@ class ObjectCreatePageSpec {
 	String targetResponderName;
 
 	@DataAttribute (
-		name = "form")
-	String formContextName;
+		name = "fields")
+	String formFieldsName;
 
 	@DataAttribute (
 		name = "fields-provider")

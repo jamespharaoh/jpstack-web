@@ -19,9 +19,9 @@ import wbs.platform.object.criteria.CriteriaSpec;
 @Data
 @DataClass ("list-tab")
 @PrototypeComponent ("objectListTabSpec")
-@ConsoleModuleData
 public
-class ObjectListTabSpec {
+class ObjectListTabSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

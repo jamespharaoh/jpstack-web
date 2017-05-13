@@ -8,11 +8,14 @@
 	</models>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.ObjectPrivsPageSpec"/>
+
 		<component class="console.ObjectPrivsPageBuilder"/>
-		<component class="console.ObjectPrivsPageSpec"/>
 		<component class="console.ObjectPrivsPart"/>
 		<component class="console.ObjectSummaryPrivPart"/>
 		<component class="console.PrivDataLoaderImplementation"/>
+
 	</layer>
 
 	<layer name="fixture">

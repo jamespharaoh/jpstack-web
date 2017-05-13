@@ -116,6 +116,12 @@ class WbsServletListener
 				taskLogger,
 				this);
 
+			bootstrapComponentManager.registerPluginBootstrapComponents (
+				taskLogger,
+				stringSplitComma (
+					event.getServletContext ().getInitParameter (
+						"layerNames")));
+
 			registerWebComponents (
 				taskLogger,
 				bootstrapComponentManager);

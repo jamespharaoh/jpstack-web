@@ -1,5 +1,5 @@
 <console-module
-	name="console-deployment">
+	name="deployment-version">
 
 	<console-helper-provider
 		object-name="deploymentVersion"

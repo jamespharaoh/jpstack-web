@@ -7,6 +7,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
+import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -19,10 +21,13 @@ import wbs.utils.etc.PropertyUtils;
 @Accessors (fluent = true)
 @DataClass ("where-not-null")
 @PrototypeComponent ("whereNotNullCriteriaSpec")
-@ConsoleModuleData
 public
 class WhereNotNullCriteriaSpec
-	implements CriteriaSpec {
+	implements
+		ConsoleModuleData,
+		CriteriaSpec {
+
+	// attributes
 
 	@DataAttribute (
 		name = "field",
@@ -30,10 +35,14 @@ class WhereNotNullCriteriaSpec
 	@Getter @Setter
 	String fieldName;
 
+	// implementation
+
 	@Override
 	public
 	boolean evaluate (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull UserPrivChecker privChecker,
 			@NonNull ConsoleHelper <?> objectHelper,
 			@NonNull Record <?> object) {
 

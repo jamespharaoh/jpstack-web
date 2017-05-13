@@ -3,10 +3,13 @@
 	package="wbs.platform.object.create">
 
 	<layer name="console">
+
+		<bootstrap-component class="ObjectCreatePageSpec"/>
+
 		<component class="ObjectCreateAction"/>
 		<component class="ObjectCreatePageBuilder"/>
-		<component class="ObjectCreatePageSpec"/>
 		<component class="ObjectCreatePart"/>
+
 	</layer>
 
 </plugin>
