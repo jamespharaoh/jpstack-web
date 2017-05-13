@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.YesNoFormFieldSpec;
@@ -21,12 +18,8 @@ import wbs.console.forms.types.FieldsProvider;
 import wbs.console.module.ConsoleModuleBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.HiddenComponent;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;

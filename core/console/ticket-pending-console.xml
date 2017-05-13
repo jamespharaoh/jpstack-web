@@ -1,5 +1,5 @@
 <console-module
-	name="ticket-pending-console">
+	name="ticket-pending">
 
 	<object-context
 		name="ticket.pending"
