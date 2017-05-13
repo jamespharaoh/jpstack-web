@@ -17,9 +17,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("integer-in-condition")
 @PrototypeComponent ("supervisorIntegerInConditionSpec")
-@ConsoleModuleData
 public
-class SupervisorIntegerInConditionSpec {
+class SupervisorIntegerInConditionSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfig;

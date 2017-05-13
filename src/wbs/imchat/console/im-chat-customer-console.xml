@@ -34,7 +34,7 @@
 
 			<object-search-page
 				search-fields="search"
-				results-fields="results"
+				results-column-fields="results"
 				priv-key="imChat.manage"
 				parent-id-key="imChatId"
 				parent-id-name="imChatId"/>

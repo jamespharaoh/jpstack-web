@@ -3,14 +3,17 @@
 	package="wbs.platform.object.search">
 
 	<layer name="console">
+
+		<bootstrap-component class="ObjectSearchPageSpec"/>
+		<bootstrap-component class="ObjectSearchResultsModeSpec"/>
+
 		<component class="ObjectSearchCsvResponder"/>
 		<component class="ObjectSearchGetAction"/>
 		<component class="ObjectSearchPageBuilder"/>
-		<component class="ObjectSearchPageSpec"/>
 		<component class="ObjectSearchPart"/>
 		<component class="ObjectSearchPostAction"/>
-		<component class="ObjectSearchResultsModeSpec"/>
 		<component class="ObjectSearchResultsPart"/>
+
 	</layer>
 
 </plugin>

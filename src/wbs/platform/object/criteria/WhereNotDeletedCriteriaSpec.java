@@ -5,6 +5,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
+import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataClass;
@@ -16,15 +18,20 @@ import wbs.utils.etc.PropertyUtils;
 @Accessors (fluent = true)
 @DataClass ("where-not-deleted")
 @PrototypeComponent ("whereNotDeletedCriteriaSpec")
-@ConsoleModuleData
 public
 class WhereNotDeletedCriteriaSpec
-	implements CriteriaSpec {
+	implements
+		ConsoleModuleData,
+		CriteriaSpec {
+
+	// implementation
 
 	@Override
 	public
 	boolean evaluate (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull UserPrivChecker privChecker,
 			@NonNull ConsoleHelper <?> objectHelper,
 			@NonNull Record <?> object) {
 

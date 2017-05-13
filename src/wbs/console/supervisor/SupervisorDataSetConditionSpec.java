@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("condition")
 @PrototypeComponent ("supervisorDataSetConditionSpec")
-@ConsoleModuleData
 public
-class SupervisorDataSetConditionSpec {
+class SupervisorDataSetConditionSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorDataSetSpec dataSet;

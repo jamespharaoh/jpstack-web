@@ -26,7 +26,7 @@
 
 			<object-search-page
 				search-fields="search"
-				results-fields="results"
+				results-column-fields="results"
 				priv-key="manualResponder.manage"
 				parent-id-key="manualResponderId"
 				parent-id-name="manualResponderId"/>

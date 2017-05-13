@@ -76,7 +76,7 @@
 			name="upload"
 			class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm"
 			type="perform"
-			fields="upload-form"/>
+			column-fields="upload-form"/>
 
 	</form-contexts>
 

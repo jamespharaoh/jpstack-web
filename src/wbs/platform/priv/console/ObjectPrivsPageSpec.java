@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-privs-page")
 @PrototypeComponent ("objectPrivsPageSpec")
-@ConsoleModuleData
 public
-class ObjectPrivsPageSpec {
+class ObjectPrivsPageSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

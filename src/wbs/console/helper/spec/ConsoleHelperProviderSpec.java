@@ -21,9 +21,9 @@ import wbs.framework.data.annotations.DataInitMethod;
 @Data
 @DataClass ("console-helper-provider")
 @PrototypeComponent ("consoleHelperProviderSpec")
-@ConsoleModuleData
 public
-class ConsoleHelperProviderSpec {
+class ConsoleHelperProviderSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

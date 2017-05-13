@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
 import org.joda.time.DateTime;

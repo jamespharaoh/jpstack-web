@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-responder-page")
 @PrototypeComponent ("contextResponderPageSpec")
-@ConsoleModuleData
 public
-class ContextResponderPageSpec {
+class ContextResponderPageSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

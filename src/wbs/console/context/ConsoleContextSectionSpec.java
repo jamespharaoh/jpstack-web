@@ -19,9 +19,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("section")
 @PrototypeComponent ("consoleContextSectionSpec")
-@ConsoleModuleData
 public
-class ConsoleContextSectionSpec {
+class ConsoleContextSectionSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("stats-group")
 @PrototypeComponent ("supervisorTableStatsGroupSpec")
-@ConsoleModuleData
 public
-class SupervisorTableStatsGroupSpec {
+class SupervisorTableStatsGroupSpec
+	implements ConsoleModuleData {
 
 	@DataAncestor
 	SupervisorConfigSpec supervisorConfigSpec;

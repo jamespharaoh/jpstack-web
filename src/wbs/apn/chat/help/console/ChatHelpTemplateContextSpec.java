@@ -19,9 +19,9 @@ import wbs.framework.data.annotations.DataClass;
 @ToString (of = "type")
 @DataClass ("chat-help-template-context")
 @PrototypeComponent ("chatHelpTemplateContextSpec")
-@ConsoleModuleData
 public
-class ChatHelpTemplateContextSpec {
+class ChatHelpTemplateContextSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

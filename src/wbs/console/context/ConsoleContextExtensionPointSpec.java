@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("extension-point")
 @PrototypeComponent ("consoleContextExtensionPointSpec")
-@ConsoleModuleData
 public
-class ConsoleContextExtensionPointSpec {
+class ConsoleContextExtensionPointSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

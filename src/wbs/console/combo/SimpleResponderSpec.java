@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("simple-responder")
 @PrototypeComponent ("simpleResponderSpec")
-@ConsoleModuleData
 public
-class SimpleResponderSpec {
+class SimpleResponderSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

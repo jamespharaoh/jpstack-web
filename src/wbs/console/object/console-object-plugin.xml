@@ -3,13 +3,16 @@
 	package="wbs.console.object">
 
 	<layer name="console">
+
+		<bootstrap-component class="ExtendContextSpec"/>
+		<bootstrap-component class="ObjectContextSpec"/>
+
 		<component class="ExtendContextBuilder"/>
 		<component class="ExtendContextMetaBuilder"/>
-		<component class="ExtendContextSpec"/>
 		<component class="ObjectContext"/>
 		<component class="ObjectContextBuilder"/>
 		<component class="ObjectContextMetaBuilder"/>
-		<component class="ObjectContextSpec"/>
+
 	</layer>
 
 </plugin>

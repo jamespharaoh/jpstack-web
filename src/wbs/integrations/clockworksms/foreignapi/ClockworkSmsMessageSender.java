@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -357,7 +355,7 @@ class ClockworkSmsMessageSender {
 
 				clockworkResponse =
 					(ClockworkSmsMessageResponse)
-					clockworkSmsForeignApiDataFromXml.readInputStream (
+					clockworkSmsForeignApiDataFromXml.readInputStreamRequired (
 						taskLogger,
 						new ByteArrayInputStream (
 							stringToUtf8 (

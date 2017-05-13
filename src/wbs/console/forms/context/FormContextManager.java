@@ -6,6 +6,9 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.console.forms.types.FormType;
+import wbs.console.module.ConsoleModule;
+
 public
 interface FormContextManager {
 
@@ -28,5 +31,14 @@ interface FormContextManager {
 				containerClass));
 
 	}
+
+	<Type>
+	FormContextBuilder <Type> createFormContextBuilder (
+			ConsoleModule consoleModule,
+			String formName,
+			Class <Type> containerClass,
+			FormType formType,
+			Optional <String> columnFieldsNameOptional,
+			Optional <String> rowFieldsNameOptional);
 
 }

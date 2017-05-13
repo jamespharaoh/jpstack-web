@@ -2,7 +2,6 @@ package wbs.console.component;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
-import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -14,8 +13,11 @@ import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.enums.EnumConsoleHelperFactory;
+import wbs.console.module.ConsoleModuleSpecManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryBuilder;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
@@ -24,30 +26,21 @@ import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.ComponentPlugin;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+@SingletonComponent ("consoleComponentPlugin")
 public
 class ConsoleComponentPlugin
 	implements ComponentPlugin {
 
-	// state
+	// singleton dependencies
 
+	@SingletonDependency
+	ConsoleModuleSpecManager consoleModuleSpecManager;
+
+	@ClassSingletonDependency
 	LogContext logContext;
-
-	// constructors
-
-	public
-	ConsoleComponentPlugin (
-			@NonNull LoggingLogic loggingLogic) {
-
-		logContext =
-			loggingLogic.findOrCreateLogContext (
-				classNameFull (
-					getClass ()));
-
-	}
 
 	// implementation
 

@@ -96,6 +96,10 @@
 			package="wbs.console.combo"/>
 
 		<plugin
+			name="console-component"
+			package="wbs.console.component"/>
+
+		<plugin
 			name="console-context"
 			package="wbs.console.context"/>
 
@@ -699,7 +703,7 @@
 		<layer name="config"/>
 
 		<layer name="console">
-			<plugin class="wbs.console.component.ConsoleComponentPlugin"/>
+			<plugin name="consoleComponentPlugin"/>
 		</layer>
 
 		<layer name="data"/>
@@ -707,13 +711,13 @@
 		<layer name="entity"/>
 
 		<layer name="fixture">
-			<plugin class="wbs.framework.fixtures.FixtureComponentPlugin"/>
+			<plugin name="fixtureComponentPlugin"/>
 		</layer>
 
 		<layer name="generate"/>
 
 		<layer name="hibernate">
-			<plugin class="wbs.framework.hibernate.HibernateComponentPlugin"/>
+			<plugin name="hibernateComponentPlugin"/>
 		</layer>
 
 		<layer name="logic"/>
@@ -725,7 +729,7 @@
 		<layer name="model-generate"/>
 
 		<layer name="object">
-			<plugin class="wbs.framework.object.ObjectComponentPlugin"/>
+			<plugin name="objectComponentPlugin"/>
 		</layer>
 
 		<layer name="object-generate"/>

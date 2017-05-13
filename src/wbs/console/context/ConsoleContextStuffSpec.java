@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-stuff")
 @PrototypeComponent ("consoleContextStuffSpec")
-@ConsoleModuleData
 public
-class ConsoleContextStuffSpec {
+class ConsoleContextStuffSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

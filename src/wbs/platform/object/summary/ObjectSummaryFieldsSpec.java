@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("fields")
 @PrototypeComponent ("objectSummaryFieldsSpec")
-@ConsoleModuleData
 public
-class ObjectSummaryFieldsSpec {
+class ObjectSummaryFieldsSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

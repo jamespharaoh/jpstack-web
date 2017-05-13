@@ -23,9 +23,9 @@ import wbs.framework.data.annotations.DataClass;
 @ToString (of = "name")
 @DataClass ("simple-context")
 @PrototypeComponent ("simpleConsoleContextSpec")
-@ConsoleModuleData
 public
-class SimpleConsoleContextSpec {
+class SimpleConsoleContextSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

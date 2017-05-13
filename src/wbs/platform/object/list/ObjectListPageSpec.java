@@ -20,9 +20,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-list-page")
 @PrototypeComponent ("objectListPageSpec")
-@ConsoleModuleData
 public
-class ObjectListPageSpec {
+class ObjectListPageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 
@@ -33,8 +33,8 @@ class ObjectListPageSpec {
 	String typeCode;
 
 	@DataAttribute (
-		name = "form")
-	String formFieldContextName;
+		name = "fields")
+	String formFieldsName;
 
 	@DataAttribute (
 		name = "fields-provider")

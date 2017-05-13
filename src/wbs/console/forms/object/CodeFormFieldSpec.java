@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("code-field")
 @PrototypeComponent ("codeFormFieldSpec")
-@ConsoleModuleData
 public
-class CodeFormFieldSpec {
+class CodeFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String label;

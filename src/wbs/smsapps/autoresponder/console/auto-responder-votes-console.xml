@@ -27,7 +27,7 @@
 			name="votes"
 			class="wbs.smsapps.autoresponder.console.AutoResponderVotesForm"
 			type="search"
-			fields="auto-responder-votes"/>
+			column-fields="auto-responder-votes"/>
 
 	</form-contexts>
 

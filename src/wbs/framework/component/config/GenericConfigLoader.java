@@ -94,7 +94,7 @@ class GenericConfigLoader {
 			@NonNull String configFilePath) {
 
 		return (GenericConfigSpec)
-			dataFromXml.readFilename (
+			dataFromXml.readFilenameRequired (
 				parentTaskLogger,
 				configFilePath);
 

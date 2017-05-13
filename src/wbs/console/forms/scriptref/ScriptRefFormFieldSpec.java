@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("script-ref")
 @PrototypeComponent ("scriptRefFormFieldSpec")
-@ConsoleModuleData
 public
-class ScriptRefFormFieldSpec {
+class ScriptRefFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

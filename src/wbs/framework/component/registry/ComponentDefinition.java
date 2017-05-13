@@ -42,6 +42,10 @@ class ComponentDefinition {
 
 	@DataAttribute
 	@Getter @Setter
+	Class <?> interfaceClass;
+
+	@DataAttribute
+	@Getter @Setter
 	Boolean hide = false;
 
 	@DataAttribute

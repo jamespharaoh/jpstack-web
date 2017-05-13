@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("parent-field")
 @PrototypeComponent ("parentFormFieldSpec")
-@ConsoleModuleData
 public
-class ParentFormFieldSpec {
+class ParentFormFieldSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

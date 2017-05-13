@@ -17,9 +17,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("supervisor-config")
 @PrototypeComponent ("supervisorConfigSpec")
-@ConsoleModuleData
 public
-class SupervisorConfigSpec {
+class SupervisorConfigSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

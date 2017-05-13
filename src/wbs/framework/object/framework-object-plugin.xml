@@ -3,6 +3,9 @@
 	package="wbs.framework.object">
 
 	<layer name="object">
+
+		<bootstrap-component class="ObjectComponentPlugin"/>
+
 		<component class="ObjectHelperChildrenImplementation"/>
 		<component class="ObjectHelperCodeImplementation"/>
 		<component class="ObjectHelperFindImplementation"/>
@@ -12,6 +15,7 @@
 		<component class="ObjectHelperPropertyImplementation"/>
 		<component class="ObjectHelperUpdateImplementation"/>
 		<component class="ObjectManagerImplementation"/>
+
 	</layer>
 
 </plugin>

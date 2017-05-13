@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("chat-user-code-field")
 @PrototypeComponent ("chatUserCodeFormFieldSpec")
-@ConsoleModuleData
 public
-class ChatUserCodeFormFieldSpec {
+class ChatUserCodeFormFieldSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

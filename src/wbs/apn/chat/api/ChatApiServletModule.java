@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;

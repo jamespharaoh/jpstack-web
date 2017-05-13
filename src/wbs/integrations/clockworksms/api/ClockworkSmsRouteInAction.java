@@ -234,7 +234,7 @@ class ClockworkSmsRouteInAction
 
 			request =
 				(ClockworkSmsRouteInRequest)
-				dataFromXml.readInputStream (
+				dataFromXml.readInputStreamRequired (
 					taskLogger,
 					new ByteArrayInputStream (
 						requestBytes),

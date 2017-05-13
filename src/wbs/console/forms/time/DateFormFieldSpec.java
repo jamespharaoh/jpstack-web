@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("date-field")
 @PrototypeComponent ("dateFormFieldSpec")
-@ConsoleModuleData
 public
-class DateFormFieldSpec {
+class DateFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

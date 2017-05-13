@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("run-post-processor")
 @PrototypeComponent ("runPostProcessorSpec")
-@ConsoleModuleData
 public
-class RunPostProcessorSpec {
+class RunPostProcessorSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

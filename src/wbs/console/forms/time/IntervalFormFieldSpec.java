@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("interval-field")
 @PrototypeComponent ("intervalFormFieldSpec")
-@ConsoleModuleData
 public
-class IntervalFormFieldSpec {
+class IntervalFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String label;

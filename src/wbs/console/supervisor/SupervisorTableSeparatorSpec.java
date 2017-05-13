@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("separator")
 @PrototypeComponent ("supervisorTableSeparatorSpec")
-@ConsoleModuleData
 public
-class SupervisorTableSeparatorSpec {
+class SupervisorTableSeparatorSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorTablePartSpec supervisorTablePartSpec;

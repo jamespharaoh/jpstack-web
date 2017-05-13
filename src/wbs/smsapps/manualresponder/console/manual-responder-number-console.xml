@@ -30,7 +30,7 @@
 
 			<object-search-page
 				search-fields="search-form"
-				results-fields="search-results"/>
+				results-column-fields="search-results"/>
 
 		</list>
 

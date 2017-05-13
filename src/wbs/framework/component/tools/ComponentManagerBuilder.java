@@ -7,9 +7,6 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
-import static wbs.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.utils.etc.TypeUtils.classInstantiate;
-import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -19,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
-
-import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,13 +29,6 @@ import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
 import wbs.api.module.ApiModuleSpecFactory;
 
-import wbs.console.module.ConsoleMetaModule;
-import wbs.console.module.ConsoleMetaModuleFactory;
-import wbs.console.module.ConsoleModule;
-import wbs.console.module.ConsoleModuleFactory;
-import wbs.console.module.ConsoleModuleSpec;
-import wbs.console.module.ConsoleModuleSpecFactory;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -53,7 +41,6 @@ import wbs.framework.component.scaffold.BuildLayerSpec;
 import wbs.framework.component.scaffold.BuildSpec;
 import wbs.framework.component.scaffold.PluginApiModuleSpec;
 import wbs.framework.component.scaffold.PluginComponentSpec;
-import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.component.scaffold.PluginLayerSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -393,15 +380,10 @@ class ComponentManagerBuilder {
 			) {
 
 				ComponentPlugin componentPlugin =
-					dynamicCast (
-						ComponentPlugin.class,
-						classInstantiate (
-							classForNameRequired (
-								buildLayerPlugin.className ()),
-							ImmutableList.<Class <?>> of (
-								LoggingLogic.class),
-							ImmutableList.<Object> of (
-								loggingLogic)));
+					bootstrapComponentManager.getComponentRequired (
+						taskLogger,
+						buildLayerPlugin.name (),
+						ComponentPlugin.class);
 
 				for (
 					PluginSpec plugin
@@ -501,117 +483,6 @@ class ComponentManagerBuilder {
 			);
 
 			return 0;
-
-		}
-
-	}
-
-	void registerConsoleModule (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"registerConsoleModule");
-
-		) {
-
-			String xmlResourceName =
-				stringFormat (
-					"/%s/console/%s-console.xml",
-					pluginConsoleModuleSpec
-						.plugin ()
-						.packageName ()
-						.replace (".", "/"),
-					pluginConsoleModuleSpec
-						.name ());
-
-			String consoleSpecComponentName =
-				stringFormat (
-					"%sConsoleModuleSpec",
-					hyphenToCamel (
-						pluginConsoleModuleSpec.name ()));
-
-			String consoleModuleComponentName =
-				stringFormat (
-					"%sConsoleModule",
-					hyphenToCamel (
-						pluginConsoleModuleSpec.name ()));
-
-			String consoleMetaModuleComponentName =
-				stringFormat (
-					"%sConsoleMetaModule",
-					hyphenToCamel (
-						pluginConsoleModuleSpec.name ()));
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					consoleSpecComponentName)
-
-				.componentClass (
-					ConsoleModuleSpec.class)
-
-				.scope (
-					"singleton")
-
-				.factoryClass (
-					ConsoleModuleSpecFactory.class)
-
-				.addValueProperty (
-					"xmlResourceName",
-					xmlResourceName)
-
-			);
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					consoleModuleComponentName)
-
-				.componentClass (
-					ConsoleModule.class)
-
-				.scope (
-					"singleton")
-
-				.factoryClass (
-					ConsoleModuleFactory.class)
-
-				.addReferenceProperty (
-					"consoleSpec",
-					consoleSpecComponentName)
-
-			);
-
-			componentRegistry.registerDefinition (
-				taskLogger,
-				new ComponentDefinition ()
-
-				.name (
-					consoleMetaModuleComponentName)
-
-				.componentClass (
-					ConsoleMetaModule.class)
-
-				.scope (
-					"singleton")
-
-				.factoryClass (
-					ConsoleMetaModuleFactory.class)
-
-				.addReferenceProperty (
-					"consoleSpec",
-					consoleSpecComponentName)
-
-			);
 
 		}
 

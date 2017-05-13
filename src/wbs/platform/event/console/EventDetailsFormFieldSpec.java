@@ -12,8 +12,8 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("event-details-field")
 @PrototypeComponent ("eventDetailsFormFieldSpec")
-@ConsoleModuleData
 public
-class EventDetailsFormFieldSpec {
+class EventDetailsFormFieldSpec
+	implements ConsoleModuleData {
 
 }

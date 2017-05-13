@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-request-handler")
 @PrototypeComponent ("contextRequestHandlerSpec")
-@ConsoleModuleData
 public
-class ContextRequestHandlerSpec {
+class ContextRequestHandlerSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

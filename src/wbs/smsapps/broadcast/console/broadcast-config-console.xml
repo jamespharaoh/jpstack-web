@@ -1,5 +1,5 @@
 <console-module
-	name="broacast-config">
+	name="broadcast-config">
 
 	<console-helper-provider
 		object-name="broadcastConfig">

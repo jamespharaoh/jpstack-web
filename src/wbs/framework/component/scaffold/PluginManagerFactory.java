@@ -137,7 +137,7 @@ class PluginManagerFactory
 
 				PluginSpec plugin =
 					(PluginSpec)
-					pluginDataFromXml.readClasspath (
+					pluginDataFromXml.readClasspathRequired (
 						taskLogger,
 						pluginPath,
 						ImmutableList.of (

@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("floating-point-field")
 @PrototypeComponent ("floatingPointFormFieldSpec")
-@ConsoleModuleData
 public
-class FloatingPointFormFieldSpec {
+class FloatingPointFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

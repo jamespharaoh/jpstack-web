@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("html-field")
 @PrototypeComponent ("htmlFormFieldSpec")
-@ConsoleModuleData
 public
-class HtmlFormFieldSpec {
+class HtmlFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

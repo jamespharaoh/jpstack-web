@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("simple-part")
 @PrototypeComponent ("supervisorSimplePartSpec")
-@ConsoleModuleData
 public
-class SupervisorSimplePartSpec {
+class SupervisorSimplePartSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

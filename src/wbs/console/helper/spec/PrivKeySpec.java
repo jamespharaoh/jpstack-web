@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("priv-key")
 @PrototypeComponent ("privKeySpec")
-@ConsoleModuleData
 public
-class PrivKeySpec {
+class PrivKeySpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

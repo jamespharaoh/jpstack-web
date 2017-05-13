@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("integer-field")
 @PrototypeComponent ("integerFormFieldSpec")
-@ConsoleModuleData
 public
-class IntegerFormFieldSpec {
+class IntegerFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

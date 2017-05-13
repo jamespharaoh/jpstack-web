@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("unary-stats-grouper")
 @PrototypeComponent ("supervisorUnaryStatsGrouperSpec")
-@ConsoleModuleData
 public
-class SupervisorUnaryStatsGrouperSpec {
+class SupervisorUnaryStatsGrouperSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

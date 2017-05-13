@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("operand")
 @PrototypeComponent ("supervisorMultiplicationOperandSpec")
-@ConsoleModuleData
 public
-class SupervisorMultiplicationOperandSpec {
+class SupervisorMultiplicationOperandSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorMultiplicationStatsResolverSpec

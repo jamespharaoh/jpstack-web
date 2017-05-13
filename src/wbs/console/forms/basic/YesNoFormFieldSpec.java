@@ -17,9 +17,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("yes-no-field")
 @PrototypeComponent ("yesNoField")
-@ConsoleModuleData
 public
-class YesNoFormFieldSpec {
+class YesNoFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (required = true)
 	String name;

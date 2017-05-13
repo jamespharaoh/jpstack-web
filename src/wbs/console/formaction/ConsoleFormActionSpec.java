@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("form-action")
 @PrototypeComponent ("contextFormActionSpec")
-@ConsoleModuleData
 public
-class ConsoleFormActionSpec {
+class ConsoleFormActionSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

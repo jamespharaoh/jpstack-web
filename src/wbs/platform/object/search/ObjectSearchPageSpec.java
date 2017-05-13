@@ -18,9 +18,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-search-page")
 @PrototypeComponent ("objectSearchPageSpec")
-@ConsoleModuleData
 public
-class ObjectSearchPageSpec {
+class ObjectSearchPageSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 
@@ -44,8 +44,8 @@ class ObjectSearchPageSpec {
 	String searchClassName;
 
 	@DataAttribute (
-		name = "search-form")
-	String searchFormContextName;
+		name = "search-fields")
+	String searchFormFieldsName;
 
 	@DataAttribute (
 		name = "search-dao-method")
@@ -56,8 +56,12 @@ class ObjectSearchPageSpec {
 	String resultsClassName;
 
 	@DataAttribute (
-		name = "results-form")
-	String resultsFormContextName;
+		name = "results-column-fields")
+	String resultsColumnFormFieldsName;
+
+	@DataAttribute (
+		name = "results-row-fields")
+	String resultsRowFormFieldsName;
 
 	@DataAttribute (
 		name = "results-dao-method")

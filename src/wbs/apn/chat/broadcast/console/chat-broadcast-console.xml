@@ -188,11 +188,11 @@
 
 		</multi-form-context>
 
-		<object-form-context
+		<form-context
 			name="verify"
-			object-name="chat-user"
+			class="wbs.apn.chat.user.core.model.ChatUserRec"
 			type="read-only"
-			fields="verify-user"/>
+			column-fields="verify-user"/>
 
 	</form-contexts>
 

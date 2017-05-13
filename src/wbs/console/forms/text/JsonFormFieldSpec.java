@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("json-field")
 @PrototypeComponent ("jsonFormFieldSpec")
-@ConsoleModuleData
 public
-class JsonFormFieldSpec {
+class JsonFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

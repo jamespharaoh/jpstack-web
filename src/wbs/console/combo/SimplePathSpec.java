@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("simple-path")
 @PrototypeComponent ("simplePathSpec")
-@ConsoleModuleData
 public
-class SimplePathSpec {
+class SimplePathSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

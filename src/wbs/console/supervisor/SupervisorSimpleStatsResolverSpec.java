@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("simple-stats-resolver")
 @PrototypeComponent ("supervisorSimpleStatsResolverSpec")
-@ConsoleModuleData
 public
-class SupervisorSimpleStatsResolverSpec {
+class SupervisorSimpleStatsResolverSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

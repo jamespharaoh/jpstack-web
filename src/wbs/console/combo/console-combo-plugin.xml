@@ -3,36 +3,39 @@
 	package="wbs.console.combo">
 
 	<layer name="console">
+
+		<bootstrap-component class="ContextActionPageSpec"/>
+		<bootstrap-component class="ContextActionSpec"/>
+		<bootstrap-component class="ContextFileSpec"/>
+		<bootstrap-component class="ContextGetActionSpec"/>
+		<bootstrap-component class="ContextRequestHandlerSpec"/>
+		<bootstrap-component class="ContextResponderPageSpec"/>
+		<bootstrap-component class="ContextTabResponderPageSpec"/>
+		<bootstrap-component class="ContextTabResponderSpec"/>
+		<bootstrap-component class="ContextTabActionPageSpec"/>
+		<bootstrap-component class="ContextTabPageSpec"/>
+		<bootstrap-component class="SimpleActionPageSpec"/>
+		<bootstrap-component class="SimpleFileSpec"/>
+		<bootstrap-component class="SimplePathSpec"/>
+		<bootstrap-component class="SimpleResponderSpec"/>
+		<bootstrap-component class="SimpleResponderFileSpec"/>
+
 		<component class="ContextActionPageBuilder"/>
-		<component class="ContextActionPageSpec"/>
 		<component class="ContextActionBuilder"/>
-		<component class="ContextActionSpec"/>
 		<component class="ContextFileBuilder"/>
-		<component class="ContextFileSpec"/>
 		<component class="ContextGetActionBuilder"/>
-		<component class="ContextGetActionSpec"/>
 		<component class="ContextRequestHandlerBuilder"/>
-		<component class="ContextRequestHandlerSpec"/>
 		<component class="ContextResponderPageBuilder"/>
-		<component class="ContextResponderPageSpec"/>
 		<component class="ContextTabResponderBuilder"/>
 		<component class="ContextTabResponderPageBuilder"/>
-		<component class="ContextTabResponderPageSpec"/>
-		<component class="ContextTabResponderSpec"/>
 		<component class="ContextTabActionPageBuilder"/>
-		<component class="ContextTabActionPageSpec"/>
 		<component class="ContextTabPageBuilder"/>
-		<component class="ContextTabPageSpec"/>
 		<component class="SimpleActionPageBuilder"/>
-		<component class="SimpleActionPageSpec"/>
 		<component class="SimpleFileBuilder"/>
-		<component class="SimpleFileSpec"/>
 		<component class="SimplePathBuilder"/>
-		<component class="SimplePathSpec"/>
 		<component class="SimpleResponderBuilder"/>
-		<component class="SimpleResponderSpec"/>
 		<component class="SimpleResponderFileBuilder"/>
-		<component class="SimpleResponderFileSpec"/>
+
 	</layer>
 
 </plugin>

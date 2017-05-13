@@ -18,9 +18,8 @@ class BuildLayerPluginSpec {
 	BuildLayerSpec layer;
 
 	@DataAttribute (
-		name = "class",
 		required = true)
 	@Getter @Setter
-	String className;
+	String name;
 
 }

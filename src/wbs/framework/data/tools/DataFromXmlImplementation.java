@@ -9,6 +9,8 @@ import static wbs.utils.etc.Misc.toEnumGeneric;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.ReflectionUtils.fieldParameterizedType;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -108,7 +110,7 @@ class DataFromXmlImplementation
 
 	@Override
 	public
-	Object readInputStream (
+	Optional <Object> readInputStream (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull InputStream inputStream,
 			@NonNull String filename,
@@ -145,7 +147,7 @@ class DataFromXmlImplementation
 					exception,
 					"Error parsing XML");
 
-				throw taskLogger.makeException ();
+				return optionalAbsent ();
 
 			}
 
@@ -175,13 +177,12 @@ class DataFromXmlImplementation
 					exception,
 					"Error building object tree from XML");
 
-				throw taskLogger.makeException ();
+				return optionalAbsent ();
 
 			}
 
-			taskLogger.makeException ();
-
-			return result;
+			return optionalOf (
+				result);
 
 		}
 
@@ -189,7 +190,7 @@ class DataFromXmlImplementation
 
 	@Override
 	public
-	Object readClasspath (
+	Optional <Object> readClasspath (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
@@ -201,31 +202,45 @@ class DataFromXmlImplementation
 					parentTaskLogger,
 					"readClasspath");
 
-			InputStream inputStream =
-				getClass ().getResourceAsStream (
-					filename);
-
 		) {
 
-			if (inputStream == null) {
+			try (
 
-				throw new RuntimeException (
-					stringFormat (
+				InputStream inputStream =
+					getClass ().getResourceAsStream (
+						filename);
+
+			) {
+
+				if (
+					isNull (
+						inputStream)
+				) {
+
+					taskLogger.errorFormat (
 						"Classpath resource %s not found",
-						filename));
+						filename);
+
+					return optionalAbsent ();
+
+				}
+
+				return readInputStream (
+					taskLogger,
+					inputStream,
+					filename,
+					parents);
+
+			} catch (IOException ioException) {
+
+				taskLogger.errorFormatException (
+					ioException,
+					"Error reading resource %s",
+					filename);
+
+				return optionalAbsent ();
 
 			}
-
-			return readInputStream (
-				taskLogger,
-				inputStream,
-				filename,
-				parents);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
 
 		}
 
@@ -233,7 +248,7 @@ class DataFromXmlImplementation
 
 	@Override
 	public
-	Object readFilename (
+	Object readFilenameRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
@@ -251,7 +266,7 @@ class DataFromXmlImplementation
 
 		) {
 
-			return readInputStream (
+			return readInputStreamRequired (
 				taskLogger,
 				inputStream,
 				filename,

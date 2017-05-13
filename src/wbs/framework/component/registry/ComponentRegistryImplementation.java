@@ -811,7 +811,7 @@ class ComponentRegistryImplementation
 
 			ComponentsSpec components =
 				(ComponentsSpec)
-				dataFromXml.readClasspath (
+				dataFromXml.readClasspathRequired (
 					taskLogger,
 					classpath);
 
@@ -845,7 +845,7 @@ class ComponentRegistryImplementation
 
 			ComponentsSpec componentsSpec =
 				(ComponentsSpec)
-				dataFromXml.readFilename (
+				dataFromXml.readFilenameRequired (
 					taskLogger,
 					filename);
 

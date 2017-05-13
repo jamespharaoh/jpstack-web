@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.ComponentInterface;
 import wbs.framework.component.annotations.HiddenComponent;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
@@ -205,6 +206,29 @@ class AnnotatedClassComponentTools {
 
 			}
 
+			// check for component interface annotation
+
+			ComponentInterface componentInterfaceAnnotation =
+				providedClass.getAnnotation (
+					ComponentInterface.class);
+
+			Class <?> interfaceClass;
+
+			if (
+				isNotNull (
+					componentInterfaceAnnotation)
+			) {
+
+				interfaceClass =
+					componentInterfaceAnnotation.value ();
+
+			} else {
+
+				interfaceClass =
+					componentClass;
+
+			}
+
 			// handle singleton componentannotation
 
 			if (
@@ -227,6 +251,9 @@ class AnnotatedClassComponentTools {
 
 						.componentClass (
 							componentClass)
+
+						.interfaceClass (
+							interfaceClass)
 
 						.scope (
 							"singleton")
@@ -263,6 +290,9 @@ class AnnotatedClassComponentTools {
 
 						.componentClass (
 							componentClass)
+
+						.interfaceClass (
+							interfaceClass)
 
 						.scope (
 							"prototype")
@@ -305,6 +335,9 @@ class AnnotatedClassComponentTools {
 						.componentClass (
 							componentClass)
 
+						.interfaceClass (
+							interfaceClass)
+
 						.scope (
 							"prototype")
 
@@ -327,6 +360,9 @@ class AnnotatedClassComponentTools {
 						.factoryClass (
 							genericCastUnchecked (
 								ThreadLocalProxyComponentFactory.class))
+
+						.interfaceClass (
+							interfaceClass)
 
 						.scope (
 							"singleton")

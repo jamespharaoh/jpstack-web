@@ -18,9 +18,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("integer-stats-formatter")
 @PrototypeComponent ("supervisorIntStatsFormtterSpec")
-@ConsoleModuleData
 public
-class SupervisorIntegerStatsFormatterSpec {
+class SupervisorIntegerStatsFormatterSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

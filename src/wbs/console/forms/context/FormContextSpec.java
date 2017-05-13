@@ -7,7 +7,6 @@ import lombok.experimental.Accessors;
 
 import wbs.console.forms.types.FormType;
 import wbs.console.module.ConsoleModuleData;
-import wbs.console.module.ConsoleModuleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -18,16 +17,16 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @EqualsAndHashCode (of = "name")
 @ToString (of = "name")
-@DataClass ("field-set")
-@PrototypeComponent ("formFieldSetSpec")
-@ConsoleModuleData
+@DataClass ("form-context")
+@PrototypeComponent ("formContextSpec")
 public
-class FormContextSpec {
+class FormContextSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 
 	@DataParent
-	ConsoleModuleSpec consoleModule;
+	FormContextsSpec formContexts;
 
 	// attributes
 

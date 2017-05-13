@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("sum-stats-aggregator")
 @PrototypeComponent ("supervisorSumStatsAggregatorSpec")
-@ConsoleModuleData
 public
-class SupervisorSumStatsAggregatorSpec {
+class SupervisorSumStatsAggregatorSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

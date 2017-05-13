@@ -1,5 +1,5 @@
 <console-module
-	name="broacast-number">
+	name="broadcast-number">
 
 	<console-helper-provider
 		object-name="broadcastNumber"

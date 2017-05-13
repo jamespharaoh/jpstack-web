@@ -22,7 +22,7 @@
 
 			<object-search-page
 				search-fields="search"
-				results-fields="results"/>
+				results-column-fields="results"/>
 
 		</list>
 

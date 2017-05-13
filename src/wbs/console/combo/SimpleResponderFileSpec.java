@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("simple-responder-file")
 @PrototypeComponent ("simpleResponderFileSpec")
-@ConsoleModuleData
 public
-class SimpleResponderFileSpec {
+class SimpleResponderFileSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

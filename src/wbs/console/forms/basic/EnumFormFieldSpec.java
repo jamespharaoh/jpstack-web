@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("enum-field")
 @PrototypeComponent ("enumFormFieldSpec")
-@ConsoleModuleData
 public
-class EnumFormFieldSpec {
+class EnumFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

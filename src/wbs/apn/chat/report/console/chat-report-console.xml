@@ -14,7 +14,7 @@
 			object-type="chatUser"
 			search-class="wbs.apn.chat.user.core.model.ChatUserSearch"
 			search-fields="recent-user-search"
-			results-fields="recent-user-results"/>
+			results-column-fields="recent-user-results"/>
 
 		<extension-point
 			name="chatReport.graphs"/>
@@ -33,7 +33,7 @@
 			object-type="chatUserCredit"
 			search-class="wbs.apn.chat.bill.model.ChatUserCreditSearch"
 			search-fields="admin-credit-search"
-			results-fields="admin-credit-results"/>
+			results-column-fields="admin-credit-results"/>
 
 		<object-search-page
 			name="alarms"
@@ -41,7 +41,7 @@
 			object-type="chatUserInitiationLog"
 			search-class="wbs.apn.chat.contact.model.ChatUserInitiationLogSearch"
 			search-fields="initiation-log-search"
-			results-fields="initiation-log-results"/>
+			results-column-fields="initiation-log-results"/>
 
 	</simple-context>
 
@@ -285,21 +285,5 @@
 			name="reason"/>
 
 	</field-set>
-
-	<form-contexts>
-
-		<form-context
-			name="rev-share-search"
-			class="wbs.apn.chat.report.console.ChatReportRevShareForm"
-			type="search"
-			fields="rev-share-search"/>
-
-		<form-context
-			name="rev-share-results"
-			class="wbs.apn.chat.report.console.ChatReportRevShareItem"
-			type="read-only"
-			fields="rev-share-results"/>
-
-	</form-contexts>
 
 </console-module>

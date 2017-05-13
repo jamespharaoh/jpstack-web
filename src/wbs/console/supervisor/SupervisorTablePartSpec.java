@@ -17,9 +17,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("table")
 @PrototypeComponent ("supervisorTablePartSpec")
-@ConsoleModuleData
 public
-class SupervisorTablePartSpec {
+class SupervisorTablePartSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfig;

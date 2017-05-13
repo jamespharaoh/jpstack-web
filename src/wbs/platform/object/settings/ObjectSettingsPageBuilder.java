@@ -2,6 +2,8 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -25,6 +27,7 @@ import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.IdFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
+import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -486,10 +489,14 @@ class ObjectSettingsPageBuilder <
 						consoleHelper.objectName ()));
 
 			formContextBuilder =
-				formContextManager.formContextBuilderRequired (
-					consoleModule.name (),
-					spec.formContextName (),
-					consoleHelper.objectClass ());
+				formContextManager.createFormContextBuilder (
+					consoleModule,
+					name,
+					consoleHelper.objectClass (),
+					FormType.update,
+					optionalOf (
+						spec.formFieldsName ()),
+					optionalAbsent ());
 
 			// if a provider name is provided
 

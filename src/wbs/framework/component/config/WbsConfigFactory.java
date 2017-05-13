@@ -103,7 +103,7 @@ class WbsConfigFactory
 
 			WbsConfig wbsConfig =
 				(WbsConfig)
-				dataFromXml.readFilename (
+				dataFromXml.readFilenameRequired (
 					taskLogger,
 					filename);
 

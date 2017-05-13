@@ -5,7 +5,7 @@
 	<layer name="console">
 
 		<bootstrap-component class="ConsoleModuleSpec"/>
-		<bootstrap-component class="ConsoleModuleSpecReader"/>
+		<bootstrap-component class="ConsoleModuleSpecManagerFactory"/>
 
 		<component class="ConsoleManagerImplementation"/>
 		<component class="ConsoleMetaManagerImplementation"/>

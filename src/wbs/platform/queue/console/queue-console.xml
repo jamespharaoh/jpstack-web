@@ -46,7 +46,7 @@
 					object-type="queueItem"
 					search-class="wbs.platform.queue.model.QueueItemSearch"
 					search-fields="queue-item-report-search"
-					results-fields="queue-item-report-results"/>
+					results-column-fields="queue-item-report-results"/>
 
 				<object-search-page
 					name="user"
@@ -56,7 +56,7 @@
 					search-fields="user-queue-search"
 					search-dao-method="searchUserQueueReportIds"
 					results-class="wbs.platform.queue.model.UserQueueReport"
-					results-fields="user-queue-results"
+					results-column-fields="user-queue-results"
 					results-dao-method="searchUserQueueReports"/>
 
 			</section>

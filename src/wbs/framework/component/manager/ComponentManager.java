@@ -3,6 +3,8 @@ package wbs.framework.component.manager;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Closeable;
 import java.util.List;
@@ -73,7 +75,14 @@ interface ComponentManager
 			optionalIsNotPresent (
 				componentProvider)
 		) {
-			throw new RuntimeException ();
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"No such component %s of type %s",
+					componentName,
+					classNameSimple (
+						componentClass)));
+
 		}
 
 		return componentProvider.get ().get ();

@@ -3,16 +3,19 @@
 	package="wbs.platform.object.summary">
 
 	<layer name="console">
+
+		<bootstrap-component class="ObjectSummaryPageSpec"/>
+		<bootstrap-component class="ObjectSummaryBeanPartSpec"/>
+		<bootstrap-component class="ObjectSummaryFieldsSpec"/>
+		<bootstrap-component class="ObjectSummaryHeadingSpec"/>
+
 		<component class="ObjectSummaryPageBuilder"/>
-		<component class="ObjectSummaryPageSpec"/>
 		<component class="ObjectSummaryPart"/>
 		<component class="ObjectSummaryBeanPartBuilder"/>
-		<component class="ObjectSummaryBeanPartSpec"/>
 		<component class="ObjectSummaryFieldsBuilder"/>
 		<component class="ObjectSummaryFieldsPart"/>
-		<component class="ObjectSummaryFieldsSpec"/>
 		<component class="ObjectSummaryHeadingBuilder"/>
-		<component class="ObjectSummaryHeadingSpec"/>
+
 	</layer>
 
 </plugin>

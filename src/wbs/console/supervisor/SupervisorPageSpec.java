@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("supervisor-page")
 @PrototypeComponent ("supervisorPageSpec")
-@ConsoleModuleData
 public
-class SupervisorPageSpec {
+class SupervisorPageSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

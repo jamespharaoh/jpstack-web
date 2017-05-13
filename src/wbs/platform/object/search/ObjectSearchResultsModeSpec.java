@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("results-mode")
 @PrototypeComponent ("objectSearchResultsModeSpec")
-@ConsoleModuleData
 public
-class ObjectSearchResultsModeSpec {
+class ObjectSearchResultsModeSpec
+	implements ConsoleModuleData {
 
 	@DataParent
 	ObjectSearchPageSpec page;
@@ -25,7 +25,7 @@ class ObjectSearchResultsModeSpec {
 	String name;
 
 	@DataAttribute (
-		name = "form")
-	String formContextName;
+		name = "fields")
+	String formFieldsName;
 
 }

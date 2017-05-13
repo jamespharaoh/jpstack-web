@@ -1,6 +1,8 @@
 package wbs.platform.object.list;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -25,6 +27,7 @@ import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
+import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -330,10 +333,14 @@ class ObjectListPageBuilder <
 			}*/
 
 			formContextBuilder =
-				formContextManager.formContextBuilderRequired (
-					consoleModule.name (),
-					spec.formFieldContextName (),
-					consoleHelper.objectClass ());
+				formContextManager.createFormContextBuilder (
+					consoleModule,
+					"list",
+					consoleHelper.objectClass (),
+					FormType.readOnly,
+					optionalOf (
+						spec.formFieldsName ()),
+					optionalAbsent ());
 
 			listBrowsersByFieldName =
 				ifNull (

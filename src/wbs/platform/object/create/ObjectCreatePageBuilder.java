@@ -1,6 +1,8 @@
 package wbs.platform.object.create;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -21,6 +23,7 @@ import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.forms.object.ParentFormFieldSpec;
+import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -371,10 +374,14 @@ class ObjectCreatePageBuilder <
 						consoleHelper.objectTypeCode ()));
 
 			formContextBuilder =
-				formContextManager.formContextBuilderRequired (
-					consoleModule.name (),
-					spec.formContextName (),
-					consoleHelper.objectClass ());
+				formContextManager.createFormContextBuilder (
+					consoleModule,
+					name,
+					consoleHelper.objectClass (),
+					FormType.create,
+					optionalOf (
+						spec.formFieldsName ()),
+					optionalAbsent ());
 
 			// if a provider name is provided
 

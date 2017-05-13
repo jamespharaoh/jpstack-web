@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("stats-total")
 @PrototypeComponent ("supervisorTableStatsTotalSpec")
-@ConsoleModuleData
 public
-class SupervisorTableStatsTotalSpec {
+class SupervisorTableStatsTotalSpec
+	implements ConsoleModuleData {
 
 	@DataAncestor
 	SupervisorConfigSpec supervisorConfigSpec;

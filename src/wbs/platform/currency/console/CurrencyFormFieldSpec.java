@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("currency-field")
 @PrototypeComponent ("currencyFormFieldSpec")
-@ConsoleModuleData
 public
-class CurrencyFormFieldSpec {
+class CurrencyFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

@@ -17,10 +17,12 @@
 	</models>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.ImageFormFieldSpec"/>
+
 		<component class="console.ImageCsvFormFieldInterfaceMapping"/>
 		<component class="console.ImageFormFieldBuilder"/>
 		<component class="console.ImageFormFieldRenderer"/>
-		<component class="console.ImageFormFieldSpec"/>
 		<component class="console.MediaAudioResponder"/>
 		<component class="console.MediaConsoleLogicImplementation"/>
 		<component class="console.MediaCryptor"/>
@@ -29,6 +31,7 @@
 		<component class="console.MediaThumb100Responder"/>
 		<component class="console.MediaThumb32Responder"/>
 		<component class="console.MediaVideoResponder"/>
+
 	</layer>
 
 	<layer name="logic">

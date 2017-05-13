@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-link")
 @PrototypeComponent ("consoleContextLinkSpec")
-@ConsoleModuleData
 public
-class ConsoleContextLinkSpec {
+class ConsoleContextLinkSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

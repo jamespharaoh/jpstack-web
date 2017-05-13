@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("set-field")
 @PrototypeComponent ("objectTicketCreateSetFieldSpec")
-@ConsoleModuleData
 public
-class ObjectTicketCreateSetFieldSpec {
+class ObjectTicketCreateSetFieldSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

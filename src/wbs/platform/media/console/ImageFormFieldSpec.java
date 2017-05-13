@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("image-field")
 @PrototypeComponent ("imageFormFieldSpec")
-@ConsoleModuleData
 public
-class ImageFormFieldSpec {
+class ImageFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

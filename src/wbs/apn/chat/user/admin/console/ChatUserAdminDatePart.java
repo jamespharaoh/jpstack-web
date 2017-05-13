@@ -16,8 +16,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;

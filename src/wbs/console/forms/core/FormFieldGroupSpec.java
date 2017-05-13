@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("group")
 @PrototypeComponent ("formFieldGroupSpec")
-@ConsoleModuleData
 public
-class FormFieldGroupSpec {
+class FormFieldGroupSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

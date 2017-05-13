@@ -16,9 +16,9 @@ import wbs.framework.entity.record.Record;
 @Data
 @DataClass ("text-area-field")
 @PrototypeComponent ("textAreaFormFieldSpec")
-@ConsoleModuleData
 public
-class TextAreaFormFieldSpec {
+class TextAreaFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

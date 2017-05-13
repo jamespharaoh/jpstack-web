@@ -1,42 +1,31 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryBuilder;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.ComponentPlugin;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+@SingletonComponent ("objectComponentPlugin")
 public
 class ObjectComponentPlugin
 	implements ComponentPlugin {
 
-	// state
+	// singleton dependencies
 
+	@ClassSingletonDependency
 	LogContext logContext;
-
-	// constructors
-
-	public
-	ObjectComponentPlugin (
-			@NonNull LoggingLogic loggingLogic) {
-
-		logContext =
-			loggingLogic.findOrCreateLogContext (
-				classNameFull (
-					getClass ()));
-
-	}
 
 	// public implementation
 

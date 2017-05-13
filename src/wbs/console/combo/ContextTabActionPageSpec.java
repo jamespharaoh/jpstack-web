@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-tab-action-page")
 @PrototypeComponent ("contextTabActionPageSpec")
-@ConsoleModuleData
 public
-class ContextTabActionPageSpec {
+class ContextTabActionPageSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

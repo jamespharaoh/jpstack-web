@@ -10,7 +10,7 @@
 			object-type="manualResponderRequest"
 			search-class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
 			search-fields="simple-report-search"
-			results-fields="simple-report-results"/>
+			results-column-fields="simple-report-results"/>
 
 		<object-search-page
 			name="service"
@@ -20,7 +20,7 @@
 			search-fields="service-report-search"
 			search-dao-method="searchServiceReportIds"
 			results-class="wbs.smsapps.manualresponder.model.ManualResponderServiceReport"
-			results-fields="service-report-results"
+			results-column-fields="service-report-results"
 			results-dao-method="searchServiceReports"/>
 
 		<object-search-page
@@ -31,7 +31,7 @@
 			search-fields="operator-report-search"
 			search-dao-method="searchOperatorReportIds"
 			results-class="wbs.smsapps.manualresponder.model.ManualResponderOperatorReport"
-			results-fields="operator-report-results"
+			results-column-fields="operator-report-results"
 			results-dao-method="searchOperatorReports"/>
 
 	</simple-context>

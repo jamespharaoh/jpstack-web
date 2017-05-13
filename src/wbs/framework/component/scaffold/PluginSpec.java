@@ -54,8 +54,8 @@ class PluginSpec
 
 	@DataChildren
 	@Getter @Setter
-	List<PluginFixtureSpec> fixtures =
-		new ArrayList<PluginFixtureSpec> ();
+	List <PluginFixtureSpec> fixtures =
+		new ArrayList<> ();
 
 	@DataIgnore
 	Object sqlScripts;
@@ -64,23 +64,23 @@ class PluginSpec
 		direct = true,
 		childElement = "layer")
 	@Getter @Setter
-	List<PluginLayerSpec> layers =
-		new ArrayList<PluginLayerSpec> ();
+	List <PluginLayerSpec> layers =
+		new ArrayList<> ();
 
 	@DataChildrenIndex
 	@Getter @Setter
-	Map<String,PluginLayerSpec> layersByName =
-		new HashMap<String,PluginLayerSpec> ();
+	Map <String, PluginLayerSpec> layersByName =
+		new HashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<PluginApiModuleSpec> apiModules =
-		new ArrayList<PluginApiModuleSpec> ();
+	List <PluginApiModuleSpec> apiModules =
+		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<PluginConsoleModuleSpec> consoleModules =
-		new ArrayList<PluginConsoleModuleSpec> ();
+	List <PluginConsoleModuleSpec> consoleModules =
+		new ArrayList<> ();
 
 	// implementation
 

@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("timezone-field")
 @PrototypeComponent ("timezoneFormFieldSpec")
-@ConsoleModuleData
 public
-class TimezoneFormFieldSpec {
+class TimezoneFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

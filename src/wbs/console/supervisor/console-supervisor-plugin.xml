@@ -3,46 +3,49 @@
 	package="wbs.console.supervisor">
 
 	<layer name="console">
-		<component class="SupervisorAdditionOperandSpec"/>
+
+		<bootstrap-component class="SupervisorAdditionOperandSpec"/>
+		<bootstrap-component class="SupervisorAdditionStatsResolverSpec"/>
+		<bootstrap-component class="SupervisorConditionSpec"/>
+		<bootstrap-component class="SupervisorConfigSpec"/>
+		<bootstrap-component class="SupervisorDataSetSpec"/>
+		<bootstrap-component class="SupervisorHeadingPartSpec"/>
+		<bootstrap-component class="SupervisorIntegerConditionSpec"/>
+		<bootstrap-component class="SupervisorIntegerInConditionSpec"/>
+		<bootstrap-component class="SupervisorIntegerStatsFormatterSpec"/>
+		<bootstrap-component class="SupervisorMultiplicationOperandSpec"/>
+		<bootstrap-component class="SupervisorMultiplicationStatsResolverSpec"/>
+		<bootstrap-component class="SupervisorPageSpec"/>
+		<bootstrap-component class="SupervisorSimplePartSpec"/>
+		<bootstrap-component class="SupervisorSimpleStatsResolverSpec"/>
+		<bootstrap-component class="SupervisorSumStatsAggregatorSpec"/>
+		<bootstrap-component class="SupervisorTableHeadingSpec"/>
+		<bootstrap-component class="SupervisorTablePartSpec"/>
+		<bootstrap-component class="SupervisorTableSeparatorSpec"/>
+		<bootstrap-component class="SupervisorTableStatsGroupSpec"/>
+		<bootstrap-component class="SupervisorTableStatsTotalSpec"/>
+		<bootstrap-component class="SupervisorUnaryStatsGrouperSpec"/>
+
 		<component class="SupervisorAdditionStatsResolverBuilder"/>
-		<component class="SupervisorAdditionStatsResolverSpec"/>
-		<component class="SupervisorConditionSpec"/>
 		<component class="SupervisorConfigBuilder"/>
-		<component class="SupervisorConfigSpec"/>
-		<component class="SupervisorDataSetSpec"/>
 		<component class="SupervisorHeadingPartBuilder"/>
-		<component class="SupervisorHeadingPartSpec"/>
-		<component class="SupervisorIntegerConditionSpec"/>
-		<component class="SupervisorIntegerInConditionSpec"/>
 		<component class="SupervisorIntegerStatsFormatterBuilder"/>
-		<component class="SupervisorIntegerStatsFormatterSpec"/>
-		<component class="SupervisorMultiplicationOperandSpec"/>
 		<component class="SupervisorMultiplicationStatsResolverBuilder"/>
-		<component class="SupervisorMultiplicationStatsResolverSpec"/>
 		<component class="SupervisorPageBuilder"/>
-		<component class="SupervisorPageSpec"/>
 		<component class="SupervisorPart"/>
 		<component class="SupervisorSimplePartBuilder"/>
-		<component class="SupervisorSimplePartSpec"/>
 		<component class="SupervisorSimpleStatsResolverBuilder"/>
-		<component class="SupervisorSimpleStatsResolverSpec"/>
 		<component class="SupervisorSumStatsAggregatorBuilder"/>
-		<component class="SupervisorSumStatsAggregatorSpec"/>
 		<component class="SupervisorTableHeadingBuilder"/>
-		<component class="SupervisorTableHeadingSpec"/>
 		<component class="SupervisorTableHeadingPart"/>
 		<component class="SupervisorTablePart"/>
 		<component class="SupervisorTablePartBuilder"/>
-		<component class="SupervisorTablePartSpec"/>
 		<component class="SupervisorTableSeparatorBuilder"/>
-		<component class="SupervisorTableSeparatorSpec"/>
 		<component class="SupervisorTableStatsGroupBuilder"/>
 		<component class="SupervisorTableStatsGroupPart"/>
-		<component class="SupervisorTableStatsGroupSpec"/>
 		<component class="SupervisorTableStatsTotalBuilder"/>
-		<component class="SupervisorTableStatsTotalSpec"/>
 		<component class="SupervisorUnaryStatsGrouperBuilder"/>
-		<component class="SupervisorUnaryStatsGrouperSpec"/>
+
 	</layer>
 
 </plugin>

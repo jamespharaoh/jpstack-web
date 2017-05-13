@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-action")
 @PrototypeComponent ("contextActionSpec")
-@ConsoleModuleData
 public
-class ContextActionSpec {
+class ContextActionSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

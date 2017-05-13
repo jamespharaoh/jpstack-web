@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("list-browser")
 @PrototypeComponent ("objectListBrowserSpec")
-@ConsoleModuleData
 public
-class ObjectListBrowserSpec {
+class ObjectListBrowserSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

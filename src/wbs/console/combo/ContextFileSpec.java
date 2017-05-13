@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-file")
 @PrototypeComponent ("contextFileSpec")
-@ConsoleModuleData
 public
-class ContextFileSpec {
+class ContextFileSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

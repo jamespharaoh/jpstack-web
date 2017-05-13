@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("index-field")
 @PrototypeComponent ("indexFormFieldSpec")
-@ConsoleModuleData
 public
-class IndexFormFieldSpec {
+class IndexFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

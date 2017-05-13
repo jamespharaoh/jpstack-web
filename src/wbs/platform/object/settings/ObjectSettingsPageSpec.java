@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-settings-page")
 @PrototypeComponent ("objectSettingsPageSpec")
-@ConsoleModuleData
 public
-class ObjectSettingsPageSpec {
+class ObjectSettingsPageSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 
@@ -30,8 +30,12 @@ class ObjectSettingsPageSpec {
 	String objectName;
 
 	@DataAttribute (
-		name = "form")
-	String formContextName;
+		name = "fields")
+	String formFieldsName;
+
+	@DataAttribute (
+		name = "fields-provider")
+	String formFieldsProviderName;
 
 	@DataAttribute
 	String privKey;

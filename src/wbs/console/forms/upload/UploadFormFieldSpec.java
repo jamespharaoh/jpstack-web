@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("upload-field")
 @PrototypeComponent ("uploadFormFieldSpec")
-@ConsoleModuleData
 public
-class UploadFormFieldSpec {
+class UploadFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String label;

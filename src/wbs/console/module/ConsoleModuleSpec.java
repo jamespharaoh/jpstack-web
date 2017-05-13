@@ -19,9 +19,9 @@ import wbs.framework.data.annotations.DataClass;
 @ToString (of = "name")
 @DataClass ("console-module")
 @PrototypeComponent ("consoleModuleSpec")
-@ConsoleModuleData
 public
-class ConsoleModuleSpec {
+class ConsoleModuleSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute (
 		required = true)

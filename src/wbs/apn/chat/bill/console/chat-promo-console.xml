@@ -1,5 +1,5 @@
 <console-module
-	name="chatPromo">
+	name="chat-promo">
 
 	<console-helper-provider
 		object-name="chatPromo"

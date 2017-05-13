@@ -23,9 +23,9 @@ import wbs.framework.data.annotations.DataParent;
 @ToString (of = "name")
 @DataClass ("field-set")
 @PrototypeComponent ("formFieldSetSpec")
-@ConsoleModuleData
 public
-class FormFieldSetSpec {
+class FormFieldSetSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

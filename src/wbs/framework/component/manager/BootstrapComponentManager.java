@@ -2,8 +2,13 @@ package wbs.framework.component.manager;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableOnlyItemRequired;
+import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrElseSet;
 import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
@@ -13,18 +18,25 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
+import static wbs.utils.etc.TypeUtils.rawType;
 import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -32,13 +44,18 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Provider;
+import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -47,10 +64,12 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.ComponentInterface;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -90,7 +109,7 @@ class BootstrapComponentManager
 	Map <String, ComponentData> componentsByName =
 		new TreeMap<> ();
 
-	Map <Class <?>, ComponentData> componentsByInterface =
+	Map <Class <?>, List <ComponentData>> componentsByInterface =
 		new HashMap<> ();
 
 	BuildSpec buildSpec;
@@ -188,21 +207,6 @@ class BootstrapComponentManager
 
 			}
 
-			if (
-				mapContainsKey (
-					componentsByInterface,
-					interfaceClass)
-			) {
-
-				taskLogger.errorFormat (
-					"Duplicated component class: %s",
-					classNameFull (
-						interfaceClass));
-
-				return this;
-
-			}
-
 			ComponentData componentData =
 				new ComponentData ()
 
@@ -224,11 +228,9 @@ class BootstrapComponentManager
 
 			;
 
-			componentsByName.put (
+			addComponentData (
+				taskLogger,
 				componentName,
-				componentData);
-
-			componentsByInterface.put (
 				interfaceClass,
 				componentData);
 
@@ -521,9 +523,12 @@ class BootstrapComponentManager
 							: pluginLayerSpec.bootstrapComponents ()
 					) {
 
-						debugFormat (
-							"Load bootstrap component: %s",
-							pluginComponentSpec.className ());
+						registerPluginBootstrapComponent (
+							taskLogger,
+							stringFormat (
+								"%s.%s",
+								pluginSpec.packageName (),
+								pluginComponentSpec.className ()));
 
 					}
 
@@ -703,6 +708,55 @@ class BootstrapComponentManager
 
 	// private implementation
 
+	private
+	void registerPluginBootstrapComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String className) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerSingletonClass");
+
+		) {
+
+debugFormat (
+	"Boootstrap component %s",
+	className);
+
+			Class <?> providedClass =
+				classForNameRequired (
+					className);
+
+			ComponentInterface componentInterfaceAnnotation =
+				providedClass.getAnnotation (
+					ComponentInterface.class);
+
+			if (
+				isNotNull (
+					componentInterfaceAnnotation)
+			) {
+
+				registerClass (
+					taskLogger,
+					componentInterfaceAnnotation.value (),
+					providedClass);
+
+			} else {
+
+				registerClass (
+					taskLogger,
+					providedClass,
+					providedClass);
+
+			}
+
+		}
+
+	}
+
 	private synchronized
 	void registerSingletonClass (
 			@NonNull TaskLogger parentTaskLogger,
@@ -766,11 +820,9 @@ class BootstrapComponentManager
 
 			;
 
-			componentsByName.put (
+			addComponentData (
+				taskLogger,
 				singletonComponentAnnotation.value (),
-				componentData);
-
-			componentsByInterface.put (
 				interfaceClass,
 				componentData);
 
@@ -838,13 +890,63 @@ class BootstrapComponentManager
 
 			;
 
-			componentsByName.put (
+			addComponentData (
+				taskLogger,
 				prototypeComponentAnnotation.value (),
-				componentData);
-
-			componentsByInterface.put (
 				interfaceClass,
 				componentData);
+
+		}
+
+	}
+
+	private
+	void addComponentData (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <?> interfaceClass,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addComponentData");
+
+		) {
+
+			componentsByName.put (
+				componentName,
+				componentData);
+
+			Set <Class <?>> allInterfaceClasses =
+				new HashSet<> ();
+
+			allInterfaceClasses.add (
+				interfaceClass);
+
+			allInterfaceClasses.addAll (
+				ClassUtils.getAllSuperclasses (
+					interfaceClass));
+
+			allInterfaceClasses.addAll (
+				ClassUtils.getAllInterfaces (
+					interfaceClass));
+
+			allInterfaceClasses.forEach (
+				allInterfaceClass -> {
+
+					List <ComponentData> componentsForInterface =
+						mapItemForKeyOrElseSet (
+							componentsByInterface,
+							allInterfaceClass,
+							() -> new ArrayList<> ());
+
+					componentsForInterface.add (
+						componentData);
+
+			});
 
 		}
 
@@ -965,243 +1067,433 @@ class BootstrapComponentManager
 						component.getClass ())
 			) {
 
-				SingletonDependency singletonDependencyAnnotation =
-					field.getAnnotation (
-						SingletonDependency.class);
-
-				ClassSingletonDependency classSingletonDependencyAnnotation =
-					field.getAnnotation (
-						ClassSingletonDependency.class);
-
-				PrototypeDependency prototypeDependencyAnnotation =
-					field.getAnnotation (
-						PrototypeDependency.class);
-
-				StrongPrototypeDependency strongPrototypeDependencyAnnotation =
-					field.getAnnotation (
-						StrongPrototypeDependency.class);
-
-				UninitializedDependency uninitializedDependencyAnnotation =
-					field.getAnnotation (
-						UninitializedDependency.class);
-
-				List <Annotation> allAnnotations =
-					ImmutableList.<Annotation> copyOf (
-						presentInstances (
-							optionalFromNullable (
-								classSingletonDependencyAnnotation),
-							optionalFromNullable (
-								prototypeDependencyAnnotation),
-							optionalFromNullable (
-								singletonDependencyAnnotation),
-							optionalFromNullable (
-								strongPrototypeDependencyAnnotation),
-							optionalFromNullable (
-								uninitializedDependencyAnnotation)));
-
-				if (
-					collectionIsEmpty (
-						allAnnotations)
-				) {
-					continue;
-				}
-
-				if (
-					collectionHasMoreThanOneElement (
-						allAnnotations)
-				) {
-					throw new RuntimeException ();
-				}
-
-				field.setAccessible (
-					true);
-
-				if (
-					isNotNull (
-						singletonDependencyAnnotation)
-				) {
-
-					Class <?> targetClass =
-						field.getType ();
-
-					Optional <ComponentData> componentDataOptional =
-						mapItemForKey (
-							componentsByInterface,
-							targetClass);
-
-					if (
-						optionalIsNotPresent (
-							componentDataOptional)
-					) {
-
-						throw new RuntimeException (
-							stringFormat (
-								"Singleton dependency %s.%s ",
-								classNameFull (
-									component.getClass ()),
-								field.getName (),
-								"of type %s ",
-								classNameFull (
-									targetClass),
-								"not found"));
-
-					}
-
-					ComponentData componentData =
-						optionalGetRequired (
-							componentDataOptional);
-
-					fieldSet (
-						field,
-						component,
-						optionalOf (
-							getComponentReal (
-								componentData)));
-
-				} else if (
-					isNotNull (
-						classSingletonDependencyAnnotation)
-				) {
-
-					if (
-						classNotEqual (
-							field.getType (),
-							LogContext.class)
-					) {
-						throw todo ();
-					}
-
-					fieldSet (
-						field,
-						component,
-						optionalOf (
-							loggingLogic.findOrCreateLogContext (
-								classNameFull (
-									component.getClass ()))));
-
-				} else if (
-					isNotNull (
-						prototypeDependencyAnnotation)
-					|| isNotNull (
-						strongPrototypeDependencyAnnotation)
-				) {
-
-					if (
-						classNotEqual (
-							field.getType (),
-							Provider.class)
-					) {
-						throw new RuntimeException ();
-					}
-
-					ParameterizedType parameterizedType =
-						(ParameterizedType)
-						field.getGenericType ();
-
-					Class <?> targetClass =
-						(Class <?>)
-						parameterizedType.getActualTypeArguments () [0];
-
-					Optional <ComponentData> componentDataOptional =
-						mapItemForKey (
-							componentsByInterface,
-							targetClass);
-
-					if (
-						optionalIsNotPresent (
-							componentDataOptional)
-					) {
-
-						throw new RuntimeException (
-							stringFormat (
-								"Prototype dependency %s.%s ",
-								classNameFull (
-									component.getClass ()),
-								field.getName (),
-								"of type %s ",
-								classNameFull (
-									targetClass),
-								"not found"));
-
-					}
-
-					ComponentData componentData =
-						optionalGetRequired (
-							componentDataOptional);
-
-					fieldSet (
-						field,
-						component,
-						optionalOf (
-							(Provider <?>)
-							() -> getComponentReal (
-								componentData)));
-
-				} else if (
-					isNotNull (
-						uninitializedDependencyAnnotation)
-				) {
-
-					if (
-						classNotEqual (
-							field.getType (),
-							Provider.class)
-					) {
-						throw new RuntimeException ();
-					}
-
-					ParameterizedType parameterizedType =
-						(ParameterizedType)
-						field.getGenericType ();
-
-					Class <?> targetClass =
-						(Class <?>)
-						parameterizedType.getActualTypeArguments () [0];
-
-					Optional <ComponentData> componentDataOptional =
-						mapItemForKey (
-							componentsByInterface,
-							targetClass);
-
-					if (
-						optionalIsNotPresent (
-							componentDataOptional)
-					) {
-
-						throw new RuntimeException (
-							stringFormat (
-								"Prototype dependency %s.%s ",
-								classNameFull (
-									component.getClass ()),
-								field.getName (),
-								"of type %s ",
-								classNameFull (
-									targetClass),
-								"not found"));
-
-					}
-
-					ComponentData componentData =
-						optionalGetRequired (
-							componentDataOptional);
-
-					fieldSet (
-						field,
-						component,
-						optionalOf (
-							(Provider <?>)
-							() -> getComponentReal (
-								componentData)));
-
-				} else {
-
-					throw shouldNeverHappen ();
-
-				}
+				initialiseComponentField (
+					taskLogger,
+					component,
+					field);
 
 			}
 
 		}
+
+	}
+
+	private
+	void initialiseComponentField (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object component,
+			@NonNull Field field) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initialiseComponentField");
+
+		) {
+
+			SingletonDependency singletonDependencyAnnotation =
+				field.getAnnotation (
+					SingletonDependency.class);
+
+			ClassSingletonDependency classSingletonDependencyAnnotation =
+				field.getAnnotation (
+					ClassSingletonDependency.class);
+
+			PrototypeDependency prototypeDependencyAnnotation =
+				field.getAnnotation (
+					PrototypeDependency.class);
+
+			StrongPrototypeDependency strongPrototypeDependencyAnnotation =
+				field.getAnnotation (
+					StrongPrototypeDependency.class);
+
+			UninitializedDependency uninitializedDependencyAnnotation =
+				field.getAnnotation (
+					UninitializedDependency.class);
+
+			List <Annotation> allAnnotations =
+				ImmutableList.<Annotation> copyOf (
+					presentInstances (
+						optionalFromNullable (
+							classSingletonDependencyAnnotation),
+						optionalFromNullable (
+							prototypeDependencyAnnotation),
+						optionalFromNullable (
+							singletonDependencyAnnotation),
+						optionalFromNullable (
+							strongPrototypeDependencyAnnotation),
+						optionalFromNullable (
+							uninitializedDependencyAnnotation)));
+
+			if (
+				collectionIsEmpty (
+					allAnnotations)
+			) {
+				return;
+			}
+
+			if (
+				collectionHasMoreThanOneElement (
+					allAnnotations)
+			) {
+				throw new RuntimeException ();
+			}
+
+			Optional <Annotation> qualifierAnnotationOptional =
+				findQualifierAnnotation (
+					Arrays.asList (
+						field.getAnnotations ()));
+
+			field.setAccessible (
+				true);
+
+			if (
+				isNotNull (
+					singletonDependencyAnnotation)
+			) {
+
+				Class <?> targetClass =
+					field.getType ();
+
+				List <ComponentData> componentDatas =
+					componentDatasForClass (
+						taskLogger,
+						targetClass,
+						qualifierAnnotationOptional);
+
+				if (
+					collectionIsEmpty (
+						componentDatas)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Singleton dependency %s.%s ",
+							classNameFull (
+								component.getClass ()),
+							field.getName (),
+							"of type %s ",
+							classNameFull (
+								targetClass),
+							"not found"));
+
+				}
+
+				if (
+					collectionHasMoreThanOneElement (
+						componentDatas)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Singleton dependency %s.%s ",
+							classNameFull (
+								component.getClass ()),
+							field.getName (),
+							"of type %s ",
+							classNameFull (
+								targetClass),
+							"has multiple candidates"));
+
+				}
+
+				ComponentData componentData =
+					iterableOnlyItemRequired (
+						componentDatas);
+
+				fieldSet (
+					field,
+					component,
+					optionalOf (
+						getComponentReal (
+							componentData)));
+
+			} else if (
+				isNotNull (
+					classSingletonDependencyAnnotation)
+			) {
+
+				if (
+					classNotEqual (
+						field.getType (),
+						LogContext.class)
+				) {
+					throw todo ();
+				}
+
+				fieldSet (
+					field,
+					component,
+					optionalOf (
+						loggingLogic.findOrCreateLogContext (
+							classNameFull (
+								component.getClass ()))));
+
+			} else if (
+				isNotNull (
+					prototypeDependencyAnnotation)
+				|| isNotNull (
+					strongPrototypeDependencyAnnotation)
+				|| isNotNull (
+					uninitializedDependencyAnnotation)
+			) {
+
+				if (
+					classEqualSafe (
+						field.getType (),
+						Provider.class)
+				) {
+
+					ParameterizedType parameterizedType =
+						(ParameterizedType)
+						field.getGenericType ();
+
+					Class <?> targetClass =
+						(Class <?>)
+						parameterizedType.getActualTypeArguments () [0];
+
+					List <ComponentData> componentDatas =
+						componentDatasForClass (
+							taskLogger,
+							targetClass,
+							qualifierAnnotationOptional);
+
+					if (
+						collectionIsEmpty (
+							componentDatas)
+					) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Prototype dependency %s.%s ",
+								classNameFull (
+									component.getClass ()),
+								field.getName (),
+								"of type %s ",
+								classNameFull (
+									targetClass),
+								"not found"));
+
+					}
+
+					if (
+						collectionHasMoreThanOneElement (
+							componentDatas)
+					) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Prototype dependency %s.%s ",
+								classNameFull (
+									component.getClass ()),
+								field.getName (),
+								"of type %s ",
+								classNameFull (
+									targetClass),
+								"has multiple candidates"));
+
+					}
+
+					ComponentData componentData =
+						iterableOnlyItemRequired (
+							componentDatas);
+
+					fieldSet (
+						field,
+						component,
+						optionalOf (
+							(Provider <?>)
+							() -> getComponentReal (
+								componentData)));
+
+				} else if (
+					classEqualSafe (
+						field.getType (),
+						Map.class)
+				) {
+
+					ParameterizedType parameterizedFieldType =
+						genericCastUnchecked (
+							field.getGenericType ());
+
+					Class <?> keyType =
+						rawType (
+							parameterizedFieldType
+								.getActualTypeArguments () [0]);
+
+					ParameterizedType providerType =
+						genericCastUnchecked (
+							parameterizedFieldType
+								.getActualTypeArguments () [1]);
+
+					if (
+						classNotEqual (
+							(Class <?>) providerType.getRawType (),
+							Provider.class)
+					) {
+						throw new RuntimeException ();
+					}
+
+					Class <?> valueType =
+						rawType (
+							providerType.getActualTypeArguments () [0]);
+
+					List <ComponentData> componentDatas =
+						componentDatasForClass (
+							taskLogger,
+							valueType,
+							qualifierAnnotationOptional);
+
+					if (
+						classEqualSafe (
+							keyType,
+							String.class)
+					) {
+
+						Map <String, Provider <?>> mapToInject =
+							iterableTransformToMap (
+								componentDatas,
+								componentData ->
+									componentData.name (),
+								componentData ->
+									(Provider <?>)
+									() -> getComponentReal (
+										componentData));
+
+						fieldSet (
+							field,
+							component,
+							optionalOf (
+								mapToInject));
+
+					} else if (
+						classEqualSafe (
+							keyType,
+							Class.class)
+					) {
+
+						Map <Class <?>, Provider <?>> mapToInject =
+							iterableTransformToMap (
+								componentDatas,
+								componentData ->
+									componentData.interfaceClass (),
+								componentData ->
+									(Provider <?>)
+									() -> getComponentReal (
+										componentData));
+
+						fieldSet (
+							field,
+							component,
+							optionalOf (
+								mapToInject));
+
+					} else {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Don't support maps with key type %s",
+								classNameSimple (
+									keyType)));
+
+					}
+
+				} else {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Prototype dependency %s.%s ",
+							classNameFull (
+								component.getClass ()),
+							field.getName (),
+							"is of type %s ",
+							classNameSimple (
+								field.getType ()),
+							"(expected Provider)"));
+
+				}
+
+			} else {
+
+				throw shouldNeverHappen ();
+
+			}
+
+		}
+
+	}
+
+	private
+	List <ComponentData> componentDatasForClass (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <?> targetClass,
+			@NonNull Optional <Annotation> qualifierAnnotation) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"componentDatasForClass");
+
+		) {
+
+			List <ComponentData> componentDatas =
+				optionalOrElseRequired (
+					mapItemForKey (
+						componentsByInterface,
+						targetClass),
+					() -> emptyList ());
+
+			if (
+				optionalIsPresent (
+					qualifierAnnotation)
+			) {
+
+				componentDatas =
+					iterableFilterToList (
+						componentData ->
+							optionalIsPresent (
+								findQualifierAnnotation (
+									componentData.implementationClass ())),
+						componentDatas);
+
+			}
+
+			return componentDatas;
+
+		}
+
+	}
+
+	private
+	Optional <Annotation> findQualifierAnnotation (
+			@NonNull Class <?> targetClass) {
+
+		return findQualifierAnnotation (
+			Arrays.asList (
+				targetClass.getAnnotations ()));
+
+	}
+
+	private
+	Optional <Annotation> findQualifierAnnotation (
+			@NonNull List <Annotation> annotations) {
+
+		return optionalFromJava (
+			annotations.stream ()
+
+			.filter (
+				annotation ->
+					isNotNull (
+						annotation.getClass ().getAnnotation (
+							Qualifier.class)))
+
+			.findFirst ()
+
+		);
 
 	}
 

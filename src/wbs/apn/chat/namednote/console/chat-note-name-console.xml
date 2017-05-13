@@ -1,5 +1,5 @@
 <console-module
-	name="chat-named-note">
+	name="chat-note-name">
 
 	<extend-context
 		name="chat.namedNote"

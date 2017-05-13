@@ -19,9 +19,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("object-summary-page")
 @PrototypeComponent ("objectSummaryPageSpec")
-@ConsoleModuleData
 public
-class ObjectSummaryPageSpec {
+class ObjectSummaryPageSpec
+	implements ConsoleModuleData {
 
 	// attributes
 
@@ -29,8 +29,8 @@ class ObjectSummaryPageSpec {
 	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute (
-		name = "form")
-	String formContextName;
+		name = "fields")
+	String formFieldsName;
 
 	@DataAttribute (
 		name = "fields-provider")
@@ -41,7 +41,7 @@ class ObjectSummaryPageSpec {
 
 	@DataChildren (
 		direct = true)
-	List<Object> builders =
-		new ArrayList<Object> ();
+	List <Object> builders =
+		new ArrayList<> ();
 
 }

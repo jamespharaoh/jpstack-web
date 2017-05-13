@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("duration-field")
 @PrototypeComponent ("durationFormFieldSpec")
-@ConsoleModuleData
 public
-class DurationFormFieldSpec {
+class DurationFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("context-tab-responder")
 @PrototypeComponent ("simpleTabResponderSpec")
-@ConsoleModuleData
 public
-class ContextTabResponderSpec {
+class ContextTabResponderSpec
+	implements ConsoleModuleData {
 
 	// tree attributes
 

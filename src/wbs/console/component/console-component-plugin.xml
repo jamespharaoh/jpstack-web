@@ -1,0 +1,9 @@
+<plugin
+	name="console-component"
+	package="wbs.console.component">
+
+	<layer name="console">
+		<bootstrap-component class="ConsoleComponentPlugin"/>
+	</layer>
+
+</plugin>

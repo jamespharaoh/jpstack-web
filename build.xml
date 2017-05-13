@@ -150,6 +150,7 @@
       <fileset dir="src/wbs/api/resource/files"/>
       <fileset dir="src/wbs/console/async/api/files"/>
       <fileset dir="src/wbs/console/combo/api/files"/>
+      <fileset dir="src/wbs/console/component/api/files"/>
       <fileset dir="src/wbs/console/context/api/files"/>
       <fileset dir="src/wbs/console/formaction/api/files"/>
       <fileset dir="src/wbs/console/forms/api/files"/>
@@ -332,6 +333,7 @@
       <fileset dir="src/wbs/api/resource/console/files"/>
       <fileset dir="src/wbs/console/async/files"/>
       <fileset dir="src/wbs/console/combo/files"/>
+      <fileset dir="src/wbs/console/component/files"/>
       <fileset dir="src/wbs/console/context/files"/>
       <fileset dir="src/wbs/console/formaction/files"/>
       <fileset dir="src/wbs/console/forms/files"/>

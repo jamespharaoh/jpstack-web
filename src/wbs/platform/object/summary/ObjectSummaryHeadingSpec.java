@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataParent;
 @Data
 @DataClass ("heading")
 @PrototypeComponent ("objectSummaryHeadingSpec")
-@ConsoleModuleData
 public
-class ObjectSummaryHeadingSpec {
+class ObjectSummaryHeadingSpec
+	implements ConsoleModuleData {
 
 	@DataAncestor
 	ConsoleModuleSpec consoleModule;

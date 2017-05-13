@@ -4,7 +4,6 @@ import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Optional;

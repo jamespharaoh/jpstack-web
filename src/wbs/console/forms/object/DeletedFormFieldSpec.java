@@ -13,9 +13,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("deleted-field")
 @PrototypeComponent ("deletedFormFieldSpec")
-@ConsoleModuleData
 public
-class DeletedFormFieldSpec {
+class DeletedFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

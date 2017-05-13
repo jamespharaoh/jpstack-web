@@ -237,7 +237,7 @@ class ModelMetaLoader {
 
 					spec =
 						(ModelMetaSpec)
-						dataFromXml.readInputStream (
+						dataFromXml.readInputStreamRequired (
 							taskLogger,
 							inputStream,
 							resourceName,

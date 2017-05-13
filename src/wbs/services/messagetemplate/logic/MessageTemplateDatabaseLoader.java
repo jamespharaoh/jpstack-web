@@ -87,7 +87,7 @@ class MessageTemplateDatabaseLoader {
 		) {
 
 			return genericCastUnchecked (
-				dataFromXml.readClasspath (
+				dataFromXml.readClasspathRequired (
 					taskLogger,
 					resourceName));
 

@@ -15,9 +15,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("simple-file")
 @PrototypeComponent ("simpleFileSpec")
-@ConsoleModuleData
 public
-class SimpleFileSpec {
+class SimpleFileSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

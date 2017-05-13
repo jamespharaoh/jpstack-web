@@ -19,9 +19,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("extend-context")
 @PrototypeComponent ("extendContextSpec")
-@ConsoleModuleData
 public
-class ExtendContextSpec {
+class ExtendContextSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

@@ -58,7 +58,7 @@ class BuildSpecFactory
 
 			BuildSpec build =
 				(BuildSpec)
-				buildDataFromXml.readClasspath (
+				buildDataFromXml.readClasspathRequired (
 					taskLogger,
 					"/wbs-build.xml");
 

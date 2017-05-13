@@ -3,9 +3,13 @@
 	package="wbs.framework.fixtures">
 
 	<layer name="fixture">
+
+		<bootstrap-component class="FixtureComponentPlugin"/>
+
 		<component class="FixturesSpecialConfig"/>
 		<component class="FixturesTestAccounts"/>
 		<component class="FixturesThreadManager"/>
+
 	</layer>
 
 </plugin>

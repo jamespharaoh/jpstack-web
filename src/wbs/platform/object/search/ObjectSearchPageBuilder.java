@@ -6,7 +6,10 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -29,6 +32,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.context.FormContextBuilder;
 import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
@@ -423,6 +427,11 @@ class ObjectSearchPageBuilder <
 
 	void setDefaults () {
 
+		name =
+			ifNull (
+				spec.name (),
+				"search");
+
 		if (
 			isNotNull (
 				spec.objectTypeName ())
@@ -481,24 +490,36 @@ class ObjectSearchPageBuilder <
 					() -> consoleHelper.objectClass ()));
 
 		searchFormContextBuilder =
-			formContextManager.formContextBuilderRequired (
-				consoleModule.name (),
-				spec.searchFormContextName (),
-				searchClass);
+			formContextManager.createFormContextBuilder (
+				consoleModule,
+				name,
+				searchClass,
+				FormType.search,
+				optionalOf (
+					spec.searchFormFieldsName ()),
+				optionalAbsent ());
 
-		boolean haveResultsFormContextName =
+		boolean haveResultsColumnsFormFieldsName =
 			isNotNull (
-				spec.resultsFormContextName ());
+				spec.resultsColumnFormFieldsName ());
+
+		boolean haveResultsRowFormFieldsName =
+			isNotNull (
+				spec.resultsColumnFormFieldsName ());
+
+		boolean haveResultsFormFieldsNames =
+			haveResultsColumnsFormFieldsName
+			|| haveResultsRowFormFieldsName;
 
 		boolean haveResultsModes =
 			collectionIsNotEmpty (
 				spec.resultsModes ());
 
-		if (haveResultsFormContextName && haveResultsModes) {
+		if (haveResultsFormFieldsNames && haveResultsModes) {
 			throw new RuntimeException ();
 		}
 
-		if (haveResultsFormContextName) {
+		if (haveResultsFormFieldsNames) {
 
 			resultsModes =
 				ImmutableMap.<String, ObjectSearchResultsMode <ResultType>> of (
@@ -509,10 +530,15 @@ class ObjectSearchPageBuilder <
 					"normal")
 
 				.formContextBuilder (
-					formContextManager.formContextBuilderRequired (
-						consoleModule.name (),
-						spec.resultsFormContextName (),
-						resultClass))
+					formContextManager.createFormContextBuilder (
+						consoleModule,
+						name,
+						resultClass,
+						FormType.readOnly,
+						optionalFromNullable (
+							spec.resultsColumnFormFieldsName ()),
+						optionalFromNullable (
+							spec.resultsRowFormFieldsName ())))
 
 			);
 
@@ -528,20 +554,22 @@ class ObjectSearchPageBuilder <
 							resultsModeSpec.name ())
 
 						.formContextBuilder (
-							formContextManager.formContextBuilderRequired (
-								consoleModule.name (),
-								resultsModeSpec.formContextName (),
-								resultClass)),
+							formContextManager.createFormContextBuilder (
+								consoleModule,
+								stringFormat (
+									"%s-%s",
+									name,
+									resultsModeSpec.name ()),
+								resultClass,
+								FormType.search,
+								optionalOf (
+									resultsModeSpec.formFieldsName ()),
+								optionalAbsent ())),
 
 					spec.resultsModes ()),
 				ObjectSearchResultsMode::name);
 
 		}
-
-		name =
-			ifNull (
-				spec.name (),
-				"search");
 
 		privKey =
 			spec.privKey ();

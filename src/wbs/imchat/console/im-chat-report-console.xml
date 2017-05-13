@@ -12,7 +12,7 @@
 			search-fields="operator-report-search"
 			search-dao-method="searchOperatorReportIds"
 			results-class="wbs.imchat.model.ImChatOperatorReport"
-			results-fields="operator-report-results"
+			results-column-fields="operator-report-results"
 			results-dao-method="findOperatorReports"/>
 
 	</simple-context>

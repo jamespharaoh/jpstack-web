@@ -156,7 +156,7 @@ class OxygenateRouteInMmsNewAction
 
 				request =
 					genericCastUnchecked (
-						requestFromXml.readInputStream (
+						requestFromXml.readInputStreamRequired (
 							taskLogger,
 							new ByteArrayInputStream (
 								requestBytes),

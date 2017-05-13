@@ -3,27 +3,30 @@
 	package="wbs.console.context">
 
 	<layer name="console">
+
+		<bootstrap-component class="ConsoleContextLinkSpec"/>
+		<bootstrap-component class="ConsoleContextSectionSpec"/>
+		<bootstrap-component class="ConsoleContextStuffSpec"/>
+		<bootstrap-component class="SimpleConsoleContextSpec"/>
+		<bootstrap-component class="ConsoleContextExtensionPointSpec"/>
+
 		<component class="ConsoleContextExtensionPointBuilder"/>
 		<component class="ConsoleContextExtensionPointMetaBuilder"/>
-		<component class="ConsoleContextExtensionPointSpec"/>
 		<component class="ConsoleContextLink"/>
 		<component class="ConsoleContextLinkBuilder"/>
 		<component class="ConsoleContextLinkMetaBuilder"/>
-		<component class="ConsoleContextLinkSpec"/>
 		<component class="ConsoleContextNestedExtensionPoint"/>
 		<component class="ConsoleContextPrivLookup"/>
 		<component class="ConsoleContextRootExtensionPoint"/>
 		<component class="ConsoleContextSectionBuilder"/>
 		<component class="ConsoleContextSectionMetaBuilder"/>
-		<component class="ConsoleContextSectionSpec"/>
 		<component class="ConsoleContextStuff"/>
 		<component class="ConsoleContextStuffBuilder"/>
-		<component class="ConsoleContextStuffSpec"/>
 		<component class="ConsoleContextType"/>
 		<component class="SimpleConsoleContext"/>
 		<component class="SimpleConsoleContextBuilder"/>
 		<component class="SimpleConsoleContextMetaBuilder"/>
-		<component class="SimpleConsoleContextSpec"/>
+
 	</layer>
 
 </plugin>

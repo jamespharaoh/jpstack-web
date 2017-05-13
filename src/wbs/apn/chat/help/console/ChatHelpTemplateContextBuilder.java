@@ -361,7 +361,7 @@ class ChatHelpTemplateContextBuilder
 			.typeCode (
 				typeCode)
 
-			.formFieldContextName (
+			.formFieldsName (
 				"list")
 
 			.targetContextTypeName (
@@ -384,7 +384,7 @@ class ChatHelpTemplateContextBuilder
 			.typeCode (
 				typeCode)
 
-			.formContextName (
+			.formFieldsName (
 				"create")
 
 			.targetContextTypeName (
@@ -403,7 +403,7 @@ class ChatHelpTemplateContextBuilder
 			.consoleSpec (
 				spec.consoleSpec ())
 
-			.formContextName (
+			.formFieldsName (
 				"settings")
 
 			.listContextTypeName (

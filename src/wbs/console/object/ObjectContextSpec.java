@@ -23,9 +23,9 @@ import wbs.framework.data.annotations.DataClass;
 @ToString (of = "name")
 @DataClass ("object-context")
 @PrototypeComponent ("objectContextSpec")
-@ConsoleModuleData
 public
-class ObjectContextSpec {
+class ObjectContextSpec
+	implements ConsoleModuleData {
 
 	// attributes
 

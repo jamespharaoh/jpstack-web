@@ -14,9 +14,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("timestamp-from-field")
 @PrototypeComponent ("timestampFromFormFieldSpec")
-@ConsoleModuleData
 public
-class TimestampFromFormFieldSpec {
+class TimestampFromFormFieldSpec
+	implements ConsoleModuleData {
 
 	@DataAttribute
 	String name;

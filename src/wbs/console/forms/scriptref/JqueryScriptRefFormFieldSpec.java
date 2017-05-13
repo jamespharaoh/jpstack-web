@@ -12,8 +12,8 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("jquery-script-ref")
 @PrototypeComponent ("jqueryScriptRefFormFieldSpec")
-@ConsoleModuleData
 public
-class JqueryScriptRefFormFieldSpec {
+class JqueryScriptRefFormFieldSpec
+	implements ConsoleModuleData {
 
 }

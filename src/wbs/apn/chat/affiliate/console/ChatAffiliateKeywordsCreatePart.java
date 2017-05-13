@@ -9,8 +9,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
-import javax.inject.Named;
-
 import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;

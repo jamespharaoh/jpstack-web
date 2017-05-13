@@ -27,16 +27,19 @@
 	</layer>
 
 	<layer name="console">
+
+		<bootstrap-component class="console.EventDetailsFormFieldSpec"/>
+		<bootstrap-component class="console.ObjectEventsPageSpec"/>
+
 		<component class="console.EventConsoleLogicImplementation"/>
 		<component class="console.EventDetailsFormFieldBuilder"/>
 		<component class="console.EventDetailsFormFieldInterfaceMapping"/>
-		<component class="console.EventDetailsFormFieldSpec"/>
 		<component class="console.EventFormFieldPluginProvider"/>
 		<component class="console.NameFormFieldUpdateHook"/>
 		<component class="console.ObjectEventsPageBuilder"/>
-		<component class="console.ObjectEventsPageSpec"/>
 		<component class="console.ObjectEventsPart"/>
 		<component class="console.SimpleFormFieldUpdateHook"/>
+
 	</layer>
 
 	<fixtures>
