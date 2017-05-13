@@ -627,6 +627,40 @@ class TypeUtils {
 
 	}
 
+	public static
+	Class <?> rawType (
+			@NonNull Type type) {
+
+		if (
+			isInstanceOf (
+				Class.class,
+				type)
+		) {
+
+			return genericCastUnchecked (
+				type);
+
+		} else if (
+			isInstanceOf (
+				ParameterizedType.class,
+				type)
+		) {
+
+			ParameterizedType parameterizedType =
+				genericCastUnchecked (
+					type);
+
+			return genericCastUnchecked (
+				parameterizedType.getRawType ());
+
+		} else {
+
+			throw new ClassCastException ();
+
+		}
+
+	}
+
 	@SuppressWarnings ("unchecked")
 	public static <ToClass>
 	ToClass genericCastUnchecked (
