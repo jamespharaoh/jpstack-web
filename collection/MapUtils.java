@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public
 class MapUtils {
 
@@ -450,6 +452,34 @@ class MapUtils {
 					inItem),
 				valueFunction.apply (
 					inItem));
+
+		}
+
+		return outMapBuilder.build ();
+
+	}
+
+	public static <InLeft, InRight, OutKey, OutValue>
+	Map <OutKey, OutValue> iterableTransformToMap (
+			@NonNull Iterable <Pair <InLeft, InRight>> inIterable,
+			@NonNull BiFunction <InLeft, InRight, OutKey> keyFunction,
+			@NonNull BiFunction <InLeft, InRight, OutValue> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> outMapBuilder =
+			ImmutableMap.builder ();
+
+		for (
+			Pair <InLeft, InRight> inPair
+				: inIterable
+		) {
+
+			outMapBuilder.put (
+				keyFunction.apply (
+					inPair.getLeft (),
+					inPair.getRight ()),
+				valueFunction.apply (
+					inPair.getLeft (),
+					inPair.getRight ()));
 
 		}
 

@@ -1,7 +1,7 @@
 package wbs.utils.etc;
 
 import static wbs.utils.etc.TypeUtils.classNameFull;
-import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -947,7 +947,7 @@ class OptionalUtils {
 			) {
 
 				return Optional.of (
-					dynamicCast (
+					dynamicCastRequired (
 						classToCastTo,
 						optionalValue.get ()));
 

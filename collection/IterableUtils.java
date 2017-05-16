@@ -1,10 +1,12 @@
 package wbs.utils.collection;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.dynamicCast;
 
 import java.util.Iterator;
 import java.util.List;
@@ -295,6 +297,69 @@ class IterableUtils {
 	}
 
 	public static <ItemType>
+	Optional <ItemType> iterableOnlyItem (
+			@NonNull Iterable <ItemType> iterable) {
+
+		Iterator <ItemType> iterator =
+			iterable.iterator ();
+
+		if (! iterator.hasNext ()) {
+			return optionalAbsent ();
+		}
+
+		ItemType item =
+			iterator.next ();
+
+		if (iterator.hasNext ()) {
+			throw new IllegalArgumentException ();
+		}
+
+		return optionalOf (
+			item);
+
+	}
+
+	public static <InType, OutType extends InType>
+	Optional <OutType> iterableOnlyItemByClass (
+			@NonNull Iterable <InType> iterable,
+			@NonNull Class <OutType> targetClass) {
+
+		OutType foundItem =
+			null;
+
+		for (
+			InType inItem
+				: iterable
+		) {
+
+			Optional <OutType> outItemOptional =
+				dynamicCast (
+					targetClass,
+					inItem);
+
+			if (
+				optionalIsNotPresent (
+					outItemOptional)
+			) {
+				continue;
+			}
+
+			if (foundItem != null) {
+				throw new IllegalArgumentException ();
+			}
+
+			foundItem =
+				optionalGetRequired (
+					outItemOptional);
+
+		}
+
+		return optionalFromNullable (
+			foundItem);
+
+	}
+
+	public static <ItemType>
 	ItemType iterableOnlyItemRequired (
 			@NonNull Iterable <ItemType> iterable) {
 
@@ -313,6 +378,37 @@ class IterableUtils {
 		}
 
 		return item;
+
+	}
+
+	public static <InType, OutType>
+	Iterable <OutType> iterableFilterByClass (
+			@NonNull Iterable <InType> iterable,
+			@NonNull Class <OutType> targetClass) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.map (
+				item ->
+					dynamicCast (
+						targetClass,
+						item))
+
+			.filter (
+				optionalItem ->
+					optionalIsPresent (
+						optionalItem))
+
+			.map (
+				optionalItem ->
+					optionalGetRequired (
+						optionalItem))
+
+			.iterator ()
+
+		;
 
 	}
 

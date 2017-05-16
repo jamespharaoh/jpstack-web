@@ -464,6 +464,17 @@ class StringUtils {
 	}
 
 	public static
+	String hyphenToCamelCapitalise (
+			@NonNull String string) {
+
+		return capitalise (
+			delimitedToCamel (
+				string,
+				"-"));
+
+	}
+
+	public static
 	String hyphenToSpaces (
 			@NonNull String string) {
 

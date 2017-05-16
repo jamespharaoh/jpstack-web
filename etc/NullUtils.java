@@ -2,7 +2,6 @@ package wbs.utils.etc;
 
 import static wbs.utils.collection.ArrayUtils.arrayStream;
 import static wbs.utils.collection.IterableUtils.iterableStream;
-import static wbs.utils.etc.Misc.isNull;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -194,6 +193,40 @@ class NullUtils {
 			.iterator ()
 
 		);
+
+	}
+
+	public static
+	boolean isNull (
+			Object object) {
+
+		return object == null;
+
+	}
+
+	public static
+	boolean isNotNull (
+			Object object) {
+
+		return object != null;
+
+	}
+	public static
+	boolean anyIsNotNull (
+			Object ... objects) {
+
+		for (
+			Object object
+				: objects
+		) {
+
+			if (object != null) {
+				return true;
+			}
+
+		}
+
+		return false;
 
 	}
 
