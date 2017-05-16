@@ -47,8 +47,10 @@ class TicketSettingsFieldsProvider
 
 			return ticketFieldsProviderProvider.get ()
 
-				.setMode (
-					"settings");
+				.mode (
+					"settings")
+
+			;
 
 		}
 
