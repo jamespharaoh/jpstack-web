@@ -1,6 +1,7 @@
 package wbs.platform.servlet;
 
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -26,6 +27,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.collect.ImmutableList;
@@ -204,6 +206,21 @@ class WbsServletListener
 			genericCastUnchecked (
 				event.getServletRequest ());
 
+		boolean debug =
+			Arrays.stream (
+				ifNull (
+					request.getCookies (),
+					new Cookie [] {}
+				)
+			).anyMatch (
+				cookie ->
+					stringEqualSafe (
+						cookie.getName (),
+						"wbs-debug")
+					&& stringEqualSafe (
+						cookie.getValue (),
+						"yes"));
+
 		TaskLogger.implicitArgument.store (
 			logContext.createTaskLogger (
 				"requestInitialized",
@@ -215,14 +232,7 @@ class WbsServletListener
 						"requestUri",
 						request.getRequestURI ())),
 				optionalOf (
-					Arrays.stream (request.getCookies ()).anyMatch (
-						cookie ->
-							stringEqualSafe (
-								cookie.getName (),
-								"wbs-debug")
-							&& stringEqualSafe (
-								cookie.getValue (),
-								"yes")))));
+					debug)));
 
 		TaskLogger.implicitArgument.retrieveAndInvokeVoid (
 			taskLogger ->
