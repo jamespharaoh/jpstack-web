@@ -122,24 +122,23 @@
 
 	</field-set>
 
-	<field-set
-		name="copy"
-		class="wbs.services.messagetemplate.console.MessageTemplateCopyForm">
+	<forms>
 
-		<object-field
-			name="sourceMessageTemplateDatabaseId"
-			object-type="messageTemplateDatabase"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<form-context
+		<form
 			name="copy"
 			class="wbs.services.messagetemplate.console.MessageTemplateCopyForm"
-			type="perform"
-			column-fields="copy"/>
+			type="perform">
 
-	</form-contexts>
+			<column-fields>
+
+				<object-field
+					name="sourceMessageTemplateDatabaseId"
+					object-type="messageTemplateDatabase"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

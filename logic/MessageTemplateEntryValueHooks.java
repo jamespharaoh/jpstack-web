@@ -1,10 +1,10 @@
 package wbs.services.messagetemplate.logic;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import com.google.common.base.Optional;
 
