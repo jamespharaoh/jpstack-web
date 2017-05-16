@@ -700,6 +700,8 @@
 
 	<layers>
 
+		<layer name="api"/>
+
 		<layer name="config"/>
 
 		<layer name="console">
