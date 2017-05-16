@@ -5,9 +5,15 @@ import java.util.regex.Matcher;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
@@ -21,10 +27,13 @@ class DigitalSelectRoutePathHandlerEntry
 	// singleton dependencies
 
 	@SingletonDependency
-	RequestContext requestContext;
+	DigitalSelectRouteReportFile digitalSelectRouteReportFile;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	DigitalSelectRouteReportFile digitalSelectRouteReportFile;
+	RequestContext requestContext;
 
 	// constructoors
 
@@ -51,12 +60,24 @@ class DigitalSelectRoutePathHandlerEntry
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		files =
-			ImmutableMap.<String,WebFile>builder ()
-				.put ("report", digitalSelectRouteReportFile)
-				.build ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			files =
+				ImmutableMap.<String,WebFile>builder ()
+					.put ("report", digitalSelectRouteReportFile)
+					.build ();
+
+		}
 
 	}
 

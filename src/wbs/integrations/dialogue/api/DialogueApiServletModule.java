@@ -622,19 +622,31 @@ class DialogueApiServletModule
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		reportFile =
-			apiFileProvider.get ()
+		try (
 
-			.postActionProvider (
-				reportActionProvider);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"init");
 
-		routeFiles =
-			ImmutableMap.<String,WebFile>builder ()
-				.put ("/in", inFile)
-				.put ("/report", reportFile)
-				.build ();
+		) {
+
+			reportFile =
+				apiFileProvider.get ()
+
+				.postActionProvider (
+					reportActionProvider);
+
+			routeFiles =
+				ImmutableMap.<String,WebFile>builder ()
+					.put ("/in", inFile)
+					.put ("/report", reportFile)
+					.build ();
+
+		}
 
 	}
 

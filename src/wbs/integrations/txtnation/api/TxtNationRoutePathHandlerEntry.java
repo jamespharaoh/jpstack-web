@@ -5,9 +5,15 @@ import java.util.regex.Matcher;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
@@ -19,6 +25,9 @@ class TxtNationRoutePathHandlerEntry
 	extends RegexpPathHandler.Entry {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -54,16 +63,28 @@ class TxtNationRoutePathHandlerEntry
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		files =
-			ImmutableMap.<String,WebFile>builder ()
+		try (
 
-			.put (
-				"in",
-				txtNationRouteInFile)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
 
-			.build ();
+		) {
+
+			files =
+				ImmutableMap.<String,WebFile>builder ()
+
+				.put (
+					"in",
+					txtNationRouteInFile)
+
+				.build ();
+
+		}
 
 	}
 
