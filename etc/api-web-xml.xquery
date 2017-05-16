@@ -85,7 +85,7 @@ declare variable $mode external;
 
 	<filter>
 		<filter-name>responseFilter</filter-name>
-		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
+		<filter-class>wbs.framework.servlet.ComponentFilterProxy</filter-class>
 	</filter>
 
 	<!-- filter mappings -->
@@ -100,7 +100,7 @@ declare variable $mode external;
 	<servlet>
 		<display-name>default</display-name>
 		<servlet-name>pathHandlerServlet</servlet-name>
-		<servlet-class>wbs.framework.servlet.BeanServletProxy</servlet-class>
+		<servlet-class>wbs.framework.servlet.ComponentServletProxy</servlet-class>
 	</servlet>
 
 	<!-- servlet mappings -->
