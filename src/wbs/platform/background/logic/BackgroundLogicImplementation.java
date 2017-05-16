@@ -1,6 +1,6 @@
 package wbs.platform.background.logic;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
@@ -96,7 +96,7 @@ class BackgroundLogicImplementation
 					backgroundProcessName);
 
 			if (
-				! collectionHasTwoElements (
+				! collectionHasTwoItems (
 					backgroundProcessNameParts)
 			) {
 				throw new RuntimeException ();

@@ -1,11 +1,11 @@
 package wbs.console.helper.provider;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetOrAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -35,9 +35,6 @@ import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.helper.spec.ConsoleHelperProviderSpec;
-import wbs.console.helper.spec.PrivKeySpec;
-import wbs.console.helper.spec.RunPostProcessorSpec;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -343,7 +340,7 @@ class GenericConsoleHelperProvider <
 				String privCode;
 
 				if (
-					collectionHasOneElement (
+					collectionHasOneItem (
 						privCodeParts)
 				) {
 
@@ -354,7 +351,7 @@ class GenericConsoleHelperProvider <
 						privKeySpec.privCode ();
 
 				} else if (
-					collectionHasTwoElements (
+					collectionHasTwoItems (
 						privCodeParts)
 				) {
 
@@ -605,7 +602,7 @@ class GenericConsoleHelperProvider <
 					String privCode;
 
 					if (
-						collectionHasOneElement (
+						collectionHasOneItem (
 							privCodeParts)
 					) {
 
@@ -619,7 +616,7 @@ class GenericConsoleHelperProvider <
 							privKeySpec.privCode ();
 
 					} else if (
-						collectionHasTwoElements (
+						collectionHasTwoItems (
 							privCodeParts)
 					) {
 

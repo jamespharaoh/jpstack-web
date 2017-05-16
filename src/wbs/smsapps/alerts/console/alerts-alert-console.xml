@@ -75,20 +75,4 @@
 
 	</field-set>
 
-	<form-contexts>
-
-		<form-context
-			name="list"
-			class="wbs.smsapps.alerts.model.AlertsAlertRec"
-			type="read-only"
-			column-fields="list"/>
-
-		<form-context
-			name="summary"
-			class="wbs.smsapps.alerts.model.AlertsAlertRec"
-			type="read-only"
-			column-fields="summary"/>
-
-	</form-contexts>
-
 </console-module>

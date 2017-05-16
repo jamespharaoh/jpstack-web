@@ -98,7 +98,10 @@
 		<console-module name="im-chat"/>
 		<console-module name="im-chat-conversation"/>
 		<console-module name="im-chat-customer"/>
+		<console-module name="im-chat-customer-credit"/>
 		<console-module name="im-chat-customer-detail-type"/>
+		<console-module name="im-chat-customer-detail-value"/>
+		<console-module name="im-chat-event"/>
 		<console-module name="im-chat-message"/>
 		<console-module name="im-chat-pending"/>
 		<console-module name="im-chat-price-point"/>

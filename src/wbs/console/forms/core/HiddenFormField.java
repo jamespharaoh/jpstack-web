@@ -2,7 +2,6 @@ package wbs.console.forms.core;
 
 import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
@@ -11,6 +10,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 
@@ -25,11 +25,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormField;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldSubmission;
 import wbs.console.forms.types.FormUpdateResult;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -102,7 +101,7 @@ class HiddenFormField <Container, Generic, Native>
 	FormFieldAccessor <Container, Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping <Container, Generic, Native> nativeMapping;
+	ConsoleFormNativeMapping <Container, Generic, Native> nativeMapping;
 
 	@Getter @Setter
 	FormFieldInterfaceMapping <Container, Generic, String> csvMapping;
@@ -113,7 +112,7 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	boolean canView (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -187,7 +186,7 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	void renderFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -253,7 +252,7 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	void implicit (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -292,7 +291,7 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	FormUpdateResult <Generic, Native> update (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (

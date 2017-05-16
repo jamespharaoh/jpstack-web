@@ -14,8 +14,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -67,7 +67,7 @@ class ObjectTicketCreatePart <
 	// properties
 
 	@Getter @Setter
-	FormContextBuilder <TicketRec> formContextBuilder;
+	ConsoleFormType <TicketRec> formContextBuilder;
 
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
@@ -84,7 +84,7 @@ class ObjectTicketCreatePart <
 	TicketRec ticket;
 	TicketManagerRec ticketManager;
 
-	FormContext <TicketRec> formContext;
+	ConsoleForm <TicketRec> formContext;
 
 	// implementation
 

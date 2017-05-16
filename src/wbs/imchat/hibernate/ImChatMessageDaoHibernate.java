@@ -1,6 +1,6 @@
 package wbs.imchat.hibernate;
 
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;

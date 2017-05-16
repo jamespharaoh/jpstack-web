@@ -3,7 +3,7 @@ package wbs.platform.object.search;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleFormType;
 
 @Accessors (fluent = true)
 @Data
@@ -12,6 +12,6 @@ class ObjectSearchResultsMode <Container> {
 
 	String name;
 
-	FormContextBuilder <Container> formContextBuilder;
+	ConsoleFormType <Container> formContextBuilder;
 
 }

@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.ThreadUtils.threadInterruptAndJoinIgnoreInterrupt;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 import static wbs.utils.time.TimeUtils.laterThan;

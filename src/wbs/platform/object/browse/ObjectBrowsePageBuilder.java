@@ -11,18 +11,18 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormBuilder;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -30,7 +30,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -48,23 +47,22 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("objectBrowsePageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectBrowsePageBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -100,7 +98,7 @@ class ObjectBrowsePageBuilder <
 
 	String typeCode;
 
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	// build
 
@@ -130,6 +128,7 @@ class ObjectBrowsePageBuilder <
 			) {
 
 				buildContextTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildContextFile (
@@ -144,24 +143,36 @@ class ObjectBrowsePageBuilder <
 	}
 
 	void buildContextTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
+		try (
 
-			contextTab.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTab");
 
-				.name (
-					container.pathPrefix () + ".browse")
+		) {
 
-				.defaultLabel (
-					"Browse")
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
 
-				.localFile (
-					container.pathPrefix () + ".browse"),
+				contextTab.get ()
 
-			extensionPoint.contextTypeNames ());
+					.name (
+						container.pathPrefix () + ".browse")
+
+					.defaultLabel (
+						"Browse")
+
+					.localFile (
+						container.pathPrefix () + ".browse"),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -257,7 +268,8 @@ class ObjectBrowsePageBuilder <
 				spec.typeCode ();
 
 			formContextBuilder =
-				formContextManager.formContextBuilderRequired (
+				formContextManager.getFormTypeRequired (
+					taskLogger,
 					consoleModule.name (),
 					spec.formContextName (),
 					consoleHelper.objectClass ());
@@ -327,7 +339,7 @@ class ObjectBrowsePageBuilder <
 					"%s.browse",
 					consoleHelper.objectName ());
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
 				consoleHelper,
 				fieldSetName,

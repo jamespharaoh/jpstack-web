@@ -43,6 +43,9 @@
 	</layer>
 
 	<console-modules>
+		<console-module name="chat-block"/>
+		<console-module name="chat-contact"/>
+		<console-module name="chat-contact-note"/>
 		<console-module name="chat-message"/>
 		<console-module name="chat-monitor-inbox"/>
 		<console-module name="chat-message-pending"/>

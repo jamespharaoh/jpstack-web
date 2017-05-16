@@ -3,7 +3,7 @@ package wbs.console.supervisor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -16,7 +16,7 @@ import wbs.framework.data.annotations.DataParent;
 @PrototypeComponent ("supervisorMultiplicationOperandSpec")
 public
 class SupervisorMultiplicationOperandSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataParent
 	SupervisorMultiplicationStatsResolverSpec

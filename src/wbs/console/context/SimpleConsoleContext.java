@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -16,7 +16,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.spec.PrivKeySpec;
+import wbs.console.helper.provider.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
 
@@ -173,7 +173,7 @@ class SimpleConsoleContext
 						privKeySpec.privCode ());
 
 				if (
-					collectionHasTwoElements (
+					collectionHasTwoItems (
 						privCodeParts)
 				) {
 

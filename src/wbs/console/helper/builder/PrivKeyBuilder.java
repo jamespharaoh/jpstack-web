@@ -4,12 +4,11 @@ import static wbs.utils.etc.Misc.doNothing;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.spec.PrivKeySpec;
+import wbs.console.helper.provider.PrivKeySpec;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -20,10 +19,9 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("privKeyBuilder")
-@ConsoleModuleBuilderHandler
 public
 class PrivKeyBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 

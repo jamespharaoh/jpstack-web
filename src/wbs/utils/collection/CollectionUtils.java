@@ -1,6 +1,6 @@
 package wbs.utils.collection;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
@@ -96,6 +97,14 @@ class CollectionUtils {
 	public static
 	long collectionSize (
 			@NonNull Collection <?> collection) {
+
+		return collection.size ();
+
+	}
+
+	public static
+	long collectionSize (
+			@NonNull Map <?, ?> collection) {
 
 		return collection.size ();
 
@@ -357,7 +366,7 @@ class CollectionUtils {
 	// one element
 
 	public static
-	boolean collectionHasOneElement (
+	boolean collectionHasOneItem (
 			@NonNull Collection <?> collection) {
 
 		return collection.size () == 1;
@@ -407,7 +416,7 @@ class CollectionUtils {
 	// two elements
 
 	public static
-	boolean collectionHasTwoElements (
+	boolean collectionHasTwoItems (
 			@NonNull Collection <?> collection) {
 
 		return collection.size () == 2;

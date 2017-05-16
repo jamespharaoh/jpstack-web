@@ -10,7 +10,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -25,7 +25,7 @@ import wbs.framework.logging.LogContext;
 public
 class ObjectIdFormFieldNativeMapping
 		<Container, RecordType extends Record <RecordType>>
-	implements FormFieldNativeMapping <Container, RecordType, Long> {
+	implements ConsoleFormNativeMapping <Container, RecordType, Long> {
 
 	// singleton dependencies
 

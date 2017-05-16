@@ -20,8 +20,8 @@ import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -56,8 +56,8 @@ class ChatRebillSendAction
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	@NamedDependency
-	FormContextBuilder <ChatRebillSearch> chatRebillFormContextBuilder;
+	@NamedDependency ("chatRebillSearchFormType")
+	ConsoleFormType <ChatRebillSearch> formType;
 
 	@SingletonDependency
 	ChatRebillLogConsoleHelper chatRebillLogHelper;
@@ -76,7 +76,7 @@ class ChatRebillSendAction
 
 	// state
 
-	FormContext <ChatRebillSearch> formContext;
+	ConsoleForm <ChatRebillSearch> form;
 
 	// details
 
@@ -122,20 +122,17 @@ class ChatRebillSendAction
 
 				.build ();
 
-			formContext =
-				chatRebillFormContextBuilder.build (
+			form =
+				formType.buildAction (
 					transaction,
 					formHints);
 
-			formContext.update (
+			form.update (
 				transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 				return null;
 			}
-
-			ChatRebillSearch formValue =
-				formContext.object ();
 
 			// search for users
 
@@ -146,18 +143,18 @@ class ChatRebillSendAction
 					true)
 
 				.includeBlocked (
-					formValue.includeBlocked ())
+					form.value ().includeBlocked ())
 
 				.includeFailed (
-					formValue.includeFailed ());
+					form.value ().includeFailed ());
 
 			List <Pair <ChatUserRec, Optional <String>>> allChatUsers =
 				chatUserHelper.findWantingBill (
 					transaction,
 					chat,
-					formValue.lastAction (),
+					form.value ().lastAction (),
 					ifNull (
-						- formValue.minimumCreditOwed () + 1,
+						- form.value ().minimumCreditOwed () + 1,
 						0l))
 
 				.stream ()
@@ -246,16 +243,16 @@ class ChatRebillSendAction
 							transaction))
 
 					.setLastAction (
-						formValue.lastAction ())
+						form.value ().lastAction ())
 
 					.setMinimumCreditOwed (
-						formValue.minimumCreditOwed ())
+						form.value ().minimumCreditOwed ())
 
 					.setIncludeBlocked (
-						formValue.includeBlocked ())
+						form.value ().includeBlocked ())
 
 					.setIncludeFailed (
-						formValue.includeFailed ())
+						form.value ().includeFailed ())
 
 					.setNumChatUsers (
 						collectionSize (

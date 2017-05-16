@@ -1,6 +1,6 @@
 package wbs.imchat.api;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.List;
 

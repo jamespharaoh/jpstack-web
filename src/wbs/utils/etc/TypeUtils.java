@@ -6,6 +6,8 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrKey;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualUnsafe;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -62,7 +64,29 @@ class TypeUtils {
 	}
 
 	public static <CastType>
-	CastType dynamicCast (
+	Optional <CastType> dynamicCast (
+			@NonNull Class <CastType> classToCastTo,
+			@NonNull Object value) {
+
+		if (
+			classToCastTo.isInstance (
+				value)
+		) {
+
+			return optionalOf (
+				classToCastTo.cast (
+					value));
+
+		} else {
+
+			return optionalAbsent ();
+
+		}
+
+	}
+
+	public static <CastType>
+	CastType dynamicCastRequired (
 			@NonNull Class <CastType> classToCastTo,
 			@NonNull Object value) {
 

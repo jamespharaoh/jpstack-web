@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -25,7 +24,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("simpleConsoleContextSpec")
 public
 class SimpleConsoleContextSpec
-	implements ConsoleModuleData {
+	implements ConsoleContextSpec {
 
 	// tree attributes
 

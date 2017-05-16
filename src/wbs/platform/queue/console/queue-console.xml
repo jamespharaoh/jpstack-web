@@ -259,28 +259,37 @@
 
 	</field-set>
 
-	<field-set
-		name="queue-debug-form"
-		class="wbs.platform.queue.console.QueueDebugForm">
+	<forms>
 
-		<object-field
-			name="userId"
-			object-type="user"
-			nullable="no"/>
+		<form
+			name="debug"
+			class="wbs.platform.queue.console.QueueDebugForm"
+			type="search">
 
-		<object-field
-			name="sliceId"
-			object-type="slice"
-			nullable="yes"/>
+			<column-fields>
 
-		<yes-no-field
-			name="allItems"
-			nullable="no"/>
+				<object-field
+					name="userId"
+					object-type="user"
+					nullable="no"/>
 
-		<yes-no-field
-			name="claimedItems"
-			nullable="no"/>
+				<object-field
+					name="sliceId"
+					object-type="slice"
+					nullable="yes"/>
 
-	</field-set>
+				<yes-no-field
+					name="allItems"
+					nullable="no"/>
+
+				<yes-no-field
+					name="claimedItems"
+					nullable="no"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

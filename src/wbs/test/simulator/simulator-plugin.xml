@@ -34,8 +34,10 @@
 
 	<console-modules>
 		<console-module name="simulator"/>
+		<console-module name="simulator-event"/>
 		<console-module name="simulator-route"/>
 		<console-module name="simulator-session"/>
+		<console-module name="simulator-session-number"/>
 	</console-modules>
 
 </plugin>

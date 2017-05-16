@@ -1,13 +1,22 @@
 package wbs.framework.component.tools;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
+import static wbs.utils.collection.IterableUtils.iterableOnlyItemRequired;
+import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.keyEqualsString;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -16,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,6 +51,7 @@ import wbs.framework.component.scaffold.BuildLayerPluginSpec;
 import wbs.framework.component.scaffold.BuildLayerSpec;
 import wbs.framework.component.scaffold.BuildSpec;
 import wbs.framework.component.scaffold.PluginApiModuleSpec;
+import wbs.framework.component.scaffold.PluginBootstrapComponentSpec;
 import wbs.framework.component.scaffold.PluginComponentSpec;
 import wbs.framework.component.scaffold.PluginLayerSpec;
 import wbs.framework.component.scaffold.PluginManager;
@@ -343,18 +355,49 @@ class ComponentManagerBuilder {
 	}
 
 	void registerPluginLayerComponents (
-			@NonNull TaskLogger taskLog,
-			@NonNull PluginSpec plugin,
-			@NonNull PluginLayerSpec layer) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PluginSpec pluginSpec,
+			@NonNull PluginLayerSpec layerSpec) {
 
-		for (
-			PluginComponentSpec component
-				: layer.components ()
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerPluginLayerComponents",
+					keyEqualsString (
+						"pluginName",
+						pluginSpec.name ()),
+					keyEqualsString (
+						"layerName",
+						layerSpec.name ()));
 		) {
 
-			registerLayerComponent (
-				taskLog,
-				component);
+			for (
+				PluginBootstrapComponentSpec component
+					: layerSpec.bootstrapComponents ()
+			) {
+
+				registerLayerComponent (
+					taskLogger,
+					pluginSpec,
+					layerSpec,
+					component.className ());
+
+			}
+
+			for (
+				PluginComponentSpec component
+					: layerSpec.components ()
+			) {
+
+				registerLayerComponent (
+					taskLogger,
+					pluginSpec,
+					layerSpec,
+					component.className ());
+
+			}
 
 		}
 
@@ -456,7 +499,8 @@ class ComponentManagerBuilder {
 
 				.addValueProperty (
 					"xmlResourceName",
-					xmlResourceName)
+					optionalOf (
+						xmlResourceName))
 
 			);
 
@@ -490,7 +534,9 @@ class ComponentManagerBuilder {
 
 	void registerLayerComponent (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull PluginComponentSpec componentSpec) {
+			@NonNull PluginSpec pluginSpec,
+			@NonNull PluginLayerSpec layerSpec,
+			@NonNull String className) {
 
 		try (
 
@@ -503,35 +549,37 @@ class ComponentManagerBuilder {
 
 			taskLogger.debugFormat (
 				"Loading %s from %s",
-				componentSpec.className (),
-				componentSpec.plugin ().name ());
+				className,
+				pluginSpec.name ());
 
 			String componentClassName =
 				stringFormat (
 					"%s.%s",
-					componentSpec.plugin ().packageName (),
-					componentSpec.className ());
+					pluginSpec.packageName (),
+					className);
 
-			Class <?> componentClass;
+			Optional <Class <?>> componentClassOptional =
+				classForName (
+					componentClassName);
 
-			try {
-
-				componentClass =
-					Class.forName (
-						componentClassName);
-
-			} catch (ClassNotFoundException exception) {
+			if (
+				optionalIsNotPresent (
+					componentClassOptional)
+			) {
 
 				taskLogger.errorFormat (
-					"No such class %s in %s.%s.%s",
+					"No such class %s in plugin %s layer %s",
 					componentClassName,
-					componentSpec.plugin ().name (),
-					componentSpec.layer ().name (),
-					componentSpec.className ());
+					pluginSpec.name (),
+					layerSpec.name ());
 
 				return;
 
 			}
+
+			Class <?> componentClass =
+				optionalGetRequired (
+					componentClassOptional);
 
 			List <ComponentDefinition> componentDefinitions =
 				annotatedClassComponentTools.definitionsForClass (
@@ -540,6 +588,38 @@ class ComponentManagerBuilder {
 
 			if (taskLogger.errors ()) {
 				return;
+			}
+
+			if (
+				collectionHasOneItem (
+					componentDefinitions)
+			) {
+
+				ComponentDefinition componentDefinition =
+					iterableOnlyItemRequired (
+						componentDefinitions);
+
+				if (
+
+					stringEqualSafe (
+						componentDefinition.scope (),
+						"singleton")
+
+					&& mapContainsKey (
+						bootstrapComponentManager.allSingletonComponents (
+							taskLogger),
+						componentDefinition.name ())
+
+				) {
+
+					taskLogger.debugFormat (
+						"Skip bootstrap singleton component %s",
+						componentDefinition.name ());
+
+					return;
+
+				}
+
 			}
 
 			componentDefinitions.forEach (
@@ -556,7 +636,7 @@ class ComponentManagerBuilder {
 				componentDefinition.name ();
 
 			if (
-				collectionHasTwoElements (
+				collectionHasTwoItems (
 					componentDefinitions)
 			) {
 

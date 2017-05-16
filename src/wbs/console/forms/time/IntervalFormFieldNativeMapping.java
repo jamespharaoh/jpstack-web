@@ -10,7 +10,7 @@ import lombok.NonNull;
 
 import org.joda.time.Interval;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.misc.ConsoleUserHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -26,7 +26,7 @@ import wbs.utils.time.TextualInterval;
 @PrototypeComponent ("intervalFormFieldNativeMapping")
 public
 class IntervalFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, TextualInterval, Interval> {
+	implements ConsoleFormNativeMapping <Container, TextualInterval, Interval> {
 
 	// singleton dependencies
 

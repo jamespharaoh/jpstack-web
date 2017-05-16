@@ -57,7 +57,7 @@ class ConsoleModuleSpecManagerFactory
 	// prototype dependencies
 
 	@PrototypeDependency
-	Map <Class <?>, Provider <ConsoleModuleData>> consoleModuleSpecProviders;
+	Map <Class <?>, Provider <ConsoleSpec>> consoleModuleSpecProviders;
 
 	@PrototypeDependency
 	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;

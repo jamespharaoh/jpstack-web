@@ -2,7 +2,7 @@ package wbs.apn.chat.contact.daemon;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringSimplifyAllowNonGsm;
 import static wbs.utils.collection.CollectionUtils.emptyList;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;

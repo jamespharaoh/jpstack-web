@@ -24,6 +24,9 @@ class CombinedFormFieldSet <Container>
 	// state
 
 	private final
+	String name;
+
+	private final
 	Class <Container> containerClass;
 
 	private final
@@ -33,8 +36,12 @@ class CombinedFormFieldSet <Container>
 
 	public
 	CombinedFormFieldSet (
+			@NonNull String name,
 			@NonNull Class <Container> containerClass,
 			@NonNull Iterable <FormFieldSet <Container>> members) {
+
+		this.name =
+			name;
 
 		this.containerClass =
 			containerClass;
@@ -84,6 +91,12 @@ class CombinedFormFieldSet <Container>
 	}
 
 	// implementation
+
+	@Override
+	public
+	String name () {
+		return name;
+	}
 
 	@Override
 	public

@@ -1,12 +1,12 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,8 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -52,6 +52,10 @@ class SubscriptionNumberAddRemoveAction
 	@SingletonDependency
 	Database database;
 
+	@SingletonDependency
+	@NamedDependency ("subscriptionNumberAddRemoveFormType")
+	ConsoleFormType <SubscriptionNumberAddRemoveForm> formType;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -66,10 +70,6 @@ class SubscriptionNumberAddRemoveAction
 
 	@SingletonDependency
 	SubscriptionConsoleHelper subscriptionHelper;
-
-	@SingletonDependency
-	@NamedDependency ("subscriptionNumberAddRemoveFormContextBuilder")
-	FormContextBuilder <SubscriptionNumberAddRemoveForm> formContextBuilder;
 
 	@SingletonDependency
 	SubscriptionNumberConsoleHelper subscriptionNumberHelper;
@@ -115,15 +115,12 @@ class SubscriptionNumberAddRemoveAction
 
 			// process form
 
-			FormContext <SubscriptionNumberAddRemoveForm> formContext =
-				formContextBuilder.build (
+			ConsoleForm <SubscriptionNumberAddRemoveForm> form =
+				formType.buildAction (
 					transaction,
 					emptyMap ());
 
-			SubscriptionNumberAddRemoveForm addRemoveForm =
-				formContext.object ();
-
-			formContext.update (
+			form.update (
 				transaction);
 
 			// parse numbers
@@ -134,8 +131,8 @@ class SubscriptionNumberAddRemoveAction
 
 				numberStrings =
 					numberFormatLogic.parseLines (
-						addRemoveForm.numberFormat (),
-						addRemoveForm.numbers ());
+						form.value ().numberFormat (),
+						form.value ().numbers ());
 
 			} catch (WbsNumberFormatException exception) {
 
@@ -202,10 +199,10 @@ class SubscriptionNumberAddRemoveAction
 					SubscriptionAffiliateRec newSubscriptionAffiliate =
 						ifNull (
 							subscriptionNumber.getSubscriptionAffiliate (),
-							addRemoveForm.subscriptionAffiliate ());
+							form.value ().subscriptionAffiliate ());
 
 					SubscriptionListRec newSubscriptionList =
-						addRemoveForm.subscriptionList ();
+						form.value ().subscriptionList ();
 
 					SubscriptionSubRec subscriptionSub =
 						subscriptionSubHelper.insert (

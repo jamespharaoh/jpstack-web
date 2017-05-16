@@ -1,8 +1,8 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;

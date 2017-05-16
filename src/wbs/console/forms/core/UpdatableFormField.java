@@ -1,13 +1,12 @@
 package wbs.console.forms.core;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.isRight;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -18,6 +17,7 @@ import static wbs.utils.etc.ResultUtils.getError;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
@@ -41,12 +41,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.feature.FeatureChecker;
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormField;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
@@ -134,7 +133,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	FormFieldAccessor <Container, Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping <Container, Generic, Native> nativeMapping;
+	ConsoleFormNativeMapping <Container, Generic, Native> nativeMapping;
 
 	@Getter @Setter
 	List<FormFieldValueValidator <Generic>> valueValidators;
@@ -170,7 +169,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	boolean canView (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -212,7 +211,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					viewPriv);
 
 			if (
-				collectionHasOneElement (
+				collectionHasOneItem (
 					privParts)
 			) {
 
@@ -225,7 +224,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					privCode);
 
 			} else if (
-				collectionHasTwoElements (
+				collectionHasTwoItems (
 					privParts)
 			) {
 
@@ -269,7 +268,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void setDefault (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -307,7 +306,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
@@ -360,7 +359,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container,
 			@NonNull Long columnSpan) {
 
@@ -412,7 +411,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -463,7 +462,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container,
 			@NonNull Optional <String> error) {
 
@@ -550,7 +549,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormReset (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -633,7 +632,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderCsvRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -682,7 +681,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	FormUpdateResult <Generic, Native> update (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
 		try (
@@ -895,7 +894,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void runUpdateHook (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container,
 			@NonNull FormUpdateResult <Generic, Native> updateResult,
 			@NonNull PermanentRecord <?> linkObject,

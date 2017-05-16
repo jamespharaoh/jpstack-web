@@ -1,6 +1,6 @@
 package wbs.integrations.fonix.hibernate;
 
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 
 import java.util.List;
 

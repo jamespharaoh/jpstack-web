@@ -1,8 +1,8 @@
 package wbs.utils.etc;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 

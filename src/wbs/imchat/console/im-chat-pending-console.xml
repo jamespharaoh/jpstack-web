@@ -21,73 +21,92 @@
 
 	</object-context>
 
-	<field-set
-		name="customerFields"
-		object-name="imChatCustomer">
+	<forms>
 
-		<object-field
-			name="imChat"
-			object-type="imChat"/>
+		<form
+			name="summary-customer"
+			object-type="im-chat-customer"
+			type="read-only">
 
-		<object-field
-			name="customer"
-			object-type="imChatCustomer"
-			field="this"
-			root-field="imChat"/>
+			<column-fields>
 
-		<integer-field
-			name="numConversations"/>
+				<object-field
+					name="imChat"
+					object-type="imChat"/>
 
-		<currency-field
-			name="balance"
-			currency="imChat.creditCurrency"/>
+				<object-field
+					name="customer"
+					object-type="imChatCustomer"
+					field="this"
+					root-field="imChat"/>
 
-	</field-set>
+				<integer-field
+					name="numConversations"/>
 
-	<field-set
-		name="profileFields"
-		object-name="imChatProfile">
+				<currency-field
+					name="balance"
+					currency="imChat.creditCurrency"/>
 
-		<object-field
-			name="profile"
-			object-type="imChatProfile"
-			field="this"
-			root-field="imChat"/>
+			</column-fields>
 
-		<text-field
-			name="publicName"
-			label="Name"/>
+		</form>
 
-		<text-field
-			name="publicDescription"
-			label="Description"/>
+		<form
+			name="summary-profile"
+			object-type="im-chat-profile"
+			type="read-only">
 
-		<image-field
-			name="profileImage"
-			show-filename="no"/>
+			<column-fields>
 
-	</field-set>
+				<object-field
+					name="profile"
+					object-type="imChatProfile"
+					field="this"
+					root-field="imChat"/>
 
-	<field-set
-		name="messageFields"
-		object-name="imChatMessage">
+				<text-field
+					name="publicName"
+					label="Name"/>
 
-		<object-field
-			name="senderUser"
-			label="User"
-			object-type="user"/>
+				<text-field
+					name="publicDescription"
+					label="Description"/>
 
-		<text-field
-			name="messageText"
-			label="Message"/>
+				<image-field
+					name="profileImage"
+					show-filename="no"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</column-fields>
 
-		<currency-field
-			name="price"
-			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary-message"
+			object-type="im-chat-message"
+			type="read-only">
+
+			<column-fields>
+
+				<object-field
+					name="senderUser"
+					label="User"
+					object-type="user"/>
+
+				<text-field
+					name="messageText"
+					label="Message"/>
+
+				<timestamp-field
+					name="timestamp"/>
+
+				<currency-field
+					name="price"
+					currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

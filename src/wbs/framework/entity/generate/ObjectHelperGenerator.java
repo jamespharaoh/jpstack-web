@@ -2,7 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classForName;

@@ -1,7 +1,8 @@
 package wbs.console.tab;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -122,7 +123,18 @@ class TabbedResponder
 	protected
 	Set <ScriptRef> scriptRefs () {
 
-		return pagePart.scriptRefs ();
+		if (
+			isNotNull (
+				pagePart)
+		) {
+
+			return pagePart.scriptRefs ();
+
+		} else {
+
+			return emptySet ();
+
+		}
 
 	}
 
@@ -182,6 +194,28 @@ class TabbedResponder
 			super.prepare (
 				transaction);
 
+			prepareTabs (
+				transaction);
+
+			preparePagePart (
+				transaction);
+
+		}
+
+	}
+
+	private
+	void prepareTabs (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareTabs");
+
+		) {
+
 			TabContext tabContext =
 				requestContext.tabContextRequired ();
 
@@ -215,47 +249,67 @@ class TabbedResponder
 
 			myLayer1.tab (tab);
 
-			if (pagePart != null) {
+		}
 
-				try {
+	}
 
-					pagePart.prepare (
-						transaction);
+	private
+	void preparePagePart (
+			@NonNull Transaction parentTransaction) {
 
-				} catch (RuntimeException exception) {
+		try (
 
-					String path =
-						joinWithoutSeparator (
-							requestContext.servletPath (),
-							optionalOrEmptyString (
-								requestContext.pathInfo ()));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"preparePagePart");
 
-					// log the exception
+		) {
 
-					transaction.warningFormatException (
-						exception,
-						"Exception while reponding to: %s",
-						path);
+			if (
+				isNull (
+					pagePart)
+			) {
+				return;
+			}
 
-					// record the exception
+			try {
 
-					exceptionLogger.logThrowable (
-						transaction,
-						"console",
-						path,
-						exception,
-						consoleUserHelper.loggedInUserId (),
-						GenericExceptionResolution.ignoreWithUserWarning);
+				pagePart.prepare (
+					transaction);
 
-					// and remember we had a problem
+			} catch (RuntimeException exception) {
 
-					pagePartThrew =
-						exception;
+				String path =
+					joinWithoutSeparator (
+						requestContext.servletPath (),
+						optionalOrEmptyString (
+							requestContext.pathInfo ()));
 
-					requestContext.addError (
-						"Internal error");
+				// log the exception
 
-				}
+				transaction.warningFormatException (
+					exception,
+					"Exception while reponding to: %s",
+					path);
+
+				// record the exception
+
+				exceptionLogger.logThrowable (
+					transaction,
+					"console",
+					path,
+					exception,
+					consoleUserHelper.loggedInUserId (),
+					GenericExceptionResolution.ignoreWithUserWarning);
+
+				// and remember we had a problem
+
+				pagePartThrew =
+					exception;
+
+				requestContext.addError (
+					"Internal error");
 
 			}
 

@@ -23,6 +23,7 @@
 
 	<console-modules>
 		<console-module name="chat-affiliate"/>
+		<console-module name="chat-affiliate-users-summary"/>
 	</console-modules>
 
 </plugin>

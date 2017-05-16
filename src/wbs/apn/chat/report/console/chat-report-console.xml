@@ -46,84 +46,6 @@
 	</simple-context>
 
 	<field-set
-		name="rev-share-search"
-		class="wbs.apn.chat.report.console.ChatReportRevShareForm">
-
-		<text-field
-			name="month"/>
-
-	</field-set>
-
-	<field-set
-		name="rev-share-results"
-		class="wbs.apn.chat.report.console.ChatReportRevShareItem">
-
-		<text-field
-			name="path"
-			label="Affiliate"/>
-
-		<text-field
-			name="description"
-			label="Description"/>
-
-		<integer-field
-			name="joiners"
-			label="Joiners"/>
-
-		<integer-field
-			name="outRevNum"
-			label="Out rev #"/>
-
-		<integer-field
-			name="inRevNum"
-			label="In rev #"/>
-
-		<integer-field
-			name="smsCostNum"
-			label="SMS cost #"/>
-
-		<integer-field
-			name="mmsCostNum"
-			label="MMS cost #"/>
-
-		<currency-field
-			name="outRev_p"
-			label="Out rev"
-			currency="currency"/>
-
-		<currency-field
-			name="inRev_p"
-			label="In rev"
-			currency="currency"/>
-
-		<currency-field
-			name="smsCost_p"
-			label="SMS cost"
-			currency="currency"/>
-
-		<currency-field
-			name="mmsCost_p"
-			label="MMS cost"
-			currency="currency"/>
-
-		<currency-field
-			name="creditRev_p"
-			label="Card rev"
-			currency="currency"/>
-
-		<currency-field
-			name="staffCost_p"
-			label="Staff"
-			currency="currency"/>
-
-		<currency-field
-			name="total_p"
-			label="Total"
-			currency="currency"/>
-
-	</field-set>
-
-	<field-set
 		name="recent-user-search"
 		class="wbs.apn.chat.user.core.model.ChatUserSearch">
 
@@ -285,5 +207,97 @@
 			name="reason"/>
 
 	</field-set>
+
+	<forms>
+
+		<form
+			name="rev-share-search"
+			class="wbs.apn.chat.report.console.ChatReportRevShareForm"
+			type="search">
+
+			<column-fields>
+
+				<text-field
+					name="month"/>
+
+			</column-fields>
+
+		</form>
+
+		<form
+			name="rev-share-results"
+			class="wbs.apn.chat.report.console.ChatReportRevShareItem"
+			type="read-only">
+
+			<column-fields>
+
+				<text-field
+					name="path"
+					label="Affiliate"/>
+
+				<text-field
+					name="description"
+					label="Description"/>
+
+				<integer-field
+					name="joiners"
+					label="Joiners"/>
+
+				<integer-field
+					name="outRevNum"
+					label="Out rev #"/>
+
+				<integer-field
+					name="inRevNum"
+					label="In rev #"/>
+
+				<integer-field
+					name="smsCostNum"
+					label="SMS cost #"/>
+
+				<integer-field
+					name="mmsCostNum"
+					label="MMS cost #"/>
+
+				<currency-field
+					name="outRev_p"
+					label="Out rev"
+					currency="currency"/>
+
+				<currency-field
+					name="inRev_p"
+					label="In rev"
+					currency="currency"/>
+
+				<currency-field
+					name="smsCost_p"
+					label="SMS cost"
+					currency="currency"/>
+
+				<currency-field
+					name="mmsCost_p"
+					label="MMS cost"
+					currency="currency"/>
+
+				<currency-field
+					name="creditRev_p"
+					label="Card rev"
+					currency="currency"/>
+
+				<currency-field
+					name="staffCost_p"
+					label="Staff"
+					currency="currency"/>
+
+				<currency-field
+					name="total_p"
+					label="Total"
+					currency="currency"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

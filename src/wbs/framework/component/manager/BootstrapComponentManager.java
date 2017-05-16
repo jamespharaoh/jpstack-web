@@ -4,19 +4,20 @@ import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneEleme
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.IterableUtils.iterableOnlyItemRequired;
 import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrElseSet;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.doesNotImplement;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.todo;
+import static wbs.utils.etc.NullUtils.anyIsNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -44,6 +45,7 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -164,12 +166,12 @@ class BootstrapComponentManager
 
 	}
 
-	public synchronized <Type>
+	public synchronized <ComponentType>
 	BootstrapComponentManager registerSingleton (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <Type> interfaceClass,
-			@NonNull Type component) {
+			@NonNull Class <ComponentType> interfaceClass,
+			@NonNull ComponentType component) {
 
 		try (
 
@@ -549,7 +551,8 @@ class BootstrapComponentManager
 	Optional <Provider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialized) {
 
 		try (
 
@@ -559,6 +562,10 @@ class BootstrapComponentManager
 					"getComponentProvider");
 
 		) {
+
+			if (! initialized) {
+				throw new IllegalArgumentException ();
+			}
 
 			Optional <ComponentData> componentDataOptional =
 				mapItemForKey (
@@ -696,6 +703,16 @@ class BootstrapComponentManager
 
 	}
 
+	@Override
+	public
+	void initializeComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object component) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
 	// safe closeable implementation
 
 	@Override
@@ -721,10 +738,6 @@ class BootstrapComponentManager
 					"registerSingletonClass");
 
 		) {
-
-debugFormat (
-	"Boootstrap component %s",
-	className);
 
 			Class <?> providedClass =
 				classForNameRequired (
@@ -1093,6 +1106,8 @@ debugFormat (
 
 		) {
 
+			// get dependency annotation
+
 			SingletonDependency singletonDependencyAnnotation =
 				field.getAnnotation (
 					SingletonDependency.class);
@@ -1141,83 +1156,81 @@ debugFormat (
 				throw new RuntimeException ();
 			}
 
+			boolean singleton =
+				anyIsNotNull (
+					singletonDependencyAnnotation,
+					classSingletonDependencyAnnotation);
+
+			boolean classSingleton =
+				isNotNull (
+					classSingletonDependencyAnnotation);
+
+			boolean prototype =
+				! singleton;
+
+			// get qualifier annotation
+
 			Optional <Annotation> qualifierAnnotationOptional =
 				findQualifierAnnotation (
 					Arrays.asList (
 						field.getAnnotations ()));
 
+			// make field accessible
+
 			field.setAccessible (
 				true);
 
+			// get injection type
+
+			Optional <InjectionType> injectionTypeOptional =
+				getInjectionType (
+					taskLogger,
+					field.getGenericType ());
+
 			if (
-				isNotNull (
-					singletonDependencyAnnotation)
+				optionalIsNotPresent (
+					injectionTypeOptional)
 			) {
+				return;
+			}
 
-				Class <?> targetClass =
-					field.getType ();
+			InjectionType injectionType =
+				optionalGetRequired (
+					injectionTypeOptional);
 
-				List <ComponentData> componentDatas =
-					componentDatasForClass (
-						taskLogger,
-						targetClass,
-						qualifierAnnotationOptional);
+			if (prototype && ! injectionType.prototype) {
 
-				if (
-					collectionIsEmpty (
-						componentDatas)
-				) {
+				taskLogger.errorFormat (
+					"Prototype dependency %s.%s ",
+					classNameFull (
+						component.getClass ()),
+					field.getName (),
+					"should use Provider");
 
-					throw new RuntimeException (
-						stringFormat (
-							"Singleton dependency %s.%s ",
-							classNameFull (
-								component.getClass ()),
-							field.getName (),
-							"of type %s ",
-							classNameFull (
-								targetClass),
-							"not found"));
+				return;
 
-				}
+			}
 
-				if (
-					collectionHasMoreThanOneElement (
-						componentDatas)
-				) {
+			if (singleton && injectionType.prototype) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Singleton dependency %s.%s ",
-							classNameFull (
-								component.getClass ()),
-							field.getName (),
-							"of type %s ",
-							classNameFull (
-								targetClass),
-							"has multiple candidates"));
+				taskLogger.errorFormat (
+					"Singleton dependency %s.%s ",
+					classNameFull (
+						component.getClass ()),
+					field.getName (),
+					"should not use Provider");
 
-				}
+				return;
 
-				ComponentData componentData =
-					iterableOnlyItemRequired (
-						componentDatas);
+			}
 
-				fieldSet (
-					field,
-					component,
-					optionalOf (
-						getComponentReal (
-							componentData)));
+			// handle class singleton
 
-			} else if (
-				isNotNull (
-					classSingletonDependencyAnnotation)
-			) {
+			if (classSingleton) {
 
 				if (
 					classNotEqual (
-						field.getType (),
+						injectionType.valueType,
 						LogContext.class)
 				) {
 					throw todo ();
@@ -1231,136 +1244,71 @@ debugFormat (
 							classNameFull (
 								component.getClass ()))));
 
-			} else if (
+				return;
+
+			}
+
+			// get values
+
+			List <ComponentData> valueComponentDatas =
+				componentDatasForClass (
+					taskLogger,
+					injectionType.valueType,
+					qualifierAnnotationOptional);
+
+			List <Pair <ComponentData, Object>> valueComponentsWithData;
+
+			if (prototype) {
+
+				valueComponentsWithData =
+					iterableMapToList (
+						valueComponentDatas,
+						valueComponentData ->
+							Pair.of (
+								valueComponentData,
+								(Provider <?>)
+									() -> getComponentReal (
+										valueComponentData)));
+
+			} else {
+
+				valueComponentsWithData =
+					iterableMapToList (
+						valueComponentDatas,
+						valueComponentData ->
+							Pair.of (
+								valueComponentData,
+								getComponentReal (
+									valueComponentData)));
+
+			}
+
+			// inject the value
+
+			if (
 				isNotNull (
-					prototypeDependencyAnnotation)
-				|| isNotNull (
-					strongPrototypeDependencyAnnotation)
-				|| isNotNull (
-					uninitializedDependencyAnnotation)
+					injectionType.collectionType)
 			) {
 
 				if (
 					classEqualSafe (
-						field.getType (),
-						Provider.class)
-				) {
-
-					ParameterizedType parameterizedType =
-						(ParameterizedType)
-						field.getGenericType ();
-
-					Class <?> targetClass =
-						(Class <?>)
-						parameterizedType.getActualTypeArguments () [0];
-
-					List <ComponentData> componentDatas =
-						componentDatasForClass (
-							taskLogger,
-							targetClass,
-							qualifierAnnotationOptional);
-
-					if (
-						collectionIsEmpty (
-							componentDatas)
-					) {
-
-						throw new RuntimeException (
-							stringFormat (
-								"Prototype dependency %s.%s ",
-								classNameFull (
-									component.getClass ()),
-								field.getName (),
-								"of type %s ",
-								classNameFull (
-									targetClass),
-								"not found"));
-
-					}
-
-					if (
-						collectionHasMoreThanOneElement (
-							componentDatas)
-					) {
-
-						throw new RuntimeException (
-							stringFormat (
-								"Prototype dependency %s.%s ",
-								classNameFull (
-									component.getClass ()),
-								field.getName (),
-								"of type %s ",
-								classNameFull (
-									targetClass),
-								"has multiple candidates"));
-
-					}
-
-					ComponentData componentData =
-						iterableOnlyItemRequired (
-							componentDatas);
-
-					fieldSet (
-						field,
-						component,
-						optionalOf (
-							(Provider <?>)
-							() -> getComponentReal (
-								componentData)));
-
-				} else if (
-					classEqualSafe (
-						field.getType (),
+						injectionType.collectionType,
 						Map.class)
 				) {
 
-					ParameterizedType parameterizedFieldType =
-						genericCastUnchecked (
-							field.getGenericType ());
-
-					Class <?> keyType =
-						rawType (
-							parameterizedFieldType
-								.getActualTypeArguments () [0]);
-
-					ParameterizedType providerType =
-						genericCastUnchecked (
-							parameterizedFieldType
-								.getActualTypeArguments () [1]);
-
-					if (
-						classNotEqual (
-							(Class <?>) providerType.getRawType (),
-							Provider.class)
-					) {
-						throw new RuntimeException ();
-					}
-
-					Class <?> valueType =
-						rawType (
-							providerType.getActualTypeArguments () [0]);
-
-					List <ComponentData> componentDatas =
-						componentDatasForClass (
-							taskLogger,
-							valueType,
-							qualifierAnnotationOptional);
-
 					if (
 						classEqualSafe (
-							keyType,
+							injectionType.keyType,
 							String.class)
 					) {
 
-						Map <String, Provider <?>> mapToInject =
+						Map <String, ?> mapToInject =
 							iterableTransformToMap (
-								componentDatas,
-								componentData ->
-									componentData.name (),
-								componentData ->
-									(Provider <?>)
-									() -> getComponentReal (
-										componentData));
+								valueComponentsWithData,
+								(valueComponentData, valueComponent) ->
+									valueComponentData.name (),
+								(valueComponentData, valueComponent) ->
+									valueComponent);
 
 						fieldSet (
 							field,
@@ -1370,19 +1318,17 @@ debugFormat (
 
 					} else if (
 						classEqualSafe (
-							keyType,
+							injectionType.keyType,
 							Class.class)
 					) {
 
-						Map <Class <?>, Provider <?>> mapToInject =
+						Map <Class <?>, ?> mapToInject =
 							iterableTransformToMap (
-								componentDatas,
-								componentData ->
-									componentData.interfaceClass (),
-								componentData ->
-									(Provider <?>)
-									() -> getComponentReal (
-										componentData));
+								valueComponentsWithData,
+								(valueComponentData, valueComponent) ->
+									valueComponentData.interfaceClass (),
+								(valueComponentData, valueComponent) ->
+									valueComponent);
 
 						fieldSet (
 							field,
@@ -1396,30 +1342,167 @@ debugFormat (
 							stringFormat (
 								"Don't support maps with key type %s",
 								classNameSimple (
-									keyType)));
+									injectionType.keyType)));
 
 					}
 
 				} else {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Prototype dependency %s.%s ",
-							classNameFull (
-								component.getClass ()),
-							field.getName (),
-							"is of type %s ",
-							classNameSimple (
-								field.getType ()),
-							"(expected Provider)"));
+					throw shouldNeverHappen ();
 
 				}
 
 			} else {
 
-				throw shouldNeverHappen ();
+				if (
+					collectionIsEmpty (
+						valueComponentsWithData)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Dependency %s.%s ",
+							classNameFull (
+								component.getClass ()),
+							field.getName (),
+							"of type %s ",
+							classNameFull (
+								injectionType.valueType),
+							"not found"));
+
+				}
+
+				if (
+					collectionHasMoreThanOneElement (
+						valueComponentsWithData)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Dependency %s.%s ",
+							classNameFull (
+								component.getClass ()),
+							field.getName (),
+							"of type %s ",
+							classNameFull (
+								injectionType.valueType),
+							"has multiple candidates"));
+
+				}
+
+				Pair <ComponentData, Object> valueComponentWithData =
+					iterableOnlyItemRequired (
+						valueComponentsWithData);
+
+				Object valueComponent =
+					valueComponentWithData.getRight ();
+
+				fieldSet (
+					field,
+					component,
+					optionalOf (
+						valueComponent));
 
 			}
+
+		}
+
+	}
+
+	private
+	static class InjectionType {
+		Class <?> collectionType;
+		Class <?> keyType;
+		Class <?> valueType;
+		boolean prototype;
+	}
+
+	private
+	Optional <InjectionType> getInjectionType (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Type fieldType) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getInjectionType");
+
+		) {
+
+			InjectionType injectionType =
+				new InjectionType ();
+
+			Type valueInjectionType;
+
+			Class <?> fieldRawType =
+				rawType (
+					fieldType);
+
+			if (
+				classEqualSafe (
+					fieldRawType,
+					Map.class)
+			) {
+
+				injectionType.collectionType =
+					Map.class;
+
+				ParameterizedType parameterizedFieldType =
+					genericCastUnchecked (
+						fieldType);
+
+				injectionType.keyType =
+					rawType (
+						parameterizedFieldType
+							.getActualTypeArguments () [0]);
+
+				valueInjectionType =
+					genericCastUnchecked (
+						parameterizedFieldType
+							.getActualTypeArguments () [1]);
+
+			} else {
+
+				valueInjectionType =
+					fieldType;
+
+			}
+
+			// check for provider
+
+			if (
+				classEqualSafe (
+					rawType (
+						valueInjectionType),
+					Provider.class)
+			) {
+
+				ParameterizedType parameterizedType =
+					genericCastUnchecked (
+						valueInjectionType);
+
+				injectionType.valueType =
+					rawType (
+						parameterizedType.getActualTypeArguments () [0]);
+
+				injectionType.prototype = true;
+
+			} else {
+
+				injectionType.valueType =
+					rawType (
+						valueInjectionType);
+
+				injectionType.prototype = false;
+
+			}
+
+			// return
+
+			return optionalOf (
+				injectionType);
 
 		}
 

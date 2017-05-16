@@ -8,8 +8,8 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -31,8 +31,12 @@ class ImChatCustomerCreditPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@NamedDependency ("imChatCustomerCreditHistoryFormContextBuilder")
-	FormContextBuilder <ImChatCustomerCreditRec> historyFormContextBuilder;
+	@NamedDependency ("imChatCustomerCreditCustomerFormType")
+	ConsoleFormType <ImChatCustomerRec> customerFormType;
+
+	@SingletonDependency
+	@NamedDependency ("imChatCustomerCreditHistoryFormType")
+	ConsoleFormType <ImChatCustomerCreditRec> historyFormType;
 
 	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
@@ -44,18 +48,14 @@ class ImChatCustomerCreditPart
 	LogContext logContext;
 
 	@SingletonDependency
-	@NamedDependency ("imChatCustomerCreditRequestFormContextBuilder")
-	FormContextBuilder <ImChatCustomerCreditRequest> requestFormContextBuilder;
-
-	@SingletonDependency
-	@NamedDependency ("imChatCustomerCreditSummaryContextBuilder")
-	FormContextBuilder <ImChatCustomerRec> summaryFormContextBuilder;
+	@NamedDependency ("imChatCustomerCreditActionFormType")
+	ConsoleFormType <ImChatCustomerCreditRequest> requestFormType;
 
 	// state
 
-	FormContext <ImChatCustomerRec> summaryFormContext;
-	FormContext <ImChatCustomerCreditRequest> requestFormContext;
-	FormContext <ImChatCustomerCreditRec> historyFormContext;
+	ConsoleForm <ImChatCustomerRec> customerForm;
+	ConsoleForm <ImChatCustomerCreditRequest> requestForm;
+	ConsoleForm <ImChatCustomerCreditRec> historyForm;
 
 	ImChatCustomerRec customer;
 
@@ -75,20 +75,21 @@ class ImChatCustomerCreditPart
 
 		) {
 
-			summaryFormContext =
-				summaryFormContextBuilder.build (
+			customer =
+				imChatCustomerHelper.findFromContextRequired (
+					transaction);
+
+			customerForm =
+				customerFormType.buildResponse (
 					transaction,
 					emptyMap ());
 
-			requestFormContext =
-				requestFormContextBuilder.build (
+			requestForm =
+				requestFormType.buildResponse (
 					transaction,
 					emptyMap ());
 
-			ImChatCustomerCreditRequest request =
-				requestFormContext.object ();
-
-			request
+			requestForm.value ()
 
 				.customer (
 					imChatCustomerHelper.findFromContextRequired (
@@ -97,12 +98,12 @@ class ImChatCustomerCreditPart
 			List <ImChatCustomerCreditRec> creditHistory =
 				imChatCustomerCreditHelper.findByIndexRange (
 					transaction,
-					request.customer (),
-					max (0l, request.customer.getNumCredits () - 10l),
-					request.customer.getNumCredits ());
+					customer,
+					max (0l, customer.getNumCredits () - 10l),
+					customer.getNumCredits ());
 
-			historyFormContext =
-				historyFormContextBuilder.build (
+			historyForm =
+				historyFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					creditHistory);
@@ -130,13 +131,13 @@ class ImChatCustomerCreditPart
 			htmlHeadingTwoWrite (
 				"Customer details");
 
-			summaryFormContext.outputDetailsTable (
+			customerForm.outputDetailsTable (
 				transaction);
 
 			htmlHeadingTwoWrite (
 				"Apply credit");
 
-			requestFormContext.outputFormTable (
+			requestForm.outputFormTable (
 				transaction,
 				"post",
 				requestContext.resolveLocalUrl (
@@ -146,7 +147,7 @@ class ImChatCustomerCreditPart
 			htmlHeadingTwoWrite (
 				"Recent credit history");
 
-			historyFormContext.outputListTable (
+			historyForm.outputListTable (
 				transaction,
 				true);
 

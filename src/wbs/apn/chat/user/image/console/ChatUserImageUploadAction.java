@@ -17,8 +17,8 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -65,8 +65,8 @@ class ChatUserImageUploadAction
 	Database database;
 
 	@SingletonDependency
-	@NamedDependency ("chatUserImageUploadFormContextBuilder")
-	FormContextBuilder <ChatUserImageUploadForm> formContextBuilder;
+	@NamedDependency ("chatUserImageUploadFormType")
+	ConsoleFormType <ChatUserImageUploadForm> formType;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -88,11 +88,9 @@ class ChatUserImageUploadAction
 
 	// state
 
-	FormContext <ChatUserImageUploadForm> formContext;
-
 	ChatUserImageType chatUserImageType;
 
-	ChatUserImageUploadForm uploadForm;
+	ConsoleForm <ChatUserImageUploadForm> form;
 
 	// details
 
@@ -123,13 +121,10 @@ class ChatUserImageUploadAction
 
 		) {
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formType.buildAction (
 					transaction,
 					emptyMap ());
-
-			uploadForm =
-				formContext.object ();
 
 			chatUserImageType =
 				toEnum (
@@ -138,7 +133,7 @@ class ChatUserImageUploadAction
 					requestContext.stuff (
 						"chatUserImageType"));
 
-			formContext.update (
+			form.update (
 				transaction);
 
 			String resultType;
@@ -156,7 +151,7 @@ class ChatUserImageUploadAction
 					rawMediaLogic.videoConvertRequired (
 						transaction,
 						"3gpp",
-						uploadForm.upload ().data ());
+						form.value ().upload ().data ());
 
 				// set others
 
@@ -175,7 +170,7 @@ class ChatUserImageUploadAction
 				Optional <BufferedImage> imageOptional =
 					rawMediaLogic.readImage (
 						transaction,
-						uploadForm.upload ().data (),
+						form.value ().upload ().data (),
 						"image/jpeg");
 
 				if (
@@ -187,7 +182,7 @@ class ChatUserImageUploadAction
 						stringFormat (
 							"Error reading image (content type was %s)",
 							ifNull (
-								uploadForm.upload ().contentType (),
+								form.value ().upload ().contentType (),
 								"not specified")));
 
 					return null;
@@ -288,7 +283,7 @@ class ChatUserImageUploadAction
 			chatUserImageList.add (
 				chatUserImage);
 
-			if (uploadForm.setAsPrimary ()) {
+			if (form.value ().setAsPrimary ()) {
 
 				chatUserLogic.setMainChatUserImageByType (
 					chatUser,

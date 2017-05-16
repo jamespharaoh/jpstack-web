@@ -2,8 +2,8 @@ package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;

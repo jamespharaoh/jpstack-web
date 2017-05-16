@@ -18,6 +18,8 @@
 	</layer>
 
 	<console-modules>
+		<console-module name="chat-named-note"/>
+		<console-module name="chat-named-note-log"/>
 		<console-module name="chat-note-name"/>
 	</console-modules>
 

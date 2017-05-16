@@ -42,6 +42,9 @@
 
 	<console-modules>
 		<console-module name="forwarder"/>
+		<console-module name="forwarder-message-in"/>
+		<console-module name="forwarder-message-out"/>
+		<console-module name="forwarder-message-out-report"/>
 		<console-module name="forwarder-route"/>
 	</console-modules>
 

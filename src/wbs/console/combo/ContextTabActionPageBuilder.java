@@ -16,17 +16,16 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -41,12 +40,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("contextTabActionPageBuider")
-@ConsoleModuleBuilderHandler
 public
 class ContextTabActionPageBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -118,6 +116,7 @@ class ContextTabActionPageBuilder <
 			) {
 
 				buildTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildFile (
@@ -133,30 +132,42 @@ class ContextTabActionPageBuilder <
 	}
 
 	void buildTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint
 				resolvedExtensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
+		try (
 
-			contextTab.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
 
-				.name (
-					tabName)
+		) {
 
-				.defaultLabel (
-					tabLabel)
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
 
-				.localFile (
-					localFile)
+				contextTab.get ()
 
-				.privKeys (
-					privKeys),
+					.name (
+						tabName)
 
-			hideTab
-				? Collections.emptyList ()
-				: resolvedExtensionPoint.contextTypeNames ());
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						localFile)
+
+					.privKeys (
+						privKeys),
+
+				hideTab
+					? Collections.emptyList ()
+					: resolvedExtensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

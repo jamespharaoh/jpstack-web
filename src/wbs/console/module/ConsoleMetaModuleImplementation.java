@@ -27,17 +27,17 @@ class ConsoleMetaModuleImplementation
 
 	@DataChildren
 	@Getter @Setter
-	List<ConsoleContextExtensionPoint> extensionPoints =
+	List <ConsoleContextExtensionPoint> extensionPoints =
 		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<ConsoleContextLink> contextLinks =
+	List <ConsoleContextLink> contextLinks =
 		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<ConsoleContextHint> contextHints =
+	List <ConsoleContextHint> contextHints =
 		new ArrayList<> ();
 
 	// property utils

@@ -21,7 +21,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("consoleModuleSpec")
 public
 class ConsoleModuleSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataAttribute (
 		required = true)

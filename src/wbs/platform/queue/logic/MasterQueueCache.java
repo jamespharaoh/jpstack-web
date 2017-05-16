@@ -1,7 +1,7 @@
 package wbs.platform.queue.logic;
 
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 
 import java.util.List;
 import java.util.Map;

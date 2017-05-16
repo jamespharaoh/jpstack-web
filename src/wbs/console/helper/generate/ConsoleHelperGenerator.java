@@ -36,9 +36,7 @@ import wbs.console.forms.object.EntityFinder;
 import wbs.console.helper.core.ConsoleHelperImplementation;
 import wbs.console.helper.core.ConsoleHelperMethods;
 import wbs.console.helper.core.ConsoleHooks;
-import wbs.console.helper.provider.GenericConsoleHelperProvider;
-import wbs.console.helper.spec.ConsoleHelperProviderSpec;
-import wbs.console.helper.spec.ConsoleHelperProviderSpecManager;
+import wbs.console.helper.provider.ConsoleHelperProvider;
 import wbs.console.lookup.ObjectLookup;
 
 import wbs.framework.codegen.JavaAssignmentWriter;
@@ -470,15 +468,20 @@ class ConsoleHelperGenerator {
 		classWriter.addSingletonDependency (
 			ObjectTypeRegistry.class);
 
-		classWriter.addSingletonDependency (
-			ConsoleHelperProviderSpecManager.class);
+		classWriter.addNamedSingletonDependency (
+			ConsoleHelperProvider.class,
+			stringFormat (
+				"%hConsoleHelperProvider",
+				model.objectName ()));
 
 		classWriter.addNamedSingletonDependency (
 			stringFormat (
 				"%s.logic.%s",
 				packageName,
 				objectHelperImplementationName),
-			"objectHelper");
+			stringFormat (
+				"%sObjectHelper",
+				model.objectName ()));
 
 		if (hasDao) {
 
@@ -509,9 +512,6 @@ class ConsoleHelperGenerator {
 	void addPrototypeDependencies () {
 
 		classWriter.addUninitializedDependency (
-			GenericConsoleHelperProvider.class);
-
-		classWriter.addUninitializedDependency (
 			imports ->
 				stringFormat (
 					"%s <%s>",
@@ -534,14 +534,6 @@ class ConsoleHelperGenerator {
 		classWriter.addState (
 			ObjectModel.class,
 			"objectModel");
-
-		classWriter.addState (
-			ConsoleHelperProviderSpec.class,
-			"consoleHelperProviderSpec");
-
-		classWriter.addState (
-			GenericConsoleHelperProvider.class,
-			"consoleHelperProvider");
 
 		classWriter.addState (
 			ConsoleHooks.class,
@@ -642,99 +634,30 @@ class ConsoleHelperGenerator {
 				"objectModel =");
 
 			formatWriter.writeLineFormat (
-				"\tobjectHelper.objectModel ();");
+				"\t%sObjectHelper.objectModel ();",
+				model.objectName ());
 
 			formatWriter.writeNewline ();
 
-			// console helper provider spec
+			// console hooks
 
-			javaAssignmentWriterProvider.get ()
+			formatWriter.writeLineFormat (
+				"consoleHooksImplementation =");
 
-				.variableName (
-					"consoleHelperProviderSpec")
+			if (hasHooks) {
 
-				.value (
-					stringFormat (
-						"%s.get (\"%s\")",
-						"consoleHelperProviderSpecManager.specsByName ()",
-						model.objectName ()))
+				formatWriter.writeLineFormat (
+					"\t%s;",
+					consoleHooksComponentName);
 
-				.write (
-					formatWriter);
+			} else {
 
-			formatWriter.writeLineFormatIncreaseIndent (
-				"if (consoleHelperProviderSpec == null) {");
-
-			formatWriter.writeNewline ();
-
-			javaAssignmentWriterProvider.get ()
-
-				.variableName (
-					"consoleHelperProviderSpec")
-
-				.valueFormat (
-					"new %s ()",
+				formatWriter.writeLineFormat (
+					"\tnew %s.DefaultImplementation ();",
 					imports.register (
-						ConsoleHelperProviderSpec.class))
+						ConsoleHooks.class));
 
-				.propertyFormat (
-					"objectName",
-					"\"%s\"",
-					model.objectName ())
-
-				.propertyFormat (
-					"idKey",
-					"\"%sId\"",
-					model.objectName ())
-
-				.write (
-					formatWriter);
-
-			formatWriter.writeLineFormatDecreaseIndent (
-				"}");
-
-			formatWriter.writeNewline ();
-
-			// console helper provider
-
-			javaAssignmentWriterProvider.get ()
-
-				.variableName (
-					"consoleHelperProvider")
-
-				.value (
-					"genericConsoleHelperProviderProvider.get ()")
-
-				.property (
-					"consoleHelperProviderSpec",
-					"consoleHelperProviderSpec")
-
-				.property (
-					"objectHelper",
-					stringFormat (
-						"%s (%s, \"%sObjectHelper\", %s.class)",
-						"componentManager.getComponentRequired",
-						"taskLogger",
-						model.objectName (),
-						imports.registerFormat (
-							"%s.model.%s",
-							packageName,
-							objectHelperInterfaceName)))
-
-				.propertyFormat (
-					"consoleHelperClass",
-					"%s.class",
-					imports.registerFormat (
-						"%s.console.%s",
-						packageName,
-						consoleHelperInterfaceName))
-
-				.call (
-					"init",
-					"taskLogger")
-
-				.write (
-					formatWriter);
+			}
 
 			// console helper implementation
 
@@ -746,20 +669,19 @@ class ConsoleHelperGenerator {
 				.value (
 					"consoleHelperImplementationProvider.get ()")
 
-				.property (
+				.propertyFormat (
 					"objectHelper",
-					"objectHelper")
+					"%sObjectHelper",
+					model.objectName ())
 
-				.property (
+				.propertyFormat (
 					"consoleHelperProvider",
-					"consoleHelperProvider")
+					"%sConsoleHelperProvider",
+					model.objectName ())
 
 				.property (
 					"consoleHooks",
-					ifThenElse (
-						hasHooks,
-						() -> "consoleHooksImplementation",
-						() -> "null"))
+					"consoleHooksImplementation")
 
 				.write (
 					formatWriter);
@@ -774,7 +696,8 @@ class ConsoleHelperGenerator {
 					componentName);
 
 				formatWriter.writeLineFormat (
-					"\tobjectHelper.%sImplementation ();",
+					"\t%sObjectHelper.%sImplementation ();",
+					model.objectName (),
 					componentName);
 
 				formatWriter.writeNewline ();

@@ -1,6 +1,6 @@
 package wbs.console.helper.core;
 
-import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 
 import com.google.common.base.Optional;
 
@@ -36,7 +36,7 @@ interface ConsoleHelperMethods <
 
 		return getPathId (
 			parentTransaction,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object));
 
@@ -57,7 +57,7 @@ interface ConsoleHelperMethods <
 
 		return getDefaultContextPath (
 			parentTransaction,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object));
 
@@ -74,7 +74,7 @@ interface ConsoleHelperMethods <
 
 		return getDefaultLocalPath (
 			parentTransaction,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object));
 
@@ -108,7 +108,7 @@ interface ConsoleHelperMethods <
 		writeHtml (
 			parentTransaction,
 			formatWriter,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object),
 			assumedRoot,

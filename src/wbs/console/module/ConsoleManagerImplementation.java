@@ -1,9 +1,9 @@
 package wbs.console.module;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -77,6 +77,9 @@ class ConsoleManagerImplementation
 		WebModule {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
 	@Getter

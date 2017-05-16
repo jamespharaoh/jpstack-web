@@ -4,7 +4,7 @@ import static wbs.utils.collection.CollectionUtils.listSorted;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.Map;

@@ -2,8 +2,8 @@ package wbs.platform.object.list;
 
 import static wbs.utils.collection.CollectionUtils.collectionStream;
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
@@ -46,8 +46,8 @@ import org.joda.time.Interval;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -114,7 +114,7 @@ class ObjectListPart <
 	Map <String, ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -136,7 +136,7 @@ class ObjectListPart <
 	ConsoleContext targetContext;
 	ParentType parent;
 
-	FormContext <ObjectType> formContext;
+	ConsoleForm <ObjectType> form;
 
 	// details
 
@@ -213,8 +213,8 @@ class ObjectListPart <
 
 		) {
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formType.buildResponse (
 					transaction,
 					emptyMap (),
 					allObjects);
@@ -901,7 +901,7 @@ class ObjectListPart <
 
 			htmlTableRowOpen ();
 
-			formContext.outputTableHeadings (
+			form.outputTableHeadings (
 				transaction);
 
 			htmlTableRowClose ();
@@ -941,7 +941,7 @@ class ObjectListPart <
 
 				);
 
-				formContext.outputTableCellsList (
+				form.outputTableCellsList (
 					transaction,
 					object,
 					false);

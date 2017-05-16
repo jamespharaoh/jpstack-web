@@ -1,5 +1,6 @@
 package wbs.console.object;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.maybeList;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -10,9 +11,9 @@ import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 
-import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -20,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ConsoleContextType;
@@ -28,6 +28,7 @@ import wbs.console.context.SimpleConsoleContext;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
@@ -36,7 +37,6 @@ import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -52,12 +52,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("objectContextBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectContextBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -144,7 +143,9 @@ class ObjectContextBuilder <
 			buildContextTypes ();
 
 			buildSimpleContexts ();
-			buildSimpleTabs ();
+
+			buildSimpleTabs (
+				taskLogger);
 
 			List <ResolvedConsoleContextLink> resolvedContextLinks =
 				consoleMetaManager.resolveContextLink (
@@ -159,15 +160,13 @@ class ObjectContextBuilder <
 					resolvedContextLink);
 
 				buildResolvedTabs (
+					taskLogger,
 					resolvedContextLink);
 
 			}
 
 			ConsoleContextBuilderContainer <ObjectType> listContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-				.taskLogger (
-					container.taskLogger ())
 
 				.consoleHelper (
 					consoleHelper)
@@ -203,9 +202,6 @@ class ObjectContextBuilder <
 
 			ConsoleContextBuilderContainer <ObjectType> objectContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-				.taskLogger (
-					container.taskLogger ())
 
 				.consoleHelper (
 					consoleHelper)
@@ -367,39 +363,51 @@ class ObjectContextBuilder <
 
 	}
 
-	void buildSimpleTabs () {
+	void buildSimpleTabs (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"link",
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildSimpleTabs");
 
-				.name (
-					"link:" + name)
+		) {
 
-				.defaultLabel (
-					"Object title"),
+			consoleModule.addContextTab (
+				taskLogger,
+				"link",
 
-			ImmutableList.<String> of ());
+				contextTabProvider.get ()
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"end",
+					.name (
+						"link:" + name)
 
-			contextTabProvider.get ()
+					.defaultLabel (
+						"Object title"),
 
-				.name (
-					stringFormat (
-						"%s",
-						name,
-						":link"))
+				ImmutableList.<String> of ());
 
-				.defaultLabel (
-					capitalise (
-						consoleHelper.friendlyName ())),
+			consoleModule.addContextTab (
+				taskLogger,
+				"end",
 
-			Collections.<String> emptyList ());
+				contextTabProvider.get ()
+
+					.name (
+						stringFormat (
+							"%s",
+							name,
+							":link"))
+
+					.defaultLabel (
+						capitalise (
+							consoleHelper.friendlyName ())),
+
+				emptyList ());
+
+		}
 
 	}
 
@@ -497,27 +505,39 @@ class ObjectContextBuilder <
 	}
 
 	void buildResolvedTabs (
-			ResolvedConsoleContextLink resolvedConsoleContextLink) {
+			@NonNull TaskLogger parentTaskLogger,
+			@Nonnull ResolvedConsoleContextLink consoleContextLink) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			resolvedConsoleContextLink.tabLocation (),
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResolvedTabs");
 
-				.name (
-					resolvedConsoleContextLink.tabName ())
+		) {
 
-				.defaultLabel (
-					resolvedConsoleContextLink.tabLabel ())
+			consoleModule.addContextTab (
+				taskLogger,
+				consoleContextLink.tabLocation (),
 
-				.privKeys (
-					resolvedConsoleContextLink.tabPrivKey ())
+				contextTabProvider.get ()
 
-				.localFile (
-					"type:" + name + ":list"),
+					.name (
+						consoleContextLink.tabName ())
 
-			resolvedConsoleContextLink.tabContextTypeNames ());
+					.defaultLabel (
+						consoleContextLink.tabLabel ())
+
+					.privKeys (
+						consoleContextLink.tabPrivKey ())
+
+					.localFile (
+						"type:" + name + ":list"),
+
+				consoleContextLink.tabContextTypeNames ());
+
+		}
 
 	}
 

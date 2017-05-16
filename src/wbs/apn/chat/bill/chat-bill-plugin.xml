@@ -39,13 +39,18 @@
 	</layer>
 
 	<console-modules>
+		<console-module name="chat-daily-limit-log"/>
 		<console-module name="chat-network"/>
 		<console-module name="chat-promo"/>
+		<console-module name="chat-promo-user"/>
 		<console-module name="chat-rebill"/>
 		<console-module name="chat-rebill-log"/>
 		<console-module name="chat-route"/>
 		<console-module name="chat-route-network"/>
+		<console-module name="chat-user-bill-log"/>
 		<console-module name="chat-user-credit"/>
+		<console-module name="chat-user-credit-limit-log"/>
+		<console-module name="chat-user-spend"/>
 	</console-modules>
 
 </plugin>

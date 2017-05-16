@@ -29,8 +29,8 @@ import lombok.NonNull;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -138,22 +138,20 @@ class ChatReportRevSharePart
 	ObjectManager objectManager;
 
 	@SingletonDependency
-	@NamedDependency ("chatReportRevShareResultsFormContextBuilder")
-	FormContextBuilder <ChatReportRevShareItem> resultsFormContextBuilder;
+	@NamedDependency ("chatReportRevShareResultsFormType")
+	ConsoleFormType <ChatReportRevShareItem> resultsFormType;
 
 	@SingletonDependency
-	@NamedDependency ("chatReportRevShareSearchFormContextBuilder")
-	FormContextBuilder <ChatReportRevShareForm> searchFormContextBuilder;
+	@NamedDependency ("chatReportRevShareSearchFormType")
+	ConsoleFormType <ChatReportRevShareForm> searchFormType;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
 
-	FormContext <ChatReportRevShareForm> searchFormContext;
-	FormContext <ChatReportRevShareItem> resultsFormContext;
-
-	ChatReportRevShareForm searchForm;
+	ConsoleForm <ChatReportRevShareForm> searchForm;
+	ConsoleForm <ChatReportRevShareItem> resultsForm;
 
 	LocalDate startDate;
 	LocalDate endDate;
@@ -183,18 +181,15 @@ class ChatReportRevSharePart
 
 			// prepare search form
 
-			searchFormContext =
-				searchFormContextBuilder.build (
+			searchForm =
+				searchFormType.buildResponse (
 					transaction,
 					emptyMap ());
-
-			searchForm =
-				searchFormContext.object ();
 
 			LocalDate today =
 				LocalDate.now ();
 
-			searchForm
+			searchForm.value ()
 
 				.month (
 					today.toString (
@@ -202,7 +197,7 @@ class ChatReportRevSharePart
 
 			;
 
-			searchFormContext.update (
+			searchForm.update (
 				transaction);
 
 			chat =
@@ -222,7 +217,7 @@ class ChatReportRevSharePart
 				LocalDate.parse (
 					stringFormat (
 						"%s-01",
-						searchForm.month ()));
+						searchForm.value ().month ()));
 
 			endDate =
 				startDate.plusMonths (1);
@@ -256,8 +251,8 @@ class ChatReportRevSharePart
 
 			// prepare results form
 
-			resultsFormContext =
-				resultsFormContextBuilder.build (
+			resultsForm =
+				resultsFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					chatReportsSorted);
@@ -761,7 +756,7 @@ class ChatReportRevSharePart
 				chatMonthCostHelper.findByCode (
 					transaction,
 					chat,
-					searchForm.month ());
+					searchForm.value ().month ());
 
 			if (
 				optionalIsNotPresent (
@@ -865,7 +860,7 @@ class ChatReportRevSharePart
 
 			htmlTableOpenDetails ();
 
-			searchFormContext.outputFormRows (
+			searchForm.outputFormRows (
 				transaction);
 
 			htmlTableDetailsRowWriteHtml (
@@ -907,7 +902,7 @@ class ChatReportRevSharePart
 
 			htmlTableRowOpen ();
 
-			resultsFormContext.outputTableHeadings (
+			resultsForm.outputTableHeadings (
 				transaction);
 
 			htmlTableRowClose ();
@@ -921,7 +916,7 @@ class ChatReportRevSharePart
 
 				htmlTableRowOpen ();
 
-				resultsFormContext.outputTableCellsList (
+				resultsForm.outputTableCellsList (
 					transaction,
 					chatReport,
 					true);
@@ -934,7 +929,7 @@ class ChatReportRevSharePart
 
 			htmlTableRowOpen ();
 
-			resultsFormContext.outputTableCellsList (
+			resultsForm.outputTableCellsList (
 				transaction,
 				totalReport,
 				true);

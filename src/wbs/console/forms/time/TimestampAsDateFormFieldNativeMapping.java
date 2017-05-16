@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.misc.ConsoleUserHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -26,7 +26,7 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("timestampAsDateFormFieldNativeMapping")
 public
 class TimestampAsDateFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, LocalDate, Instant> {
+	implements ConsoleFormNativeMapping <Container, LocalDate, Instant> {
 
 	// singleton dependencies
 

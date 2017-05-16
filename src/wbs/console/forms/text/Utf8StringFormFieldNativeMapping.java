@@ -11,7 +11,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
@@ -19,7 +19,7 @@ import wbs.framework.database.Transaction;
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public
 class Utf8StringFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, String, byte[]> {
+	implements ConsoleFormNativeMapping <Container, String, byte[]> {
 
 	@Override
 	public

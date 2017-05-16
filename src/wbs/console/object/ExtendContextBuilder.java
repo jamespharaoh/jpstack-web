@@ -7,19 +7,18 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -33,12 +32,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("extendContextBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ExtendContextBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -129,9 +127,6 @@ class ExtendContextBuilder <
 
 			ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
-
-				.taskLogger (
-					container.taskLogger ())
 
 				.consoleHelper (
 					consoleHelper)

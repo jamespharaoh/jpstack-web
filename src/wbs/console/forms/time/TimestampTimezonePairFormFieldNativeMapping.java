@@ -14,7 +14,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -25,7 +25,7 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("timestampTimezonePairFormFieldNativeMapping")
 public
 class TimestampTimezonePairFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <
+	implements ConsoleFormNativeMapping <
 		Container,
 		DateTime,
 		Pair <Instant, String>

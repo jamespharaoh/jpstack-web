@@ -1,8 +1,8 @@
 package wbs.apn.chat.user.core.daemon;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;

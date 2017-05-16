@@ -43,7 +43,7 @@ class ConsoleMetaModuleFactory
 	// properties
 
 	@Getter @Setter
-	ConsoleModuleSpec consoleSpec;
+	ConsoleModuleSpec consoleModuleSpec;
 
 	// implementation
 
@@ -70,7 +70,7 @@ class ConsoleMetaModuleFactory
 			consoleMetaModuleBuilder.descend (
 				taskLogger,
 				contextMetaBuilderContainer,
-				consoleSpec.builders (),
+				consoleModuleSpec.builders (),
 				consoleMetaModule,
 				MissingBuilderBehaviour.ignore);
 

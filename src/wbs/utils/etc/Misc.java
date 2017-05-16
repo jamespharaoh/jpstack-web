@@ -692,22 +692,6 @@ class Misc {
 	}
 
 	public static
-	boolean isNull (
-			Object object) {
-
-		return object == null;
-
-	}
-
-	public static
-	boolean isNotNull (
-			Object object) {
-
-		return object != null;
-
-	}
-
-	public static
 	boolean lessThan (
 			int left,
 			int right) {

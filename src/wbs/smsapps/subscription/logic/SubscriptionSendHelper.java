@@ -1,7 +1,7 @@
 package wbs.smsapps.subscription.logic;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.List;
 

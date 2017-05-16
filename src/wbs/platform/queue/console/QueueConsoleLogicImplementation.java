@@ -1,10 +1,10 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.EnumUtils.enumName;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.joinWithFullStop;

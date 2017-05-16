@@ -2,7 +2,7 @@ package wbs.integrations.mediaburst.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.BinaryUtils.bytesFromHex;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;

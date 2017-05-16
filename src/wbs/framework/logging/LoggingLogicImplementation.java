@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -21,7 +22,8 @@ class LoggingLogicImplementation
 
 	// state
 
-	Long nextEventId = 0l;
+	AtomicLong nextEventId =
+		new AtomicLong ();
 
 	Boolean debugEnabled;
 
@@ -35,9 +37,6 @@ class LoggingLogicImplementation
 
 	Map <String, LogContext> logContexts =
 		new HashMap<> ();
-
-	private
-	Long nextId = 0l;
 
 	// constructors
 
@@ -73,9 +72,11 @@ class LoggingLogicImplementation
 	// log target implementation
 
 	@Override
-	public
+	public synchronized
 	Long nextEventId () {
-		return nextEventId ++;
+
+		return nextEventId.getAndIncrement ();
+
 	}
 
 	@Override

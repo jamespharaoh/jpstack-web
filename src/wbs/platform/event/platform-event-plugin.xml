@@ -48,6 +48,8 @@
 
 	<console-modules>
 		<console-module name="event"/>
+		<console-module name="event-link"/>
+		<console-module name="event-type"/>
 	</console-modules>
 
 </plugin>

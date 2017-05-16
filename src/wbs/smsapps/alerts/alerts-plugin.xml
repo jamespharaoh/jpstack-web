@@ -22,6 +22,7 @@
 
 	<console-modules>
 		<console-module name="alerts-alert"/>
+		<console-module name="alerts-number"/>
 		<console-module name="alerts-settings"/>
 		<console-module name="alerts-status-check"/>
 		<console-module name="alerts-subject"/>

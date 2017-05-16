@@ -46,6 +46,10 @@ class PostgresqlRootDataSource
 
 		) {
 
+			//@SuppressWarnings ("unused")
+			//Class <?> postgresqlDriverClass =
+			//	org.postgresql.Driver.class;
+
 			PGSimpleDataSource rootDataSource =
 				new PGSimpleDataSource ();
 

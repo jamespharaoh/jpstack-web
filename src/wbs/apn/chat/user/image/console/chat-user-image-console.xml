@@ -1,6 +1,9 @@
 <console-module
 	name="chat-user-image">
 
+	<console-helper-provider
+		object-name="chatUserImage"/>
+
 	<extend-context
 		name="chatUser.images"
 		base-name="chatUser"
@@ -57,27 +60,26 @@
 
 	</extend-context>
 
-	<field-set
-		name="upload-form"
-		class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm">
+	<forms>
 
-		<upload-field
-			name="upload"
-			label="File to upload"/>
-
-		<yes-no-field
-			name="setAsPrimary"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<form-context
+		<form
 			name="upload"
 			class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm"
-			type="perform"
-			column-fields="upload-form"/>
+			type="perform">
 
-	</form-contexts>
+			<column-fields>
+
+				<upload-field
+					name="upload"
+					label="File to upload"/>
+
+				<yes-no-field
+					name="setAsPrimary"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

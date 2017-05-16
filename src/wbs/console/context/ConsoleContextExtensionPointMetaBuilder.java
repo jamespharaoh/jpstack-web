@@ -5,11 +5,10 @@ import javax.inject.Provider;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
+import wbs.console.module.ConsoleMetaModuleBuilderComponent;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -23,10 +22,9 @@ import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleContextExtensionPointMetaBuilder")
-@ConsoleMetaModuleBuilderHandler
 public
 class ConsoleContextExtensionPointMetaBuilder
-	implements BuilderComponent {
+	implements ConsoleMetaModuleBuilderComponent {
 
 	// singleton dependencies
 

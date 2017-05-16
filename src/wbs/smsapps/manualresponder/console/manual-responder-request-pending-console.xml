@@ -21,15 +21,24 @@
 
 	</object-context>
 
-	<field-set
-		name="customer-details"
-		object-name="smsCustomer">
+	<forms>
 
-		<code-field/>
+		<form
+			name="customer"
+			object-type="sms-customer"
+			type="read-only">
 
-		<date-field
-			name="dateOfBirth"/>
+			<column-fields>
 
-	</field-set>
+				<code-field/>
+
+				<date-field
+					name="dateOfBirth"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

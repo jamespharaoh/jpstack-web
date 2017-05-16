@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
@@ -12,7 +12,7 @@ import wbs.framework.database.Transaction;
 @PrototypeComponent ("identityFormFieldNativeMapping")
 public
 class IdentityFormFieldNativeMapping <Container, Type>
-	implements FormFieldNativeMapping <Container, Type, Type> {
+	implements ConsoleFormNativeMapping <Container, Type, Type> {
 
 	@Override
 	public

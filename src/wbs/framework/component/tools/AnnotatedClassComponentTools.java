@@ -6,9 +6,9 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.IterableUtils.iterableMap;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.filterNotNullToList;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
@@ -369,11 +369,13 @@ class AnnotatedClassComponentTools {
 
 						.addValueProperty (
 							"componentName",
-							componentName)
+							optionalOf (
+								componentName))
 
 						.addValueProperty (
 							"componentClass",
-							proxiedRequestComponent.proxyInterface ())
+							optionalOf (
+								proxiedRequestComponent.proxyInterface ()))
 
 						.hide (
 							hidden)

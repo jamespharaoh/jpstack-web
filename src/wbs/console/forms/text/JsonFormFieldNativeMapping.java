@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
@@ -21,7 +21,7 @@ import wbs.framework.database.Transaction;
 @PrototypeComponent ("jsonFormFieldNativeMapping")
 public
 class JsonFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,Object,String> {
+	implements ConsoleFormNativeMapping<Container,Object,String> {
 
 	@Override
 	public

@@ -15,19 +15,18 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.context.SimpleConsoleContext;
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -47,10 +46,9 @@ import wbs.platform.object.settings.ObjectSettingsPageSpec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 
 @PrototypeComponent ("chatHelpTemplateContextBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ChatHelpTemplateContextBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -152,17 +150,18 @@ class ChatHelpTemplateContextBuilder
 
 			buildContextTypes ();
 			buildContexts ();
-			buildParentTab ();
+
+			buildParentTab (
+				taskLogger);
+
 			buildListPage ();
 			buildCreatePage ();
 			buildSettingsPage ();
 
 			ConsoleContextBuilderContainer <ChatHelpTemplateRec> listContainer =
-				new ConsoleContextBuilderContainerImplementation
-					<ChatHelpTemplateRec> ()
-
-				.taskLogger (
-					container.taskLogger ())
+				new ConsoleContextBuilderContainerImplementation <
+					ChatHelpTemplateRec
+				> ()
 
 				.consoleHelper (
 					chatHelpTemplateHelper)
@@ -196,12 +195,11 @@ class ChatHelpTemplateContextBuilder
 				consoleModule,
 				MissingBuilderBehaviour.error);
 
-			ConsoleContextBuilderContainer <ChatHelpTemplateRec> objectContainer =
-				new ConsoleContextBuilderContainerImplementation
-					<ChatHelpTemplateRec> ()
-
-				.taskLogger (
-					container.taskLogger ())
+			ConsoleContextBuilderContainer <ChatHelpTemplateRec>
+				objectContainer =
+					new ConsoleContextBuilderContainerImplementation <
+						ChatHelpTemplateRec
+					> ()
 
 				.consoleHelper (
 					chatHelpTemplateHelper)
@@ -326,27 +324,39 @@ class ChatHelpTemplateContextBuilder
 
 	}
 
-	void buildParentTab () {
+	void buildParentTab (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			parentContextTabLocation,
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildParentTab");
 
-				.name (
-					parentContextTabName)
+		) {
 
-				.defaultLabel (
-					parentContextTabLabel)
+			consoleModule.addContextTab (
+				taskLogger,
+				parentContextTabLocation,
 
-				.localFile (
-					parentContextTabLocalFile)
+				contextTabProvider.get ()
 
-				.privKeys (
-					parentContextPrivKey),
+					.name (
+						parentContextTabName)
 
-			parentContextTypeNames);
+					.defaultLabel (
+						parentContextTabLabel)
+
+					.localFile (
+						parentContextTabLocalFile)
+
+					.privKeys (
+						parentContextPrivKey),
+
+				parentContextTypeNames);
+
+		}
 
 	}
 

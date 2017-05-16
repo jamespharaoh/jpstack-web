@@ -2,9 +2,9 @@ package wbs.framework.activitymanagerold;
 
 import static wbs.utils.collection.MapUtils.mapIsEmpty;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.max;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;

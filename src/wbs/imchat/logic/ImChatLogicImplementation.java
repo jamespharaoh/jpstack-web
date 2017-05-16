@@ -1,8 +1,8 @@
 package wbs.imchat.logic;
 
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;

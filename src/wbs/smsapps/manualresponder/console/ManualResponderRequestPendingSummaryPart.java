@@ -6,12 +6,12 @@ import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
@@ -55,8 +55,8 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
@@ -127,8 +127,8 @@ class ManualResponderRequestPendingSummaryPart
 	ManualResponderRequestConsoleHelper manualResponderRequestHelper;
 
 	@SingletonDependency
-	@NamedDependency ("manualResponderRequestPendingCustomerFormContextBuilder")
-	FormContextBuilder <SmsCustomerRec> customerFormContextBuilder;
+	@NamedDependency ("manualResponderRequestPendingCustomerFormType")
+	ConsoleFormType <SmsCustomerRec> customerFormType;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -162,7 +162,7 @@ class ManualResponderRequestPendingSummaryPart
 
 	// state
 
-	FormContext <SmsCustomerRec> customerFormContext;
+	ConsoleForm <SmsCustomerRec> customerForm;
 
 	ManualResponderRequestRec manualResponderRequest;
 	ManualResponderNumberRec manualResponderNumber;
@@ -273,8 +273,8 @@ class ManualResponderRequestPendingSummaryPart
 					smsCustomer)
 			) {
 
-				customerFormContext =
-					customerFormContextBuilder.build (
+				customerForm =
+					customerFormType.buildResponse (
 						transaction,
 						emptyMap (),
 						smsCustomer);
@@ -694,7 +694,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
-			customerFormContext.outputDetailsTable (
+			customerForm.outputDetailsTable (
 				transaction);
 
 		}

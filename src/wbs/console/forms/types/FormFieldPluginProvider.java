@@ -2,14 +2,14 @@ package wbs.console.forms.types;
 
 import com.google.common.base.Optional;
 
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
 
 public
 interface FormFieldPluginProvider {
 
 	default
-	Optional<FormFieldNativeMapping<?,?,?>> getNativeMapping (
-			FormFieldBuilderContext context,
+	Optional<ConsoleFormNativeMapping<?,?,?>> getNativeMapping (
+			ConsoleFormBuilderContext context,
 			Class<?> containerClass,
 			String fieldName,
 			Class<?> genericClass,
@@ -21,7 +21,7 @@ interface FormFieldPluginProvider {
 
 	default
 	Optional<FormFieldUpdateHook<?,?,?>> getUpdateHook (
-			FormFieldBuilderContext context,
+			ConsoleFormBuilderContext context,
 			Class<?> containerClass,
 			String fieldName) {
 

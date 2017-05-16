@@ -20,6 +20,7 @@
 	<console-modules>
 		<console-module name="dialogue"/>
 		<console-module name="dialogue-locator"/>
+		<console-module name="dialogue-mms-route"/>
 	</console-modules>
 
 </plugin>

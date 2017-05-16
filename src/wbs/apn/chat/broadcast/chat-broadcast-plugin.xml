@@ -32,6 +32,7 @@
 
 	<console-modules>
 		<console-module name="chat-broadcast"/>
+		<console-module name="chat-broadcast-number"/>
 	</console-modules>
 
 </plugin>

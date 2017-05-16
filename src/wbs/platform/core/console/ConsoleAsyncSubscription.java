@@ -1,7 +1,7 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.collection.MapUtils.mapContainsKey;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.HashMap;
 import java.util.HashSet;

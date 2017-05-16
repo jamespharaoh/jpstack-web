@@ -20,9 +20,10 @@ interface BuilderFactory <
 			Class <?> builderClass,
 			Provider <?> builderProvider);
 
+	<Type>
 	Factory addBuilders (
 			TaskLogger parentTaskLogger,
-			Map <Class <?>, Provider <Object>> builders);
+			Map <Class <?>, Provider <Type>> builders);
 
 	Builder <Context> create (
 			TaskLogger parentTaskLogger);

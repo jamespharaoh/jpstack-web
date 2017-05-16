@@ -1,5 +1,6 @@
 package wbs.platform.object.summary;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -15,11 +16,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormBuilder;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
@@ -30,7 +31,7 @@ import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
@@ -41,7 +42,6 @@ import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -59,13 +59,12 @@ import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectSummaryPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -76,10 +75,13 @@ class ObjectSummaryPageBuilder <
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager consoleFormManager;
+
+	@SingletonDependency
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -124,7 +126,7 @@ class ObjectSummaryPageBuilder <
 	@Getter
 	ConsoleHelper <ObjectType> consoleHelper;
 
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	String privKey;
 
@@ -169,6 +171,7 @@ class ObjectSummaryPageBuilder <
 			) {
 
 				buildContextTabs (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildContextFile (
@@ -188,31 +191,43 @@ class ObjectSummaryPageBuilder <
 	}
 
 	void buildContextTabs (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"end",
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTabs");
 
-				.name (
-					stringFormat (
-						"%s.summary",
-						container.pathPrefix ()))
+		) {
 
-				.defaultLabel (
-					"Summary")
+			consoleModule.addContextTab (
+				taskLogger,
+				"end",
 
-				.localFile (
-					stringFormat (
-						"%s.summary",
-						container.pathPrefix ()))
+				contextTabProvider.get ()
 
-				.privKeys (
-					privKey),
+					.name (
+						stringFormat (
+							"%s.summary",
+							container.pathPrefix ()))
 
-			extensionPoint.contextTypeNames ());
+					.defaultLabel (
+						"Summary")
+
+					.localFile (
+						stringFormat (
+							"%s.summary",
+							container.pathPrefix ()))
+
+					.privKeys (
+						privKey),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -288,38 +303,79 @@ class ObjectSummaryPageBuilder <
 
 	public
 	ObjectSummaryPageBuilder <ObjectType, ParentType> addFieldsPart (
-			@NonNull FormFieldSet <ObjectType> formFieldSet) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String fieldsName) {
 
-		PagePartFactory partFactory =
-			parentTransaction -> {
+		try (
 
-			try (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addFieldsPart");
+		) {
 
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"addFieldsPart");
+			return addFieldsPart (
+				taskLogger,
+				consoleFormManager.createFormType (
+					taskLogger,
+					consoleModule,
+					fieldsName,
+					consoleHelper.objectClass (),
+					FormType.readOnly,
+					optionalOf (
+						fieldsName),
+					optionalAbsent ()));
 
-			) {
+		}
 
-				return summaryFieldsPartProvider.get ()
+	}
 
-					.consoleHelper (
-						consoleHelper)
+	public
+	ObjectSummaryPageBuilder <ObjectType, ParentType> addFieldsPart (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleFormType <ObjectType> formType) {
 
-					.formContextBuilder (
-						formContextBuilder)
+		try (
 
-				;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"addFieldsPart");
 
-			}
+		) {
 
-		};
+			PagePartFactory partFactory =
+				parentTransaction -> {
 
-		pagePartFactories.add (
-			partFactory);
+				try (
 
-		return this;
+					NestedTransaction nestedTansaction =
+						parentTransaction.nestTransaction (
+							logContext,
+							"addFieldsPart.PagePartFactory");
+
+				) {
+
+					return summaryFieldsPartProvider.get ()
+
+						.consoleHelper (
+							consoleHelper)
+
+						.formContextBuilder (
+							formType)
+
+					;
+
+				}
+
+			};
+
+			pagePartFactories.add (
+				partFactory);
+
+			return this;
+
+		}
 
 	}
 
@@ -424,27 +480,40 @@ class ObjectSummaryPageBuilder <
 			consoleHelper =
 				container.consoleHelper ();
 
-			formContextBuilder =
-				formContextManager.createFormContextBuilder (
-					consoleModule,
-					"summary",
-					consoleHelper.objectClass (),
-					FormType.readOnly,
-					optionalOf (
-						spec.formFieldsName ()),
-					optionalAbsent ());
+			formType =
+				ifNotNullThenElse (
+					spec.formFieldsName,
+					() -> formContextManager.createFormType (
+						taskLogger,
+						consoleModule,
+						"summary",
+						consoleHelper.objectClass (),
+						FormType.readOnly,
+						optionalOf (
+							spec.formFieldsName ()),
+						optionalAbsent ()),
+					() -> formContextManager.createFormType (
+						taskLogger,
+						"summary",
+						consoleHelper.objectClass (),
+						FormType.readOnly,
+						optionalOf (
+							defaultFields (
+								taskLogger)),
+						optionalAbsent ()));
 
 			privKey =
 				spec.privKey ();
 
-			/*
 			if (spec.builders ().isEmpty ()) {
 
 				addFieldsPart (
-					formFieldSet);
+					taskLogger,
+					formType);
 
 			}
 
+			/*
 			// if a provider name is provided
 
 			if (spec.fieldsProviderName () != null) {
@@ -456,9 +525,7 @@ class ObjectSummaryPageBuilder <
 							spec.fieldsProviderName (),
 							FieldsProvider.class));
 
-			}
-
-			else {
+			} else {
 
 				fieldsProvider =
 					null;
@@ -470,6 +537,7 @@ class ObjectSummaryPageBuilder <
 
 	}
 
+	private
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -537,7 +605,7 @@ class ObjectSummaryPageBuilder <
 					"%s.summary",
 					consoleHelper.objectName ());
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
 				consoleHelper,
 				fieldSetName,

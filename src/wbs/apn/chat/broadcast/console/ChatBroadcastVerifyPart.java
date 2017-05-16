@@ -22,10 +22,10 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.MultiFormContextBuilder;
-import wbs.console.forms.context.MultiFormContexts;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
+import wbs.console.forms.core.ConsoleMultiForm;
+import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -56,13 +56,11 @@ class ChatBroadcastVerifyPart
 
 	@SingletonDependency
 	@NamedDependency
-	MultiFormContextBuilder <ChatBroadcastSendForm>
-		chatBroadcastSendFormContextsBuilder;
+	ConsoleMultiFormType <ChatBroadcastSendForm> chatBroadcastSendFormType;
 
 	@SingletonDependency
 	@NamedDependency
-	FormContextBuilder <ChatUserRec>
-		chatBroadcastVerifyFormContextsBuilder;
+	ConsoleFormType <ChatUserRec> chatBroadcastVerifyFormType;
 
 	@SingletonDependency
 	ChatConsoleHelper chatHelper;
@@ -87,10 +85,9 @@ class ChatBroadcastVerifyPart
 	ChatRec chat;
 	ChatUserRec fromUser;
 
-	MultiFormContexts <ChatBroadcastSendForm> sendFormContexts;
-	FormContext <ChatUserRec> verifyFormContext;
+	ConsoleMultiForm <ChatBroadcastSendForm> sendForm;
+	ConsoleForm <ChatUserRec> verifyForm;
 
-	ChatBroadcastSendForm sendForm;
 	List <ChatUserRec> recipients;
 
 	// details
@@ -149,19 +146,16 @@ class ChatBroadcastVerifyPart
 
 				.build ();
 
-			sendFormContexts =
-				chatBroadcastSendFormContextsBuilder.build (
+			sendForm =
+				chatBroadcastSendFormType.build (
 					transaction,
 					formHints);
-
-			sendForm =
-				sendFormContexts.object ();
 
 			fromUser =
 				chatUserHelper.findByCodeRequired (
 					transaction,
 					chat,
-					sendForm.fromUser ());
+					sendForm.value ().fromUser ());
 
 			List <Long> chatUserIds =
 				genericCastUnchecked (
@@ -173,8 +167,8 @@ class ChatBroadcastVerifyPart
 					transaction,
 					chatUserIds);
 
-			verifyFormContext =
-				chatBroadcastVerifyFormContextsBuilder.build (
+			verifyForm =
+				chatBroadcastVerifyFormType.buildResponse (
 					transaction,
 					formHints,
 					recipients);
@@ -203,7 +197,7 @@ class ChatBroadcastVerifyPart
 
 			// always hidden
 
-			sendFormContexts.outputFormAlwaysHidden (
+			sendForm.outputFormAlwaysHidden (
 				transaction,
 				"search",
 				"numbers",
@@ -213,7 +207,7 @@ class ChatBroadcastVerifyPart
 
 			// temporarily hidden
 
-			sendFormContexts.outputFormTemporarilyHidden (
+			sendForm.outputFormTemporarilyHidden (
 				transaction,
 				"search",
 				"numbers",
@@ -241,7 +235,7 @@ class ChatBroadcastVerifyPart
 					fromUser.getInfoText (),
 					() -> fromUser.getInfoText ().getText ()));
 
-			sendFormContexts.outputFormRows (
+			sendForm.outputFormRows (
 				transaction,
 				"message-message");
 
@@ -283,7 +277,7 @@ class ChatBroadcastVerifyPart
 				integerToDecimalString (
 					recipients.size ()));
 
-			if (sendForm.search ()) {
+			if (sendForm.value ().search ()) {
 
 				htmlParagraphOpen ();
 
@@ -295,7 +289,7 @@ class ChatBroadcastVerifyPart
 
 			}
 
-			verifyFormContext.outputListTable (
+			verifyForm.outputListTable (
 				transaction,
 				false);
 

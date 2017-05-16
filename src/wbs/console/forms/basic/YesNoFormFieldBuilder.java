@@ -14,23 +14,22 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderComponent;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.core.ConsoleFormPluginManager;
 import wbs.console.forms.core.FormFieldSetImplementation;
 import wbs.console.forms.core.HiddenFormField;
 import wbs.console.forms.core.ReadOnlyFormField;
 import wbs.console.forms.core.UpdatableFormField;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
-import wbs.console.forms.types.FormFieldPluginManager;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -42,15 +41,14 @@ import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("yesNoFormFieldBuilder")
-@ConsoleModuleBuilderHandler
 public
 class YesNoFormFieldBuilder
-	implements BuilderComponent {
+	implements ConsoleFormBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldPluginManager formFieldPluginManager;
+	ConsoleFormPluginManager formFieldPluginManager;
 
 	// prototype dependencies
 
@@ -96,7 +94,7 @@ class YesNoFormFieldBuilder
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext context;
+	ConsoleFormBuilderContext context;
 
 	@BuilderSource
 	YesNoFormFieldSpec spec;
@@ -170,7 +168,7 @@ class YesNoFormFieldBuilder
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping =
+		ConsoleFormNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
 		// value validators

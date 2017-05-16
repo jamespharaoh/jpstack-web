@@ -130,4 +130,13 @@
 
 	</field-set>
 
+	<forms>
+
+		<form
+			name="restart-action"
+			class="java.lang.Object"
+			type="perform"/>
+
+	</forms>
+
 </console-module>

@@ -7,7 +7,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -19,7 +19,7 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("chainedFormFieldNativeMapping")
 public
 class ChainedFormFieldNativeMapping <Container, Generic, Temporary, Native>
-	implements FormFieldNativeMapping <Container, Generic, Native> {
+	implements ConsoleFormNativeMapping <Container, Generic, Native> {
 
 	// singleton components
 
@@ -29,10 +29,10 @@ class ChainedFormFieldNativeMapping <Container, Generic, Temporary, Native>
 	// properties
 
 	@Getter @Setter
-	FormFieldNativeMapping <Container, Generic, Temporary> previousMapping;
+	ConsoleFormNativeMapping <Container, Generic, Temporary> previousMapping;
 
 	@Getter @Setter
-	FormFieldNativeMapping <Container, Temporary, Native> nextMapping;
+	ConsoleFormNativeMapping <Container, Temporary, Native> nextMapping;
 
 	// implementation
 

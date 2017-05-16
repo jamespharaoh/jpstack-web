@@ -3,7 +3,7 @@ package wbs.framework.object;
 import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 
 import javax.annotation.Nonnull;
 
@@ -37,7 +37,7 @@ interface ObjectHelperPropertyMethods <
 			Record <?> object) {
 
 		return getName (
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object));
 

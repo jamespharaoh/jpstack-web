@@ -3,7 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
@@ -38,8 +38,8 @@ import com.google.common.collect.Lists;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
@@ -72,8 +72,8 @@ class ImChatPendingSummaryPart
 	// dependencies
 
 	@SingletonDependency
-	@NamedDependency ("imChatPendingSummaryCustomerFormContextBuilder")
-	FormContextBuilder <ImChatCustomerRec> customerFormContextBuilder;
+	@NamedDependency ("imChatPendingSummaryCustomerFormType")
+	ConsoleFormType <ImChatCustomerRec> customerFormType;
 
 	@SingletonDependency
 	ImChatMessageConsoleHelper imChatMessageHelper;
@@ -82,8 +82,8 @@ class ImChatPendingSummaryPart
 	LogContext logContext;
 
 	@SingletonDependency
-	@NamedDependency ("imChatPendingSummaryMessageFormContextBuilder")
-	FormContextBuilder <ImChatMessageRec> messageFormContextBuilder;
+	@NamedDependency ("imChatPendingSummaryMessageFormType")
+	ConsoleFormType <ImChatMessageRec> messageFormType;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -92,14 +92,14 @@ class ImChatPendingSummaryPart
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
-	@NamedDependency ("imChatPendingSummaryProfileFormContextBuilder")
-	FormContextBuilder <ImChatProfileRec> profileFormContextBuilder;
+	@NamedDependency ("imChatPendingSummaryProfileFormType")
+	ConsoleFormType <ImChatProfileRec> profileFormType;
 
 	// state
 
-	FormContext <ImChatCustomerRec> customerFormContext;
-	FormContext <ImChatProfileRec> profileFormContext;
-	FormContext <ImChatMessageRec> messageFormContext;
+	ConsoleForm <ImChatCustomerRec> customerForm;
+	ConsoleForm <ImChatProfileRec> profileForm;
+	ConsoleForm <ImChatMessageRec> messageForm;
 
 	ImChatMessageRec message;
 	ImChatConversationRec conversation;
@@ -176,20 +176,20 @@ class ImChatPendingSummaryPart
 
 			// setup forms
 
-			customerFormContext =
-				customerFormContextBuilder.build (
+			customerForm =
+				customerFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					customer);
 
-			profileFormContext =
-				profileFormContextBuilder.build (
+			profileForm =
+				profileFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					profile);
 
-			messageFormContext =
-				messageFormContextBuilder.build (
+			messageForm =
+				messageFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					message);
@@ -323,7 +323,7 @@ class ImChatPendingSummaryPart
 			htmlHeadingThreeWrite (
 				"Customer summary");
 
-			customerFormContext.outputDetailsTable (
+			customerForm.outputDetailsTable (
 				transaction);
 
 		}
@@ -346,7 +346,7 @@ class ImChatPendingSummaryPart
 			htmlHeadingThreeWrite (
 				"Profile summary");
 
-			profileFormContext.outputDetailsTable (
+			profileForm.outputDetailsTable (
 				transaction);
 
 		}
@@ -420,7 +420,7 @@ class ImChatPendingSummaryPart
 
 			htmlTableRowOpen ();
 
-			messageFormContext.outputTableHeadings (
+			messageForm.outputTableHeadings (
 				transaction);
 
 			htmlTableRowClose ();
@@ -445,7 +445,7 @@ class ImChatPendingSummaryPart
 							classForMessage (
 								historyReply)));
 
-					messageFormContext.outputTableCellsList (
+					messageForm.outputTableCellsList (
 						transaction,
 						historyReply,
 						true);
@@ -471,7 +471,7 @@ class ImChatPendingSummaryPart
 
 				)));
 
-				messageFormContext.outputTableCellsList (
+				messageForm.outputTableCellsList (
 					transaction,
 					historyRequest,
 					true);

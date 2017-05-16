@@ -15,15 +15,14 @@ import com.google.common.collect.Iterables;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -38,12 +37,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("consoleContextSectionBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ConsoleContextSectionBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -119,15 +117,16 @@ class ConsoleContextSectionBuilder <
 					resolvedExtensionPoint);
 
 				buildContextTabs (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
 
-			ConsoleContextBuilderContainer<ObjectType> nextContextBuilderContainer =
-				new ConsoleContextBuilderContainerImplementation<ObjectType> ()
-
-				.taskLogger (
-					container.taskLogger ())
+			ConsoleContextBuilderContainer <ObjectType>
+				nextContextBuilderContainer =
+					new ConsoleContextBuilderContainerImplementation <
+						ObjectType
+					> ()
 
 				.consoleHelper (
 					consoleHelper)
@@ -259,24 +258,36 @@ class ConsoleContextSectionBuilder <
 	}
 
 	void buildContextTabs (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTabs");
 
-				.name (
-					tabName)
+		) {
 
-				.defaultLabel (
-					label)
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
 
-				.localFile (
-					tabTarget),
+				contextTabProvider.get ()
 
-			extensionPoint.contextTypeNames ());
+					.name (
+						tabName)
+
+					.defaultLabel (
+						label)
+
+					.localFile (
+						tabTarget),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

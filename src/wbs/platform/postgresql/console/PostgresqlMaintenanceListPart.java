@@ -41,7 +41,7 @@ import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
-import wbs.utils.etc.Misc;
+import wbs.utils.etc.NullUtils;
 
 @PrototypeComponent ("postgresqlMaintenanceListPart")
 public
@@ -171,7 +171,7 @@ class PostgresqlMaintenanceListPart
 						PostgresqlMaintenanceRec::getLastDuration)
 
 					.filter (
-						Misc::isNotNull)
+						NullUtils::isNotNull)
 
 					.map (
 						Duration::new)

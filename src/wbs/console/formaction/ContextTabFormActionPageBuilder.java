@@ -1,5 +1,6 @@
 package wbs.console.formaction;
 
+import static wbs.utils.etc.NullUtils.anyIsNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -11,12 +12,12 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -24,7 +25,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -41,11 +41,10 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("contextTabFormActionPageBuilder")
-@ConsoleModuleBuilderHandler
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class ContextTabFormActionPageBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -56,7 +55,7 @@ class ContextTabFormActionPageBuilder
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -103,8 +102,8 @@ class ContextTabFormActionPageBuilder
 
 	Provider <ConsoleFormActionHelper> formActionHelperProvider;
 
-	FormContextBuilder <?> actionFormContextBuilder;
-	FormContextBuilder <?> historyFormContextBuilder;
+	ConsoleFormType <?> actionFormType;
+	ConsoleFormType <?> historyFormType;
 
 	PagePartFactory pagePartFactory;
 	Provider <Action> actionProvider;
@@ -129,7 +128,8 @@ class ContextTabFormActionPageBuilder
 
 			setDefaults ();
 
-			initFormFields ();
+			initFormFields (
+				taskLogger);
 
 			initFormActionHelper (
 				taskLogger);
@@ -147,6 +147,7 @@ class ContextTabFormActionPageBuilder
 			) {
 
 				buildTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildFile (
@@ -158,27 +159,50 @@ class ContextTabFormActionPageBuilder
 
 	}
 
-	void initFormFields () {
+	private
+	void initFormFields (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		actionFormContextBuilder =
-			formContextManager.formContextBuilderRequired (
-				consoleModule.name (),
-				ifNull (
-					spec.actionFormContextName (),
-					stringFormat (
-						"%s-form",
-						spec.name ())),
-				Object.class);
+		try (
 
-		historyFormContextBuilder =
-			formContextManager.formContextBuilderRequired (
-				consoleModule.name (),
-				ifNull (
-					spec.historyFormContextName (),
-					stringFormat (
-						"%s-history",
-						spec.name ())),
-				Object.class);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initFormFields");
+
+		) {
+
+			actionFormType =
+				formContextManager.getFormTypeRequired (
+					taskLogger,
+					consoleModule.name (),
+					ifNull (
+						spec.actionFormTypeName (),
+						stringFormat (
+							"%s-action",
+							spec.name ())),
+					Object.class);
+
+			if (
+				anyIsNotNull (
+					spec.historyHeading (),
+					spec.historyFormTypeName ())
+			) {
+
+				historyFormType =
+					formContextManager.getFormTypeRequired (
+						taskLogger,
+						consoleModule.name (),
+						ifNull (
+							spec.historyFormTypeName (),
+							stringFormat (
+								"%s-history",
+								spec.name ())),
+						Object.class);
+
+			}
+
+		}
 
 	}
 
@@ -205,16 +229,28 @@ class ContextTabFormActionPageBuilder
 	}
 
 	void buildTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
-			consoleContextTabProvider.get ()
-				.name (tabName)
-				.defaultLabel (tabLabel)
-				.localFile (localFile),
-			extensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
+
+		) {
+
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
+				consoleContextTabProvider.get ()
+					.name (tabName)
+					.defaultLabel (tabLabel)
+					.localFile (localFile),
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -238,7 +274,7 @@ class ContextTabFormActionPageBuilder
 				formActionHelperProvider.get ())
 
 			.actionFormContextBuilder (
-				actionFormContextBuilder)
+				actionFormType)
 
 			.helpText (
 				spec.helpText ())
@@ -253,7 +289,7 @@ class ContextTabFormActionPageBuilder
 				spec.historyHeading ())
 
 			.historyFormContextBuilder (
-				historyFormContextBuilder)
+				historyFormType)
 
 		;
 
@@ -268,7 +304,7 @@ class ContextTabFormActionPageBuilder
 				"action")
 
 			.formContextBuilder (
-				actionFormContextBuilder)
+				actionFormType)
 
 			.formActionHelper (
 				formActionHelperProvider.get ())

@@ -15,6 +15,8 @@ import wbs.console.html.ScriptRef;
 public
 interface FormFieldSet <Container> {
 
+	String name ();
+
 	Iterable <FormItem <Container>> formItems ();
 
 	Iterable <FormField <Container, ?, ?, ?>> formFields ();

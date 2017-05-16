@@ -46,6 +46,7 @@
 	<console-modules>
 		<console-module name="chat"/>
 		<console-module name="chat-month-cost"/>
+		<console-module name="chat-stats"/>
 	</console-modules>
 
 	<fixtures>

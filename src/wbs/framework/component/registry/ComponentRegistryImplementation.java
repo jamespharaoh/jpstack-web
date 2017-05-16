@@ -7,16 +7,17 @@ import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -81,7 +82,7 @@ import wbs.framework.component.manager.ComponentManagerImplementation;
 import wbs.framework.component.registry.InjectedProperty.CollectionType;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
-import wbs.framework.component.tools.SingletonComponentFactory;
+import wbs.framework.component.tools.ValueComponentFactory;
 import wbs.framework.component.xml.ComponentPropertyValueSpec;
 import wbs.framework.component.xml.ComponentsComponentSpec;
 import wbs.framework.component.xml.ComponentsPropertiesPropertySpec;
@@ -340,6 +341,8 @@ class ComponentRegistryImplementation
 
 		) {
 
+			taskLogger.makeException ();
+
 			// create component manager
 
 			@SuppressWarnings ("resource")
@@ -480,24 +483,30 @@ class ComponentRegistryImplementation
 
 			if (componentDefinition.name () == null) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition has no name");
+
+				return this;
 
 			}
 
 			if (componentDefinition.componentClass () == null) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s has no component class",
 					componentDefinition.name ());
+
+				return this;
 
 			}
 
 			if (componentDefinition.scope () == null) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Copmonent definition %s has no scope",
 					componentDefinition.name ());
+
+				return this;
 
 			}
 
@@ -506,9 +515,11 @@ class ComponentRegistryImplementation
 					componentDefinition.name ())
 			) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Duplicated component definition name %s",
 					componentDefinition.name ());
+
+				return this;
 
 			}
 
@@ -519,10 +530,12 @@ class ComponentRegistryImplementation
 					"prototype")
 			) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s has invalid scope %s",
 					componentDefinition.name (),
 					componentDefinition.scope ());
+
+				return this;
 
 			}
 
@@ -538,20 +551,24 @@ class ComponentRegistryImplementation
 					instantiationClass.getModifiers ())
 			) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s refers to non-public class %s",
 					componentDefinition.name (),
 					instantiationClass.getName ());
+
+				return this;
 
 			}
 
 			if (Modifier.isAbstract (
 					instantiationClass.getModifiers ())) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s refers to abstract class %s",
 					componentDefinition.name (),
 					instantiationClass.getName ());
+
+				return this;
 
 			}
 
@@ -564,11 +581,13 @@ class ComponentRegistryImplementation
 
 			} catch (NoSuchMethodException exception) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s refers class %s with no default ",
 					componentDefinition.name (),
 					instantiationClass.getName (),
 					"constructor");
+
+				return this;
 
 			}
 
@@ -577,12 +596,14 @@ class ComponentRegistryImplementation
 					constructor.getModifiers ())
 			) {
 
-				throw taskLogger.fatalFormat (
+				taskLogger.errorFormat (
 					"Component definition %s ",
 					componentDefinition.name (),
 					"refers to class %s ",
 					instantiationClass.getName (),
 					"with non-public default constructor");
+
+				return this;
 
 			}
 
@@ -773,11 +794,12 @@ class ComponentRegistryImplementation
 
 				.factoryClass (
 					genericCastUnchecked (
-						SingletonComponentFactory.class))
+						ValueComponentFactory.class))
 
 				.addValueProperty (
 					"component",
-					component)
+					optionalOf (
+						component))
 
 				.owned (
 					false);
@@ -1249,11 +1271,13 @@ class ComponentRegistryImplementation
 
 					.addValueProperty (
 						"loggingLogic",
-						loggingLogic)
+						optionalOf (
+							loggingLogic))
 
 					.addValueProperty (
 						"componentClass",
-						field.getDeclaringClass ())
+						optionalOf (
+							field.getDeclaringClass ()))
 
 				;
 

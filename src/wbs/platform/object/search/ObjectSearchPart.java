@@ -25,8 +25,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -79,7 +79,7 @@ class ObjectSearchPart <
 	String sessionKey;
 
 	@Getter @Setter
-	FormContextBuilder <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormContextBuilder;
 
 	@Getter @Setter
 	String fileName;
@@ -93,7 +93,7 @@ class ObjectSearchPart <
 
 	Map <String, Object> formHints;
 
-	FormContext <SearchType> searchFormContext;
+	ConsoleForm <SearchType> searchFormContext;
 
 	// details
 
@@ -165,12 +165,12 @@ class ObjectSearchPart <
 				formHintsBuilder.build ();
 
 			searchFormContext =
-				searchFormContextBuilder.build (
+				searchFormContextBuilder.buildResponse (
 					transaction,
 					formHints);
 
 			currentSearch =
-				searchFormContext.object ();
+				searchFormContext.value ();
 
 			cleanSearch =
 				classInstantiate (

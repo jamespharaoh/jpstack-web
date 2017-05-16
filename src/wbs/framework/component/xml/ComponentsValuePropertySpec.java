@@ -1,5 +1,7 @@
 package wbs.framework.component.xml;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -65,7 +67,8 @@ class ComponentsValuePropertySpec
 
 			componentDefinition.addValueProperty (
 				name,
-				value);
+				optionalOf (
+					value));
 
 		}
 

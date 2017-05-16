@@ -6,12 +6,11 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
+import wbs.console.module.ConsoleMetaModuleBuilderComponent;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -24,10 +23,9 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("simpleConsoleContextMetaBuilder")
-@ConsoleMetaModuleBuilderHandler
 public
 class SimpleConsoleContextMetaBuilder
-	implements BuilderComponent {
+	implements ConsoleMetaModuleBuilderComponent {
 
 	// singleton dependencies
 

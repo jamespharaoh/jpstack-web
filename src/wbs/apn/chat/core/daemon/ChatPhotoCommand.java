@@ -1,11 +1,11 @@
 package wbs.apn.chat.core.daemon;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import com.google.common.base.Optional;
 

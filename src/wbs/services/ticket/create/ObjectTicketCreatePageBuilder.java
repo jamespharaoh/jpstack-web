@@ -12,15 +12,14 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.types.FieldsProvider;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -28,7 +27,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -52,10 +50,9 @@ import wbs.services.ticket.core.model.TicketRec;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectTicketCreatePageBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -63,13 +60,10 @@ class ObjectTicketCreatePageBuilder
 	ComponentManager componentManager;
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
-
-	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -131,7 +125,7 @@ class ObjectTicketCreatePageBuilder
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FormContextBuilder <TicketRec> formContextBuilder;
+	ConsoleFormType <TicketRec> formContextBuilder;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -161,17 +155,17 @@ class ObjectTicketCreatePageBuilder
 				taskLogger);
 
 			for (
-				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+				ResolvedConsoleContextExtensionPoint extensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
 						container.extensionPointName ())
 			) {
 
 				buildTab (
-					container.taskLogger (),
-					resolvedExtensionPoint);
+					taskLogger,
+					extensionPoint);
 
 				buildFile (
-					resolvedExtensionPoint);
+					extensionPoint);
 
 			}
 
@@ -183,7 +177,7 @@ class ObjectTicketCreatePageBuilder
 
 	void buildTab (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		try (
 
@@ -203,7 +197,7 @@ class ObjectTicketCreatePageBuilder
 					.localFile (localFile),
 				hideTab
 					? Collections.<String>emptyList ()
-					: resolvedExtensionPoint.contextTypeNames ());
+					: extensionPoint.contextTypeNames ());
 
 		}
 

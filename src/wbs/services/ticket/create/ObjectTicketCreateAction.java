@@ -19,8 +19,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -135,7 +135,7 @@ class ObjectTicketCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormContextBuilder <TicketRec> formContextBuilder;
+	ConsoleFormType <TicketRec> formContextBuilder;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -154,7 +154,7 @@ class ObjectTicketCreateAction <
 	ConsoleHelper <ParentType> parentHelper;
 	TicketManagerRec ticketManager;
 
-	FormContext <ObjectType> formContext;
+	ConsoleForm <ObjectType> formContext;
 
 	// details
 
@@ -356,8 +356,8 @@ class ObjectTicketCreateAction <
 			}
 			*/
 
-			FormContext <TicketRec> formContext =
-				formContextBuilder.build (
+			ConsoleForm <TicketRec> formContext =
+				formContextBuilder.buildAction (
 					transaction,
 					emptyMap (),
 					ticket);

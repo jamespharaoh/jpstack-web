@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -21,7 +21,7 @@ import wbs.utils.etc.PropertyUtils;
 public
 class WhereNotDeletedCriteriaSpec
 	implements
-		ConsoleModuleData,
+		ConsoleSpec,
 		CriteriaSpec {
 
 	// implementation

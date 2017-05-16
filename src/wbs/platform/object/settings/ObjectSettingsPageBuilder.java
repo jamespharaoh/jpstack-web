@@ -17,11 +17,11 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormBuilder;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
@@ -32,7 +32,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -59,12 +59,11 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("objectSettingsPageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectSettingsPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
-> {
+> implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -72,7 +71,7 @@ class ObjectSettingsPageBuilder <
 	ComponentManager componentManager;
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@WeakSingletonDependency
 	ConsoleManager consoleManager;
@@ -81,7 +80,7 @@ class ObjectSettingsPageBuilder <
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -126,7 +125,7 @@ class ObjectSettingsPageBuilder <
 
 	ConsoleHelper <ObjectType> consoleHelper;
 
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	//FormFieldSet <ObjectType> formFieldSet;
 	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
@@ -146,6 +145,7 @@ class ObjectSettingsPageBuilder <
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (
@@ -174,6 +174,7 @@ class ObjectSettingsPageBuilder <
 			) {
 
 				buildTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildFile (
@@ -186,27 +187,39 @@ class ObjectSettingsPageBuilder <
 	}
 
 	void buildTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"end",
-			contextTab.get ()
+		try (
 
-				.name (
-					tabName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
 
-				.defaultLabel (
-					capitalise (friendlyShortName))
+		) {
 
-				.localFile (
-					fileName)
+			consoleModule.addContextTab (
+				taskLogger,
+				"end",
+				contextTab.get ()
 
-				.privKeys (
-					Collections.singletonList (
-						privKey)),
+					.name (
+						tabName)
 
-			extensionPoint.contextTypeNames ());
+					.defaultLabel (
+						capitalise (friendlyShortName))
+
+					.localFile (
+						fileName)
+
+					.privKeys (
+						Collections.singletonList (
+							privKey)),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -421,12 +434,12 @@ class ObjectSettingsPageBuilder <
 		) {
 
 			consoleHelper =
-				ifNotNullThenElse (
-					spec.objectName (),
-					() -> genericCastUnchecked (
-						objectManager.findConsoleHelperRequired (
-							spec.objectName ())),
-					() -> container.consoleHelper ());
+				genericCastUnchecked (
+					ifNotNullThenElse (
+						spec.objectName (),
+						() -> objectManager.findConsoleHelperRequired (
+							spec.objectName ()),
+						() -> container.consoleHelper ()));
 
 			name =
 				spec.name ();
@@ -489,14 +502,26 @@ class ObjectSettingsPageBuilder <
 						consoleHelper.objectName ()));
 
 			formContextBuilder =
-				formContextManager.createFormContextBuilder (
-					consoleModule,
-					name,
-					consoleHelper.objectClass (),
-					FormType.update,
-					optionalOf (
-						spec.formFieldsName ()),
-					optionalAbsent ());
+				ifNotNullThenElse (
+					spec.formFieldsName (),
+					() -> formContextManager.createFormType (
+						taskLogger,
+						consoleModule,
+						shortName,
+						consoleHelper.objectClass (),
+						FormType.update,
+						optionalOf (
+							spec.formFieldsName ()),
+						optionalAbsent ()),
+					() -> formContextManager.createFormType (
+						taskLogger,
+						shortName,
+						consoleHelper.objectClass (),
+						FormType.update,
+						optionalOf (
+							defaultFields (
+								taskLogger)),
+						optionalAbsent ()));
 
 			// if a provider name is provided
 
@@ -524,6 +549,7 @@ class ObjectSettingsPageBuilder <
 
 	}
 
+	private
 	FormFieldSet <ObjectType> defaultFields (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -571,7 +597,7 @@ class ObjectSettingsPageBuilder <
 					"%s.settings",
 					consoleHelper.objectName ());
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
 				consoleHelper,
 				fieldSetName,

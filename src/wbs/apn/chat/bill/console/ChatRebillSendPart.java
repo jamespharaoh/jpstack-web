@@ -29,8 +29,8 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -53,32 +53,31 @@ class ChatRebillSendPart
 	// singleton dependencies
 
 	@SingletonDependency
+	@NamedDependency ("chatRebillBillResultsFormType")
+	ConsoleFormType <ChatUserRec> billResultsFormType;
+
+	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@SingletonDependency
-	@NamedDependency ("chatRebillSearchFormContextBuilder")
-	FormContextBuilder <ChatRebillSearch> searchFormContextBuilder;
-
-	@SingletonDependency
-	@NamedDependency ("chatRebillBillResultsFormContextBuilder")
-	FormContextBuilder <ChatUserRec> billResultsFormContextBuilder;
-
-	@SingletonDependency
-	@NamedDependency ("chatRebillNonBillResultsFormContextBuilder")
-	FormContextBuilder <ChatRebillNonBillResult>
-		nonBillResultsFormContextBuilder;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	@SingletonDependency
+	@NamedDependency ("chatRebillNonBillResultsFormType")
+	ConsoleFormType <ChatRebillNonBillResult> nonBillResultsFormType;
+
+	@SingletonDependency
+	@NamedDependency ("chatRebillSearchFormType")
+	ConsoleFormType <ChatRebillSearch> searchFormType;
+
 	// state
 
-	FormContext <ChatRebillSearch> searchFormContext;
-	FormContext <ChatUserRec> billResultsFormContext;
-	FormContext <ChatRebillNonBillResult> nonBillResultsFormContext;
+	ConsoleForm <ChatRebillSearch> searchForm;
+	ConsoleForm <ChatUserRec> billResultsForm;
+	ConsoleForm <ChatRebillNonBillResult> nonBillResultsForm;
 
 	Optional <List <ChatUserRec>> billSearchResults;
 	Optional <List <ChatRebillNonBillResult>> nonBillSearchResults;
@@ -149,19 +148,19 @@ class ChatRebillSendPart
 
 				.build ();
 
-			searchFormContext =
-				searchFormContextBuilder.build (
+			searchForm =
+				searchFormType.buildResponse (
 					transaction,
 					formHints);
 
-			billResultsFormContext =
-				billResultsFormContextBuilder.build (
+			billResultsForm =
+				billResultsFormType.buildResponse (
 					transaction,
 					formHints,
 					billSearchResults);
 
-			nonBillResultsFormContext =
-				nonBillResultsFormContextBuilder.build (
+			nonBillResultsForm =
+				nonBillResultsFormType.buildResponse (
 					transaction,
 					formHints,
 					nonBillSearchResults);
@@ -220,7 +219,7 @@ class ChatRebillSendPart
 
 			htmlTableOpenDetails ();
 
-			searchFormContext.outputFormRows (
+			searchForm.outputFormRows (
 				transaction);
 
 			htmlTableClose ();
@@ -312,7 +311,7 @@ class ChatRebillSendPart
 
 			}
 
-			billResultsFormContext.outputListTable (
+			billResultsForm.outputListTable (
 				transaction,
 				true);
 
@@ -358,7 +357,7 @@ class ChatRebillSendPart
 				"built into the system. Some of these may be bypassed with ",
 				"settings on the search form.");
 
-			nonBillResultsFormContext.outputListTable (
+			nonBillResultsForm.outputListTable (
 				transaction,
 				true);
 

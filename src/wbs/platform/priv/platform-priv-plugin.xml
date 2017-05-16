@@ -30,6 +30,7 @@
 
 	<console-modules>
 		<console-module name="priv"/>
+		<console-module name="priv-type"/>
 	</console-modules>
 
 </plugin>

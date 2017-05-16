@@ -1,5 +1,7 @@
 package wbs.console.module;
 
+import static wbs.utils.etc.Misc.doNothing;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,22 +10,15 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.core.FormFieldBuilderContext;
-import wbs.console.forms.core.FormFieldBuilderContextImplementation;
-import wbs.console.forms.core.FormFieldSet;
-import wbs.console.forms.core.FormFieldSetImplementation;
+import wbs.console.forms.core.ConsoleFormsSpec;
 import wbs.console.forms.core.FormFieldSetSpec;
-import wbs.console.forms.types.FormField;
-import wbs.console.forms.types.FormItem;
-import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.helper.provider.ConsoleHelperProviderSpec;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
@@ -49,15 +44,14 @@ class ConsoleModuleBuilder
 	@StrongPrototypeDependency
 	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
-	@PrototypeDependency
-	@ConsoleModuleBuilderHandler
-	Map <Class <?>, Provider <Object>> consoleModuleBuilders;
+	@StrongPrototypeDependency
+	Map <Class <?>, Provider <ConsoleModuleBuilderComponent>> builders;
 
 	// state
 
 	Builder <TaskLogger> builder;
 
-	// init
+	// life cycle
 
 	@NormalLifecycleSetup
 	public
@@ -81,82 +75,12 @@ class ConsoleModuleBuilder
 
 				.addBuilders (
 					taskLogger,
-					consoleModuleBuilders)
+					builders)
 
 				.create (
 					taskLogger)
 
 			;
-
-		}
-
-	}
-
-	// implementation
-
-	public <Container>
-	FormFieldSet <Container> buildFormFieldSet (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ConsoleHelper <?> consoleHelper,
-			@NonNull String fieldSetName,
-			@NonNull List <Object> formFieldSpecs) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"buildFormFieldSet");
-
-		) {
-
-			FormFieldBuilderContext formFieldBuilderContext =
-				new FormFieldBuilderContextImplementation ()
-
-				.containerClass (
-					consoleHelper.objectClass ())
-
-				.consoleHelper (
-					consoleHelper);
-
-			FormFieldSetImplementation <Container> formFieldSet =
-				new FormFieldSetImplementation<> ();
-
-			builder.descend (
-				taskLogger,
-				formFieldBuilderContext,
-				formFieldSpecs,
-				formFieldSet,
-				MissingBuilderBehaviour.error);
-
-			for (
-				FormItem <?> formItem
-					: formFieldSet.formItems ()
-			) {
-
-				formItem.init (
-					fieldSetName);
-
-			}
-
-			for (
-				FormField <?, ?, ?, ?> formField
-					: formFieldSet.formFields ()
-			) {
-
-				if (formField.fileUpload ()) {
-
-					formFieldSet.fileUpload (
-						true);
-
-				}
-
-			}
-
-			if (formFieldSet.fileUpload () == null)
-				formFieldSet.fileUpload (false);
-
-			return formFieldSet;
 
 		}
 
@@ -184,7 +108,16 @@ class ConsoleModuleBuilder
 				: childObjects
 		) {
 
-			if (childObject instanceof FormFieldSetSpec) {
+			if (
+				childObject instanceof ConsoleFormsSpec
+				|| childObject instanceof ConsoleHelperProviderSpec
+			) {
+
+				doNothing ();
+
+			} else if (
+				childObject instanceof FormFieldSetSpec
+			) {
 
 				firstPass.add (
 					childObject);

@@ -1,9 +1,9 @@
 package wbs.apn.chat.user.core.logic;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import com.google.common.base.Optional;
 

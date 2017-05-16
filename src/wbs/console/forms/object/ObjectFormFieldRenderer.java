@@ -2,8 +2,8 @@ package wbs.console.forms.object;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.successOrElse;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;

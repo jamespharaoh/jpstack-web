@@ -31,21 +31,38 @@ interface ComponentManager
 
 	<ComponentType>
 	Optional <Provider <ComponentType>> getComponentProvider (
-			TaskLogger taskLogger,
+			TaskLogger parentTaskLogger,
 			String componentName,
-			Class <ComponentType> componentClass);
+			Class <ComponentType> componentClass,
+			Boolean initialized);
+
+	default <ComponentType>
+	Optional <Provider <ComponentType>> getComponentProvider (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		return getComponentProvider (
+			parentTaskLogger,
+			componentName,
+			componentClass,
+			true);
+
+	}
 
 	default <ComponentType>
 	Optional <ComponentType> getComponent (
 			@NonNull TaskLogger taskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialized) {
 
 		Optional <Provider <ComponentType>> componentProvider =
 			getComponentProvider (
 				taskLogger,
 				componentName,
-				componentClass);
+				componentClass,
+				initialized);
 
 		if (
 			optionalIsNotPresent (
@@ -60,16 +77,32 @@ interface ComponentManager
 	}
 
 	default <ComponentType>
-	ComponentType getComponentRequired (
-			@NonNull TaskLogger taskLogger,
+	Optional <ComponentType> getComponent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
+		return getComponent (
+			parentTaskLogger,
+			componentName,
+			componentClass,
+			true);
+
+	}
+
+	default <ComponentType>
+	ComponentType getComponentRequired (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialise) {
+
 		Optional <Provider <ComponentType>> componentProvider =
 			getComponentProvider (
-				taskLogger,
+				parentTaskLogger,
 				componentName,
-				componentClass);
+				componentClass,
+				initialise);
 
 		if (
 			optionalIsNotPresent (
@@ -86,6 +119,20 @@ interface ComponentManager
 		}
 
 		return componentProvider.get ().get ();
+
+	}
+
+	default <ComponentType>
+	ComponentType getComponentRequired (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		return getComponentRequired (
+			parentTaskLogger,
+			componentName,
+			componentClass,
+			true);
 
 	}
 
@@ -115,13 +162,14 @@ interface ComponentManager
 
 	default <ComponentType>
 	Provider <ComponentType> getComponentProviderRequired (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialise) {
 
 		Optional <Provider <ComponentType>> componentProvider =
 			getComponentProvider (
-				taskLogger,
+				parentTaskLogger,
 				componentName,
 				componentClass);
 
@@ -136,6 +184,20 @@ interface ComponentManager
 
 	}
 
+	default <ComponentType>
+	Provider <ComponentType> getComponentProviderRequired (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		return getComponentProviderRequired (
+			parentTaskLogger,
+			componentName,
+			componentClass,
+			true);
+
+	}
+
 	List <String> requestComponentNames ();
 
 	ComponentMetaData componentMetaData (
@@ -147,6 +209,10 @@ interface ComponentManager
 	void bootstrapComponent (
 			Object component,
 			String componentName);
+
+	void initializeComponent (
+			TaskLogger parentTaskLogger,
+			Object component);
 
 	@Override
 	void close ();

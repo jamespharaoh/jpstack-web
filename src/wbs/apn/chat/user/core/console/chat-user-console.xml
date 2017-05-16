@@ -36,8 +36,13 @@
 				search-fields="search"
 				priv-key="chat.supervisor">
 
-				<results-mode name="normal"/>
-				<results-mode name="credit"/>
+				<results-mode
+					name="normal"
+					fields="results-normal"/>
+
+				<results-mode
+					name="credit"
+					fields="results-credit"/>
 
 			</object-search-page>
 
@@ -176,7 +181,7 @@
 	</field-set>
 
 	<field-set
-		name="results-normal-columns"
+		name="results-normal"
 		object-name="chatUser">
 
 		<code-field/>
@@ -205,7 +210,7 @@
 	</field-set>
 
 	<field-set
-		name="results-credit-columns"
+		name="results-credit"
 		object-name="chatUser">
 
 		<code-field/>

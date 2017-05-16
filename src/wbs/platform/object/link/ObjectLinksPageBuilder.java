@@ -8,15 +8,14 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -24,7 +23,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -37,28 +35,25 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
 
 @PrototypeComponent ("objectLinksPageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectLinksPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	TargetType extends Record <TargetType>
-> implements BuilderComponent {
+> implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
+	ConsoleFormManager consoleFormManager;
+
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
-
-	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
-
-	@SingletonDependency
-	FormContextManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -115,7 +110,7 @@ class ObjectLinksPageBuilder <
 	String updateSignalName;
 	String targetUpdateSignalName;
 	String successNotice;
-	FormContextBuilder <TargetType> targetFormContextBuilder;
+	ConsoleFormType <TargetType> targetFormType;
 
 	// build
 
@@ -126,38 +121,63 @@ class ObjectLinksPageBuilder <
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder <TaskLogger> builder) {
 
-		setDefaults ();
+		try (
 
-		for (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
 		) {
 
-			buildTab (
-				resolvedExtensionPoint);
+			setDefaults (
+				taskLogger);
 
-			buildFile (
-				resolvedExtensionPoint);
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+					: consoleMetaManager.resolveExtensionPoint (
+						container.extensionPointName ())
+			) {
+
+				buildTab (
+					taskLogger,
+					resolvedExtensionPoint);
+
+				buildFile (
+					resolvedExtensionPoint);
+
+			}
+
+			buildResponder ();
 
 		}
-
-		buildResponder ();
 
 	}
 
 	void buildTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
-			contextTab.get ()
-				.name (tabName)
-				.defaultLabel (tabLabel)
-				.localFile (localFile)
-				.privKeys (privKey),
-			extensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
+
+		) {
+
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
+				contextTab.get ()
+					.name (tabName)
+					.defaultLabel (tabLabel)
+					.localFile (localFile)
+					.privKeys (privKey),
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -242,8 +262,8 @@ class ObjectLinksPageBuilder <
 					.targetHelper (
 						targetConsoleHelper)
 
-					.targetFormContextBuilder (
-						targetFormContextBuilder)
+					.targetFormType (
+						targetFormType)
 
 					.localFile (
 						localFile)
@@ -273,88 +293,101 @@ class ObjectLinksPageBuilder <
 
 	// defaults
 
-	void setDefaults () {
+	private
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleHelper =
-			container.consoleHelper ();
+		try (
 
-		// general stuff
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
+		) {
 
-		name =
-			spec.name ();
+			consoleHelper =
+				container.consoleHelper ();
 
-		tabName =
-			stringFormat (
-				"%s.%s",
-				container.pathPrefix (),
-				name);
+			// general stuff
 
-		tabLabel =
-			capitalise (
-				camelToSpaces (
-					name));
+			name =
+				spec.name ();
 
-		localFile =
-			stringFormat (
-				"%s.%s",
-				container.pathPrefix (),
-				name);
+			tabName =
+				stringFormat (
+					"%s.%s",
+					container.pathPrefix (),
+					name);
 
-		privKey =
-			stringFormat (
-				"%s.manage",
-				container.pathPrefix ());
-
-		responderName =
-			stringFormat (
-				"%s%sResponder",
-				container.newBeanNamePrefix (),
+			tabLabel =
 				capitalise (
-					name));
+					camelToSpaces (
+						name));
 
-		pageTitle =
-			stringFormat (
-				"%s %s",
-				container.consoleHelper ().friendlyName (),
-				camelToSpaces (
-					name));
+			localFile =
+				stringFormat (
+					"%s.%s",
+					container.pathPrefix (),
+					name);
 
-		linksField =
-			container.consoleHelper ().field (
-				spec.linksFieldName ());
+			privKey =
+				stringFormat (
+					"%s.manage",
+					container.pathPrefix ());
 
-		targetConsoleHelper =
-			objectManager.findConsoleHelperRequired (
-				(Class <?>)
-				linksField.collectionValueType ());
+			responderName =
+				stringFormat (
+					"%s%sResponder",
+					container.newBeanNamePrefix (),
+					capitalise (
+						name));
 
-		targetLinksField =
-			targetConsoleHelper.field (
-				spec.targetLinksFieldName ());
+			pageTitle =
+				stringFormat (
+					"%s %s",
+					container.consoleHelper ().friendlyName (),
+					camelToSpaces (
+						name));
 
-		addEventName =
-			spec.addEventName ();
+			linksField =
+				container.consoleHelper ().field (
+					spec.linksFieldName ());
 
-		removeEventName =
-			spec.removeEventName ();
+			targetConsoleHelper =
+				objectManager.findConsoleHelperRequired (
+					(Class <?>)
+					linksField.collectionValueType ());
 
-		eventOrder =
-			spec.eventOrder ();
+			targetLinksField =
+				targetConsoleHelper.field (
+					spec.targetLinksFieldName ());
 
-		updateSignalName =
-			spec.updateSignalName ();
+			addEventName =
+				spec.addEventName ();
 
-		targetUpdateSignalName =
-			spec.targetUpdateSignalName ();
+			removeEventName =
+				spec.removeEventName ();
 
-		successNotice =
-			spec.successNotice ();
+			eventOrder =
+				spec.eventOrder ();
 
-		targetFormContextBuilder =
-			formContextManager.formContextBuilderRequired (
-				consoleModule.name (),
-				spec.fieldsName (),
-				targetConsoleHelper.objectClass ());
+			updateSignalName =
+				spec.updateSignalName ();
+
+			targetUpdateSignalName =
+				spec.targetUpdateSignalName ();
+
+			successNotice =
+				spec.successNotice ();
+
+			targetFormType =
+				consoleFormManager.getFormTypeRequired (
+					taskLogger,
+					consoleModule.name (),
+					spec.formTypeName (),
+					targetConsoleHelper.objectClass ());
+
+		}
 
 	}
 

@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -27,7 +27,7 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("dateFormFieldNativeMapping")
 public
 class DateFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, Instant, Date> {
+	implements ConsoleFormNativeMapping <Container, Instant, Date> {
 
 	// singleton dependencies
 

@@ -42,6 +42,7 @@
 
 	<console-modules>
 		<console-module name="chat-user-image"/>
+		<console-module name="chat-user-image-upload-token"/>
 	</console-modules>
 
 </plugin>

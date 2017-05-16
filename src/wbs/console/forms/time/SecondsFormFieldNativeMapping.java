@@ -12,7 +12,7 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -23,7 +23,7 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("secondsFormFieldNativeMapping")
 public
 class SecondsFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, Duration, Long> {
+	implements ConsoleFormNativeMapping <Container, Duration, Long> {
 
 	// singleton dependencies
 

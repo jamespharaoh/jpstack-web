@@ -1,8 +1,10 @@
 package wbs.platform.object.create;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -13,11 +15,11 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormBuilder;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
@@ -26,7 +28,7 @@ import wbs.console.forms.object.ParentFormFieldSpec;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -34,7 +36,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -53,13 +54,12 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("objectCreatePageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectCreatePageBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependences
 
@@ -70,10 +70,10 @@ class ObjectCreatePageBuilder <
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -121,7 +121,7 @@ class ObjectCreatePageBuilder <
 	String targetContextTypeName;
 	String targetResponderName;
 	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -156,6 +156,7 @@ class ObjectCreatePageBuilder <
 			) {
 
 				buildTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildFile (
@@ -170,27 +171,39 @@ class ObjectCreatePageBuilder <
 	}
 
 	void buildTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"end",
+		try (
 
-			contextTabProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
 
-				.name (
-					tabName)
+		) {
 
-				.defaultLabel (
-					tabLabel)
+			consoleModule.addContextTab (
+				taskLogger,
+				"end",
 
-				.localFile (
-					localFile)
+				contextTabProvider.get ()
 
-				/*.privKeys (
-				 * 	Collections.singletonList (privKey))*/,
+					.name (
+						tabName)
 
-			extensionPoint.contextTypeNames ());
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						localFile)
+
+					/*.privKeys (
+					 * 	Collections.singletonList (privKey))*/,
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -222,7 +235,7 @@ class ObjectCreatePageBuilder <
 				createPrivCode)
 
 			.formContextBuilder (
-				formContextBuilder)
+				formType)
 
 			.createTimeFieldName (
 				createTimeFieldName)
@@ -268,8 +281,8 @@ class ObjectCreatePageBuilder <
 					.consoleHelper (
 						consoleHelper)
 
-					.formContextBuilder (
-						formContextBuilder)
+					.formType (
+						formType)
 
 					.parentPrivCode (
 						createPrivCode)
@@ -373,15 +386,28 @@ class ObjectCreatePageBuilder <
 						"%s_create",
 						consoleHelper.objectTypeCode ()));
 
-			formContextBuilder =
-				formContextManager.createFormContextBuilder (
-					consoleModule,
-					name,
-					consoleHelper.objectClass (),
-					FormType.create,
-					optionalOf (
-						spec.formFieldsName ()),
-					optionalAbsent ());
+			formType =
+				genericCastUnchecked (
+					ifNotNullThenElse (
+						spec.formFieldsName,
+						() -> formContextManager.createFormType (
+							taskLogger,
+							consoleModule,
+							name,
+							consoleHelper.objectClass (),
+							FormType.create,
+							optionalOf (
+								spec.formFieldsName ()),
+							optionalAbsent ()),
+						() -> formContextManager.createFormType (
+							taskLogger,
+							name,
+							consoleHelper.objectClass (),
+							FormType.create,
+							optionalOf (
+								defaultFields (
+									taskLogger)),
+							optionalAbsent ())));
 
 			// if a provider name is provided
 
@@ -470,7 +496,7 @@ class ObjectCreatePageBuilder <
 					"%s.create",
 					consoleHelper.objectName ());
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
 				consoleHelper,
 				fieldSetName,

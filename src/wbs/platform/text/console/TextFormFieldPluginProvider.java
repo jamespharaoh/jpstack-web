@@ -6,7 +6,7 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
 import wbs.console.forms.types.FormFieldPluginProvider;
 
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -31,7 +31,7 @@ class TextFormFieldPluginProvider
 	@Override
 	public
 	Optional getNativeMapping (
-			FormFieldBuilderContext context,
+			ConsoleFormBuilderContext context,
 			Class containerClass,
 			String fieldName,
 			Class genericClass,

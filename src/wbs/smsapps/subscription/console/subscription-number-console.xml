@@ -138,27 +138,36 @@
 
 	</field-set>
 
-	<field-set
-		name="addRemoveForm"
-		class="wbs.smsapps.subscription.console.SubscriptionNumberAddRemoveForm">
+	<forms>
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+		<form
+			name="add-remove"
+			class="wbs.smsapps.subscription.console.SubscriptionNumberAddRemoveForm"
+			type="perform">
 
-		<object-field
-			name="subscriptionAffiliate"
-			label="Affiliate"
-			object-type="subscriptionAffiliate"/>
+			<column-fields>
 
-		<object-field
-			name="subscriptionList"
-			label="List"
-			object-type="subscriptionList"/>
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
 
-		<text-area-field
-			name="numbers"/>
+				<object-field
+					name="subscriptionAffiliate"
+					label="Affiliate"
+					object-type="subscriptionAffiliate"/>
 
-	</field-set>
+				<object-field
+					name="subscriptionList"
+					label="List"
+					object-type="subscriptionList"/>
+
+				<text-area-field
+					name="numbers"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

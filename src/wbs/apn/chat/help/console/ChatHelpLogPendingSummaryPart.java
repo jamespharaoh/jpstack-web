@@ -2,7 +2,7 @@ package wbs.apn.chat.help.console;
 
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;

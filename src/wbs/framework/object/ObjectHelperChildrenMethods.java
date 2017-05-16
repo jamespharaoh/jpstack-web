@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ interface ObjectHelperChildrenMethods <
 
 		return getChildren (
 			parentTransaction,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object),
 			childClass);
@@ -54,7 +54,7 @@ interface ObjectHelperChildrenMethods <
 
 		return getMinorChildren (
 			parentTransaction,
-			dynamicCast (
+			dynamicCastRequired (
 				objectHelper ().objectClass (),
 				object));
 

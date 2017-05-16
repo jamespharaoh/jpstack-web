@@ -1,6 +1,9 @@
 <console-module
 	name="chat-note-name">
 
+	<console-helper-provider
+		object-name="chatNoteName"/>
+
 	<extend-context
 		name="chat.namedNote"
 		base-name="chat.settings"

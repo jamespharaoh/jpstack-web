@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.ConsoleForm;
 import wbs.console.html.ScriptRef;
 
 import wbs.framework.database.Transaction;
@@ -49,7 +49,7 @@ interface FormItem <Container> {
 	default
 	boolean canView (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object) {
 
 		return true;

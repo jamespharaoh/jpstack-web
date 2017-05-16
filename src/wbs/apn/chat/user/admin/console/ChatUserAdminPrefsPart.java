@@ -1,7 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;

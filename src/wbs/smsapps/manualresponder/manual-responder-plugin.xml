@@ -53,6 +53,7 @@
 		<console-module name="manual-responder"/>
 		<console-module name="manual-responder-affiliate"/>
 		<console-module name="manual-responder-number"/>
+		<console-module name="manual-responder-reply"/>
 		<console-module name="manual-responder-request"/>
 		<console-module name="manual-responder-request-pending"/>
 		<console-module name="manual-responder-shared-report" />

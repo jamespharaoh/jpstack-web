@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.ConsoleForm;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
@@ -25,7 +25,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	boolean canView (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object) {
 
 		return true;
@@ -35,7 +35,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
@@ -47,7 +47,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object,
 			@NonNull Long columnSpan) {
 
@@ -58,7 +58,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -68,7 +68,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -78,7 +78,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container container,
 			@NonNull Optional <String> error) {
 
@@ -89,7 +89,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormReset (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> formContext,
+			@NonNull ConsoleForm <Container> formContext,
 			@NonNull Container container) {
 
 		doNothing ();
@@ -99,7 +99,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderCsvRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -109,7 +109,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void implicit (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -119,7 +119,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void setDefault (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -129,7 +129,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	FormUpdateResult <Generic, Native> update (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container object) {
 
 		throw new UnsupportedOperationException ();
@@ -139,7 +139,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void runUpdateHook (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormContext <Container> context,
+			@NonNull ConsoleForm <Container> context,
 			@NonNull Container object,
 			@NonNull FormUpdateResult <Generic, Native> result,
 			@NonNull PermanentRecord <?> linkObject,

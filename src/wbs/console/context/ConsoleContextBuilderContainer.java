@@ -7,7 +7,7 @@ import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleContextBuilderContainer<
-	ObjectType extends Record<ObjectType>
+	ObjectType extends Record <ObjectType>
 >
 	extends SimpleConsoleBuilderContainer {
 

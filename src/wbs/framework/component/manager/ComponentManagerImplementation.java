@@ -16,11 +16,11 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notEqualToOne;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -159,7 +159,8 @@ class ComponentManagerImplementation
 	Optional <ComponentType> getComponent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialise) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -195,7 +196,7 @@ class ComponentManagerImplementation
 					getComponentReal (
 						taskLogger,
 						componentDefinition,
-						true,
+						initialise,
 						false)));
 
 		}
@@ -303,7 +304,8 @@ class ComponentManagerImplementation
 	Optional <Provider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialise) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -353,7 +355,9 @@ class ComponentManagerImplementation
 				genericCastUnchecked (
 					getComponentProvider (
 						taskLogger,
-						componentDefinition)));
+						componentDefinition,
+						initialise,
+						false)));
 
 		}
 
@@ -364,7 +368,8 @@ class ComponentManagerImplementation
 	Provider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
+			@NonNull Class <ComponentType> componentClass,
+			@NonNull Boolean initialise) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -418,7 +423,9 @@ class ComponentManagerImplementation
 			return genericCastUnchecked (
 				getComponentProvider (
 					taskLogger,
-					componentDefinition));
+					componentDefinition,
+					initialise,
+					false));
 
 		}
 
@@ -439,6 +446,34 @@ class ComponentManagerImplementation
 		) {
 
 			throw todo ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void initializeComponent (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object component) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentReal");
+
+		) {
+
+			ComponentData componentData =
+				mapItemForKeyRequired (
+					componentDatas,
+					component);
+
+			initializeComponentReal (
+				taskLogger,
+				componentData);
 
 		}
 
@@ -527,12 +562,16 @@ class ComponentManagerImplementation
 				throw taskLogger.makeException ();
 			}
 
-			if (
-				! initializeComponent (
-					taskLogger,
-					componentData)
-			) {
-				throw taskLogger.makeException ();
+			if (initialize) {
+
+				if (
+					! initializeComponentReal (
+						taskLogger,
+						componentData)
+				) {
+					throw taskLogger.makeException ();
+				}
+
 			}
 
 			Object component =
@@ -642,7 +681,7 @@ class ComponentManagerImplementation
 					taskLogger,
 					componentData);
 
-				initializeComponent (
+				initializeComponentReal (
 					taskLogger,
 					componentData);
 
@@ -913,6 +952,11 @@ class ComponentManagerImplementation
 
 			}
 
+			componentDatas.put (
+				optionalGetRequired (
+					componentData.optionalComponent),
+				componentData);
+
 			componentData.state =
 				ComponentState.uninitialized;
 
@@ -927,7 +971,7 @@ class ComponentManagerImplementation
 	}
 
 	private
-	boolean initializeComponent (
+	boolean initializeComponentReal (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentData componentData) {
 
@@ -1065,7 +1109,7 @@ class ComponentManagerImplementation
 
 			// initialize component
 
-			initializeComponent (
+			initializeComponentReal (
 				taskLogger,
 				componentData);
 
@@ -1892,21 +1936,8 @@ class ComponentManagerImplementation
 	public
 	Provider <?> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition componentDefinition) {
-
-		return getComponentProvider (
-			parentTaskLogger,
-			componentDefinition,
-			true,
-			false);
-
-	}
-
-	public
-	Provider <?> getComponentProvider (
-			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialized,
+			@NonNull Boolean initialise,
 			@NonNull Boolean weak) {
 
 		try (
@@ -1929,7 +1960,7 @@ class ComponentManagerImplementation
 					return getComponentReal (
 						taskLogger,
 						componentDefinition,
-						initialized,
+						initialise,
 						weak);
 
 				}

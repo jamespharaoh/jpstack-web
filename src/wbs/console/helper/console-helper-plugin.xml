@@ -10,9 +10,9 @@
 
 	<layer name="console">
 
-		<bootstrap-component class="spec.ConsoleHelperProviderSpec"/>
-		<bootstrap-component class="spec.PrivKeySpec"/>
-		<bootstrap-component class="spec.RunPostProcessorSpec"/>
+		<bootstrap-component class="provider.ConsoleHelperProviderSpec"/>
+		<bootstrap-component class="provider.PrivKeySpec"/>
+		<bootstrap-component class="provider.RunPostProcessorSpec"/>
 
 		<component class="builder.PrivKeyBuilder"/>
 
@@ -20,12 +20,7 @@
 
 		<component class="manager.ConsoleObjectManagerImplementation"/>
 
-		<component class="provider.ConsoleHelperProviderBuilder"/>
-		<component class="provider.ConsoleHelperProviderManager"/>
-		<component class="provider.ConsoleHelperProviderMetaBuilder"/>
 		<component class="provider.GenericConsoleHelperProvider"/>
-
-		<component class="spec.ConsoleHelperProviderSpecManager"/>
 
 	</layer>
 

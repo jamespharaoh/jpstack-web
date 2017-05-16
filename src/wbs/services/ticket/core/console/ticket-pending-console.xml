@@ -18,54 +18,73 @@
 
 	</object-context>
 
-	<field-set
-		name="ticketFields"
-		object-name="ticket">
+	<forms>
 
-		<code-field/>
+		<form
+			name="history-ticket"
+			object-type="ticket"
+			type="read-only">
 
-		<integer-field
-			name="numNotes"/>
+			<column-fields>
 
-		<integer-field
-			name="numFields"/>
+				<code-field/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<integer-field
+					name="numNotes"/>
 
-		<object-field
-			name="ticketState"
-			label="State"
-			object-type="ticketState"/>
+				<integer-field
+					name="numFields"/>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
 
-	<field-set
-		name="ticketNoteFields"
-		object-name="ticketNote">
+				<object-field
+					name="ticketState"
+					label="State"
+					object-type="ticketState"/>
 
-		<index-field/>
+			</column-fields>
 
-		<text-field
-			name="noteText"/>
+		</form>
 
-	</field-set>
+		<form
+			name="history-note"
+			object-type="ticket-note"
+			type="read-only">
 
-	<field-set
-		name="ticketStateFields"
-		object-name="ticketState">
+			<column-fields>
 
-		<name-field/>
+				<index-field/>
 
-		<yes-no-field
-			name="showInQueue"/>
+				<text-field
+					name="noteText"/>
 
-		<integer-field
-			name="minimum"/>
+			</column-fields>
 
-		<integer-field
-			name="maximum"/>
+		</form>
 
-	</field-set>
+		<form
+			name="history-state"
+			object-type="ticket-state"
+			type="read-only">
+
+			<column-fields>
+
+				<name-field/>
+
+				<yes-no-field
+					name="showInQueue"/>
+
+				<integer-field
+					name="minimum"/>
+
+				<integer-field
+					name="maximum"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

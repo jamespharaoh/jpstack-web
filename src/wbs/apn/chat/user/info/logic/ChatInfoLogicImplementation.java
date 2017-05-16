@@ -2,7 +2,7 @@ package wbs.apn.chat.user.info.logic;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;

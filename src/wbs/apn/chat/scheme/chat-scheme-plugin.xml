@@ -12,6 +12,7 @@
 	<console-modules>
 		<console-module name="chat-scheme"/>
 		<console-module name="chat-scheme-keyword"/>
+		<console-module name="chat-scheme-map"/>
 	</console-modules>
 
 </plugin>

@@ -193,73 +193,92 @@
 
 	</field-set>
 
-	<field-set
-		name="credit-summary"
-		object-name="imChatCustomer">
+	<forms>
 
-		<code-field/>
+		<form
+			name="credit-action"
+			class="wbs.imchat.console.ImChatCustomerCreditRequest"
+			type="perform">
 
-		<integer-field
-			name="numConversations"/>
+			<column-fields>
 
-		<integer-field
-			name="numPurchases"/>
+				<text-field
+					name="reason"/>
 
-		<integer-field
-			name="numCredits"/>
+				<currency-field
+					name="creditAmount"
+					currency="customer.imChat.creditCurrency"/>
 
-		<currency-field
-			name="balance"
-			currency="imChat.creditCurrency"/>
+				<currency-field
+					name="billAmount"
+					currency="customer.imChat.billingCurrency"/>
 
-	</field-set>
+			</column-fields>
 
-	<field-set
-		name="credit-request"
-		class="wbs.imchat.console.ImChatCustomerCreditRequest">
+		</form>
 
-		<text-field
-			name="reason"/>
+		<form
+			name="credit-customer"
+			object-type="im-chat-customer"
+			type="read-only">
 
-		<currency-field
-			name="creditAmount"
-			currency="customer.imChat.creditCurrency"/>
+			<column-fields>
 
-		<currency-field
-			name="billAmount"
-			currency="customer.imChat.billingCurrency"/>
+				<code-field/>
 
-	</field-set>
+				<integer-field
+					name="numConversations"/>
 
-	<field-set
-		name="credit-history"
-		object-name="imChatCustomerCredit">
+				<integer-field
+					name="numPurchases"/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<integer-field
+					name="numCredits"/>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+				<currency-field
+					name="balance"
+					currency="imChat.creditCurrency"/>
 
-		<text-field
-			name="reason"/>
+			</column-fields>
 
-		<currency-field
-			name="creditAmount"
-			label="Credit"
-			currency="imChatCustomer.imChat.creditCurrency"/>
+		</form>
 
-		<currency-field
-			name="creditBalanceAfter"
-			label="Balance"
-			currency="imChatCustomer.imChat.creditCurrency"/>
+		<form
+			name="credit-history"
+			object-type="im-chat-customer-credit"
+			type="read-only">
 
-		<currency-field
-			name="billAmount"
-			label="Bill"
-			currency="imChatCustomer.imChat.billingCurrency"/>
+			<column-fields>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
+
+				<object-field
+					name="user"
+					object-type="user"/>
+
+				<text-field
+					name="reason"/>
+
+				<currency-field
+					name="creditAmount"
+					label="Credit"
+					currency="imChatCustomer.imChat.creditCurrency"/>
+
+				<currency-field
+					name="creditBalanceAfter"
+					label="Balance"
+					currency="imChatCustomer.imChat.creditCurrency"/>
+
+				<currency-field
+					name="billAmount"
+					label="Bill"
+					currency="imChatCustomer.imChat.billingCurrency"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

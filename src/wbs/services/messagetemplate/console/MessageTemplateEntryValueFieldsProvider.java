@@ -7,11 +7,11 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.scriptref.ScriptRefFormFieldSpec;
 import wbs.console.forms.text.TextAreaFormFieldSpec;
 import wbs.console.forms.types.FieldsProvider;
-import wbs.console.module.ConsoleModuleBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -36,13 +36,13 @@ class MessageTemplateEntryValueFieldsProvider
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
-	MessageTemplateSetConsoleHelper messageTemplateSetConsoleHelper;
+	MessageTemplateEntryValueConsoleHelper messageTemplateEntryValueHelper;
 
 	// state
 
@@ -136,13 +136,13 @@ class MessageTemplateEntryValueFieldsProvider
 
 			String fieldSetName =
 				stringFormat (
-					"%s.%s",
-					messageTemplateSetConsoleHelper.objectName (),
+					"%s-%s",
+					messageTemplateEntryValueHelper.objectName (),
 					mode);
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
-				messageTemplateSetConsoleHelper,
+				messageTemplateEntryValueHelper,
 				fieldSetName,
 				formFieldSpecs);
 

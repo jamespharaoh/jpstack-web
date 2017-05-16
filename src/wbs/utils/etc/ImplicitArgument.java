@@ -1,7 +1,7 @@
 package wbs.utils.etc;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

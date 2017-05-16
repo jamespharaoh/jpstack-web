@@ -1,7 +1,7 @@
 package wbs.console.priv;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.Arrays;
 import java.util.Collection;

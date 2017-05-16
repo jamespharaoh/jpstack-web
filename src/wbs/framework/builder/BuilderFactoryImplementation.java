@@ -5,7 +5,7 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
@@ -251,10 +251,10 @@ class BuilderFactoryImplementation <Context>
 	}
 
 	@Override
-	public
+	public <Type>
 	BuilderFactoryImplementation <Context> addBuilders (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Map <Class <?>, Provider <Object>> buildersMap) {
+			@NonNull Map <Class <?>, Provider <Type>> buildersMap) {
 
 		try (
 
@@ -268,7 +268,7 @@ class BuilderFactoryImplementation <Context>
 			checkContextClassIsNotNull ();
 
 			for (
-				Map.Entry <Class <?>, Provider <Object>> builderEntry
+				Map.Entry <Class <?>, Provider <Type>> builderEntry
 					: buildersMap.entrySet ()
 			) {
 

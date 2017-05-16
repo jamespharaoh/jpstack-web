@@ -36,6 +36,8 @@
 	<console-modules>
 		<console-module name="chat-help-log"/>
 		<console-module name="chat-help-template"/>
+		<console-module name="chat-hint"/>
+		<console-module name="chat-hint-log"/>
 	</console-modules>
 
 </plugin>

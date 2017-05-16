@@ -1,7 +1,7 @@
 package wbs.apn.chat.user.core.hibernate;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;

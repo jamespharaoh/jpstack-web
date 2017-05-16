@@ -1,8 +1,10 @@
 package wbs.console.module;
 
+import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.contains;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -72,7 +74,7 @@ class ConsoleMetaManagerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init (
+	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -107,7 +109,7 @@ class ConsoleMetaManagerImplementation
 			// collect stuff
 
 			for (
-				Map.Entry<String,ConsoleMetaModule> consoleMetaModuleEntry
+				Map.Entry <String, ConsoleMetaModule> consoleMetaModuleEntry
 					: consoleMetaModules.entrySet ()
 			) {
 
@@ -215,6 +217,13 @@ class ConsoleMetaManagerImplementation
 				}
 
 			}
+
+			taskLogger.noticeFormat (
+				"Console meta manager initialised %s ",
+				integerToDecimalString (
+					collectionSize (
+						consoleMetaModules)),
+				"meta modules");
 
 		}
 

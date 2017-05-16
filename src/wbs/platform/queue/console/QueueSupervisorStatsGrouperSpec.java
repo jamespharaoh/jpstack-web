@@ -3,7 +3,7 @@ package wbs.platform.queue.console;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 import wbs.console.supervisor.SupervisorConfigSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -17,7 +17,7 @@ import wbs.framework.data.annotations.DataParent;
 @PrototypeComponent ("queueSupervisorStatsGrouperSpec")
 public
 class QueueSupervisorStatsGrouperSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

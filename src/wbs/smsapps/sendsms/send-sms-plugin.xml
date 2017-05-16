@@ -21,6 +21,7 @@
 
 	<console-modules>
 		<console-module name="send-sms-config"/>
+		<console-module name="send-sms-message"/>
 	</console-modules>
 
 </plugin>

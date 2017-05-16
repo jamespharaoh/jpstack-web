@@ -1,8 +1,8 @@
 package wbs.smsapps.autoresponder.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.simplify;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -18,8 +18,8 @@ import java.util.TreeMap;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -53,9 +53,8 @@ class AutoResponderVotesPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@NamedDependency
-	FormContextBuilder <AutoResponderVotesForm>
-		autoResponderVotesFormContextBuilder;
+	@NamedDependency ("autoResponderVotesSearchFormType")
+	ConsoleFormType <AutoResponderVotesForm> formType;
 
 	@SingletonDependency
 	AutoResponderConsoleHelper autoResponderHelper;
@@ -83,7 +82,7 @@ class AutoResponderVotesPart
 
 	// state
 
-	FormContext <AutoResponderVotesForm> formContext;
+	ConsoleForm <AutoResponderVotesForm> form;
 
 	Map <String, Long> votes;
 
@@ -105,17 +104,17 @@ class AutoResponderVotesPart
 
 			// setup form context
 
-			formContext =
-				autoResponderVotesFormContextBuilder.build (
+			form =
+				formType.buildResponse (
 					transaction,
 					emptyMap ());
 
 			// process form
 
-			formContext.update (
+			form.update (
 				transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 				return;
 			}
 
@@ -140,7 +139,7 @@ class AutoResponderVotesPart
 					autoResponderService.getId ())
 
 				.createdTime (
-					formContext.object ().timePeriod ())
+					form.value ().timePeriod ())
 
 				.direction (
 					MessageDirection.in);
@@ -196,7 +195,7 @@ class AutoResponderVotesPart
 
 			// form
 
-			formContext.outputFormTable (
+			form.outputFormTable (
 				transaction,
 				"get",
 				requestContext.resolveLocalUrl (

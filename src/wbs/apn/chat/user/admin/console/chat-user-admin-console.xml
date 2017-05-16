@@ -74,28 +74,6 @@
 	</extend-context>
 
 	<field-set
-		name="location-form"
-		class="wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper$ChatUserAdminLocationForm">
-
-		<text-field
-			name="currentLocationName"
-			read-only="yes"/>
-
-		<floating-point-field
-			name="currentLocationLatitude"
-			read-only="yes"/>
-
-		<floating-point-field
-			name="currentLocationLongitude"
-			read-only="yes"/>
-
-		<text-field
-			name="newLocationName"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
 		name="settings"
 		object-name="chatUser">
 
@@ -119,56 +97,97 @@
 
 	</field-set>
 
-	<field-set
-		name="credit-form"
-		class="wbs.apn.chat.user.admin.console.ChatUserAdminCreditForm">
+	<forms>
 
-		<currency-field
-			name="currentCredit"
-			currency="chat.currency"
-			read-only="yes"/>
+		<form
+			name="credit-action"
+			class="wbs.apn.chat.user.admin.console.ChatUserAdminCreditForm"
+			type="perform">
 
-		<currency-field
-			name="creditAmount"
-			currency="chat.currency"/>
+			<column-fields>
 
-		<currency-field
-			name="billAmount"
-			currency="chat.currency"/>
+				<currency-field
+					name="currentCredit"
+					currency="chat.currency"
+					read-only="yes"/>
 
-		<text-field
-			name="details"
-			minimum-length="1"/>
+				<currency-field
+					name="creditAmount"
+					currency="chat.currency"/>
 
-	</field-set>
+				<currency-field
+					name="billAmount"
+					currency="chat.currency"/>
 
-	<field-set
-		name="credit-history"
-		object-name="chatUserCredit">
+				<text-field
+					name="details"
+					minimum-length="1"/>
 
-		<id-field
-			label="Ref"/>
+			</column-fields>
 
-		<timestamp-field
-			name="timestamp"/>
+		</form>
 
-		<currency-field
-			name="creditAmount"
-			label="Credit"
-			currency="chat.currency"/>
+		<form
+			name="credit-history"
+			object-type="chat-user-credit"
+			type="read-only">
 
-		<currency-field
-			name="billAmount"
-			label="Bill"
-			currency="chat.currency"/>
+			<column-fields>
 
-		<text-field
-			name="details"/>
+				<id-field
+					label="Ref"/>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+				<timestamp-field
+					name="timestamp"/>
 
-	</field-set>
+				<currency-field
+					name="creditAmount"
+					label="Credit"
+					currency="chat.currency"/>
+
+				<currency-field
+					name="billAmount"
+					label="Bill"
+					currency="chat.currency"/>
+
+				<text-field
+					name="details"/>
+
+				<object-field
+					name="user"
+					object-type="user"/>
+
+			</column-fields>
+
+		</form>
+
+		<form
+			name="location-action"
+			class="wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper$ChatUserAdminLocationForm"
+			type="perform">
+
+			<column-fields>
+
+				<text-field
+					name="currentLocationName"
+					read-only="yes"/>
+
+				<floating-point-field
+					name="currentLocationLatitude"
+					read-only="yes"/>
+
+				<floating-point-field
+					name="currentLocationLongitude"
+					read-only="yes"/>
+
+				<text-field
+					name="newLocationName"
+					nullable="yes"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

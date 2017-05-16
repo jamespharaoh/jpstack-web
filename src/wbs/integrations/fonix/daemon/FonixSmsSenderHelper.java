@@ -1,7 +1,7 @@
 package wbs.integrations.fonix.daemon;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;

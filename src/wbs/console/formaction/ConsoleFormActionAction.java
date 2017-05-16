@@ -10,8 +10,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -47,7 +47,7 @@ class ConsoleFormActionAction <FormState, History>
 	String name;
 
 	@Getter @Setter
-	FormContextBuilder <FormState> formContextBuilder;
+	ConsoleFormType <FormState> formContextBuilder;
 
 	@Getter @Setter
 	ConsoleFormActionHelper <FormState, History> formActionHelper;
@@ -94,18 +94,18 @@ class ConsoleFormActionAction <FormState, History>
 				transaction,
 				formState);
 
-			FormContext <FormState> formContext =
-				formContextBuilder.build (
+			ConsoleForm <FormState> form =
+				formContextBuilder.buildAction (
 					transaction,
 					formHints,
 					formState);
 
-			formContext.update (
+			form.update (
 				transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 
-				formContext.reportErrors (
+				form.reportErrors (
 					transaction);
 
 				return null;

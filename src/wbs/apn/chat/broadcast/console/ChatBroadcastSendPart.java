@@ -17,8 +17,8 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.context.MultiFormContextBuilder;
-import wbs.console.forms.context.MultiFormContexts;
+import wbs.console.forms.core.ConsoleMultiForm;
+import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -43,8 +43,7 @@ class ChatBroadcastSendPart
 
 	@SingletonDependency
 	@NamedDependency
-	MultiFormContextBuilder <ChatBroadcastSendForm>
-		chatBroadcastSendFormContextsBuilder;
+	ConsoleMultiFormType <ChatBroadcastSendForm> chatBroadcastSendFormType;
 
 	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
@@ -57,7 +56,7 @@ class ChatBroadcastSendPart
 
 	// state
 
-	MultiFormContexts <ChatBroadcastSendForm> formContext;
+	ConsoleMultiForm <ChatBroadcastSendForm> form;
 
 	// details
 
@@ -113,8 +112,8 @@ class ChatBroadcastSendPart
 
 			;
 
-			formContext =
-				chatBroadcastSendFormContextsBuilder.build (
+			form =
+				chatBroadcastSendFormType.build (
 					transaction,
 					formHints);
 
@@ -141,7 +140,7 @@ class ChatBroadcastSendPart
 			htmlHeadingThreeWrite (
 				"Recipients");
 
-			formContext.outputFormAlwaysHidden (
+			form.outputFormAlwaysHidden (
 				transaction,
 				"search",
 				"numbers",
@@ -149,11 +148,11 @@ class ChatBroadcastSendPart
 				"message-user",
 				"message-message");
 
-			if (! formContext.object ().search ()) {
+			if (! form.value ().search ()) {
 
 				htmlTableOpenDetails ();
 
-				formContext.outputFormRows (
+				form.outputFormRows (
 					transaction,
 					"numbers",
 					"common");
@@ -171,17 +170,17 @@ class ChatBroadcastSendPart
 
 				htmlParagraphClose ();
 
-				formContext.outputFormTemporarilyHidden (
+				form.outputFormTemporarilyHidden (
 					transaction,
 					"search");
 
 			}
 
-			if (formContext.object ().search ()) {
+			if (form.value ().search ()) {
 
 				htmlTableOpenDetails ();
 
-				formContext.outputFormRows (
+				form.outputFormRows (
 					transaction,
 					"search",
 					"common");
@@ -197,7 +196,7 @@ class ChatBroadcastSendPart
 					" value=\"disable search\"",
 					">");
 
-				formContext.outputFormTemporarilyHidden (
+				form.outputFormTemporarilyHidden (
 					transaction,
 					"numbers");
 
@@ -208,7 +207,7 @@ class ChatBroadcastSendPart
 
 			htmlTableOpenDetails ();
 
-			formContext.outputFormRows (
+			form.outputFormRows (
 				transaction,
 				"message-user");
 
@@ -225,7 +224,7 @@ class ChatBroadcastSendPart
 
 			htmlParagraphClose ();
 
-			formContext.outputFormTemporarilyHidden (
+			form.outputFormTemporarilyHidden (
 				transaction,
 				"message-message");
 

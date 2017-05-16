@@ -1,7 +1,7 @@
 package wbs.console.forms.text;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
@@ -16,30 +16,29 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.basic.IdentityFormFieldInterfaceMapping;
 import wbs.console.forms.basic.NullFormFieldConstraintValidator;
 import wbs.console.forms.basic.RequiredFormFieldValueValidator;
 import wbs.console.forms.basic.SimpleFormFieldAccessor;
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderComponent;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.core.ConsoleFormPluginManagerImplementation;
 import wbs.console.forms.core.FormFieldSetImplementation;
 import wbs.console.forms.core.HiddenFormField;
 import wbs.console.forms.core.ReadOnlyFormField;
 import wbs.console.forms.core.UpdatableFormField;
-import wbs.console.forms.logic.FormFieldPluginManagerImplementation;
 import wbs.console.forms.object.DereferenceFormFieldAccessor;
 import wbs.console.forms.object.DynamicFormFieldAccessor;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -54,15 +53,14 @@ import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textFormFieldBuilder")
-@ConsoleModuleBuilderHandler
 public
 class TextFormFieldBuilder
-	implements BuilderComponent {
+	implements ConsoleFormBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldPluginManagerImplementation formFieldPluginManager;
+	ConsoleFormPluginManagerImplementation formFieldPluginManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -112,7 +110,7 @@ class TextFormFieldBuilder
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext context;
+	ConsoleFormBuilderContext context;
 
 	@BuilderSource
 	TextFormFieldSpec spec;
@@ -238,7 +236,7 @@ class TextFormFieldBuilder
 
 			// native mapping
 
-			FormFieldNativeMapping nativeMapping =
+			ConsoleFormNativeMapping nativeMapping =
 				formFieldPluginManager.getNativeMappingRequired (
 					context,
 					context.containerClass (),

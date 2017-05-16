@@ -1,7 +1,7 @@
 package wbs.console.forms.time;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -17,28 +17,27 @@ import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.basic.IdentityFormFieldNativeMapping;
 import wbs.console.forms.basic.NullFormFieldConstraintValidator;
 import wbs.console.forms.basic.RequiredFormFieldValueValidator;
 import wbs.console.forms.basic.SimpleFormFieldAccessor;
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderComponent;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.core.ConsoleFormPluginManagerImplementation;
 import wbs.console.forms.core.FormFieldSetImplementation;
 import wbs.console.forms.core.ReadOnlyFormField;
 import wbs.console.forms.core.UpdatableFormField;
-import wbs.console.forms.logic.FormFieldPluginManagerImplementation;
 import wbs.console.forms.object.DereferenceFormFieldAccessor;
 import wbs.console.forms.text.TextFormFieldRenderer;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -55,15 +54,14 @@ import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("timestampFormFieldBuilder")
-@ConsoleModuleBuilderHandler
 public
 class TimestampFormFieldBuilder
-	implements BuilderComponent {
+	implements ConsoleFormBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldPluginManagerImplementation formFieldPluginManager;
+	ConsoleFormPluginManagerImplementation formFieldPluginManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -113,7 +111,7 @@ class TimestampFormFieldBuilder
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext context;
+	ConsoleFormBuilderContext context;
 
 	@BuilderSource
 	TimestampFormFieldSpec spec;
@@ -204,7 +202,7 @@ class TimestampFormFieldBuilder
 
 			// native mapping
 
-			FormFieldNativeMapping nativeMapping;
+			ConsoleFormNativeMapping nativeMapping;
 
 			if (propertyClass == Instant.class) {
 

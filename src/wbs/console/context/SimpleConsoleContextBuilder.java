@@ -14,10 +14,10 @@ import com.google.common.collect.Iterables;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.helper.spec.PrivKeySpec;
+import wbs.console.helper.provider.PrivKeySpec;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
@@ -26,7 +26,6 @@ import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -42,12 +41,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("simpleConsoleContextBuilder")
-@ConsoleModuleBuilderHandler
 public
 class SimpleConsoleContextBuilder <
 	ObjectType extends Record <ObjectType>
 >
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -135,15 +133,13 @@ class SimpleConsoleContextBuilder <
 					resolvedContextLink);
 
 				buildResolvedTabs (
+					taskLogger,
 					resolvedContextLink);
 
 			}
 
-			ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
-				new ConsoleContextBuilderContainerImplementation<ObjectType> ()
-
-				.taskLogger (
-					container.taskLogger ())
+			ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
+				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
 				.consoleHelper (
 					null)
@@ -264,27 +260,38 @@ class SimpleConsoleContextBuilder <
 	}
 
 	void buildResolvedTabs (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextLink contextLink) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			contextLink.tabLocation (),
+		try (
 
-			contextTab.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResolvedTabs");
+		) {
 
-				.name (
-					contextLink.tabName ())
+			consoleModule.addContextTab (
+				taskLogger,
+				contextLink.tabLocation (),
 
-				.defaultLabel (
-					contextLink.tabLabel ())
+				contextTab.get ()
 
-				.privKeys (
-					contextLink.tabPrivKey ())
+					.name (
+						contextLink.tabName ())
 
-				.localFile (
-					"type:" + name),
+					.defaultLabel (
+						contextLink.tabLabel ())
 
-			contextLink.tabContextTypeNames ());
+					.privKeys (
+						contextLink.tabPrivKey ())
+
+					.localFile (
+						"type:" + name),
+
+				contextLink.tabContextTypeNames ());
+
+		}
 
 	}
 

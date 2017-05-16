@@ -2,12 +2,11 @@ package wbs.console.combo;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -23,10 +22,9 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.pathhandler.PathHandler;
 
 @PrototypeComponent ("simplePathBuilder")
-@ConsoleModuleBuilderHandler
 public
 class SimplePathBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 

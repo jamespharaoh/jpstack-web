@@ -21,4 +21,8 @@
 		<component class="daemon.DigitalSelectSender"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="digital-select-route-out"/>
+	</console-modules>
+
 </plugin>

@@ -8,8 +8,8 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -28,17 +28,15 @@ class SubscriptionNumberAddRemovePart
 	// singleton dependencies
 
 	@SingletonDependency
-	@NamedDependency ("subscriptionNumberAddRemoveFormContextBuilder")
-	FormContextBuilder <SubscriptionNumberAddRemoveForm> formContextBuilder;
+	@NamedDependency ("subscriptionNumberAddRemoveFormType")
+	ConsoleFormType <SubscriptionNumberAddRemoveForm> formType;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	// state
 
-	FormContext <SubscriptionNumberAddRemoveForm> formContext;
-
-	SubscriptionNumberAddRemoveForm addRemoveForm;
+	ConsoleForm <SubscriptionNumberAddRemoveForm> form;
 
 	// implementation
 
@@ -56,15 +54,12 @@ class SubscriptionNumberAddRemovePart
 
 		) {
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formType.buildResponse (
 					transaction,
 					emptyMap ());
 
-			addRemoveForm =
-				formContext.object ();
-
-			formContext.update (
+			form.update (
 				transaction);
 
 		}
@@ -91,7 +86,7 @@ class SubscriptionNumberAddRemovePart
 
 			htmlTableOpenDetails ();
 
-			formContext.outputFormRows (
+			form.outputFormRows (
 				transaction);
 
 			htmlTableOpenDetails ();

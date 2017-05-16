@@ -1,6 +1,6 @@
 package wbs.apn.chat.infosite.api;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import lombok.NonNull;

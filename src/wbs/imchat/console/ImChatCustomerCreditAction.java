@@ -5,8 +5,8 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -34,8 +34,8 @@ class ImChatCustomerCreditAction
 	Database database;
 
 	@SingletonDependency
-	@NamedDependency ("imChatCustomerCreditFormContextBuilder")
-	FormContextBuilder <ImChatCustomerCreditRequest> formContextBuilder;
+	@NamedDependency ("imChatCustomerCreditActionFormType")
+	ConsoleFormType <ImChatCustomerCreditRequest> formType;
 
 	@SingletonDependency
 	ImChatCustomerCreditConsoleHelper imChatCustomerCreditHelper;
@@ -86,26 +86,25 @@ class ImChatCustomerCreditAction
 
 			// process form fields
 
-			FormContext <ImChatCustomerCreditRequest> formContext =
-				formContextBuilder.build (
+			ConsoleForm <ImChatCustomerCreditRequest> form =
+				formType.buildAction (
 					transaction,
 					emptyMap ());
 
-			ImChatCustomerCreditRequest request =
-				formContext.object ();
-
-			request
+			form.value ()
 
 				.customer (
 					imChatCustomerHelper.findFromContextRequired (
-						transaction));
+						transaction))
 
-			formContext.update (
+			;
+
+			form.update (
 					transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 
-				formContext.reportErrors (
+				form.reportErrors (
 					transaction);
 
 				return null;
@@ -119,10 +118,10 @@ class ImChatCustomerCreditAction
 				imChatCustomerCreditHelper.createInstance ()
 
 				.setImChatCustomer (
-					request.customer ())
+					form.value ().customer ())
 
 				.setIndex (
-					request.customer ().getNumCredits ())
+					form.value ().customer ().getNumCredits ())
 
 				.setTimestamp (
 					transaction.now ())
@@ -132,41 +131,41 @@ class ImChatCustomerCreditAction
 						transaction))
 
 				.setReason (
-					request.reason ())
+					form.value ().reason ())
 
 				.setCreditAmount (
-					request.creditAmount ())
+					form.value ().creditAmount ())
 
 				.setCreditBalanceBefore (
-					request.customer ().getBalance ())
+					form.value ().customer ().getBalance ())
 
 				.setCreditBalanceAfter (
-					+ request.customer ().getBalance ()
-					+ request.creditAmount ())
+					+ form.value ().customer ().getBalance ()
+					+ form.value ().creditAmount ())
 
 				.setBillAmount (
-					request.billAmount ())
+					form.value ().billAmount ())
 
 			);
 
 			// update customer
 
-			request.customer ()
+			form.value ().customer ()
 
 				.setNumCredits (
-					request.customer.getNumCredits () + 1)
+					form.value ().customer.getNumCredits () + 1)
 
 				.setBalance (
-					+ request.customer ().getBalance ()
-					+ request.creditAmount ())
+					+ form.value ().customer ().getBalance ()
+					+ form.value ().creditAmount ())
 
 				.setTotalPurchaseValue (
-					+ request.customer ().getTotalPurchaseValue ()
-					+ request.creditAmount ())
+					+ form.value ().customer ().getTotalPurchaseValue ()
+					+ form.value ().creditAmount ())
 
 				.setTotalPurchasePrice (
-					+ request.customer ().getTotalPurchasePrice ()
-					+ request.billAmount ());
+					+ form.value ().customer ().getTotalPurchasePrice ()
+					+ form.value ().billAmount ());
 
 			// complete transaction
 

@@ -19,6 +19,7 @@
 
 	<console-modules>
 		<console-module name="affiliate"/>
+		<console-module name="affiliate-type"/>
 	</console-modules>
 
 </plugin>

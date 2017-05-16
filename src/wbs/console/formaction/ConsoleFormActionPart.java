@@ -1,6 +1,6 @@
 package wbs.console.formaction;
 
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
@@ -12,8 +12,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -39,7 +39,7 @@ class ConsoleFormActionPart <FormState, History>
 	ConsoleFormActionHelper <FormState, History> helper;
 
 	@Getter @Setter
-	FormContextBuilder <FormState> actionFormContextBuilder;
+	ConsoleFormType <FormState> actionFormContextBuilder;
 
 	@Getter @Setter
 	String name;
@@ -60,12 +60,12 @@ class ConsoleFormActionPart <FormState, History>
 	String historyHeading;
 
 	@Getter @Setter
-	FormContextBuilder <History> historyFormContextBuilder;
+	ConsoleFormType <History> historyFormContextBuilder;
 
 	// state
 
-	FormContext <FormState> actionFormContext;
-	FormContext <History> historyFormContext;
+	ConsoleForm <FormState> actionFormContext;
+	ConsoleForm <History> historyFormContext;
 
 	List <History> history;
 
@@ -100,7 +100,7 @@ class ConsoleFormActionPart <FormState, History>
 				formState);
 
 			actionFormContext =
-				actionFormContextBuilder.build (
+				actionFormContextBuilder.buildAction (
 					transaction,
 					formHints,
 					formState);
@@ -113,7 +113,7 @@ class ConsoleFormActionPart <FormState, History>
 			) {
 
 				historyFormContext =
-					historyFormContextBuilder.build (
+					historyFormContextBuilder.buildAction (
 						transaction,
 						formHints,
 						helper.history (

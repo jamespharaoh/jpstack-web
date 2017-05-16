@@ -15,4 +15,12 @@
 		<component class="logic.ChatInfoLogicImplementation"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="chat-profile-field"/>
+		<console-module name="chat-profile-field-value"/>
+		<console-module name="chat-user-info"/>
+		<console-module name="chat-user-name"/>
+		<console-module name="chat-user-profile-field"/>
+	</console-modules>
+
 </plugin>

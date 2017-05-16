@@ -16,7 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.ConsoleForm;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -102,8 +102,8 @@ class ConsoleFormActionsAction
 				genericCastUnchecked (
 					formState));
 
-			FormContext <?> formContext =
-				formAction.actionFormContextBuilder ().build (
+			ConsoleForm <?> formContext =
+				formAction.actionFormContextBuilder ().buildAction (
 					transaction,
 					emptyMap (),
 					Collections.singletonList (

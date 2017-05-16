@@ -45,7 +45,9 @@
 	</fixtures>
 
 	<console-modules>
+		<console-module name="content"/>
 		<console-module name="media"/>
+		<console-module name="media-type"/>
 	</console-modules>
 
 </plugin>

@@ -1,10 +1,10 @@
 package wbs.web.context;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.io.IOException;
 import java.io.OutputStream;

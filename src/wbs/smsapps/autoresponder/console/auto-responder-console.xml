@@ -1,4 +1,5 @@
-<console-module name="auto-responder">
+<console-module
+	name="auto-responder">
 
 	<console-helper-provider
 		object-name="autoResponder">

@@ -5,17 +5,14 @@
 	<layer name="console">
 
 		<bootstrap-component class="basic.EnumFormFieldSpec"/>
+		<bootstrap-component class="basic.FloatingPointFormFieldSpec"/>
+		<bootstrap-component class="basic.IntegerFormFieldSpec"/>
 		<bootstrap-component class="basic.YesNoFormFieldSpec"/>
 
-		<bootstrap-component class="context.FormContextSpec"/>
-		<bootstrap-component class="context.FormContextsSpec"/>
-		<bootstrap-component class="context.MultiFormContextFieldsSpec"/>
-		<bootstrap-component class="context.MultiFormContextSpec"/>
-
+		<bootstrap-component class="core.ConsoleFormSectionSpec"/>
+		<bootstrap-component class="core.ConsoleFormSpec"/>
+		<bootstrap-component class="core.ConsoleFormsSpec"/>
 		<bootstrap-component class="core.FormFieldSetSpec"/>
-
-		<bootstrap-component class="number.FloatingPointFormFieldSpec"/>
-		<bootstrap-component class="number.IntegerFormFieldSpec"/>
 
 		<bootstrap-component class="object.CodeFormFieldSpec"/>
 		<bootstrap-component class="object.DeletedFormFieldSpec"/>
@@ -49,10 +46,17 @@
 		<component class="basic.EnumCsvFormFieldInterfaceMapping"/>
 		<component class="basic.EnumFormFieldBuilder"/>
 		<component class="basic.EnumFormFieldRenderer"/>
+		<component class="basic.FloatingPointFormFieldBuilder"/>
+		<component class="basic.FloatingPointFormFieldInterfaceMapping"/>
+		<component class="basic.FloatingPointFormFieldValueValidator"/>
 		<component class="basic.IdentityFormFieldAccessor"/>
 		<component class="basic.IdentityFormFieldInterfaceMapping"/>
 		<component class="basic.IdentityFormFieldNativeMapping"/>
 		<component class="basic.IdentityFormFieldPluginProvider"/>
+		<component class="basic.IntegerFormFieldBuilder"/>
+		<component class="basic.IntegerFormFieldInterfaceMapping"/>
+		<component class="basic.IntegerFormFieldValueValidator"/>
+		<component class="basic.JavaIntegerFormFieldNativeMapping"/>
 		<component class="basic.NullFormFieldConstraintValidator"/>
 		<component class="basic.NullFormFieldUpdateHook"/>
 		<component class="basic.PairFormFieldAccessor"/>
@@ -63,21 +67,16 @@
 		<component class="basic.YesNoFormFieldBuilder"/>
 		<component class="basic.YesNoFormFieldRenderer"/>
 
-		<component class="core.HiddenFormField"/>
+		<component class="core.ConsoleFormBuilder"/>
+		<component class="core.ConsoleFormImplementation"/>
+		<component class="core.ConsoleFormManagerImplementation"/>
+		<component class="core.ConsoleFormPluginManagerImplementation"/>
+		<component class="core.ConsoleFormTypeImplementation"/>
+		<component class="core.ConsoleMultiFormType"/>
 		<component class="core.FormFieldSetBuilder"/>
+		<component class="core.HiddenFormField"/>
 		<component class="core.ReadOnlyFormField"/>
 		<component class="core.UpdatableFormField"/>
-
-		<component class="logic.FormFieldLogic"/>
-		<component class="logic.FormFieldPluginManagerImplementation"/>
-
-		<component class="number.FloatingPointFormFieldBuilder"/>
-		<component class="number.FloatingPointFormFieldInterfaceMapping"/>
-		<component class="number.FloatingPointFormFieldValueValidator"/>
-		<component class="number.IntegerFormFieldBuilder"/>
-		<component class="number.IntegerFormFieldInterfaceMapping"/>
-		<component class="number.IntegerFormFieldValueValidator"/>
-		<component class="number.JavaIntegerFormFieldNativeMapping"/>
 
 		<component class="object.CodeFormFieldBuilder"/>
 		<component class="object.CodeFormFieldConstraintValidator"/>

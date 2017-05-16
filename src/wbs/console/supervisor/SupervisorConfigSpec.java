@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -19,7 +19,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("supervisorConfigSpec")
 public
 class SupervisorConfigSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataAttribute (
 		required = true)

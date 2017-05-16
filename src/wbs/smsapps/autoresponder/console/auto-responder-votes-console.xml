@@ -12,23 +12,22 @@
 
 	</extend-context>
 
-	<field-set
-		name="auto-responder-votes"
-		class="wbs.smsapps.autoresponder.console.AutoResponderVotesForm">
+	<forms>
 
-		<interval-field
-			name="timePeriod"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<form-context
-			name="votes"
+		<form
+			name="search"
 			class="wbs.smsapps.autoresponder.console.AutoResponderVotesForm"
-			type="search"
-			column-fields="auto-responder-votes"/>
+			type="search">
 
-	</form-contexts>
+			<column-fields>
+
+				<interval-field
+					name="timePeriod"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -40,7 +40,9 @@
 
 	<console-modules>
 		<console-module name="postgresql"/>
+		<console-module name="postgresql-class"/>
 		<console-module name="postgresql-maintenance"/>
+		<console-module name="postgresql-stat-activity"/>
 	</console-modules>
 
 </plugin>

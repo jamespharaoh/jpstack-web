@@ -18,28 +18,26 @@ import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.basic.IdentityFormFieldNativeMapping;
 import wbs.console.forms.basic.NullFormFieldConstraintValidator;
 import wbs.console.forms.basic.RequiredFormFieldValueValidator;
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderComponent;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.core.ConsoleFormPluginManagerImplementation;
 import wbs.console.forms.core.FormFieldSetImplementation;
 import wbs.console.forms.core.ReadOnlyFormField;
 import wbs.console.forms.core.UpdatableFormField;
-import wbs.console.forms.logic.FormFieldPluginManagerImplementation;
 import wbs.console.forms.object.DereferenceFormFieldAccessor;
 import wbs.console.forms.text.TextFormFieldRenderer;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
-import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -51,24 +49,24 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("timestampFromFormFieldBuilder")
-@ConsoleModuleBuilderHandler
 public
 class TimestampFromFormFieldBuilder
-	implements BuilderComponent {
+	implements ConsoleFormBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldPluginManagerImplementation formFieldPluginManager;
+	ConsoleFormPluginManagerImplementation formFieldPluginManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	ObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -111,7 +109,7 @@ class TimestampFromFormFieldBuilder
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext context;
+	ConsoleFormBuilderContext context;
 
 	@BuilderSource
 	TimestampFromFormFieldSpec spec;
@@ -174,7 +172,7 @@ class TimestampFromFormFieldBuilder
 							fieldName)));
 
 			FormFieldAccessor formFieldAccessor;
-			FormFieldNativeMapping formFieldNativeMapping;
+			ConsoleFormNativeMapping formFieldNativeMapping;
 
 			if (propertyClass == Instant.class) {
 

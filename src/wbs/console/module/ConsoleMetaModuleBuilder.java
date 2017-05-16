@@ -7,8 +7,6 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
-
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -40,8 +38,8 @@ class ConsoleMetaModuleBuilder
 	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
-	@ConsoleMetaModuleBuilderHandler
-	Map <Class <?>, Provider <Object>> consoleMetaModuleBuilders;
+	Map <Class <?>, Provider <ConsoleMetaModuleBuilderComponent>>
+		consoleMetaModuleBuilders;
 
 	// state
 

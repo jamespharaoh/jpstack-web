@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.context.ConsoleContextSpec;
 import wbs.console.module.ConsoleModuleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -21,7 +21,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("extendContextSpec")
 public
 class ExtendContextSpec
-	implements ConsoleModuleData {
+	implements ConsoleContextSpec {
 
 	// attributes
 

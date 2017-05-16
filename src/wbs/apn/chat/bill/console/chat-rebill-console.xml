@@ -24,95 +24,104 @@
 
 	</extend-context>
 
-	<field-set
-		name="search"
-		class="wbs.apn.chat.bill.console.ChatRebillSearch">
+	<forms>
 
-		<timestamp-from-field
-			name="lastAction"/>
-
-		<currency-field
-			name="minimumCreditOwed"
-			currency="chat.currency"
-			minimum="1"/>
-
-		<yes-no-field
-			name="includeBlocked"
-			nullable="no"/>
-
-		<yes-no-field
-			name="includeFailed"
-			nullable="no"/>
-
-	</field-set>
-
-	<field-set
-		name="bill-results"
-		object-name="chatUser">
-
-		<code-field/>
-
-		<enum-field
-			name="gender"/>
-
-		<enum-field
-			name="orient"/>
-
-		<text-field
-			name="name"/>
-
-		<currency-field
-			name="credit"
-			field="credit"
-			currency="chat.currency"/>
-
-		<timestamp-from-field
-			name="lastAction"/>
-
-	</field-set>
-
-	<field-set
-		name="non-bill-results"
-		class="wbs.apn.chat.bill.console.ChatRebillNonBillResult">
-
-		<text-field
-			name="code"
-			field="chatUser.code"/>
-
-		<enum-field
-			name="gender"
-			field="chatUser.gender"/>
-
-		<enum-field
-			name="orient"
-			field="chatUser.orient"/>
-
-		<text-field
-			name="name"
-			field="chatUser.name"/>
-
-		<currency-field
-			name="credit"
-			field="chatUser.credit"
-			currency="chatUser.chat.currency"/>
-
-		<timestamp-from-field
-			name="lastAction"
-			field="chatUser.lastAction"/>
-
-		<text-field
-			name="reason"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<form-context
+		<form
 			name="search"
-			class="wbs.apn.chat.bill.console.chatRebillSearch"
-			type="perform"
-			column-fields="search"/>
+			class="wbs.apn.chat.bill.console.ChatRebillSearch"
+			type="search">
 
-	</form-contexts>
+			<column-fields>
+
+				<timestamp-from-field
+					name="lastAction"/>
+
+				<currency-field
+					name="minimumCreditOwed"
+					currency="chat.currency"
+					minimum="1"/>
+
+				<yes-no-field
+					name="includeBlocked"
+					nullable="no"/>
+
+				<yes-no-field
+					name="includeFailed"
+					nullable="no"/>
+
+			</column-fields>
+
+		</form>
+
+		<form
+			name="bill-results"
+			object-type="chat-user"
+			type="read-only">
+
+			<column-fields>
+
+				<code-field/>
+
+				<enum-field
+					name="gender"/>
+
+				<enum-field
+					name="orient"/>
+
+				<text-field
+					name="name"/>
+
+				<currency-field
+					name="credit"
+					field="credit"
+					currency="chat.currency"/>
+
+				<timestamp-from-field
+					name="lastAction"/>
+
+			</column-fields>
+
+		</form>
+
+		<form
+			name="non-bill-results"
+			class="wbs.apn.chat.bill.console.ChatRebillNonBillResult"
+			type="read-only">
+
+			<column-fields>
+
+				<text-field
+					name="code"
+					field="chatUser.code"/>
+
+				<enum-field
+					name="gender"
+					field="chatUser.gender"/>
+
+				<enum-field
+					name="orient"
+					field="chatUser.orient"/>
+
+				<text-field
+					name="name"
+					field="chatUser.name"/>
+
+				<currency-field
+					name="credit"
+					field="chatUser.credit"
+					currency="chatUser.chat.currency"/>
+
+				<timestamp-from-field
+					name="lastAction"
+					field="chatUser.lastAction"/>
+
+				<text-field
+					name="reason"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

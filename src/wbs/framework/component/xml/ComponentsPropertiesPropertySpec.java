@@ -1,5 +1,7 @@
 package wbs.framework.component.xml;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -56,7 +58,7 @@ class ComponentsPropertiesPropertySpec
 	public
 	void register (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ComponentDefinition beanDefinition) {
+			@NonNull ComponentDefinition componentDefinition) {
 
 		try (
 
@@ -81,9 +83,10 @@ class ComponentsPropertiesPropertySpec
 
 			}
 
-			beanDefinition.addValueProperty (
+			componentDefinition.addValueProperty (
 				name,
-				properties);
+				optionalOf (
+					properties));
 
 		}
 

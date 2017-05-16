@@ -1,6 +1,6 @@
 package wbs.framework.codegen;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
@@ -189,7 +189,7 @@ class JavaInterfaceWriter
 			) {
 
 				if (
-					collectionHasOneElement (
+					collectionHasOneItem (
 						extendsInterfaceNames)
 				) {
 

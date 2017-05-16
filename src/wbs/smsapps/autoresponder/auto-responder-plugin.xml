@@ -33,6 +33,8 @@
 
 	<console-modules>
 		<console-module name="auto-responder"/>
+		<console-module name="auto-responder-request"/>
+		<console-module name="auto-responder-template"/>
 		<console-module name="auto-responder-votes"/>
 	</console-modules>
 

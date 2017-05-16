@@ -1,5 +1,9 @@
 package wbs.framework.component.registry;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormatArray;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -99,11 +105,19 @@ class ComponentDefinition {
 	public
 	ComponentDefinition addValueProperty (
 			@NonNull String name,
-			@NonNull Object value) {
+			@NonNull Optional <Object> value) {
 
-		valueProperties.put (
-			name,
-			value);
+		if (
+			optionalIsPresent (
+				value)
+		) {
+
+			valueProperties.put (
+				name,
+				optionalGetRequired (
+					value));
+
+		}
 
 		return this;
 
@@ -117,6 +131,20 @@ class ComponentDefinition {
 		referenceProperties.put (
 			name,
 			referencedComponentName);
+
+		return this;
+
+	}
+
+	public
+	ComponentDefinition addReferencePropertyFormat (
+			@NonNull String name,
+			@NonNull String ... referencedComponentNameArguments) {
+
+		referenceProperties.put (
+			name,
+			stringFormatArray (
+				referencedComponentNameArguments));
 
 		return this;
 

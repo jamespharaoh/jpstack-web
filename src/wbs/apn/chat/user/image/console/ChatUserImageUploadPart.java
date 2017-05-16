@@ -6,8 +6,8 @@ import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -28,19 +28,17 @@ class ChatUserImageUploadPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@NamedDependency ("chatUserImageUploadFormContextBuilder")
-	FormContextBuilder <ChatUserImageUploadForm> formContextBuilder;
+	@NamedDependency ("chatUserImageUploadFormType")
+	ConsoleFormType <ChatUserImageUploadForm> formType;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	// state
 
-	FormContext <ChatUserImageUploadForm> formContext;
+	ConsoleForm <ChatUserImageUploadForm> form;
 
 	ChatUserImageType chatUserImageType;
-
-	ChatUserImageUploadForm uploadForm;
 
 	// implementation
 
@@ -64,17 +62,14 @@ class ChatUserImageUploadPart
 					requestContext.stuffString (
 						"chatUserImageType"));
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formType.buildResponse (
 					transaction,
 					emptyMap ());
 
-			uploadForm =
-				new ChatUserImageUploadForm ();
-
 			if (requestContext.post ()) {
 
-				formContext.update (
+				form.update (
 					transaction);
 
 			}
@@ -100,7 +95,7 @@ class ChatUserImageUploadPart
 			htmlParagraphWrite (
 				"Please upload the photo or video.");
 
-			formContext.outputFormTable (
+			form.outputFormTable (
 				transaction,
 				"post",
 				requestContext.resolveLocalUrlFormat (

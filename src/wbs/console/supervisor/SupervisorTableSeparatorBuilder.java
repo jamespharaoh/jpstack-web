@@ -7,7 +7,7 @@ import javax.inject.Provider;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.part.PagePart;
 import wbs.console.part.TextPart;
 
@@ -25,9 +25,9 @@ import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableSeparatorBuilder")
-@ConsoleModuleBuilderHandler
 public
-class SupervisorTableSeparatorBuilder {
+class SupervisorTableSeparatorBuilder
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -52,6 +52,7 @@ class SupervisorTableSeparatorBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (

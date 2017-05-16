@@ -33,7 +33,6 @@
 	</layer>
 
 	<layer name="console">
-		<component class="console.ChatUserConsoleConfig"/>
 		<component class="console.ChatUserConsoleHooks"/>
 		<component class="console.ChatUserHelpFormAction"/>
 		<component class="console.ChatUserHelpFormResponder"/>
@@ -56,6 +55,12 @@
 
 	<console-modules>
 		<console-module name="chat-user"/>
+		<console-module name="chat-user-alarm"/>
+		<console-module name="chat-user-date-log"/>
+		<console-module name="chat-user-dob-failure"/>
+		<console-module name="chat-user-note"/>
+		<console-module name="chat-user-session"/>
+		<console-module name="chat-users-summary"/>
 	</console-modules>
 
 </plugin>

@@ -20,4 +20,8 @@
 		<component class="api.ChatInfoSiteViewResponder"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="chat-info-site"/>
+	</console-modules>
+
 </plugin>

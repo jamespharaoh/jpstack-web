@@ -3,8 +3,8 @@ package wbs.console.formaction;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
+import wbs.console.module.ConsoleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
@@ -17,7 +17,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("contextTabFormActionPageSpec")
 public
 class ContextTabFormActionPageSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	// tree attributes
 
@@ -32,7 +32,7 @@ class ContextTabFormActionPageSpec
 
 	@DataAttribute (
 		name = "action-form")
-	String actionFormContextName;
+	String actionFormTypeName;
 
 	@DataAttribute
 	String helpText;
@@ -51,6 +51,6 @@ class ContextTabFormActionPageSpec
 
 	@DataAttribute (
 		name = "history-form")
-	String historyFormContextName;
+	String historyFormTypeName;
 
 }

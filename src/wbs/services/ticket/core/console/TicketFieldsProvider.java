@@ -9,13 +9,13 @@ import java.util.Set;
 
 import lombok.NonNull;
 
+import wbs.console.forms.basic.IntegerFormFieldSpec;
 import wbs.console.forms.basic.YesNoFormFieldSpec;
+import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.FormFieldSet;
-import wbs.console.forms.number.IntegerFormFieldSpec;
 import wbs.console.forms.object.ObjectFormFieldSpec;
 import wbs.console.forms.text.TextFormFieldSpec;
 import wbs.console.forms.types.FieldsProvider;
-import wbs.console.module.ConsoleModuleBuilder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -37,7 +37,7 @@ class TicketFieldsProvider
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
+	ConsoleFormBuilder consoleFormBuilder;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -210,7 +210,7 @@ class TicketFieldsProvider
 					ticketConsoleHelper.objectName(),
 					mode);
 
-			return consoleModuleBuilder.buildFormFieldSet (
+			return consoleFormBuilder.buildFormFieldSet (
 				taskLogger,
 				ticketConsoleHelper,
 				fieldSetName,

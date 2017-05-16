@@ -1,6 +1,9 @@
 <console-module
 	name="chat-broadcast">
 
+	<console-helper-provider
+		object-name="chatBroadcast"/>
+
 	<extend-context
 		name="chat.broadcast"
 		base-name="chat"
@@ -25,175 +28,144 @@
 
 	</extend-context>
 
-	<field-set
-		name="send-search"
-		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+	<forms>
 
-		<yes-no-field
-			name="search"
-			hidden="yes"/>
-
-		<interval-field
-			name="lastAction"
-			nullable="yes"/>
-
-		<enum-field
-			name="gender"
-			nullable="yes"/>
-
-		<enum-field
-			name="orient"
-			nullable="yes"/>
-
-		<object-field
-			name="categoryId"
-			object-type="chatCategory"
-			root-field="chat"
-			nullable="yes"/>
-
-		<yes-no-field
-			name="hasPicture"
-			label="Picture"
-			nullable="yes"/>
-
-		<yes-no-field
-			name="isAdult"
-			label="Adult"
-			nullable="yes"/>
-
-		<currency-field
-			name="minimumSpend"
-			label="Search spend minimum"
-			currency="chat.currency"
-			nullable="yes"/>
-
-		<currency-field
-			name="maximumSpend"
-			label="Search spend maximum"
-			currency="chat.currency"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="send-numbers"
-		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
-
-		<text-area-field
-			name="numbers"/>
-
-	</field-set>
-
-	<field-set
-		name="send-common"
-		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
-
-		<yes-no-field
-			name="includeBlocked"
-			view-priv="chat:supervisor"/>
-
-		<yes-no-field
-			name="includeOptedOut"
-			view-priv="chat:supervisor"/>
-
-	</field-set>
-
-	<field-set
-		name="send-message-user"
-		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
-
-		<text-field
-			name="fromUser"/>
-
-	</field-set>
-
-	<field-set
-		name="send-message-message"
-		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
-
-		<text-field
-			name="prefix"
-			read-only="yes"/>
-
-		<text-area-field
-			name="message"
-			char-count-function="gsmCharCountNew"
-			char-count-data="{ maxReduceField: 'send-prefix' }"/>
-
-	</field-set>
-
-	<field-set
-		name="verify-user"
-		object-name="chatUser">
-
-		<object-field
-			name="number"
-			object-type="number"/>
-
-		<code-field/>
-
-		<text-field
-			name="name"/>
-
-		<timestamp-field
-			name="lastAction"/>
-
-		<enum-field
-			name="gender"/>
-
-		<enum-field
-			name="orient"/>
-
-		<object-field
-			name="category"
-			root-field="chat"/>
-
-		<image-field
-			name="picture"
-			field="mainChatUserImage.media"
-			label="Pic"/>
-
-		<yes-no-field
-			name="adultVerified"
-			label="Adult"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<multi-form-context
+		<form
 			name="send"
 			class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm"
 			type="perform">
 
-			<fields
-				name="search"
-				fields="send-search"/>
+			<section name="search">
 
-			<fields
-				name="numbers"
-				fields="send-numbers"/>
+				<yes-no-field
+					name="search"
+					hidden="yes"/>
 
-			<fields
-				name="common"
-				fields="send-common"/>
+				<interval-field
+					name="lastAction"
+					nullable="yes"/>
 
-			<fields
-				name="message-user"
-				fields="send-message-user"/>
+				<enum-field
+					name="gender"
+					nullable="yes"/>
 
-			<fields
-				name="message-message"
-				fields="send-message-message"/>
+				<enum-field
+					name="orient"
+					nullable="yes"/>
 
-		</multi-form-context>
+				<object-field
+					name="categoryId"
+					object-type="chatCategory"
+					root-field="chat"
+					nullable="yes"/>
 
-		<form-context
+				<yes-no-field
+					name="hasPicture"
+					label="Picture"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="isAdult"
+					label="Adult"
+					nullable="yes"/>
+
+				<currency-field
+					name="minimumSpend"
+					label="Search spend minimum"
+					currency="chat.currency"
+					nullable="yes"/>
+
+				<currency-field
+					name="maximumSpend"
+					label="Search spend maximum"
+					currency="chat.currency"
+					nullable="yes"/>
+
+			</section>
+
+			<section name="numbers">
+
+				<text-area-field
+					name="numbers"/>
+
+			</section>
+
+			<section name="common">
+
+				<yes-no-field
+					name="includeBlocked"
+					view-priv="chat:supervisor"/>
+
+				<yes-no-field
+					name="includeOptedOut"
+					view-priv="chat:supervisor"/>
+
+			</section>
+
+			<section name="message-user">
+
+				<text-field
+					name="fromUser"/>
+
+			</section>
+
+			<section name="message-message">
+
+				<text-field
+					name="prefix"
+					read-only="yes"/>
+
+				<text-area-field
+					name="message"
+					char-count-function="gsmCharCountNew"
+					char-count-data="{ maxReduceField: 'send-prefix' }"/>
+
+			</section>
+
+		</form>
+
+		<form
 			name="verify"
-			class="wbs.apn.chat.user.core.model.ChatUserRec"
-			type="read-only"
-			column-fields="verify-user"/>
+			object-type="chat-user"
+			type="read-only">
 
-	</form-contexts>
+			<column-fields>
+
+				<object-field
+					name="number"
+					object-type="number"/>
+
+				<code-field/>
+
+				<text-field
+					name="name"/>
+
+				<timestamp-field
+					name="lastAction"/>
+
+				<enum-field
+					name="gender"/>
+
+				<enum-field
+					name="orient"/>
+
+				<object-field
+					name="category"
+					root-field="chat"/>
+
+				<image-field
+					name="picture"
+					field="mainChatUserImage.media"
+					label="Pic"/>
+
+				<yes-no-field
+					name="adultVerified"
+					label="Adult"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

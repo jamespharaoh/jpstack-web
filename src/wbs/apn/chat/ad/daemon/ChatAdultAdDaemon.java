@@ -2,7 +2,7 @@ package wbs.apn.chat.ad.daemon;
 
 import static wbs.utils.collection.CollectionUtils.iterableFirstElementRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.time.TimeUtils.laterThan;

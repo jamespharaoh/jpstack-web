@@ -1,6 +1,8 @@
 package wbs.console.formaction;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.NullUtils.anyIsNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
@@ -15,11 +17,11 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormManager;
 import wbs.console.module.ConsoleMetaManager;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -27,7 +29,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -44,11 +45,10 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("contextTabFormActionsPageBuilder")
-@ConsoleModuleBuilderHandler
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class ContextTabFormActionsPageBuilder
-	implements BuilderComponent {
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -59,7 +59,7 @@ class ContextTabFormActionsPageBuilder
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -182,74 +182,93 @@ class ContextTabFormActionsPageBuilder
 
 	}
 
+	private
 	ConsoleFormAction initFormAction (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleFormActionSpec actionSpec) {
 
-		String helperBeanName =
-			stringFormat (
-				"%s%sFormActionHelper",
-				container.newBeanNamePrefix (),
-				capitalise (
-					hyphenToCamel (
-						ifNull (
-							actionSpec.name (),
-							actionSpec.helperName ()))));
+		try (
 
-		ConsoleFormActionHelper <?, ?> actionHelper =
-			genericCastUnchecked (
-				componentManager.getComponentRequired (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					helperBeanName,
-					ConsoleFormActionHelper.class));
+					"initFormAction");
 
-		return new ConsoleFormAction ()
+		) {
 
-			.name (
-				actionSpec.name ())
+			String helperBeanName =
+				stringFormat (
+					"%s%sFormActionHelper",
+					container.newBeanNamePrefix (),
+					capitalise (
+						hyphenToCamel (
+							ifNull (
+								actionSpec.name (),
+								actionSpec.helperName ()))));
 
-			.helper (
+			ConsoleFormActionHelper <?, ?> actionHelper =
 				genericCastUnchecked (
-					actionHelper))
+					componentManager.getComponentRequired (
+						parentTaskLogger,
+						helperBeanName,
+						ConsoleFormActionHelper.class));
 
-			.heading (
-				capitalise (
-					hyphenToSpaces (
-						actionSpec.name ())))
+			return new ConsoleFormAction ()
 
-			.helpText (
-				actionSpec.helpText ())
+				.name (
+					actionSpec.name ())
 
-			.actionFormContextBuilder (
-				formContextManager.formContextBuilderRequired (
-					consoleModule.name (),
+				.helper (
+					genericCastUnchecked (
+						actionHelper))
+
+				.heading (
+					capitalise (
+						hyphenToSpaces (
+							actionSpec.name ())))
+
+				.helpText (
+					actionSpec.helpText ())
+
+				.actionFormContextBuilder (
+					formContextManager.getFormTypeRequired (
+						taskLogger,
+						consoleModule.name (),
+						ifNull (
+							actionSpec.actionFormTypeName (),
+							stringFormat (
+								"%s-action",
+								actionSpec.name ())),
+						Object.class))
+
+				.submitLabel (
 					ifNull (
-						actionSpec.actionFormContextName (),
-						stringFormat (
-							"%s-form",
-							actionSpec.name ())),
-					Object.class))
+						actionSpec.submitLabel (),
+						hyphenToSpaces (
+							actionSpec.name ())))
 
-			.submitLabel (
-				ifNull (
-					actionSpec.submitLabel (),
-					hyphenToSpaces (
-						actionSpec.name ())))
+				.historyHeading (
+					actionSpec.historyHeading ())
 
-			.historyHeading (
-				actionSpec.historyHeading ())
+				.historyFormContextBuilder (
+					ifThenElse (
+						anyIsNotNull (
+							actionSpec.historyHeading (),
+							actionSpec.historyFormTypeName ()),
+						() -> formContextManager.getFormTypeRequired (
+							taskLogger,
+							consoleModule.name (),
+							ifNull (
+								actionSpec.historyFormTypeName (),
+								stringFormat (
+									"%s-history",
+									actionSpec.name ())),
+							Object.class),
+						() -> null))
 
-			.historyFormContextBuilder (
-				formContextManager.formContextBuilderRequired (
-					consoleModule.name (),
-					ifNull (
-						actionSpec.historyFormContextName (),
-						stringFormat (
-							"%s-history",
-							actionSpec.name ())),
-					Object.class))
+			;
 
-		;
+		}
 
 	}
 
@@ -257,14 +276,25 @@ class ContextTabFormActionsPageBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			container.tabLocation (),
-			consoleContextTabProvider.get ()
-				.name (tabName)
-				.defaultLabel (tabLabel)
-				.localFile (localFile),
-			extensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildTab");
+
+		) {
+
+			consoleModule.addContextTab (
+				taskLogger,
+				container.tabLocation (),
+				consoleContextTabProvider.get ()
+					.name (tabName)
+					.defaultLabel (tabLabel)
+					.localFile (localFile),
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

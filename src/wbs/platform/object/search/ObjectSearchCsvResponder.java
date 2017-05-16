@@ -3,7 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
@@ -26,7 +26,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
@@ -93,7 +93,7 @@ class ObjectSearchCsvResponder <ResultType>
 	Object searchObject;
 	List <Long> objectIds;
 
-	FormContext <ResultType> formContext;
+	ConsoleForm <ResultType> formContext;
 
 	// implementation
 
@@ -177,7 +177,7 @@ class ObjectSearchCsvResponder <ResultType>
 			// form context
 
 			formContext =
-				resultsMode.formContextBuilder ().build (
+				resultsMode.formContextBuilder ().buildResponse (
 					transaction,
 					emptyMap ());
 

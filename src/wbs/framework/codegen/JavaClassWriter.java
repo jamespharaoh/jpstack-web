@@ -2,7 +2,7 @@ package wbs.framework.codegen;
 
 import static wbs.utils.collection.ArrayUtils.arrayIsNotEmpty;
 import static wbs.utils.collection.ArrayUtils.arrayMap;
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
@@ -13,8 +13,8 @@ import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.ReflectionUtils.methodInvokeByName;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -58,6 +58,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -768,7 +769,7 @@ class JavaClassWriter
 			) {
 
 				if (
-					collectionHasOneElement (
+					collectionHasOneItem (
 						implementsInterfaces)
 				) {
 
@@ -925,6 +926,15 @@ class JavaClassWriter
 				"@%s",
 				imports.register (
 					dependency.annotationClass ()));
+
+			if (dependency.named ()) {
+
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					NamedDependency.class));
+
+			}
 
 			if (dependency.provider ()) {
 

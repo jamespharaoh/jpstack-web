@@ -1,18 +1,21 @@
 package wbs.platform.object.create;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.PropertyUtils.propertyClassForObject;
+import static wbs.utils.etc.PropertyUtils.propertySetAuto;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -34,8 +37,8 @@ import org.joda.time.Instant;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -60,8 +63,6 @@ import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.console.UserConsoleLogic;
-
-import wbs.utils.etc.PropertyUtils;
 
 import wbs.web.responder.Responder;
 
@@ -136,7 +137,7 @@ class ObjectCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -149,7 +150,7 @@ class ObjectCreateAction <
 	ConsoleHelper <ParentType> parentHelper;
 	ParentType parent;
 
-	FormContext <ObjectType> formContext;
+	ConsoleForm <ObjectType> form;
 
 	ConsoleContext targetContext;
 
@@ -232,10 +233,13 @@ class ObjectCreateAction <
 
 			}
 
-			// create new record
+			// setup form
 
-			ObjectType object =
-				consoleHelper.createInstance ();
+			form =
+				formContextBuilder.buildAction (
+					transaction,
+					emptyMap (),
+					consoleHelper.createInstance ());
 
 			// set parent
 
@@ -249,7 +253,7 @@ class ObjectCreateAction <
 			) {
 
 				consoleHelper.setParent (
-					object,
+					form.value (),
 					parent);
 
 			}
@@ -258,8 +262,8 @@ class ObjectCreateAction <
 
 			if (consoleHelper.typeCodeExists ()) {
 
-				PropertyUtils.propertySetAuto (
-					object,
+				propertySetAuto (
+					form.value (),
 					consoleHelper.typeCodeFieldName (),
 					typeCode);
 
@@ -275,17 +279,12 @@ class ObjectCreateAction <
 
 			}*/
 
-			formContext =
-				formContextBuilder.build (
-					transaction,
-					emptyMap ());
-
-			formContext.update (
+			form.update (
 				transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 
-				formContext.reportErrors (
+				form.reportErrors (
 					transaction);
 
 				return null;
@@ -297,21 +296,21 @@ class ObjectCreateAction <
 			if (createTimeFieldName != null) {
 
 				Class<?> createTimeFieldClass =
-					PropertyUtils.propertyClassForObject (
-						object,
+					propertyClassForObject (
+						form.value (),
 						createTimeFieldName);
 
 				if (createTimeFieldClass == Instant.class) {
 
-					PropertyUtils.propertySetAuto (
-						object,
+					propertySetAuto (
+						form.value (),
 						createTimeFieldName,
 						transaction.now ());
 
 				} else if (createTimeFieldClass == Date.class) {
 
-					PropertyUtils.propertySetAuto (
-						object,
+					propertySetAuto (
+						form.value (),
 						createTimeFieldName,
 						instantToDateNullSafe (
 							transaction.now ()));
@@ -328,8 +327,8 @@ class ObjectCreateAction <
 
 			if (createUserFieldName != null) {
 
-				PropertyUtils.propertySetAuto (
-					object,
+				propertySetAuto (
+					form.value (),
 					createUserFieldName,
 					userConsoleLogic.userRequired (
 						transaction));
@@ -340,26 +339,26 @@ class ObjectCreateAction <
 
 			consoleHelper ().consoleHooks ().beforeCreate (
 				transaction,
-				object);
+				form.value ());
 
 			// insert
 
 			consoleHelper.insert (
 				transaction,
-				object);
+				form.value ());
 
 			// after create hook
 
 			consoleHelper ().consoleHooks ().afterCreate (
 				transaction,
-				object);
+				form.value ());
 
 			// create event
 
 			Object objectRef =
 				consoleHelper.codeExists ()
-					? consoleHelper.getCode (object)
-					: object.getId ();
+					? consoleHelper.getCode (form.value ())
+					: form.value ().getId ();
 
 			if (consoleHelper.ephemeral ()) {
 
@@ -379,24 +378,24 @@ class ObjectCreateAction <
 					"object_created",
 					userConsoleLogic.userRequired (
 						transaction),
-					object,
+					form.value (),
 					parent);
 
 			}
 
 			// update events
 
-			if (object instanceof PermanentRecord) {
+			if (form.value () instanceof PermanentRecord) {
 
-				formContext.runUpdateHooks (
+				form.runUpdateHooks (
 					transaction,
-					(PermanentRecord <?>) object,
+					(PermanentRecord <?>) form.value (),
 					optionalAbsent (),
 					optionalAbsent ());
 
 			} else {
 
-				formContext.runUpdateHooks (
+				form.runUpdateHooks (
 					transaction,
 					(PermanentRecord<?>) parent,
 					optionalOf (
@@ -440,7 +439,7 @@ class ObjectCreateAction <
 					targetContextTypeName);
 
 			if (
-				collectionHasOneElement (
+				collectionHasOneItem (
 					targetContextTypeNameParts)
 			) {
 
@@ -458,10 +457,10 @@ class ObjectCreateAction <
 				consoleManager.changeContext (
 					transaction,
 					targetContext,
-					"/" + object.getId ());
+					"/" + form.value ().getId ());
 
 			} else if (
-				collectionHasTwoElements (
+				collectionHasTwoItems (
 					targetContextTypeNameParts)
 			) {
 
@@ -492,7 +491,7 @@ class ObjectCreateAction <
 				consoleManager.changeContext (
 					transaction,
 					targetContext,
-					"/" + object.getId ());
+					"/" + form.value ().getId ());
 
 			}
 

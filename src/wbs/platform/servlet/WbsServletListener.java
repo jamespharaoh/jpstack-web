@@ -1,7 +1,7 @@
 package wbs.platform.servlet;
 
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -406,6 +406,9 @@ class WbsServletListener
 
 				setServletRequest = true;
 
+				List <Object> targetComponents =
+					new ArrayList<> ();
+
 				for (
 					String requestComponentName
 						: componentManager.requestComponentNames ()
@@ -427,7 +430,8 @@ class WbsServletListener
 						componentManager.getComponentRequired (
 							taskLogger,
 							targetComponentName,
-							Object.class);
+							Object.class,
+							false);
 
 					control.threadLocalProxySet (
 						targetComponent);
@@ -435,7 +439,16 @@ class WbsServletListener
 					setRequestComponentNames.add (
 						requestComponentName);
 
+					targetComponents.add (
+						targetComponent);
+
 				}
+
+				targetComponents.forEach (
+					targetComponent ->
+						componentManager.initializeComponent (
+							taskLogger,
+							targetComponent));
 
 				success = true;
 

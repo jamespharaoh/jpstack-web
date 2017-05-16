@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.types.FormField;
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -16,7 +16,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("timestampToFormFieldSpec")
 public
 class TimestampToFormFieldSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataAttribute
 	String label;

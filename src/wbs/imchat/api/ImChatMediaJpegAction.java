@@ -1,8 +1,8 @@
 package wbs.imchat.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.maximumJavaInteger;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;

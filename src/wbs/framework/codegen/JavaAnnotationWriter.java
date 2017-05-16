@@ -1,7 +1,7 @@
 package wbs.framework.codegen;
 
 import static wbs.utils.collection.ArrayUtils.arrayIsEmpty;
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.iterableFirstElementRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -80,7 +80,7 @@ class JavaAnnotationWriter {
 
 			if (
 
-				collectionHasOneElement (
+				collectionHasOneItem (
 					attributes.entrySet ())
 
 				&& stringEqualSafe (

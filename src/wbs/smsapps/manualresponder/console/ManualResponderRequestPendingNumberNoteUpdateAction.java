@@ -1,10 +1,10 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

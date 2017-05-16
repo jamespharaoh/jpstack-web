@@ -24,6 +24,7 @@
 
 	<console-modules>
 		<console-module name="paypal-account"/>
+		<console-module name="paypal-payment"/>
 	</console-modules>
 
 </plugin>

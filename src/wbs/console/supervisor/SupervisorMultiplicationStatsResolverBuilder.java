@@ -8,7 +8,7 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.reporting.MultiplicationStatsResolver;
 import wbs.console.reporting.StatsResolver;
 
@@ -25,9 +25,9 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("supervisorMultiplicationStatsResolverBuilder")
-@ConsoleModuleBuilderHandler
 public
-class SupervisorMultiplicationStatsResolverBuilder {
+class SupervisorMultiplicationStatsResolverBuilder
+	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -52,6 +52,7 @@ class SupervisorMultiplicationStatsResolverBuilder {
 
 	// build
 
+	@Override
 	@BuildMethod
 	public
 	void build (

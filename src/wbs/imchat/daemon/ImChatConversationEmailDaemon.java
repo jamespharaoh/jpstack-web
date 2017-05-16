@@ -1,7 +1,7 @@
 package wbs.imchat.daemon;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.List;

@@ -143,32 +143,31 @@
 
 	</field-set>
 
-	<field-set
-		name="send-message"
-		class="wbs.smsapps.sendsms.console.SendSmsConfigSendForm">
+	<forms>
 
-		<text-field
-			name="originator"
-			read-only="yes"/>
-
-		<text-field
-			name="number"
-			nullable="no"/>
-
-		<text-area-field
-			name="messageBody"
-			nullable="no"/>
-
-	</field-set>
-
-	<form-contexts>
-
-		<form-context
+		<form
 			name="send-message"
 			class="wbs.smsapps.sendsms.console.SendSmsConfigSendForm"
-			type="perform"
-			column-fields="send-message"/>
+			type="perform">
 
-	</form-contexts>
+			<column-fields>
+
+				<text-field
+					name="originator"
+					read-only="yes"/>
+
+				<text-field
+					name="number"
+					nullable="no"/>
+
+				<text-area-field
+					name="messageBody"
+					nullable="no"/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

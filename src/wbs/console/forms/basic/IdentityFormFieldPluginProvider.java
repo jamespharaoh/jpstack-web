@@ -6,8 +6,8 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import wbs.console.forms.core.FormFieldBuilderContext;
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldPluginProvider;
 
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -30,7 +30,7 @@ class IdentityFormFieldPluginProvider
 	@Override
 	public
 	Optional getNativeMapping (
-			FormFieldBuilderContext context,
+			ConsoleFormBuilderContext context,
 			Class containerClass,
 			String fieldName,
 			Class genericClass,
@@ -43,7 +43,7 @@ class IdentityFormFieldPluginProvider
 		) {
 
 			return Optional.of (
-				(FormFieldNativeMapping)
+				(ConsoleFormNativeMapping)
 				identityFormFieldNativeMappingProvider.get ());
 
 		} else {

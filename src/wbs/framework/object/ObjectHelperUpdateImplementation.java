@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -245,7 +245,7 @@ class ObjectHelperUpdateImplementation <
 
 		EphemeralRecord <RecordType> object =
 			(EphemeralRecord <RecordType>)
-			dynamicCast (
+			dynamicCastRequired (
 				objectModel.objectClass (),
 				objectUncast);
 
@@ -327,7 +327,7 @@ class ObjectHelperUpdateImplementation <
 			@NonNull RecordTypeAgain objectUncast) {
 
 		RecordType object =
-			dynamicCast (
+			dynamicCastRequired (
 				objectModel.objectClass (),
 				objectUncast);
 

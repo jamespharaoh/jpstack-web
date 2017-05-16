@@ -1,18 +1,47 @@
 package wbs.console.component;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.IterableUtils.iterableFilterByClass;
+import static wbs.utils.collection.IterableUtils.iterableOnlyItemByClass;
+import static wbs.utils.collection.MapUtils.iterableTransformToMap;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.etc.Misc.todo;
+import static wbs.utils.etc.NullUtils.anyIsNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamelCapitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.console.forms.core.ConsoleFormSpec;
+import wbs.console.forms.core.ConsoleFormType;
+import wbs.console.forms.core.ConsoleFormTypeFactory;
+import wbs.console.forms.core.ConsoleFormsSpec;
+import wbs.console.forms.core.ConsoleMultiFormType;
+import wbs.console.forms.core.ConsoleMultiFormTypeFactory;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.enums.EnumConsoleHelperFactory;
+import wbs.console.helper.provider.ConsoleHelperProvider;
+import wbs.console.helper.provider.ConsoleHelperProviderFactory;
+import wbs.console.helper.provider.ConsoleHelperProviderSpec;
+import wbs.console.module.ConsoleMetaModule;
+import wbs.console.module.ConsoleMetaModuleFactory;
+import wbs.console.module.ConsoleModule;
+import wbs.console.module.ConsoleModuleFactory;
+import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecManager;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -20,6 +49,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryBuilder;
+import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginModelSpec;
@@ -80,6 +110,13 @@ class ConsoleComponentPlugin
 						taskLogger,
 						componentRegistry,
 						pluginCustomTypeSpec));
+
+			plugin.consoleModules ().forEach (
+				consoleModuleSpec ->
+					registerConsoleModule (
+						taskLogger,
+						componentRegistry,
+						consoleModuleSpec));
 
 		}
 
@@ -247,7 +284,8 @@ class ConsoleComponentPlugin
 
 				.addValueProperty (
 					"enumClass",
-					enumClass)
+					optionalOf (
+						enumClass))
 
 			);
 
@@ -337,9 +375,365 @@ class ConsoleComponentPlugin
 
 				.addValueProperty (
 					"enumClass",
-					enumClass)
+					optionalOf (
+						enumClass))
 
 			);
+
+		}
+
+	}
+
+	private
+	void registerConsoleModule (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentRegistryBuilder componentRegistry,
+			@NonNull PluginConsoleModuleSpec pluginConsoleMouleSpec) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleModule");
+
+		) {
+
+			// get module spec
+
+			ConsoleModuleSpec consoleModuleSpec =
+				mapItemForKeyRequired (
+					consoleModuleSpecManager.specsByName (),
+					pluginConsoleMouleSpec.name ());
+
+			// register console meta module
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.name (
+					stringFormat (
+						"%sConsoleMetaModule",
+						hyphenToCamel (
+							consoleModuleSpec.name ())))
+
+				.componentClass (
+					ConsoleMetaModule.class)
+
+				.factoryClass (
+					genericCastUnchecked (
+						ConsoleMetaModuleFactory.class))
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"consoleModuleSpec",
+					optionalOf (
+						consoleModuleSpec))
+
+			);
+
+			// register console module
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.name (
+					stringFormat (
+						"%sConsoleModule",
+						hyphenToCamel (
+							consoleModuleSpec.name ())))
+
+				.componentClass (
+					ConsoleModule.class)
+
+				.factoryClass (
+					genericCastUnchecked (
+						ConsoleModuleFactory.class))
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"consoleModuleSpec",
+					optionalOf (
+						consoleModuleSpec))
+
+			);
+
+			// iterate over console helper providers
+
+			for (
+				ConsoleHelperProviderSpec consoleHelperProviderSpec
+					: iterableFilterByClass (
+						consoleModuleSpec.builders (),
+						ConsoleHelperProviderSpec.class)
+			) {
+
+				registerConsoleHelperProvider (
+					taskLogger,
+					componentRegistry,
+					consoleHelperProviderSpec);
+
+			}
+
+			// iterate over forms
+
+			Optional <ConsoleFormsSpec> consoleFormsSpecOptional =
+				iterableOnlyItemByClass (
+					consoleModuleSpec.builders (),
+					ConsoleFormsSpec.class);
+
+			if (
+				optionalIsPresent (
+					consoleFormsSpecOptional)
+			) {
+
+				ConsoleFormsSpec consoleFormsSpec =
+					optionalGetRequired (
+						consoleFormsSpecOptional);
+
+				consoleFormsSpec.forms ().forEach (
+					consoleFormSpec ->
+						registerConsoleFormType (
+							taskLogger,
+							componentRegistry,
+							consoleModuleSpec,
+							consoleFormSpec));
+
+			}
+
+		}
+
+	}
+
+	private
+	void registerConsoleHelperProvider (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentRegistryBuilder componentRegistry,
+			@NonNull ConsoleHelperProviderSpec spec) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleHelperProvider");
+		) {
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.name (
+					stringFormat (
+						"%sConsoleHelperProvider",
+						spec.objectName ()))
+
+				.scope (
+					"singleton")
+
+				.componentClass (
+					ConsoleHelperProvider.class)
+
+				.factoryClass (
+					genericCastUnchecked (
+						ConsoleHelperProviderFactory.class))
+
+				.addValueProperty (
+					"spec",
+					optionalOf (
+						spec))
+
+			);
+
+		}
+
+	}
+
+	private
+	void registerConsoleFormType (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentRegistryBuilder componentRegistry,
+			@NonNull ConsoleModuleSpec moduleSpec,
+			@NonNull ConsoleFormSpec formSpec) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleFormType");
+
+		) {
+
+			boolean gotFields =
+				anyIsNotNull (
+					formSpec.columnFields (),
+					formSpec.rowFields ());
+
+			boolean gotSections =
+				collectionIsNotEmpty (
+					formSpec.sections ());
+
+			if (gotFields && gotSections) {
+				throw todo ();
+			}
+
+			if (! gotSections) {
+
+				ComponentDefinition componentDefinition =
+					new ComponentDefinition ()
+
+					.name (
+						stringFormat (
+							"%s%sFormType",
+							hyphenToCamel (
+								moduleSpec.name ()),
+							hyphenToCamelCapitalise (
+								formSpec.name ())))
+
+					.componentClass (
+						ConsoleFormType.class)
+
+					.factoryClass (
+						genericCastUnchecked (
+							ConsoleFormTypeFactory.class))
+
+					.scope (
+						"singleton")
+
+					.addValueProperty (
+						"consoleModuleName",
+						optionalOf (
+							moduleSpec.name ()))
+
+					.addValueProperty (
+						"formName",
+						optionalOf (
+							formSpec.name ()))
+
+					.addValueProperty (
+						"formType",
+						optionalOf (
+							formSpec.formType ()))
+
+					.addValueProperty (
+						"columnFields",
+						optionalFromNullable (
+							formSpec.columnFields ()))
+
+					.addValueProperty (
+						"rowFields",
+						optionalFromNullable (
+							formSpec.rowFields ()))
+
+				;
+
+				if (
+					isNotNull (
+						formSpec.objectTypeName ())
+				) {
+
+					componentDefinition.addReferencePropertyFormat (
+						"consoleHelper",
+						"%sConsoleHelper",
+						hyphenToCamel (
+							formSpec.objectTypeName ()));
+
+				} else {
+
+					componentDefinition.addValueProperty (
+						"containerClass",
+						optionalOf (
+							classForNameRequired (
+								formSpec.className ())));
+
+				}
+
+				componentRegistry.registerDefinition (
+					taskLogger,
+					componentDefinition);
+
+			} else {
+
+				ComponentDefinition componentDefinition =
+					new ComponentDefinition ()
+
+					.name (
+						stringFormat (
+							"%s%sFormType",
+							hyphenToCamel (
+								moduleSpec.name ()),
+							hyphenToCamelCapitalise (
+								formSpec.name ())))
+
+					.componentClass (
+						ConsoleMultiFormType.class)
+
+					.factoryClass (
+						genericCastUnchecked (
+							ConsoleMultiFormTypeFactory.class))
+
+					.scope (
+						"singleton")
+
+					.addValueProperty (
+						"consoleModuleName",
+						optionalOf (
+							moduleSpec.name ()))
+
+					.addValueProperty (
+						"formName",
+						optionalOf (
+							formSpec.name ()))
+
+					.addValueProperty (
+						"formType",
+						optionalOf (
+							formSpec.formType ()))
+
+					.addValueProperty (
+						"sectionFields",
+						optionalOf (
+							iterableTransformToMap (
+								formSpec.sections (),
+								section ->
+									section.name (),
+								section ->
+									section.fields ())))
+
+				;
+
+				if (
+					isNotNull (
+						formSpec.objectTypeName ())
+				) {
+
+					componentDefinition.addReferencePropertyFormat (
+						"consoleHelper",
+						"%sConsoleHelper",
+						hyphenToCamel (
+							formSpec.objectTypeName ()));
+
+				} else {
+
+					componentDefinition.addValueProperty (
+						"containerClass",
+						optionalOf (
+							classForNameRequired (
+								formSpec.className ())));
+
+				}
+
+				componentRegistry.registerDefinition (
+					taskLogger,
+					componentDefinition);
+
+			}
 
 		}
 
