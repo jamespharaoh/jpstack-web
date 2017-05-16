@@ -130,7 +130,7 @@ class ObjectSearchPageBuilder <
 	Class <SearchType> searchClass;
 	Class <ResultType> resultClass;
 
-	ConsoleFormType <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormType;
 
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
@@ -277,7 +277,7 @@ class ObjectSearchPageBuilder <
 				parentIdName)
 
 			.searchFormContextBuilder (
-				searchFormContextBuilder)
+				searchFormType)
 
 			.resultsModes (
 				resultsModes)
@@ -340,8 +340,8 @@ class ObjectSearchPageBuilder <
 					.sessionKey (
 						sessionKey)
 
-					.searchFormContextBuilder (
-						searchFormContextBuilder)
+					.searchFormType (
+						searchFormType)
 
 					.fileName (
 						fileName);
@@ -508,7 +508,7 @@ class ObjectSearchPageBuilder <
 							spec.resultsClassName ()),
 						() -> consoleHelper.objectClass ()));
 
-			searchFormContextBuilder =
+			searchFormType =
 				formContextManager.createFormType (
 					taskLogger,
 					consoleModule,
