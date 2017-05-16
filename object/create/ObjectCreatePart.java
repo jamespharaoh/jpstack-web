@@ -80,9 +80,9 @@ class ObjectCreatePart <
 
 	ConsoleHelper <ParentType> parentHelper;
 	List <ParentType> parents;
-	ParentType parent;
 
-	ObjectType object;
+	ParentType parent;
+	Record <?> grandparent;
 
 	Map <String, Object> formHints;
 	ConsoleForm <ObjectType> form;
@@ -125,39 +125,40 @@ class ObjectCreatePart <
 			prepareParents (
 				transaction);
 
-			// if a field provider was provided
+			prepareFormHints (
+				transaction);
 
-			/*
-			if (formFieldsProvider != null) {
-
-				prepareFieldSet (
-					transaction);
-
-			}
-			*/
-
-			// get update results
-
-			form =
-				formType.buildResponse (
-					transaction,
-					formHints);
-
-			// create dummy instance
-
-			object =
-				consoleHelper.createInstance ();
-
-			// set parent
+			// prepare form
 
 			if (
-				parent != null
-				&& consoleHelper.canGetParent ()
+
+				isNotNull (
+					parent)
+
 			) {
 
-				consoleHelper.setParent (
-					object,
-					parent);
+				form =
+					formType.buildResponseWithParent (
+						transaction,
+						formHints,
+						parent,
+						consoleHelper.createInstance ());
+
+				if (consoleHelper.canGetParent ()) {
+
+					consoleHelper.setParent (
+						form.value (),
+						parent);
+
+				}
+
+			} else {
+
+				form =
+					formType.buildResponse (
+						transaction,
+						formHints,
+						consoleHelper.createInstance ());
 
 			}
 
@@ -177,26 +178,18 @@ class ObjectCreatePart <
 
 		) {
 
-			ImmutableMap.Builder <String, Object> formHintsBuilder =
-				ImmutableMap.builder ();
-
-			ConsoleHelper <ParentType> parentHelperTemp =
-				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
-
-			parentHelper =
-				parentHelperTemp;
+			ConsoleHelper <ParentType> parentHelper =
+				genericCastUnchecked (
+					objectManager.findConsoleHelperRequired (
+						consoleHelper.parentClassRequired ()));
 
 			if (parentHelper.isRoot ()) {
 
-				ParentType parentTemp =
+				parent =
 					genericCastUnchecked (
 						rootHelper.findRequired (
 							transaction,
 							0l));
-
-				parent =
-					parentTemp;
 
 				return;
 
@@ -225,7 +218,7 @@ class ObjectCreatePart <
 
 			ConsoleHelper <?> grandParentHelper =
 				objectManager.findConsoleHelperRequired (
-					parentHelper.parentClass ());
+					parentHelper.parentClassRequired ());
 
 			Optional <Long> grandParentIdOptional =
 				requestContext.stuffInteger (
@@ -236,8 +229,6 @@ class ObjectCreatePart <
 					grandParentIdOptional)
 			) {
 
-				// show parents based on grand parent
-
 				parents =
 					parentHelper.findByParent (
 						transaction,
@@ -246,13 +237,57 @@ class ObjectCreatePart <
 							optionalGetRequired (
 								grandParentIdOptional)));
 
-				// set grandparent hints
-
-				Record <?> grandparent =
+				grandparent =
 					grandParentHelper.findRequired (
 						transaction,
 						optionalGetRequired (
 							grandParentIdOptional));
+
+			} else {
+
+				// show all parents
+
+				parents =
+					parentHelper.findAll (
+						transaction);
+
+			}
+
+		}
+
+	}
+
+	private
+	void prepareFormHints (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepareFormHints");
+
+		) {
+
+			ImmutableMap.Builder <String, Object> formHintsBuilder =
+				ImmutableMap.builder ();
+
+			if (
+				isNotNull (
+					parent)
+			) {
+
+				formHintsBuilder.put (
+					"parent",
+					parent);
+
+			}
+
+			if (
+				isNotNull (
+					grandparent)
+			) {
 
 				formHintsBuilder.put (
 					"grandparent",
@@ -277,14 +312,6 @@ class ObjectCreatePart <
 						parentHelper.parentFieldName ()),
 					grandparent);
 
-			} else {
-
-				// show all parents
-
-				parents =
-					parentHelper.findAll (
-						transaction);
-
 			}
 
 			formHints =
@@ -293,20 +320,6 @@ class ObjectCreatePart <
 		}
 
 	}
-
-	/*
-	void prepareFieldSet (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		formFieldSet =
-			parent != null
-				? formFieldsProvider.getFieldsForParent (
-					parentTaskLogger,
-					parent)
-				: formFieldsProvider.getStaticFields ();
-
-	}
-	*/
 
 	@Override
 	public

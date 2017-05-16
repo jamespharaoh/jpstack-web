@@ -5,6 +5,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -352,6 +353,8 @@ class ObjectListPageBuilder <
 						consoleModule,
 						"list",
 						consoleHelper.objectClass (),
+						genericCastUnchecked (
+							consoleHelper.parentClass ()),
 						FormType.readOnly,
 						optionalOf (
 							spec.formFieldsName ()),
@@ -360,6 +363,8 @@ class ObjectListPageBuilder <
 						taskLogger,
 						"list",
 						consoleHelper.objectClass (),
+						genericCastUnchecked (
+							consoleHelper.parentClass ()),
 						FormType.readOnly,
 						optionalOf (
 							defaultFields (
@@ -404,7 +409,7 @@ class ObjectListPageBuilder <
 				consoleHelper.parentTypeIsFixed ()
 
 				&& classEqualSafe (
-					consoleHelper.parentClass (),
+					consoleHelper.parentClassRequired (),
 					SliceRec.class)
 
 			) {

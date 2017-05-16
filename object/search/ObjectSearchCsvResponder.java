@@ -1,5 +1,6 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
@@ -179,7 +180,8 @@ class ObjectSearchCsvResponder <ResultType>
 			formContext =
 				resultsMode.formContextBuilder ().buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					emptyList ());
 
 		}
 

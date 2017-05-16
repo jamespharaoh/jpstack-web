@@ -1,6 +1,7 @@
 package wbs.platform.object.search;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
@@ -216,7 +217,8 @@ class ObjectSearchResultsPart <
 			form =
 				resultsMode.formContextBuilder ().buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					emptyList ());
 
 			// current object
 

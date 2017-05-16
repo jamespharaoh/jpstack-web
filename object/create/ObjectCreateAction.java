@@ -186,7 +186,7 @@ class ObjectCreateAction <
 			parentHelper =
 				genericCastUnchecked (
 					objectManager.findConsoleHelperRequired (
-						consoleHelper.parentClass ()));
+						consoleHelper.parentClassRequired ()));
 
 			// determine parent
 

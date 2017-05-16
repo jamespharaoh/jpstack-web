@@ -2,6 +2,7 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -27,6 +28,7 @@ import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.IdFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -80,7 +82,7 @@ class ObjectSettingsPageBuilder <
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	ConsoleFormManager formContextManager;
+	ConsoleFormManager consoleFormManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -125,10 +127,7 @@ class ObjectSettingsPageBuilder <
 
 	ConsoleHelper <ObjectType> consoleHelper;
 
-	ConsoleFormType <ObjectType> formContextBuilder;
-
-	//FormFieldSet <ObjectType> formFieldSet;
-	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	ConsoleFormType <ObjectType> formType;
 
 	String privKey;
 	String name;
@@ -249,8 +248,8 @@ class ObjectSettingsPageBuilder <
 				.consoleHelper (
 					consoleHelper)
 
-				.formContextBuilder (
-					formContextBuilder)
+				.formType (
+					formType)
 
 				.objectRefName (
 					consoleHelper.codeExists ()
@@ -284,8 +283,8 @@ class ObjectSettingsPageBuilder <
 				.consoleHelper (
 						consoleHelper)
 
-				.formContextBuilder (
-					formContextBuilder)
+				.formType (
+					formType)
 
 			;
 
@@ -390,7 +389,7 @@ class ObjectSettingsPageBuilder <
 						"/" + fileName)
 
 					.formContextBuilder (
-						formContextBuilder)
+						formType)
 
 					.removeLocalName (
 						consoleHelper.ephemeral ()
@@ -501,27 +500,54 @@ class ObjectSettingsPageBuilder <
 						"%s.manage",
 						consoleHelper.objectName ()));
 
-			formContextBuilder =
-				ifNotNullThenElse (
-					spec.formFieldsName (),
-					() -> formContextManager.createFormType (
-						taskLogger,
-						consoleModule,
-						shortName,
-						consoleHelper.objectClass (),
-						FormType.update,
-						optionalOf (
-							spec.formFieldsName ()),
-						optionalAbsent ()),
-					() -> formContextManager.createFormType (
+			if (
+				isNotNull (
+					spec.formFieldsProviderName ())
+			) {
+
+				formType =
+					consoleFormManager.createFormType (
 						taskLogger,
 						shortName,
 						consoleHelper.objectClass (),
+						genericCastUnchecked (
+							consoleHelper.parentClass ()),
 						FormType.update,
-						optionalOf (
-							defaultFields (
-								taskLogger)),
-						optionalAbsent ()));
+						genericCastUnchecked (
+							componentManager.getComponentRequired (
+								taskLogger,
+								spec.formFieldsProviderName (),
+								FieldsProvider.class)));
+
+			} else {
+
+				formType =
+					ifNotNullThenElse (
+						spec.formFieldsName (),
+						() -> consoleFormManager.createFormType (
+							taskLogger,
+							consoleModule,
+							shortName,
+							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
+							FormType.update,
+							optionalOf (
+								spec.formFieldsName ()),
+							optionalAbsent ()),
+						() -> consoleFormManager.createFormType (
+							taskLogger,
+							shortName,
+							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
+							FormType.update,
+							optionalOf (
+								defaultFields (
+									taskLogger)),
+							optionalAbsent ()));
+
+			}
 
 			// if a provider name is provided
 

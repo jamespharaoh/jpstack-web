@@ -124,14 +124,13 @@ class QueueDebugPart
 			form =
 				formType.buildResponse (
 					transaction,
-					emptyMap ());
-
-			form.value ()
+					emptyMap (),
+					new QueueDebugForm ()
 
 				.userId (
 					userConsoleLogic.userIdRequired ())
 
-			;
+			);
 
 			form.update (
 				transaction);

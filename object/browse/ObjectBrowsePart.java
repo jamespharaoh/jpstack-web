@@ -195,7 +195,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 			ConsoleHelper <?> parentHelper =
 				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
+					consoleHelper.parentClassRequired ());
 
 			Optional <Long> parentIdOptional =
 				requestContext.stuffInteger (
@@ -237,7 +237,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 			ConsoleHelper <?> grandParentHelper =
 				objectManager.findConsoleHelperRequired (
-					parentHelper.parentClass ());
+					parentHelper.parentClassRequired ());
 
 			Optional <Long> grandParentIdOptional =
 				requestContext.stuffInteger (

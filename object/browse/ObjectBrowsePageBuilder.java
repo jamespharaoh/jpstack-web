@@ -297,7 +297,7 @@ class ObjectBrowsePageBuilder <
 
 			if (
 				consoleHelper.parentTypeIsFixed ()
-				&& consoleHelper.parentClass () == SliceRec.class
+				&& consoleHelper.parentClassRequired () == SliceRec.class
 			) {
 
 				formFieldSpecs.add (
