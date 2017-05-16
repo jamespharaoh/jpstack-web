@@ -805,6 +805,24 @@ class OptionalUtils {
 
 	}
 
+	public static <Type>
+	Optional <Type> optionalIfPresent (
+			@NonNull Optional <?> optional,
+			@NonNull Supplier <Type> valueSupplier) {
+
+		if (optional.isPresent ()) {
+
+			return optionalOf (
+				valueSupplier.get ());
+
+		} else {
+
+			return optionalAbsent ();
+
+		}
+
+	}
+
 	public static <T>
 	T optionalOr (
 			Optional <T> optional,
@@ -988,6 +1006,27 @@ class OptionalUtils {
 		} else {
 
 			return Optional.absent ();
+
+		}
+
+	}
+
+	public static <From, To>
+	To optionalMapRequiredOrNull (
+			@NonNull Optional <From> optionalValue,
+			@NonNull Function <? super From, To> mappingFunction) {
+
+		if (
+			optionalIsPresent (
+				optionalValue)
+		) {
+
+			return mappingFunction.apply (
+				optionalValue.get ());
+
+		} else {
+
+			return null;
 
 		}
 
