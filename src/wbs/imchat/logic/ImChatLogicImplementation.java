@@ -3,6 +3,8 @@ package wbs.imchat.logic;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
@@ -265,14 +267,15 @@ class ImChatLogicImplementation
 			// create log
 
 			if (
-				isNotNull (
+				optionalIsPresent (
 					consoleUser)
 			) {
 
 				eventLogic.createEvent (
 					transaction,
 					"im_chat_customer_generated_password_from_console",
-					consoleUser.get (),
+					optionalGetRequired (
+						consoleUser),
 					customer);
 
 			} else {
