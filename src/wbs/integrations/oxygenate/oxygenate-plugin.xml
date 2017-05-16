@@ -25,6 +25,7 @@
 	<layer name="api">
 		<component class="api.OxygenateRouteInAction"/>
 		<component class="api.OxygenateRouteInMmsNewAction"/>
+		<component class="api.OxygenateRouteInMmsNewRequestBuilder"/>
 		<component class="api.OxygenateRouteInMmsOldAction"/>
 		<component class="api.OxygenateRouteInSmsAction"/>
 		<component class="api.OxygenateRouteReportAction"/>

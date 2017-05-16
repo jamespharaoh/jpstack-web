@@ -10,8 +10,9 @@ import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
@@ -26,6 +27,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -34,14 +37,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
@@ -88,6 +88,9 @@ class OxygenateRouteInMmsNewAction
 
 	@SingletonDependency
 	OxygenateRouteInObjectHelper oxygenateRouteInHelper;
+
+	@SingletonDependency
+	OxygenateRouteInMmsNewRequestBuilder requestBuilder;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -152,23 +155,26 @@ class OxygenateRouteInMmsNewAction
 
 			// decode request
 
-			try {
+			Optional <OxygenateRouteInMmsNewRequest> requestOptional =
+				requestBuilder.readInputStream (
+					taskLogger,
+					new ByteArrayInputStream (
+						requestBytes));
 
-				request =
-					genericCastUnchecked (
-						requestFromXml.readInputStreamRequired (
-							taskLogger,
-							new ByteArrayInputStream (
-								requestBytes),
-							"oxygen8-route-in-mms-new.xml"));
-
-			} catch (LoggedErrorsException loggedErrorsException) {
+			if (
+				optionalIsNotPresent (
+					requestOptional)
+			) {
 
 				throw new HttpUnprocessableEntityException (
 					"Unable to interpret MMS request",
 					emptyList ());
 
 			}
+
+			request =
+				optionalGetRequired (
+					requestOptional);
 
 			// simple verification
 
@@ -461,17 +467,5 @@ class OxygenateRouteInMmsNewAction
 		}
 
 	}
-
-	// misc
-
-	private final static
-	DataFromXml requestFromXml =
-		new DataFromXmlBuilder ()
-
-		.registerBuilderClasses (
-			OxygenateRouteInMmsNewRequest.class,
-			OxygenateRouteInMmsNewRequest.Attachment.class)
-
-		.build ();
 
 }
