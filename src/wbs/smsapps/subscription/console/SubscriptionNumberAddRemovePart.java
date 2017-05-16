@@ -57,7 +57,8 @@ class SubscriptionNumberAddRemovePart
 			form =
 				formType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					new SubscriptionNumberAddRemoveForm ());
 
 			form.update (
 				transaction);

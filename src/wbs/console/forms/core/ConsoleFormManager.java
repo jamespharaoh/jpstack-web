@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.module.ConsoleModule;
 
@@ -47,23 +48,34 @@ interface ConsoleFormManager {
 
 	}
 
-	<Type>
-	ConsoleFormType <Type> createFormType (
+	<Container>
+	ConsoleFormType <Container> createFormType (
+			TaskLogger parentTaskLogger,
+			String formName,
+			Class <Container> containerClass,
+			Optional <Class <?>> parentClassOptional,
+			FormType formType,
+			FieldsProvider <Container, ?> fieldsProvider);
+
+	<Container>
+	ConsoleFormType <Container> createFormType (
 			TaskLogger parentTaskLogger,
 			ConsoleModule consoleModule,
 			String formName,
-			Class <Type> containerClass,
+			Class <Container> containerClass,
+			Optional <Class <?>> parentClassOptional,
 			FormType formType,
 			Optional <String> columnFieldsNameOptional,
 			Optional <String> rowFieldsNameOptional);
 
-	<Type>
-	ConsoleFormType <Type> createFormType (
+	<Container>
+	ConsoleFormType <Container> createFormType (
 			TaskLogger parentTaskLogger,
 			String formName,
-			Class <Type> containerClass,
+			Class <Container> containerClass,
+			Optional <Class <?>> parentClassOptional,
 			FormType formType,
-			Optional <FormFieldSet <Type>> columnFieldsNameOptional,
-			Optional <FormFieldSet <Type>> rowFieldsNameOptional);
+			Optional <FormFieldSet <Container>> columnFieldsOptional,
+			Optional <FormFieldSet <Container>> rowFieldsOptional);
 
 }

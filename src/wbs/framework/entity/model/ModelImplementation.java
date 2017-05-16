@@ -275,7 +275,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	Class <? extends Record <?>> parentClass () {
+	Class <? extends Record <?>> parentClassRequired () {
 
 		if (parentTypeField != null) {
 

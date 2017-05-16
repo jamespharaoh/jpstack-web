@@ -125,7 +125,8 @@ class ChatRebillSendAction
 			form =
 				formType.buildAction (
 					transaction,
-					formHints);
+					formHints,
+					new ChatRebillSearch ());
 
 			form.update (
 				transaction);

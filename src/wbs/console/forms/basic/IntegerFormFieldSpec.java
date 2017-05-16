@@ -4,7 +4,7 @@ package wbs.console.forms.basic;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleSpec;
+import wbs.console.forms.types.ConsoleFormFieldSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -16,7 +16,7 @@ import wbs.framework.data.annotations.DataClass;
 @PrototypeComponent ("integerFormFieldSpec")
 public
 class IntegerFormFieldSpec
-	implements ConsoleSpec {
+	implements ConsoleFormFieldSpec {
 
 	@DataAttribute (
 		required = true)

@@ -402,7 +402,7 @@ class ConsoleFormImplementation <Container>
 				}
 
 				FormField <Container, ?, ?, ?> formField =
-					allFields ().formField (
+					allFields ().formFieldRequired (
 						updateResultEntry.getKey ().getRight ());
 
 				FormUpdateResult <?, ?> updateResult =

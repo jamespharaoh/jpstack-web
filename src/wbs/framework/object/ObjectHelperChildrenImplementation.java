@@ -117,7 +117,7 @@ class ObjectHelperChildrenImplementation <
 					childHelper.parentTypeIsFixed ()
 
 					&& classNotEqual (
-						childHelper.parentClass (),
+						childHelper.parentClassRequired (),
 						objectHelper ().objectClass ())
 
 				) {
@@ -173,7 +173,7 @@ class ObjectHelperChildrenImplementation <
 					childHelper.parentTypeIsFixed ()
 
 					&& classNotEqual (
-						childHelper.parentClass (),
+						childHelper.parentClassRequired (),
 						objectHelper.objectClass ())
 
 				) {

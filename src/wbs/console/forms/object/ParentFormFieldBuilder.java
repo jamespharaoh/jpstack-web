@@ -159,7 +159,7 @@ class ParentFormFieldBuilder
 			ConsoleHelper <?> parentHelper =
 				consoleHelper.parentTypeIsFixed ()
 					? objectManager.findConsoleHelperRequired (
-						consoleHelper.parentClass ())
+						consoleHelper.parentClassRequired ())
 					: null;
 
 			String createPrivDelegate =
@@ -190,7 +190,7 @@ class ParentFormFieldBuilder
 						consoleHelper.parentFieldName ())
 
 					.nativeClass (
-						consoleHelper.parentClass ()),
+						consoleHelper.parentClassRequired ()),
 
 				() -> parentFormFieldAccessorProvider.get ()
 

@@ -86,7 +86,7 @@ class ConsoleFormBuilder {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleHelper <Container> consoleHelper,
 			@NonNull String fieldSetName,
-			@NonNull List <Object> formFieldSpecs) {
+			@NonNull List <?> formFieldSpecs) {
 
 		try (
 

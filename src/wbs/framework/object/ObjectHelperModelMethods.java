@@ -1,5 +1,7 @@
 package wbs.framework.object;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.codegen.DoNotDelegate;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
@@ -26,7 +28,8 @@ interface ObjectHelperModelMethods <
 	ModelField field (
 			String name);
 
-	Class <? extends Record <?>> parentClass ();
+	Optional <Class <? extends Record <?>>> parentClass ();
+	Class <? extends Record <?>> parentClassRequired ();
 	ModelField parentField ();
 	String parentFieldName ();
 	String parentLabel ();

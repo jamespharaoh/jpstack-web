@@ -184,7 +184,8 @@ class ChatReportRevSharePart
 			searchForm =
 				searchFormType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					new ChatReportRevShareForm ());
 
 			LocalDate today =
 				LocalDate.now ();

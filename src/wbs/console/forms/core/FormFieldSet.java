@@ -1,10 +1,14 @@
 package wbs.console.forms.core;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -21,8 +25,22 @@ interface FormFieldSet <Container> {
 
 	Iterable <FormField <Container, ?, ?, ?>> formFields ();
 
-	FormField <Container, ?, ?, ?> formField (
+	Optional <FormField <Container, ?, ?, ?>> formField (
 			String name);
+
+	default
+	FormField <Container, ?, ?, ?> formFieldRequired (
+			@NonNull String name) {
+
+		return optionalOrThrow (
+			formField (
+				name),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No such form field: %s",
+					name)));
+
+	}
 
 	Boolean fileUpload ();
 

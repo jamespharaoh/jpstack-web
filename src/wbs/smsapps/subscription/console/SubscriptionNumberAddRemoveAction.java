@@ -3,10 +3,10 @@ package wbs.smsapps.subscription.console;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +118,8 @@ class SubscriptionNumberAddRemoveAction
 			ConsoleForm <SubscriptionNumberAddRemoveForm> form =
 				formType.buildAction (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					new SubscriptionNumberAddRemoveForm ());
 
 			form.update (
 				transaction);

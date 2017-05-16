@@ -1,24 +1,54 @@
 package wbs.console.forms.types;
 
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+
 import wbs.console.forms.core.FormFieldSet;
 
-import wbs.framework.entity.record.Record;
-import wbs.framework.logging.TaskLogger;
+import wbs.framework.database.Transaction;
 
 public
-interface FieldsProvider <
-	ObjectType extends Record <ObjectType>,
-	ParentType extends Record <ParentType>
-> {
+interface FieldsProvider <Container, Parent> {
 
-	FormFieldSet <ObjectType> getStaticFields ();
+	Class <Container> containerClass ();
 
-	FormFieldSet <ObjectType> getFieldsForParent (
-			TaskLogger taskLogger,
-			ParentType parent);
+	Class <Parent> parentClass ();
 
-	FormFieldSet <ObjectType> getFieldsForObject (
-			TaskLogger taskLogger,
-			ObjectType object);
+	FormFieldSetPair <Container> getStaticFields (
+			Transaction parentTransaction);
+
+	FormFieldSetPair <Container> getFieldsForParent (
+			Transaction parentTransaction,
+			Parent parent);
+
+	default
+	FormFieldSetPair <Container> getFieldsForParentGeneric (
+			@NonNull Transaction parentTransaction,
+			@NonNull Object parent) {
+
+		return getFieldsForParent (
+			parentTransaction,
+			dynamicCastRequired (
+				parentClass (),
+				parent));
+
+	}
+
+	FormFieldSetPair <Container> getFieldsForObject (
+			Transaction parentTransaction,
+			Container container);
+
+	@Accessors (fluent = true)
+	@Data
+	public static
+	class FormFieldSetPair <Container> {
+
+		FormFieldSet <Container> columnFields;
+		FormFieldSet <Container> rowFields;
+
+	}
 
 }

@@ -75,38 +75,34 @@ class ImChatCustomerCreditPart
 
 		) {
 
-			customer =
-				imChatCustomerHelper.findFromContextRequired (
-					transaction);
-
 			customerForm =
 				customerFormType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					imChatCustomerHelper.findFromContextRequired (
+						transaction));
 
 			requestForm =
 				requestFormType.buildResponse (
 					transaction,
-					emptyMap ());
-
-			requestForm.value ()
+					emptyMap (),
+					new ImChatCustomerCreditRequest ()
 
 				.customer (
 					imChatCustomerHelper.findFromContextRequired (
-						transaction));
+						transaction))
 
-			List <ImChatCustomerCreditRec> creditHistory =
-				imChatCustomerCreditHelper.findByIndexRange (
-					transaction,
-					customer,
-					max (0l, customer.getNumCredits () - 10l),
-					customer.getNumCredits ());
+			);
 
 			historyForm =
 				historyFormType.buildResponse (
 					transaction,
 					emptyMap (),
-					creditHistory);
+					imChatCustomerCreditHelper.findByIndexRange (
+						transaction,
+						customer,
+						max (0l, customer.getNumCredits () - 10l),
+						customer.getNumCredits ()));
 
 		}
 

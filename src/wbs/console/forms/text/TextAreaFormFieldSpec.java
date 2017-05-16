@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleSpec;
+import wbs.console.forms.types.ConsoleNamedFormFieldSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -18,7 +18,7 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("textAreaFormFieldSpec")
 public
 class TextAreaFormFieldSpec
-	implements ConsoleSpec {
+	implements ConsoleNamedFormFieldSpec {
 
 	@DataAttribute (
 		required = true)

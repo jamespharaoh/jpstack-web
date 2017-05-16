@@ -5,6 +5,7 @@ import static wbs.utils.collection.IterableUtils.iterableFilterByClass;
 import static wbs.utils.collection.IterableUtils.iterableOnlyItemByClass;
 import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.anyIsNotNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -13,6 +14,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -32,6 +34,9 @@ import wbs.console.forms.core.ConsoleFormTypeFactory;
 import wbs.console.forms.core.ConsoleFormsSpec;
 import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.forms.core.ConsoleMultiFormTypeFactory;
+import wbs.console.forms.core.StaticFieldsProvider;
+import wbs.console.forms.core.StaticFieldsProviderFactory;
+import wbs.console.forms.core.StaticObjectFieldsProviderFactory;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.enums.EnumConsoleHelperFactory;
 import wbs.console.helper.provider.ConsoleHelperProvider;
@@ -52,6 +57,7 @@ import wbs.framework.component.registry.ComponentRegistryBuilder;
 import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
+import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.ComponentPlugin;
@@ -71,6 +77,9 @@ class ConsoleComponentPlugin
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	PluginManager pluginManager;
 
 	// implementation
 
@@ -583,7 +592,120 @@ class ConsoleComponentPlugin
 				throw todo ();
 			}
 
+			Class <?> formClass =
+				ifNotNullThenElse (
+					formSpec.objectTypeName (),
+					() -> pluginManager.modelClass (
+						formSpec.objectTypeName ()),
+					() -> classForNameRequired (
+						formSpec.className ()));
+
 			if (! gotSections) {
+
+				String fieldsProviderName =
+					stringFormat (
+						"%s%sFormFieldsProvider",
+						hyphenToCamel (
+							moduleSpec.name ()),
+						hyphenToCamelCapitalise (
+							formSpec.name ()));
+
+				if (
+					isNotNull (
+						formSpec.objectTypeName ())
+				) {
+
+					componentRegistry.registerDefinition (
+						taskLogger,
+						new ComponentDefinition ()
+
+						.name (
+							fieldsProviderName)
+
+						.componentClass (
+							StaticFieldsProvider.class)
+
+						.factoryClass (
+							genericCastUnchecked (
+								StaticObjectFieldsProviderFactory.class))
+
+						.scope (
+							"singleton")
+
+						.hide (
+							true)
+
+						.addValuePropertyFormat (
+							"name",
+							"%s.%s",
+							moduleSpec.name (),
+							formSpec.name ())
+
+						.addReferencePropertyFormat (
+							"consoleHelper",
+							"%sConsoleHelper",
+							hyphenToCamel (
+								formSpec.objectTypeName ()))
+
+						.addValueProperty (
+							"columnFieldSpecs",
+							optionalFromNullable (
+								formSpec.columnFields ()))
+
+						.addValueProperty (
+							"rowFieldSpecs",
+							optionalFromNullable (
+								formSpec.rowFields ()))
+
+					);
+
+				} else {
+
+					componentRegistry.registerDefinition (
+						taskLogger,
+						new ComponentDefinition ()
+
+						.name (
+							fieldsProviderName)
+
+						.componentClass (
+							StaticFieldsProvider.class)
+
+						.factoryClass (
+							genericCastUnchecked (
+								StaticFieldsProviderFactory.class))
+
+						.scope (
+							"singleton")
+
+						.hide (
+							true)
+
+						.addValueProperty (
+							"name",
+							optionalOfFormat (
+								"%s.%s",
+								moduleSpec.name (),
+								formSpec.name ()))
+
+						.addValueProperty (
+							"containerClass",
+							optionalOf (
+								formClass))
+
+						.addValueProperty (
+							"columnFieldSpecs",
+							optionalFromNullable (
+								formSpec.columnFields ()))
+
+						.addValueProperty (
+							"rowFieldSpecs",
+							optionalFromNullable (
+								formSpec.rowFields ()))
+
+					);
+
+				}
 
 				ComponentDefinition componentDefinition =
 					new ComponentDefinition ()
@@ -621,15 +743,9 @@ class ConsoleComponentPlugin
 						optionalOf (
 							formSpec.formType ()))
 
-					.addValueProperty (
-						"columnFields",
-						optionalFromNullable (
-							formSpec.columnFields ()))
-
-					.addValueProperty (
-						"rowFields",
-						optionalFromNullable (
-							formSpec.rowFields ()))
+					.addReferenceProperty (
+						"fieldsProvider",
+						fieldsProviderName)
 
 				;
 

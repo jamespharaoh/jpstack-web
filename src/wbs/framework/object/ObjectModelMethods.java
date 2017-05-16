@@ -11,7 +11,7 @@ interface ObjectModelMethods <
 	String objectTypeCode ();
 
 	Long parentTypeId ();
-	Class <? extends Record <?>> parentClass ();
+	Class <? extends Record <?>> parentClassRequired ();
 
 	Object daoImplementation ();
 	Class <?> daoInterface ();

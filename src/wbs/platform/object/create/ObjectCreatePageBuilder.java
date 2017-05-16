@@ -395,6 +395,8 @@ class ObjectCreatePageBuilder <
 							consoleModule,
 							name,
 							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
 							FormType.create,
 							optionalOf (
 								spec.formFieldsName ()),
@@ -403,6 +405,8 @@ class ObjectCreatePageBuilder <
 							taskLogger,
 							name,
 							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
 							FormType.create,
 							optionalOf (
 								defaultFields (

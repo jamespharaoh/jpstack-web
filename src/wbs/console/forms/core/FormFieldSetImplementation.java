@@ -1,5 +1,6 @@
 package wbs.console.forms.core;
 
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -10,6 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -155,10 +158,11 @@ class FormFieldSetImplementation <Container>
 
 	@Override
 	public
-	FormField <Container, ?, ?, ?> formField (
+	Optional <FormField <Container, ?, ?, ?>> formField (
 			@NonNull String name) {
 
-		return formFieldsByName.get (
+		return mapItemForKey (
+			formFieldsByName,
 			name);
 
 	}

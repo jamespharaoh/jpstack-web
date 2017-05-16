@@ -121,17 +121,18 @@ class ChatUserImageUploadAction
 
 		) {
 
-			form =
-				formType.buildAction (
-					transaction,
-					emptyMap ());
-
 			chatUserImageType =
 				toEnum (
 					ChatUserImageType.class,
 					(String)
 					requestContext.stuff (
 						"chatUserImageType"));
+
+			form =
+				formType.buildAction (
+					transaction,
+					emptyMap (),
+					new ChatUserImageUploadForm ());
 
 			form.update (
 				transaction);

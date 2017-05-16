@@ -89,18 +89,17 @@ class ImChatCustomerCreditAction
 			ConsoleForm <ImChatCustomerCreditRequest> form =
 				formType.buildAction (
 					transaction,
-					emptyMap ());
-
-			form.value ()
+					emptyMap (),
+					new ImChatCustomerCreditRequest ()
 
 				.customer (
 					imChatCustomerHelper.findFromContextRequired (
 						transaction))
 
-			;
+			);
 
 			form.update (
-					transaction);
+				transaction);
 
 			if (form.errors ()) {
 

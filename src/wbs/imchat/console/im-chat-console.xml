@@ -35,7 +35,8 @@
 				fields="list"/>
 
 			<object-create-page
-				fields="create"/>
+				fields="create"
+				target-responder="imChatSettingsGeneralResponder"/>
 
 		</list>
 

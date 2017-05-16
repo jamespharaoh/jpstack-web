@@ -190,7 +190,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 				ObjectHelper <?> parentHelper =
 					objectManager.objectHelperForClassRequired (
-						objectModel.parentClass ());
+						objectModel.parentClassRequired ());
 
 				Record <?> parent =
 					parentHelper.findByCodeRequired (

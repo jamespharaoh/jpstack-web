@@ -65,7 +65,8 @@ class ChatUserImageUploadPart
 			form =
 				formType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					new ChatUserImageUploadForm ());
 
 			if (requestContext.post ()) {
 

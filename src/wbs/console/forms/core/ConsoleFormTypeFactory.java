@@ -1,9 +1,6 @@
 package wbs.console.forms.core;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -16,6 +13,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 
@@ -64,10 +62,7 @@ class ConsoleFormTypeFactory <Container>
 	FormType formType;
 
 	@Getter @Setter
-	List <Object> columnFields;
-
-	@Getter @Setter
-	List <Object> rowFields;
+	FieldsProvider <Container, ?> fieldsProvider;
 
 	// implementation
 
@@ -96,27 +91,8 @@ class ConsoleFormTypeFactory <Container>
 				.formType (
 					formType)
 
-				.columnFields (
-					optionalOrNull (
-						optionalMapRequired (
-							optionalFromNullable (
-								columnFields),
-							columnFields ->
-								buildFormFieldSet (
-									taskLogger,
-									"columns",
-									columnFields))))
-
-				.rowFields (
-					optionalOrNull (
-						optionalMapRequired (
-							optionalFromNullable (
-								rowFields),
-							rowFields ->
-								buildFormFieldSet (
-									taskLogger,
-									"rows",
-									columnFields))))
+				.fieldsProvider (
+					fieldsProvider)
 
 			;
 

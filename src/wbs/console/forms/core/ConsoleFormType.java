@@ -1,16 +1,7 @@
 package wbs.console.forms.core;
 
-import static wbs.utils.collection.CollectionUtils.emptyList;
-import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Optional;
-
-import lombok.NonNull;
 
 import wbs.framework.database.Transaction;
 
@@ -22,81 +13,47 @@ interface ConsoleFormType <Container> {
 	ConsoleForm <Container> buildAction (
 			Transaction parentTransaction,
 			Map <String, Object> hints,
-			List <Container> objects);
+			Container value);
 
 	ConsoleForm <Container> buildAction (
 			Transaction parentTransaction,
-			Map <String, Object> hints);
+			Map <String, Object> hints,
+			List <Container> values);
 
-	default
-	ConsoleForm <Container> buildAction (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <List <Container>> objects) {
+	ConsoleForm <Container> buildActionWithParent (
+			Transaction parentTransaction,
+			Map <String, Object> hints,
+			Object parent,
+			Container value);
 
-		return buildAction (
-			parentTransaction,
-			hints,
-			optionalOrElseRequired (
-				objects,
-				() -> emptyList ()));
-
-	}
-
-	default
-	ConsoleForm <Container> buildAction (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints,
-			@NonNull Container object) {
-
-		return buildAction (
-			parentTransaction,
-			hints,
-			new ArrayList <Container> (
-				Collections.singleton (
-					object)));
-
-	}
+	ConsoleForm <Container> buildActionWithParent (
+			Transaction parentTransaction,
+			Map <String, Object> hints,
+			Object parent,
+			List <Container> values);
 
 	// ---------- build response
 
 	ConsoleForm <Container> buildResponse (
 			Transaction parentTransaction,
 			Map <String, Object> hints,
-			List <Container> objects);
+			Container value);
 
 	ConsoleForm <Container> buildResponse (
 			Transaction parentTransaction,
-			Map <String, Object> hints);
+			Map <String, Object> hints,
+			List <Container> values);
 
-	default
-	ConsoleForm <Container> buildResponse (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <List <Container>> objects) {
+	ConsoleForm <Container> buildResponseWithParent (
+			Transaction parentTransaction,
+			Map <String, Object> hints,
+			Object parent,
+			Container value);
 
-		return buildResponse (
-			parentTransaction,
-			hints,
-			optionalOrElseRequired (
-				objects,
-				() -> emptyList ()));
-
-	}
-
-	default
-	ConsoleForm <Container> buildResponse (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints,
-			@NonNull Container object) {
-
-		return buildResponse (
-			parentTransaction,
-			hints,
-			new ArrayList <Container> (
-				Collections.singleton (
-					object)));
-
-	}
+	ConsoleForm <Container> buildResponseWithParent (
+			Transaction parentTransaction,
+			Map <String, Object> hints,
+			Object parent,
+			List <Container> values);
 
 }

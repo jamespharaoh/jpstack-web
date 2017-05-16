@@ -105,7 +105,7 @@ class ComponentDefinition {
 	public
 	ComponentDefinition addValueProperty (
 			@NonNull String name,
-			@NonNull Optional <Object> value) {
+			@NonNull Optional <?> value) {
 
 		if (
 			optionalIsPresent (
@@ -118,6 +118,20 @@ class ComponentDefinition {
 					value));
 
 		}
+
+		return this;
+
+	}
+
+	public
+	ComponentDefinition addValuePropertyFormat (
+			@NonNull String name,
+			@NonNull String ... valueArguments) {
+
+		valueProperties.put (
+			name,
+			stringFormatArray (
+				valueArguments));
 
 		return this;
 

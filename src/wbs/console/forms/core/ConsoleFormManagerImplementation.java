@@ -18,6 +18,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.module.ConsoleModule;
 
@@ -46,6 +47,9 @@ class ConsoleFormManagerImplementation
 
 	@PrototypeDependency
 	Provider <ConsoleFormTypeImplementation <?>> consoleFormTypeProvider;
+
+	@PrototypeDependency
+	Provider <StaticFieldsProvider <?, ?>> staticFieldsProviderProvider;
 
 	// public implementation
 
@@ -96,6 +100,7 @@ class ConsoleFormManagerImplementation
 			@NonNull ConsoleModule consoleModule,
 			@NonNull String formName,
 			@NonNull Class <Type> containerClass,
+			@NonNull Optional <Class <?>> parentClassOptional,
 			@NonNull FormType formType,
 			@NonNull Optional <String> columnFieldsNameOptional,
 			@NonNull Optional <String> rowFieldsNameOptional) {
@@ -115,18 +120,18 @@ class ConsoleFormManagerImplementation
 
 		) {
 
-			return genericCastUnchecked (
-				consoleFormTypeProvider.get ()
-
-				.formName (
-					formName)
+			StaticFieldsProvider <Type, Object> fieldsProvider =
+				genericCastUnchecked (
+					staticFieldsProviderProvider.get ()
 
 				.containerClass (
 					genericCastUnchecked (
 						containerClass))
 
-				.formType (
-					formType)
+				.parentClass (
+					genericCastUncheckedNullSafe (
+						optionalOrNull (
+							parentClassOptional)))
 
 				.columnFields (
 					optionalOrNull (
@@ -148,6 +153,25 @@ class ConsoleFormManagerImplementation
 
 			);
 
+			return genericCastUnchecked (
+				consoleFormTypeProvider.get ()
+
+				.formName (
+					formName)
+
+				.containerClass (
+					genericCastUnchecked (
+						containerClass))
+
+				.formType (
+					formType)
+
+				.fieldsProvider (
+					genericCastUnchecked (
+						fieldsProvider))
+
+			);
+
 		}
 
 	}
@@ -158,9 +182,9 @@ class ConsoleFormManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String formName,
 			@NonNull Class <Type> containerClass,
+			@NonNull Optional <Class <?>> parentClassOptional,
 			@NonNull FormType formType,
-			@NonNull Optional <FormFieldSet <Type>> columnFieldsOptional,
-			@NonNull Optional <FormFieldSet <Type>> rowFieldsOptional) {
+			@NonNull FieldsProvider <Type, ?> fieldsProvider) {
 
 		try (
 
@@ -187,6 +211,52 @@ class ConsoleFormManagerImplementation
 				.formType (
 					formType)
 
+				.fieldsProvider (
+					genericCastUnchecked (
+						fieldsProvider))
+
+			);
+
+		}
+
+	}
+
+	@Override
+	public <Type>
+	ConsoleFormType <Type> createFormType (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String formName,
+			@NonNull Class <Type> containerClass,
+			@NonNull Optional <Class <?>> parentClassOptional,
+			@NonNull FormType formType,
+			@NonNull Optional <FormFieldSet <Type>> columnFieldsOptional,
+			@NonNull Optional <FormFieldSet <Type>> rowFieldsOptional) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFormContextBuilder",
+					keyEqualsString (
+						"formName",
+						formName));
+
+		) {
+
+			StaticFieldsProvider <Type, Object> fieldsProvider =
+				genericCastUnchecked (
+					staticFieldsProviderProvider.get ()
+
+				.containerClass (
+					genericCastUnchecked (
+						containerClass))
+
+				.parentClass (
+					genericCastUncheckedNullSafe (
+						optionalOrNull (
+							parentClassOptional)))
+
 				.columnFields (
 					genericCastUncheckedNullSafe (
 						optionalOrNull (
@@ -198,6 +268,14 @@ class ConsoleFormManagerImplementation
 							rowFieldsOptional)))
 
 			);
+
+			return createFormType (
+				taskLogger,
+				formName,
+				containerClass,
+				parentClassOptional,
+				formType,
+				fieldsProvider);
 
 		}
 

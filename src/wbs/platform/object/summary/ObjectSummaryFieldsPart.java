@@ -121,7 +121,7 @@ class ObjectSummaryFieldsPart <
 
 			ConsoleHelper <ParentType> parentHelper =
 				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
+					consoleHelper.parentClassRequired ());
 
 			if (parentHelper.isRoot ()) {
 

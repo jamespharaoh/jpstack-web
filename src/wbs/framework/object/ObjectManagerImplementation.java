@@ -1205,7 +1205,7 @@ class ObjectManagerImplementation
 			return Optional.absent ();
 
 		return Optional.<Class<?>>of (
-			objectHelper.parentClass ());
+			objectHelper.parentClassRequired ());
 
 	}
 

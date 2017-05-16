@@ -1,34 +1,48 @@
 package wbs.services.messagetemplate.console;
 
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import lombok.NonNull;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+import wbs.console.forms.core.CombinedFormFieldSet;
 import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.forms.scriptref.ScriptRefFormFieldSpec;
 import wbs.console.forms.text.TextAreaFormFieldSpec;
-import wbs.console.forms.types.FieldsProvider;
+import wbs.console.forms.types.ConsoleNamedFormFieldSpec;
+import wbs.console.forms.types.ObjectFieldsProvider;
+import wbs.console.module.ConsoleModule;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("messageTemplateEntryFieldsProvider")
 public
 class MessageTemplateEntryValueFieldsProvider
-	implements FieldsProvider <
+	implements ObjectFieldsProvider <
 		MessageTemplateEntryValueRec,
 		MessageTemplateSetRec
 	> {
@@ -38,46 +52,73 @@ class MessageTemplateEntryValueFieldsProvider
 	@SingletonDependency
 	ConsoleFormBuilder consoleFormBuilder;
 
+	@WeakSingletonDependency
+	@NamedDependency ("messageTemplateEntryValueConsoleModule")
+	ConsoleModule consoleModule;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
 	MessageTemplateEntryValueConsoleHelper messageTemplateEntryValueHelper;
 
-	// state
+	// properties
 
-	FormFieldSet <MessageTemplateEntryValueRec> formFields;
+	@Getter @Setter
+	FormFieldSet <MessageTemplateEntryValueRec> fields;
 
+	@Getter @Setter
 	String mode;
+
+	// details
+
+	@Override
+	public
+	Class <MessageTemplateEntryValueRec> containerClass () {
+		return MessageTemplateEntryValueRec.class;
+	}
+
+	@Override
+	public
+	Class <MessageTemplateSetRec> parentClass () {
+		return MessageTemplateSetRec.class;
+	}
 
 	// implementation
 
 	@Override
 	public
-	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForObject (
-			@NonNull TaskLogger parentTaskLogger,
+	FormFieldSetPair <MessageTemplateEntryValueRec> getFieldsForObject (
+			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateEntryValueRec entryValue) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getFieldsForObject");
 
 		) {
 
-			List <Object> formFieldSpecs =
+			String formName =
+				stringFormat (
+					"%s.%s",
+					messageTemplateEntryValueHelper.objectName (),
+					mode);
+
+			// get script ref fields
+
+			List <ScriptRefFormFieldSpec> scriptRefFieldSpecs =
 				new ArrayList<> ();
 
-			// retrieve existing message template types
+			if (
+				stringEqualSafe (
+					mode,
+					"settings")
+			) {
 
-			MessageTemplateEntryTypeRec entryType =
-				entryValue.getMessageTemplateEntryType ();
-
-			if (mode != "list") {
-
-				formFieldSpecs.add (
+				scriptRefFieldSpecs.add (
 					new ScriptRefFormFieldSpec ()
 
 					.path (
@@ -85,7 +126,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 				);
 
-				formFieldSpecs.add (
+				scriptRefFieldSpecs.add (
 					new ScriptRefFormFieldSpec ()
 
 					.path (
@@ -93,7 +134,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 				);
 
-				formFieldSpecs.add (
+				scriptRefFieldSpecs.add (
 					new ScriptRefFormFieldSpec ()
 
 					.path (
@@ -101,50 +142,87 @@ class MessageTemplateEntryValueFieldsProvider
 
 				);
 
-				// build dynamic form fields
+			}
 
-				for (
-					MessageTemplateFieldTypeRec fieldType
-						: entryType.getMessageTemplateFieldTypes ()
-				) {
+			FormFieldSet <MessageTemplateEntryValueRec> scriptRefFields =
+				consoleFormBuilder.buildFormFieldSet (
+					transaction,
+					messageTemplateEntryValueHelper,
+					stringFormat (
+						"%s.scriptref",
+						formName),
+					scriptRefFieldSpecs);
 
-					formFieldSpecs.add (
-						new TextAreaFormFieldSpec ()
+			// get static felds
 
-						.name (
-							fieldType.getCode ())
+			FormFieldSet <MessageTemplateEntryValueRec> staticFields =
+				consoleModule.formFieldSetRequired (
+					mode,
+					MessageTemplateEntryValueRec.class);
 
-						.label (
-							fieldType.getName ())
+			// build dynamic form fields
 
-						.dataProvider (
-							"messageTemplateEntryValueFormFieldDataProvider")
+			MessageTemplateEntryTypeRec entryType =
+				entryValue.getMessageTemplateEntryType ();
 
-						.parent (
-							fieldType)
+			List <ConsoleNamedFormFieldSpec> dynamicFieldSpecs =
+				new ArrayList<> ();
 
-						.dynamic (
-							true)
+			for (
+				MessageTemplateFieldTypeRec fieldType
+					: entryType.getMessageTemplateFieldTypes ()
+			) {
 
-					);
+				dynamicFieldSpecs.add (
+					new TextAreaFormFieldSpec ()
 
-				}
+					.name (
+						fieldType.getCode ())
+
+					.label (
+						fieldType.getName ())
+
+					.dataProvider (
+						"messageTemplateEntryValueFormFieldDataProvider")
+
+					.parent (
+						fieldType)
+
+					.dynamic (
+						true)
+
+				);
 
 			}
 
-			// build field set
+			Collections.sort (
+				dynamicFieldSpecs,
+				Ordering.natural ().onResultOf (
+					ConsoleNamedFormFieldSpec::name));
 
-			String fieldSetName =
-				stringFormat (
-					"%s-%s",
-					messageTemplateEntryValueHelper.objectName (),
-					mode);
+			FormFieldSet <MessageTemplateEntryValueRec> dynamicFields =
+				consoleFormBuilder.buildFormFieldSet (
+					transaction,
+					messageTemplateEntryValueHelper,
+					stringFormat (
+						"%s.dynamic",
+						formName),
+					dynamicFieldSpecs);
 
-			return consoleFormBuilder.buildFormFieldSet (
-				taskLogger,
-				messageTemplateEntryValueHelper,
-				fieldSetName,
-				formFieldSpecs);
+			// combine and return
+
+			return new FormFieldSetPair <MessageTemplateEntryValueRec> ()
+
+				.columnFields (
+					new CombinedFormFieldSet <MessageTemplateEntryValueRec> (
+						formName,
+						MessageTemplateEntryValueRec.class,
+						ImmutableList.of (
+							scriptRefFields,
+							staticFields,
+							dynamicFields)))
+
+			;
 
 		}
 
@@ -152,9 +230,8 @@ class MessageTemplateEntryValueFieldsProvider
 
 	@Override
 	public
-	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForParent (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull MessageTemplateSetRec parent) {
+	FormFieldSetPair <MessageTemplateEntryValueRec> getStaticFields (
+			@NonNull Transaction parentTransaction) {
 
 		throw new UnsupportedOperationException ();
 
@@ -162,31 +239,11 @@ class MessageTemplateEntryValueFieldsProvider
 
 	@Override
 	public
-	FormFieldSet <MessageTemplateEntryValueRec> getStaticFields () {
+	FormFieldSetPair <MessageTemplateEntryValueRec> getFieldsForParent (
+			@NonNull Transaction parentTransaction,
+			@NonNull MessageTemplateSetRec parent) {
 
 		throw new UnsupportedOperationException ();
-
-	}
-
-	public
-	MessageTemplateEntryValueFieldsProvider setFields (
-			@NonNull FormFieldSet <MessageTemplateEntryValueRec> fields) {
-
-		formFields =
-			fields;
-
-		return this;
-
-	}
-
-	public
-	MessageTemplateEntryValueFieldsProvider setMode (
-			@NonNull String mode) {
-
-		this.mode =
-			mode;
-
-		return this;
 
 	}
 

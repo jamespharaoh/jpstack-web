@@ -45,8 +45,10 @@ class TicketCreateFieldsProvider
 
 			return ticketFieldsProviderProvider.get ()
 
-				.setMode (
-					"create");
+				.mode (
+					"create")
+
+			;
 
 		}
 

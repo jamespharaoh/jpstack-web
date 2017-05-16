@@ -2,12 +2,17 @@ package wbs.console.forms.core;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 
@@ -158,22 +163,32 @@ class CombinedFormFieldSet <Container>
 
 	@Override
 	public
-	FormField <Container, ?, ?, ?> formField (
+	Optional <FormField <Container, ?, ?, ?>> formField (
 			@NonNull String name) {
 
-		return members.stream ()
+		return genericCastUnchecked (
+			optionalFromJava (
+				members.stream ()
 
 			.map (
 				member ->
 					member.formField (
 						name))
 
+			.filter (
+				fieldOptional ->
+					optionalIsPresent (
+						fieldOptional))
+
+			.map (
+				fieldOptional ->
+					genericCastUnchecked (
+						optionalGetRequired (
+							fieldOptional)))
+
 			.findFirst ()
 
-			.orElse (
-				null)
-
-		;
+		));
 
 	}
 

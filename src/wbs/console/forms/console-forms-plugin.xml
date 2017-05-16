@@ -76,6 +76,7 @@
 		<component class="core.FormFieldSetBuilder"/>
 		<component class="core.HiddenFormField"/>
 		<component class="core.ReadOnlyFormField"/>
+		<component class="core.StaticFieldsProvider"/>
 		<component class="core.UpdatableFormField"/>
 
 		<component class="object.CodeFormFieldBuilder"/>

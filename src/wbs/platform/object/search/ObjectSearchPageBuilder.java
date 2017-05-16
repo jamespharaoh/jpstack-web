@@ -514,6 +514,7 @@ class ObjectSearchPageBuilder <
 					consoleModule,
 					name,
 					searchClass,
+					optionalAbsent (),
 					FormType.search,
 					optionalOf (
 						spec.searchFormFieldsName ()),
@@ -558,6 +559,7 @@ class ObjectSearchPageBuilder <
 							consoleModule,
 							name,
 							resultClass,
+							optionalAbsent (),
 							FormType.readOnly,
 							optionalFromNullable (
 								spec.resultsColumnFormFieldsName ()),
@@ -586,6 +588,7 @@ class ObjectSearchPageBuilder <
 										name,
 										resultsModeSpec.name ()),
 									resultClass,
+									optionalAbsent (),
 									FormType.search,
 									optionalOf (
 										resultsModeSpec.formFieldsName ()),

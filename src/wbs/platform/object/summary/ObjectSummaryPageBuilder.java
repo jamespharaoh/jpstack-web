@@ -1,8 +1,10 @@
 package wbs.platform.object.summary;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -27,6 +29,7 @@ import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.IdFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.forms.object.ParentFormFieldSpec;
+import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
@@ -321,6 +324,8 @@ class ObjectSummaryPageBuilder <
 					consoleModule,
 					fieldsName,
 					consoleHelper.objectClass (),
+					genericCastUnchecked (
+						consoleHelper.parentClass ()),
 					FormType.readOnly,
 					optionalOf (
 						fieldsName),
@@ -480,27 +485,54 @@ class ObjectSummaryPageBuilder <
 			consoleHelper =
 				container.consoleHelper ();
 
-			formType =
-				ifNotNullThenElse (
-					spec.formFieldsName,
-					() -> formContextManager.createFormType (
-						taskLogger,
-						consoleModule,
-						"summary",
-						consoleHelper.objectClass (),
-						FormType.readOnly,
-						optionalOf (
-							spec.formFieldsName ()),
-						optionalAbsent ()),
-					() -> formContextManager.createFormType (
+			if (
+				isNotNull (
+					spec.fieldsProviderName ())
+			) {
+
+				formType =
+					consoleFormManager.createFormType (
 						taskLogger,
 						"summary",
 						consoleHelper.objectClass (),
-						FormType.readOnly,
-						optionalOf (
-							defaultFields (
-								taskLogger)),
-						optionalAbsent ()));
+						genericCastUnchecked (
+							consoleHelper.parentClass ()),
+						FormType.update,
+						genericCastUnchecked (
+							componentManager.getComponentRequired (
+								taskLogger,
+								spec.fieldsProviderName (),
+								FieldsProvider.class)));
+
+			} else {
+
+				formType =
+					ifNotNullThenElse (
+						spec.formFieldsName,
+						() -> formContextManager.createFormType (
+							taskLogger,
+							consoleModule,
+							"summary",
+							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
+							FormType.readOnly,
+							optionalOf (
+								spec.formFieldsName ()),
+							optionalAbsent ()),
+						() -> formContextManager.createFormType (
+							taskLogger,
+							"summary",
+							consoleHelper.objectClass (),
+							genericCastUnchecked (
+								consoleHelper.parentClass ()),
+							FormType.readOnly,
+							optionalOf (
+								defaultFields (
+									taskLogger)),
+							optionalAbsent ()));
+
+			}
 
 			privKey =
 				spec.privKey ();

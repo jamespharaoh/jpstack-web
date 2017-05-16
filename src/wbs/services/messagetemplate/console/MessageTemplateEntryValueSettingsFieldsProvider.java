@@ -48,8 +48,10 @@ class MessageTemplateEntryValueSettingsFieldsProvider
 
 			return messageTemplateEntryValueFieldsProvider.get ()
 
-				.setMode (
-					"settings");
+				.mode (
+					"settings")
+
+			;
 
 		}
 

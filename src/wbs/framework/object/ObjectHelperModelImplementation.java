@@ -1,8 +1,12 @@
 package wbs.framework.object;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -85,7 +89,7 @@ class ObjectHelperModelImplementation <
 
 	@Override
 	public
-	Class <? extends Record <?>> parentClass () {
+	Class <? extends Record <?>> parentClassRequired () {
 
 		if (objectModel.isRooted ()) {
 
@@ -93,7 +97,33 @@ class ObjectHelperModelImplementation <
 
 		} else {
 
-			return objectModel.parentClass ();
+			return objectModel.parentClassRequired ();
+
+		}
+
+	}
+
+	@Override
+	public
+	Optional <Class <? extends Record <?>>> parentClass () {
+
+		if (objectModel.isRoot ()) {
+
+			return optionalAbsent ();
+
+		} else if (objectModel.isRooted ()) {
+
+			return optionalOf (
+				objectTypeRegistry.rootRecordClass ());
+
+		} else if (parentTypeIsFixed ()) {
+
+			return optionalOf (
+				objectModel.parentClassRequired ());
+
+		} else {
+
+			return optionalAbsent ();
 
 		}
 

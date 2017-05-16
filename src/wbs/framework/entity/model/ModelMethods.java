@@ -48,7 +48,7 @@ interface ModelMethods <RecordType extends Record <RecordType>> {
 	Boolean create ();
 	Boolean mutable ();
 
-	Class <? extends Record <?>> parentClass ();
+	Class <? extends Record <?>> parentClassRequired ();
 	Class <? extends ObjectHelper <?>> helperClass ();
 
 	// property accessors

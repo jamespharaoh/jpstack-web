@@ -107,7 +107,8 @@ class AutoResponderVotesPart
 			form =
 				formType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					new AutoResponderVotesForm ());
 
 			// process form
 

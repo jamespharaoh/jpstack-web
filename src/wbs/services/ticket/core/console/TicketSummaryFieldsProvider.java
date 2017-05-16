@@ -47,8 +47,10 @@ class TicketSummaryFieldsProvider
 
 			return ticketFieldsProviderProvider.get ()
 
-				.setMode (
-					"summary");
+				.mode (
+					"summary")
+
+			;
 
 		}
 

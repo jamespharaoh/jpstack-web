@@ -1,7 +1,6 @@
 package wbs.console.forms.core;
 
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
-import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -17,6 +16,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.console.forms.types.FieldsProvider;
+import wbs.console.forms.types.FieldsProvider.FormFieldSetPair;
 import wbs.console.forms.types.FormFieldSubmission;
 import wbs.console.forms.types.FormType;
 import wbs.console.forms.types.FormUpdateResultSet;
@@ -51,7 +52,7 @@ class ConsoleFormTypeImplementation <Container>
 	// uninitialized dependencies
 
 	@UninitializedDependency
-	Provider <ConsoleFormImplementation <Container>> formContextProvider;
+	Provider <ConsoleFormImplementation <Container>> consoleFormProvider;
 
 	// properties
 
@@ -65,10 +66,7 @@ class ConsoleFormTypeImplementation <Container>
 	FormType formType;
 
 	@Getter @Setter
-	FormFieldSet <Container> columnFields;
-
-	@Getter @Setter
-	FormFieldSet <Container> rowFields;
+	FieldsProvider <Container, ?> fieldsProvider;
 
 	// implementation
 
@@ -77,7 +75,7 @@ class ConsoleFormTypeImplementation <Container>
 	ConsoleForm <Container> buildAction (
 			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, Object> hints,
-			@NonNull List <Container> values) {
+			@NonNull Container value) {
 
 		try (
 
@@ -97,7 +95,12 @@ class ConsoleFormTypeImplementation <Container>
 					formName),
 				updateResults);
 
-			return formContextProvider.get ()
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForObject (
+					transaction,
+					value);
+
+			return consoleFormProvider.get ()
 
 				.requestContext (
 					requestContext)
@@ -109,10 +112,10 @@ class ConsoleFormTypeImplementation <Container>
 					containerClass)
 
 				.columnFields (
-					columnFields)
+					formFieldSetPair.columnFields ())
 
 				.rowFields (
-					rowFields)
+					formFieldSetPair.rowFields ())
 
 				.formName (
 					formName)
@@ -124,7 +127,8 @@ class ConsoleFormTypeImplementation <Container>
 					hints)
 
 				.values (
-					values)
+					ImmutableList.of (
+						value))
 
 				.submission (
 					FormFieldSubmission.fromRequestContext (
@@ -143,14 +147,193 @@ class ConsoleFormTypeImplementation <Container>
 	public
 	ConsoleForm <Container> buildAction (
 			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints) {
+			@NonNull Map <String, Object> hints,
+			@NonNull List <Container> values) {
 
-		return buildAction (
-			parentTransaction,
-			hints,
-			ImmutableList.of (
-				classInstantiate (
-					containerClass)));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getStaticFields (
+					transaction);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					values)
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
+	ConsoleForm <Container> buildActionWithParent (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Object> hints,
+			@NonNull Object parent,
+			@NonNull Container value) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormUpdateResultSet updateResults =
+				new FormUpdateResultSet ();
+
+			requestContext.request (
+				stringFormat (
+					"form--%s--results",
+					formName),
+				updateResults);
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForParentGeneric (
+					transaction,
+					parent);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					ImmutableList.of (
+						value))
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+				.updateResultSet (
+					updateResults)
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
+	ConsoleForm <Container> buildActionWithParent (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Object> hints,
+			@NonNull Object parent,
+			@NonNull List <Container> values) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForParentGeneric (
+					transaction,
+					parent);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					values)
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+			;
+
+		}
 
 	}
 
@@ -159,7 +342,7 @@ class ConsoleFormTypeImplementation <Container>
 	ConsoleForm <Container> buildResponse (
 			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, Object> hints,
-			@NonNull List <Container> objects) {
+			@NonNull Container value) {
 
 		try (
 
@@ -179,7 +362,12 @@ class ConsoleFormTypeImplementation <Container>
 								formName)),
 						() -> new FormUpdateResultSet ()));
 
-			return formContextProvider.get ()
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForObject (
+					transaction,
+					value);
+
+			return consoleFormProvider.get ()
 
 				.requestContext (
 					requestContext)
@@ -194,10 +382,10 @@ class ConsoleFormTypeImplementation <Container>
 					containerClass)
 
 				.columnFields (
-					columnFields)
+					formFieldSetPair.columnFields ())
 
 				.rowFields (
-					rowFields)
+					formFieldSetPair.rowFields ())
 
 				.formName (
 					formName)
@@ -209,7 +397,8 @@ class ConsoleFormTypeImplementation <Container>
 					hints)
 
 				.values (
-					objects)
+					ImmutableList.of (
+						value))
 
 				.submission (
 					FormFieldSubmission.fromRequestContext (
@@ -228,14 +417,202 @@ class ConsoleFormTypeImplementation <Container>
 	public
 	ConsoleForm <Container> buildResponse (
 			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> hints) {
+			@NonNull Map <String, Object> hints,
+			@NonNull List <Container> values) {
 
-		return buildResponse (
-			parentTransaction,
-			hints,
-			ImmutableList.of (
-				classInstantiate (
-					containerClass)));
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getStaticFields (
+					transaction);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.formatWriter (
+					requestContext.formatWriter ())
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					values)
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
+	ConsoleForm <Container> buildResponseWithParent (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Object> hints,
+			@NonNull Object parent,
+			@NonNull Container value) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormUpdateResultSet updateResults =
+				genericCastUncheckedNullSafe (
+					optionalOrElseRequired (
+						requestContext.request (
+							stringFormat (
+								"form--%s--results",
+								formName)),
+						() -> new FormUpdateResultSet ()));
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForParentGeneric (
+					transaction,
+					parent);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.formatWriter (
+					requestContext.formatWriter ())
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					ImmutableList.of (
+						value))
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+				.updateResultSet (
+					updateResults)
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
+	ConsoleForm <Container> buildResponseWithParent (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Object> hints,
+			@NonNull Object parent,
+			@NonNull List <Container> values) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"build");
+
+		) {
+
+			FormFieldSetPair <Container> formFieldSetPair =
+				fieldsProvider.getFieldsForParentGeneric (
+					transaction,
+					parent);
+
+			return consoleFormProvider.get ()
+
+				.requestContext (
+					requestContext)
+
+				.formatWriter (
+					requestContext.formatWriter ())
+
+				.privChecker (
+					privChecker)
+
+				.containerClass (
+					containerClass)
+
+				.columnFields (
+					formFieldSetPair.columnFields ())
+
+				.rowFields (
+					formFieldSetPair.rowFields ())
+
+				.formName (
+					formName)
+
+				.formType (
+					formType)
+
+				.hints (
+					hints)
+
+				.values (
+					values)
+
+				.submission (
+					FormFieldSubmission.fromRequestContext (
+						requestContext))
+
+			;
+
+		}
 
 	}
 

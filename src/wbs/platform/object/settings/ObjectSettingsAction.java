@@ -87,7 +87,7 @@ class ObjectSettingsAction <
 	String objectType;
 
 	@Getter @Setter
-	ConsoleFormType <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	// state
 
@@ -155,25 +155,25 @@ class ObjectSettingsAction <
 			}
 			*/
 
-			ConsoleForm <ObjectType> formContext =
-				formContextBuilder.buildAction (
+			ConsoleForm <ObjectType> form =
+				formType.buildAction (
 					transaction,
 					emptyMap (),
 					object);
 
-			formContext.update (
+			form.update (
 				transaction);
 
-			if (formContext.errors ()) {
+			if (form.errors ()) {
 
-				formContext.reportErrors (
+				form.reportErrors (
 					transaction);
 
 				return null;
 
 			}
 
-			if (! formContext.updates ()) {
+			if (! form.updates ()) {
 
 				requestContext.addWarning (
 					"No changes made");
@@ -186,7 +186,7 @@ class ObjectSettingsAction <
 
 			if (object instanceof PermanentRecord) {
 
-				formContext.runUpdateHooks (
+				form.runUpdateHooks (
 					transaction,
 					(PermanentRecord <?>) object,
 					optionalAbsent (),
@@ -205,7 +205,7 @@ class ObjectSettingsAction <
 						object,
 						objectRefName);
 
-				formContext.runUpdateHooks (
+				form.runUpdateHooks (
 					transaction,
 					linkObject,
 					optionalOf (
@@ -242,7 +242,7 @@ class ObjectSettingsAction <
 
 			ConsoleHelper <ParentType> parentHelper =
 				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
+					consoleHelper.parentClassRequired ());
 
 			if (parentHelper.isRoot ()) {
 

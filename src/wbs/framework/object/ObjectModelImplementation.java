@@ -1,5 +1,7 @@
 package wbs.framework.object;
 
+import static wbs.utils.etc.Misc.requiredValue;
+
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,7 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	@Getter @Setter
 	Long parentTypeId;
 
-	@Getter @Setter
+	@Setter
 	Class <Record <?>> parentClass;
 
 	@Getter @Setter
@@ -43,9 +45,18 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	Class <?> daoInterface;
 
 	@Getter @Setter
-	ObjectHooks<RecordType> hooks;
+	ObjectHooks <RecordType> hooks;
 
 	// model properties
+
+	@Override
+	public
+	Class <? extends Record <?>> parentClassRequired () {
+
+		return requiredValue (
+			parentClass);
+
+	}
 
 	@Override
 	public

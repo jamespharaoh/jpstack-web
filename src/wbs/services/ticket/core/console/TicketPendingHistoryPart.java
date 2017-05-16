@@ -1,5 +1,6 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
@@ -103,12 +104,14 @@ class TicketPendingHistoryPart
 			ticketNoteForm =
 				ticketNoteFormType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					emptyList ());
 
 			ticketStateForm =
 				ticketStateFormType.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					emptyList ());
 
 		}
 

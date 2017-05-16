@@ -136,7 +136,7 @@ class ObjectSearchPart <
 
 				ConsoleHelper <?> parentHelper =
 					objectManager.findConsoleHelperRequired (
-						consoleHelper.parentClass ());
+						consoleHelper.parentClassRequired ());
 
 				Optional <Long> parentIdOptional =
 					requestContext.stuffInteger (
@@ -164,13 +164,15 @@ class ObjectSearchPart <
 			formHints =
 				formHintsBuilder.build ();
 
+			currentSearch =
+				classInstantiate (
+					searchFormContext.containerClass ());
+
 			searchFormContext =
 				searchFormContextBuilder.buildResponse (
 					transaction,
-					formHints);
-
-			currentSearch =
-				searchFormContext.value ();
+					formHints,
+					currentSearch);
 
 			cleanSearch =
 				classInstantiate (

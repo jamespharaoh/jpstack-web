@@ -1,8 +1,8 @@
 package wbs.platform.object.settings;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -13,8 +13,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.Set;
-
-import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -81,9 +79,6 @@ class ObjectSettingsPart <
 
 	// state
 
-	ObjectType object;
-	ParentType parent;
-
 	boolean canEdit;
 
 	ConsoleForm <ObjectType> form;
@@ -94,7 +89,18 @@ class ObjectSettingsPart <
 	public
 	Set <ScriptRef> scriptRefs () {
 
-		return form.allFields ().scriptRefs ();
+		if (
+			isNotNull (
+				form)
+		) {
+
+			return form.allFields ().scriptRefs ();
+
+		} else {
+
+			return emptySet ();
+
+		}
 
 	}
 
@@ -112,11 +118,6 @@ class ObjectSettingsPart <
 
 		) {
 
-			object =
-				objectLookup.lookupObject (
-					transaction,
-					requestContext.consoleContextStuffRequired ());
-
 			canEdit = (
 
 				editPrivKey != null
@@ -126,90 +127,17 @@ class ObjectSettingsPart <
 
 			);
 
-			/*
-			if (formFieldsProvider != null) {
-
-				prepareParent (
-					transaction);
-
-				prepareFieldSet (
-					transaction);
-
-			}
-			*/
-
 			form =
 				formContextBuilder.buildResponse (
 					transaction,
-					emptyMap ());
+					emptyMap (),
+					objectLookup.lookupObject (
+						transaction,
+						requestContext.consoleContextStuffRequired ()));
 
 		}
 
 	}
-
-	void prepareParent (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"prepareParent");
-
-		) {
-
-			ConsoleHelper <ParentType> parentHelper =
-				objectManager.findConsoleHelperRequired (
-					consoleHelper.parentClass ());
-
-			if (parentHelper.isRoot ()) {
-
-				parent =
-					parentHelper.findRequired (
-						transaction,
-						0l);
-
-				return;
-
-			}
-
-			Optional <Long> parentIdOptional =
-				requestContext.stuffInteger (
-					parentHelper.idKey ());
-
-			if (
-				optionalIsPresent (
-					parentIdOptional)
-			) {
-
-				// use specific parent
-
-				parent =
-					parentHelper.findRequired (
-						transaction,
-						optionalGetRequired (
-							parentIdOptional));
-
-				return;
-
-			}
-
-		}
-
-	}
-
-	/*
-	void prepareFieldSet (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		formFieldSet =
-			formFieldsProvider.getFieldsForObject (
-				parentTaskLogger,
-				object);
-
-	}
-	*/
 
 	@Override
 	public
@@ -256,8 +184,7 @@ class ObjectSettingsPart <
 			htmlTableOpenDetails ();
 
 			form.outputFormRows (
-				transaction,
-				object);
+				transaction);
 
 			htmlTableClose ();
 

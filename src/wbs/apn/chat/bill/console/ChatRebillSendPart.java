@@ -3,11 +3,13 @@ package wbs.apn.chat.bill.console;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -100,41 +102,45 @@ class ChatRebillSendPart
 
 			// get search results
 
-			Optional <List <Long>> billSearchResultsTemp =
+			Optional <List <Long>> billSearchResultIds =
 				genericCastUnchecked (
 					requestContext.request (
 						"billSearchResults"));
 
 			billSearchResults =
 				optionalMapRequired (
-					billSearchResultsTemp,
+					billSearchResultIds,
 					chatUserIds ->
 						presentInstancesList (
 							chatUserHelper.findMany (
 								transaction,
 								chatUserIds)));
 
-			Optional <List <Pair <Long, String>>> nonBillSearchResultsTemp =
+			Optional <List <Pair <Long, String>>> nonBillSearchResultIds =
 				genericCastUnchecked (
 					requestContext.request (
 						"nonBillSearchResults"));
 
 			nonBillSearchResults =
 				optionalMapRequired (
-					nonBillSearchResultsTemp,
+					nonBillSearchResultIds,
 					list ->
 						iterableMapToList (
 							list,
 							chatUserWithReason ->
 								new ChatRebillNonBillResult ()
-									.chatUser (
-										chatUserHelper.findRequired (
-											transaction,
-											(Long)
-											chatUserWithReason.getLeft ()))
-									.reason (
-										(String)
-										chatUserWithReason.getRight ())));
+
+				.chatUser (
+					chatUserHelper.findRequired (
+						transaction,
+						(Long)
+						chatUserWithReason.getLeft ()))
+
+				.reason (
+					(String)
+					chatUserWithReason.getRight ())
+
+			));
 
 			// setup forms
 
@@ -151,19 +157,24 @@ class ChatRebillSendPart
 			searchForm =
 				searchFormType.buildResponse (
 					transaction,
-					formHints);
+					formHints,
+					new ChatRebillSearch ());
 
 			billResultsForm =
 				billResultsFormType.buildResponse (
 					transaction,
 					formHints,
-					billSearchResults);
+					optionalOrElseRequired (
+						billSearchResults,
+						() -> emptyList ()));
 
 			nonBillResultsForm =
 				nonBillResultsFormType.buildResponse (
 					transaction,
 					formHints,
-					nonBillSearchResults);
+					optionalOrElseRequired (
+						nonBillSearchResults,
+						() -> emptyList ()));
 
 		}
 

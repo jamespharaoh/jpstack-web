@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import wbs.console.forms.basic.IntegerFormFieldSpec;
 import wbs.console.forms.basic.YesNoFormFieldSpec;
@@ -20,15 +23,16 @@ import wbs.console.forms.types.FieldsProvider;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("ticketFieldsProvider")
 public
 class TicketFieldsProvider
@@ -51,37 +55,53 @@ class TicketFieldsProvider
 	@SingletonDependency
 	TicketConsoleHelper ticketConsoleHelper;
 
-	// state
+	// properties
 
+	@Getter @Setter
 	FormFieldSet <TicketRec> formFields;
 
+	@Getter @Setter
 	String mode;
+
+	// details
+
+	@Override
+	public
+	Class <TicketRec> containerClass () {
+		return TicketRec.class;
+	}
+
+	@Override
+	public
+	Class <TicketManagerRec> parentClass () {
+		return TicketManagerRec.class;
+	}
 
 	// implementation
 
 	@Override
 	public
-	FormFieldSet <TicketRec> getFieldsForObject (
-			@NonNull TaskLogger parentTaskLogger,
+	FormFieldSetPair <TicketRec> getFieldsForObject (
+			@NonNull Transaction parentTransaction,
 			@NonNull TicketRec ticket) {
 
 		return getFieldsForParent (
-			parentTaskLogger,
+			parentTransaction,
 			ticket.getTicketManager ());
 
 	}
 
 	@Override
 	public
-	FormFieldSet <TicketRec> getFieldsForParent (
-			@NonNull TaskLogger parentTaskLogger,
+	FormFieldSetPair <TicketRec> getFieldsForParent (
+			@NonNull Transaction parentTransaction,
 			@NonNull TicketManagerRec ticketManager) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"getFieldsForParent");
 
 		) {
@@ -210,11 +230,13 @@ class TicketFieldsProvider
 					ticketConsoleHelper.objectName(),
 					mode);
 
-			return consoleFormBuilder.buildFormFieldSet (
-				taskLogger,
-				ticketConsoleHelper,
-				fieldSetName,
-				formFieldSpecs);
+			return new FormFieldSetPair <TicketRec> ()
+				.columnFields (
+					consoleFormBuilder.buildFormFieldSet (
+						transaction,
+						ticketConsoleHelper,
+						fieldSetName,
+						formFieldSpecs));
 
 		}
 
@@ -222,20 +244,10 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet <TicketRec> getStaticFields () {
+	FormFieldSetPair <TicketRec> getStaticFields (
+			@NonNull Transaction parentTransaction) {
 
 		throw new UnsupportedOperationException ();
-
-	}
-
-	public
-	TicketFieldsProvider setMode (
-			@NonNull String modeSet) {
-
-		mode =
-			modeSet;
-
-		return this;
 
 	}
 
