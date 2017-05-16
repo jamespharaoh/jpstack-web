@@ -21,6 +21,15 @@
 
 		<description-field/>
 
+		<!-- settings -->
+
+		<!--
+		<reference-field
+			name="inherit"
+			type="messageTemplateSet"
+			nullable="yes"/>
+		-->
+
 		<!-- statistics -->
 
 		<integer-field

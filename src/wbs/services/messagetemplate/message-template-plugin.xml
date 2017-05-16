@@ -34,6 +34,7 @@
 		<component class="console.MessageTemplateEntryValueSettingsFieldsProvider"/>
 		<component class="console.MessageTemplateEntryValueSummaryFieldsProvider"/>
 		<component class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
+		<component class="console.MessageTemplateSetSettingsCreateMissingFormActionHelper"/>
 	</layer>
 
 	<layer name="logic">

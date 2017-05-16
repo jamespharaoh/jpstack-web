@@ -100,7 +100,7 @@ class ConsoleFormActionPart <FormState, History>
 				formState);
 
 			actionFormContext =
-				actionFormContextBuilder.buildAction (
+				actionFormContextBuilder.buildResponse (
 					transaction,
 					formHints,
 					formState);
