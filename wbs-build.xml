@@ -736,7 +736,7 @@
 
 		<layer name="object-generate"/>
 
-		<layer name="proces-api"/>
+		<layer name="process-api"/>
 
 		<layer name="schema"/>
 
