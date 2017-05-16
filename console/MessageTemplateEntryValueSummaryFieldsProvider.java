@@ -48,8 +48,10 @@ class MessageTemplateEntryValueSummaryFieldsProvider
 
 			return messageTemplateEntryValueFieldsProvider.get ()
 
-				.setMode (
-					"summary");
+				.mode (
+					"summary")
+
+			;
 
 		}
 

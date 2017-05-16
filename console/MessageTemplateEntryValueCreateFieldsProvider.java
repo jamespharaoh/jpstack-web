@@ -48,8 +48,10 @@ class MessageTemplateEntryValueCreateFieldsProvider
 
 			return messageTemplateEntryValueFieldsProvider.get ()
 
-				.setMode (
-					"create");
+				.mode (
+					"create")
+
+			;
 
 		}
 
