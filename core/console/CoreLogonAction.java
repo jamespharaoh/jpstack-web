@@ -1,6 +1,6 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -125,7 +125,7 @@ class CoreLogonAction
 						username);
 
 				if (
-					collectionHasTwoElements (
+					collectionHasTwoItems (
 						usernameParts)
 				) {
 

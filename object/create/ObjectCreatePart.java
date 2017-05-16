@@ -1,25 +1,27 @@
 package wbs.platform.object.create;
 
+import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -66,7 +68,7 @@ class ObjectCreatePart <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	@Getter @Setter
 	String parentPrivCode;
@@ -83,7 +85,7 @@ class ObjectCreatePart <
 	ObjectType object;
 
 	Map <String, Object> formHints;
-	FormContext <ObjectType> formContext;
+	ConsoleForm <ObjectType> form;
 
 	// implementation
 
@@ -91,13 +93,18 @@ class ObjectCreatePart <
 	public
 	Set <ScriptRef> scriptRefs () {
 
-		Set <ScriptRef> scriptRefs =
-			new LinkedHashSet<> ();
+		if (
+			isNotNull (
+				form)
+		) {
 
-		scriptRefs.addAll (
-			formContext.allFields ().scriptRefs ());
+			return form.scriptRefs ();
 
-		return scriptRefs;
+		} else {
+
+			return emptySet ();
+
+		}
 
 	}
 
@@ -131,8 +138,8 @@ class ObjectCreatePart <
 
 			// get update results
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formType.buildResponse (
 					transaction,
 					formHints);
 
@@ -169,6 +176,9 @@ class ObjectCreatePart <
 					"prepareParents");
 
 		) {
+
+			ImmutableMap.Builder <String, Object> formHintsBuilder =
+				ImmutableMap.builder ();
 
 			ConsoleHelper <ParentType> parentHelperTemp =
 				objectManager.findConsoleHelperRequired (
@@ -244,38 +254,41 @@ class ObjectCreatePart <
 						optionalGetRequired (
 							grandParentIdOptional));
 
-				formHints.put (
+				formHintsBuilder.put (
 					"grandparent",
 					grandparent);
 
-				formHints.put (
+				formHintsBuilder.put (
 					stringFormat (
 						"%s.parent",
 						consoleHelper.parentFieldName ()),
 					grandparent);
 
-				formHints.put (
+				formHintsBuilder.put (
 					stringFormat (
 						"parent.%s",
 						parentHelper.parentFieldName ()),
 					grandparent);
 
-				formHints.put (
+				formHintsBuilder.put (
 					stringFormat (
 						"%s.%s",
 						consoleHelper.parentFieldName (),
 						parentHelper.parentFieldName ()),
 					grandparent);
 
-				return;
+			} else {
+
+				// show all parents
+
+				parents =
+					parentHelper.findAll (
+						transaction);
 
 			}
 
-			// show all parents
-
-			parents =
-				parentHelper.findAll (
-					transaction);
+			formHints =
+				formHintsBuilder.build ();
 
 		}
 
@@ -313,7 +326,7 @@ class ObjectCreatePart <
 				"Please enter the details for the new %h",
 				consoleHelper.shortName ());
 
-			formContext.outputFormTable (
+			form.outputFormTable (
 				transaction,
 				"post",
 				requestContext.resolveLocalUrl (

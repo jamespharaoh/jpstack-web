@@ -28,8 +28,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
@@ -82,7 +82,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	String localName;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -92,7 +92,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	ObjectType currentObject;
 	List <ObjectType> allObjects;
 
-	FormContext <Object> formContext;
+	ConsoleForm <Object> formContext;
 
 	ConsoleContext targetContext;
 

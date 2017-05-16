@@ -1,8 +1,8 @@
 package wbs.platform.scaffold.logic;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;

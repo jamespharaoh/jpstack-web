@@ -44,7 +44,7 @@
 				event-order="target-then-context"
 				target-signal="user_privs"
 				success-notice="Group membership updated"
-				fields="members"
+				form="members"
 				owned-by="us"/>
 
 			<context-tab-action-page
@@ -92,19 +92,28 @@
 
 	</field-set>
 
-	<field-set
-		name="members"
-		object-name="user">
+	<forms>
 
-		<parent-field/>
-		<code-field/>
+		<form
+			name="members"
+			object-type="user"
+			type="read-only">
 
-		<text-field
-			name="fullname"
-			label="Full name"/>
+			<column-fields>
 
-		<description-field/>
+				<parent-field/>
+				<code-field/>
 
-	</field-set>
+				<text-field
+					name="fullname"
+					label="Full name"/>
+
+				<description-field/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

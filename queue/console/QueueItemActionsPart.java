@@ -1,7 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;

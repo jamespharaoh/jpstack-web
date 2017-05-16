@@ -28,8 +28,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
@@ -86,7 +86,7 @@ class ObjectLinksPart <
 	ConsoleHelper <TargetType> targetHelper;
 
 	@Getter @Setter
-	FormContextBuilder <TargetType> targetFormContextBuilder;
+	ConsoleFormType <TargetType> targetFormType;
 
 	@Getter @Setter
 	String localFile;
@@ -98,7 +98,7 @@ class ObjectLinksPart <
 
 	List <TargetType> targetObjects;
 
-	FormContext <TargetType> formContext;
+	ConsoleForm <TargetType> targetForm;
 
 	// details
 
@@ -140,8 +140,8 @@ class ObjectLinksPart <
 			Collections.sort (
 				targetObjects);
 
-			formContext =
-				targetFormContextBuilder.build (
+			targetForm =
+				targetFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					targetObjects);
@@ -190,7 +190,7 @@ class ObjectLinksPart <
 
 			htmlTableRowOpen ();
 
-			formContext.outputTableHeadings (
+			targetForm.outputTableHeadings (
 				transaction);
 
 			htmlTableHeaderCellWrite (
@@ -216,7 +216,7 @@ class ObjectLinksPart <
 
 				htmlTableRowOpen ();
 
-				formContext.outputTableCellsList (
+				targetForm.outputTableCellsList (
 					transaction,
 					targetObject,
 					true);

@@ -3,7 +3,7 @@ package wbs.platform.user.console;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 import wbs.console.supervisor.SupervisorConfigSpec;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -17,7 +17,7 @@ import wbs.framework.data.annotations.DataParent;
 @PrototypeComponent ("supervisorUserStatsGrouperSpec")
 public
 class SupervisorUserStatsGrouperSpec
-	implements ConsoleModuleData {
+	implements ConsoleSpec {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;

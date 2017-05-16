@@ -2,9 +2,9 @@ package wbs.platform.object.summary;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -88,22 +88,18 @@ class ObjectSummaryPart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		Set<ScriptRef> scriptRefs =
-			new LinkedHashSet<ScriptRef> ();
+		return parts.stream ()
 
-		for (
-			PagePart pagePart
-				: parts
-		) {
+			.flatMap (
+				part ->
+					part.scriptRefs ().stream ())
 
-			scriptRefs.addAll (
-				pagePart.scriptRefs ());
+			.collect (
+				Collectors.toSet ())
 
-		}
-
-		return scriptRefs;
+		;
 
 	}
 

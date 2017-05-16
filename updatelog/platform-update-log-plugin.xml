@@ -10,4 +10,8 @@
 		<component class="logic.UpdateManager"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="update-log"/>
+	</console-modules>
+
 </plugin>

@@ -3,8 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
@@ -13,6 +12,7 @@ import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithComma;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -34,8 +34,8 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -122,7 +122,7 @@ class ObjectSearchPostAction <
 	String parentIdName;
 
 	@Getter @Setter
-	FormContextBuilder <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormContextBuilder;
 
 	@Getter @Setter
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
@@ -246,8 +246,8 @@ class ObjectSearchPostAction <
 						() -> classInstantiate (
 							searchClass)));
 
-			FormContext <SearchType> searchFormContext =
-				searchFormContextBuilder.build (
+			ConsoleForm <SearchType> searchFormContext =
+				searchFormContextBuilder.buildAction (
 					transaction,
 					emptyMap (),
 					search);

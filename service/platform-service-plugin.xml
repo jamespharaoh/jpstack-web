@@ -19,6 +19,7 @@
 
 	<console-modules>
 		<console-module name="service"/>
+		<console-module name="service-type"/>
 	</console-modules>
 
 </plugin>

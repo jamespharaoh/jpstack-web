@@ -3,7 +3,7 @@ package wbs.platform.background.logic;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanNotEqual;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToCamel;

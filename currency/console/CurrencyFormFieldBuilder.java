@@ -17,33 +17,32 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.Range;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.basic.IdentityFormFieldNativeMapping;
+import wbs.console.forms.basic.IntegerFormFieldInterfaceMapping;
+import wbs.console.forms.basic.IntegerFormFieldValueValidator;
 import wbs.console.forms.basic.NullFormFieldConstraintValidator;
 import wbs.console.forms.basic.RangeFormFieldInterfaceMapping;
 import wbs.console.forms.basic.RequiredFormFieldValueValidator;
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderComponent;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
+import wbs.console.forms.core.ConsoleFormPluginManagerImplementation;
 import wbs.console.forms.core.FormFieldSetImplementation;
 import wbs.console.forms.core.ReadOnlyFormField;
 import wbs.console.forms.core.UpdatableFormField;
-import wbs.console.forms.logic.FormFieldPluginManagerImplementation;
-import wbs.console.forms.number.IntegerFormFieldInterfaceMapping;
-import wbs.console.forms.number.IntegerFormFieldValueValidator;
 import wbs.console.forms.object.DereferenceFormFieldAccessor;
 import wbs.console.forms.text.TextFormFieldRenderer;
 import wbs.console.forms.text.TextualRangeFormFieldInterfaceMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormField;
 import wbs.console.forms.types.FormFieldAccessor;
 import wbs.console.forms.types.FormFieldConstraintValidator;
 import wbs.console.forms.types.FormFieldInterfaceMapping;
-import wbs.console.forms.types.FormFieldNativeMapping;
 import wbs.console.forms.types.FormFieldRenderer;
 import wbs.console.forms.types.FormFieldUpdateHook;
 import wbs.console.forms.types.FormFieldValueValidator;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -58,15 +57,14 @@ import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("currencyFormFieldBuilder")
-@ConsoleModuleBuilderHandler
 public
 class CurrencyFormFieldBuilder
-	implements BuilderComponent {
+	implements ConsoleFormBuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	FormFieldPluginManagerImplementation formFieldPluginManager;
+	ConsoleFormPluginManagerImplementation formFieldPluginManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -127,7 +125,7 @@ class CurrencyFormFieldBuilder
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext context;
+	ConsoleFormBuilderContext context;
 
 	@BuilderSource
 	CurrencyFormFieldSpec spec;
@@ -217,7 +215,7 @@ class CurrencyFormFieldBuilder
 
 			// native mapping
 
-			FormFieldNativeMapping nativeMapping;
+			ConsoleFormNativeMapping nativeMapping;
 
 			boolean range;
 

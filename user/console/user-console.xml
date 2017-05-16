@@ -80,7 +80,7 @@
 				event-order="context-then-target"
 				signal="user_privs"
 				success-notice="User groups updated"
-				fields="groups"
+				form="groups"
 				owned-by="them"/>
 
 			<section
@@ -185,14 +185,23 @@
 
 	</field-set>
 
-	<field-set
-		name="groups"
-		object-name="group">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="groups"
+			object-type="group"
+			type="read-only">
 
-	</field-set>
+			<column-fields>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</column-fields>
+
+		</form>
+
+	</forms>
 
 </console-module>

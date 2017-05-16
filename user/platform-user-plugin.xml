@@ -37,7 +37,9 @@
 
 	<console-modules>
 		<console-module name="user"/>
+		<console-module name="user-data"/>
 		<console-module name="user-online"/>
+		<console-module name="user-priv"/>
 		<console-module name="user-session"/>
 	</console-modules>
 

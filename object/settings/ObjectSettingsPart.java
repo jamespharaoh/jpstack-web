@@ -21,8 +21,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -74,7 +74,7 @@ class ObjectSettingsPart <
 	String localName;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	@Getter @Setter
 	String removeLocalName;
@@ -86,7 +86,7 @@ class ObjectSettingsPart <
 
 	boolean canEdit;
 
-	FormContext <ObjectType> formContext;
+	ConsoleForm <ObjectType> form;
 
 	// implementation
 
@@ -94,7 +94,7 @@ class ObjectSettingsPart <
 	public
 	Set <ScriptRef> scriptRefs () {
 
-		return formContext.allFields ().scriptRefs ();
+		return form.allFields ().scriptRefs ();
 
 	}
 
@@ -138,8 +138,8 @@ class ObjectSettingsPart <
 			}
 			*/
 
-			formContext =
-				formContextBuilder.build (
+			form =
+				formContextBuilder.buildResponse (
 					transaction,
 					emptyMap ());
 
@@ -232,7 +232,7 @@ class ObjectSettingsPart <
 
 				try {
 
-					if (formContext.fileUpload ()) {
+					if (form.fileUpload ()) {
 
 						enctype =
 							"multipart/form-data";
@@ -255,7 +255,7 @@ class ObjectSettingsPart <
 
 			htmlTableOpenDetails ();
 
-			formContext.outputFormRows (
+			form.outputFormRows (
 				transaction,
 				object);
 

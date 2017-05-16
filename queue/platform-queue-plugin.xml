@@ -76,6 +76,7 @@
 		<console-module name="queue-item"/>
 		<console-module name="queue-item-claim"/>
 		<console-module name="queue-subject"/>
+		<console-module name="queue-type"/>
 	</console-modules>
 
 </plugin>

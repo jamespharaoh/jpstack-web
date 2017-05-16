@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -19,7 +19,7 @@ import wbs.framework.logging.TaskLogger;
 public
 class WhereICanManageCriteriaSpec
 	implements
-		ConsoleModuleData,
+		ConsoleSpec,
 		CriteriaSpec {
 
 	// implementation

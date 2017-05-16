@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.core.FormFieldBuilderContext;
+import wbs.console.forms.core.ConsoleFormBuilderContext;
 import wbs.console.forms.types.FormFieldPluginProvider;
 import wbs.console.helper.core.ConsoleHelper;
 
@@ -36,7 +36,7 @@ class EventFormFieldPluginProvider
 	@Override
 	public
 	Optional getUpdateHook (
-			@NonNull FormFieldBuilderContext context,
+			@NonNull ConsoleFormBuilderContext context,
 			@NonNull Class<?> containerClass,
 			@NonNull String fieldName) {
 

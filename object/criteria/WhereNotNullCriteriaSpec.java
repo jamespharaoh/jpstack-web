@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
-import wbs.console.module.ConsoleModuleData;
+import wbs.console.module.ConsoleSpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -24,7 +24,7 @@ import wbs.utils.etc.PropertyUtils;
 public
 class WhereNotNullCriteriaSpec
 	implements
-		ConsoleModuleData,
+		ConsoleSpec,
 		CriteriaSpec {
 
 	// attributes

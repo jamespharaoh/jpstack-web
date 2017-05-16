@@ -17,8 +17,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
@@ -87,7 +87,7 @@ class ObjectSettingsAction <
 	String objectType;
 
 	@Getter @Setter
-	FormContextBuilder <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formContextBuilder;
 
 	// state
 
@@ -155,8 +155,8 @@ class ObjectSettingsAction <
 			}
 			*/
 
-			FormContext <ObjectType> formContext =
-				formContextBuilder.build (
+			ConsoleForm <ObjectType> formContext =
+				formContextBuilder.buildAction (
 					transaction,
 					emptyMap (),
 					object);
@@ -220,7 +220,7 @@ class ObjectSettingsAction <
 			transaction.commit ();
 
 			requestContext.addNotice (
-				"Details updated");
+				"Settings updated");
 
 			return detailsResponder.get ();
 

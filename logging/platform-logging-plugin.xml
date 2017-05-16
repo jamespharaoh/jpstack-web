@@ -28,4 +28,14 @@
 		<component class="logic.PlatformLoggingLogicImplementation"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="logging-global-rule"/>
+		<console-module name="logging-dynamic-context"/>
+		<console-module name="logging-dynamic-context-invocation"/>
+		<console-module name="logging-dynamic-context-rule"/>
+		<console-module name="logging-event"/>
+		<console-module name="logging-static-context"/>
+		<console-module name="logging-static-context-rule"/>
+	</console-modules>
+
 </plugin>

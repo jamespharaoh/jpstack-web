@@ -8,7 +8,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.types.FormFieldNativeMapping;
+import wbs.console.forms.types.ConsoleFormNativeMapping;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -24,7 +24,7 @@ import wbs.platform.text.model.TextRec;
 @PrototypeComponent ("textFormFieldNativeMapping")
 public
 class TextFormFieldNativeMapping <Container>
-	implements FormFieldNativeMapping <Container, String, TextRec> {
+	implements ConsoleFormNativeMapping <Container, String, TextRec> {
 
 	// singleton dependencies
 

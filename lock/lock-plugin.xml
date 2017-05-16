@@ -14,4 +14,8 @@
 		<component class="logic.LockLogicImplementation"/>
 	</layer>
 
+	<console-modules>
+		<console-module name="lock"/>
+	</console-modules>
+
 </plugin>

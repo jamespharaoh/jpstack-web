@@ -4,10 +4,9 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -21,12 +20,11 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("objectSummaryBeanPartBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectSummaryBeanPartBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
-> implements BuilderComponent {
+> implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 

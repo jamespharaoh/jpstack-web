@@ -4,7 +4,7 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
@@ -33,8 +33,8 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -66,8 +66,8 @@ class QueueDebugPart
 	// singleton dependencies
 
 	@SingletonDependency
-	@NamedDependency ("queueDebugFormContextBuilder")
-	FormContextBuilder <QueueDebugForm> formContextBuilder;
+	@NamedDependency ("queueDebugFormType")
+	ConsoleFormType <QueueDebugForm> formType;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -101,9 +101,7 @@ class QueueDebugPart
 
 	// state
 
-	FormContext <QueueDebugForm> formContext;
-
-	QueueDebugForm form;
+	ConsoleForm <QueueDebugForm> form;
 
 	List <QueueInfo> queueInfos;
 
@@ -124,18 +122,18 @@ class QueueDebugPart
 		) {
 
 			form =
-				new QueueDebugForm ()
+				formType.buildResponse (
+					transaction,
+					emptyMap ());
+
+			form.value ()
 
 				.userId (
-					userConsoleLogic.userIdRequired ());
+					userConsoleLogic.userIdRequired ())
 
-			formContext =
-				formContextBuilder.build (
-					transaction,
-					emptyMap (),
-					form);
+			;
 
-			formContext.update (
+			form.update (
 				transaction);
 
 			SortedQueueSubjects sortedQueueSubjects =
@@ -152,7 +150,7 @@ class QueueDebugPart
 					optionalOrNull (
 						userHelper.find (
 							transaction,
-							form.userId ())))
+							form.value ().userId ())))
 
 				.sort (
 					transaction);
@@ -188,7 +186,7 @@ class QueueDebugPart
 
 		) {
 
-			formContext.outputFormTable (
+			form.outputFormTable (
 				transaction,
 				"get",
 				requestContext.resolveLocalUrl (
@@ -212,10 +210,10 @@ class QueueDebugPart
 				if (
 
 					isNotNull (
-						form.sliceId ())
+						form.value ().sliceId ())
 
 					&& integerNotEqualSafe (
-						form.sliceId (),
+						form.value ().sliceId (),
 						queueInfo.slice.getId ())
 
 				) {
@@ -262,12 +260,12 @@ class QueueDebugPart
 
 			htmlTableRowOpen (
 				htmlColumnSpanAttribute (
-					form.allItems ()
+					form.value ().allItems ()
 						? 2l * queueInfo.subjectInfos.size ()
 						: 2l));
 
 			List <SubjectInfo> subjectInfos =
-				form.allItems ()
+				form.value ().allItems ()
 					? queueInfo.subjectInfos
 					: ImmutableList.of (
 						queueInfo.subjectInfos.get (0));

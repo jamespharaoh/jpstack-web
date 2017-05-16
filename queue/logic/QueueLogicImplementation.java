@@ -2,13 +2,13 @@ package wbs.platform.queue.logic;
 
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.laterThan;
 

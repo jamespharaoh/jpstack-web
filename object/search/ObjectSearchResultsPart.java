@@ -1,11 +1,11 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -66,7 +66,7 @@ import org.joda.time.LocalDate;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.forms.context.FormContext;
+import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.types.FormField;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.core.ConsoleHooks;
@@ -162,7 +162,7 @@ class ObjectSearchResultsPart <
 
 	Optional <ConsoleContext> targetContext;
 
-	FormContext <ResultType> formContext;
+	ConsoleForm <ResultType> form;
 
 	// details
 
@@ -213,8 +213,8 @@ class ObjectSearchResultsPart <
 					resultsModes,
 					resultsModeName);
 
-			formContext =
-				resultsMode.formContextBuilder ().build (
+			form =
+				resultsMode.formContextBuilder ().buildResponse (
 					transaction,
 					emptyMap ());
 
@@ -522,7 +522,7 @@ class ObjectSearchResultsPart <
 			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
-			collectionHasOneElement (
+			collectionHasOneItem (
 				resultsModes.entrySet ())
 		) {
 			return;
@@ -580,7 +580,7 @@ class ObjectSearchResultsPart <
 
 			htmlTableRowOpen ();
 
-			formContext.outputTableHeadings (
+			form.outputTableHeadings (
 				transaction);
 
 			htmlTableRowClose ();
@@ -605,7 +605,7 @@ class ObjectSearchResultsPart <
 					htmlTableCellWrite (
 						"(deleted)",
 						htmlColumnSpanAttribute (
-							formContext.columnFields ().columns ()));
+							form.columnFields ().columns ()));
 
 					htmlTableRowClose ();
 
@@ -634,7 +634,7 @@ class ObjectSearchResultsPart <
 					htmlTableCellWrite (
 						"(restricted)",
 						htmlColumnSpanAttribute (
-							formContext.columnFields ().columns ()));
+							form.columnFields ().columns ()));
 
 					htmlTableRowClose ();
 
@@ -685,7 +685,7 @@ class ObjectSearchResultsPart <
 								transaction,
 								rowTimestamp),
 							htmlColumnSpanAttribute (
-								formContext.columnFields ().columns ()));
+								form.columnFields ().columns ()));
 
 						htmlTableRowClose ();
 
@@ -697,7 +697,7 @@ class ObjectSearchResultsPart <
 
 				if (
 					isNotNull (
-						formContext.rowFields ())
+						form.rowFields ())
 				) {
 
 					htmlTableRowSeparatorWrite ();
@@ -754,7 +754,7 @@ class ObjectSearchResultsPart <
 
 				}
 
-				formContext.outputTableCellsList (
+				form.outputTableCellsList (
 					transaction,
 					result,
 					false);
@@ -765,12 +765,12 @@ class ObjectSearchResultsPart <
 
 				if (
 					isNotNull (
-						formContext.rowFields ())
+						form.rowFields ())
 				) {
 
 					for (
 						FormField <ResultType, ?, ?, ?> rowField
-							: formContext.rowFields ().formFields ()
+							: form.rowFields ().formFields ()
 					) {
 
 						htmlTableRowOpen (
@@ -821,10 +821,10 @@ class ObjectSearchResultsPart <
 
 							rowField.renderTableCellList (
 								transaction,
-								formContext,
+								form,
 								result,
 								false,
-								formContext.columnFields ().columns ());
+								form.columnFields ().columns ());
 
 						} catch (Exception exception) {
 

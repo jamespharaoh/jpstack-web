@@ -4,8 +4,8 @@ import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -27,16 +27,15 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.forms.context.FormContextBuilder;
-import wbs.console.forms.context.FormContextManager;
+import wbs.console.forms.core.ConsoleFormManager;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleBuilder;
+import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
@@ -44,7 +43,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -63,13 +61,12 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.action.Action;
 
 @PrototypeComponent ("objectSearchPageBuilder")
-@ConsoleModuleBuilderHandler
 public
 class ObjectSearchPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	SearchType extends Serializable,
 	ResultType extends IdObject
-> implements BuilderComponent {
+> implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
 
@@ -77,10 +74,7 @@ class ObjectSearchPageBuilder <
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	ConsoleModuleBuilder consoleModuleBuilder;
-
-	@SingletonDependency
-	FormContextManager formContextManager;
+	ConsoleFormManager formContextManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -136,7 +130,7 @@ class ObjectSearchPageBuilder <
 	Class <SearchType> searchClass;
 	Class <ResultType> resultClass;
 
-	FormContextBuilder <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormContextBuilder;
 
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
@@ -173,7 +167,8 @@ class ObjectSearchPageBuilder <
 
 		) {
 
-			setDefaults ();
+			setDefaults (
+				taskLogger);
 
 			buildGetAction ();
 			buildPostAction ();
@@ -188,6 +183,7 @@ class ObjectSearchPageBuilder <
 			) {
 
 				buildContextTab (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildContextFile (
@@ -200,29 +196,41 @@ class ObjectSearchPageBuilder <
 	}
 
 	void buildContextTab (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextTab (
-			container.taskLogger (),
-			"end",
+		try (
 
-			contextTab.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTab");
 
-				.name (
-					tabName)
+		) {
 
-				.defaultLabel (
-					tabLabel)
+			consoleModule.addContextTab (
+				taskLogger,
+				"end",
 
-				.localFile (
-					fileName)
+				contextTab.get ()
 
-				.privKeys (
-					privKey != null
-						? Collections.singletonList (privKey)
-						: Collections.<String>emptyList ()),
+					.name (
+						tabName)
 
-			extensionPoint.contextTypeNames ());
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						fileName)
+
+					.privKeys (
+						privKey != null
+							? Collections.singletonList (privKey)
+							: Collections.<String>emptyList ()),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -425,208 +433,227 @@ class ObjectSearchPageBuilder <
 
 	}
 
-	void setDefaults () {
+	private
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		name =
-			ifNull (
-				spec.name (),
-				"search");
+		try (
 
-		if (
-			isNotNull (
-				spec.objectTypeName ())
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
+
 		) {
 
-			consoleHelper =
+			name =
+				ifNull (
+					spec.name (),
+					"search");
+
+			if (
+				isNotNull (
+					spec.objectTypeName ())
+			) {
+
+				consoleHelper =
+					genericCastUnchecked (
+						objectManager.findConsoleHelperRequired (
+							spec.objectTypeName ()));
+
+			} else {
+
+				consoleHelper =
+					container.consoleHelper ();
+
+			}
+
+			String searchClassName =
+				ifNull (
+					spec.searchClassName (),
+					stringFormat (
+						"%s.%sSearch",
+						consoleHelper
+							.objectClass ()
+							.getPackage ()
+							.getName (),
+						capitalise (
+							consoleHelper.objectName ())));
+
+			Optional <Class <?>> searchClassOptional =
+				classForName (
+					searchClassName);
+
+			if (
+				optionalIsNotPresent (
+					searchClassOptional)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Search class not found: %s",
+						searchClassName));
+
+			}
+
+			searchClass =
 				genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
-						spec.objectTypeName ()));
+					searchClassOptional.get ());
 
-		} else {
+			resultClass =
+				genericCastUnchecked (
+					ifNotNullThenElse (
+						spec.resultsClassName (),
+						() -> classForNameRequired (
+							spec.resultsClassName ()),
+						() -> consoleHelper.objectClass ()));
 
-			consoleHelper =
-				container.consoleHelper ();
+			searchFormContextBuilder =
+				formContextManager.createFormType (
+					taskLogger,
+					consoleModule,
+					name,
+					searchClass,
+					FormType.search,
+					optionalOf (
+						spec.searchFormFieldsName ()),
+					optionalAbsent ());
 
-		}
+			boolean haveResultsColumnsFormFieldsName =
+				isNotNull (
+					spec.resultsColumnFormFieldsName ());
 
-		String searchClassName =
-			ifNull (
-				spec.searchClassName (),
-				stringFormat (
-					"%s.%sSearch",
-					consoleHelper
-						.objectClass ()
-						.getPackage ()
-						.getName (),
-					capitalise (
-						consoleHelper.objectName ())));
+			boolean haveResultsRowFormFieldsName =
+				isNotNull (
+					spec.resultsColumnFormFieldsName ());
 
-		Optional <Class <?>> searchClassOptional =
-			classForName (
-				searchClassName);
+			boolean haveResultsFormFieldsNames =
+				haveResultsColumnsFormFieldsName
+				|| haveResultsRowFormFieldsName;
 
-		if (
-			optionalIsNotPresent (
-				searchClassOptional)
-		) {
+			boolean haveResultsModes =
+				collectionIsNotEmpty (
+					spec.resultsModes ());
 
-			throw new RuntimeException (
-				stringFormat (
-					"Search class not found: %s",
-					searchClassName));
+			if (haveResultsFormFieldsNames && haveResultsModes) {
+				throw new RuntimeException ();
+			}
 
-		}
+			if (haveResultsFormFieldsNames) {
 
-		searchClass =
-			genericCastUnchecked (
-				searchClassOptional.get ());
+				resultsModes =
+					ImmutableMap.<
+						String,
+						ObjectSearchResultsMode <ResultType>
+					> of (
+						"normal",
+						new ObjectSearchResultsMode <ResultType> ()
 
-		resultClass =
-			genericCastUnchecked (
-				ifNotNullThenElse (
-					spec.resultsClassName (),
-					() -> classForNameRequired (
-						spec.resultsClassName ()),
-					() -> consoleHelper.objectClass ()));
+					.name (
+						"normal")
 
-		searchFormContextBuilder =
-			formContextManager.createFormContextBuilder (
-				consoleModule,
-				name,
-				searchClass,
-				FormType.search,
-				optionalOf (
-					spec.searchFormFieldsName ()),
-				optionalAbsent ());
+					.formContextBuilder (
+						formContextManager.createFormType (
+							taskLogger,
+							consoleModule,
+							name,
+							resultClass,
+							FormType.readOnly,
+							optionalFromNullable (
+								spec.resultsColumnFormFieldsName ()),
+							optionalFromNullable (
+								spec.resultsRowFormFieldsName ())))
 
-		boolean haveResultsColumnsFormFieldsName =
-			isNotNull (
-				spec.resultsColumnFormFieldsName ());
+				);
 
-		boolean haveResultsRowFormFieldsName =
-			isNotNull (
-				spec.resultsColumnFormFieldsName ());
+			} else {
 
-		boolean haveResultsFormFieldsNames =
-			haveResultsColumnsFormFieldsName
-			|| haveResultsRowFormFieldsName;
+				resultsModes =
+					mapWithDerivedKey (
+						iterableMap (
+							resultsModeSpec ->
+								new ObjectSearchResultsMode <ResultType> ()
 
-		boolean haveResultsModes =
-			collectionIsNotEmpty (
-				spec.resultsModes ());
+							.name (
+								resultsModeSpec.name ())
 
-		if (haveResultsFormFieldsNames && haveResultsModes) {
-			throw new RuntimeException ();
-		}
+							.formContextBuilder (
+								formContextManager.createFormType (
+									taskLogger,
+									consoleModule,
+									stringFormat (
+										"%s-%s",
+										name,
+										resultsModeSpec.name ()),
+									resultClass,
+									FormType.search,
+									optionalOf (
+										resultsModeSpec.formFieldsName ()),
+									optionalAbsent ())),
 
-		if (haveResultsFormFieldsNames) {
+						spec.resultsModes ()),
+					ObjectSearchResultsMode::name);
 
-			resultsModes =
-				ImmutableMap.<String, ObjectSearchResultsMode <ResultType>> of (
-					"normal",
-					new ObjectSearchResultsMode <ResultType> ()
+			}
 
-				.name (
-					"normal")
+			privKey =
+				spec.privKey ();
 
-				.formContextBuilder (
-					formContextManager.createFormContextBuilder (
-						consoleModule,
-						name,
-						resultClass,
-						FormType.readOnly,
-						optionalFromNullable (
-							spec.resultsColumnFormFieldsName ()),
-						optionalFromNullable (
-							spec.resultsRowFormFieldsName ())))
+			parentIdKey =
+				spec.parentIdKey ();
 
-			);
+			parentIdName =
+				spec.parentIdName ();
 
-		} else {
-
-			resultsModes =
-				mapWithDerivedKey (
-					iterableMap (
-						resultsModeSpec ->
-							new ObjectSearchResultsMode <ResultType> ()
-
-						.name (
-							resultsModeSpec.name ())
-
-						.formContextBuilder (
-							formContextManager.createFormContextBuilder (
-								consoleModule,
-								stringFormat (
-									"%s-%s",
-									name,
-									resultsModeSpec.name ()),
-								resultClass,
-								FormType.search,
-								optionalOf (
-									resultsModeSpec.formFieldsName ()),
-								optionalAbsent ())),
-
-					spec.resultsModes ()),
-				ObjectSearchResultsMode::name);
-
-		}
-
-		privKey =
-			spec.privKey ();
-
-		parentIdKey =
-			spec.parentIdKey ();
-
-		parentIdName =
-			spec.parentIdName ();
-
-		sessionKey =
-			stringFormat (
-				"%s.%s",
-				container.pathPrefix (),
-				name);
-
-		tabName =
-			ifNull (
-				spec.tabName (),
+			sessionKey =
 				stringFormat (
 					"%s.%s",
 					container.pathPrefix (),
-					name));
+					name);
 
-		tabLabel =
-			ifNull (
-				spec.tabLabel (),
-				"Search");
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		fileName =
-			ifNull (
-				spec.fileName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			tabLabel =
+				ifNull (
+					spec.tabLabel (),
+					"Search");
 
-		searchResponderName =
-			ifNull (
-				spec.searchResponderName (),
-				stringFormat (
-					"%s%sResponder",
-					container.newBeanNamePrefix (),
-					capitalise (
-						name)));
+			fileName =
+				ifNull (
+					spec.fileName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		searchResultsResponderName =
-			ifNull (
-				spec.searchResultsResponderName (),
-				stringFormat (
-					"%s%sResultsResponder",
-					container.newBeanNamePrefix (),
-					capitalise (
-						name)));
+			searchResponderName =
+				ifNull (
+					spec.searchResponderName (),
+					stringFormat (
+						"%s%sResponder",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)));
 
-		itemsPerPage =
-			100l;
+			searchResultsResponderName =
+				ifNull (
+					spec.searchResultsResponderName (),
+					stringFormat (
+						"%s%sResultsResponder",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)));
+
+			itemsPerPage =
+				100l;
+
+		}
 
 	}
 
