@@ -1,6 +1,6 @@
 package wbs.web.action;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 
 import javax.inject.Provider;
 

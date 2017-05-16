@@ -1,6 +1,6 @@
 package wbs.web.utils;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
