@@ -10,8 +10,8 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import lombok.NonNull;
 
-import wbs.console.forms.context.FormContext;
-import wbs.console.forms.context.FormContextBuilder;
+import wbs.console.forms.core.ConsoleForm;
+import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -42,16 +42,16 @@ class TicketPendingHistoryPart
 	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
-	@NamedDependency ("ticketPendingHistoryTicketFormContextBuilder")
-	FormContextBuilder <TicketRec> ticketFormContextBuilder;
+	@NamedDependency ("ticketPendingHistoryTicketFormType")
+	ConsoleFormType <TicketRec> ticketFormType;
 
 	@SingletonDependency
-	@NamedDependency ("ticketPendingHistoryNoteFormContextBuilder")
-	FormContextBuilder <TicketNoteRec> ticketNoteFormContextBuilder;
+	@NamedDependency ("ticketPendingHistoryNoteFormType")
+	ConsoleFormType <TicketNoteRec> ticketNoteFormType;
 
 	@SingletonDependency
-	@NamedDependency ("ticketPendingHistorySateFormContextBuilder")
-	FormContextBuilder <TicketStateRec> ticketStateFormContextBuilder;
+	@NamedDependency ("ticketPendingHistoryStateFormType")
+	ConsoleFormType <TicketStateRec> ticketStateFormType;
 
 	@SingletonDependency
 	TicketStateConsoleHelper ticketStateHelper;
@@ -64,9 +64,9 @@ class TicketPendingHistoryPart
 
 	// state
 
-	FormContext <TicketRec> ticketFormContext;
-	FormContext <TicketNoteRec> ticketNoteFormContext;
-	FormContext <TicketStateRec> ticketStateFormContext;
+	ConsoleForm <TicketRec> ticketForm;
+	ConsoleForm <TicketNoteRec> ticketNoteForm;
+	ConsoleForm <TicketStateRec> ticketStateForm;
 
 	TicketRec ticket;
 
@@ -94,19 +94,19 @@ class TicketPendingHistoryPart
 
 			// form contexts
 
-			ticketFormContext =
-				ticketFormContextBuilder.build (
+			ticketForm =
+				ticketFormType.buildResponse (
 					transaction,
 					emptyMap (),
 					ticket);
 
-			ticketNoteFormContext =
-				ticketNoteFormContextBuilder.build (
+			ticketNoteForm =
+				ticketNoteFormType.buildResponse (
 					transaction,
 					emptyMap ());
 
-			ticketStateFormContext =
-				ticketStateFormContextBuilder.build (
+			ticketStateForm =
+				ticketStateFormType.buildResponse (
 					transaction,
 					emptyMap ());
 
@@ -158,7 +158,7 @@ class TicketPendingHistoryPart
 
 			htmlTableOpenDetails ();
 
-			ticketFormContext.outputTableRows (
+			ticketForm.outputTableRows (
 				transaction);
 
 			htmlTableClose ();
@@ -196,7 +196,7 @@ class TicketPendingHistoryPart
 
 				htmlTableRowOpen ();
 
-				ticketNoteFormContext.outputTableCellsList (
+				ticketNoteForm.outputTableCellsList (
 					transaction,
 					ticketNote,
 					true);
@@ -228,7 +228,7 @@ class TicketPendingHistoryPart
 
 			htmlTableOpenDetails ();
 
-			ticketStateFormContext.outputTableRows (
+			ticketStateForm.outputTableRows (
 				transaction,
 				ticket.getTicketState ());
 

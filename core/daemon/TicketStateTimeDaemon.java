@@ -3,7 +3,7 @@ package wbs.services.ticket.core.daemon;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.booleanEqual;
 import static wbs.utils.etc.Misc.disabled;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.notLessThanZero;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 

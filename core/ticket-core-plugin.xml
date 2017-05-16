@@ -44,7 +44,9 @@
 		<console-module name="ticket-pending"/>
 		<console-module name="ticket-state"/>
 		<console-module name="ticket-field-type"/>
+		<console-module name="ticket-field-value"/>
 		<console-module name="ticket-note"/>
+		<console-module name="ticket-template"/>
 	</console-modules>
 
 </plugin>
