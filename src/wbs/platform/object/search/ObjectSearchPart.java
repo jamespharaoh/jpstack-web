@@ -79,7 +79,7 @@ class ObjectSearchPart <
 	String sessionKey;
 
 	@Getter @Setter
-	ConsoleFormType <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormType;
 
 	@Getter @Setter
 	String fileName;
@@ -93,7 +93,7 @@ class ObjectSearchPart <
 
 	Map <String, Object> formHints;
 
-	ConsoleForm <SearchType> searchFormContext;
+	ConsoleForm <SearchType> searchForm;
 
 	// details
 
@@ -166,19 +166,19 @@ class ObjectSearchPart <
 
 			currentSearch =
 				classInstantiate (
-					searchFormContext.containerClass ());
+					searchClass);
 
-			searchFormContext =
-				searchFormContextBuilder.buildResponse (
+			searchForm =
+				searchFormType.buildResponse (
 					transaction,
 					formHints,
 					currentSearch);
 
 			cleanSearch =
 				classInstantiate (
-					searchFormContext.containerClass ());
+					searchClass);
 
-			searchFormContext.setDefaults (
+			searchForm.setDefaults (
 				transaction,
 				cleanSearch);
 
@@ -210,7 +210,7 @@ class ObjectSearchPart <
 
 			htmlTableOpenDetails ();
 
-			searchFormContext.outputFormRows (
+			searchForm.outputFormRows (
 				transaction);
 
 			htmlTableClose ();
@@ -245,7 +245,7 @@ class ObjectSearchPart <
 			formatWriter.writeLineFormatIncreaseIndent (
 				"function resetSearchForm () {");
 
-			searchFormContext.outputFormReset (
+			searchForm.outputFormReset (
 				transaction,
 				cleanSearch);
 
