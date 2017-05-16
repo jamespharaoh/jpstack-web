@@ -39,7 +39,19 @@
 
 			<object-summary-page/>
 
-			<object-settings-page/>
+			<section
+				name="settings"
+				label="Settings">
+
+				<object-settings-page
+					short-name="general"/>
+
+				<context-tab-form-action-page
+					name="createMissing"
+					action-form="create-missing"
+					submit-label="create missing"/>
+
+			</section>
 
 			<context-link
 				name="entry"
@@ -52,5 +64,14 @@
 		</object>
 
 	</object-context>
+
+	<forms>
+
+		<form
+			name="create-missing"
+			class="java.lang.Object"
+			type="perform"/>
+
+	</forms>
 
 </console-module>
