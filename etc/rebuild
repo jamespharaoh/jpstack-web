@@ -105,6 +105,25 @@ File.open "etc/libraries.xml", "w" do
 
 end
 
+# ========= api
+
+create_xml \
+	"api-web-xml",
+	"api/web-live.xml",
+	"mode" => "live"
+
+create_xml \
+	"api-web-xml",
+	"api/web-test.xml",
+	"mode" => "test"
+
+create_xml \
+	"api-server-xml",
+	"api/server-test.xml",
+	"mode" => "test"
+
+# ========= console
+
 create_xml \
 	"console-web-xml",
 	"console/web-live.xml",
@@ -124,17 +143,7 @@ create_xml \
 	"config" => "console"
 
 create_xml \
-	"api-web-xml",
-	"api/web-live.xml",
-	"mode" => "live"
-
-create_xml \
-	"api-web-xml",
-	"api/web-test.xml",
-	"mode" => "test"
-
-create_xml \
-	"server-xml",
+	"console-server-xml",
 	"console/server-test.xml",
 	"mode" => "test"
 

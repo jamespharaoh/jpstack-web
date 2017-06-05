@@ -206,7 +206,7 @@ writeBuildFile world = do
 
 			],
 
-			makeComboTarget "tomcat-test" [
+			makeComboTarget "api-test" [
 
 				"build-framework",
 				"build-meta",
@@ -217,10 +217,22 @@ writeBuildFile world = do
 				"build-rest",
 
 				"api-deploy",
-				"console-deploy",
-				"daemon-deploy",
+				"api-test"
 
-				"tomcat-test"
+			],
+
+			makeComboTarget "console-test" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-object-helpers",
+				"generate-console-helpers",
+				"build-rest",
+
+				"console-deploy",
+				"console-test"
 
 			],
 
@@ -667,12 +679,79 @@ writeBuildFile world = do
 			sattr "executable" exec
 		] elems
 
-	let makeTomcatTestTarget = let
+	let makeApiTestTarget = let
 
 		tomcatDir =
-			 "work/tomcat-test"
+			 "work/api-test"
 
-		in makeSimpleTarget ("tomcat-test") [
+		in makeSimpleTarget ("api-test") [
+
+			-- deploy tomcat
+
+			makeMkdir "temp",
+
+			makeExecDir "temp" "tar" [
+				makeArgLine "--extract",
+				makeArgLine "--file ../binaries/packages/apache-tomcat-7.0.67.tar.gz"
+			],
+
+			makeDeleteDir $ tomcatDir ++ "/**",
+			makeMoveFileToFile "temp/apache-tomcat-7.0.67" tomcatDir,
+
+			-- configure tomcat
+
+			makeCopyFileToFileOverwrite
+				("api/server-test.xml")
+				(tomcatDir ++ "/conf/server.xml"),
+
+			makeCopyFileToFile
+				"config/tomcat-users.xml"
+				(tomcatDir ++ "/conf/tomcat-users.xml"),
+
+			-- deploy api
+
+			makeDeleteDir $ tomcatDir ++ "/apps/api/ROOT",
+
+			makeCopyDirToDir
+				("work/api/root")
+				(tomcatDir ++ "/apps/api/ROOT"),
+
+			makeCopyDirToDir
+				(tomcatDir ++ "/webapps/manager")
+				(tomcatDir ++ "/apps/api/manager"),
+
+			makeCopyDirToDir
+				(tomcatDir ++ "/webapps/host-manager")
+				(tomcatDir ++ "/apps/api/host-manager"),
+
+			-- deploy api
+
+			makeDeleteDir $ tomcatDir ++ "/apps/api/ROOT",
+
+			makeCopyDirToDir
+				("work/api/root")
+				(tomcatDir ++ "/apps/api/ROOT"),
+
+			makeCopyDirToDir
+				(tomcatDir ++ "/webapps/manager")
+				(tomcatDir ++ "/apps/api/manager"),
+
+			makeCopyDirToDir
+				(tomcatDir ++ "/webapps/host-manager")
+				(tomcatDir ++ "/apps/api/host-manager"),
+
+			makeExec (tomcatDir ++ "/bin/catalina.sh") [
+				makeArgLine "run"
+			]
+
+		]
+
+	let makeConsoleTestTarget = let
+
+		tomcatDir =
+			 "work/console-test"
+
+		in makeSimpleTarget ("console-test") [
 
 			-- deploy tomcat
 
@@ -778,12 +857,17 @@ writeBuildFile world = do
 
 	let makeDeployTargets =
 		[
+
 			makeDaemonDeployTarget,
+
 			makeWebDeployTarget "api",
 			makeWebDeployTarget "console",
-			makeTomcatTestTarget,
-			makeDaemonTestTarget,
-			makeAgentTestTarget
+
+			makeAgentTestTarget,
+			makeApiTestTarget,
+			makeConsoleTestTarget,
+			makeDaemonTestTarget
+
 		]
 
 	let makeServiceTarget name service action =
