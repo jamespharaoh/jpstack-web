@@ -24,11 +24,16 @@
 
 	</models>
 
+	<fixtures>
+		<fixture name="logging"/>
+	</fixtures>
+
 	<layer name="logic">
 		<component class="logic.PlatformLoggingLogicImplementation"/>
 	</layer>
 
 	<console-modules>
+		<console-module name="logging"/>
 		<console-module name="logging-global-rule"/>
 		<console-module name="logging-dynamic-context"/>
 		<console-module name="logging-dynamic-context-invocation"/>

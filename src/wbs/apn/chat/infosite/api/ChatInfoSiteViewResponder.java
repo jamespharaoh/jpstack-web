@@ -113,7 +113,7 @@ class ChatInfoSiteViewResponder
 
 			requestContext.addHeader (
 				"Content-Type",
-				"text/html");
+				"text/html; charset=utf-8");
 
 		}
 

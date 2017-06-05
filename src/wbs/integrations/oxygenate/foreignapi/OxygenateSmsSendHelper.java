@@ -114,7 +114,7 @@ class OxygenateSmsSendHelper
 				"Content-Type",
 				joinWithSemicolonAndSpace (
 					"application/x-www-form-urlencoded",
-					"charset=UTF-8"))
+					"charset=utf-8"))
 
 			.build ();
 
