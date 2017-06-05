@@ -714,6 +714,8 @@
 			<plugin name="consoleComponentPlugin"/>
 		</layer>
 
+		<layer name="daemon"/>
+
 		<layer name="data"/>
 
 		<layer name="entity"/>
