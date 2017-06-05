@@ -78,7 +78,7 @@ class MessageTemplateMessagesGetAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					"handle");
 

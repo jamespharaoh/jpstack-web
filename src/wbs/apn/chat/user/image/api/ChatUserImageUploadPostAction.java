@@ -73,7 +73,7 @@ class ChatUserImageUploadPostAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goApi");
@@ -253,7 +253,7 @@ class ChatUserImageUploadPostAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"handleException");

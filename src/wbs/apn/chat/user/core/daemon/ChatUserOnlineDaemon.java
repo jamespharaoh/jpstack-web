@@ -115,7 +115,7 @@ class ChatUserOnlineDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatUsers");
@@ -140,7 +140,7 @@ class ChatUserOnlineDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doChatUser");

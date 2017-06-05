@@ -90,7 +90,7 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -140,7 +140,7 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doConversationUpdate",
@@ -181,7 +181,7 @@ class ImChatConversationEmailDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"doConversationEmail",

@@ -103,7 +103,7 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -164,7 +164,7 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatUserIds",
@@ -208,7 +208,7 @@ class ChatCreditDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doChatUser",

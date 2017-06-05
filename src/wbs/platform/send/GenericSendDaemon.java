@@ -94,7 +94,7 @@ class GenericSendDaemon <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getJobIds");
@@ -117,7 +117,7 @@ class GenericSendDaemon <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"runJob");

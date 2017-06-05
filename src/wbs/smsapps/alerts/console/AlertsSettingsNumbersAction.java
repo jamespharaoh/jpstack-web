@@ -99,7 +99,7 @@ class AlertsSettingsNumbersAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goReal");

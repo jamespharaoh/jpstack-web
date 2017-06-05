@@ -1237,7 +1237,7 @@ class ConsoleManagerImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"changeContext");
@@ -1367,7 +1367,7 @@ class ConsoleManagerImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"fileForPath");

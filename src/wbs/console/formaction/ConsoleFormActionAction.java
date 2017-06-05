@@ -75,7 +75,7 @@ class ConsoleFormActionAction <FormState, History>
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goReal");

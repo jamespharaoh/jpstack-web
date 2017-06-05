@@ -168,7 +168,7 @@ class ChatMessagePendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goSend");
@@ -387,7 +387,7 @@ class ChatMessagePendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goReject");

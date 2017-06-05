@@ -111,7 +111,7 @@ class ChatUserQuietDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatUserIds");
@@ -172,7 +172,7 @@ class ChatUserQuietDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doChatUserReal");

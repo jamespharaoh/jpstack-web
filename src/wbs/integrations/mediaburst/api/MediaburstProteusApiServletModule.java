@@ -125,7 +125,7 @@ class MediaburstProteusApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"reportFile.doPost");

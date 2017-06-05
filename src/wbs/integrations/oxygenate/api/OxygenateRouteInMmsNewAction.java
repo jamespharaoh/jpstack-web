@@ -232,7 +232,7 @@ class OxygenateRouteInMmsNewAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"updateDatabase");
@@ -374,7 +374,7 @@ class OxygenateRouteInMmsNewAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"storeLog");

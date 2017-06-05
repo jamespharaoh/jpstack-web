@@ -178,7 +178,7 @@ class ClockworkSmsRouteReportAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"updateDatabase");
@@ -495,7 +495,7 @@ class ClockworkSmsRouteReportAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"storeLog");

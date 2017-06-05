@@ -1,6 +1,5 @@
 package wbs.framework.database;
 
-import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
@@ -25,23 +24,7 @@ interface Database {
 			boolean readWrite);
 
 	default
-	OwnedTransaction beginReadWriteWithoutParameters (
-			@NonNull LogContext parentLogContext,
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String dynamicContextName) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalOf (
-				parentTaskLogger),
-			dynamicContextName,
-			emptyList (),
-			true);
-
-	}
-
-	default
-	OwnedTransaction beginReadWriteWithParameters (
+	OwnedTransaction beginReadWrite (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String dynamicContextName,
@@ -59,21 +42,7 @@ interface Database {
 	}
 
 	default
-	OwnedTransaction beginReadWriteWithoutParameters (
-			@NonNull LogContext parentLogContext,
-			@NonNull String dynamicContextName) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
-			dynamicContextName,
-			emptyList (),
-			true);
-
-	}
-
-	default
-	OwnedTransaction beginReadWriteWithParameters (
+	OwnedTransaction beginReadWrite (
 			@NonNull LogContext parentLogContext,
 			@NonNull String dynamicContextName,
 			@NonNull CharSequence ... dynamicContextParameters) {
@@ -89,23 +58,7 @@ interface Database {
 	}
 
 	default
-	OwnedTransaction beginReadOnlyWithoutParameters (
-			@NonNull LogContext parentLogContext,
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String dynamicContextName) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalOf (
-				parentTaskLogger),
-			dynamicContextName,
-			emptyList (),
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyWithParameters (
+	OwnedTransaction beginReadOnly (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String dynamicContextName,
@@ -123,21 +76,7 @@ interface Database {
 	}
 
 	default
-	OwnedTransaction beginReadOnlyWithoutParameters (
-			@NonNull LogContext parentLogContext,
-			@NonNull String dynamicContextName) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
-			dynamicContextName,
-			emptyList (),
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnlyWithParameters (
+	OwnedTransaction beginReadOnly (
 			@NonNull LogContext parentLogContext,
 			@NonNull String dynamicContextName,
 			@NonNull CharSequence ... dynamicContextParameters) {

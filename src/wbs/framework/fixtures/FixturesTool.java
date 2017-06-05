@@ -189,7 +189,7 @@ class FixturesTool {
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"runFixtureProviderReal");

@@ -105,7 +105,7 @@ class ChatUserAlarmDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getPendingAlarms");
@@ -168,7 +168,7 @@ class ChatUserAlarmDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doAlarmReal");

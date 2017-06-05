@@ -7,6 +7,7 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.moreThan;
@@ -15,7 +16,6 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
@@ -137,7 +137,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					"backupResponder");
 
@@ -314,7 +314,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goDismiss");
@@ -347,7 +347,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goApproveName");
@@ -451,7 +451,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goApproveInfo");
@@ -564,7 +564,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goApproveImage");
@@ -738,7 +738,7 @@ class ChatUserPendingFormAction
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"goRejectName");
@@ -860,7 +860,7 @@ class ChatUserPendingFormAction
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"goRejectInfo");
@@ -1089,7 +1089,7 @@ class ChatUserPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goRejectImage");

@@ -2,8 +2,8 @@ package wbs.imchat.api;
 
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import javax.inject.Provider;
 
@@ -77,7 +77,7 @@ class ImChatConditionsAcceptAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"handle");

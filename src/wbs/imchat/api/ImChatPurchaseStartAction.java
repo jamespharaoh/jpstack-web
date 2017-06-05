@@ -143,7 +143,7 @@ class ImChatPurchaseStartAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					"handle");
 
@@ -507,7 +507,7 @@ class ImChatPurchaseStartAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"updatePurchase");

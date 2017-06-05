@@ -172,7 +172,7 @@ class ChatBillDeliveryHandler
 					ref);
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"handle",

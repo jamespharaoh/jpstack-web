@@ -1,13 +1,13 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -503,7 +503,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"SendRpcHandler.handle");
@@ -917,7 +917,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"SendExRpcHandler.handle");
@@ -1933,7 +1933,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"QueryExRpcHandler.handle");
@@ -2351,7 +2351,7 @@ class ForwarderApiModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"PeekExRpcHandler.handle");

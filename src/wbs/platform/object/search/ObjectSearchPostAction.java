@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
@@ -12,7 +13,6 @@ import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithComma;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -143,7 +143,7 @@ class ObjectSearchPostAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goReal");

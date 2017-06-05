@@ -193,7 +193,7 @@ class ManualResponderRequestPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goIgnore",
@@ -245,7 +245,7 @@ class ManualResponderRequestPendingFormAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goSend");

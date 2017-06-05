@@ -73,7 +73,7 @@ class TxtNationRouteInFile
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doPost");

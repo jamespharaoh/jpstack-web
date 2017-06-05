@@ -106,7 +106,7 @@ class ChatAdultAdDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"ChatAdultAdDaemon.runOnce");
@@ -162,7 +162,7 @@ class ChatAdultAdDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doAdultAd");

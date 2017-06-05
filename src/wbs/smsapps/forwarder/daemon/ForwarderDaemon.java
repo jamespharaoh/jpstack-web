@@ -92,7 +92,7 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"MainThread.doQuery");
@@ -527,7 +527,7 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"getMessage",
@@ -596,7 +596,7 @@ class ForwarderDaemon
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"WorkerThread.doResult",

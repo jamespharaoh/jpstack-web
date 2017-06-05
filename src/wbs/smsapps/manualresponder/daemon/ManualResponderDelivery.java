@@ -80,7 +80,7 @@ class ManualResponderDelivery
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					"handle");
 

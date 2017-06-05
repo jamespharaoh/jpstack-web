@@ -106,7 +106,7 @@ class ChatUserJoinOutboundDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatUsers");
@@ -169,7 +169,7 @@ class ChatUserJoinOutboundDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doChatUserReal",

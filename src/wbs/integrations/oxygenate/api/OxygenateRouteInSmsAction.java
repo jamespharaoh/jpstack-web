@@ -266,7 +266,7 @@ class OxygenateRouteInSmsAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"storeLog");
@@ -388,7 +388,7 @@ class OxygenateRouteInSmsAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"updateDatabase");

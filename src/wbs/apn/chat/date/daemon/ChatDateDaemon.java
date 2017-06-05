@@ -222,7 +222,7 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatIds");
@@ -349,7 +349,7 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"getChatData",
@@ -628,7 +628,7 @@ class ChatDateDaemon
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"doUser",

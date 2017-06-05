@@ -295,7 +295,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"MediaFile.doGet");
@@ -858,7 +858,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"ProfilesRpcHandler.handle");
@@ -1472,7 +1472,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"MediaRpcHandler.handle");
@@ -1794,7 +1794,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"ProfileRpcHandler.handle");
@@ -2517,7 +2517,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"ProfileDeleteRpcHandler.handle");
@@ -2746,7 +2746,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"MessageSendRpcHandler.handle");
@@ -3072,7 +3072,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"MessagePollRpcHandler.handle");
@@ -3547,7 +3547,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"ImageUpdateRpcHandler.handle");
@@ -4213,7 +4213,7 @@ class ChatApiServletModule
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadWriteWithoutParameters (
+					database.beginReadWrite (
 						logContext,
 						parentTaskLogger,
 						"CreditRpcHandler.handle");

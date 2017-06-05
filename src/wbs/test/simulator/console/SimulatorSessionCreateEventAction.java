@@ -234,7 +234,7 @@ class SimulatorSessionCreateEventAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"sendMessage");
@@ -414,7 +414,7 @@ class SimulatorSessionCreateEventAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"deliveryReport");

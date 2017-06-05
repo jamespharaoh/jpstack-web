@@ -2,10 +2,10 @@ package wbs.imchat.api;
 
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.lessThanZero;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.utils.etc.NullUtils.isNull;
 
 import javax.inject.Provider;
 
@@ -91,7 +91,7 @@ class ImChatConversationEndAction
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"handle");

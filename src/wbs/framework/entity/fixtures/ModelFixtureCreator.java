@@ -118,7 +118,7 @@ class ModelFixtureCreator {
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					"runModelFixtureCreators");
 

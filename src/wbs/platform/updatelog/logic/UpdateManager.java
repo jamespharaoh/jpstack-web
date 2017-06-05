@@ -359,7 +359,7 @@ class UpdateManager {
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"UpdateManager.getVersionDb",
