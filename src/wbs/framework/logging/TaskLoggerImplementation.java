@@ -304,8 +304,8 @@ class TaskLoggerImplementation
 
 		return stringFormat (
 			"%s.%s (%s) (%s)",
-			dynamicContextName,
 			staticContextName,
+			dynamicContextName,
 			joinWithCommaAndSpace (
 				dynamicContextParameters),
 			integerToDecimalString (

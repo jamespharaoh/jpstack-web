@@ -21,17 +21,6 @@ interface LogContext {
 
 	default
 	OwnedTaskLogger createTaskLogger (
-			@NonNull String name) {
-
-		return createTaskLogger (
-			name,
-			emptyList (),
-			optionalAbsent ());
-
-	}
-
-	default
-	OwnedTaskLogger createTaskLogger (
 			@NonNull String dynamicContextName,
 			@NonNull CharSequence ... parameters) {
 
