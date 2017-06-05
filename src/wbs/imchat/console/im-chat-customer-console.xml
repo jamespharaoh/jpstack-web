@@ -202,9 +202,6 @@
 
 			<column-fields>
 
-				<text-field
-					name="reason"/>
-
 				<currency-field
 					name="creditAmount"
 					currency="customer.imChat.creditCurrency"/>
@@ -212,6 +209,9 @@
 				<currency-field
 					name="billAmount"
 					currency="customer.imChat.billingCurrency"/>
+
+				<text-field
+					name="reason"/>
 
 			</column-fields>
 
