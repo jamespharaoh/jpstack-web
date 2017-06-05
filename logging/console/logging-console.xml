@@ -9,9 +9,9 @@
 			priv="root:manage"/>
 
 		<context-link
-			name="context"
+			name="staticContext"
 			link="loggingStaticContext"
-			label="Contexts"
+			label="Static contexts"
 			priv-key="logging.manage"/>
 
 		<section

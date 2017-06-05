@@ -4,4 +4,28 @@
 	<console-helper-provider
 		object-name="loggingGlobalRule"/>
 
+	<object-context
+		name="loggingGlobalRule"
+		object-name="loggingGlobalRule">
+
+		<list>
+
+			<object-list-page/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page/>
+
+			<object-settings-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
 </console-module>

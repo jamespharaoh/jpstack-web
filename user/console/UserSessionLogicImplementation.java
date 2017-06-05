@@ -1,6 +1,7 @@
 package wbs.platform.user.console;
 
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.hashSha1Base64;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseInteger;
@@ -820,16 +821,32 @@ class UserSessionLogicImplementation
 						online.getSessionId ())
 				) {
 
-					transaction.debugFormat (
-						"Update session timestamp for user %s",
-						integerToDecimalString (
-							user.getId ()));
+					Instant activeTimestamp =
+						mapItemForKeyRequired (
+							activeSessions,
+							online.getSessionId ());
 
-					online
+					if (
+						earlierThan (
+							online.getTimestamp (),
+							activeTimestamp)
+					) {
 
-						.setTimestamp (
-							activeSessions.get (
-								online.getSessionId ()));
+						transaction.debugFormat (
+							"Update session timestamp for user %s ",
+							integerToDecimalString (
+								user.getId ()),
+							"to %s",
+							objectToString (
+								activeTimestamp));
+
+						online
+	
+							.setTimestamp (
+								activeSessions.get (
+									online.getSessionId ()));
+
+					}
 
 				}
 
@@ -861,8 +878,8 @@ class UserSessionLogicImplementation
 
 					transaction.noticeFormat (
 						"Log off user %s ",
-						objectToString (
-							online.getTimestamp ()),
+						integerToDecimalString (
+							user.getId ()),
 						"with session timestamp %s ",
 						objectToString (
 							online.getTimestamp ()));
