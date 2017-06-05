@@ -264,7 +264,7 @@ class PrivDataLoaderImplementation
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"PrivDataReloader.provide");
@@ -688,7 +688,7 @@ class PrivDataLoaderImplementation
 			try (
 
 				OwnedTransaction transaction =
-					database.beginReadOnlyWithoutParameters (
+					database.beginReadOnly (
 						logContext,
 						parentTaskLogger,
 						"UserDataReloader.provide");

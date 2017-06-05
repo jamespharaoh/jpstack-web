@@ -159,7 +159,7 @@ class SliceLogicImplementation
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					"runOnce");
 

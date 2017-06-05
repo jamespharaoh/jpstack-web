@@ -5,7 +5,6 @@ import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
@@ -176,7 +175,7 @@ class ObjectCreateAction <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"goReal");

@@ -96,7 +96,7 @@ class GenericScheduleDaemon <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadOnlyWithoutParameters (
+				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
 					"runOnce");
@@ -120,7 +120,7 @@ class GenericScheduleDaemon <
 		try (
 
 			OwnedTransaction transaction =
-				database.beginReadWriteWithoutParameters (
+				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
 					"runJob");
