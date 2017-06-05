@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -217,7 +218,7 @@ class ChatUserAdminOnlineAction
 					chatMiscLogic.userLogoffWithMessage (
 						transaction,
 						chatUser,
-						null,
+						optionalAbsent (),
 						false);
 
 				}

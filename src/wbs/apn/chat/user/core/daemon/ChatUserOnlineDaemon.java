@@ -191,7 +191,7 @@ class ChatUserOnlineDaemon
 				chatMiscLogic.userLogoffWithMessage (
 					transaction,
 					chatUser,
-					null,
+					optionalAbsent (),
 					true);
 
 				transaction.commit ();
