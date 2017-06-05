@@ -31,35 +31,16 @@ class RegexpPathHandler
 	List <Entry> entries =
 		new ArrayList<> ();
 
-	// constructors
-
-	public
-	RegexpPathHandler () {
-
-	}
-
-	public
-	RegexpPathHandler (
-			@NonNull Entry... newEntries) {
-
-		for (Entry entry
-				: newEntries) {
-
-			add (
-				entry);
-
-		}
-
-	}
-
 	// utility methods
 
 	public
-	void add (
+	RegexpPathHandler add (
 			@NonNull Entry entry) {
 
 		entries.add (
 			entry);
+
+		return this;
 
 	}
 
