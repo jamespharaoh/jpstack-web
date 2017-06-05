@@ -1,10 +1,10 @@
 package wbs.integrations.dialogue.api;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -20,6 +20,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -29,6 +31,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -96,6 +99,11 @@ class DialogueMmsApiServletModule
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// TODO should be in the database
 	Map <String, Integer> networks =
@@ -446,12 +454,6 @@ class DialogueMmsApiServletModule
 
 	};
 
-	// =========================================================== path handler
-
-	final
-	PathHandler pathHandler =
-		new RegexpPathHandler (routeEntry);
-
 	// ================================================================== files
 
 	final
@@ -465,15 +467,22 @@ class DialogueMmsApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap.<String, PathHandler> builder ()
 
 			.put (
 				"/dialogueMMS",
-				pathHandler)
+				regexpPathHandlerProvider.get ()
 
-			.build ();
+				.add (
+					routeEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

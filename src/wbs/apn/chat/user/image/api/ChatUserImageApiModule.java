@@ -44,6 +44,9 @@ class ChatUserImageApiModule
 	@PrototypeDependency
 	Provider <ApiFile> apiFileProvider;
 
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+
 	// state
 
 	WebFile imageUploadFile;
@@ -107,10 +110,16 @@ class ChatUserImageApiModule
 
 			.put (
 				"/chat/imageUpload",
-				new RegexpPathHandler (
-					imageUploadEntry))
+				regexpPathHandlerProvider.get ()
 
-			.build ();
+				.add (
+					imageUploadEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

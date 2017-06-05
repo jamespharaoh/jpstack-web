@@ -1,10 +1,10 @@
 package wbs.integrations.mediaburst.api;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -13,12 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -63,6 +66,11 @@ class MediaburstProteusApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// ============================================================ inFile
 
@@ -274,12 +282,6 @@ class MediaburstProteusApiServletModule
 
 	};
 
-	// ================================= path handler
-
-	PathHandler pathHandler =
-		new RegexpPathHandler (
-			routeEntry);
-
 	// ================================= files
 
 	Map<String,WebFile> defaultFiles =
@@ -291,11 +293,22 @@ class MediaburstProteusApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
-			.put ("/mediaburst/proteus", pathHandler)
-			.build ();
+		return ImmutableMap.<String, PathHandler> builder ()
+
+			.put (
+				"/mediaburst/proteus",
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					routeEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

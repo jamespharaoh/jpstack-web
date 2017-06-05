@@ -2,12 +2,15 @@ package wbs.integrations.txtnation.api;
 
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
@@ -32,6 +35,11 @@ class TxtNationApiServletModule
 	@SingletonDependency
 	TxtNationRoutePathHandlerEntry txtNationRoutePathHandlerEntry;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+
 	// state
 
 	PathHandler pathHandler;
@@ -53,8 +61,12 @@ class TxtNationApiServletModule
 		) {
 
 			pathHandler =
-				new RegexpPathHandler (
-					txtNationRoutePathHandlerEntry);
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					txtNationRoutePathHandlerEntry)
+
+			;
 
 		}
 

@@ -2,11 +2,12 @@ package wbs.apn.chat.infosite.api;
 
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -44,6 +45,9 @@ class ChatInfoSiteApiModule
 
 	@PrototypeDependency
 	Provider <ApiFile> apiFile;
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// state
 
@@ -131,16 +135,22 @@ class ChatInfoSiteApiModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		Map<String,PathHandler> ret =
-			new HashMap<String,PathHandler> ();
+		return ImmutableMap.<String, PathHandler> builder ()
 
-		ret.put (
-			"/chat/infoSite",
-			new RegexpPathHandler (infoSiteEntry));
+			.put (
+				"/chat/infoSite",
+				regexpPathHandlerProvider.get ()
 
-		return ret;
+				.add (
+					infoSiteEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

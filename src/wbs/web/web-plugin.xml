@@ -9,6 +9,7 @@
 		<component class="context.RequestContextImplementation"/>
 
 		<component class="pathhandler.DelegatingPathHandler"/>
+		<component class="pathhandler.RegexpPathHandler"/>
 
 		<component class="responder.JsonResponder"/>
 

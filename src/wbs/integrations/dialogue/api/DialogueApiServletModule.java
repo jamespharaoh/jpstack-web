@@ -110,6 +110,9 @@ class DialogueApiServletModule
 	@PrototypeDependency
 	Provider <DialogueResponder> dialogueResponderProvider;
 
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+
 	// =============================================================== networks
 
 	// TODO this belongs in the database
@@ -693,14 +696,21 @@ class DialogueApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap.<String, PathHandler> builder ()
 
-			.put ("/dialogue",
-				new RegexpPathHandler (
-					inEntry,
-					routeEntry))
+			.put (
+				"/dialogue",
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					inEntry)
+
+				.add (
+					routeEntry)
+
+			)
 
 			.build ();
 

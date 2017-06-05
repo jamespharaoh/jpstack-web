@@ -2,8 +2,11 @@ package wbs.integrations.digitalselect.api;
 
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -22,6 +25,11 @@ class DigitalSelectApiServletModule
 	@SingletonDependency
 	DigitalSelectRoutePathHandlerEntry digitalSelectRoutePathHandlerEntry;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+
 	// implementation
 
 	@Override
@@ -32,8 +40,12 @@ class DigitalSelectApiServletModule
 
 			.put (
 				"/digitalselect",
-				new RegexpPathHandler (
-					digitalSelectRoutePathHandlerEntry))
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					digitalSelectRoutePathHandlerEntry)
+
+			)
 
 			.build ();
 

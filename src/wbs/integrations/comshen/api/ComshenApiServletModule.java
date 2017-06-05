@@ -6,12 +6,15 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -65,6 +68,11 @@ class ComshenApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// ================================= report file
 
@@ -171,14 +179,7 @@ class ComshenApiServletModule
 
 	};
 
-	// ============================================================ path handler
-
-	final
-	PathHandler pathHandler =
-		new RegexpPathHandler (
-			routeEntry);
-
-	// ============================================================ files
+	// ================================================================== files
 
 	final
 	Map<String,WebFile> defaultFiles =
@@ -186,15 +187,26 @@ class ComshenApiServletModule
 			.put ("report", reportFile)
 			.build ();
 
-	// ============================================================ servlet module
+	// ========================================================= servlet module
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
-			.put ("/comshen", pathHandler)
-			.build ();
+		return ImmutableMap.<String, PathHandler> builder ()
+
+			.put (
+				"/comshen",
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					routeEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

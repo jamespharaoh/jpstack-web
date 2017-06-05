@@ -11,6 +11,7 @@ import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -20,7 +21,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -240,6 +240,9 @@ class ChatApiServletModule
 	Provider <PhpRpcAction> phpRpcAction;
 
 	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+
+	@PrototypeDependency
 	Provider <XmlRpcAction> xmlRpcAction;
 
 	@PrototypeDependency
@@ -443,16 +446,22 @@ class ChatApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		Map<String,PathHandler> ret =
-			new HashMap<String,PathHandler> ();
+		return ImmutableMap.<String, PathHandler> builder ()
 
-		ret.put (
-			"/chat/media",
-			new RegexpPathHandler (mediaEntry));
+			.put (
+				"/chat/media",
+				regexpPathHandlerProvider.get ()
 
-		return ret;
+				.add (
+					mediaEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

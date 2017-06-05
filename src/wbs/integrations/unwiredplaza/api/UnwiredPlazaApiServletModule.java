@@ -7,12 +7,15 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -58,6 +61,11 @@ class UnwiredPlazaApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// ============================================================ report file
 
@@ -255,17 +263,11 @@ class UnwiredPlazaApiServletModule
 
 	};
 
-	// ================================= path handler
-
-	final
-	PathHandler pathHandler =
-		new RegexpPathHandler (routeEntry);
-
 	// ============================================================ files
 
 	final
-	Map<String,WebFile> defaultFiles =
-		ImmutableMap.<String,WebFile>builder ()
+	Map <String, WebFile> defaultFiles =
+		ImmutableMap.<String, WebFile> builder ()
 			.put ("report", reportFile)
 			.build ();
 
@@ -273,11 +275,22 @@ class UnwiredPlazaApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
-			.put ("/unwiredplaza", pathHandler)
-			.build ();
+		return ImmutableMap.<String, PathHandler> builder ()
+
+			.put (
+				"/unwiredplaza",
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					routeEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 

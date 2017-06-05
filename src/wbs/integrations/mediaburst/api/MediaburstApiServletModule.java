@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -95,6 +98,11 @@ class MediaburstApiServletModule
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// implementation
 
@@ -514,12 +522,6 @@ class MediaburstApiServletModule
 
 	};
 
-	// ============================================================ path handler
-
-	final
-	PathHandler pathHandler =
-		new RegexpPathHandler (routeEntry);
-
 	// ============================================================ files
 
 	final
@@ -533,11 +535,22 @@ class MediaburstApiServletModule
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
-			.put ("/mediaburst", pathHandler)
-			.build ();
+		return ImmutableMap.<String, PathHandler> builder ()
+
+			.put (
+				"/mediaburst",
+				regexpPathHandlerProvider.get ()
+
+				.add (
+					routeEntry)
+
+			)
+
+			.build ()
+
+		;
 
 	}
 
