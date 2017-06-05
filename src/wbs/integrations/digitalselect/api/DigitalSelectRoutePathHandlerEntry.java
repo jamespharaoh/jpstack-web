@@ -1,5 +1,7 @@
 package wbs.integrations.digitalselect.api;
 
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -49,7 +51,8 @@ class DigitalSelectRoutePathHandlerEntry
 
 		requestContext.request (
 			"routeId",
-			Integer.parseInt (matcher.group (1)));
+			parseIntegerRequired (
+				matcher.group (1)));
 
 		return files.get (
 			matcher.group (2));
@@ -73,7 +76,7 @@ class DigitalSelectRoutePathHandlerEntry
 		) {
 
 			files =
-				ImmutableMap.<String,WebFile>builder ()
+				ImmutableMap.<String, WebFile> builder ()
 					.put ("report", digitalSelectRouteReportFile)
 					.build ();
 
