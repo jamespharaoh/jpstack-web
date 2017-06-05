@@ -40,7 +40,6 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.logic.DeploymentLogic;
 import wbs.platform.scaffold.console.RootConsoleHelper;
-import wbs.platform.status.console.StatusLineManager;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -65,9 +64,6 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 	@SingletonDependency
 	RootConsoleHelper rootHelper;
-
-	@SingletonDependency
-	StatusLineManager statusLineManager;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
