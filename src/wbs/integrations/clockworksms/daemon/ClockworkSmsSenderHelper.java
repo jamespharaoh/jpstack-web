@@ -5,6 +5,7 @@ import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -155,6 +156,23 @@ class ClockworkSmsSenderHelper
 			long gsmLength =
 				GsmUtils.gsmStringLength (
 					smsMessage.getText ().getText ());
+
+			if (
+				equalToZero (
+					gsmLength)
+			) {
+
+				return new SetupRequestResult <ClockworkSmsMessageSender> ()
+
+					.status (
+						SetupRequestStatus.validationError)
+
+					.statusMessage (
+						"The message text is empty")
+
+				;
+
+			}
 
 			long gsmParts =
 				GsmUtils.gsmCountMessageParts (
