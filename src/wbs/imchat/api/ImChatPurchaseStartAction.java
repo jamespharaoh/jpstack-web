@@ -6,8 +6,8 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToUnderscore;
+import static wbs.utils.string.StringUtils.uppercase;
 
 import java.util.Map;
 
@@ -408,7 +408,7 @@ class ImChatPurchaseStartAction
 				purchase.getId ();
 
 			purchaseCurrencyString =
-				capitalise (
+				uppercase (
 					imChat.getBillingCurrency ().getCode ());
 
 			purchasePriceString =

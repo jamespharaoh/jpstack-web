@@ -1,7 +1,7 @@
 package wbs.imchat.api;
 
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.uppercase;
 
 import java.util.Map;
 
@@ -231,7 +231,7 @@ class ImChatPurchaseConfirmAction
 						transaction,
 						paypalPayment.getPaypalToken (),
 						paypalPayment.getPaypalPayerId (),
-						capitalise (
+						uppercase (
 							imChat.getBillingCurrency ().getCode ()),
 						currencyLogic.formatSimple (
 							imChat.getBillingCurrency (),
