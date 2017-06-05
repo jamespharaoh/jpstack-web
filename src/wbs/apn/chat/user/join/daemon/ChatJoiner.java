@@ -814,7 +814,7 @@ class ChatJoiner {
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 				chatSendLogic.sendSystemMagic (
@@ -852,7 +852,7 @@ class ChatJoiner {
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 				return false;
@@ -1314,7 +1314,7 @@ class ChatJoiner {
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 				return false;

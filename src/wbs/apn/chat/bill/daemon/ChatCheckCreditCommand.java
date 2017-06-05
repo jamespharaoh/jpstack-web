@@ -1,5 +1,6 @@
 package wbs.apn.chat.bill.daemon;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
@@ -172,7 +173,7 @@ class ChatCheckCreditCommand
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 				return smsInboxLogic.inboxProcessed (

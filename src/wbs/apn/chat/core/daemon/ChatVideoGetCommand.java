@@ -2,6 +2,7 @@ package wbs.apn.chat.core.daemon;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -203,7 +204,7 @@ class ChatVideoGetCommand
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 				return smsInboxLogic.inboxProcessed (

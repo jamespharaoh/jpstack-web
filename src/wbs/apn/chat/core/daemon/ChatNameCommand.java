@@ -2,6 +2,7 @@ package wbs.apn.chat.core.daemon;
 
 import static wbs.framework.entity.record.IdObject.objectId;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
@@ -185,7 +186,7 @@ class ChatNameCommand
 					chatUser,
 					message,
 					rest,
-					null,
+					optionalAbsent (),
 					true);
 
 			} else if (newName.length () > 0) {
