@@ -10,6 +10,7 @@ import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrElseSet;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.doesNotImplement;
@@ -746,6 +747,11 @@ class BootstrapComponentManager
 			ComponentInterface componentInterfaceAnnotation =
 				providedClass.getAnnotation (
 					ComponentInterface.class);
+
+debugFormat (
+	"CLASS: %s",
+	classNameFull (
+		providedClass));
 
 			if (
 				isNotNull (

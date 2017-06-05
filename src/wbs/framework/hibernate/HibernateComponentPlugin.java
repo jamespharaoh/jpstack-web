@@ -6,7 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.ComponentInterface;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryBuilder;
@@ -18,7 +17,6 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("hibernateComponentPlugin")
-@ComponentInterface (ComponentPlugin.class)
 public
 class HibernateComponentPlugin
 	implements ComponentPlugin {

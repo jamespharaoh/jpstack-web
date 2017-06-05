@@ -397,7 +397,7 @@ class ConsoleComponentPlugin
 	void registerConsoleModule (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentRegistryBuilder componentRegistry,
-			@NonNull PluginConsoleModuleSpec pluginConsoleMouleSpec) {
+			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
 
 		try (
 
@@ -413,7 +413,7 @@ class ConsoleComponentPlugin
 			ConsoleModuleSpec consoleModuleSpec =
 				mapItemForKeyRequired (
 					consoleModuleSpecManager.specsByName (),
-					pluginConsoleMouleSpec.name ());
+					pluginConsoleModuleSpec.name ());
 
 			// register console meta module
 

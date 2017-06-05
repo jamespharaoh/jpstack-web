@@ -70,6 +70,10 @@
 		<!-- api -->
 
 		<plugin
+			name="api-component"
+			package="wbs.api.component"/>
+
+		<plugin
 			name="api-misc"
 			package="wbs.api.misc"/>
 
@@ -700,7 +704,9 @@
 
 	<layers>
 
-		<layer name="api"/>
+		<layer name="api">
+			<plugin name="apiComponentPlugin"/>
+		</layer>
 
 		<layer name="config"/>
 
