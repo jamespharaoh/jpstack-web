@@ -8,6 +8,7 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -24,11 +25,11 @@ import lombok.NonNull;
 import wbs.api.mvc.ApiLoggingAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -108,6 +109,10 @@ class ClockworkSmsRouteReportAction
 	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
 
+	@SingletonDependency
+	@NamedDependency ("clockworkSmsRouteReportRequestReader")
+	DataFromXml requestReader;
+
 	// prototype dependencies
 
 	@PrototypeDependency
@@ -153,22 +158,13 @@ class ClockworkSmsRouteReportAction
 
 			// decode request
 
-			DataFromXml dataFromXml =
-				new DataFromXmlBuilder ()
-
-				.registerBuilderClasses (
-					ClockworkSmsRouteReportRequest.class,
-					ClockworkSmsRouteReportRequest.Item.class)
-
-				.build ();
-
 			request =
-				(ClockworkSmsRouteReportRequest)
-				dataFromXml.readInputStreamRequired (
-					taskLogger,
-					new ByteArrayInputStream (
-						requestBytes),
-					"clockwork-sms-route-report.xml");
+				genericCastUnchecked (
+					requestReader.readInputStreamRequired (
+						taskLogger,
+						new ByteArrayInputStream (
+							requestBytes),
+						"clockwork-sms-route-report.xml"));
 
 		}
 
