@@ -1,13 +1,16 @@
 package wbs.integrations.mediaburst.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
@@ -259,14 +262,39 @@ class MediaburstApiServletModule
 						transaction,
 						routeId);
 
-				Optional <NetworkRec> networkOptional =
-					optionalMapRequired (
+				Optional <Long> networkIdOptional =
+					optionalMapOptional (
 						networkParamOptional,
 						networkParam ->
+							mapItemForKey (
+								networkMap,
+								networkParam));
+
+				if (
+
+					optionalIsPresent (
+						networkParamOptional)
+
+					&& optionalIsNotPresent (
+						networkIdOptional)
+
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Unrecognised network param: %s",
+							optionalGetRequired (
+								networkParamOptional)));
+
+				}
+
+				Optional <NetworkRec> networkOptional =
+					optionalMapRequired (
+						networkIdOptional,
+						networkId ->
 							networkHelper.findRequired (
 								transaction,
-								networkMap.get (
-									networkParam)));
+								networkId));
 
 				// check for concatenation
 
