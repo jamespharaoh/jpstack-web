@@ -92,6 +92,7 @@ class JsonResponder
 						stringWriter);
 
 					formatWriter.writeLineFormat (
+						"%s",
 						stringWriter.toString ());
 
 				} catch (IOException ioException) {
