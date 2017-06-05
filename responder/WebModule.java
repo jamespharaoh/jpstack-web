@@ -2,14 +2,22 @@ package wbs.web.responder;
 
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
 
 public
 interface WebModule {
 
-	Map <String, PathHandler> paths ();
+	default
+	Map <String, PathHandler> paths () {
+		return ImmutableMap.of ();
+	}
 
-	Map <String, WebFile> files ();
+	default
+	Map <String, WebFile> files () {
+		return ImmutableMap.of ();
+	}
 
 }
