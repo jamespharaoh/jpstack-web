@@ -1,8 +1,9 @@
 package wbs.integrations.paypal.logic;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.equalIgnoreCase;
 import static wbs.utils.string.StringUtils.replaceAll;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,11 +22,14 @@ import com.paypal.exception.SSLConfigurationException;
 import com.paypal.sdk.exceptions.OAuthException;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.xml.sax.SAXException;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -48,15 +52,23 @@ import urn.ebay.apis.eBLBaseComponents.PaymentDetailsType;
 import urn.ebay.apis.eBLBaseComponents.PaymentInfoType;
 import urn.ebay.apis.eBLBaseComponents.SetExpressCheckoutRequestDetailsType;
 
-@Log4j
 @SingletonComponent ("paypalApi")
 public
 class PaypalApiImplementation
 	implements PaypalApi {
 
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// public implementation
+
 	@Override
 	public
-	Optional<String> setExpressCheckout (
+	Optional <String> setExpressCheckout (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String currency,
 			@NonNull String amount,
 			@NonNull String returnUrl,
 			@NonNull String cancelUrl,
@@ -64,145 +76,156 @@ class PaypalApiImplementation
 			@NonNull Map <String, String> expressCheckoutProperties)
 		throws InterruptedException {
 
-		// setup request
+		try (
 
-		SetExpressCheckoutRequestDetailsType requestDetails =
-			new SetExpressCheckoutRequestDetailsType ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setExpressCheckout");
 
-		requestDetails.setReturnURL (
-			returnUrl);
-
-		requestDetails.setCancelURL (
-			cancelUrl);
-
-		List<PaymentDetailsType> paymentDetailsList =
-			new ArrayList<PaymentDetailsType> ();
-
-		PaymentDetailsType paymentDetails =
-			new PaymentDetailsType ();
-
-		BasicAmountType orderTotal =
-			new BasicAmountType (
-				CurrencyCodeType.GBP,
-				amount);
-
-		paymentDetails.setOrderTotal (
-			orderTotal);
-
-		paymentDetails.setPaymentAction (
-			PaymentActionCodeType.SALE);
-
-		paymentDetailsList.add (
-			paymentDetails);
-
-		requestDetails.setPaymentDetails (
-			paymentDetailsList);
-
-		SetExpressCheckoutReq checkoutReq =
-			new SetExpressCheckoutReq ();
-
-		SetExpressCheckoutRequestType checkoutRequest =
-			new SetExpressCheckoutRequestType (
-				requestDetails);
-
-		checkoutReq.setSetExpressCheckoutRequest (
-			checkoutRequest);
-
-		// make call
-
-		PayPalAPIInterfaceServiceService service =
-			new PayPalAPIInterfaceServiceService (
-				expressCheckoutProperties);
-
-		SetExpressCheckoutResponseType response;
-
-		try {
-
-			response =
-				service.setExpressCheckout (
-					checkoutReq);
-
-		} catch (ClientActionRequiredException clientActionRequiredException) {
-
-			throw new RuntimeException (
-				clientActionRequiredException);
-
-		} catch (HttpErrorException httpErrorException) {
-
-			throw new RuntimeException (
-				httpErrorException);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
-		} catch (InvalidCredentialException invalidCredentialException) {
-
-			throw new RuntimeException (
-				invalidCredentialException);
-
-		} catch (InvalidResponseDataException invalidResponseDataException) {
-
-			throw new RuntimeException (
-				invalidResponseDataException);
-
-		} catch (MissingCredentialException missingCredentialException) {
-
-			throw new RuntimeException (
-				missingCredentialException);
-
-		} catch (OAuthException oauthException) {
-
-			throw new RuntimeException (
-				oauthException);
-
-		} catch (ParserConfigurationException parserConfigurationException) {
-
-			throw new RuntimeException (
-				parserConfigurationException);
-
-		} catch (SAXException saxException) {
-
-			throw new RuntimeException (
-				saxException);
-
-		} catch (SSLConfigurationException sslConfigurationException) {
-
-			throw new RuntimeException (
-				sslConfigurationException);
-
-		}
-
-		// Accessing response parameters
-
-		if (
-			equalIgnoreCase (
-				response.getAck ().getValue (),
-				"success")
 		) {
 
-			return Optional.of (
-				replaceAll (
-					checkoutUrl,
-					"{token}",
-					response.getToken ()));
+			// setup request
 
-		} else {
+			SetExpressCheckoutRequestDetailsType requestDetails =
+				new SetExpressCheckoutRequestDetailsType ();
 
-			for (
-				ErrorType error
-					: response.getErrors ()
-			) {
+			requestDetails.setReturnURL (
+				returnUrl);
 
-				log.error (
-					stringFormat (
-						"Paypal error: %s",
-						error.getLongMessage ()));
+			requestDetails.setCancelURL (
+				cancelUrl);
+
+			List<PaymentDetailsType> paymentDetailsList =
+				new ArrayList<PaymentDetailsType> ();
+
+			PaymentDetailsType paymentDetails =
+				new PaymentDetailsType ();
+
+			BasicAmountType orderTotal =
+				new BasicAmountType (
+					CurrencyCodeType.valueOf (
+						currency),
+					amount);
+
+			paymentDetails.setOrderTotal (
+				orderTotal);
+
+			paymentDetails.setPaymentAction (
+				PaymentActionCodeType.SALE);
+
+			paymentDetailsList.add (
+				paymentDetails);
+
+			requestDetails.setPaymentDetails (
+				paymentDetailsList);
+
+			SetExpressCheckoutReq checkoutReq =
+				new SetExpressCheckoutReq ();
+
+			SetExpressCheckoutRequestType checkoutRequest =
+				new SetExpressCheckoutRequestType (
+					requestDetails);
+
+			checkoutReq.setSetExpressCheckoutRequest (
+				checkoutRequest);
+
+			// make call
+
+			PayPalAPIInterfaceServiceService service =
+				new PayPalAPIInterfaceServiceService (
+					expressCheckoutProperties);
+
+			SetExpressCheckoutResponseType response;
+
+			try {
+
+				response =
+					service.setExpressCheckout (
+						checkoutReq);
+
+			} catch (ClientActionRequiredException clientActionRequiredException) {
+
+				throw new RuntimeException (
+					clientActionRequiredException);
+
+			} catch (HttpErrorException httpErrorException) {
+
+				throw new RuntimeException (
+					httpErrorException);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			} catch (InvalidCredentialException invalidCredentialException) {
+
+				throw new RuntimeException (
+					invalidCredentialException);
+
+			} catch (InvalidResponseDataException invalidResponseDataException) {
+
+				throw new RuntimeException (
+					invalidResponseDataException);
+
+			} catch (MissingCredentialException missingCredentialException) {
+
+				throw new RuntimeException (
+					missingCredentialException);
+
+			} catch (OAuthException oauthException) {
+
+				throw new RuntimeException (
+					oauthException);
+
+			} catch (ParserConfigurationException parserConfigurationException) {
+
+				throw new RuntimeException (
+					parserConfigurationException);
+
+			} catch (SAXException saxException) {
+
+				throw new RuntimeException (
+					saxException);
+
+			} catch (SSLConfigurationException sslConfigurationException) {
+
+				throw new RuntimeException (
+					sslConfigurationException);
 
 			}
 
-			return Optional.absent ();
+			// Accessing response parameters
+
+			if (
+				equalIgnoreCase (
+					response.getAck ().getValue (),
+					"success")
+			) {
+
+				return optionalOf (
+					replaceAll (
+						checkoutUrl,
+						"{token}",
+						response.getToken ()));
+
+			} else {
+
+				for (
+					ErrorType error
+						: response.getErrors ()
+				) {
+
+					taskLogger.errorFormat (
+						"Paypal error: %s",
+						error.getLongMessage ());
+
+				}
+
+				return optionalAbsent ();
+
+			}
 
 		}
 
@@ -211,116 +234,127 @@ class PaypalApiImplementation
 	@Override
 	public
 	Optional <String> getExpressCheckout (
-			String paypalToken,
-			Map <String, String> expressCheckoutProperties)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String paypalToken,
+			@NonNull Map <String, String> expressCheckoutProperties)
 		throws InterruptedException {
 
-		// GetExpressCheckoutDetailsReq
+		try (
 
-		GetExpressCheckoutDetailsReq detailsRequest =
-			new GetExpressCheckoutDetailsReq ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getExpressCheckout");
 
-		GetExpressCheckoutDetailsRequestType detailsRequestType =
-			new GetExpressCheckoutDetailsRequestType (
-				paypalToken);
-
-		detailsRequest.setGetExpressCheckoutDetailsRequest (
-			detailsRequestType);
-
-		// Creating service wrapper object
-
-		PayPalAPIInterfaceServiceService service =
-			new PayPalAPIInterfaceServiceService (
-				expressCheckoutProperties);
-
-		GetExpressCheckoutDetailsResponseType responseType;
-
-		try {
-
-			responseType =
-				service.getExpressCheckoutDetails (
-					detailsRequest);
-
-		} catch (ClientActionRequiredException clientActionRequiredException) {
-
-			throw new RuntimeException (
-				clientActionRequiredException);
-
-		} catch (HttpErrorException httpErrorException) {
-
-			throw new RuntimeException (
-				httpErrorException);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
-		} catch (InvalidCredentialException invalidCredentialException) {
-
-			throw new RuntimeException (
-				invalidCredentialException);
-
-		} catch (InvalidResponseDataException invalidResponseDataException) {
-
-			throw new RuntimeException (
-				invalidResponseDataException);
-
-		} catch (MissingCredentialException missingCredentialException) {
-
-			throw new RuntimeException (
-				missingCredentialException);
-
-		} catch (OAuthException oauthException) {
-
-			throw new RuntimeException (
-				oauthException);
-
-		} catch (ParserConfigurationException parserConfigurationException) {
-
-			throw new RuntimeException (
-				parserConfigurationException);
-
-		} catch (SAXException saxException) {
-
-			throw new RuntimeException (
-				saxException);
-
-		} catch (SSLConfigurationException sslConfigurationException) {
-
-			throw new RuntimeException (
-				sslConfigurationException);
-
-		}
-
-		// Accessing response parameters
-
-		if (
-			equalIgnoreCase (
-				responseType.getAck ().getValue (),
-				"success")
 		) {
 
-			return Optional.of (
-				responseType.getGetExpressCheckoutDetailsResponseDetails ()
-					.getPayerInfo ()
-					.getPayerID ());
+			// GetExpressCheckoutDetailsReq
 
-		} else {
+			GetExpressCheckoutDetailsReq detailsRequest =
+				new GetExpressCheckoutDetailsReq ();
 
-			for (
-				ErrorType error
-					: responseType.getErrors ()
-			) {
+			GetExpressCheckoutDetailsRequestType detailsRequestType =
+				new GetExpressCheckoutDetailsRequestType (
+					paypalToken);
 
-				log.error (
-					stringFormat (
-						"Paypal error: %s",
-						error.getLongMessage ()));
+			detailsRequest.setGetExpressCheckoutDetailsRequest (
+				detailsRequestType);
+
+			// Creating service wrapper object
+
+			PayPalAPIInterfaceServiceService service =
+				new PayPalAPIInterfaceServiceService (
+					expressCheckoutProperties);
+
+			GetExpressCheckoutDetailsResponseType responseType;
+
+			try {
+
+				responseType =
+					service.getExpressCheckoutDetails (
+						detailsRequest);
+
+			} catch (ClientActionRequiredException clientActionRequiredException) {
+
+				throw new RuntimeException (
+					clientActionRequiredException);
+
+			} catch (HttpErrorException httpErrorException) {
+
+				throw new RuntimeException (
+					httpErrorException);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			} catch (InvalidCredentialException invalidCredentialException) {
+
+				throw new RuntimeException (
+					invalidCredentialException);
+
+			} catch (InvalidResponseDataException invalidResponseDataException) {
+
+				throw new RuntimeException (
+					invalidResponseDataException);
+
+			} catch (MissingCredentialException missingCredentialException) {
+
+				throw new RuntimeException (
+					missingCredentialException);
+
+			} catch (OAuthException oauthException) {
+
+				throw new RuntimeException (
+					oauthException);
+
+			} catch (ParserConfigurationException parserConfigurationException) {
+
+				throw new RuntimeException (
+					parserConfigurationException);
+
+			} catch (SAXException saxException) {
+
+				throw new RuntimeException (
+					saxException);
+
+			} catch (SSLConfigurationException sslConfigurationException) {
+
+				throw new RuntimeException (
+					sslConfigurationException);
 
 			}
 
-			return Optional.absent ();
+			// Accessing response parameters
+
+			if (
+				equalIgnoreCase (
+					responseType.getAck ().getValue (),
+					"success")
+			) {
+
+				return optionalOf (
+					responseType.getGetExpressCheckoutDetailsResponseDetails ()
+						.getPayerInfo ()
+						.getPayerID ());
+
+			} else {
+
+				for (
+					ErrorType error
+						: responseType.getErrors ()
+				) {
+
+					taskLogger.errorFormat (
+						"Paypal error: %s",
+						error.getLongMessage ());
+
+				}
+
+				return Optional.absent ();
+
+			}
 
 		}
 
@@ -329,172 +363,184 @@ class PaypalApiImplementation
 	@Override
 	public
 	Boolean doExpressCheckout (
-			String paypalToken,
-			String payerId,
-			String amount,
-			Map <String, String> expressCheckoutProperties)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String paypalToken,
+			@NonNull String payerId,
+			@NonNull String currency,
+			@NonNull String amount,
+			@NonNull Map <String, String> expressCheckoutProperties)
 		throws InterruptedException {
 
-		// DoExpressCheckoutPaymentReq
+		try (
 
-		DoExpressCheckoutPaymentReq doExpressCheckoutPaymentReq =
-			new DoExpressCheckoutPaymentReq ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doExpressCheckout");
 
-		DoExpressCheckoutPaymentRequestDetailsType doExpressCheckoutPaymentRequestDetails =
-			new DoExpressCheckoutPaymentRequestDetailsType ();
-
-		// Set the token and payerId
-
-		doExpressCheckoutPaymentRequestDetails.setToken (
-			paypalToken);
-
-		doExpressCheckoutPaymentRequestDetails.setPayerID (
-			payerId);
-
-		// Payment Information
-
-		List<PaymentDetailsType> paymentDetailsList =
-			new ArrayList<PaymentDetailsType> ();
-
-		PaymentDetailsType paymentDetails =
-			new PaymentDetailsType ();
-
-		BasicAmountType orderTotal =
-			new BasicAmountType (
-				CurrencyCodeType.GBP,
-				amount);
-
-		paymentDetails.setOrderTotal (
-			orderTotal);
-
-		paymentDetails.setPaymentAction (
-			PaymentActionCodeType.SALE);
-
-		paymentDetailsList.add (
-			paymentDetails);
-
-		doExpressCheckoutPaymentRequestDetails.setPaymentDetails (
-			paymentDetailsList);
-
-		DoExpressCheckoutPaymentRequestType doExpressCheckoutPaymentRequest =
-			new DoExpressCheckoutPaymentRequestType (
-			doExpressCheckoutPaymentRequestDetails);
-
-		doExpressCheckoutPaymentReq.setDoExpressCheckoutPaymentRequest (
-			doExpressCheckoutPaymentRequest);
-
-		// Creating service wrapper object
-
-		PayPalAPIInterfaceServiceService service =
-			new PayPalAPIInterfaceServiceService (
-				expressCheckoutProperties);
-
-		DoExpressCheckoutPaymentResponseType doExpressCheckoutPaymentResponse;
-
-		try {
-
-			doExpressCheckoutPaymentResponse =
-				service.doExpressCheckoutPayment (
-					doExpressCheckoutPaymentReq);
-
-		} catch (ClientActionRequiredException clientActionRequiredException) {
-
-			throw new RuntimeException (
-				clientActionRequiredException);
-
-		} catch (HttpErrorException httpErrorException) {
-
-			throw new RuntimeException (
-				httpErrorException);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
-		} catch (InvalidCredentialException invalidCredentialException) {
-
-			throw new RuntimeException (
-				invalidCredentialException);
-
-		} catch (InvalidResponseDataException invalidResponseDataException) {
-
-			throw new RuntimeException (
-				invalidResponseDataException);
-
-		} catch (MissingCredentialException missingCredentialException) {
-
-			throw new RuntimeException (
-				missingCredentialException);
-
-		} catch (OAuthException oauthException) {
-
-			throw new RuntimeException (
-				oauthException);
-
-		} catch (ParserConfigurationException parserConfigurationException) {
-
-			throw new RuntimeException (
-				parserConfigurationException);
-
-		} catch (SAXException saxException) {
-
-			throw new RuntimeException (
-				saxException);
-
-		} catch (SSLConfigurationException sslConfigurationException) {
-
-			throw new RuntimeException (
-				sslConfigurationException);
-
-		}
-
-		// Accessing response parameters
-
-		if (
-			equalIgnoreCase (
-				doExpressCheckoutPaymentResponse.getAck ().getValue (),
-				"success")
 		) {
 
-			List<PaymentInfoType> paymentInfoList =
-				doExpressCheckoutPaymentResponse
-					.getDoExpressCheckoutPaymentResponseDetails ()
-					.getPaymentInfo ();
+			// DoExpressCheckoutPaymentReq
 
-			if (paymentInfoList != null) {
+			DoExpressCheckoutPaymentReq doExpressCheckoutPaymentReq =
+				new DoExpressCheckoutPaymentReq ();
 
-				for (
-					PaymentInfoType paymentInfo
-						: paymentInfoList
-				) {
+			DoExpressCheckoutPaymentRequestDetailsType doExpressCheckoutPaymentRequestDetails =
+				new DoExpressCheckoutPaymentRequestDetailsType ();
 
-					log.info (
-						stringFormat (
-							"OwnedTransaction id: %s",
-							paymentInfo.getTransactionID ()));
+			// Set the token and payerId
+
+			doExpressCheckoutPaymentRequestDetails.setToken (
+				paypalToken);
+
+			doExpressCheckoutPaymentRequestDetails.setPayerID (
+				payerId);
+
+			// Payment Information
+
+			List <PaymentDetailsType> paymentDetailsList =
+				new ArrayList<> ();
+
+			PaymentDetailsType paymentDetails =
+				new PaymentDetailsType ();
+
+			BasicAmountType orderTotal =
+				new BasicAmountType (
+					CurrencyCodeType.valueOf (
+						currency),
+					amount);
+
+			paymentDetails.setOrderTotal (
+				orderTotal);
+
+			paymentDetails.setPaymentAction (
+				PaymentActionCodeType.SALE);
+
+			paymentDetailsList.add (
+				paymentDetails);
+
+			doExpressCheckoutPaymentRequestDetails.setPaymentDetails (
+				paymentDetailsList);
+
+			DoExpressCheckoutPaymentRequestType doExpressCheckoutPaymentRequest =
+				new DoExpressCheckoutPaymentRequestType (
+				doExpressCheckoutPaymentRequestDetails);
+
+			doExpressCheckoutPaymentReq.setDoExpressCheckoutPaymentRequest (
+				doExpressCheckoutPaymentRequest);
+
+			// Creating service wrapper object
+
+			PayPalAPIInterfaceServiceService service =
+				new PayPalAPIInterfaceServiceService (
+					expressCheckoutProperties);
+
+			DoExpressCheckoutPaymentResponseType doExpressCheckoutPaymentResponse;
+
+			try {
+
+				doExpressCheckoutPaymentResponse =
+					service.doExpressCheckoutPayment (
+						doExpressCheckoutPaymentReq);
+
+			} catch (ClientActionRequiredException clientActionRequiredException) {
+
+				throw new RuntimeException (
+					clientActionRequiredException);
+
+			} catch (HttpErrorException httpErrorException) {
+
+				throw new RuntimeException (
+					httpErrorException);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			} catch (InvalidCredentialException invalidCredentialException) {
+
+				throw new RuntimeException (
+					invalidCredentialException);
+
+			} catch (InvalidResponseDataException invalidResponseDataException) {
+
+				throw new RuntimeException (
+					invalidResponseDataException);
+
+			} catch (MissingCredentialException missingCredentialException) {
+
+				throw new RuntimeException (
+					missingCredentialException);
+
+			} catch (OAuthException oauthException) {
+
+				throw new RuntimeException (
+					oauthException);
+
+			} catch (ParserConfigurationException parserConfigurationException) {
+
+				throw new RuntimeException (
+					parserConfigurationException);
+
+			} catch (SAXException saxException) {
+
+				throw new RuntimeException (
+					saxException);
+
+			} catch (SSLConfigurationException sslConfigurationException) {
+
+				throw new RuntimeException (
+					sslConfigurationException);
+
+			}
+
+			// Accessing response parameters
+
+			if (
+				equalIgnoreCase (
+					doExpressCheckoutPaymentResponse.getAck ().getValue (),
+					"success")
+			) {
+
+				List <PaymentInfoType> paymentInfoList =
+					doExpressCheckoutPaymentResponse
+						.getDoExpressCheckoutPaymentResponseDetails ()
+						.getPaymentInfo ();
+
+				if (paymentInfoList != null) {
+
+					for (
+						PaymentInfoType paymentInfo
+							: paymentInfoList
+					) {
+
+						taskLogger.noticeFormat (
+							"Transaction id: %s",
+							paymentInfo.getTransactionID ());
+
+					}
 
 				}
 
-			}
+				return true;
 
-			return true;
+			} else {
 
-		} else {
+				for (
+					ErrorType error
+						: doExpressCheckoutPaymentResponse.getErrors ()
+				) {
 
-			for (
-				ErrorType error
-					: doExpressCheckoutPaymentResponse.getErrors ()
-			) {
-
-				log.error (
-					stringFormat (
+					taskLogger.errorFormat (
 						"Paypal error: %s",
-						error.getLongMessage ()));
+						error.getLongMessage ());
+
+				}
+
+				return false;
 
 			}
-
-			return false;
 
 		}
 

@@ -1,6 +1,7 @@
 package wbs.imchat.api;
 
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.string.StringUtils.capitalise;
 
 import java.util.Map;
 
@@ -227,8 +228,11 @@ class ImChatPurchaseConfirmAction
 
 				checkoutSuccess =
 					paypalApi.doExpressCheckout (
+						transaction,
 						paypalPayment.getPaypalToken (),
 						paypalPayment.getPaypalPayerId (),
+						capitalise (
+							imChat.getBillingCurrency ().getCode ()),
 						currencyLogic.formatSimple (
 							imChat.getBillingCurrency (),
 							paypalPayment.getValue ()),

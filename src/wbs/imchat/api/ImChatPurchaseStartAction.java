@@ -6,6 +6,7 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToUnderscore;
 
 import java.util.Map;
@@ -121,15 +122,16 @@ class ImChatPurchaseStartAction
 	Long customerId;
 	ImChatCustomerData customerData;
 
-	Map<String,String> paypalExpressCheckoutProperties;
+	Map <String, String> paypalExpressCheckoutProperties;
 
 	Long purchaseId;
+	String purchaseCurrencyString;
 	String purchasePriceString;
 	String purchaseSuccessUrl;
 	String purchaseFailureUrl;
 	String purchaseCheckoutUrl;
 
-	Optional<String> redirectUrl;
+	Optional <String> redirectUrl;
 
 	// implementation
 
@@ -147,7 +149,8 @@ class ImChatPurchaseStartAction
 
 		) {
 
-			decodeRequest ();
+			decodeRequest (
+				transaction);
 
 			Optional <Responder> createPurchaseResult =
 				createPurchase (
@@ -160,7 +163,8 @@ class ImChatPurchaseStartAction
 				return createPurchaseResult.get ();
 			}
 
-			makeApiCall ();
+			makeApiCall (
+				transaction);
 
 			updatePurchase (
 				transaction);
@@ -171,20 +175,32 @@ class ImChatPurchaseStartAction
 
 	}
 
-	void decodeRequest () {
+	void decodeRequest (
+			@NonNull Transaction parentTransaction) {
 
-		DataFromJson dataFromJson =
-			new DataFromJson ();
+		try (
 
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"decodeRequest");
 
-		purchaseRequest =
-			dataFromJson.fromJson (
-				ImChatPurchaseStartRequest.class,
-				jsonValue);
+		) {
+
+			DataFromJson dataFromJson =
+				new DataFromJson ();
+
+			JSONObject jsonValue =
+				(JSONObject)
+				JSONValue.parse (
+					requestContext.reader ());
+
+			purchaseRequest =
+				dataFromJson.fromJson (
+					ImChatPurchaseStartRequest.class,
+					jsonValue);
+
+		}
 
 	}
 
@@ -391,6 +407,10 @@ class ImChatPurchaseStartAction
 			purchaseId =
 				purchase.getId ();
 
+			purchaseCurrencyString =
+				capitalise (
+					imChat.getBillingCurrency ().getCode ());
+
 			purchasePriceString =
 				currencyLogic.formatSimple (
 					imChat.getBillingCurrency (),
@@ -432,34 +452,48 @@ class ImChatPurchaseStartAction
 
 	}
 
-	void makeApiCall () {
+	void makeApiCall (
+			@NonNull Transaction parentTransaction) {
 
-		// update paypal
+		try (
 
-		if (imChatDevelopmentMode) {
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"makeApiCall");
 
-			redirectUrl =
-				Optional.of (
-					"development-mode");
+		) {
 
-		} else {
+			// update paypal
 
-			try {
+			if (imChatDevelopmentMode) {
 
 				redirectUrl =
-					paypalApi.setExpressCheckout (
-						purchasePriceString,
-						purchaseSuccessUrl,
-						purchaseFailureUrl,
-						purchaseCheckoutUrl,
-						paypalExpressCheckoutProperties);
+					Optional.of (
+						"development-mode");
 
-			} catch (InterruptedException interruptedException) {
+			} else {
 
-				Thread.currentThread ().interrupt ();
+				try {
 
-				throw new RuntimeException (
-					interruptedException);
+					redirectUrl =
+						paypalApi.setExpressCheckout (
+							transaction,
+							purchaseCurrencyString,
+							purchasePriceString,
+							purchaseSuccessUrl,
+							purchaseFailureUrl,
+							purchaseCheckoutUrl,
+							paypalExpressCheckoutProperties);
+
+				} catch (InterruptedException interruptedException) {
+
+					Thread.currentThread ().interrupt ();
+
+					throw new RuntimeException (
+						interruptedException);
+
+				}
 
 			}
 

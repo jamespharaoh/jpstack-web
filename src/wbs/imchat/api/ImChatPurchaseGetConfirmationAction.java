@@ -1,7 +1,7 @@
 package wbs.imchat.api;
 
-import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.Map;
 
@@ -204,7 +204,7 @@ class ImChatPurchaseGetConfirmationAction
 			PaypalAccountRec paypalAccount =
 				imChat.getPaypalAccount ();
 
-			Map<String,String> expressCheckoutProperties =
+			Map <String, String> expressCheckoutProperties =
 				paypalLogic.expressCheckoutProperties (
 					paypalAccount);
 
@@ -214,6 +214,7 @@ class ImChatPurchaseGetConfirmationAction
 
 				payerId =
 					paypalApi.getExpressCheckout (
+						transaction,
 						confirmationRequest.paypalToken (),
 						expressCheckoutProperties);
 
