@@ -1,5 +1,6 @@
 package wbs.web.pathhandler;
 
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringEndsWithSimple;
@@ -57,6 +58,9 @@ class DelegatingPathHandler
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
+debugFormat (
+	"DPA setup");
+
 		try (
 
 			OwnedTaskLogger taskLogger =
@@ -85,6 +89,10 @@ class DelegatingPathHandler
 				WebModule servletModule =
 					servletModuleEntry.getValue ();
 
+debugFormat (
+	"DPA servlet module %s",
+	servletModuleName);
+
 				// import all its paths
 
 				Map <String, ? extends PathHandler> modulePaths =
@@ -99,6 +107,10 @@ class DelegatingPathHandler
 
 						String modulePathName =
 							modulePathEntry.getKey ();
+
+debugFormat (
+	"DPA path %s",
+	modulePathName);
 
 						PathHandler modulePathHandler =
 							modulePathEntry.getValue ();
@@ -146,8 +158,13 @@ class DelegatingPathHandler
 							: moduleFiles.entrySet ()
 					) {
 
+
 						String moduleFileName =
 							moduleFileEntry.getKey ();
+
+debugFormat (
+	"DPA file %s",
+	moduleFileName);
 
 						if (
 							fileDeclaredByModule.containsKey (
@@ -181,6 +198,9 @@ class DelegatingPathHandler
 				}
 
 			}
+
+debugFormat (
+	"DPA done");
 
 		}
 
