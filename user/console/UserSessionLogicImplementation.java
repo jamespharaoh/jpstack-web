@@ -15,6 +15,7 @@ import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.keyEqualsYesNo;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -819,6 +820,11 @@ class UserSessionLogicImplementation
 						online.getSessionId ())
 				) {
 
+					transaction.debugFormat (
+						"Update session timestamp for user %s",
+						integerToDecimalString (
+							user.getId ()));
+
 					online
 
 						.setTimestamp (
@@ -827,18 +833,39 @@ class UserSessionLogicImplementation
 
 				}
 
-				// check if he has been disabled or timed out
+				// log off inactive users
+
+				if (! user.getActive ()) {
+
+					transaction.noticeFormat (
+						"Log off disabled user %s",
+						integerToDecimalString (
+							user.getId ()));
+
+					userLogoff (
+						transaction,
+						user);
+
+					continue;
+
+				}
+
+				// log off users without a recent update
 
 				if (
-
-					! user.getActive ()
-
-					|| earlierThan (
+					earlierThan (
 						online.getTimestamp ().plus (
 							logoffTime),
 						transaction.now ())
-
 				) {
+
+					transaction.noticeFormat (
+						"Log off user %s ",
+						objectToString (
+							online.getTimestamp ()),
+						"with session timestamp %s ",
+						objectToString (
+							online.getTimestamp ()));
 
 					userLogoff (
 						transaction,
