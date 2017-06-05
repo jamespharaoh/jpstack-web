@@ -4,4 +4,22 @@
 	<console-helper-provider
 		object-name="loggingStaticContext"/>
 
+	<object-context
+		name="loggingStaticContext"
+		object-name="loggingStaticContext">
+
+		<list>
+
+			<object-list-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page/>
+
+		</object>
+
+	</object-context>
+
 </console-module>
