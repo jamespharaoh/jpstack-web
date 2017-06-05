@@ -841,7 +841,7 @@ class UserSessionLogicImplementation
 								activeTimestamp));
 
 						online
-	
+
 							.setTimestamp (
 								activeSessions.get (
 									online.getSessionId ()));
