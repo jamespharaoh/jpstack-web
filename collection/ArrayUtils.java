@@ -102,4 +102,12 @@ class ArrayUtils {
 
 	}
 
+	public static <Type>
+	boolean arrayHasOneItem (
+			@NonNull Type[] array) {
+
+		return array.length == 1;
+
+	}
+
 }

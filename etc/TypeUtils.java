@@ -7,6 +7,9 @@ import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrKey;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualUnsafe;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -27,6 +30,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -702,6 +707,41 @@ class TypeUtils {
 
 		return (ToClass)
 			object;
+
+	}
+
+	public static
+	List <Type> classAllGenericInterfaces (
+			@NonNull Class <?> subjectClass) {
+
+		ImmutableSet.Builder <Type> interfacesBuilder =
+			ImmutableSet.builder ();
+
+		Optional <Class <?>> currentClassOptional =
+			optionalOf (
+				subjectClass);
+
+		while (
+			optionalIsPresent (
+				currentClassOptional)
+		) {
+
+			Class <?> currentClass =
+				optionalGetRequired (
+					currentClassOptional);
+
+			interfacesBuilder.addAll (
+				Arrays.asList (
+					currentClass.getGenericInterfaces ()));
+
+			currentClassOptional =
+				optionalFromNullable (
+					currentClass.getSuperclass ());
+
+		}
+
+		return ImmutableList.copyOf (
+			interfacesBuilder.build ());
 
 	}
 

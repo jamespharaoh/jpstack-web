@@ -25,7 +25,7 @@ class OptionalUtils {
 
 	public static <Type>
 	Optional <Type> optionalFromJava (
-			@NonNull java.util.Optional <Type> javaOptional) {
+			@NonNull java.util.Optional <? extends Type> javaOptional) {
 
 		if (javaOptional.isPresent ()) {
 
