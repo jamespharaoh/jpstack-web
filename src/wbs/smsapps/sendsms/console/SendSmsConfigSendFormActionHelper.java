@@ -8,7 +8,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.formaction.AbstractConsoleFormActionHelper;
+import wbs.console.formaction.ConsoleFormActionHelper;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -35,7 +35,7 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("sendSmsConfigSendFormActionHelper")
 public
 class SendSmsConfigSendFormActionHelper
-	extends AbstractConsoleFormActionHelper <
+	implements ConsoleFormActionHelper <
 		SendSmsConfigSendForm,
 		Object
 	> {

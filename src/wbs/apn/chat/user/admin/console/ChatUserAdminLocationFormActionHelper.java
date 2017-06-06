@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.formaction.AbstractConsoleFormActionHelper;
+import wbs.console.formaction.ConsoleFormActionHelper;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -31,7 +31,7 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("chatUserAdminLocationFormActionHelper")
 public
 class ChatUserAdminLocationFormActionHelper
-	extends AbstractConsoleFormActionHelper <
+	implements ConsoleFormActionHelper <
 		ChatUserAdminLocationForm,
 		Object
 	> {

@@ -1,5 +1,7 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.ArrayUtils.arrayHasOneItem;
+import static wbs.utils.collection.ArrayUtils.arrayIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
@@ -176,7 +178,18 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 		) {
 
-			if (codes.length == 1) {
+			if (
+				arrayIsEmpty (
+					codes)
+			) {
+
+				throw new IllegalArgumentException (
+					"Must supply one or more code");
+
+			} else if (
+				arrayHasOneItem (
+					codes)
+			) {
 
 				return Optional.fromNullable (
 					objectDatabaseHelper.findByParentAndCode (
@@ -184,9 +197,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 						ancestorGlobalId,
 						codes [0]));
 
-			}
-
-			if (codes.length > 1) {
+			} else {
 
 				ObjectHelper <?> parentHelper =
 					objectManager.objectHelperForClassRequired (
@@ -213,9 +224,6 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 						codes [1]));
 
 			}
-
-			throw new IllegalArgumentException (
-				"codes");
 
 		}
 

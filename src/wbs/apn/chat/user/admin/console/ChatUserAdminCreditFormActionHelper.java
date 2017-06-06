@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.console.formaction.AbstractConsoleFormActionHelper;
+import wbs.console.formaction.ConsoleFormActionHelper;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -42,7 +42,7 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("chatUserAdminCreditFormActionHelper")
 public
 class ChatUserAdminCreditFormActionHelper
-	extends AbstractConsoleFormActionHelper <
+	implements ConsoleFormActionHelper <
 		ChatUserAdminCreditForm,
 		ChatUserCreditRec
 	> {
