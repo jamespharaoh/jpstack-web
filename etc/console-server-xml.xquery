@@ -1,19 +1,8 @@
-<Server port="8005" shutdown="SHUTDOWN">
+<Server port="8180" shutdown="SHUTDOWN">
 
 	<Listener
 		className="org.apache.catalina.core.AprLifecycleListener"
 		SSLEngine="on"/>
-
-	<!--
-	<Listener
-		className="org.apache.catalina.core.JasperListener"/>
-
-	<Listener
-		className="org.apache.catalina.mbeans.ServerLifecycleListener"/>
-
-	<Listener
-		className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
-	-->
 
 	<GlobalNamingResources>
 
@@ -38,8 +27,7 @@
 		<Connector
 			port="8080"
 			protocol="HTTP/1.1"
-			connectionTimeout="20000"
-			redirectPort="8443" />
+			connectionTimeout="20000"/>
 
 		<Engine
 			name="console-engine"

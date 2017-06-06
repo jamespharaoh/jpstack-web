@@ -1,4 +1,4 @@
-<Server port="8005" shutdown="SHUTDOWN">
+<Server port="8181" shutdown="SHUTDOWN">
 
 	<Listener
 		className="org.apache.catalina.core.AprLifecycleListener"
@@ -27,8 +27,7 @@
 		<Connector
 			port="8081"
 			protocol="HTTP/1.1"
-			connectionTimeout="20000"
-			redirectPort="8444" />
+			connectionTimeout="20000"/>
 
 		<Engine
 			name="api-engine"
