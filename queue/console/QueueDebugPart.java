@@ -4,6 +4,7 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -32,6 +33,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
@@ -139,7 +141,12 @@ class QueueDebugPart
 				queueSubjectSorterProvider.get ()
 
 				.queueCache (
-					masterQueueCacheProvider.get ())
+					masterQueueCacheProvider.get ()
+
+					.setup (
+						transaction)
+
+				)
 
 				.loggedInUser (
 					userConsoleLogic.userRequired (
@@ -353,23 +360,30 @@ class QueueDebugPart
 								"vertical-align",
 								"top")));
 
-					formatWriter.writeLineFormat (
-						"Last update: %h<br>",
-						userConsoleLogic.timestampWithoutTimezoneString (
-							transaction,
-							queueInfo.slice ()
-								.getCurrentQueueInactivityUpdateTime ()));
+					Instant inactivityUpdateTime =
+						queueInfo.slice ()
+							.getCurrentQueueInactivityUpdateTime ();
 
 					formatWriter.writeLineFormat (
-						"Inactive since: %h<br>",
-						ifNotNullThenElse (
-							queueInfo.slice ().getCurrentQueueInactivityTime (),
+						"Last update: %h<br>",
+						ifNotNullThenElseEmDash (
+							inactivityUpdateTime,
 							() -> userConsoleLogic
 								.timestampWithoutTimezoneString (
 									transaction,
-									queueInfo.slice ()
-										.getCurrentQueueInactivityTime ()),
-							() -> "none"));
+									inactivityUpdateTime)));
+
+					Instant currentInactivityTime =
+						queueInfo.slice ().getCurrentQueueInactivityTime ();
+
+					formatWriter.writeLineFormat (
+						"Inactive since: %h<br>",
+						ifNotNullThenElseEmDash (
+							currentInactivityTime,
+							() -> userConsoleLogic
+								.timestampWithoutTimezoneString (
+									transaction,
+									currentInactivityTime)));
 
 					formatWriter.writeLineFormat (
 						"Configured inactivity time: %h<br>",

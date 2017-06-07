@@ -1,6 +1,7 @@
 package wbs.platform.queue.logic;
 
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.isNotNull;
 
 import java.util.List;
@@ -168,7 +169,8 @@ class MasterQueueCache
 
 		) {
 
-			return queueSubjects;
+			return requiredValue (
+				queueSubjects);
 
 		}
 
