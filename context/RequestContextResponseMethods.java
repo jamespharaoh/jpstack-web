@@ -1,13 +1,14 @@
 package wbs.web.context;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
-import static wbs.utils.etc.NullUtils.isNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import lombok.NonNull;
 
@@ -36,7 +37,9 @@ interface RequestContextResponseMethods
 
 				state.formatWriter =
 					new WriterFormatWriter (
-						response ().getWriter ());
+						new OutputStreamWriter (
+							response ().getOutputStream (),
+							"utf-8"));
 
 			} catch (IOException ioException) {
 
@@ -175,6 +178,47 @@ interface RequestContextResponseMethods
 	default
 	void reset () {
 		response ().reset ();
+	}
+
+	default
+	void contentType (
+			@NonNull String contentType) {
+
+		response ().setContentType (
+			contentType);
+
+	}
+
+	default
+	void contentType (
+			@NonNull String contentType,
+			@NonNull String characterEncoding) {
+
+		response ().setContentType (
+			contentType);
+
+		response ().setCharacterEncoding (
+			characterEncoding);
+
+	}
+
+	default
+	void characterEncoding (
+			@NonNull String characterEncoding) {
+
+		response ().setCharacterEncoding (
+			characterEncoding);
+
+	}
+
+	default
+	void contentLength (
+			@NonNull Long contentLength) {
+
+		response ().setContentLength (
+			toJavaIntegerRequired (
+				contentLength));
+
 	}
 
 	// state
