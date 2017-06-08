@@ -188,9 +188,9 @@ class AbstractMediaImageResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
-				getMimeType (media));
+			requestContext.contentType (
+				getMimeType (
+					media));
 
 			requestContext.setHeader (
 				"Content-Length",

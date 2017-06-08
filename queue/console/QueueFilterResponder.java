@@ -63,9 +63,9 @@ class QueueFilterResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
-				"text/plain");
+			requestContext.contentType (
+				"text/plain",
+				"utf-8");
 
 			requestContext.setHeader (
 				"Cache-Control",

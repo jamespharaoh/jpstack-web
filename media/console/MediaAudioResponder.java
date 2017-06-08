@@ -98,8 +98,7 @@ class MediaAudioResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				"audio/mpeg");
 
 			requestContext.setHeader (
