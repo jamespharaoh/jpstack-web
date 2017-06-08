@@ -234,7 +234,7 @@ class ObjectCreatePageBuilder <
 			.createPrivCode (
 				createPrivCode)
 
-			.formContextBuilder (
+			.formType (
 				formType)
 
 			.createTimeFieldName (

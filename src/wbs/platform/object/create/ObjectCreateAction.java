@@ -136,7 +136,7 @@ class ObjectCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	ConsoleFormType <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -235,7 +235,7 @@ class ObjectCreateAction <
 			// setup form
 
 			form =
-				formContextBuilder.buildAction (
+				formType.buildAction (
 					transaction,
 					emptyMap (),
 					consoleHelper.createInstance ());
@@ -270,14 +270,6 @@ class ObjectCreateAction <
 
 			// perform updates
 
-			/*
-			if (formFieldsProvider != null) {
-
-				prepareFieldSet (
-					transaction);
-
-			}*/
-
 			form.update (
 				transaction);
 
@@ -294,7 +286,7 @@ class ObjectCreateAction <
 
 			if (createTimeFieldName != null) {
 
-				Class<?> createTimeFieldClass =
+				Class <?> createTimeFieldClass =
 					propertyClassForObject (
 						form.value (),
 						createTimeFieldName);
@@ -545,7 +537,8 @@ class ObjectCreateAction <
 					optionalOrNull (
 						requestContext.form (
 							stringFormat (
-								"create.%s",
+								"%s.%s",
+								formType.formName (),
 								consoleHelper.parentFieldName ())));
 
 				if (

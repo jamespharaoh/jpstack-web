@@ -8,6 +8,10 @@ import wbs.framework.database.Transaction;
 public
 interface ConsoleFormType <Container> {
 
+	// ---------- accessors
+
+	String formName ();
+
 	// ---------- build action
 
 	ConsoleForm <Container> buildAction (

@@ -214,18 +214,22 @@ class ChatUserImageHistoryPart
 				// moderator
 
 				htmlTableCellWrite (
-					objectManager.objectPathMini (
-						transaction,
+					ifNotNullThenElseEmDash (
 						chatUserImage.getModerator (),
-						userConsoleLogic.sliceRequired (
-							transaction)));
+						() -> objectManager.objectPathMini (
+							transaction,
+							chatUserImage.getModerator (),
+							userConsoleLogic.sliceRequired (
+								transaction))));
 
 				// moderation time
 
 				htmlTableCellWrite (
-					userConsoleLogic.timestampWithoutTimezoneString (
-						transaction,
-						chatUserImage.getModerationTime ()));
+					ifNotNullThenElseEmDash (
+						chatUserImage.getModerationTime (),
+						() -> userConsoleLogic.timestampWithoutTimezoneString (
+							transaction,
+							chatUserImage.getModerationTime ())));
 
 				// end row
 

@@ -37,7 +37,8 @@ class ConsoleMultiFormFactory <Container>
 	// uninitialized dependencies
 
 	@UninitializedDependency
-	Provider <ConsoleMultiFormType <Container>> consoleMultiFormTypeProvider;
+	Provider <ConsoleMultiFormTypeImplementation <Container>>
+		consoleMultiFormTypeImplementationProvider;
 
 	// properties
 
@@ -63,7 +64,7 @@ class ConsoleMultiFormFactory <Container>
 	ConsoleMultiFormType <Container> makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return consoleMultiFormTypeProvider.get ()
+		return consoleMultiFormTypeImplementationProvider.get ()
 
 			.containerClass (
 				objectClass)

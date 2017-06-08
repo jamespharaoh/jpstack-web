@@ -42,7 +42,8 @@ class ConsoleMultiFormTypeFactory <Container>
 	// uninitalized components
 
 	@UninitializedDependency
-	Provider <ConsoleMultiFormType <Container>> multiFormContextTypeProvider;
+	Provider <ConsoleMultiFormTypeImplementation <Container>>
+		multiFormContextTypeImplementationProvider;
 
 	// properties
 
@@ -80,7 +81,7 @@ class ConsoleMultiFormTypeFactory <Container>
 
 		) {
 
-			return multiFormContextTypeProvider.get ()
+			return multiFormContextTypeImplementationProvider.get ()
 
 				.containerClass (
 					containerClass)

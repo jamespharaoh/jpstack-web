@@ -1418,7 +1418,8 @@ class ChatJoiner {
 					true,
 					optionalOf (
 						message.getThreadId ()),
-					ChatMessageMethod.sms);
+					optionalOf (
+						ChatMessageMethod.sms));
 
 			}
 

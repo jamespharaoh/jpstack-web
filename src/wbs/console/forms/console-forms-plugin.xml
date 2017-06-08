@@ -72,7 +72,7 @@
 		<component class="core.ConsoleFormManagerImplementation"/>
 		<component class="core.ConsoleFormPluginManagerImplementation"/>
 		<component class="core.ConsoleFormTypeImplementation"/>
-		<component class="core.ConsoleMultiFormType"/>
+		<component class="core.ConsoleMultiFormTypeImplementation"/>
 		<component class="core.FormFieldSetBuilder"/>
 		<component class="core.HiddenFormField"/>
 		<component class="core.ReadOnlyFormField"/>

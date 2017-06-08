@@ -6,6 +6,9 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -410,7 +413,8 @@ class ChatMiscLogicImplementation
 					sendMessage,
 					optionalOf (
 						message.getThreadId ()),
-					ChatMessageMethod.sms);
+					optionalOf (
+						ChatMessageMethod.sms));
 
 				currentSendMessage = true;
 
@@ -447,7 +451,7 @@ class ChatMiscLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean sendMessage,
 			@NonNull Optional <Long> threadId,
-			@NonNull ChatMessageMethod deliveryMethod) {
+			@NonNull Optional <ChatMessageMethod> deliveryMethod) {
 
 		try (
 
@@ -464,8 +468,15 @@ class ChatMiscLogicImplementation
 			// if they're already online do nothing
 
 			if (
+
 				chatUser.getOnline ()
-				&& chatUser.getDeliveryMethod () == deliveryMethod
+
+				&& optionalEqualOrNotPresentWithClass (
+					ChatMessageMethod.class,
+					optionalFromNullable (
+						chatUser.getDeliveryMethod ()),
+					deliveryMethod)
+
 			) {
 				return;
 			}
@@ -498,7 +509,10 @@ class ChatMiscLogicImplementation
 					null)
 
 				.setDeliveryMethod (
-					deliveryMethod);
+					optionalOrNull (
+						deliveryMethod))
+
+			;
 
 			// schedule an ad
 
@@ -551,7 +565,11 @@ class ChatMiscLogicImplementation
 
 			if (
 
-				deliveryMethod == ChatMessageMethod.web
+				optionalEqualAndPresentWithClass (
+					ChatMessageMethod.class,
+					deliveryMethod,
+					optionalOf (
+						ChatMessageMethod.web))
 
 				&& (
 

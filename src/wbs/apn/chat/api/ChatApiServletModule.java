@@ -19,6 +19,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -3235,8 +3236,9 @@ class ChatApiServletModule
 						transaction,
 						chatUser,
 						false,
-						null,
-						method);
+						optionalAbsent (),
+						optionalOf (
+							method));
 
 				}
 

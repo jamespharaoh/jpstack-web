@@ -2,6 +2,7 @@ package wbs.apn.chat.broadcast.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
@@ -146,10 +147,17 @@ class ChatBroadcastVerifyPart
 
 				.build ();
 
+			ChatBroadcastSendForm sendFormValue =
+				dynamicCastRequired (
+					ChatBroadcastSendForm.class,
+					requestContext.requestRequired (
+						"chat-broadcast-send-form"));
+
 			sendForm =
-				chatBroadcastSendFormType.build (
+				chatBroadcastSendFormType.buildResponse (
 					transaction,
-					formHints);
+					formHints,
+					sendFormValue);
 
 			fromUser =
 				chatUserHelper.findByCodeRequired (
@@ -160,7 +168,7 @@ class ChatBroadcastVerifyPart
 			List <Long> chatUserIds =
 				genericCastUnchecked (
 					requestContext.requestRequired (
-						"chatBroadcastChatUserIds"));
+						"chat-broadcast-send-results"));
 
 			recipients =
 				chatUserHelper.findManyRequired (
@@ -202,7 +210,7 @@ class ChatBroadcastVerifyPart
 				"search",
 				"numbers",
 				"common",
-				"mesage-user",
+				"message-user",
 				"message-message");
 
 			// temporarily hidden

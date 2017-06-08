@@ -3,6 +3,7 @@ package wbs.apn.chat.user.image.console;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -243,11 +244,13 @@ class ChatUserImageListPart
 						chatUserImage.getTimestamp ()));
 
 				htmlTableCellWrite (
-					objectManager.objectPathMini (
-						transaction,
+					ifNotNullThenElseEmDash (
 						chatUserImage.getModerator (),
-						userConsoleLogic.sliceRequired (
-							transaction)));
+						() -> objectManager.objectPathMini (
+							transaction,
+							chatUserImage.getModerator (),
+							userConsoleLogic.sliceRequired (
+								transaction))));
 
 				htmlTableCellWrite (
 					chatUserImage.getClassification ());

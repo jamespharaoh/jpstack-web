@@ -1,5 +1,7 @@
 package wbs.apn.chat.broadcast.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -112,10 +114,19 @@ class ChatBroadcastSendPart
 
 			;
 
+			ChatBroadcastSendForm formValue =
+				dynamicCastRequired (
+					ChatBroadcastSendForm.class,
+					optionalOrElseRequired (
+						requestContext.request (
+							"chat-broadcast-send-form"),
+						() -> new ChatBroadcastSendForm ()));
+
 			form =
-				chatBroadcastSendFormType.build (
+				chatBroadcastSendFormType.buildResponse (
 					transaction,
-					formHints);
+					formHints,
+					formValue);
 
 		}
 

@@ -65,6 +65,11 @@ interface ConsoleForm <Container> {
 	}
 
 	default
+	long errorCount () {
+		return updateResultSet ().errorCount ();
+	}
+
+	default
 	Boolean updates () {
 		return updateResultSet ().updates ();
 	}

@@ -218,10 +218,18 @@ class ChatBroadcastSendAction
 
 				.build ();
 
+			ChatBroadcastSendForm formValue =
+				new ChatBroadcastSendForm ();
+
+			requestContext.request (
+				"chat-broadcast-send-form",
+				formValue);
+
 			ConsoleMultiForm <ChatBroadcastSendForm> form =
-				chatBroadcastSendFormType.build (
+				chatBroadcastSendFormType.buildAction (
 					transaction,
-					formHints);
+					formHints,
+					formValue);
 
 			form.update (
 				transaction,
@@ -573,7 +581,7 @@ class ChatBroadcastSendAction
 				// show verify page
 
 				requestContext.request (
-					"chatBroadcastChatUserIds",
+					"chat-broadcast-send-results",
 					remainingChatUserIds);
 
 				if (verify) {

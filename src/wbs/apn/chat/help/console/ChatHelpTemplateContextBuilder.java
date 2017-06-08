@@ -146,17 +146,26 @@ class ChatHelpTemplateContextBuilder
 
 		) {
 
-			setDefaults ();
+			setDefaults (
+				taskLogger);
 
-			buildContextTypes ();
-			buildContexts ();
+			buildContextTypes (
+				taskLogger);
+
+			buildContexts (
+				taskLogger);
 
 			buildParentTab (
 				taskLogger);
 
-			buildListPage ();
-			buildCreatePage ();
-			buildSettingsPage ();
+			buildListPage (
+				taskLogger);
+
+			buildCreatePage (
+				taskLogger);
+
+			buildSettingsPage (
+				taskLogger);
 
 			ConsoleContextBuilderContainer <ChatHelpTemplateRec> listContainer =
 				new ConsoleContextBuilderContainerImplementation <
@@ -236,94 +245,133 @@ class ChatHelpTemplateContextBuilder
 
 	}
 
-	void buildContextTypes () {
+	private
+	void buildContextTypes (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
-				.name (contextTypeNamePlural));
+		try (
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
-				.name (contextTypeNameCombined));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTypes");
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
-				.name (contextTypeName));
+		) {
 
-	}
+			consoleModule.addContextType (
+				contextTypeProvider.get ()
 
-	void buildContexts () {
+				.name (
+					contextTypeNamePlural)
 
-		consoleModule.addContext (
-			simpleConsoleContextProvider.get ()
+			);
 
-			.name (
-				contextNamePlural)
+			consoleModule.addContextType (
+				contextTypeProvider.get ()
 
-			.typeName (
-				contextTypeNamePlural)
+				.name (
+					contextTypeNameCombined)
 
-			.pathPrefix (
-				"/" + contextNamePlural)
+			);
 
-			.global (
-				true)
+			consoleModule.addContextType (
+				contextTypeProvider.get ()
 
-			.title (
-				capitalise (
-					chatHelpTemplateHelper.shortNamePlural ()))
+				.name (
+					contextTypeName)
 
-			.parentContextName (
-				parentContextName)
+			);
 
-			.parentContextTabName (
-				parentContextTabName)
-
-			.stuff (
-				ImmutableMap.<String, Object> of (
-					"chatHelpTemplateType",
-					typeCamel)));
-
-		consoleModule.addContext (
-			objectContextProvider.get ()
-
-			.name (
-				contextName)
-
-			.typeName (
-				contextTypeNameCombined)
-
-			.pathPrefix (
-				"/" + contextName)
-
-			.global (
-				true)
-
-			.title (
-				objectTitle)
-
-			.requestIdKey (
-				chatHelpTemplateHelper.idKey ())
-
-			.objectLookup (
-				chatHelpTemplateHelper)
-
-			.postProcessorName (
-				chatHelpTemplateHelper.objectName ())
-
-			.parentContextName (
-				parentContextName)
-
-			.parentContextTabName (
-				parentContextTabName)
-
-			.stuff (
-				ImmutableMap.<String, Object> of (
-					"chatHelpTemplateType",
-					typeCamel)));
+		}
 
 	}
 
+	private
+	void buildContexts (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContexts");
+
+		) {
+
+			consoleModule.addContext (
+				simpleConsoleContextProvider.get ()
+
+				.name (
+					contextNamePlural)
+
+				.typeName (
+					contextTypeNamePlural)
+
+				.pathPrefix (
+					"/" + contextNamePlural)
+
+				.global (
+					true)
+
+				.title (
+					capitalise (
+						chatHelpTemplateHelper.shortNamePlural ()))
+
+				.parentContextName (
+					parentContextName)
+
+				.parentContextTabName (
+					parentContextTabName)
+
+				.stuff (
+					ImmutableMap.<String, Object> of (
+						"chatHelpTemplateType",
+						typeCamel)));
+
+			consoleModule.addContext (
+				objectContextProvider.get ()
+
+				.name (
+					contextName)
+
+				.typeName (
+					contextTypeNameCombined)
+
+				.pathPrefix (
+					"/" + contextName)
+
+				.global (
+					true)
+
+				.title (
+					objectTitle)
+
+				.requestIdKey (
+					chatHelpTemplateHelper.idKey ())
+
+				.objectLookup (
+					chatHelpTemplateHelper)
+
+				.postProcessorName (
+					chatHelpTemplateHelper.objectName ())
+
+				.parentContextName (
+					parentContextName)
+
+				.parentContextTabName (
+					parentContextTabName)
+
+				.stuff (
+					ImmutableMap.<String, Object> of (
+						"chatHelpTemplateType",
+						typeCamel)));
+
+		}
+
+	}
+
+	private
 	void buildParentTab (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -360,151 +408,203 @@ class ChatHelpTemplateContextBuilder
 
 	}
 
-	void buildListPage () {
+	private
+	void buildListPage (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		listChildren.add (
-			objectListPageSpecProvider.get ()
+		try (
 
-			.consoleSpec (
-				spec.consoleSpec ())
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildListPage");
 
-			.typeCode (
-				typeCode)
+		) {
 
-			.formFieldsName (
-				"list")
+			listChildren.add (
+				objectListPageSpecProvider.get ()
 
-			.targetContextTypeName (
+				.consoleSpec (
+					spec.consoleSpec ())
+
+				.typeCode (
+					typeCode)
+
+				.formFieldsName (
+					"list")
+
+				.targetContextTypeName (
+					stringFormat (
+						"chatHelpTemplate+.%s",
+						typeCamel))
+
+			);
+
+		}
+
+	}
+
+	private
+	void buildCreatePage (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildCreatePage");
+
+		) {
+
+			listChildren.add (
+				objectCreatePageSpecProvider.get ()
+
+				.consoleSpec (
+					spec.consoleSpec ())
+
+				.typeCode (
+					typeCode)
+
+				.formFieldsName (
+					"create")
+
+				.targetContextTypeName (
+					contextTypeNameCombined)
+
+				.targetResponderName (
+					settingsResponderName));
+
+		}
+
+	}
+
+	private
+	void buildSettingsPage (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildSettingsPage");
+
+		) {
+
+			objectBuilders.add (
+				objectSettingsPageSpecProvider.get ()
+
+				.consoleSpec (
+					spec.consoleSpec ())
+
+				.formFieldsName (
+					"settings")
+
+				.listContextTypeName (
+					contextTypeNamePlural));
+
+		}
+
+	}
+
+	private
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
+
+		) {
+
+			typeCamel =
+				spec.type ();
+
+			structuralName =
+				stringFormat (
+					"chat.settings.template.%s",
+					typeCamel);
+
+			typeCode =
+				camelToUnderscore (
+					typeCamel);
+
+			contextName =
+				stringFormat (
+					"chat.settings.template.%s",
+					typeCamel);
+
+			contextNamePlural =
+				stringFormat (
+					"chat.settings.templates.%s",
+					typeCamel);
+
+			contextTypeName =
+				stringFormat (
+					"chatHelpTemplate.%s",
+					typeCamel);
+
+			contextTypeNamePlural =
+				stringFormat (
+					"chatHelpTemplates.%s",
+					typeCamel);
+
+			contextTypeNameCombined =
 				stringFormat (
 					"chatHelpTemplate+.%s",
-					typeCamel))
+					typeCamel);
 
-		);
+			beanName =
+				stringFormat (
+					"chatHelpTemplate%s",
+					capitalise (typeCamel));
 
-	}
+			objectTitle =
+				stringFormat (
+					"%s template {chatHelpTemplateName}",
+					capitalise (
+						camelToSpaces (
+							typeCamel)));
 
-	void buildCreatePage () {
+			parentContextTypeNames =
+				ImmutableList.<String> of (
+					"chat.settings.templates");
 
-		listChildren.add (
-			objectCreatePageSpecProvider.get ()
+			parentContextName =
+				"chat.settings.templates";
 
-			.consoleSpec (
-				spec.consoleSpec ())
+			parentContextTabName =
+				stringFormat (
+					"chat.settings.templates.%s",
+					typeCamel);
 
-			.typeCode (
-				typeCode)
+			parentContextTabLocation =
+				container.tabLocation ();
 
-			.formFieldsName (
-				"create")
-
-			.targetContextTypeName (
-				contextTypeNameCombined)
-
-			.targetResponderName (
-				settingsResponderName));
-
-	}
-
-	void buildSettingsPage () {
-
-		objectBuilders.add (
-			objectSettingsPageSpecProvider.get ()
-
-			.consoleSpec (
-				spec.consoleSpec ())
-
-			.formFieldsName (
-				"settings")
-
-			.listContextTypeName (
-				contextTypeNamePlural));
-
-	}
-
-	// defaults
-
-	void setDefaults () {
-
-		typeCamel =
-			spec.type ();
-
-		structuralName =
-			stringFormat (
-				"chat.settings.template.%s",
-				typeCamel);
-
-		typeCode =
-			camelToUnderscore (
-				typeCamel);
-
-		contextName =
-			stringFormat (
-				"chat.settings.template.%s",
-				typeCamel);
-
-		contextNamePlural =
-			stringFormat (
-				"chat.settings.templates.%s",
-				typeCamel);
-
-		contextTypeName =
-			stringFormat (
-				"chatHelpTemplate.%s",
-				typeCamel);
-
-		contextTypeNamePlural =
-			stringFormat (
-				"chatHelpTemplates.%s",
-				typeCamel);
-
-		contextTypeNameCombined =
-			stringFormat (
-				"chatHelpTemplate+.%s",
-				typeCamel);
-
-		beanName =
-			stringFormat (
-				"chatHelpTemplate%s",
-				capitalise (typeCamel));
-
-		objectTitle =
-			stringFormat (
-				"%s template {chatHelpTemplateName}",
+			parentContextTabLabel =
 				capitalise (
-					camelToSpaces (typeCamel)));
+					camelToSpaces (
+						typeCamel));
 
-		parentContextTypeNames =
-			ImmutableList.<String>of (
-				"chat.settings.templates");
+			parentContextTabLocalFile =
+				stringFormat (
+					"type:%s",
+					contextTypeNamePlural);
 
-		parentContextName =
-			"chat.settings.templates";
+			parentContextPrivKey =
+				"chat.manage";
 
-		parentContextTabName =
-			stringFormat (
-				"chat.settings.templates.%s",
-				typeCamel);
+			settingsResponderName =
+				stringFormat (
+					"chatHelpTemplate%sSettingsResponder",
+					capitalise (
+						typeCamel));
 
-		parentContextTabLocation =
-			container.tabLocation ();
-
-		parentContextTabLabel =
-			capitalise (
-				camelToSpaces (
-					typeCamel));
-
-		parentContextTabLocalFile =
-			stringFormat (
-				"type:%s",
-				contextTypeNamePlural);
-
-		parentContextPrivKey =
-			"chat.manage";
-
-		settingsResponderName =
-			stringFormat (
-				"chatHelpTemplate%sSettingsResponder",
-				capitalise (typeCamel));
+		}
 
 	}
 

@@ -211,6 +211,7 @@ class NullUtils {
 		return object != null;
 
 	}
+
 	public static
 	boolean anyIsNotNull (
 			Object ... objects) {
@@ -227,6 +228,18 @@ class NullUtils {
 		}
 
 		return false;
+
+	}
+
+	public static
+	String isNullString (
+			Object object) {
+
+		if (object != null) {
+			return "not null";
+		} else {
+			return "null";
+		}
 
 	}
 

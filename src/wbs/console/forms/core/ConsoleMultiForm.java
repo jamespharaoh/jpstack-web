@@ -30,7 +30,7 @@ class ConsoleMultiForm <Container> {
 	Container value;
 
 	@Getter @Setter
-	Map <String, ConsoleForm <Container>> formContexts;
+	Map <String, ConsoleForm <Container>> forms;
 
 	// accessors
 
@@ -39,7 +39,7 @@ class ConsoleMultiForm <Container> {
 			@NonNull String name) {
 
 		return mapItemForKeyRequired (
-			formContexts,
+			forms,
 			name);
 
 	}
@@ -47,12 +47,25 @@ class ConsoleMultiForm <Container> {
 	public
 	Boolean errors () {
 
-		return formContexts.values ().stream ()
+		return forms.values ().stream ()
 
 			.anyMatch (
 				ConsoleForm::errors)
 
 		;
+
+	}
+
+	public
+	long errorCount () {
+
+		return forms.values ().stream ()
+
+			.mapToLong (
+				form ->
+					form.errorCount ())
+
+			.sum ();
 
 	}
 
@@ -116,7 +129,7 @@ class ConsoleMultiForm <Container> {
 	void reportErrors (
 			@NonNull Transaction parentTransaction) {
 
-		formContexts.values ().forEach (
+		forms.values ().forEach (
 			context ->
 				context.reportErrors (
 					parentTransaction));

@@ -113,7 +113,7 @@ class ConsoleFormActionPart <FormState, History>
 			) {
 
 				historyFormContext =
-					historyFormContextBuilder.buildAction (
+					historyFormContextBuilder.buildResponse (
 						transaction,
 						formHints,
 						helper.history (

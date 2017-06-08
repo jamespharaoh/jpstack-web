@@ -436,6 +436,9 @@ class ChatCoreFixtureProvider
 						"test",
 						"test"))
 
+				.setTimezone (
+					"UTC")
+
 				/* TODO should not reference by id
 				.setTicketManager (
 					ticketManagerHelper.find (
@@ -589,6 +592,9 @@ class ChatCoreFixtureProvider
 							"chat_free"),
 						"static"))
 
+				.setTimezone (
+					"UTC")
+
 			);
 
 			chatSchemeHelper.insert (
@@ -647,6 +653,9 @@ class ChatCoreFixtureProvider
 							"test",
 							"chat_free"),
 						"static"))
+
+				.setTimezone (
+					"UTC")
 
 			);
 
@@ -779,6 +788,9 @@ class ChatCoreFixtureProvider
 
 					.setCreditMode (
 						ChatUserCreditMode.billedMessages)
+
+					.setDeliveryMethod (
+						ChatMessageMethod.sms)
 
 				);
 

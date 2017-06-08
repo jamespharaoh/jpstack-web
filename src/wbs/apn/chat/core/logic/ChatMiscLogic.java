@@ -37,7 +37,7 @@ interface ChatMiscLogic {
 			ChatUserRec chatUser,
 			Boolean sendMessage,
 			Optional <Long> threadId,
-			ChatMessageMethod deliveryMethod);
+			Optional <ChatMessageMethod> deliveryMethod);
 
 	void userLogoffWithMessage (
 			Transaction parentTransaction,
