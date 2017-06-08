@@ -167,11 +167,15 @@ class UrbanAirshipApi {
 						httpContext));
 
 				StringEntity postEntity =
-					new StringEntity (json, "utf-8");
+					new StringEntity (
+						json,
+						"utf-8");
 
-				postEntity.setContentType ("application/json");
+				postEntity.setContentType (
+					"application/json");
 
-				post.setEntity (postEntity);
+				post.setEntity (
+					postEntity);
 
 				// output request for debugging
 

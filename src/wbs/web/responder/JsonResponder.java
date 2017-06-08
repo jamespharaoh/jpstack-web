@@ -1,7 +1,8 @@
 package wbs.web.responder;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import static wbs.utils.collection.CollectionUtils.arrayLength;
+import static wbs.utils.etc.IoUtils.writeBytes;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import javax.inject.Provider;
 
@@ -19,9 +20,6 @@ import wbs.framework.data.tools.DataToJson;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.utils.io.RuntimeIoException;
-import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 
@@ -62,47 +60,32 @@ class JsonResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
-				"application/json");
+			DataToJson dataToJson =
+				new DataToJson ();
 
-			try (
+			Object jsonValue =
+				dataToJson.toJson (
+					value);
 
-				FormatWriter formatWriter =
-					requestContext.formatWriter ();
+			String stringValue =
+				JSONValue.toJSONString (
+					jsonValue);
 
-			) {
+			byte[] bytesValue =
+				stringToUtf8 (
+					stringValue);
 
-				DataToJson dataToJson =
-					new DataToJson ();
+			requestContext.contentType (
+				"application/json",
+				"utf-8");
 
-				Object jsonValue =
-					dataToJson.toJson (
-						value);
+			requestContext.contentLength (
+				arrayLength (
+					bytesValue));
 
-				try (
-
-					StringWriter stringWriter =
-						new StringWriter ();
-
-				) {
-
-					JSONValue.writeJSONString (
-						jsonValue,
-						stringWriter);
-
-					formatWriter.writeLineFormat (
-						"%s",
-						stringWriter.toString ());
-
-				} catch (IOException ioException) {
-
-					throw new RuntimeIoException (
-						ioException);
-
-				}
-
-			}
+			writeBytes (
+				requestContext.outputStream (),
+				bytesValue);
 
 		}
 

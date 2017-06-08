@@ -94,6 +94,9 @@ class ProcessApiStatusHandler
 		response.setContentType (
 			"application/json");
 
+		response.setCharacterEncoding (
+			"utf-8");
+
 		response.setContentLength (
 			jsonResponseString.length ());
 

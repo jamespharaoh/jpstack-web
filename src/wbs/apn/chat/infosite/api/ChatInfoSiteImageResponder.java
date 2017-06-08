@@ -137,8 +137,7 @@ class ChatInfoSiteImageResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				media.getMediaType ().getMimeType ());
 
 			requestContext.setHeader (

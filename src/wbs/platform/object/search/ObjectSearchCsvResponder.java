@@ -202,9 +202,9 @@ class ObjectSearchCsvResponder <ResultType>
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
-				"text/csv");
+			requestContext.contentType (
+				"text/csv",
+				"utf-8");
 
 			requestContext.setHeader (
 				"Content-Disposition",

@@ -1,10 +1,7 @@
 package wbs.console.forms.core;
 
-import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.stringFormat;
-
-import java.util.List;
 
 import javax.inject.Provider;
 
@@ -83,7 +80,11 @@ class ConsoleFormTypeFactory <Container>
 			return consoleFormTypeProvider.get ()
 
 				.containerClass (
-					containerClass)
+					genericCastUnchecked (
+						ifNotNullThenElse (
+							consoleHelper,
+							() -> consoleHelper.objectClass (),
+							() -> containerClass)))
 
 				.formName (
 					formName)
@@ -95,55 +96,6 @@ class ConsoleFormTypeFactory <Container>
 					fieldsProvider)
 
 			;
-
-		}
-
-	}
-
-	private
-	FormFieldSet <Container> buildFormFieldSet (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String name,
-			@NonNull List <Object> fieldSpecs) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"buildFormFieldSet");
-
-		) {
-
-			if (
-				isNotNull (
-					consoleHelper)
-			) {
-
-				return genericCastUnchecked (
-					consoleFormBuilder.buildFormFieldSet (
-						taskLogger,
-						consoleHelper,
-						stringFormat (
-							"%s.%s.%s",
-							consoleModuleName,
-							formName,
-							name),
-						fieldSpecs));
-
-			} else {
-
-				return consoleFormBuilder.buildFormFieldSet (
-					taskLogger,
-					containerClass,
-					stringFormat (
-						"%s.%s.%s",
-						consoleModuleName,
-						formName,
-						name),
-					fieldSpecs);
-
-			}
 
 		}
 

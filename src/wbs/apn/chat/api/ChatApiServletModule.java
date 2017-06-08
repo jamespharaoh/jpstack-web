@@ -337,16 +337,16 @@ class ChatApiServletModule
 				String mimeType =
 					media.getMediaType ().getMimeType ();
 
-				if (allOf (
+				if (
 
-					() ->isNotNull (
-						format),
+					isNotNull (
+						format)
 
-					() -> stringNotEqualSafe (
+					&& stringNotEqualSafe (
 						format,
 						"orig")
 
-				)) {
+				) {
 
 					if (mediaLogic.isVideo (mimeType)) {
 
@@ -390,9 +390,18 @@ class ChatApiServletModule
 
 				}
 
-				requestContext.setHeader (
-					"Content-Type",
+				requestContext.contentType (
 					media.getMediaType ().getMimeType ());
+
+				if (
+					isNotNull (
+						media.getEncoding ())
+				) {
+
+					requestContext.characterEncoding (
+						media.getEncoding ());
+
+				}
 
 				requestContext.setHeader (
 					"Content-Length",

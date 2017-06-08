@@ -57,9 +57,9 @@ class PhpMapResponder
 		requestContext.status (
 			status);
 
-		requestContext.setHeader (
-			"Content-Type",
-			"application/vnd.php.serialized; charset=utf-8");
+		requestContext.contentType (
+			"application/vnd.php.serialized",
+			"utf-8");
 
 		@SuppressWarnings ("resource")
 		OutputStream outputStream =

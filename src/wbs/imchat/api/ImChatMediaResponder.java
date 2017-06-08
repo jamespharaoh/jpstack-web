@@ -57,8 +57,7 @@ class ImChatMediaResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				contentType);
 
 			requestContext.setHeader (

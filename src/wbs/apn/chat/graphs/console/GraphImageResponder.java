@@ -336,8 +336,7 @@ class GraphImageResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				"image/png");
 
 		}

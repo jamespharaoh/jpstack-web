@@ -82,9 +82,9 @@ class CoreFrameSetResponder
 			super.setHtmlHeaders (
 				transaction);
 
-			requestContext.setHeader (
-				"Content-Type",
-				"text/html; charset=utf-8");
+			requestContext.contentType (
+				"text/html",
+				"utf-8");
 
 			requestContext.setHeader (
 				"Cache-Control",

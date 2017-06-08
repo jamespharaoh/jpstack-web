@@ -81,8 +81,7 @@ class ChatUserImageZipResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				"application/zip");
 
 			requestContext.setHeader (

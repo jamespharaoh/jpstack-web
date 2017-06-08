@@ -117,8 +117,7 @@ class MediaVideoResponder
 
 		) {
 
-			requestContext.setHeader (
-				"Content-Type",
+			requestContext.contentType (
 				"video/x-flv");
 
 			requestContext.setHeader (
