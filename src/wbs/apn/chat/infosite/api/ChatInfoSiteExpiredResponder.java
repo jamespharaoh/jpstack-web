@@ -1,5 +1,6 @@
 package wbs.apn.chat.infosite.api;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import lombok.NonNull;
@@ -11,13 +12,15 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.web.context.RequestContext;
-import wbs.web.responder.PrintResponder;
+import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("chatInfoSiteExpiredResponder")
 public
 class ChatInfoSiteExpiredResponder
-	extends PrintResponder {
+	extends BufferedTextResponder {
 
 	// dependencies
 
@@ -31,7 +34,16 @@ class ChatInfoSiteExpiredResponder
 
 	@Override
 	protected
-	void goHeaders (
+	void prepare (
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
+	protected
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -53,8 +65,9 @@ class ChatInfoSiteExpiredResponder
 
 	@Override
 	protected
-	void goContent (
-			@NonNull Transaction parentTransaction) {
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -66,6 +79,7 @@ class ChatInfoSiteExpiredResponder
 		) {
 
 			htmlParagraphWrite (
+				formatWriter,
 				"This message is no longer valid.");
 
 		}

@@ -3,6 +3,7 @@ package wbs.apn.chat.user.image.console;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -11,7 +12,6 @@ import java.util.zip.ZipOutputStream;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -24,11 +24,12 @@ import wbs.utils.io.RuntimeIoException;
 
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.web.responder.BufferedResponder;
 
 @PrototypeComponent ("chatUserImageZipResponder")
 public
 class ChatUserImageZipResponder
-	extends ConsoleResponder {
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -69,7 +70,7 @@ class ChatUserImageZipResponder
 
 	@Override
 	public
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -77,7 +78,7 @@ class ChatUserImageZipResponder
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setHtmlHeaders");
+					"headers");
 
 		) {
 
@@ -95,7 +96,8 @@ class ChatUserImageZipResponder
 	@Override
 	public
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
 
 		try (
 

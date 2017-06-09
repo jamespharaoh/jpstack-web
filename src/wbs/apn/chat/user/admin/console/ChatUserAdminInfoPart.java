@@ -25,6 +25,7 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -33,6 +34,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -62,6 +64,9 @@ class ChatUserAdminInfoPart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -122,7 +127,8 @@ class ChatUserAdminInfoPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -139,10 +145,12 @@ class ChatUserAdminInfoPart
 			) {
 
 				htmlFormOpenPostAction (
+					formatWriter,
 					requestContext.resolveLocalUrl (
 						"/chatUser.admin.info"));
 
-				htmlTableOpenDetails ();
+				htmlTableOpenDetails (
+					formatWriter);
 
 				String charCountJavascript =
 					stringFormat (
@@ -152,6 +160,7 @@ class ChatUserAdminInfoPart
 						"0");
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Info",
 					stringFormat (
 						"<textarea",
@@ -171,17 +180,21 @@ class ChatUserAdminInfoPart
 								() -> chatUser.getInfoText ().getText ()))));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Chars",
 					"<span id=\"chars\">&nbsp;</span>");
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Reason",
 					() -> chatConsoleLogic.writeSelectForChatUserEditReason (
+						formatWriter,
 						"editReason",
 						requestContext.formOrEmptyString (
 							"editReason")));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Action",
 					stringFormat (
 						"<input\n",
@@ -189,9 +202,11 @@ class ChatUserAdminInfoPart
 						" value=\"save changes\"",
 						">"));
 
-				htmlTableClose ();
+				htmlTableClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 			}
 
@@ -202,11 +217,14 @@ class ChatUserAdminInfoPart
 				return;
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"History");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Timestamp",
 				"Original",
 				"Edited",
@@ -218,25 +236,30 @@ class ChatUserAdminInfoPart
 					: chatUserInfos
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatUserInfo.getCreationTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserInfo.getOriginalText (),
 						() -> chatUserInfo.getOriginalText ().getText ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserInfo.getEditedText (),
 						() -> chatUserInfo.getEditedText ().getText ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatConsoleLogic.textForChatUserInfoStatus (
 						chatUserInfo.getStatus ()));
 
@@ -247,20 +270,24 @@ class ChatUserAdminInfoPart
 
 					objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						chatUserInfo.getModerator ());
 
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"—");
 
 				}
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

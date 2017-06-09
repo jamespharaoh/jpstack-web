@@ -10,6 +10,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlUtils.encodeNewlineToBr;
 
 import java.util.List;
 
@@ -34,13 +35,13 @@ import wbs.sms.message.core.model.MessageSearch;
 import wbs.sms.message.core.model.MessageSearch.MessageSearchOrder;
 import wbs.sms.number.core.model.NumberRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("chatHelpLogPendingMessagesPart")
 public
@@ -134,7 +135,8 @@ class ChatHelpLogPendingMessagesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -145,9 +147,11 @@ class ChatHelpLogPendingMessagesPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"From",
 				"To",
 				"Timestamp",
@@ -158,7 +162,8 @@ class ChatHelpLogPendingMessagesPart
 					: messages
 			) {
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				String rowClass;
 
@@ -173,44 +178,54 @@ class ChatHelpLogPendingMessagesPart
 				// message attributes row
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						rowClass));
 
 				htmlTableCellWrite (
+					formatWriter,
 					message.getNumFrom ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					message.getNumTo ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatUserLogic.getTimezone (
 							chatUser),
 						message.getCreatedTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						message.getCharge ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				// message content row
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						rowClass));
 
 				htmlTableCellWrite (
-					HtmlUtils.encodeNewlineToBr (
+					formatWriter,
+					encodeNewlineToBr (
 						message.getText ().getText ()),
 					htmlColumnSpanAttribute (
 						4l));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

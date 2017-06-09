@@ -38,6 +38,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -49,6 +50,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectBrowsePart")
@@ -69,6 +72,9 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -344,7 +350,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -357,16 +364,20 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// table header
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			formContext.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table content
 
@@ -376,6 +387,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 			) {
 
 				htmlTableRowOpen (
+					formatWriter,
 
 					htmlClassAttribute (
 						presentInstances (
@@ -404,15 +416,18 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 				formContext.outputTableCellsList (
 					transaction,
+					formatWriter,
 					false);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

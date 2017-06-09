@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -22,6 +23,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.broadcast.model.BroadcastRec;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("broadcastNumbersPart")
@@ -36,6 +39,9 @@ class BroadcastNumbersPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -68,7 +74,8 @@ class BroadcastNumbersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -79,41 +86,51 @@ class BroadcastNumbersPart
 
 		) {
 
-			goDetails ();
+			goDetails (
+				formatWriter);
 
-			goForm ();
+			goForm (
+				formatWriter);
 
 		}
 
 	}
 
-	void goDetails () {
+	void goDetails (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableOpenDetails ();
+		htmlTableOpenDetails (
+			formatWriter);
 
 		htmlTableDetailsRowWrite (
+			formatWriter,
 			"Total accepted",
 			integerToDecimalString (
 				broadcast.getNumAccepted ()));
 
 		htmlTableDetailsRowWrite (
+			formatWriter,
 			"Total rejected",
 			integerToDecimalString (
 				broadcast.getNumRejected ()));
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 
-	void goForm () {
+	void goForm (
+			@NonNull FormatWriter formatWriter) {
 
 		// open form
 
-		htmlFormOpenPost ();
+		htmlFormOpenPost (
+			formatWriter);
 
 		// write numbers
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"Numbers<br>");
@@ -127,11 +144,13 @@ class BroadcastNumbersPart
 			requestContext.parameterOrEmptyString (
 				"numbers"));
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 		// write submit buttons
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -147,11 +166,13 @@ class BroadcastNumbersPart
 			" value=\"remove numbers\"",
 			">");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 		// close form
 
-		htmlFormClose ();
+		htmlFormClose (
+			formatWriter);
 
 	}
 

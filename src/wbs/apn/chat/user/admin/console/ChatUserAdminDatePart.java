@@ -21,6 +21,7 @@ import lombok.NonNull;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -30,6 +31,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -59,6 +61,9 @@ class ChatUserAdminDatePart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -94,7 +99,8 @@ class ChatUserAdminDatePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -106,10 +112,12 @@ class ChatUserAdminDatePart
 		) {
 
 			renderForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -117,7 +125,8 @@ class ChatUserAdminDatePart
 
 	private
 	void renderForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -138,14 +147,18 @@ class ChatUserAdminDatePart
 			}
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.date"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Date mode",
 				() -> chatUserDateModeConsoleHelper.writeSelect (
+					formatWriter,
 					"dateMode",
 					requestContext.formOrElse (
 						"dateMode",
@@ -153,6 +166,7 @@ class ChatUserAdminDatePart
 							chatUser.getDateMode ()))));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Radius (miles)",
 				stringFormat (
 					"<input",
@@ -166,6 +180,7 @@ class ChatUserAdminDatePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Start hour",
 				stringFormat (
 					"<input",
@@ -179,6 +194,7 @@ class ChatUserAdminDatePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"End hour",
 				stringFormat (
 					"<input",
@@ -192,6 +208,7 @@ class ChatUserAdminDatePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Max profiles per day",
 				stringFormat (
 					"<input",
@@ -204,7 +221,8 @@ class ChatUserAdminDatePart
 							chatUser.getDateDailyMax ())),
 					">"));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<p><input",
@@ -212,7 +230,8 @@ class ChatUserAdminDatePart
 				" value=\"save changes\"",
 				"></p>");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -220,7 +239,8 @@ class ChatUserAdminDatePart
 
 	private
 	void renderHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -231,9 +251,11 @@ class ChatUserAdminDatePart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Timestamp",
 				"Source",
 				"Mode",
@@ -246,9 +268,11 @@ class ChatUserAdminDatePart
 					: chatUser.getChatUserDateLogs ()
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserDateLogRec.getTimestamp (),
 						() -> timeFormatter.timestampTimezoneString (
@@ -263,6 +287,7 @@ class ChatUserAdminDatePart
 
 					objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						chatUserDateLogRec.getUser ());
 
 				} else if (
@@ -272,23 +297,28 @@ class ChatUserAdminDatePart
 
 					objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						chatUserDateLogRec.getMessage ());
 
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"API");
 
 				}
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUserDateLogRec.getDateMode ().name ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						chatUserDateLogRec.getRadius ()));
 
 				htmlTableCellWriteFormat (
+					formatWriter,
 					"%s–%s",
 					integerToDecimalString (
 						chatUserDateLogRec.getStartHour ()),
@@ -296,12 +326,14 @@ class ChatUserAdminDatePart
 						chatUserDateLogRec.getEndHour ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						chatUserDateLogRec.getDailyMax ()));
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

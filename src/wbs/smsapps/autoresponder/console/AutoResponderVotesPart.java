@@ -23,6 +23,7 @@ import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -43,6 +44,7 @@ import wbs.sms.message.core.model.MessageSearch;
 
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.DurationFormatter;
 
 @PrototypeComponent ("autoResponderVotesPart")
@@ -70,6 +72,9 @@ class AutoResponderVotesPart
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -183,7 +188,8 @@ class AutoResponderVotesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -198,6 +204,7 @@ class AutoResponderVotesPart
 
 			form.outputFormTable (
 				transaction,
+				formatWriter,
 				"get",
 				requestContext.resolveLocalUrl (
 					"/autoResponder.votes"),
@@ -213,11 +220,14 @@ class AutoResponderVotesPart
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Vote summary");
 
-			htmlTableOpenLayout ();
+			htmlTableOpenLayout (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Content",
 				"Votes");
 
@@ -226,18 +236,22 @@ class AutoResponderVotesPart
 					: votes.entrySet ()
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					entry.getKey ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						entry.getValue ()));
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

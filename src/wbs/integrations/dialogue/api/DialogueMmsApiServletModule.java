@@ -11,6 +11,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.dateToInstantNullSafe;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,7 +54,9 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -285,13 +289,22 @@ class DialogueMmsApiServletModule
 
 				try (
 
+					Writer writer =
+						requestContext.writer ();
+
 					FormatWriter formatWriter =
-						requestContext.formatWriter ();
+						new WriterFormatWriter (
+							writer);
 
 				) {
 
 					formatWriter.writeLineFormat (
 						"OK");
+
+				} catch (IOException ioException) {
+
+					throw new RuntimeIoException (
+						ioException);
 
 				}
 

@@ -111,6 +111,7 @@ class DaemonDeploymentRestartFormActionHelper
 			if (daemonDeployment.getRestart ()) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"There is already a restart scheduled for this daemon ",
 					"deployment, but it has not yet taken place. If this ",
 					"message persists, please contact support.");
@@ -118,6 +119,7 @@ class DaemonDeploymentRestartFormActionHelper
 			} else {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"Trigger a restart for this daemon deployment");
 
 			}

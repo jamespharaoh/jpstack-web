@@ -1,5 +1,6 @@
 package wbs.console.responder;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
@@ -20,6 +21,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtils;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("errorResponder")
@@ -52,9 +55,19 @@ class ErrorResponder
 	// implementation
 
 	@Override
+	protected
+	void prepare (
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -66,16 +79,20 @@ class ErrorResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				title);
 
-			requestContext.flushNotices ();
+			requestContext.flushNotices (
+				formatWriter);
 
 			htmlParagraphWrite (
+				formatWriter,
 				title,
 				htmlClassAttribute (
 					"error"));
 
 			htmlParagraphWrite (
+				formatWriter,
 				message);
 
 			if (
@@ -87,6 +104,7 @@ class ErrorResponder
 			) {
 
 				htmlParagraphWriteHtml (
+					formatWriter,
 					stringFormat (
 						"<pre>%h</pre>",
 						exceptionLogic.throwableDump (

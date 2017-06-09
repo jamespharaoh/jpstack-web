@@ -26,7 +26,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +55,8 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("tabbedResponder")
@@ -150,35 +151,6 @@ class TabbedResponder
 
 	@Override
 	protected
-	void setup (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"setup");
-
-		) {
-
-			super.setup (
-				transaction);
-
-			if (pagePart != null) {
-
-				pagePart.setup (
-					transaction,
-					Collections.emptyMap ());
-
-			}
-
-		}
-
-	}
-
-	@Override
-	protected
 	void prepare (
 			@NonNull Transaction parentTransaction) {
 
@@ -190,9 +162,6 @@ class TabbedResponder
 					"prepare");
 
 		) {
-
-			super.prepare (
-				transaction);
 
 			prepareTabs (
 				transaction);
@@ -320,7 +289,8 @@ class TabbedResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -332,7 +302,8 @@ class TabbedResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			if (
 
@@ -345,11 +316,13 @@ class TabbedResponder
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormatIncreaseIndent (
 				"function toggleHead (elem) {");
@@ -381,7 +354,8 @@ class TabbedResponder
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}");
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -394,7 +368,8 @@ class TabbedResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -406,16 +381,19 @@ class TabbedResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				title);
 
 			renderTabs (
-				transaction);
+				transaction,
+				formatWriter);
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			renderPagePart (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -425,7 +403,8 @@ class TabbedResponder
 
 	private
 	void renderTabs (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -524,7 +503,8 @@ class TabbedResponder
 
 	private
 	void renderPagePart (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -541,6 +521,7 @@ class TabbedResponder
 			) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"Unable to show page contents.");
 
 				if (
@@ -566,7 +547,8 @@ class TabbedResponder
 			) {
 
 				pagePart.renderHtmlBodyContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 

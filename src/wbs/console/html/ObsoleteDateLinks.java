@@ -193,6 +193,7 @@ class ObsoleteDateLinks {
 					@NonNull String title) {
 
 				htmlLinkWrite (
+					formatWriter,
 					makeLink (
 						url,
 						formData,

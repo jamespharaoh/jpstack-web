@@ -1,7 +1,5 @@
 package wbs.console.supervisor;
 
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-
 import java.util.Map;
 
 import lombok.Getter;
@@ -23,6 +21,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableStatsGroupPart")
@@ -49,46 +49,19 @@ class SupervisorTableStatsGroupPart
 	@Getter @Setter
 	StatsFormatter statsFormatter;
 
-	// state
-
+	@Getter @Setter
 	Map <String, StatsDataSet> statsDataSetsByName;
 
+	@Getter @Setter
 	StatsPeriod statsPeriod;
 
 	// implementation
 
 	@Override
 	public
-	void prepare (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"prepare");
-
-		) {
-
-			statsPeriod =
-				genericCastUnchecked (
-					parameters.get (
-						"statsPeriod"));
-
-			statsDataSetsByName =
-				genericCastUnchecked (
-					parameters.get (
-						"statsDataSetsByName"));
-
-		}
-
-	}
-
-	@Override
-	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 

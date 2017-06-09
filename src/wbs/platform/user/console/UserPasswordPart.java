@@ -8,12 +8,16 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("userPasswordPart")
 public
@@ -25,12 +29,16 @@ class UserPasswordPart
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
 	// implementation
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -44,12 +52,14 @@ class UserPasswordPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/user.password"));
 
 			// password
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Enter new password<br>");
@@ -61,11 +71,13 @@ class UserPasswordPart
 				" size=\"32\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// password confirmation
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Enter again to confirm<br>");
@@ -77,11 +89,13 @@ class UserPasswordPart
 				" size=\"32\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -89,11 +103,13 @@ class UserPasswordPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -66,15 +65,12 @@ class SupervisorSimplePartBuilder
 			String beanName =
 				spec.beanName ();
 
-			PagePartFactory pagePartFactory =
-				nextTaskLogger ->
+			supervisorConfigBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
 					componentManager.getComponentRequired (
-						nextTaskLogger,
+						transaction,
 						beanName,
-						PagePart.class);
-
-			supervisorConfigBuilder.pagePartFactories ().add  (
-				pagePartFactory);
+						PagePart.class));
 
 		}
 

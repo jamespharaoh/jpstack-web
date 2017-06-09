@@ -172,7 +172,7 @@ class TaskLoggerImplementation
 		debugFormat (
 			"Task logger %s started at %s",
 			toStringLazy (),
-			new LazyString (
+			LazyString.singleton (
 				() -> startTime.toString ()));
 
 	}
@@ -206,7 +206,7 @@ class TaskLoggerImplementation
 		debugFormat (
 			"Task logger %s ended at %s",
 			toStringLazy (),
-			new LazyString (
+			LazyString.singleton (
 				() -> endTime.toString ()));
 
 		this.endTime =
@@ -314,9 +314,9 @@ class TaskLoggerImplementation
 	}
 
 	public
-	CharSequence toStringLazy () {
+	LazyString toStringLazy () {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> toString ());
 
 	}

@@ -35,6 +35,7 @@ import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -48,6 +49,7 @@ import wbs.framework.logging.LogContext;
 import wbs.platform.user.model.UserObjectHelper;
 
 import wbs.utils.etc.PropertyUtils;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")
@@ -65,6 +67,9 @@ class ObjectLinksPart <
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserObjectHelper userHelper;
@@ -153,7 +158,8 @@ class ObjectLinksPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -167,12 +173,14 @@ class ObjectLinksPart <
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/" + localFile));
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -180,23 +188,29 @@ class ObjectLinksPart <
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// table header
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			targetForm.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Member");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table content
 
@@ -214,10 +228,12 @@ class ObjectLinksPart <
 					continue;
 				}
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				targetForm.outputTableCellsList (
 					transaction,
+					formatWriter,
 					targetObject,
 					true);
 
@@ -236,17 +252,20 @@ class ObjectLinksPart <
 					.write (
 						formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -254,7 +273,8 @@ class ObjectLinksPart <
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form hidden fields
 
@@ -288,11 +308,13 @@ class ObjectLinksPart <
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			// flush scripts
 
-			requestContext.flushScripts ();
+			requestContext.flushScripts (
+				formatWriter);
 
 		}
 

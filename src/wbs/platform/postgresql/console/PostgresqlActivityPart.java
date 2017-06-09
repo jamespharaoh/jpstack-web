@@ -29,6 +29,8 @@ import wbs.framework.logging.LogContext;
 import wbs.platform.postgresql.model.PostgresqlStatActivityObjectHelper;
 import wbs.platform.postgresql.model.PostgresqlStatActivityRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("postgresqlActivityPart")
 public
 class PostgresqlActivityPart
@@ -104,7 +106,8 @@ class PostgresqlActivityPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -116,12 +119,17 @@ class PostgresqlActivityPart
 		) {
 
 			doList (
+				transaction,
+				formatWriter,
 				activeStatActivities);
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Idle");
 
 			doList (
+				transaction,
+				formatWriter,
 				idleStatActivities);
 
 		}
@@ -129,53 +137,76 @@ class PostgresqlActivityPart
 	}
 
 	void doList (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull List <PostgresqlStatActivityRec> statActivities) {
 
-		if (
-			collectionIsEmpty (
-				statActivities)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"doList");
+
 		) {
 
-			htmlParagraphWrite (
-				"(none)");
+			if (
+				collectionIsEmpty (
+					statActivities)
+			) {
 
-			return;
+				htmlParagraphWrite (
+					formatWriter,
+					"(none)");
+
+				return;
+
+			}
+
+			htmlTableOpenList (
+				formatWriter);
+
+			htmlTableHeaderRowWrite (
+				formatWriter,
+				"PID",
+				"Database",
+				"User",
+				"Query");
+
+			for (
+				PostgresqlStatActivityRec statActivity
+					: statActivities
+			) {
+
+				htmlTableRowOpen (
+					formatWriter);
+
+				htmlTableCellWrite (
+					formatWriter,
+					integerToDecimalString (
+						statActivity.getId ()));
+
+				htmlTableCellWrite (
+					formatWriter,
+					statActivity.getDatabaseName ());
+
+				htmlTableCellWrite (
+					formatWriter,
+					statActivity.getUserName ());
+
+				htmlTableCellWrite (
+					formatWriter,
+					statActivity.getCurrentQuery ());
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
+
+			htmlTableClose (
+				formatWriter);
 
 		}
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"PID",
-			"Database",
-			"User",
-			"Query");
-
-		for (
-			PostgresqlStatActivityRec statActivity
-				: statActivities
-		) {
-
-			htmlTableRowOpen ();
-
-			htmlTableCellWrite (
-				integerToDecimalString (
-					statActivity.getId ()));
-
-			htmlTableCellWrite (
-				statActivity.getDatabaseName ());
-
-			htmlTableCellWrite (
-				statActivity.getUserName ());
-
-			htmlTableCellWrite (
-				statActivity.getCurrentQuery ());
-
-			htmlTableRowClose ();
-
-		}
-
-		htmlTableClose ();
 
 	}
 

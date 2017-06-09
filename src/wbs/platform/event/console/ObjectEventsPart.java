@@ -24,6 +24,8 @@ import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("objectEventsPart")
 public
@@ -102,7 +104,8 @@ class ObjectEventsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 

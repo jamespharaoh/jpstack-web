@@ -44,6 +44,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
@@ -158,7 +160,8 @@ class ChatMonitorInboxFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -170,14 +173,16 @@ class ChatMonitorInboxFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			if (chatMonitorInbox == null)
 				return;
 
 			// script block open
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			// show inbox
 
@@ -203,7 +208,8 @@ class ChatMonitorInboxFormResponder
 
 			// script block close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 			// style block
 
@@ -212,21 +218,25 @@ class ChatMonitorInboxFormResponder
 					== ChatUserOperatorLabel.operator
 			) {
 
-				htmlStyleBlockOpen ();
+				htmlStyleBlockOpen (
+					formatWriter);
 
 				htmlStyleRuleWrite (
+					formatWriter,
 					"h2",
 					htmlStyleRuleEntry (
 						"background",
 						"#800000"));
 
 				htmlStyleRuleWrite (
+					formatWriter,
 					"table.details th",
 					htmlStyleRuleEntry (
 						"background",
 						"#800000"));
 
-				htmlStyleBlockClose ();
+				htmlStyleBlockClose (
+					formatWriter);
 
 			}
 
@@ -248,7 +258,8 @@ class ChatMonitorInboxFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -265,19 +276,23 @@ class ChatMonitorInboxFormResponder
 			// links
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
 			htmlLinkWrite (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					"/queues/queue.home"),
 				"Queues");
 
 			htmlLinkWrite (
+				formatWriter,
 				"javascript:top.show_inbox (false)",
 				"Close");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// handle deleted chat monitor inbox
 
@@ -287,6 +302,7 @@ class ChatMonitorInboxFormResponder
 			// send message
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				stringFormat (
 					"Send message as %s",
 					userChatUser.getOperatorLabel ().toString ()));
@@ -294,6 +310,7 @@ class ChatMonitorInboxFormResponder
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					stringFormat (
 						"%s",
@@ -309,11 +326,13 @@ class ChatMonitorInboxFormResponder
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// from
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"From",
 				doName (
 					monitorChatUser));
@@ -321,6 +340,7 @@ class ChatMonitorInboxFormResponder
 			// to
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"To",
 				doName (
 					userChatUser));
@@ -328,6 +348,7 @@ class ChatMonitorInboxFormResponder
 			// message
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Message",
 				() -> formatWriter.writeLineFormat (
 					"<textarea",
@@ -353,15 +374,18 @@ class ChatMonitorInboxFormResponder
 			// chars
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Chars",
 				() -> {
 
 				htmlSpanWrite (
+					formatWriter,
 					"",
 					htmlIdAttribute (
 						"chars"));
 
 				htmlSpanWrite (
+					formatWriter,
 					"",
 					htmlIdAttribute (
 						"messageCount"));
@@ -370,11 +394,13 @@ class ChatMonitorInboxFormResponder
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -422,11 +448,13 @@ class ChatMonitorInboxFormResponder
 							"message if you already set one)"))),
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

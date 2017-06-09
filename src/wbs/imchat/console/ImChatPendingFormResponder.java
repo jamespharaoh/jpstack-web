@@ -40,6 +40,7 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -52,6 +53,8 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -77,6 +80,9 @@ class ImChatPendingFormResponder
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -136,9 +142,6 @@ class ImChatPendingFormResponder
 
 		) {
 
-			super.prepare (
-				transaction);
-
 			message =
 				imChatMessageHelper.findFromContextRequired (
 					transaction);
@@ -186,7 +189,8 @@ class ImChatPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -198,9 +202,11 @@ class ImChatPendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"top.show_inbox (true);");
@@ -218,7 +224,8 @@ class ImChatPendingFormResponder
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}, 1);");
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -227,7 +234,8 @@ class ImChatPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -241,13 +249,16 @@ class ImChatPendingFormResponder
 			requestContext.flushNotices (
 				formatWriter);
 
-			renderLinks ();
+			renderLinks (
+				formatWriter);
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Reply to IM chat");
 
 			renderForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -255,7 +266,8 @@ class ImChatPendingFormResponder
 
 	private
 	void renderForm (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -269,6 +281,7 @@ class ImChatPendingFormResponder
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrlFormat (
 					"/imChat.pending",
 					"/%u",
@@ -279,19 +292,24 @@ class ImChatPendingFormResponder
 			// table open
 
 			htmlTableOpenList (
+				formatWriter,
 				htmlIdAttribute (
 					"templates"));
 
 			// table headers
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Name",
 				"Message",
 				"Action");
 
-			renderBilledTemplate ();
-			renderFreeTemplate ();
+			renderBilledTemplate (
+				formatWriter);
+
+			renderFreeTemplate (
+				formatWriter);
 
 			for (
 				ImChatTemplateRec template
@@ -299,37 +317,45 @@ class ImChatPendingFormResponder
 			) {
 
 				renderTemplate (
+					formatWriter,
 					template);
 
 			}
 
 			renderIgnore (
-				taskLogger);
+				taskLogger,
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
-	void renderLinks () {
+	void renderLinks (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
 		htmlLinkWrite (
+			formatWriter,
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
 			"Queues");
 
 		htmlLinkWrite (
+			formatWriter,
 			summaryUrl,
 			"Summary",
 			htmlAttribute (
@@ -337,14 +363,17 @@ class ImChatPendingFormResponder
 				"main"));
 
 		htmlLinkWrite (
+			formatWriter,
 			"javascript:top.show_inbox (false);",
 			"Close");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
-	void renderBilledTemplate () {
+	void renderBilledTemplate (
+			@NonNull FormatWriter formatWriter) {
 
 		if (
 
@@ -361,6 +390,7 @@ class ImChatPendingFormResponder
 		// table row open
 
 		htmlTableRowOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"template"),
 			htmlDataAttribute (
@@ -377,7 +407,8 @@ class ImChatPendingFormResponder
 
 		// radio button
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -388,11 +419,13 @@ class ImChatPendingFormResponder
 			" value=\"bill\"",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// template name
 
 		htmlTableCellWriteHtml (
+			formatWriter,
 			stringFormat (
 				"Bill&nbsp;%s",
 				currencyLogic.formatHtml (
@@ -402,6 +435,7 @@ class ImChatPendingFormResponder
 		// message
 
 		htmlTableCellOpen (
+			formatWriter,
 			htmlStyleRuleEntry (
 				"width",
 				"100%"));
@@ -423,11 +457,13 @@ class ImChatPendingFormResponder
 			" style=\"display: none\"",
 			"></span>");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// send
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -438,15 +474,18 @@ class ImChatPendingFormResponder
 			" disabled",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// table row close
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void renderFreeTemplate () {
+	void renderFreeTemplate (
+			@NonNull FormatWriter formatWriter) {
 
 		if (! imChat.getFreeMessageEnabled ()) {
 			return;
@@ -455,6 +494,7 @@ class ImChatPendingFormResponder
 		// table row open
 
 		htmlTableRowOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"template"),
 			htmlDataAttribute (
@@ -471,7 +511,8 @@ class ImChatPendingFormResponder
 
 		// radio button
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -482,16 +523,19 @@ class ImChatPendingFormResponder
 			" value=\"free\"",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// template name
 
 		htmlTableCellWrite (
+			formatWriter,
 			"Free");
 
 		// message
 
 		htmlTableCellOpen (
+			formatWriter,
 			htmlStyleRuleEntry (
 				"width",
 				"100%"));
@@ -513,11 +557,13 @@ class ImChatPendingFormResponder
 			" style=\"display: none\"",
 			"></span>");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// send
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -528,20 +574,24 @@ class ImChatPendingFormResponder
 			" disabled",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// table row close
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
 	void renderTemplate (
-			ImChatTemplateRec template) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull ImChatTemplateRec template) {
 
 		// table row open
 
 		htmlTableRowOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"template"),
 			htmlDataAttribute (
@@ -551,7 +601,8 @@ class ImChatPendingFormResponder
 
 		// radio button
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -566,22 +617,26 @@ class ImChatPendingFormResponder
 				template.getId ()),
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// template name
 
 		htmlTableCellWriteHtml (
+			formatWriter,
 			htmlEncodeNonBreakingWhitespace (
 				template.getName ()));
 
 		// message
 
 		htmlTableCellWrite (
+			formatWriter,
 			template.getText ());
 
 		// send
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -592,16 +647,19 @@ class ImChatPendingFormResponder
 			" disabled",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// table row close
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
 	void renderIgnore (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -624,12 +682,14 @@ class ImChatPendingFormResponder
 			// table row open
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"template"));
 
 			// radio button
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -640,21 +700,25 @@ class ImChatPendingFormResponder
 				" value=\"ignore\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// template name
 
 			htmlTableCellWrite (
+				formatWriter,
 				"Ignore");
 
 			// message
 
 			htmlTableCellWrite (
+				formatWriter,
 				"");
 
 			// send
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -665,11 +729,13 @@ class ImChatPendingFormResponder
 				" disabled",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// table row close
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

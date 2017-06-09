@@ -34,6 +34,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -42,6 +43,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -70,6 +73,9 @@ class ChatRebillSendPart
 	@SingletonDependency
 	@NamedDependency ("chatRebillNonBillResultsFormType")
 	ConsoleFormType <ChatRebillNonBillResult> nonBillResultsFormType;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	@NamedDependency ("chatRebillSearchFormType")
@@ -183,7 +189,8 @@ class ChatRebillSendPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -195,17 +202,21 @@ class ChatRebillSendPart
 		) {
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"This tool allows you to rebill users who have not performed ",
 				"an action recently.");
 
 			renderSearchForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderBillSearchResults (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderNonBillSearchResults (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -213,7 +224,8 @@ class ChatRebillSendPart
 
 	private
 	void renderSearchForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -225,17 +237,22 @@ class ChatRebillSendPart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chat.rebill.send"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			searchForm.outputFormRows (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -263,9 +280,11 @@ class ChatRebillSendPart
 
 			}
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -273,7 +292,8 @@ class ChatRebillSendPart
 
 	private
 	void renderBillSearchResults (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -292,9 +312,11 @@ class ChatRebillSendPart
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Search results");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Found %s users who qualify for rebilling under the criteria ",
 				integerToDecimalString (
 					collectionSize (
@@ -314,6 +336,7 @@ class ChatRebillSendPart
 			) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"Another %s users who did not meet the requirements for ",
 					integerToDecimalString (
 						collectionSize (
@@ -324,6 +347,7 @@ class ChatRebillSendPart
 
 			billResultsForm.outputListTable (
 				transaction,
+				formatWriter,
 				true);
 
 		}
@@ -332,7 +356,8 @@ class ChatRebillSendPart
 
 	private
 	void renderNonBillSearchResults (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -356,9 +381,11 @@ class ChatRebillSendPart
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Non-billable results");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Found %s ",
 				integerToDecimalString (
 					collectionSize (
@@ -370,6 +397,7 @@ class ChatRebillSendPart
 
 			nonBillResultsForm.outputListTable (
 				transaction,
+				formatWriter,
 				true);
 
 		}

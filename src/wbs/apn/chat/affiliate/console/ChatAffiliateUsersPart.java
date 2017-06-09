@@ -23,6 +23,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -82,7 +84,8 @@ class ChatAffiliateUsersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -93,9 +96,11 @@ class ChatAffiliateUsersPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"User",
 				"Name",
 				"Info",
@@ -106,28 +111,35 @@ class ChatAffiliateUsersPart
 					: chatUsers
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUser.getCode ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUser.getName ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUser.getInfoText (),
 						() -> chatUser.getInfoText ().getText ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						chatUser.getOnline ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,6 @@ import javax.imageio.ImageIO;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -29,9 +29,11 @@ import wbs.platform.graph.console.GraphScale;
 
 import wbs.utils.io.RuntimeIoException;
 
+import wbs.web.responder.BufferedResponder;
+
 public abstract
 class GraphImageResponder
-	extends ConsoleResponder {
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -324,7 +326,7 @@ class GraphImageResponder
 
 	@Override
 	protected
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -332,7 +334,7 @@ class GraphImageResponder
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setHtmlHeaders");
+					"headers");
 
 		) {
 
@@ -346,7 +348,8 @@ class GraphImageResponder
 	@Override
 	protected
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
 
 		try (
 
@@ -360,7 +363,7 @@ class GraphImageResponder
 			ImageIO.write (
 				image,
 				"PNG",
-				requestContext.outputStream ());
+				outputStream);
 
 		} catch (IOException ioException) {
 

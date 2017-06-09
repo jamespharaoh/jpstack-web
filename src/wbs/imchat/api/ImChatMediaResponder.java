@@ -1,8 +1,9 @@
 package wbs.imchat.api;
 
-import static wbs.utils.collection.CollectionUtils.arrayLength;
 import static wbs.utils.etc.IoUtils.writeBytes;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.Misc.doNothing;
+
+import java.io.OutputStream;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,13 +18,13 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.web.context.RequestContext;
-import wbs.web.responder.AbstractResponder;
+import wbs.web.responder.BufferedResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("imChatMediaResponder")
 public
 class ImChatMediaResponder
-	extends AbstractResponder {
+	extends BufferedResponder {
 
 	// dependencies
 
@@ -45,7 +46,39 @@ class ImChatMediaResponder
 
 	@Override
 	protected
-	void goHeaders (
+	void prepare (
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
+	protected
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goContent");
+
+		) {
+
+			writeBytes (
+				outputStream,
+				data);
+
+		}
+
+	}
+
+	@Override
+	protected
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -59,34 +92,6 @@ class ImChatMediaResponder
 
 			requestContext.contentType (
 				contentType);
-
-			requestContext.setHeader (
-				"Content-Length",
-				integerToDecimalString (
-					arrayLength (
-						data)));
-
-		}
-
-	}
-
-	@Override
-	protected
-	void goContent (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"goContent");
-
-		) {
-
-			writeBytes (
-				requestContext.outputStream (),
-				data);
 
 		}
 

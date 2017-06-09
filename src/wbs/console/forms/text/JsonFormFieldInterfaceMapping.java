@@ -19,7 +19,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
-import wbs.utils.string.StringFormatWriter;
+import wbs.utils.string.LazyFormatWriter;
 
 import fj.data.Either;
 import wbs.web.utils.JsonToHtml;
@@ -51,8 +51,8 @@ class JsonFormFieldInterfaceMapping <Container>
 					logContext,
 					"genericToInterface");
 
-			StringFormatWriter formatWriter =
-				new StringFormatWriter ();
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ();
 
 		) {
 

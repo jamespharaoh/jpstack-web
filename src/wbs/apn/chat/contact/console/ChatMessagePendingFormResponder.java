@@ -37,6 +37,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -99,7 +101,8 @@ class ChatMessagePendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -111,11 +114,13 @@ class ChatMessagePendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			// script open
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			// original message
 
@@ -250,7 +255,8 @@ class ChatMessagePendingFormResponder
 
 			// script close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -259,7 +265,8 @@ class ChatMessagePendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -271,12 +278,14 @@ class ChatMessagePendingFormResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				"Chat message to approve");
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					stringFormat (
 						"/chatMessage.pending",
@@ -296,11 +305,13 @@ class ChatMessagePendingFormResponder
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// options
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Options",
 				() -> {
 
@@ -322,6 +333,7 @@ class ChatMessagePendingFormResponder
 			// template
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"helpRow"),
 				htmlStyleRuleEntry (
@@ -329,15 +341,19 @@ class ChatMessagePendingFormResponder
 					"none"));
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Template");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			htmlSelectOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"templateId"));
 
-			htmlOptionWrite ();
+			htmlOptionWrite (
+				formatWriter);
 
 			for (
 				ChatHelpTemplateRec chatHelpTemplate
@@ -345,13 +361,15 @@ class ChatMessagePendingFormResponder
 			) {
 
 				htmlOptionWrite (
+					formatWriter,
 					integerToDecimalString (
 						chatHelpTemplate.getId ()),
 					chatHelpTemplate.getCode ());
 
 			}
 
-			htmlSelectClose ();
+			htmlSelectClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -360,13 +378,16 @@ class ChatMessagePendingFormResponder
 				" value=\"ok\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// message
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Message",
 				() -> formatWriter.writeLineFormat (
 					"<textarea",
@@ -382,12 +403,15 @@ class ChatMessagePendingFormResponder
 
 			// actions
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Actions");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -422,13 +446,16 @@ class ChatMessagePendingFormResponder
 				" value=\"reject and send warning\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// script
 
@@ -438,7 +465,8 @@ class ChatMessagePendingFormResponder
 						"reject"))
 			) {
 
-				htmlScriptBlockOpen ();
+				htmlScriptBlockOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"showReject ();");
@@ -448,13 +476,15 @@ class ChatMessagePendingFormResponder
 					requestContext.parameterRequired (
 						"message"));
 
-				htmlScriptBlockClose ();
+				htmlScriptBlockClose (
+					formatWriter);
 
 			}
 
 			// form close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 

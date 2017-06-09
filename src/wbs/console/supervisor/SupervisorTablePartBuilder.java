@@ -11,8 +11,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
-import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -57,7 +55,7 @@ class SupervisorTablePartBuilder
 	// state
 
 	@Getter @Setter
-	List <Provider <PagePart>> pagePartFactories =
+	List <StatsPagePartFactory> pagePartFactories =
 		new ArrayList<> ();
 
 	// build
@@ -78,15 +76,17 @@ class SupervisorTablePartBuilder
 
 		) {
 
-			PagePartFactory pagePartFactory =
-				nextTaskLogger ->
+			supervisorConfigBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
 					supervisorTablePartProvider.get ()
 
-				.supervisorTablePartBuilder (
-					SupervisorTablePartBuilder.this);
+				.statsPeriod (
+					statsPeriod)
 
-			supervisorConfigBuilder.pagePartFactories ().add (
-				pagePartFactory);
+				.statsDataSets (
+					statsData)
+
+			);
 
 			builder.descend (
 				taskLogger,

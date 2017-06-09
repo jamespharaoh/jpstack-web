@@ -22,6 +22,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("manualResponderStatusLinePart")
 public
 class ManualResponderStatusLinePart
@@ -52,7 +54,8 @@ class ManualResponderStatusLinePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -64,6 +67,7 @@ class ManualResponderStatusLinePart
 		) {
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"manual-responder-row"),
 				htmlStyleRuleEntry (
@@ -71,11 +75,13 @@ class ManualResponderStatusLinePart
 					"none"));
 
 			htmlTableCellWrite (
+				formatWriter,
 				"—",
 				htmlIdAttribute (
 					"manual-responder-cell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

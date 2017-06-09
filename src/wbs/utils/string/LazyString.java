@@ -1,44 +1,23 @@
 package wbs.utils.string;
 
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
+import java.util.List;
 
 import javax.inject.Provider;
-
-import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 public
-class LazyString
-	implements CharSequence {
+interface LazyString
+	extends CharSequence {
 
-	// state
+	// interface
 
-	private final
-	Provider <String> provider;
+	List <String> toParts ();
 
-	private
-	Optional <String> value =
-		optionalAbsent ();
-
-	// constructors
-
-	public
-	LazyString (
-			@NonNull Provider <String> provider) {
-
-		this.provider =
-			provider;
-
-	}
-
-	// implementation
+	// default char sequence implementation
 
 	@Override
-	public
+	default
 	int length () {
 
 		return toString ().length ();
@@ -46,18 +25,17 @@ class LazyString
 	}
 
 	@Override
-	public
+	default
 	char charAt (
 			int index) {
 
 		return toString ().charAt (
 			index);
 
-
 	}
 
 	@Override
-	public
+	default
 	CharSequence subSequence (
 			int start,
 			int end) {
@@ -68,22 +46,31 @@ class LazyString
 
 	}
 
-	@Override
-	public
-	String toString () {
+	// static factories
 
-		if (
-			optionalIsNotPresent (
-				value)
-		) {
+	static
+	LazyString singleton (
+			@NonNull String value) {
 
-			value =
-				optionalOf (
-					provider.get ());
+		return new LazyStringSimple (
+			value);
 
-		}
+	}
 
-		return optionalGetRequired (
+	static
+	LazyString singleton (
+			@NonNull CharSequence value) {
+
+		return new LazyStringSingleton (
+			() -> value.toString ());
+
+	}
+
+	static
+	LazyString singleton (
+			@NonNull Provider <String> value) {
+
+		return new LazyStringSingleton (
 			value);
 
 	}

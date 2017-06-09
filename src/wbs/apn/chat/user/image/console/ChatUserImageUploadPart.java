@@ -9,6 +9,7 @@ import lombok.NonNull;
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -17,6 +18,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.image.model.ChatUserImageType;
 
@@ -33,6 +36,9 @@ class ChatUserImageUploadPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -82,7 +88,8 @@ class ChatUserImageUploadPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -94,10 +101,12 @@ class ChatUserImageUploadPart
 		) {
 
 			htmlParagraphWrite (
+				formatWriter,
 				"Please upload the photo or video.");
 
 			form.outputFormTable (
 				transaction,
+				formatWriter,
 				"post",
 				requestContext.resolveLocalUrlFormat (
 					"/chatUser.%s.upload",

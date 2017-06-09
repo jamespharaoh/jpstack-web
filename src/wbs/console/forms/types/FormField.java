@@ -11,6 +11,8 @@ import wbs.console.forms.core.ConsoleForm;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 
+import wbs.utils.string.FormatWriter;
+
 public
 interface FormField <Container, Generic, Native, Interface>
 	extends FormItem <Container> {
@@ -35,7 +37,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
@@ -47,7 +50,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object,
 			@NonNull Long columnSpan) {
 
@@ -58,7 +62,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -68,7 +73,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -78,7 +84,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Optional <String> error) {
 
@@ -89,7 +96,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderFormReset (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> formContext,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		doNothing ();
@@ -99,7 +107,8 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void renderCsvRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object) {
 
 		doNothing ();
@@ -109,7 +118,7 @@ interface FormField <Container, Generic, Native, Interface>
 	default
 	void implicit (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container object) {
 
 		doNothing ();

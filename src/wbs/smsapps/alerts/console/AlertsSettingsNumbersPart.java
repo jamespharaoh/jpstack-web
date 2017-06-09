@@ -18,6 +18,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -28,6 +29,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("alertsSettingsNumbersPart")
 public
@@ -41,6 +44,9 @@ class AlertsSettingsNumbersPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -73,7 +79,8 @@ class AlertsSettingsNumbersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -86,14 +93,16 @@ class AlertsSettingsNumbersPart
 
 			// top
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			if (
 				requestContext.canContext (
 					"super")
 			) {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -101,15 +110,18 @@ class AlertsSettingsNumbersPart
 					" value=\"save changes\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
 			// entries
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Name",
 				"Number",
 				"Enabled",
@@ -122,11 +134,13 @@ class AlertsSettingsNumbersPart
 					: alertsSettings.getAlertsNumbers ()
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				// name
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -145,11 +159,13 @@ class AlertsSettingsNumbersPart
 						alertsNumber.getName ()),
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// number
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -168,13 +184,16 @@ class AlertsSettingsNumbersPart
 						alertsNumber.getNumber ().getNumber ()),
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				// enabled
 
 				htmlSelectYesNo (
+					formatWriter,
 					stringFormat (
 						"enabled_%s",
 						integerToDecimalString (
@@ -186,11 +205,13 @@ class AlertsSettingsNumbersPart
 								alertsNumber.getId ()))),
 					alertsNumber.getEnabled ());
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// submit
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -203,19 +224,23 @@ class AlertsSettingsNumbersPart
 					" value=\"delete\"",
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// close row
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// add new
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -226,9 +251,11 @@ class AlertsSettingsNumbersPart
 					"name_new"),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -239,21 +266,26 @@ class AlertsSettingsNumbersPart
 					"number_new"),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			htmlSelectYesNo (
+				formatWriter,
 				"enabled_new",
 				requestContext.formOrEmptyString (
 					"enabled_new"),
 				true);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// submit
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -262,22 +294,26 @@ class AlertsSettingsNumbersPart
 				" value=\"add new\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// close row
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// bottom
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			if (
 				requestContext.canContext (
 					"alertsSettings.manage")
 			) {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -285,11 +321,13 @@ class AlertsSettingsNumbersPart
 					" value=\"save changes\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

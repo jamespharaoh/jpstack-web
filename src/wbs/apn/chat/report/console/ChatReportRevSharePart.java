@@ -59,6 +59,7 @@ import wbs.sms.message.stats.model.MessageStatsSearch;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
@@ -136,6 +137,9 @@ class ChatReportRevSharePart
 
 	@SingletonDependency
 	ObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	@NamedDependency ("chatReportRevShareResultsFormType")
@@ -821,7 +825,8 @@ class ChatReportRevSharePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -833,10 +838,12 @@ class ChatReportRevSharePart
 		) {
 
 			goSearchForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goReport (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -844,7 +851,8 @@ class ChatReportRevSharePart
 
 	private
 	void goSearchForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -856,15 +864,19 @@ class ChatReportRevSharePart
 		) {
 
 			htmlFormOpenGetAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatReport.revShare"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			searchForm.outputFormRows (
-				transaction);
+				transaction,
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Actions",
 				stringFormat (
 					"<input",
@@ -872,16 +884,19 @@ class ChatReportRevSharePart
 					" value=\"search\"",
 					">"));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goReport (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -893,20 +908,25 @@ class ChatReportRevSharePart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Stats");
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// header
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			resultsForm.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// row
 
@@ -915,44 +935,55 @@ class ChatReportRevSharePart
 					: chatReportsSorted
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				resultsForm.outputTableCellsList (
 					transaction,
+					formatWriter,
 					chatReport,
 					true);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// total
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			resultsForm.outputTableCellsList (
 				transaction,
+				formatWriter,
 				totalReport,
 				true);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
 	}
 
-	void goRates () {
+	void goRates (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"Rates");
 
-		htmlTableOpenList ();
+		htmlTableOpenList (
+			formatWriter);
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 

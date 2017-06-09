@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -27,6 +28,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -50,6 +53,9 @@ class ChatSettingsMonitorsPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -192,7 +198,8 @@ class ChatSettingsMonitorsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -206,26 +213,32 @@ class ChatSettingsMonitorsPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chat.settings.monitors"));
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Orient",
 				"Male",
 				"Female");
 
 			// gay row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWrite (
+				formatWriter,
 				"Gay");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -239,9 +252,11 @@ class ChatSettingsMonitorsPart
 						gayMale)),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -255,16 +270,20 @@ class ChatSettingsMonitorsPart
 						gayFemale)),
 				">");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// bi row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWrite (
+				formatWriter,
 				"Bi");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -278,9 +297,11 @@ class ChatSettingsMonitorsPart
 						biMale)),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -294,18 +315,23 @@ class ChatSettingsMonitorsPart
 						biFemale)),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// straight row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWrite (
+				formatWriter,
 				"Straight");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -319,9 +345,11 @@ class ChatSettingsMonitorsPart
 						straightMale)),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -335,17 +363,21 @@ class ChatSettingsMonitorsPart
 						straightFemale)),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -353,11 +385,13 @@ class ChatSettingsMonitorsPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

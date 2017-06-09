@@ -5,6 +5,8 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
+import java.io.OutputStream;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -16,18 +18,16 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.model.MediaRec;
 
-import wbs.utils.io.BorrowedOutputStream;
-
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.context.RequestContext;
-import wbs.web.responder.AbstractResponder;
+import wbs.web.responder.BufferedResponder;
 
 @PrototypeComponent ("chatInfoSiteImageResponder")
 public
 class ChatInfoSiteImageResponder
-	extends AbstractResponder {
+	extends BufferedResponder {
 
 	// dependencies
 
@@ -125,7 +125,7 @@ class ChatInfoSiteImageResponder
 
 	@Override
 	protected
-	void goHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -151,8 +151,9 @@ class ChatInfoSiteImageResponder
 
 	@Override
 	protected
-	void goContent (
-			@NonNull Transaction parentTransaction) {
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
 
 		try (
 
@@ -161,13 +162,10 @@ class ChatInfoSiteImageResponder
 					logContext,
 					"goContent");
 
-			BorrowedOutputStream out =
-				requestContext.outputStream ();
-
 		) {
 
 			writeBytes (
-				out,
+				outputStream,
 				data);
 
 		}

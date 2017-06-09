@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Optional;
-
 import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -81,7 +79,8 @@ class StatsConsoleLogic {
 					: sortedGroups
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				grouper.writeTdForGroup (
 					transaction,
@@ -117,10 +116,11 @@ class StatsConsoleLogic {
 				formatter.formatTotal (
 					formatWriter,
 					group,
-					Optional.fromNullable (
+					optionalFromNullable (
 						totalValue));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 

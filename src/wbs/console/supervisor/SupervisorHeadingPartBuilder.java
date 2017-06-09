@@ -7,7 +7,6 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
-import wbs.console.part.PagePartFactory;
 import wbs.console.part.TextPart;
 
 import wbs.framework.builder.Builder;
@@ -79,15 +78,14 @@ class SupervisorHeadingPartBuilder
 					"<h2>%h</h2>\n",
 					label);
 
-			PagePartFactory pagePartFactory =
-				nextTaskLogger ->
+			supervisorConfigBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
 					textPartProvider.get ()
 
 				.text (
-					text);
+					text)
 
-			supervisorConfigBuilder.pagePartFactories ().add (
-				pagePartFactory);
+			);
 
 		}
 

@@ -109,9 +109,6 @@ class ConsoleFormImplementation <Container>
 	FormFieldSubmission submission;
 
 	@Getter @Setter
-	FormatWriter formatWriter;
-
-	@Getter @Setter
 	FormUpdateResultSet updateResultSet;
 
 	// accesors
@@ -430,7 +427,8 @@ class ConsoleFormImplementation <Container>
 	@Override
 	public
 	void outputTableHeadings (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -459,7 +457,8 @@ class ConsoleFormImplementation <Container>
 	@Override
 	public
 	void outputCsvHeadings (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -507,6 +506,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object) {
 
 		try (
@@ -547,6 +547,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderFormAlwaysHidden (
 					transaction,
+					formatWriter,
 					this,
 					object);
 
@@ -560,6 +561,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object) {
 
 		try (
@@ -587,6 +589,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderFormTemporarilyHidden (
 					transaction,
+					formatWriter,
 					this,
 					object);
 
@@ -600,6 +603,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputFormRows (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container) {
 
 		try (
@@ -671,6 +675,7 @@ class ConsoleFormImplementation <Container>
 
 					formField.renderFormRow (
 						transaction,
+						formatWriter,
 						this,
 						container,
 						error);
@@ -696,6 +701,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputFormReset (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container) {
 
 		try (
@@ -714,6 +720,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderFormReset (
 					transaction,
+					formatWriter,
 					this,
 					container);
 
@@ -727,6 +734,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputFormTable (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object,
 			@NonNull String method,
 			@NonNull String actionUrl,
@@ -742,7 +750,8 @@ class ConsoleFormImplementation <Container>
 		) {
 
 			outputFormDebug (
-				transaction);
+				transaction,
+				formatWriter);
 
 			String enctype =
 				ifThenElse (
@@ -769,6 +778,7 @@ class ConsoleFormImplementation <Container>
 
 			outputFormRows (
 				transaction,
+				formatWriter,
 				object);
 
 			htmlTableClose (
@@ -798,6 +808,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputDetailsTable (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object) {
 
 		try (
@@ -814,6 +825,7 @@ class ConsoleFormImplementation <Container>
 
 			outputTableRows (
 				transaction,
+				formatWriter,
 				object);
 
 			htmlTableClose (
@@ -827,6 +839,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputListTable (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean links) {
 
 		try (
@@ -849,7 +862,8 @@ class ConsoleFormImplementation <Container>
 				formatWriter);
 
 			outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
 			htmlTableRowClose (
 				formatWriter);
@@ -885,6 +899,7 @@ class ConsoleFormImplementation <Container>
 
 					outputTableCellsList (
 						transaction,
+						formatWriter,
 						value,
 						links);
 
@@ -908,6 +923,7 @@ class ConsoleFormImplementation <Container>
 
 								rowField.renderTableCellList (
 									transaction,
+									formatWriter,
 									this,
 									value,
 									links,
@@ -949,6 +965,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputCsvRow (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object) {
 
 		try (
@@ -976,6 +993,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderCsvRow (
 					transaction,
+					formatWriter,
 					this,
 					object);
 
@@ -994,6 +1012,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputTableCellsList (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object,
 			@NonNull Boolean links) {
 
@@ -1015,6 +1034,7 @@ class ConsoleFormImplementation <Container>
 
 					formField.renderTableCellList (
 						transaction,
+						formatWriter,
 						this,
 						object,
 						links,
@@ -1042,6 +1062,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputTableRowsList (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object,
 			@NonNull Boolean links,
 			@NonNull Long columnSpan) {
@@ -1062,6 +1083,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderTableCellList (
 					transaction,
+					formatWriter,
 					this,
 					object,
 					links,
@@ -1077,6 +1099,7 @@ class ConsoleFormImplementation <Container>
 	public
 	void outputTableRows (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container object) {
 
 		try (
@@ -1111,6 +1134,7 @@ class ConsoleFormImplementation <Container>
 
 				formField.renderTableCellProperties (
 					transaction,
+					formatWriter,
 					this,
 					object,
 					1l);
@@ -1127,7 +1151,8 @@ class ConsoleFormImplementation <Container>
 	@Override
 	public
 	void outputFormDebug (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 

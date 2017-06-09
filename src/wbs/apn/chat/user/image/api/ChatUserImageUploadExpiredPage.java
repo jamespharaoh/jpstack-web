@@ -11,18 +11,20 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.web.context.RequestContext;
-import wbs.web.responder.PrintResponder;
+import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("chatUserImageUploadExpiredPage")
 public
 class ChatUserImageUploadExpiredPage
-	extends PrintResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -96,7 +98,7 @@ class ChatUserImageUploadExpiredPage
 
 	@Override
 	protected
-	void goHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -118,8 +120,9 @@ class ChatUserImageUploadExpiredPage
 
 	@Override
 	protected
-	void goContent (
-			@NonNull Transaction parentTransaction) {
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -137,10 +140,12 @@ class ChatUserImageUploadExpiredPage
 				"<html>");
 
 			goHead (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goBody (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -151,7 +156,8 @@ class ChatUserImageUploadExpiredPage
 
 	protected
 	void goHead (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -178,7 +184,8 @@ class ChatUserImageUploadExpiredPage
 
 	protected
 	void goBody (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 

@@ -14,7 +14,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeadClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeadOpen;
-import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
@@ -31,6 +31,7 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -47,6 +48,8 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("simulatorSessionConsolePart")
 public
 class SimulatorSessionConsolePart
@@ -59,6 +62,9 @@ class SimulatorSessionConsolePart
 
 	@SingletonDependency
 	NetworkConsoleHelper networkHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
@@ -163,7 +169,8 @@ class SimulatorSessionConsolePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -175,6 +182,7 @@ class SimulatorSessionConsolePart
 		) {
 
 			htmlDivOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"simulator"),
 				htmlDataAttribute (
@@ -187,12 +195,15 @@ class SimulatorSessionConsolePart
 						"/simulatorSession.poll")));
 
 			controls (
-				transaction);
+				transaction,
+				formatWriter);
 
 			eventsList (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlDivClose ();
+			htmlDivClose (
+				formatWriter);
 
 		}
 
@@ -200,7 +211,8 @@ class SimulatorSessionConsolePart
 
 	private
 	void controls (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -211,7 +223,8 @@ class SimulatorSessionConsolePart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			/*
 			pf ("<tr>\n",
@@ -230,8 +243,10 @@ class SimulatorSessionConsolePart
 			*/
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Network",
 				() -> htmlSelect (
+					formatWriter,
 					"network",
 					networkOptions,
 					optionalOrEmptyString (
@@ -244,6 +259,7 @@ class SimulatorSessionConsolePart
 						"networkSelect")));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Num from",
 				() -> formatWriter.writeLineFormat (
 					"<input",
@@ -259,6 +275,7 @@ class SimulatorSessionConsolePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Num to",
 				() -> formatWriter.writeLineFormat (
 					"<input",
@@ -274,6 +291,7 @@ class SimulatorSessionConsolePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Message",
 				() -> formatWriter.writeLineFormat (
 					"<input",
@@ -288,9 +306,11 @@ class SimulatorSessionConsolePart
 							"simulator_message")),
 					">"));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<button",
@@ -298,14 +318,16 @@ class SimulatorSessionConsolePart
 				" type=\"submit\"",
 				">send message</button>");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void eventsList (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -317,26 +339,33 @@ class SimulatorSessionConsolePart
 		) {
 
 			htmlTableOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"list",
 					"events"));
 
-			htmlTableHeadOpen ();
+			htmlTableHeadOpen (
+				formatWriter);
 
-			htmlTableHeaderRowHtml (
+			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Date",
 				"Time",
 				"Type",
 				"Details",
 				"Actions");
 
-			htmlTableHeadClose ();
+			htmlTableHeadClose (
+				formatWriter);
 
-			htmlTableBodyOpen ();
+			htmlTableBodyOpen (
+				formatWriter);
 
-			htmlTableBodyClose ();
+			htmlTableBodyClose (
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

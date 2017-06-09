@@ -111,6 +111,7 @@ class ConsoleDeploymentRestartFormActionHelper
 			if (consoleDeployment.getRestart ()) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"There is already a restart scheduled for this console ",
 					"deployment, but it has not yet taken place. If this ",
 					"message persists, please contact support.");
@@ -118,6 +119,7 @@ class ConsoleDeploymentRestartFormActionHelper
 			} else {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"Trigger a restart for this console deployment");
 
 			}

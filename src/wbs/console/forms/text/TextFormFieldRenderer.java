@@ -342,7 +342,7 @@ class TextFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue,
@@ -359,6 +359,7 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					listAlign ().name ()),
@@ -371,13 +372,14 @@ class TextFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 
@@ -387,7 +389,7 @@ class TextFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue,
@@ -404,6 +406,7 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					propertiesAlign ().name ()),
@@ -412,13 +415,14 @@ class TextFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 

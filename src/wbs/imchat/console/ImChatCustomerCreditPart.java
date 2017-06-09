@@ -4,13 +4,12 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.max;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 
-import java.util.List;
-
 import lombok.NonNull;
 
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -19,6 +18,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.imchat.model.ImChatCustomerCreditRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -46,6 +47,9 @@ class ImChatCustomerCreditPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	@NamedDependency ("imChatCustomerCreditActionFormType")
@@ -111,7 +115,8 @@ class ImChatCustomerCreditPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -122,29 +127,36 @@ class ImChatCustomerCreditPart
 
 		) {
 
-			requestContext.flushNotices ();
+			requestContext.flushNotices (
+				formatWriter);
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Customer details");
 
 			customerForm.outputDetailsTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Apply credit");
 
 			requestForm.outputFormTable (
 				transaction,
+				formatWriter,
 				"post",
 				requestContext.resolveLocalUrl (
 					"/imChatCustomer.credit"),
 				"apply credit");
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Recent credit history");
 
 			historyForm.outputListTable (
 				transaction,
+				formatWriter,
 				true);
 
 		}

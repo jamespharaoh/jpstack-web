@@ -7,7 +7,6 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
-import wbs.console.part.PagePart;
 import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsResolver;
@@ -115,30 +114,26 @@ class SupervisorTableStatsTotalBuilder
 
 			}
 
-			Provider <PagePart> pagePartFactory =
-				new Provider <PagePart> () {
+			supervisorTablePartBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
+					supervisorTableStatsGroupPartProvider.get ()
 
-				@Override
-				public
-				PagePart get () {
+				.statsGrouper (
+					statsGrouper)
 
-					return supervisorTableStatsGroupPartProvider.get ()
+				.statsResolver (
+					statsResolver)
 
-						.statsGrouper (
-							statsGrouper)
+				.statsFormatter (
+					statsFormatter)
 
-						.statsResolver (
-							statsResolver)
+				.statsPeriod (
+					statsPeriod)
 
-						.statsFormatter (
-							statsFormatter);
+				.statsDataSetsByName (
+					statsData)
 
-				}
-
-			};
-
-			supervisorTablePartBuilder.pagePartFactories ()
-				.add (pagePartFactory);
+			);
 
 		}
 

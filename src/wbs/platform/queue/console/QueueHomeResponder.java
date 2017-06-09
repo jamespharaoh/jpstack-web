@@ -3,11 +3,11 @@ package wbs.platform.queue.console;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
@@ -76,8 +76,6 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
@@ -90,6 +88,8 @@ import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("queueHomeResponder")
 public
@@ -292,7 +292,8 @@ class QueueHomeResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -304,19 +305,23 @@ class QueueHomeResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			htmlScriptBlockWrite (
+				formatWriter,
 				"top.show_inbox (true)");
 
-			renderStyles ();
+			renderStyles (
+				formatWriter);
 
 		}
 
 	}
 
 	private
-	void renderStyles () {
+	void renderStyles (
+			@NonNull FormatWriter formatWriter) {
 
 		if (
 			collectionIsEmpty (
@@ -325,7 +330,8 @@ class QueueHomeResponder
 			return;
 		}
 
-		htmlStyleBlockOpen ();
+		htmlStyleBlockOpen (
+			formatWriter);
 
 		for (
 			QueueRec queue
@@ -347,6 +353,7 @@ class QueueHomeResponder
 			}
 
 			htmlStyleRuleOpen (
+				formatWriter,
 				stringFormat (
 					"table.list tr.queue-%h td",
 					integerToDecimalString (
@@ -358,6 +365,7 @@ class QueueHomeResponder
 			) {
 
 				htmlStyleRuleEntryWrite (
+					formatWriter,
 					"background-color",
 					queue.getBackgroundColour ());
 
@@ -369,33 +377,38 @@ class QueueHomeResponder
 			) {
 
 				htmlStyleRuleEntryWrite (
+					formatWriter,
 					"color",
 					queue.getForegroundColour ());
 
 			}
 
-			htmlStyleRuleClose ();
+			htmlStyleRuleClose (
+				formatWriter);
 
 		}
 
-		htmlStyleBlockClose ();
+		htmlStyleBlockClose (
+			formatWriter);
 
 	}
 
 	protected
 	void goQueues (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"goQueues");
 
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Queues");
 
 			// nothing to claim
@@ -403,6 +416,7 @@ class QueueHomeResponder
 			if (queueInfos.isEmpty ()) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"Nothing to claim");
 
 				return;
@@ -411,21 +425,25 @@ class QueueHomeResponder
 
 			// render queue stuff
 
-			renderOptions ();
+			renderOptions (
+				formatWriter);
 
 			renderQueueItems (
-				taskLogger);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	private
-	void renderOptions () {
+	void renderOptions (
+			@NonNull FormatWriter formatWriter) {
 
 		// templates start
 
 		htmlDivOpen (
+			formatWriter,
 			htmlAttribute (
 				"style",
 				"display: none"));
@@ -433,24 +451,29 @@ class QueueHomeResponder
 		// option set template
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"optionSet"));
 
 		htmlSpanWrite (
+			formatWriter,
 			"",
 			htmlClassAttribute (
 				"optionSetName"));
 
 		htmlSpanWrite (
+			formatWriter,
 			"",
 			htmlClassAttribute (
 				"optionSetOptions"));
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 		// option template
 
 		htmlSpanOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"option"));
 
@@ -465,22 +488,27 @@ class QueueHomeResponder
 			" class=\"optionLabel\"",
 			"></label>");
 
-		htmlSpanClose ();
+		htmlSpanClose (
+			formatWriter);
 
-		htmlDivClose ();
+		htmlDivClose (
+			formatWriter);
 
 		// option sets
 
 		htmlDivWrite (
+			formatWriter,
 			"",
 			htmlClassAttribute (
 				"optionSets"));
 
 		// enable/disable link
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		htmlSpanWrite (
+			formatWriter,
 			"",
 			htmlClassAttribute (
 				"disabledInfo"));
@@ -491,6 +519,7 @@ class QueueHomeResponder
 			"(");
 
 		htmlLinkWriteInline (
+			formatWriter,
 			"javascript:void (0)",
 			"",
 			htmlClassAttribute (
@@ -501,19 +530,21 @@ class QueueHomeResponder
 
 		formatWriter.writeNewline ();
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	private
 	void renderQueueItems (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderQueueItems");
 
 		) {
@@ -521,11 +552,13 @@ class QueueHomeResponder
 			// table open
 
 			htmlTableOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"list",
 					"queueItemTable"));
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Claim",
 				"Type",
 				"Object",
@@ -537,14 +570,17 @@ class QueueHomeResponder
 			if (queueOptionsEnabled) {
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"loadingRow"));
 
 				htmlTableCellWrite (
+					formatWriter,
 					"loading...",
 					htmlColumnSpanAttribute (6l));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
@@ -583,6 +619,7 @@ class QueueHomeResponder
 				// table row open
 
 				htmlTableRowOpen (
+					formatWriter,
 
 					htmlClassAttribute (
 						joinWithSpace (
@@ -631,9 +668,11 @@ class QueueHomeResponder
 
 				// claim cell
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				htmlFormOpenPostAction (
+					formatWriter,
 					requestContext.resolveApplicationUrl (
 						"/queues/queue.claim"));
 
@@ -652,18 +691,22 @@ class QueueHomeResponder
 					" value=\"claim\"",
 					">");
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// type code
 
 				htmlTableCellWrite (
+					formatWriter,
 					parentTypeCode);
 
 				// object path
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPathMini (
 						transaction,
 						parent,
@@ -673,11 +716,13 @@ class QueueHomeResponder
 				// queue code
 
 				htmlTableCellWrite (
+					formatWriter,
 					queue.getCode ());
 
 				// available items
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.availableItems ()));
 
@@ -685,7 +730,7 @@ class QueueHomeResponder
 
 				if (
 					privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						objectManager.getParentRequired (
 							transaction,
 							queueInfo.queue ()),
@@ -693,12 +738,14 @@ class QueueHomeResponder
 				) {
 
 					htmlTableCellWrite (
+						formatWriter,
 						integerToDecimalString (
 							queueInfo.highestPriorityAvailable ()));
 
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"");
 
 				}
@@ -706,6 +753,7 @@ class QueueHomeResponder
 				// oldest
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					htmlEncodeNonBreakingWhitespace (
 						userConsoleLogic.prettyDuration (
 							transaction,
@@ -716,13 +764,15 @@ class QueueHomeResponder
 
 				// table row close
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -730,7 +780,8 @@ class QueueHomeResponder
 
 	protected
 	void goMyItems (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -749,11 +800,14 @@ class QueueHomeResponder
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"My items");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Unclaim",
 				"Object",
 				"Queue",
@@ -778,6 +832,7 @@ class QueueHomeResponder
 					queueSubject.getQueue ();
 
 				htmlTableRowOpen (
+					formatWriter,
 
 					htmlClassAttribute (
 						"magic-table-row",
@@ -797,9 +852,11 @@ class QueueHomeResponder
 
 				);
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				htmlFormOpenPostAction (
+					formatWriter,
 					requestContext.resolveApplicationUrl (
 						"/queues/queue.unclaim"));
 
@@ -818,11 +875,14 @@ class QueueHomeResponder
 					" value=\"unclaim\"",
 					">");
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPath (
 						transaction,
 						objectManager.getParentRequired (
@@ -832,27 +892,33 @@ class QueueHomeResponder
 							transaction)));
 
 				htmlTableCellWrite (
+					formatWriter,
 					queue.getCode ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
 						queueItem.getCreatedTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					queueItem.getSource ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					queueItem.getDetails ());
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				if (maxItems -- == 0)
 					break;
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -861,7 +927,8 @@ class QueueHomeResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -873,16 +940,19 @@ class QueueHomeResponder
 		) {
 
 			renderLinks (
-				transaction);
+				transaction,
+				formatWriter);
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			goQueues (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goMyItems (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -890,7 +960,8 @@ class QueueHomeResponder
 
 	private
 	void renderLinks (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -902,15 +973,18 @@ class QueueHomeResponder
 		) {
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
 			htmlLinkWrite (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					"/queues/queue.home"),
 				"Refresh");
 
 			htmlLinkWrite (
+				formatWriter,
 				"#",
 				"Close",
 
@@ -920,7 +994,8 @@ class QueueHomeResponder
 
 			);
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 

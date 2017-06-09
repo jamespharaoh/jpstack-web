@@ -310,7 +310,7 @@ class YesNoFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Boolean> interfaceValue,
@@ -327,6 +327,7 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					listAlign ().name ()),
@@ -339,13 +340,14 @@ class YesNoFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 
@@ -355,7 +357,7 @@ class YesNoFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Boolean> interfaceValue,
@@ -372,6 +374,7 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					propertiesAlign ().name ()),
@@ -380,13 +383,14 @@ class YesNoFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 

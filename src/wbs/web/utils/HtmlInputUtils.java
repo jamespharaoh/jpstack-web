@@ -2,7 +2,6 @@ package wbs.web.utils;
 
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
@@ -47,16 +46,6 @@ class HtmlInputUtils {
 
 	public static
 	void htmlSelectOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlSelectOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
-	void htmlSelectOpen (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull HtmlAttribute ... attributes) {
@@ -82,18 +71,6 @@ class HtmlInputUtils {
 	}
 
 	public static
-	void htmlSelectOpen (
-			@NonNull String name,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlSelectOpen (
-			currentFormatWriter (),
-			name,
-			attributes);
-
-	}
-
-	public static
 	void htmlSelectClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -101,14 +78,6 @@ class HtmlInputUtils {
 
 		formatWriter.writeLineFormat (
 			"</select>");
-
-	}
-
-	public static
-	void htmlSelectClose () {
-
-		htmlSelectClose (
-			currentFormatWriter ());
 
 	}
 
@@ -159,22 +128,6 @@ class HtmlInputUtils {
 
 	public static
 	void htmlOptionWrite (
-			@NonNull String value,
-			@NonNull Boolean selected,
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
-			value,
-			selected,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String value,
 			@NonNull String selectedValue,
@@ -182,7 +135,7 @@ class HtmlInputUtils {
 			@NonNull HtmlAttribute ... attributes) {
 
 		htmlOptionWrite (
-			currentFormatWriter (),
+			formatWriter,
 			value,
 			stringEqualSafe (
 				value,
@@ -194,40 +147,11 @@ class HtmlInputUtils {
 
 	public static
 	void htmlOptionWrite (
-			@NonNull String value,
-			@NonNull String selectedValue,
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
-			value,
-			selectedValue,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull HtmlAttribute ... attributes) {
 
 		htmlOptionWrite (
 			formatWriter,
-			"",
-			false,
-			"",
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWrite (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
 			"",
 			false,
 			"",
@@ -252,20 +176,6 @@ class HtmlInputUtils {
 
 	public static
 	void htmlOptionWrite (
-			@NonNull String value,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
-			value,
-			false,
-			value,
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String value,
 			@NonNull String content,
@@ -273,21 +183,6 @@ class HtmlInputUtils {
 
 		htmlOptionWrite (
 			formatWriter,
-			value,
-			false,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWrite (
-			@NonNull String value,
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
 			value,
 			false,
 			content,
@@ -303,20 +198,6 @@ class HtmlInputUtils {
 
 		htmlOptionWrite (
 			formatWriter,
-			value,
-			true,
-			value,
-			attributes);
-
-	}
-
-	public static
-	void htmlOptionWriteSelected (
-			@NonNull String value,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlOptionWrite (
-			currentFormatWriter (),
 			value,
 			true,
 			value,
@@ -396,42 +277,12 @@ class HtmlInputUtils {
 
 	public static
 	void htmlSelectYesNo (
-			@NonNull String name,
-			@NonNull Boolean value,
-			@NonNull String trueText,
-			@NonNull String falseText) {
-
-		htmlSelectYesNo (
-			currentFormatWriter (),
-			name,
-			value,
-			trueText,
-			falseText);
-
-	}
-
-	public static
-	void htmlSelectYesNo (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull Boolean value) {
 
 		htmlSelectYesNo (
 			formatWriter,
-			name,
-			value,
-			"yes",
-			"no");
-
-	}
-
-	public static
-	void htmlSelectYesNo (
-			@NonNull String name,
-			@NonNull Boolean value) {
-
-		htmlSelectYesNo (
-			currentFormatWriter (),
 			name,
 			value,
 			"yes",
@@ -495,20 +346,6 @@ class HtmlInputUtils {
 	}
 
 	public static
-	void htmlSelectYesNo (
-			@NonNull String name,
-			@NonNull String formValue,
-			@NonNull Boolean defaultValue) {
-
-		htmlSelectYesNo (
-			currentFormatWriter (),
-			name,
-			formValue,
-			defaultValue);
-
-	}
-
-	public static
 	void htmlSelectYesNoMaybe (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
@@ -545,18 +382,6 @@ class HtmlInputUtils {
 
 	}
 
-	public static
-	void htmlSelectYesNoMaybe (
-			@NonNull String name,
-			@NonNull String value) {
-
-		htmlSelectYesNoMaybe (
-			currentFormatWriter (),
-			name,
-			value);
-
-	}
-
 	public static <Key>
 	void htmlSelect (
 			@NonNull FormatWriter formatWriter,
@@ -575,6 +400,7 @@ class HtmlInputUtils {
 			name);
 
 		htmlAttributesWrite (
+			formatWriter,
 			attributes);
 
 		formatWriter.writeFormat (
@@ -601,22 +427,6 @@ class HtmlInputUtils {
 
 		formatWriter.writeLineFormat (
 			"</select>");
-
-	}
-
-	public static <Key>
-	void htmlSelect (
-			@NonNull String name,
-			@NonNull Map <? extends Key, String> options,
-			@NonNull Key selectedValue,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlSelect (
-			currentFormatWriter (),
-			name,
-			options,
-			selectedValue,
-			attributes);
 
 	}
 
@@ -678,22 +488,6 @@ class HtmlInputUtils {
 	}
 
 	// radio input elements
-
-	public static
-	void htmlRadio (
-			@NonNull String name,
-			@NonNull String value,
-			@NonNull Boolean selected,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlRadio (
-			currentFormatWriter (),
-			name,
-			value,
-			selected,
-			attributes);
-
-	}
 
 	public static
 	void htmlRadio (

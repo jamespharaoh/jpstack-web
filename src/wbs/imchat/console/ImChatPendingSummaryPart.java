@@ -56,6 +56,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.imchat.model.ImChatCustomerDetailValueRec;
@@ -209,7 +211,8 @@ class ImChatPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -221,61 +224,81 @@ class ImChatPendingSummaryPart
 		) {
 
 			htmlDivOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"layout-container"));
 
 			htmlTableOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"layout"));
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleAttribute (
 					htmlStyleRuleEntry (
 						"width",
 						"50%")));
 
 			goCustomerSummary (
-				transaction);
+				transaction,
+				formatWriter);
 
-			goCustomerDetails ();
+			goCustomerDetails (
+				transaction,
+				formatWriter);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleAttribute (
 					htmlStyleRuleEntry (
 						"width",
 						"50%")));
 
 			goProfileSummary (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goCustomerNotes (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlDivClose ();
+			htmlDivClose (
+				formatWriter);
 
 			goHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
-	void goCustomerDetails () {
+	void goCustomerDetails (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingThreeWrite (
+			formatWriter,
 			"Customer details");
 
-		htmlTableOpenDetails ();
+		htmlTableOpenDetails (
+			formatWriter);
 
 		for (
 			ImChatCustomerDetailTypeRec detailType
@@ -297,6 +320,7 @@ class ImChatPendingSummaryPart
 					detailType.getId ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				detailType.getName (),
 				ifNotNullThenElseEmDash (
 					detailValue,
@@ -304,12 +328,14 @@ class ImChatPendingSummaryPart
 
 		}
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 
 	void goCustomerSummary (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -321,10 +347,12 @@ class ImChatPendingSummaryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Customer summary");
 
 			customerForm.outputDetailsTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -332,7 +360,8 @@ class ImChatPendingSummaryPart
 
 	private
 	void goProfileSummary (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -344,10 +373,12 @@ class ImChatPendingSummaryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Profile summary");
 
 			profileForm.outputDetailsTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -355,7 +386,8 @@ class ImChatPendingSummaryPart
 
 	private
 	void goCustomerNotes (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -367,9 +399,11 @@ class ImChatPendingSummaryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Notes");
 
 			htmlParagraphWriteHtml (
+				formatWriter,
 				encodeNewlineToBr (
 					customer.getNotesText () != null
 						? customer.getNotesText ().getText ()
@@ -388,7 +422,8 @@ class ImChatPendingSummaryPart
 
 	private
 	void goHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -400,6 +435,7 @@ class ImChatPendingSummaryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Conversation history");
 
 			// retrieve messages
@@ -414,16 +450,20 @@ class ImChatPendingSummaryPart
 
 			// create message table
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// header
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			messageForm.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// row
 
@@ -441,20 +481,24 @@ class ImChatPendingSummaryPart
 						historyRequest.getPartnerImChatMessage ();
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlClassAttribute (
 							classForMessage (
 								historyReply)));
 
 					messageForm.outputTableCellsList (
 						transaction,
+						formatWriter,
 						historyReply,
 						true);
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						presentInstances (
 
@@ -473,14 +517,17 @@ class ImChatPendingSummaryPart
 
 				messageForm.outputTableCellsList (
 					transaction,
+					formatWriter,
 					historyRequest,
 					true);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

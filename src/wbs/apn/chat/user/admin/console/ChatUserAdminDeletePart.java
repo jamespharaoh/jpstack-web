@@ -3,8 +3,8 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
@@ -17,6 +17,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -24,6 +25,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -44,6 +47,9 @@ class ChatUserAdminDeletePart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -90,7 +96,8 @@ class ChatUserAdminDeletePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -114,34 +121,42 @@ class ChatUserAdminDeletePart
 
 			// information about this user
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"User ID",
 				integerToDecimalString (
 					chatUser.getId ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Code",
 				chatUser.getCode ());
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Number",
 				() -> consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatUser.getOldNumber ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Deleted",
 				booleanToYesNo (
 					isNotNull (
 						chatUser.getNumber ())));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// general information
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"The delete function simply removes the connection between ",
 				"the user and their phone number. This appears to the ",
 				"customer as if their profile has gone, while still allowing ",
@@ -150,6 +165,7 @@ class ChatUserAdminDeletePart
 			// action button, or excuse for having none
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.delete"));
 
@@ -207,7 +223,8 @@ class ChatUserAdminDeletePart
 
 			}
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

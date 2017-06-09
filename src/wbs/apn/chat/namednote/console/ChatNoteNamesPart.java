@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -26,6 +27,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -46,6 +49,9 @@ class ChatNoteNamesPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -83,7 +89,8 @@ class ChatNoteNamesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -97,11 +104,13 @@ class ChatNoteNamesPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				"chat.settings.noteNames");
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -110,13 +119,16 @@ class ChatNoteNamesPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Name",
 				"Options");
 
@@ -127,9 +139,11 @@ class ChatNoteNamesPart
 					: noteNames
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -146,9 +160,11 @@ class ChatNoteNamesPart
 						noteName.getName ()),
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -177,17 +193,21 @@ class ChatNoteNamesPart
 					" value=\"&times;\"",
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// new note
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -198,9 +218,11 @@ class ChatNoteNamesPart
 					"noteNameNew"),
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -209,17 +231,21 @@ class ChatNoteNamesPart
 				" value=\"add new\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls again
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -228,11 +254,13 @@ class ChatNoteNamesPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

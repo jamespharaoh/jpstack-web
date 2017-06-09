@@ -15,7 +15,7 @@ class NullFormatWriter
 	// properties
 
 	@Getter @Setter
-	String indentString = "\t";
+	String indentString = "";
 
 	@Getter @Setter
 	long indentSize = 0l;
@@ -25,16 +25,7 @@ class NullFormatWriter
 	@Override
 	public
 	void writeString (
-			@NonNull CharSequence string) {
-
-		doNothing ();
-
-	}
-
-	@Override
-	public
-	void writeCharacter (
-			int character) {
+			@NonNull LazyString lazyString) {
 
 		doNothing ();
 

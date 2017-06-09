@@ -19,6 +19,7 @@ import org.joda.time.Interval;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -35,6 +36,7 @@ import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueSupervisorItemsPart")
@@ -52,6 +54,9 @@ class QueueSupervisorItemsPart
 
 	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -112,7 +117,8 @@ class QueueSupervisorItemsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -124,10 +130,12 @@ class QueueSupervisorItemsPart
 		) {
 
 			renderParameterTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderContentTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -135,7 +143,8 @@ class QueueSupervisorItemsPart
 
 	private
 	void renderParameterTable (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -148,20 +157,24 @@ class QueueSupervisorItemsPart
 
 			// open table
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// write user table row
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"User",
 				() ->
 					objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						user));
 
 			// close table
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -169,7 +182,8 @@ class QueueSupervisorItemsPart
 
 	private
 	void renderContentTable (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -182,11 +196,13 @@ class QueueSupervisorItemsPart
 
 			// open table
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// write table header
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Object",
 				"Queue",
 				"Item",
@@ -214,42 +230,51 @@ class QueueSupervisorItemsPart
 
 				// open table row
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				objectManager.writeTdForObjectLink (
 					transaction,
+					formatWriter,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					queue,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					queueItem,
 					queue);
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
 						queueItem.getCreatedTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
 						queueItem.getPendingTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
 						queueItem.getProcessedTime ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

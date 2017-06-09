@@ -18,6 +18,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
@@ -68,7 +70,8 @@ class ChatUserImageRemovePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -79,7 +82,8 @@ class ChatUserImageRemovePart
 
 		) {
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			if (chatUser.getChatUserImageList ().isEmpty ()) {
 
@@ -88,15 +92,19 @@ class ChatUserImageRemovePart
 
 			} else {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				mediaConsoleLogic.writeMediaContent (
 					transaction,
+					formatWriter,
 					chatUser.getChatUserImageList ().get (0).getMedia ());
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -105,7 +113,8 @@ class ChatUserImageRemovePart
 					" value=\"remove photo\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
@@ -116,15 +125,19 @@ class ChatUserImageRemovePart
 
 			} else {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				mediaConsoleLogic.writeMediaContent (
 					transaction,
+					formatWriter,
 					chatUser.getChatUserVideoList ().get (0).getMedia ());
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -133,11 +146,13 @@ class ChatUserImageRemovePart
 					" value=\"remove video\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

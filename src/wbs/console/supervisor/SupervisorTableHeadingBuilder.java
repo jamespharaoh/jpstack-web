@@ -5,7 +5,6 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
-import wbs.console.part.PagePart;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -63,24 +62,17 @@ class SupervisorTableHeadingBuilder
 
 		) {
 
-			Provider <PagePart> pagePartFactory =
-				new Provider <PagePart> () {
+			supervisorTablePartBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
+					supervisorTableHeadingPartProvider.get ()
 
-				@Override
-				public
-				PagePart get () {
+				.supervisorTableHeadingSpec (
+					supervisorTableHeadingSpec)
 
-					return supervisorTableHeadingPartProvider.get ()
+				.statsPeriod (
+					statsPeriod)
 
-						.supervisorTableHeadingSpec (
-							supervisorTableHeadingSpec);
-
-				}
-
-			};
-
-			supervisorTablePartBuilder.pagePartFactories ()
-				.add (pagePartFactory);
+			);
 
 		}
 

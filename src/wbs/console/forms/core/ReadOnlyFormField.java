@@ -6,11 +6,11 @@ import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -51,6 +51,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")
@@ -224,6 +226,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
@@ -258,7 +261,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 							context.hints (),
 							genericValue)));
 
-			context.formatWriter ().writeLineFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"hidden\"",
 				" id=\"%h-%h\"",
@@ -281,7 +284,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
@@ -314,14 +318,14 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			renderer.renderHtmlTableCellList (
 				transaction,
-				context.formatWriter (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
 				link,
 				columnSpan);
@@ -334,7 +338,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Long columnSpan) {
 
@@ -366,14 +371,14 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			renderer.renderHtmlTableCellProperties (
 				transaction,
-				context.formatWriter (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
 				true,
 				columnSpan);
@@ -386,7 +391,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Optional <String> error) {
 
@@ -418,31 +424,31 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			htmlTableRowOpen (
-				context.formatWriter ());
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
-				context.formatWriter (),
+				formatWriter,
 				label ());
 
 			htmlTableCellOpen (
-				context.formatWriter ());
+				formatWriter);
 
 			renderer.renderHtmlComplex (
 				transaction,
-				context.formatWriter (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue);
 
 			htmlTableCellClose (
-				context.formatWriter ());
+				formatWriter);
 
 			htmlTableRowClose (
-				context.formatWriter ());
+				formatWriter);
 
 		}
 
@@ -452,6 +458,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormReset (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull ConsoleForm <Container> context,
 			@NonNull Container container) {
 
@@ -463,7 +470,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderCsvRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -493,7 +501,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 					csvMapping.genericToInterface (
 						transaction,
 						container,
-						context.hints (),
+						form.hints (),
 						genericValue));
 
 			if (
@@ -512,7 +520,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			String csvValue =
 				csvValueOptional.get ();
 
-			context.formatWriter ().writeFormat (
+			formatWriter.writeFormat (
 				"\"%s\"",
 				csvValue.replace (
 					"\"",

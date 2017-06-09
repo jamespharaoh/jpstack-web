@@ -28,6 +28,7 @@ import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
@@ -102,7 +103,8 @@ class ChatBroadcastListPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -113,9 +115,11 @@ class ChatBroadcastListPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"User",
 				"Timestamp",
 				"Chat user",
@@ -130,14 +134,17 @@ class ChatBroadcastListPart
 					: broadcasts
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPathMini (
 						transaction,
 						chatBroadcast.getCreatedUser ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							transaction,
@@ -145,20 +152,24 @@ class ChatBroadcastListPart
 						chatBroadcast.getCreatedTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPathMini (
 						transaction,
 						chatBroadcast.getChatUser (),
 						chat));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatBroadcast.getText ().getText ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						+ chatBroadcast.getNumAccepted ()
 						+ chatBroadcast.getNumSent ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatBroadcast.getSearch ()
 						? joinWithCommaAndSpace (
 							getSearchParams (
@@ -167,18 +178,22 @@ class ChatBroadcastListPart
 						: "manual number selection");
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						chatBroadcast.getIncludeBlocked ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						chatBroadcast.getIncludeOptedOut ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

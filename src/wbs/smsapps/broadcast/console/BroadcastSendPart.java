@@ -27,6 +27,8 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("broadcastSendPart")
 public
 class BroadcastSendPart
@@ -74,7 +76,8 @@ class BroadcastSendPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -90,6 +93,7 @@ class BroadcastSendPart
 			case cancelled:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This broadcast has been cancelled and can no longer be ",
 					"sent.");
 
@@ -98,6 +102,7 @@ class BroadcastSendPart
 			case partiallySent:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This broadcast was partially sent and then cancelled. It ",
 					"can no longer be sent.");
 
@@ -106,14 +111,17 @@ class BroadcastSendPart
 			case scheduled:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This broadcast has been scheduled but not yet sent. It ",
 					"can be unscheduled or cancelled.");
 
-				goDetails ();
+				goDetails (
+					formatWriter);
 
 				// unschedule
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Unschedule");
 
 				formatWriter.writeLineFormat (
@@ -121,9 +129,11 @@ class BroadcastSendPart
 					"You will be able to add and remove numbers and send or ",
 					"schedule it again.</p>");
 
-				htmlFormOpenPost ();
+				htmlFormOpenPost (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeFormat (
 					"<input",
@@ -132,22 +142,27 @@ class BroadcastSendPart
 					" value=\"unschedule\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				// cancel
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Cancel");
 
 				formatWriter.writeLineFormat (
 					"<p>Cancelling a broadcast will stop it from being sent, now ",
 					"or in the future.</p>");
 
-				htmlFormOpenPost ();
+				htmlFormOpenPost (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -156,9 +171,11 @@ class BroadcastSendPart
 					" value=\"cancel\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				break;
 
@@ -167,18 +184,22 @@ class BroadcastSendPart
 				formatWriter.writeLineFormat (
 					"<p>This broadcast is being sent. It can be cancelled.</p>");
 
-				goDetails ();
+				goDetails (
+					formatWriter);
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Cancel");
 
 				formatWriter.writeFormat (
 					"<p>Cancelling a broadcast will stop the current send and ",
 					"prevent it from being sent in the future.</p>");
 
-				htmlFormOpenPost ();
+				htmlFormOpenPost (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeFormat (
 					"<input",
@@ -187,9 +208,11 @@ class BroadcastSendPart
 					" value=\"cancel\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				break;
 
@@ -203,15 +226,18 @@ class BroadcastSendPart
 			case unsent:
 
 				formatWriter.writeLineFormat (
-					"<p>This broadcast has not yet been sent. It can be sent now ",
-					"or scheduled to automatically sent at a specific time in the ",
-					"future. Alternatively, it can be cancelled.</p>");
+					"<p>This broadcast has not yet been sent. It can be sent ",
+					"now or scheduled to automatically sent at a specific ",
+					"time in the future. Alternatively, it can be ",
+					"cancelled.</p>");
 
-				goDetails ();
+				goDetails (
+					formatWriter);
 
 				// send broadcast
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Send now");
 
 				formatWriter.writeFormat (
@@ -219,9 +245,11 @@ class BroadcastSendPart
 					"immediately.</p>");
 
 				htmlFormOpenMethod (
+					formatWriter,
 					"post");
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -230,13 +258,16 @@ class BroadcastSendPart
 					" value=\"send\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				// schedule broadcast
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Schedule");
 
 				formatWriter.writeLineFormat (
@@ -244,9 +275,11 @@ class BroadcastSendPart
 					"automatically at the specified time in the future.</p>");
 
 				htmlFormOpenMethod (
+					formatWriter,
 					"post");
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"Time and date<br>");
@@ -261,9 +294,11 @@ class BroadcastSendPart
 						transaction.now ()),
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeFormat (
 					"<input",
@@ -272,13 +307,16 @@ class BroadcastSendPart
 					" value=\"schedule\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				// cancel broadcast
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					"Cancel");
 
 				formatWriter.writeLineFormat (
@@ -286,9 +324,11 @@ class BroadcastSendPart
 					"the future.</p>");
 
 				htmlFormOpenMethod (
+					formatWriter,
 					"post");
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeFormat (
 					"<input",
@@ -297,11 +337,13 @@ class BroadcastSendPart
 					" value=\"cancel\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 				// close form
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				break;
 
@@ -315,24 +357,30 @@ class BroadcastSendPart
 
 	}
 
-	void goDetails () {
+	void goDetails (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableOpenDetails ();
+		htmlTableOpenDetails (
+			formatWriter);
 
 		htmlTableDetailsRowWrite (
+			formatWriter,
 			"Message originator",
 			broadcast.getMessageOriginator ());
 
 		htmlTableDetailsRowWrite (
+			formatWriter,
 			"Message text",
 			broadcast.getMessageText ());
 
 		htmlTableDetailsRowWrite (
+			formatWriter,
 			"Number count",
 			integerToDecimalString (
 				broadcast.getNumAccepted ()));
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 

@@ -29,6 +29,8 @@ import wbs.framework.logging.LogContext;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("alertsSubjectsPart")
 public
 class AlertsSubjectsPart
@@ -83,7 +85,8 @@ class AlertsSubjectsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -94,9 +97,11 @@ class AlertsSubjectsPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Type",
 				"Object",
 				"Include");
@@ -113,24 +118,30 @@ class AlertsSubjectsPart
 							alertsSubject.getObjectType ().getId (),
 							alertsSubject.getObjectId ()));
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					alertsSubject.getObjectType ().getCode ());
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					object);
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						alertsSubject.getInclude ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

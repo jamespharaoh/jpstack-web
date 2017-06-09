@@ -23,6 +23,7 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -31,6 +32,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -48,6 +51,9 @@ class ChatUserAdminBarringPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// prototype dependencies
 
@@ -106,7 +112,8 @@ class ChatUserAdminBarringPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -124,6 +131,7 @@ class ChatUserAdminBarringPart
 			) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"This is a monitor and cannot be barred.");
 
 				return;
@@ -133,16 +141,19 @@ class ChatUserAdminBarringPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.barring"));
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// table content
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Status",
 				booleanToString (
 					chatUser.getBarred (),
@@ -152,6 +163,7 @@ class ChatUserAdminBarringPart
 			if (requestContext.canContext ("chat.userAdmin")) {
 
 				htmlTableDetailsRowWriteRaw (
+					formatWriter,
 					"Action",
 					() -> {
 
@@ -192,6 +204,7 @@ class ChatUserAdminBarringPart
 				});
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Reason",
 					() -> formatWriter.writeFormat (
 						"<textarea",
@@ -201,6 +214,7 @@ class ChatUserAdminBarringPart
 						"></textarea>"));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Action",
 					() -> formatWriter.writeFormat (
 						"<input",
@@ -212,15 +226,18 @@ class ChatUserAdminBarringPart
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			// flush scripts
 
-			requestContext.flushScripts ();
+			requestContext.flushScripts (
+				formatWriter);
 
 		}
 

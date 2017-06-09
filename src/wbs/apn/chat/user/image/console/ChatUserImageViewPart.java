@@ -9,6 +9,7 @@ import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -18,6 +19,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserDao;
@@ -47,6 +50,9 @@ class ChatUserImageViewPart
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -99,7 +105,8 @@ class ChatUserImageViewPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -110,13 +117,16 @@ class ChatUserImageViewPart
 
 		) {
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			mediaConsoleLogic.writeMediaContent (
 				transaction,
+				formatWriter,
 				image.getMedia ());
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 

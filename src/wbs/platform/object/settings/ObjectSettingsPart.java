@@ -26,6 +26,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -36,6 +37,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.scaffold.model.RootObjectHelper;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsPart")
@@ -53,6 +56,9 @@ class ObjectSettingsPart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	RootObjectHelper rootHelper;
@@ -142,7 +148,8 @@ class ObjectSettingsPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -175,22 +182,27 @@ class ObjectSettingsPart <
 				}
 
 				htmlFormOpenPostActionEncoding (
+					formatWriter,
 					requestContext.resolveLocalUrl (
 						localName),
 					enctype);
 
 			}
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			form.outputFormRows (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			if (canEdit) {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -198,16 +210,20 @@ class ObjectSettingsPart <
 					" value=\"save changes\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 				if (removeLocalName != null) {
 
 					htmlHeadingTwoWrite (
+						formatWriter,
 						"Remove");
 
 					htmlFormOpenPostAction (
+						formatWriter,
 						requestContext.resolveLocalUrl (
 							removeLocalName));
 
@@ -217,7 +233,8 @@ class ObjectSettingsPart <
 						" value=\"remove\"",
 						">");
 
-					htmlFormClose ();
+					htmlFormClose (
+						formatWriter);
 
 				}
 

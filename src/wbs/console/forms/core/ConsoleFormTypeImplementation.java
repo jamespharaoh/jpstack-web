@@ -372,9 +372,6 @@ class ConsoleFormTypeImplementation <Container>
 				.requestContext (
 					requestContext)
 
-				.formatWriter (
-					requestContext.formatWriter ())
-
 				.privChecker (
 					privChecker)
 
@@ -437,9 +434,6 @@ class ConsoleFormTypeImplementation <Container>
 
 				.requestContext (
 					requestContext)
-
-				.formatWriter (
-					requestContext.formatWriter ())
 
 				.privChecker (
 					privChecker)
@@ -511,9 +505,6 @@ class ConsoleFormTypeImplementation <Container>
 				.requestContext (
 					requestContext)
 
-				.formatWriter (
-					requestContext.formatWriter ())
-
 				.privChecker (
 					privChecker)
 
@@ -578,9 +569,6 @@ class ConsoleFormTypeImplementation <Container>
 
 				.requestContext (
 					requestContext)
-
-				.formatWriter (
-					requestContext.formatWriter ())
 
 				.privChecker (
 					privChecker)

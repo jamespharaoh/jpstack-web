@@ -51,7 +51,6 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 import wbs.console.reporting.StatsConsoleLogic;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGranularity;
@@ -66,6 +65,8 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
@@ -537,34 +538,19 @@ class SupervisorPart
 
 		) {
 
-			Map <String, Object> partParameters =
-				ImmutableMap.<String, Object> builder ()
-
-				.put (
-					"statsPeriod",
-					statsPeriod)
-
-				.put (
-					"statsDataSetsByName",
-					statsDataSets)
-
-				.build ();
-
 			ImmutableList.Builder <PagePart> pagePartsBuilder =
 				ImmutableList.builder ();
 
 			for (
-				PagePartFactory pagePartFactory
+				StatsPagePartFactory pagePartFactory
 					: supervisorConfig.get ().pagePartFactories ()
 			) {
 
 				PagePart pagePart =
 					pagePartFactory.buildPagePart (
-						transaction);
-
-				pagePart.setup (
-					transaction,
-					partParameters);
+						transaction,
+						statsPeriod,
+						statsDataSets);
 
 				pagePart.prepare (
 					transaction);
@@ -584,7 +570,8 @@ class SupervisorPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -601,7 +588,8 @@ class SupervisorPart
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 
@@ -612,7 +600,8 @@ class SupervisorPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -624,10 +613,12 @@ class SupervisorPart
 		) {
 
 			renderLinks (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderDateForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			ObsoleteDateLinks.dailyBrowserParagraph (
 				formatWriter,
@@ -636,7 +627,8 @@ class SupervisorPart
 				dateField.date);
 
 			renderTimeChangeWarning (
-				transaction);
+				transaction,
+				formatWriter);
 
 			if (
 				collectionIsEmpty (
@@ -644,6 +636,7 @@ class SupervisorPart
 			) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"There is no configured data to display on this page.");
 
 			} else {
@@ -654,7 +647,8 @@ class SupervisorPart
 				) {
 
 					pagePart.renderHtmlBodyContent (
-						transaction);
+						transaction,
+						formatWriter);
 
 				}
 
@@ -666,7 +660,8 @@ class SupervisorPart
 
 	private
 	void renderLinks (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -685,6 +680,7 @@ class SupervisorPart
 			}
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
@@ -694,6 +690,7 @@ class SupervisorPart
 			)  {
 
 				htmlLinkWrite (
+					formatWriter,
 					stringFormat (
 						"%s",
 						localUrl,
@@ -713,7 +710,8 @@ class SupervisorPart
 
 			}
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 
@@ -721,7 +719,8 @@ class SupervisorPart
 
 	private
 	void renderDateForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -733,9 +732,11 @@ class SupervisorPart
 		) {
 
 			htmlFormOpenGetAction (
+				formatWriter,
 				localUrl);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Date<br>");
@@ -754,9 +755,11 @@ class SupervisorPart
 				" value=\"ok\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -764,7 +767,8 @@ class SupervisorPart
 
 	private
 	void renderTimeChangeWarning (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -792,6 +796,7 @@ class SupervisorPart
 			}
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"warning"));
 
@@ -808,7 +813,8 @@ class SupervisorPart
 					transaction,
 					endTime));
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 

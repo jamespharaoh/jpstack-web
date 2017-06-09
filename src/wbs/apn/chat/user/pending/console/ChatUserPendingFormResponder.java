@@ -57,6 +57,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -218,7 +220,8 @@ class ChatUserPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -230,10 +233,12 @@ class ChatUserPendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderScriptBlock (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -241,7 +246,8 @@ class ChatUserPendingFormResponder
 
 	private
 	void renderScriptBlock (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -252,7 +258,8 @@ class ChatUserPendingFormResponder
 
 		) {
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"var chatHelpTemplates = new Array ();");
@@ -282,7 +289,8 @@ class ChatUserPendingFormResponder
 						chatUser.getId ()),
 					"/chatUser.pending.summary"));
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -291,7 +299,8 @@ class ChatUserPendingFormResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -303,6 +312,7 @@ class ChatUserPendingFormResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				"Chat user—approve info");
 
 			requestContext.flushNotices (
@@ -311,6 +321,7 @@ class ChatUserPendingFormResponder
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrlFormat (
 					"/chatUser.pending",
 					"/%u",
@@ -321,6 +332,7 @@ class ChatUserPendingFormResponder
 			if (mode == PendingMode.none) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"No info to approve");
 
 				if (
@@ -330,7 +342,8 @@ class ChatUserPendingFormResponder
 						"manage")
 				) {
 
-					htmlParagraphOpen ();
+					htmlParagraphOpen (
+						formatWriter);
 
 					formatWriter.writeLineFormat (
 						"<input",
@@ -339,15 +352,18 @@ class ChatUserPendingFormResponder
 						" value=\"dismiss queue item\"",
 						">");
 
-					htmlParagraphClose ();
+					htmlParagraphClose (
+						formatWriter);
 
 				}
 
 			} else {
 
-				htmlTableOpenDetails ();
+				htmlTableOpenDetails (
+					formatWriter);
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"User",
 					stringFormat (
 						"%s/%s",
@@ -355,6 +371,7 @@ class ChatUserPendingFormResponder
 						chatUser.getCode ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Options",
 					() -> {
 
@@ -379,6 +396,7 @@ class ChatUserPendingFormResponder
 				case name:
 
 					htmlTableDetailsRowWriteHtml (
+						formatWriter,
 						"Name",
 						() -> formatWriter.writeLineFormat (
 							"<textarea",
@@ -397,6 +415,7 @@ class ChatUserPendingFormResponder
 				case info:
 
 					htmlTableDetailsRowWriteHtml (
+						formatWriter,
 						"Info",
 						() -> formatWriter.writeLineFormat (
 							"<textarea",
@@ -422,21 +441,27 @@ class ChatUserPendingFormResponder
 							ChatUserImageType.image);
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlIdAttribute (
 							"photoRow"));
 
 					htmlTableHeaderCellWrite (
+						formatWriter,
 						"Photo");
 
-					htmlTableCellOpen ();
+					htmlTableCellOpen (
+						formatWriter);
 
 					mediaConsoleLogic.writeMediaThumb100 (
 						transaction,
+						formatWriter,
 						image.getMedia ());
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					break;
 
@@ -449,37 +474,47 @@ class ChatUserPendingFormResponder
 							ChatUserImageType.video);
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlIdAttribute (
 							"photoRow"));
 
 					htmlTableHeaderRowWrite (
+						formatWriter,
 						"Video");
 
-					htmlTableCellOpen ();
+					htmlTableCellOpen (
+						formatWriter);
 
 					mediaConsoleLogic.writeMediaThumb100 (
 						transaction,
+						formatWriter,
 						video.getMedia ());
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					break;
 
 				case audio:
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlIdAttribute (
 							"photoRow"));
 
 					htmlTableHeaderRowWrite (
+						formatWriter,
 						"Audio");
 
 					htmlTableCellWrite (
+						formatWriter,
 						"(audio)");
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					break;
 
@@ -506,18 +541,23 @@ class ChatUserPendingFormResponder
 							chatUserLogic.imageTypeForMode (mode));
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlIdAttribute (
 							"classificationRow"));
 
 					htmlTableHeaderCellWrite (
+						formatWriter,
 						"Classification");
 
-					htmlTableCellOpen ();
+					htmlTableCellOpen (
+						formatWriter);
 
 					htmlSelectOpen (
+						formatWriter,
 						"classification");
 
 					htmlOptionWrite (
+						formatWriter,
 						"primary",
 						requestContext.formOrEmptyString (
 							"classification"),
@@ -534,6 +574,7 @@ class ChatUserPendingFormResponder
 					) {
 
 						htmlOptionWrite (
+							formatWriter,
 							"secondary",
 							requestContext.formOrEmptyString (
 								"classification"),
@@ -546,6 +587,7 @@ class ChatUserPendingFormResponder
 					) {
 
 						htmlOptionWrite (
+							formatWriter,
 							"landscape",
 							requestContext.formOrEmptyString (
 								"classification"),
@@ -553,17 +595,21 @@ class ChatUserPendingFormResponder
 
 					}
 
-					htmlSelectClose ();
+					htmlSelectClose (
+						formatWriter);
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
 				// template
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlIdAttribute (
 						"templateRow"),
 					htmlStyleAttribute (
@@ -572,15 +618,19 @@ class ChatUserPendingFormResponder
 							"none")));
 
 				htmlTableHeaderCellWrite (
+					formatWriter,
 					"Template");
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				htmlSelectOpen (
+					formatWriter,
 					htmlIdAttribute (
 						"templateId"));
 
 				htmlOptionWrite (
+					formatWriter,
 					"");
 
 				for (
@@ -589,13 +639,15 @@ class ChatUserPendingFormResponder
 				) {
 
 					htmlOptionWrite (
+						formatWriter,
 						integerToDecimalString (
 							chatelpTemplate.getId ()),
 						chatelpTemplate.getCode ());
 
 				}
 
-				htmlSelectClose ();
+				htmlSelectClose (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -604,13 +656,16 @@ class ChatUserPendingFormResponder
 					" value=\"ok\"",
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				// message
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlIdAttribute (
 						"messageRow"),
 					htmlStyleAttribute (
@@ -619,9 +674,11 @@ class ChatUserPendingFormResponder
 							"none")));
 
 				htmlTableHeaderCellWrite (
+					formatWriter,
 					"Message");
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<textarea",
@@ -631,18 +688,23 @@ class ChatUserPendingFormResponder
 					" cols=\"48\"",
 					"></textarea>");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				// actions
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableHeaderCellWrite (
+					formatWriter,
 					"Actions");
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				switch (mode) {
 
@@ -757,17 +819,21 @@ class ChatUserPendingFormResponder
 
 				}
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
-				htmlTableClose ();
+				htmlTableClose (
+					formatWriter);
 
 			}
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

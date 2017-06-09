@@ -25,6 +25,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableHeadingPart")
 public
@@ -44,39 +46,16 @@ class SupervisorTableHeadingPart
 	@Getter @Setter
 	SupervisorTableHeadingSpec supervisorTableHeadingSpec;
 
-	// state
-
+	@Getter @Setter
 	StatsPeriod statsPeriod;
 
 	// implementation
 
 	@Override
 	public
-	void prepare (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"prepare");
-
-		) {
-
-			statsPeriod =
-				(StatsPeriod)
-				parameters.get (
-					"statsPeriod");
-
-		}
-
-	}
-
-	@Override
-	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -91,22 +70,27 @@ class SupervisorTableHeadingPart
 
 			if (supervisorTableHeadingSpec.label () != null) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableHeaderCellWrite (
+					formatWriter,
 					supervisorTableHeadingSpec.label (),
 					htmlColumnSpanAttribute (
 						statsPeriod.size () + 2l));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// hours
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				supervisorTableHeadingSpec.groupLabel ());
 
 			for (
@@ -115,6 +99,7 @@ class SupervisorTableHeadingPart
 			) {
 
 				htmlTableHeaderCellWrite (
+					formatWriter,
 					String.format (
 						"%02d",
 						step
@@ -126,9 +111,11 @@ class SupervisorTableHeadingPart
 			}
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Total");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

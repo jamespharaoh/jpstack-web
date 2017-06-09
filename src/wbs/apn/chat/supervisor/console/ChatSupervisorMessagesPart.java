@@ -24,6 +24,7 @@ import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -36,6 +37,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
@@ -66,6 +68,9 @@ class ChatSupervisorMessagesPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -151,7 +156,8 @@ class ChatSupervisorMessagesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -164,11 +170,13 @@ class ChatSupervisorMessagesPart
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// table header
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"From",
 				"To",
 				"Time",
@@ -182,6 +190,7 @@ class ChatSupervisorMessagesPart
 			) {
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"magic-table-row"),
 					htmlDataAttribute (
@@ -196,28 +205,34 @@ class ChatSupervisorMessagesPart
 								chatMessage.getFromUser ().getId ()))));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatConsoleLogic.textForChatUser (
 						chatMessage.getFromUser ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatConsoleLogic.textForChatUser (
 						chatMessage.getToUser ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timeString (
 						transaction,
 						chatMessage.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatMessage.getOriginalText ().getText ());
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

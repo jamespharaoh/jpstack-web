@@ -58,8 +58,7 @@ class ConsoleNotices {
 	}
 
 	public
-	void flushOrNoticeFormat (
-			@NonNull FormatWriter formatWriter,
+	void noticeIfEmptyFormat (
 			@NonNull String ... arguments) {
 
 		if (
@@ -71,9 +70,6 @@ class ConsoleNotices {
 				arguments);
 
 		}
-
-		flush (
-			formatWriter);
 
 	}
 

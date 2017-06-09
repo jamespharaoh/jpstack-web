@@ -25,6 +25,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
@@ -120,7 +122,8 @@ class TicketPendingHistoryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -132,20 +135,24 @@ class TicketPendingHistoryPart
 		) {
 
 			goSummary (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goStateSummary (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goTicketNotes (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	void goSummary (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -157,14 +164,18 @@ class TicketPendingHistoryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Summary");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			ticketForm.outputTableRows (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -172,7 +183,8 @@ class TicketPendingHistoryPart
 
 	private
 	void goTicketNotes (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -184,11 +196,14 @@ class TicketPendingHistoryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Notes");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Index",
 				"Text");
 
@@ -197,25 +212,30 @@ class TicketPendingHistoryPart
 					: ticket.getTicketNotes ()
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				ticketNoteForm.outputTableCellsList (
 					transaction,
+					formatWriter,
 					ticketNote,
 					true);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goStateSummary (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -227,15 +247,19 @@ class TicketPendingHistoryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"State");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			ticketStateForm.outputTableRows (
 				transaction,
+				formatWriter,
 				ticket.getTicketState ());
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -19,6 +19,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -27,6 +28,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -56,6 +58,9 @@ class ChatUserAdminNamePart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -91,7 +96,8 @@ class ChatUserAdminNamePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -103,12 +109,15 @@ class ChatUserAdminNamePart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.name"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Name",
 				stringFormat (
 					"<input",
@@ -122,13 +131,16 @@ class ChatUserAdminNamePart
 					">"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Reason",
 				() -> chatConsoleLogic.writeSelectForChatUserEditReason (
+					formatWriter,
 					"editReason",
 					requestContext.formOrEmptyString (
 						"editReason")));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Action",
 				stringFormat (
 					"<input",
@@ -136,16 +148,21 @@ class ChatUserAdminNamePart
 					" value=\"update name\"",
 					">"));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"History");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Timestamp",
 				"Original",
 				"Edited",
@@ -158,39 +175,48 @@ class ChatUserAdminNamePart
 					: chatUser.getChatUserNames ()
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatUserName.getCreationTime ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					emptyStringIfNull (
 						chatUserName.getOriginalName ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					emptyStringIfNull (
 						chatUserName.getEditedName ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatConsoleLogic.textForChatUserInfoStatus (
 						chatUserName.getStatus ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatConsoleLogic.textForChatUserEditReason (
 						chatUserName.getEditReason ()));
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatUserName.getModerator ());
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

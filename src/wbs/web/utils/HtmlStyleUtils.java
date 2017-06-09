@@ -3,7 +3,6 @@ package wbs.web.utils;
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
 
@@ -37,14 +36,6 @@ class HtmlStyleUtils {
 	}
 
 	public static
-	void htmlStyleBlockOpen () {
-
-		htmlStyleBlockOpen (
-			currentFormatWriter ());
-
-	}
-
-	public static
 	void htmlStyleBlockClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -52,14 +43,6 @@ class HtmlStyleUtils {
 
 		formatWriter.writeLineFormat (
 			"</style>");
-
-	}
-
-	public static
-	void htmlStyleBlockClose () {
-
-		htmlStyleBlockClose (
-			currentFormatWriter ());
 
 	}
 
@@ -91,32 +74,11 @@ class HtmlStyleUtils {
 
 	public static
 	void htmlStyleRuleOpen (
-			@NonNull List <String> selectors) {
-
-		htmlStyleRuleOpen (
-			currentFormatWriter (),
-			selectors);
-
-	}
-
-	public static
-	void htmlStyleRuleOpen (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String ... selectors) {
 
 		htmlStyleRuleOpen (
 			formatWriter,
-			Arrays.asList (
-				selectors));
-
-	}
-
-	public static
-	void htmlStyleRuleOpen (
-			@NonNull String ... selectors) {
-
-		htmlStyleRuleOpen (
-			currentFormatWriter (),
 			Arrays.asList (
 				selectors));
 
@@ -130,14 +92,6 @@ class HtmlStyleUtils {
 
 		formatWriter.writeLineFormat (
 			"}");
-
-	}
-
-	public static
-	void htmlStyleRuleClose () {
-
-		htmlStyleRuleClose (
-			currentFormatWriter ());
 
 	}
 
@@ -184,18 +138,6 @@ class HtmlStyleUtils {
 
 	public static
 	void htmlStyleRuleWrite (
-			@NonNull String selector0,
-			@NonNull HtmlStyleRuleEntry ... entries) {
-
-		htmlStyleRuleWrite (
-			currentFormatWriter (),
-			selector0,
-			entries);
-
-	}
-
-	public static
-	void htmlStyleRuleWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String selector0,
 			@NonNull String selector1,
@@ -214,20 +156,6 @@ class HtmlStyleUtils {
 
 		htmlStyleRuleClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlStyleRuleWrite (
-			@NonNull String selector0,
-			@NonNull String selector1,
-			@NonNull HtmlStyleRuleEntry ... entries) {
-
-		htmlStyleRuleWrite (
-			currentFormatWriter (),
-			selector0,
-			selector1,
-			entries);
 
 	}
 
@@ -253,22 +181,6 @@ class HtmlStyleUtils {
 
 		htmlStyleRuleClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlStyleRuleWrite (
-			@NonNull String selector0,
-			@NonNull String selector1,
-			@NonNull String selector2,
-			@NonNull HtmlStyleRuleEntry ... entries) {
-
-		htmlStyleRuleWrite (
-			currentFormatWriter (),
-			selector0,
-			selector1,
-			selector2,
-			entries);
 
 	}
 
@@ -300,24 +212,6 @@ class HtmlStyleUtils {
 	}
 
 	public static
-	void htmlStyleRuleWrite (
-			@NonNull String selector0,
-			@NonNull String selector1,
-			@NonNull String selector2,
-			@NonNull String selector3,
-			@NonNull HtmlStyleRuleEntry ... entries) {
-
-		htmlStyleRuleWrite (
-			currentFormatWriter (),
-			selector0,
-			selector1,
-			selector2,
-			selector3,
-			entries);
-
-	}
-
-	public static
 	void htmlStyleRuleEntryWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull HtmlStyleRuleEntry entry) {
@@ -332,34 +226,12 @@ class HtmlStyleUtils {
 
 	public static
 	void htmlStyleRuleEntryWrite (
-			@NonNull HtmlStyleRuleEntry entry) {
-
-		htmlStyleRuleEntryWrite (
-			currentFormatWriter (),
-			entry);
-
-	}
-
-	public static
-	void htmlStyleRuleEntryWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull String value) {
 
 		formatWriter.writeLineFormat (
 			"%h: %h;",
-			name,
-			value);
-
-	}
-
-	public static
-	void htmlStyleRuleEntryWrite (
-			@NonNull String name,
-			@NonNull String value) {
-
-		htmlStyleRuleEntryWrite (
-			currentFormatWriter (),
 			name,
 			value);
 

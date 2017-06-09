@@ -33,6 +33,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -48,6 +49,7 @@ import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -89,6 +91,9 @@ class ChatUserOnlinePart
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -187,7 +192,8 @@ class ChatUserOnlinePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -198,9 +204,11 @@ class ChatUserOnlinePart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"User",
 				"T",
 				"G",
@@ -217,6 +225,7 @@ class ChatUserOnlinePart
 			) {
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"magic-table-row"),
 					htmlDataAttribute (
@@ -229,18 +238,23 @@ class ChatUserOnlinePart
 								chatUser.getId ()))));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUser.getCode ());
 
 				chatConsoleLogic.writeTdForChatUserTypeShort (
+					formatWriter,
 					chatUser);
 
 				chatConsoleLogic.writeTdForChatUserGenderShort (
+					formatWriter,
 					chatUser);
 
 				chatConsoleLogic.writeTdForChatUserOrientShort (
+					formatWriter,
 					chatUser);
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUser.getName (),
 						() -> htmlEncodeNonBreakingWhitespace (
@@ -248,22 +262,27 @@ class ChatUserOnlinePart
 
 				if (! chatUser.getChatUserImageList ().isEmpty ()) {
 
-					htmlTableCellOpen ();
+					htmlTableCellOpen (
+						formatWriter);
 
 					mediaConsoleLogic.writeMediaThumb32 (
 						transaction,
+						formatWriter,
 						chatUser.getChatUserImageList ().get (0).getMedia ());
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"—");
 
 				}
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUser.getInfoText (),
 						() -> spacify (
@@ -285,6 +304,7 @@ class ChatUserOnlinePart
 				}
 
 				htmlTableCellWrite (
+					formatWriter,
 					placeName);
 
 				if (
@@ -293,6 +313,7 @@ class ChatUserOnlinePart
 				) {
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						htmlEncodeNonBreakingWhitespace (
 							timeFormatter.prettyDuration (
 								chatUser.getLastAction (),
@@ -301,15 +322,18 @@ class ChatUserOnlinePart
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"—");
 
 				}
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

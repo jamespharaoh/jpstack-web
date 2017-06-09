@@ -14,6 +14,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -29,6 +30,8 @@ import wbs.integrations.oxygenate.model.OxygenateRouteOutRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("oxygenateRouteSummaryAdditionalPart")
 public
 class OxygenateRouteSummaryAdditionalPart
@@ -41,6 +44,9 @@ class OxygenateRouteSummaryAdditionalPart
 
 	@SingletonDependency
 	OxygenateRouteOutObjectHelper oxygen8RouteOutHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
@@ -85,7 +91,8 @@ class OxygenateRouteSummaryAdditionalPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -97,9 +104,11 @@ class OxygenateRouteSummaryAdditionalPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Oxygen8 route information");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			if (
 				isNotNull (
@@ -107,36 +116,43 @@ class OxygenateRouteSummaryAdditionalPart
 			) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Relay URL",
 					oxygen8RouteOut.getRelayUrl ());
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Shortcode",
 					oxygen8RouteOut.getShortcode ());
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Premium",
 					booleanToYesNo (
 						oxygen8RouteOut.getPremium ()));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Username",
 					oxygen8RouteOut.getUsername ());
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Password",
 					ifThenElse (
 						requestContext.canContext ("route.manage"),
 						() -> oxygen8RouteOut.getPassword (),
 						() -> "**********"));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			if (route.getCanReceive ()) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Inbound URL",
 					stringFormat (
 						"%s",
@@ -157,6 +173,7 @@ class OxygenateRouteSummaryAdditionalPart
 			) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Delivery reports URL",
 					stringFormat (
 						"%s",
@@ -170,7 +187,8 @@ class OxygenateRouteSummaryAdditionalPart
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

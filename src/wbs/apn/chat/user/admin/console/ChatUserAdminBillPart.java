@@ -24,6 +24,7 @@ import org.joda.time.LocalDate;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -33,6 +34,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.bill.console.ChatUserBillLogConsoleHelper;
@@ -71,6 +73,9 @@ class ChatUserAdminBillPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -161,7 +166,8 @@ class ChatUserAdminBillPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -220,6 +226,7 @@ class ChatUserAdminBillPart
 			) {
 
 				htmlFormOpenPostAction (
+					formatWriter,
 					requestContext.resolveLocalUrl (
 						"/chatUser.admin.bill"));
 
@@ -229,16 +236,20 @@ class ChatUserAdminBillPart
 					" value=\"reset billing\"",
 					"></p>");
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"History");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Date",
 				"Time",
 				"User");
@@ -248,15 +259,18 @@ class ChatUserAdminBillPart
 					: allBillLogs
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.dateStringShort (
 						chatUserLogic.getTimezone (
 							chatUser),
 						billLog.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timeString (
 						chatUserLogic.getTimezone (
 							chatUser),
@@ -264,13 +278,16 @@ class ChatUserAdminBillPart
 
 				consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					billLog.getUser ());
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -11,6 +11,7 @@ import lombok.NonNull;
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -19,6 +20,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
 public
@@ -33,6 +36,9 @@ class SubscriptionNumberAddRemovePart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -70,7 +76,8 @@ class SubscriptionNumberAddRemovePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -82,17 +89,22 @@ class SubscriptionNumberAddRemovePart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/subscriptionNumber.addRemove"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			form.outputFormRows (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -108,7 +120,8 @@ class SubscriptionNumberAddRemovePart
 				" value=\"remove numbers\"",
 				">");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

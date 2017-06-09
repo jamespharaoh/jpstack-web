@@ -8,7 +8,9 @@ import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,7 @@ import org.apache.commons.codec.binary.Hex;
 import wbs.api.mvc.ApiFile;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -53,7 +56,9 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
@@ -108,7 +113,8 @@ class DialogueApiServletModule
 	Provider <ApiFile> apiFileProvider;
 
 	@PrototypeDependency
-	Provider <DialogueResponder> dialogueResponderProvider;
+	@NamedDependency ("dialogueResponder")
+	Provider <Responder> dialogueResponderProvider;
 
 	@PrototypeDependency
 	Provider <RegexpPathHandler> regexpPathHandlerProvider;
@@ -348,8 +354,12 @@ class DialogueApiServletModule
 
 				try (
 
+					Writer writer =
+						requestContext.writer ();
+
 					FormatWriter formatWriter =
-						requestContext.formatWriter ();
+						new WriterFormatWriter (
+							writer);
 
 				) {
 
@@ -361,6 +371,11 @@ class DialogueApiServletModule
 
 					formatWriter.writeLineFormat (
 						"</HTML>");
+
+				} catch (IOException ioException) {
+
+					throw new RuntimeIoException (
+						ioException);
 
 				}
 

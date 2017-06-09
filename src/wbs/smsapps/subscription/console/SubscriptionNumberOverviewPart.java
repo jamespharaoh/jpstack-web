@@ -18,6 +18,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.subscription.model.SubscriptionRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("subscriptionNumberOverviewPart")
 public
 class SubscriptionNumberOverviewPart
@@ -62,7 +64,8 @@ class SubscriptionNumberOverviewPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -73,14 +76,17 @@ class SubscriptionNumberOverviewPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Subscribers",
 				integerToDecimalString (
 					subscription.getNumSubscribers ()));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

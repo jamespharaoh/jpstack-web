@@ -14,6 +14,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("consoleMultiForm")
 @Accessors (fluent = true)
 public
@@ -74,6 +76,7 @@ class ConsoleMultiForm <Container> {
 	public
 	void outputFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull String ... names) {
 
 		for (
@@ -83,6 +86,7 @@ class ConsoleMultiForm <Container> {
 
 			context (name).outputFormAlwaysHidden (
 				parentTransaction,
+				formatWriter,
 				value);
 
 		}
@@ -92,6 +96,7 @@ class ConsoleMultiForm <Container> {
 	public
 	void outputFormRows (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull String ... names) {
 
 		for (
@@ -101,6 +106,7 @@ class ConsoleMultiForm <Container> {
 
 			context (name).outputFormRows (
 				parentTransaction,
+				formatWriter,
 				value);
 
 		}
@@ -110,6 +116,7 @@ class ConsoleMultiForm <Container> {
 	public
 	void outputFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull String ... names) {
 
 		for (
@@ -119,6 +126,7 @@ class ConsoleMultiForm <Container> {
 
 			context (name).outputFormTemporarilyHidden (
 				parentTransaction,
+				formatWriter,
 				value);
 
 		}

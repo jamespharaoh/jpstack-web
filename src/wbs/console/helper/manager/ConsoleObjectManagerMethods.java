@@ -5,7 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -105,22 +104,6 @@ interface ConsoleObjectManagerMethods {
 	default
 	void writeTdForObjectMiniLink (
 			@NonNull Transaction parentTransaction,
-			@NonNull Record <?> object) {
-
-		writeTdForObject (
-			parentTransaction,
-			currentFormatWriter (),
-			object,
-			optionalAbsent (),
-			true,
-			true,
-			1l);
-
-	}
-
-	default
-	void writeTdForObjectMiniLink (
-			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Record <?> assumedRoot) {
@@ -140,24 +123,6 @@ interface ConsoleObjectManagerMethods {
 	default
 	void writeTdForObjectMiniLink (
 			@NonNull Transaction parentTransaction,
-			@NonNull Record <?> object,
-			@NonNull Record <?> assumedRoot) {
-
-		writeTdForObject (
-			parentTransaction,
-			currentFormatWriter (),
-			object,
-			optionalOf (
-				assumedRoot),
-			true,
-			true,
-			1l);
-
-	}
-
-	default
-	void writeTdForObjectMiniLink (
-			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Long columnSpan) {
@@ -165,23 +130,6 @@ interface ConsoleObjectManagerMethods {
 		writeTdForObject (
 			parentTransaction,
 			formatWriter,
-			object,
-			optionalAbsent (),
-			true,
-			true,
-			columnSpan);
-
-	}
-
-	default
-	void writeTdForObjectMiniLink (
-			@NonNull Transaction parentTransaction,
-			@NonNull Record <?> object,
-			@NonNull Long columnSpan) {
-
-		writeTdForObject (
-			parentTransaction,
-			currentFormatWriter (),
 			object,
 			optionalAbsent (),
 			true,
@@ -219,22 +167,6 @@ interface ConsoleObjectManagerMethods {
 		writeTdForObject (
 			parentTransaction,
 			formatWriter,
-			object,
-			optionalAbsent (),
-			false,
-			true,
-			1l);
-
-	}
-
-	default
-	void writeTdForObjectLink (
-			@NonNull Transaction parentTransaction,
-			@NonNull Record <?> object) {
-
-		writeTdForObject (
-			parentTransaction,
-			currentFormatWriter (),
 			object,
 			optionalAbsent (),
 			false,

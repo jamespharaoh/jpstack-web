@@ -47,6 +47,8 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.web.utils.ABSwap;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
@@ -171,7 +173,8 @@ class CoreSidebarMenuResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -183,6 +186,7 @@ class CoreSidebarMenuResponder
 		) {
 
 			htmlTableOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"menu"),
 				htmlAttribute (
@@ -217,18 +221,22 @@ class CoreSidebarMenuResponder
 
 					if (! doneGroup) {
 
-						htmlTableRowOpen ();
+						htmlTableRowOpen (
+							formatWriter);
 
 						htmlTableHeaderCellWrite (
+							formatWriter,
 							menuGroup.getLabel ());
 
-						htmlTableRowClose ();
+						htmlTableRowClose (
+							formatWriter);
 
 						doneGroup = true;
 
 					}
 
 					htmlTableRowOpen (
+						formatWriter,
 
 						htmlClassAttribute (
 							"magic-table-row",
@@ -246,17 +254,20 @@ class CoreSidebarMenuResponder
 					);
 
 					htmlTableCellWrite (
+						formatWriter,
 						menu.getLabel ());
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
 			}
 
-		}
+			htmlTableClose (
+				formatWriter);
 
-		htmlTableClose ();
+		}
 
 	}
 

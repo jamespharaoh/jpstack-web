@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
-import wbs.console.part.PagePartFactory;
 import wbs.console.reporting.StatsAggregator;
 import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
@@ -77,7 +76,7 @@ class SupervisorConfigBuilder
 		new LinkedHashMap<String,StatsResolver> ();
 
 	@Getter @Setter
-	List <PagePartFactory> pagePartFactories =
+	List <StatsPagePartFactory> pagePartFactories =
 		new ArrayList<> ();
 
 	// build

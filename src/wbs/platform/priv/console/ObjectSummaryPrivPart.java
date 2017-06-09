@@ -7,6 +7,7 @@ import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
 import static wbs.web.utils.HtmlInputUtils.htmlOptionWrite;
 import static wbs.web.utils.HtmlInputUtils.htmlSelectClose;
 import static wbs.web.utils.HtmlInputUtils.htmlSelectOpen;
@@ -31,6 +32,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -46,6 +48,8 @@ import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("objectSummaryPrivPart")
 public
@@ -67,7 +71,10 @@ class ObjectSummaryPrivPart
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;;
+	ConsoleRequestContext requestContext;
+
+	@SingletonDependency
+	UserObjectHelper userHelper;
 
 	// state
 
@@ -245,164 +252,228 @@ class ObjectSummaryPrivPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		renderUsers ();
-		renderGroups ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlBodyContent");
+
+		) {
+
+			renderUsers (
+				transaction,
+				formatWriter);
+
+			renderGroups (
+				transaction,
+				formatWriter);
+
+		}
 
 	}
 
 	private
-	void renderUsers () {
+	void renderUsers (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		htmlHeadingTwoWrite (
-			"Users");
+		try (
 
-		htmlTableOpenList ();
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderUsers");
 
-		htmlTableHeaderRowWrite (
-			"User",
-			"Privs",
-			"Grant privs");
-
-		if (userPrivs.size () == 0) {
-
-			htmlTableCellWrite (
-				"No user privs to show",
-				htmlColumnSpanAttribute (3l));
-
-		}
-
-		for (
-			Map.Entry <String, UserPrivSets> entry
-				: userPrivs.entrySet ()
 		) {
 
-			String userPath =
-				entry.getKey ();
+			htmlHeadingTwoWrite (
+				formatWriter,
+				"Users");
 
-			UserPrivSets userPrivSets =
-				entry.getValue ();
+			htmlTableOpenList (
+				formatWriter);
 
-			htmlTableRowOpen ();
+			htmlTableHeaderRowWrite (
+				formatWriter,
+				"User",
+				"Privs",
+				"Grant privs");
 
-			htmlTableCellWrite (
-				userPath);
+			if (userPrivs.size () == 0) {
 
-			htmlTableCellWrite (
-				joinWithCommaAndSpace (
-					userPrivSets.canPrivCodes));
+				htmlTableCellWrite (
+					formatWriter,
+					"No user privs to show",
+					htmlColumnSpanAttribute (3l));
 
-			htmlTableCellWrite (
-				joinWithCommaAndSpace (
-					userPrivSets.canGrantPrivCodes));
+			}
 
-			htmlTableRowClose ();
+			for (
+				Map.Entry <String, UserPrivSets> entry
+					: userPrivs.entrySet ()
+			) {
+
+				String userPath =
+					entry.getKey ();
+
+				UserPrivSets userPrivSets =
+					entry.getValue ();
+
+				htmlTableRowOpen (
+					formatWriter);
+
+				htmlTableCellWrite (
+					formatWriter,
+					userPath);
+
+				htmlTableCellWrite (
+					formatWriter,
+					joinWithCommaAndSpace (
+						userPrivSets.canPrivCodes));
+
+				htmlTableCellWrite (
+					formatWriter,
+					joinWithCommaAndSpace (
+						userPrivSets.canGrantPrivCodes));
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
+
+			// table close
+
+			htmlTableClose (
+				formatWriter);
+
+			// form open
+
+			htmlFormOpenGetAction (
+				formatWriter,
+				"");
+
+			// edit privs
+
+			htmlParagraphOpen (
+				formatWriter);
+
+			formatWriter.writeFormat (
+				"Edit privs for user to user<br>");
+
+			htmlSelectOpen (
+				formatWriter,
+				"userId");
+
+			for (
+				Map.Entry <String, UserRec> entry :
+					users.entrySet ()
+			) {
+
+				htmlOptionWrite (
+					formatWriter,
+					entry.getValue ().getId ().toString (),
+					entry.getKey ());
+
+			}
+
+			htmlSelectClose (
+				formatWriter);
+
+			formatWriter.writeFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"go\"",
+				">");
+
+			htmlParagraphClose (
+				formatWriter);
+
+			// form close
+
+			htmlFormClose (
+				formatWriter);
 
 		}
-
-		// table close
-
-		htmlTableClose ();
-
-		// form open
-
-		htmlFormOpenGet ();
-
-		// edit privs
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeFormat (
-			"Edit privs for user to user<br>");
-
-		htmlSelectOpen (
-			"userId");
-
-		for (
-			Map.Entry <String, UserRec> entry :
-				users.entrySet ()
-		) {
-
-			htmlOptionWrite (
-				entry.getValue ().getId ().toString (),
-				entry.getKey ());
-
-		}
-
-		htmlSelectClose ();
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"go\"",
-			">");
-
-		htmlParagraphClose ();
-
-		// form close
-
-		htmlFormClose ();
-
-	}
-
-	private void htmlFormOpenGet () {
-
-		// TODO Auto-generated method stub
 
 	}
 
 	private
-	void renderGroups () {
+	void renderGroups (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		// heading
+		try (
 
-		htmlHeadingTwoWrite (
-			"Groups");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderGroups");
 
-		// table open
-
-		htmlTableOpenList ();
-
-		htmlTableHeaderRowWrite (
-			"Group",
-			"Privs");
-
-		if (groupPrivs.size () == 0) {
-
-			htmlTableCellWrite (
-				"No user privs to show",
-				htmlColumnSpanAttribute (3l));
-
-		}
-
-		for (
-			Map.Entry <String, Set <String>> entry
-				: groupPrivs.entrySet ()
 		) {
 
-			String groupPath =
-				entry.getKey ();
+			// heading
 
-			Set <String> privCodes =
-				entry.getValue ();
+			htmlHeadingTwoWrite (
+				formatWriter,
+				"Groups");
 
-			htmlTableRowOpen ();
+			// table open
 
-			htmlTableCellWrite (
-				groupPath);
+			htmlTableOpenList (
+				formatWriter);
 
-			htmlTableCellWrite (
-				joinWithCommaAndSpace (
-					privCodes));
+			htmlTableHeaderRowWrite (
+				formatWriter,
+				"Group",
+				"Privs");
 
-			htmlTableRowClose ();
+			if (groupPrivs.size () == 0) {
+
+				htmlTableCellWrite (
+					formatWriter,
+					"No user privs to show",
+					htmlColumnSpanAttribute (3l));
+
+			}
+
+			for (
+				Map.Entry <String, Set <String>> entry
+					: groupPrivs.entrySet ()
+			) {
+
+				String groupPath =
+					entry.getKey ();
+
+				Set <String> privCodes =
+					entry.getValue ();
+
+				htmlTableRowOpen (
+					formatWriter);
+
+				htmlTableCellWrite (
+					formatWriter,
+					groupPath);
+
+				htmlTableCellWrite (
+					formatWriter,
+					joinWithCommaAndSpace (
+						privCodes));
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
+
+			// table close
+
+			htmlTableClose (
+				formatWriter);
 
 		}
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 

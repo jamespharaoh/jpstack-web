@@ -3,8 +3,8 @@ package wbs.apn.chat.user.core.console;
 import static wbs.utils.etc.LogicUtils.comparableLessThan;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.spacify;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -22,6 +22,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import static wbs.web.utils.HtmlUtils.htmlColourFromObject;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNonBreakingWhitespace;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -39,6 +41,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
@@ -47,7 +50,6 @@ import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("chatUserHistoryPart")
 public
@@ -70,6 +72,9 @@ class ChatUserHistoryPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -129,7 +134,8 @@ class ChatUserHistoryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -142,11 +148,13 @@ class ChatUserHistoryPart
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// table header
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Time",
 				"User",
@@ -206,22 +214,26 @@ class ChatUserHistoryPart
 					previousDate =
 						nextDate;
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlStyleAttribute (
 							htmlStyleRuleEntry (
 								"font-weight",
 								"bold")));
 
 					htmlTableCellWrite (
+						formatWriter,
 						timeFormatter.dateStringLong (
 							chatUserLogic.getTimezone (
 								chatUser),
 							chatMessage.getTimestamp ()),
 						htmlColumnSpanAttribute (5l));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
@@ -248,10 +260,12 @@ class ChatUserHistoryPart
 				));
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						rowClass));
 
 				htmlTableCellWrite (
+					formatWriter,
 					"",
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
@@ -259,23 +273,26 @@ class ChatUserHistoryPart
 							colour)));
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timeString (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatMessage.getTimestamp ()));
 
 				htmlTableCellWriteHtml (
-					HtmlUtils.htmlNonBreakingWhitespace (
-						HtmlUtils.htmlEncode (
-							otherUserId)));
+					formatWriter,
+					htmlEncodeNonBreakingWhitespace (
+						otherUserId));
 
 				htmlTableCellWrite (
+					formatWriter,
 					spacify (
 						chatMessage.getOriginalText ().getText ()));
 
 				if (fromUser.getType () == ChatUserType.monitor) {
 
 					htmlTableCellWrite (
+						formatWriter,
 						ifNotNullThenElseEmDash (
 							chatMessage.getSender (),
 							() -> chatMessage.getSender ().getUsername ()));
@@ -283,22 +300,26 @@ class ChatUserHistoryPart
 				} else if (toUser.getType () == ChatUserType.monitor) {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"(yes)");
 
 				} else {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"");
 
 				}
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

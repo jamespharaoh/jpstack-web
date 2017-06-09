@@ -39,6 +39,8 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.sms.message.core.console.MessageConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -125,7 +127,8 @@ class ChatHelpLogPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -137,10 +140,12 @@ class ChatHelpLogPendingSummaryPart
 		) {
 
 			renderDetails (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -148,7 +153,8 @@ class ChatHelpLogPendingSummaryPart
 
 	private
 	void renderDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -159,60 +165,72 @@ class ChatHelpLogPendingSummaryPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"User",
 				() -> objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatUser,
 					chatUser.getChat ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Date mode",
 				chatUser.getDateMode ().name ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Online",
 				booleanToYesNo (
 					chatUser.getOnline ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Gender",
 				ifNotNullThenElseEmDash (
 					chatUser.getGender (),
 					() -> chatUser.getGender ().name ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Orientation",
 				ifNotNullThenElseEmDash (
 					chatUser.getOrient (),
 					() -> chatUser.getOrient ().name ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Name",
 				ifNotNullThenElseEmDash (
 					chatUser.getName (),
 					() -> chatUser.getName ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Info",
 				ifNotNullThenElseEmDash (
 					chatUser.getInfoText (),
 					() -> chatUser.getInfoText ().getText ()));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Credit",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
 					chatUser.getCredit ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Barred",
 				booleanToYesNo (
 					chatUser.getBarred ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Credit mode",
 				chatUser.getCreditMode ().name ());
 
@@ -222,10 +240,12 @@ class ChatHelpLogPendingSummaryPart
 					chatUser);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Credit check",
 				creditCheckResult.details ());
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -233,7 +253,8 @@ class ChatHelpLogPendingSummaryPart
 
 	private
 	void renderHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -245,11 +266,14 @@ class ChatHelpLogPendingSummaryPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"History");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Time",
 				"Text",
@@ -282,7 +306,8 @@ class ChatHelpLogPendingSummaryPart
 					previousDate =
 						nextDate;
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 					formatWriter.writeLineFormat (
 						"<tr style=\"font-weight: bold\">");
@@ -293,7 +318,8 @@ class ChatHelpLogPendingSummaryPart
 							transaction,
 							chatHelpLog.getTimestamp ()));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
@@ -313,26 +339,32 @@ class ChatHelpLogPendingSummaryPart
 					">&nbsp;</td>");
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timeString (
 						transaction,
 						chatHelpLog.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatHelpLog.getText ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatHelpLog.getOurNumber ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatHelpLog.getUser (),
 						() -> chatHelpLog.getUser ().getUsername ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -1,9 +1,9 @@
 package wbs.apn.chat.affiliate.console;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -32,6 +32,7 @@ import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -40,6 +41,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.DurationFormatter;
 import wbs.utils.time.TextualInterval;
 
@@ -71,6 +73,9 @@ class ChatAffiliateComparePart
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -249,21 +254,28 @@ class ChatAffiliateComparePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		renderForm ();
-		renderHistory ();
+		renderForm (
+			formatWriter);
+
+		renderHistory (
+			formatWriter);
 
 	}
 
 	private
-	void renderForm () {
+	void renderForm (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlFormOpenGetAction (
+			formatWriter,
 			requestContext.resolveLocalUrl (
 				"/chatAffiliate.compare"));
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"Time period<br>");
@@ -281,14 +293,17 @@ class ChatAffiliateComparePart
 			" type=\"submit\"",
 			" value=\"ok\">");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
-		htmlFormClose ();
+		htmlFormClose (
+			formatWriter);
 
 	}
 
 	private
-	void renderHistory () {
+	void renderHistory (
+			@NonNull FormatWriter formatWriter) {
 
 		if (
 			isNull (
@@ -297,9 +312,11 @@ class ChatAffiliateComparePart
 			return;
 		}
 
-		htmlTableOpenList ();
+		htmlTableOpenList (
+			formatWriter);
 
 		htmlTableHeaderRowWrite (
+			formatWriter,
 			"Scheme",
 			"Affiliate<",
 			"Descriptionn",
@@ -313,32 +330,39 @@ class ChatAffiliateComparePart
 			ChatAffiliateRec chatAffiliate =
 				chatAffiliateWithNewUserCount.chatAffiliate;
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWrite (
+				formatWriter,
 				chatAffiliate != null
 					? chatAffiliate.getChatScheme ().getCode ()
 					: "(no affiliate)");
 
 			htmlTableCellWrite (
+				formatWriter,
 				chatAffiliate != null
 					? chatAffiliate.getCode ()
 					: "(no affiliate)");
 
 			htmlTableCellWrite (
+				formatWriter,
 				chatAffiliate != null
 					? chatAffiliate.getDescription ()
 					: "-");
 
 			htmlTableCellWrite (
+				formatWriter,
 				integerToDecimalString (
 					chatAffiliateWithNewUserCount.newUsers));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 

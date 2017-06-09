@@ -1,6 +1,5 @@
 package wbs.apn.chat.supervisor.console;
 
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
@@ -10,7 +9,9 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -24,6 +25,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
@@ -58,9 +60,12 @@ class ChatSupervisorNotesPart
 	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	// state
+	// properties
 
+	@Getter @Setter
 	StatsPeriod statsPeriod;
+
+	// state
 
 	ChatRec chat;
 
@@ -82,11 +87,6 @@ class ChatSupervisorNotesPart
 
 		) {
 
-			statsPeriod =
-				genericCastUnchecked (
-					parameters.get (
-						"statsPeriod"));
-
 			chat =
 				chatHelper.findFromContextRequired (
 					transaction);
@@ -106,7 +106,8 @@ class ChatSupervisorNotesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -117,9 +118,11 @@ class ChatSupervisorNotesPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Note",
 				"User",
 				"Monitor",
@@ -131,37 +134,45 @@ class ChatSupervisorNotesPart
 					: chatContactNotes
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatContactNote.getNotes ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatContactNote.getUser (),
 					chatContactNote.getUser ().getChat ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatContactNote.getMonitor (),
 					chatContactNote.getMonitor ().getChat ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatContactNote.getConsoleUser ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							transaction,
 							chat),
 						chatContactNote.getTimestamp ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 

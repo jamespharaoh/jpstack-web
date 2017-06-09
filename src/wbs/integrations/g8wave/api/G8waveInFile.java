@@ -5,6 +5,9 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -25,7 +28,9 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
@@ -191,13 +196,22 @@ class G8waveInFile
 
 			try (
 
+				Writer writer =
+					requestContext.writer ();
+
 				FormatWriter formatWriter =
-					requestContext.formatWriter ();
+					new WriterFormatWriter (
+						writer);
 
 			) {
 
 				formatWriter.writeLineFormat (
 					"OK");
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
 
 			}
 

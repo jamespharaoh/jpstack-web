@@ -30,6 +30,7 @@ import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -40,6 +41,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -77,6 +79,9 @@ class ChatBroadcastVerifyPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -188,7 +193,8 @@ class ChatBroadcastVerifyPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -201,12 +207,14 @@ class ChatBroadcastVerifyPart
 
 			// form
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			// always hidden
 
 			sendForm.outputFormAlwaysHidden (
 				transaction,
+				formatWriter,
 				"search",
 				"numbers",
 				"common",
@@ -217,6 +225,7 @@ class ChatBroadcastVerifyPart
 
 			sendForm.outputFormTemporarilyHidden (
 				transaction,
+				formatWriter,
 				"search",
 				"numbers",
 				"common",
@@ -225,19 +234,24 @@ class ChatBroadcastVerifyPart
 			// message info
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Message");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"From user code",
 				fromUser.getCode ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"From user name",
 				fromUser.getName ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"From user info",
 				ifNotNullThenElseEmDash (
 					fromUser.getInfoText (),
@@ -245,13 +259,16 @@ class ChatBroadcastVerifyPart
 
 			sendForm.outputFormRows (
 				transaction,
+				formatWriter,
 				"message-message");
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -267,18 +284,22 @@ class ChatBroadcastVerifyPart
 				" value=\"back\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			// recipients info
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Recipients");
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"%s recipients in total.",
@@ -287,18 +308,21 @@ class ChatBroadcastVerifyPart
 
 			if (sendForm.value ().search ()) {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"The actual number of recipients may change slightly on ",
 					"send as the search will be performed again.");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
 			verifyForm.outputListTable (
 				transaction,
+				formatWriter,
 				false);
 
 		}

@@ -307,10 +307,10 @@ class StringUtils {
 	}
 
 	public static
-	CharSequence joinWithCommaAndSpaceLazy (
+	LazyString joinWithCommaAndSpaceLazy (
 			@NonNull Iterable <CharSequence> parts) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> joinWithSeparator (
 				", ",
 				"",
@@ -320,10 +320,10 @@ class StringUtils {
 	}
 
 	public static
-	CharSequence joinWithCommaAndSpaceLazy (
+	LazyString joinWithCommaAndSpaceLazy (
 			@NonNull String ... parts) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> joinWithSeparator (
 				", ",
 				"",
@@ -1148,7 +1148,7 @@ class StringUtils {
 	LazyString stringFormatLazy (
 			Iterable <CharSequence> arguments) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
 					CharSequence::toString,
@@ -1160,7 +1160,7 @@ class StringUtils {
 	LazyString stringFormatLazy (
 			CharSequence ... arguments) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
 					CharSequence::toString,
@@ -1173,7 +1173,7 @@ class StringUtils {
 	LazyString stringFormatLazyArray (
 			CharSequence[] arguments) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
 					CharSequence::toString,
@@ -1722,6 +1722,22 @@ class StringUtils {
 			key,
 			booleanToYesNo (
 				value));
+
+	}
+
+	public static
+	long stringLength (
+			@NonNull CharSequence charSequence) {
+
+		return charSequence.toString ().length ();
+
+	}
+
+	public static
+	long stringLength (
+			@NonNull String string) {
+
+		return string.length ();
 
 	}
 

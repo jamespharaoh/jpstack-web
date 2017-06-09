@@ -25,6 +25,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
@@ -75,7 +77,8 @@ class ChatUserImageRotatePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -95,7 +98,8 @@ class ChatUserImageRotatePart
 
 			}
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -106,18 +110,22 @@ class ChatUserImageRotatePart
 					chatUser.getChatUserImageList ().get (0).getId ()),
 				">");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Image",
 				"Rotation");
 
 			// no rotation
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -126,26 +134,33 @@ class ChatUserImageRotatePart
 				" value=\"0\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			mediaConsoleLogic.writeMediaThumb100 (
 				transaction,
+				formatWriter,
 				chatUser.getChatUserImageList ().get (0).getMedia ());
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<td>Original image</td>");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// rotate 90 degrees clockwise
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -154,28 +169,35 @@ class ChatUserImageRotatePart
 				" value=\"90\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			mediaConsoleLogic.writeMediaThumb100 (
 				transaction,
+				formatWriter,
 				chatUser.getChatUserImageList ().get (0).getMedia (),
 				"90");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<td>90 degrees clockwise</td>");
 
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// rotate 180 degrees
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -184,27 +206,34 @@ class ChatUserImageRotatePart
 				" value=\"180\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			mediaConsoleLogic.writeMediaThumb100 (
 				transaction,
+				formatWriter,
 				chatUser.getChatUserImageList ().get (0).getMedia (),
 				"180");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<td>180 degrees</td>");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// rotate 90 degrees counter-clockwise
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -213,25 +242,31 @@ class ChatUserImageRotatePart
 				" value=\"270\"",
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			mediaConsoleLogic.writeMediaThumb100 (
 				transaction,
+				formatWriter,
 				chatUser.getChatUserImageList ().get (0).getMedia (),
 				"270");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<td>90 degrees counter-clockwise</td>");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// end form
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -239,9 +274,11 @@ class ChatUserImageRotatePart
 				" value=\"rotate image\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

@@ -19,6 +19,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -27,6 +28,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -54,6 +56,9 @@ class ChatUserNotesPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -96,7 +101,8 @@ class ChatUserNotesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -108,10 +114,12 @@ class ChatUserNotesPart
 		) {
 
 			renderCreateForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -119,7 +127,8 @@ class ChatUserNotesPart
 
 	private
 	void renderCreateForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -131,15 +140,19 @@ class ChatUserNotesPart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.notes"));
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Create note");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Note",
 				stringFormat (
 					"<textarea",
@@ -148,7 +161,8 @@ class ChatUserNotesPart
 					requestContext.formOrEmptyString (
 						"note")));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<p><input",
@@ -157,7 +171,8 @@ class ChatUserNotesPart
 				" value=\"create note\"",
 				"></p>\n");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -165,7 +180,8 @@ class ChatUserNotesPart
 
 	private
 	void renderHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -177,11 +193,14 @@ class ChatUserNotesPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Existing notes");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Timestamp",
 				"Note",
 				"User");
@@ -191,26 +210,32 @@ class ChatUserNotesPart
 					: chatUserNotes
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timestampTimezoneString (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatUserNote.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUserNote.getText ().getText ());
 
 				consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatUserNote.getUser ());
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

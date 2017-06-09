@@ -5,8 +5,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 
 import java.util.Collections;
 import java.util.List;
-
-import javax.inject.Provider;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -17,12 +16,16 @@ import lombok.experimental.Accessors;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
+import wbs.console.reporting.StatsDataSet;
+import wbs.console.reporting.StatsPeriod;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePart")
@@ -39,6 +42,14 @@ class SupervisorTablePart
 
 	@Getter @Setter
 	SupervisorTablePartBuilder supervisorTablePartBuilder;
+
+	@Getter @Setter
+	StatsPeriod statsPeriod;
+
+	@Getter @Setter
+	Map <String, StatsDataSet> statsDataSets;
+
+	// state
 
 	List <PagePart> pageParts =
 		Collections.emptyList ();
@@ -63,16 +74,15 @@ class SupervisorTablePart
 				ImmutableList.<PagePart> builder ();
 
 			for (
-				Provider <PagePart> pagePartFactory
+				StatsPagePartFactory pagePartFactory
 					: supervisorTablePartBuilder.pagePartFactories ()
 			) {
 
 				PagePart pagePart =
-					pagePartFactory.get ();
-
-				pagePart.setup (
-					transaction,
-					parameters);
+					pagePartFactory.buildPagePart (
+						transaction,
+						statsPeriod,
+						statsDataSets);
 
 				pagePart.prepare (
 					transaction);
@@ -92,7 +102,8 @@ class SupervisorTablePart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -109,7 +120,8 @@ class SupervisorTablePart
 			) {
 
 				pagePart.renderHtmlHeadContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 
@@ -120,7 +132,8 @@ class SupervisorTablePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -131,7 +144,8 @@ class SupervisorTablePart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			for (
 				PagePart pagePart
@@ -139,11 +153,13 @@ class SupervisorTablePart
 			) {
 
 				pagePart.renderHtmlBodyContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

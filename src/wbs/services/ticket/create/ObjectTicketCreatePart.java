@@ -20,6 +20,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -28,6 +29,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
@@ -54,6 +57,9 @@ class ObjectTicketCreatePart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
@@ -240,7 +246,8 @@ class ObjectTicketCreatePart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -252,20 +259,26 @@ class ObjectTicketCreatePart <
 		) {
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Please enter the details for the new ticket");
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/" + localFile));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			formContext.outputFormRows (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -273,9 +286,11 @@ class ObjectTicketCreatePart <
 				" value=\"create ticket\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

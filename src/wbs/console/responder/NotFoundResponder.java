@@ -1,5 +1,6 @@
 package wbs.console.responder;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
@@ -17,6 +18,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("notFoundResponder")
 public
 class NotFoundResponder
@@ -33,9 +36,19 @@ class NotFoundResponder
 	// implementation
 
 	@Override
+	protected
+	void prepare (
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -47,15 +60,19 @@ class NotFoundResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				"Page not found");
 
 			htmlParagraphWriteFormatError (
+				formatWriter,
 				"Page not found");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"The requested page could not be found:");
 
 			htmlParagraphWriteHtml (
+				formatWriter,
 				stringFormat (
 					"<code>%h</code>",
 					requestContext.requestUri ()));

@@ -111,13 +111,15 @@ class ApiDeploymentRestartFormActionHelper
 			if (apiDeployment.getRestart ()) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"There is already a restart scheduled for this API ",
-					"deployment, but it has not yet taken place. If this message ",
-					"persists, please contact support.");
+					"deployment, but it has not yet taken place. If this ",
+					"message persists, please contact support.");
 
 			} else {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"Trigger a restart for this API deployment");
 
 			}

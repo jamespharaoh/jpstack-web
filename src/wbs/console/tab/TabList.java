@@ -86,6 +86,7 @@ class TabList {
 				if (preparedTab.selected) {
 
 					htmlLinkWrite (
+						formatWriter,
 						preparedTab.url,
 						preparedTab.label,
 						htmlClassAttribute (
@@ -94,6 +95,7 @@ class TabList {
 				} else {
 
 					htmlLinkWrite (
+						formatWriter,
 						preparedTab.url,
 						preparedTab.label);
 
@@ -101,7 +103,8 @@ class TabList {
 
 			}
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 

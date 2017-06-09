@@ -31,7 +31,6 @@ import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -47,11 +46,13 @@ import wbs.platform.user.console.UserSessionLogic;
 import wbs.utils.etc.NumberUtils;
 import wbs.utils.string.FormatWriter;
 
+import wbs.web.responder.BufferedTextResponder;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
 public
 class ObjectSearchCsvResponder <ResultType>
-	extends ConsoleResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -95,29 +96,6 @@ class ObjectSearchCsvResponder <ResultType>
 	List <Long> objectIds;
 
 	ConsoleForm <ResultType> formContext;
-
-	// implementation
-
-	@Override
-	protected
-	void setup (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"setup");
-
-		) {
-
-			formatWriter =
-				requestContext.formatWriter ();
-
-		}
-
-	}
 
 	// implementation
 
@@ -190,7 +168,7 @@ class ObjectSearchCsvResponder <ResultType>
 
 	@Override
 	protected
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -198,7 +176,7 @@ class ObjectSearchCsvResponder <ResultType>
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setHtmlHeaders");
+					"headers");
 
 		) {
 
@@ -220,7 +198,8 @@ class ObjectSearchCsvResponder <ResultType>
 	@Override
 	protected
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -234,7 +213,8 @@ class ObjectSearchCsvResponder <ResultType>
 			// write headers
 
 			formContext.outputCsvHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
 			// iterate through objects
 
@@ -290,6 +270,7 @@ class ObjectSearchCsvResponder <ResultType>
 
 					formContext.outputCsvRow (
 						transaction,
+						formatWriter,
 						object);
 
 				}

@@ -24,6 +24,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -34,6 +35,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -58,6 +61,9 @@ class ChatUserImageHistoryPart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -120,7 +126,8 @@ class ChatUserImageHistoryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -131,9 +138,11 @@ class ChatUserImageHistoryPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Type",
 				"Index",
 				"Preview",
@@ -144,13 +153,16 @@ class ChatUserImageHistoryPart
 
 			if (chatUserImages.isEmpty ()) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					"No history to show",
 					htmlColumnSpanAttribute (7l));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
@@ -159,16 +171,19 @@ class ChatUserImageHistoryPart
 					: chatUserImages
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				// type
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUserImage.getType ().name ());
 
 				// index
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserImage.getIndex (),
 						() -> integerToDecimalString (
@@ -177,6 +192,7 @@ class ChatUserImageHistoryPart
 				// media
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlAttribute (
 						"style",
 						"text-align: center"));
@@ -188,6 +204,7 @@ class ChatUserImageHistoryPart
 
 					mediaConsoleLogic.writeMediaThumb100 (
 						transaction,
+						formatWriter,
 						chatUserImage.getMedia ());
 
 				} else {
@@ -197,11 +214,13 @@ class ChatUserImageHistoryPart
 
 				}
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// timestamp
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithoutTimezoneString (
 						transaction,
 						chatUserImage.getTimestamp ()));
@@ -209,11 +228,13 @@ class ChatUserImageHistoryPart
 				// status
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUserImage.getStatus ().name ());
 
 				// moderator
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserImage.getModerator (),
 						() -> objectManager.objectPathMini (
@@ -225,6 +246,7 @@ class ChatUserImageHistoryPart
 				// moderation time
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserImage.getModerationTime (),
 						() -> userConsoleLogic.timestampWithoutTimezoneString (
@@ -233,11 +255,13 @@ class ChatUserImageHistoryPart
 
 				// end row
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

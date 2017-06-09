@@ -71,6 +71,8 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("manualResponderRequestPendingFormResponder")
 public
 class ManualResponderRequestPendingFormResponder
@@ -160,9 +162,6 @@ class ManualResponderRequestPendingFormResponder
 					"prepare");
 
 		) {
-
-			super.prepare (
-				transaction);
 
 			request =
 				manualResponderRequestHelper.findFromContextRequired (
@@ -300,7 +299,8 @@ class ManualResponderRequestPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -312,11 +312,13 @@ class ManualResponderRequestPendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			// show relevant frames
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"top.show_inbox (true);");
@@ -334,7 +336,8 @@ class ManualResponderRequestPendingFormResponder
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}, 1);\n");
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -343,7 +346,8 @@ class ManualResponderRequestPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -357,15 +361,18 @@ class ManualResponderRequestPendingFormResponder
 			requestContext.flushNotices (
 				formatWriter);
 
-			goLinks ();
+			goLinks (
+				formatWriter);
 
 			if (request == null) {
 
-				goNotFound ();
+				goNotFound (
+					formatWriter);
 
 			} else if (! request.getPending ()) {
 
-				goNotPending ();
+				goNotPending (
+					formatWriter);
 
 			} else if (
 
@@ -376,7 +383,8 @@ class ManualResponderRequestPendingFormResponder
 
 			) {
 
-				goAccessDenied ();
+				goAccessDenied (
+					formatWriter);
 
 			} else if (
 
@@ -391,11 +399,14 @@ class ManualResponderRequestPendingFormResponder
 
 			) {
 
-				goNoTemplates ();
+				goNoTemplates (
+					formatWriter);
 
 			} else {
 
-				goForm ();
+				goForm (
+					transaction,
+					formatWriter);
 
 			}
 
@@ -404,354 +415,431 @@ class ManualResponderRequestPendingFormResponder
 	}
 
 	private
-	void goForm () {
+	void goForm (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		// form open
+		try (
 
-		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrlFormat (
-				"/manualResponderRequest.pending",
-				"/%u",
-				integerToDecimalString (
-					request.getId ()),
-				"/manualResponderRequest.pending.form"),
-			htmlClassAttribute (
-				"manual-responder-request-pending-form"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goForm");
 
-		// table open
-
-		htmlTableOpenList (
-			htmlStyleRuleEntry (
-				"width",
-				"100%"));
-
-		// table header
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"",
-			htmlStyleRuleEntry (
-				"width",
-				"0"));
-
-		htmlTableHeaderCellWrite (
-			"Template",
-			htmlStyleRuleEntry (
-				"width",
-				"0"));
-
-		htmlTableHeaderCellWrite (
-			"Charge",
-			htmlStyleRuleEntry (
-				"width",
-				"0"));
-
-		htmlTableHeaderCellWrite (
-			"Message");
-
-		htmlTableHeaderCellWrite (
-			"Send",
-			htmlStyleRuleEntry (
-				"width",
-				"0"));
-
-		htmlTableRowClose ();
-
-		if (alreadyReplied) {
-			renderIgnore ();
-		}
-
-		int selectedTemplateId = -1;
-
-		Optional <String> templateIdStringOptional =
-			requestContext.parameter (
-				"template-id");
-
-		if (
-			optionalIsPresent (
-				templateIdStringOptional)
 		) {
 
-			selectedTemplateId =
-				Integer.parseInt (
-					templateIdStringOptional.get ());
+			// form open
+
+			htmlFormOpenPostAction (
+				formatWriter,
+				requestContext.resolveApplicationUrlFormat (
+					"/manualResponderRequest.pending",
+					"/%u",
+					integerToDecimalString (
+						request.getId ()),
+					"/manualResponderRequest.pending.form"),
+				htmlClassAttribute (
+					"manual-responder-request-pending-form"));
+
+			// table open
+
+			htmlTableOpenList (
+				formatWriter,
+				htmlStyleRuleEntry (
+					"width",
+					"100%"));
+
+			// table header
+
+			htmlTableRowOpen (
+				formatWriter);
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"",
+				htmlStyleRuleEntry (
+					"width",
+					"0"));
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"Template",
+				htmlStyleRuleEntry (
+					"width",
+					"0"));
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"Charge",
+				htmlStyleRuleEntry (
+					"width",
+					"0"));
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"Message");
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"Send",
+				htmlStyleRuleEntry (
+					"width",
+					"0"));
+
+			htmlTableRowClose (
+				formatWriter);
+
+			if (alreadyReplied) {
+
+				renderIgnore (
+					formatWriter);
+
+			}
+
+			int selectedTemplateId = -1;
+
+			Optional <String> templateIdStringOptional =
+				requestContext.parameter (
+					"template-id");
+
+			if (
+				optionalIsPresent (
+					templateIdStringOptional)
+			) {
+
+				selectedTemplateId =
+					Integer.parseInt (
+						templateIdStringOptional.get ());
+
+			}
+
+			for (
+				ManualResponderTemplateRec template
+					: templates
+			) {
+
+				goTemplate (
+					transaction,
+					formatWriter,
+					template,
+					template.getId () == selectedTemplateId);
+
+			}
+
+			if (canIgnore && ! alreadyReplied) {
+
+				renderIgnore (
+					formatWriter);
+
+			}
+
+			// table close
+
+			htmlTableClose (
+				formatWriter);
+
+			// form close
+
+			htmlFormClose (
+				formatWriter);
 
 		}
-
-		for (
-			ManualResponderTemplateRec template
-				: templates
-		) {
-
-			goTemplate (
-				template,
-				template.getId () == selectedTemplateId);
-
-		}
-
-		if (canIgnore && ! alreadyReplied)
-			renderIgnore ();
-
-		// table close
-
-		htmlTableClose ();
-
-		// form close
-
-		htmlFormClose ();
 
 	}
 
 	private
 	void goTemplate (
-			ManualResponderTemplateRec template,
-			boolean selected) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ManualResponderTemplateRec template,
+			@NonNull Boolean selected) {
 
-		// table row open
+		try (
 
-		htmlTableRowOpen (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"goTemplate");
 
-			htmlClassAttribute (
-				"template"),
+		) {
 
-			htmlDataAttribute (
-				"template-id",
-				integerToDecimalString (
-					template.getId ())),
+			// table row open
 
-			htmlDataAttribute (
-				"template-mode",
-				booleanToString (
-					template.getSplitLong (),
-					"split",
-					"join")),
+			htmlTableRowOpen (
+				formatWriter,
 
-			htmlDataAttribute (
-				"template-min-message-parts",
-				integerToDecimalString (
-					template.getMinimumMessageParts ())),
+				htmlClassAttribute (
+					"template"),
 
-			htmlDataAttribute (
-				"template-max-messages",
-				integerToDecimalString (
-					template.getMaximumMessages ())),
+				htmlDataAttribute (
+					"template-id",
+					integerToDecimalString (
+						template.getId ())),
 
-			htmlDataAttribute (
-				"template-max-for-single-message",
-				"160"),
+				htmlDataAttribute (
+					"template-mode",
+					booleanToString (
+						template.getSplitLong (),
+						"split",
+						"join")),
 
-			htmlDataAttribute (
-				"template-max-for-message-part",
-				integerToDecimalString (
-					request
-						.getNumber ()
-						.getNetwork ()
-						.getShortMultipartMessages ()
-					? 134l
-					: 153l)),
+				htmlDataAttribute (
+					"template-min-message-parts",
+					integerToDecimalString (
+						template.getMinimumMessageParts ())),
 
-			htmlDataAttribute (
-				"template-single",
-				booleanToString (
-					template.getApplyTemplates (),
-					emptyStringIfNull (
-						template.getSingleTemplate ()),
-					"{message}")),
+				htmlDataAttribute (
+					"template-max-messages",
+					integerToDecimalString (
+						template.getMaximumMessages ())),
 
-			htmlDataAttribute (
-				"template-first",
-				booleanToString (
-					template.getApplyTemplates (),
-					emptyStringIfNull (
-						template.getFirstTemplate ()),
-					"{message}")),
+				htmlDataAttribute (
+					"template-max-for-single-message",
+					"160"),
 
-			htmlDataAttribute (
-				"template-middle",
-				booleanToString (
-					template.getApplyTemplates (),
-					emptyStringIfNull (
-						template.getMiddleTemplate ()),
-					"{message}")),
+				htmlDataAttribute (
+					"template-max-for-message-part",
+					integerToDecimalString (
+						request
+							.getNumber ()
+							.getNetwork ()
+							.getShortMultipartMessages ()
+						? 134l
+						: 153l)),
 
-			htmlDataAttribute (
-				"template-last",
-				booleanToString (
-					template.getApplyTemplates (),
-					emptyStringIfNull (
-						template.getLastTemplate ()),
-					"{message}"))
+				htmlDataAttribute (
+					"template-single",
+					booleanToString (
+						template.getApplyTemplates (),
+						emptyStringIfNull (
+							template.getSingleTemplate ()),
+						"{message}")),
 
-		);
+				htmlDataAttribute (
+					"template-first",
+					booleanToString (
+						template.getApplyTemplates (),
+						emptyStringIfNull (
+							template.getFirstTemplate ()),
+						"{message}")),
 
-		// radio button
+				htmlDataAttribute (
+					"template-middle",
+					booleanToString (
+						template.getApplyTemplates (),
+						emptyStringIfNull (
+							template.getMiddleTemplate ()),
+						"{message}")),
 
-		htmlTableCellOpen ();
+				htmlDataAttribute (
+					"template-last",
+					booleanToString (
+						template.getApplyTemplates (),
+						emptyStringIfNull (
+							template.getLastTemplate ()),
+						"{message}"))
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" class=\"template-radio\"",
-			" type=\"radio\"",
-			" name=\"template-id\"",
-			" value=\"%h\"",
-			integerToDecimalString (
-				template.getId ()),
-			selected
-				? " checked"
-				: "",
-			">");
+			);
 
-		htmlTableCellClose ();
+			// radio button
 
-		// template name
-
-		htmlTableCellWriteHtml (
-			htmlEncodeNonBreakingWhitespace (
-				template.getName ()));
-
-		// message
-
-		RouteRec route =
-			routerLogic.resolveRouter (
-				transaction,
-				template.getRouter ());
-
-		htmlTableCellWriteHtml (
-			htmlEncodeNonBreakingWhitespace (
-				ifThenElseEmDash (
-					moreThanZero (
-						route.getOutCharge ()),
-					() -> currencyLogic.formatText (
-						route.getCurrency (),
-						route.getOutCharge ()))));
-
-		if (template.getCustomisable ()) {
-
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
-				"<textarea",
-
-				" class=\"template-text\"",
-				" style=\"display: none\"",
-
-				" name=\"message-%h\"",
+				"<input",
+				" class=\"template-radio\"",
+				" type=\"radio\"",
+				" name=\"template-id\"",
+				" value=\"%h\"",
 				integerToDecimalString (
 					template.getId ()),
+				selected
+					? " checked"
+					: "",
+				">");
 
-				" rows=\"3\"",
-				" cols=\"48\"",
+			htmlTableCellClose (
+				formatWriter);
 
-				">%h</textarea><br>",
-				requestContext.parameterOrDefault (
-					"message-" + template.getId (),
-					template.getDefaultText ()));
-
-			formatWriter.writeLineFormat (
-				"<span",
-				" class=\"template-chars\"",
-				" style=\"display: none\"",
-				"></span>");
-
-			htmlTableCellClose ();
-
-		} else {
+			// template name
 
 			htmlTableCellWriteHtml (
-				template.getDefaultText ());
+				formatWriter,
+				htmlEncodeNonBreakingWhitespace (
+					template.getName ()));
+
+			// message
+
+			RouteRec route =
+				routerLogic.resolveRouter (
+					transaction,
+					template.getRouter ());
+
+			htmlTableCellWriteHtml (
+				formatWriter,
+				htmlEncodeNonBreakingWhitespace (
+					ifThenElseEmDash (
+						moreThanZero (
+							route.getOutCharge ()),
+						() -> currencyLogic.formatText (
+							route.getCurrency (),
+							route.getOutCharge ()))));
+
+			if (template.getCustomisable ()) {
+
+				htmlTableCellOpen (
+					formatWriter);
+
+				formatWriter.writeLineFormat (
+					"<textarea",
+
+					" class=\"template-text\"",
+					" style=\"display: none\"",
+
+					" name=\"message-%h\"",
+					integerToDecimalString (
+						template.getId ()),
+
+					" rows=\"3\"",
+					" cols=\"48\"",
+
+					">%h</textarea><br>",
+					requestContext.parameterOrDefault (
+						"message-" + template.getId (),
+						template.getDefaultText ()));
+
+				formatWriter.writeLineFormat (
+					"<span",
+					" class=\"template-chars\"",
+					" style=\"display: none\"",
+					"></span>");
+
+				htmlTableCellClose (
+					formatWriter);
+
+			} else {
+
+				htmlTableCellWriteHtml (
+					formatWriter,
+					template.getDefaultText ());
+
+			}
+
+			// send
+
+			htmlTableCellOpen (
+				formatWriter);
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" class=\"template-submit\"",
+				" type=\"submit\"",
+				" value=\"send\"",
+				">");
+
+			htmlTableCellClose (
+				formatWriter);
+
+			// table row close
+
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
-		// send
-
-		htmlTableCellOpen ();
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" class=\"template-submit\"",
-			" type=\"submit\"",
-			" value=\"send\"",
-			">");
-
-		htmlTableCellClose ();
-
-		// table row close
-
-		htmlTableRowClose ();
-
 	}
 
 	private
-	void goNotFound () {
+	void goNotFound (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"Not found");
 
 		htmlParagraphWriteFormat (
+			formatWriter,
 			"The specified request does not exist.");
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
 		htmlLinkWrite (
+			formatWriter,
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
 			"Queues");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	private
-	void goNotPending () {
+	void goNotPending (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"No longer pending");
 
 		htmlParagraphWriteFormat (
+			formatWriter,
 			"The specified request does not exist.");
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
 		htmlLinkWrite (
+			formatWriter,
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
 			"Queues");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	private
-	void goAccessDenied () {
+	void goAccessDenied (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"Access denied");
 
 		htmlParagraphWriteFormat (
+			formatWriter,
 			"You do not have permission to reply to this manual responder.");
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
 		htmlLinkWrite (
+			formatWriter,
 			requestContext.resolveContextUrl (
 				"/queues/queue.home"),
 			"Queues");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	private
-	void goNoTemplates () {
+	void goNoTemplates (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlParagraphWrite (
+			formatWriter,
 			"No templates specified for this manual responder",
 			htmlClassAttribute (
 				"error"));
@@ -759,18 +847,22 @@ class ManualResponderRequestPendingFormResponder
 	}
 
 	private
-	void goLinks () {
+	void goLinks (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
 		htmlLinkWrite (
+			formatWriter,
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
 			"Queues");
 
 		htmlLinkWrite (
+			formatWriter,
 			summaryUrl,
 			"Summary",
 			htmlAttribute (
@@ -778,19 +870,23 @@ class ManualResponderRequestPendingFormResponder
 				"main"));
 
 		htmlLinkWrite (
+			formatWriter,
 			"javascript:top.show_inbox (false);",
 			"Close");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	private
-	void renderIgnore () {
+	void renderIgnore (
+			@NonNull FormatWriter formatWriter) {
 
 		// table row open
 
 		htmlTableRowOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"template"),
 			htmlDataAttribute (
@@ -799,7 +895,8 @@ class ManualResponderRequestPendingFormResponder
 
 		// radio button
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -809,17 +906,20 @@ class ManualResponderRequestPendingFormResponder
 			" value=\"ignore\"",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// blank cells
 
 		htmlTableCellWrite (
+			formatWriter,
 			"",
 			htmlColumnSpanAttribute (3l));
 
 		// send
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -832,11 +932,13 @@ class ManualResponderRequestPendingFormResponder
 			" disabled=\"true\"",
 			">");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
 		// table row close
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 

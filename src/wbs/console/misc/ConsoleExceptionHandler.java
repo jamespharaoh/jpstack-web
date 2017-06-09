@@ -4,6 +4,8 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,9 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 import wbs.web.handler.WebExceptionHandler;
 
@@ -154,8 +158,12 @@ class ConsoleExceptionHandler
 
 					try (
 
+						Writer writer =
+							requestContext.writer ();
+
 						FormatWriter formatWriter =
-							requestContext.formatWriter ();
+							new WriterFormatWriter (
+								writer);
 
 					) {
 
@@ -239,6 +247,11 @@ class ConsoleExceptionHandler
 								"</pre>");
 
 						}
+
+					} catch (IOException ioExecption) {
+
+						throw new RuntimeIoException (
+							ioExecption);
 
 					}
 

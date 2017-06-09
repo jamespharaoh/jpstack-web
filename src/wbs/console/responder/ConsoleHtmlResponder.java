@@ -17,6 +17,7 @@ import lombok.NonNull;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -28,11 +29,14 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogEvent;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
+
+import wbs.web.responder.BufferedTextResponder;
 
 public abstract
 class ConsoleHtmlResponder
-	extends ConsolePrintResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -41,6 +45,9 @@ class ConsoleHtmlResponder
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -104,7 +111,7 @@ class ConsoleHtmlResponder
 
 	@Override
 	protected
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -115,9 +122,6 @@ class ConsoleHtmlResponder
 					"setHtmlHeaders");
 
 		) {
-
-			super.setHtmlHeaders (
-				transaction);
 
 			requestContext.contentType (
 				"text/html",
@@ -137,7 +141,8 @@ class ConsoleHtmlResponder
 	}
 
 	protected
-	void renderHtmlDoctype () {
+	void renderHtmlDoctype (
+			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
 			"<!DOCTYPE html>");
@@ -145,7 +150,8 @@ class ConsoleHtmlResponder
 	}
 
 	protected
-	void renderHtmlStyleSheets () {
+	void renderHtmlStyleSheets (
+			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
 			"<link",
@@ -158,16 +164,25 @@ class ConsoleHtmlResponder
 	}
 
 	protected
-	void goMetaRefresh () {
+	void goMetaRefresh (
+			@NonNull FormatWriter formatWriter) {
+
+		doNothing ();
+
 	}
 
 	protected
-	void goMeta () {
-		goMetaRefresh ();
+	void goMeta (
+			@NonNull FormatWriter formatWriter) {
+
+		goMetaRefresh (
+			formatWriter);
+
 	}
 
 	protected
-	void renderHtmlTitle () {
+	void renderHtmlTitle (
+			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
 			"<title>%h</title>",
@@ -176,7 +191,8 @@ class ConsoleHtmlResponder
 	}
 
 	protected
-	void renderHtmlScriptRefs () {
+	void renderHtmlScriptRefs (
+			@NonNull FormatWriter formatWriter) {
 
 		for (
 			ScriptRef scriptRef
@@ -197,7 +213,8 @@ class ConsoleHtmlResponder
 	}
 
 	protected
-	void renderHtmlLinks () {
+	void renderHtmlLinks (
+			@NonNull FormatWriter formatWriter) {
 
 		Set<? extends HtmlLink> links =
 			htmlLinks ();
@@ -222,7 +239,8 @@ class ConsoleHtmlResponder
 
 	protected
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -233,13 +251,17 @@ class ConsoleHtmlResponder
 
 		) {
 
-			renderHtmlTitle ();
+			renderHtmlTitle (
+				formatWriter);
 
-			renderHtmlScriptRefs ();
+			renderHtmlScriptRefs (
+				formatWriter);
 
-			renderHtmlLinks ();
+			renderHtmlLinks (
+				formatWriter);
 
-			goMeta ();
+			goMeta (
+				formatWriter);
 
 		}
 
@@ -247,7 +269,8 @@ class ConsoleHtmlResponder
 
 	protected
 	void renderHtmlHead (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -262,7 +285,8 @@ class ConsoleHtmlResponder
 				"<head>");
 
 			renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</head>");
@@ -273,7 +297,8 @@ class ConsoleHtmlResponder
 
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		doNothing ();
 
@@ -281,7 +306,8 @@ class ConsoleHtmlResponder
 
 	protected
 	void renderHtmlBody (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -296,7 +322,8 @@ class ConsoleHtmlResponder
 				"<body>");
 
 			renderHtmlBodyContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</body>");
@@ -308,7 +335,8 @@ class ConsoleHtmlResponder
 	@Override
 	protected
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -319,22 +347,26 @@ class ConsoleHtmlResponder
 
 		) {
 
-			renderHtmlDoctype ();
+			renderHtmlDoctype (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<html>");
 
 			renderHtmlHead (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderHtmlBody (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"</html>");
 
 			renderDebugInformation (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -342,7 +374,8 @@ class ConsoleHtmlResponder
 
 	private
 	void renderDebugInformation (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -496,6 +529,7 @@ class ConsoleHtmlResponder
 			formatWriter.writeNewline ();
 
 			writeTaskLog (
+				formatWriter,
 				taskLogger.findRoot ());
 
 			formatWriter.decreaseIndent ();
@@ -511,6 +545,7 @@ class ConsoleHtmlResponder
 
 	private
 	void writeTaskLog (
+			@NonNull FormatWriter formatWriter,
 			@NonNull TaskLogEvent taskLogEvent) {
 
 		formatWriter.writeLineFormatIncreaseIndent (
@@ -522,6 +557,7 @@ class ConsoleHtmlResponder
 		taskLogEvent.eventChildren ().forEach (
 			childEvent ->
 				writeTaskLog (
+					formatWriter,
 					childEvent));
 
 		formatWriter.decreaseIndent ();

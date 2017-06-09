@@ -15,12 +15,16 @@ import lombok.experimental.Accessors;
 import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFormActionPart")
@@ -32,6 +36,9 @@ class ConsoleFormActionPart <FormState, History>
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -128,7 +135,8 @@ class ConsoleFormActionPart <FormState, History>
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -142,6 +150,7 @@ class ConsoleFormActionPart <FormState, History>
 			// write heading
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				heading);
 
 			// write help
@@ -152,6 +161,7 @@ class ConsoleFormActionPart <FormState, History>
 			) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					helpText);
 
 			}
@@ -173,6 +183,7 @@ class ConsoleFormActionPart <FormState, History>
 
 				actionFormContext.outputFormTable (
 					transaction,
+					formatWriter,
 					"post",
 					requestContext.resolveLocalUrl (
 						localFile),
@@ -188,10 +199,12 @@ class ConsoleFormActionPart <FormState, History>
 			) {
 
 				htmlHeadingTwoWrite (
+					formatWriter,
 					historyHeading);
 
 				historyFormContext.outputListTable (
 					transaction,
+					formatWriter,
 					true);
 
 			}

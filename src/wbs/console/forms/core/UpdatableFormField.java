@@ -7,6 +7,7 @@ import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.isRight;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -17,7 +18,6 @@ import static wbs.utils.etc.ResultUtils.getError;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
@@ -65,6 +65,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 
@@ -306,7 +308,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
@@ -339,14 +342,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			renderer.renderHtmlTableCellList (
 				transaction,
-				context.formatWriter (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
 				link,
 				columnSpan);
@@ -359,7 +362,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Long columnSpan) {
 
@@ -391,14 +395,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			renderer.renderHtmlTableCellProperties (
 				transaction,
-				context.formatWriter (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
 				true,
 				columnSpan);
@@ -411,7 +415,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormTemporarilyHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -442,17 +447,17 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			renderer.renderFormTemporarilyHidden (
-				context.submission (),
-				context.formatWriter (),
+				form.submission (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
-				context.formType (),
-				context.formName ());
+				form.formType (),
+				form.formName ());
 
 		}
 
@@ -462,7 +467,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container,
 			@NonNull Optional <String> error) {
 
@@ -494,18 +500,18 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						interfaceMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			htmlTableRowOpen (
-				context.formatWriter ());
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
-				context.formatWriter (),
+				formatWriter,
 				label ());
 
 			htmlTableCellOpen (
-				context.formatWriter (),
+				formatWriter,
 				htmlStyleAttribute (
 					htmlStyleRuleEntry (
 						"text-align",
@@ -513,33 +519,33 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			renderer.renderFormInput (
 				transaction,
-				context.submission (),
-				context.formatWriter (),
+				form.submission (),
+				formatWriter,
 				container,
-				context.hints (),
+				form.hints (),
 				interfaceValue,
-				context.formType (),
-				context.formName ());
+				form.formType (),
+				form.formName ());
 
 			if (
 				optionalIsPresent (
 					error)
 			) {
 
-				context.formatWriter ().writeLineFormat (
+				formatWriter.writeLineFormat (
 					"<br>");
 
-				context.formatWriter ().writeLineFormat (
+				formatWriter.writeLineFormat (
 					"%h",
 					error.get ());
 
 			}
 
 			htmlTableCellClose (
-				context.formatWriter ());
+				formatWriter);
 
 			htmlTableRowClose (
-				context.formatWriter ());
+				formatWriter);
 
 		}
 
@@ -549,7 +555,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormReset (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -564,7 +571,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			if (
 
 				enumInSafe (
-					context.formType (),
+					form.formType (),
 					FormType.create,
 					FormType.perform,
 					FormType.search)
@@ -580,15 +587,15 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 							interfaceMapping.genericToInterface (
 								transaction,
 								container,
-								context.hints (),
+								form.hints (),
 								defaultValueSupplier.get ())));
 
 				renderer.renderFormReset (
 					transaction,
-					context.formatWriter (),
+					formatWriter,
 					container,
 					interfaceValue,
-					context.formName ());
+					form.formName ());
 
 			} else {
 
@@ -611,16 +618,16 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 							interfaceMapping.genericToInterface (
 								transaction,
 								container,
-								context.hints (),
+								form.hints (),
 								genericValue)));
 
 
 				renderer.renderFormReset (
 					transaction,
-					context.formatWriter (),
+					formatWriter,
 					container,
 					interfaceValue,
-					context.formName ());
+					form.formName ());
 
 			}
 
@@ -632,7 +639,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderCsvRow (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -663,11 +671,11 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						csvMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)),
 					"");
 
-			context.formatWriter ().writeFormat (
+			formatWriter.writeFormat (
 				"\"%s\"",
 				csvValue.replace (
 					"\"",
@@ -681,7 +689,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	FormUpdateResult <Generic, Native> update (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -697,8 +705,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			if (
 				! renderer.formValuePresent (
-					context.submission (),
-					context.formName ())
+					form.submission (),
+					form.formName ())
 			) {
 
 				return new FormUpdateResult <Generic, Native> ()
@@ -717,8 +725,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				requiredValue (
 					renderer.formToInterface (
 						transaction,
-						context.submission (),
-						context.formName ()));
+						form.submission (),
+						form.formName ()));
 
 			if (
 				isError (
@@ -743,7 +751,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				interfaceMapping.interfaceToGeneric (
 					transaction,
 					container,
-					context.hints (),
+					form.hints (),
 					resultValueRequired (
 						newInterfaceValue));
 

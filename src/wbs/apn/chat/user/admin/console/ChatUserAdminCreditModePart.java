@@ -14,6 +14,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -22,6 +23,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -43,6 +46,9 @@ class ChatUserAdminCreditModePart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -73,7 +79,8 @@ class ChatUserAdminCreditModePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -90,32 +97,39 @@ class ChatUserAdminCreditModePart
 					ChatUserType.monitor)
 			) {
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeFormat (
 					"This is a monitor and has no credit mode.");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 				return;
 
 			}
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.creditMode"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Credit mode",
 				() -> chatUserCreditModeConsoleHelper.writeSelect (
+					formatWriter,
 					"creditMode",
 					requestContext.formOrElse (
 						"creditMode",
 						() -> chatUser.getCreditMode ().name ())));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Actions",
 				stringFormat (
 					"<input",
@@ -123,9 +137,11 @@ class ChatUserAdminCreditModePart
 					" value=\"change mode\"",
 					">"));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

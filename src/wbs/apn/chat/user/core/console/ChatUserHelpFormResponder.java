@@ -26,6 +26,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserHelpFormResponder")
@@ -75,7 +77,8 @@ class ChatUserHelpFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -87,16 +90,19 @@ class ChatUserHelpFormResponder
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Send help message");
 
 			requestContext.flushNotices (
 				formatWriter);
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.helpForm"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			String userInfo =
 				chatUser.getName () == null
@@ -104,6 +110,7 @@ class ChatUserHelpFormResponder
 					: chatUser.getCode () + " " + chatUser.getName ();
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"User",
 				userInfo);
 
@@ -114,6 +121,7 @@ class ChatUserHelpFormResponder
 					"document.getElementById ('chars')");
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Message",
 				() -> formatWriter.writeLineFormat (
 					"<textarea",
@@ -128,15 +136,19 @@ class ChatUserHelpFormResponder
 					"></textarea>"));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Chars",
 				() -> htmlSpanWrite (
+					formatWriter,
 					"",
 					htmlIdAttribute (
 						"chars")));
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -144,11 +156,14 @@ class ChatUserHelpFormResponder
 				" value=\"send message\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			htmlScriptBlockWrite (
+				formatWriter,
 				stringFormat (
 					"%s;",
 					charCountScript));

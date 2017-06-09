@@ -10,6 +10,7 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -17,6 +18,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -34,6 +37,9 @@ class ChatUserAdminOnlinePart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -64,7 +70,8 @@ class ChatUserAdminOnlinePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -76,15 +83,18 @@ class ChatUserAdminOnlinePart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.online"));
 
 			if (chatUser.getOnline ()) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"This user is online");
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -93,11 +103,13 @@ class ChatUserAdminOnlinePart
 					" value=\"take offline\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			} else {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"This user is offline");
 
 				if (
@@ -106,12 +118,14 @@ class ChatUserAdminOnlinePart
 				) {
 
 					htmlParagraphWriteFormat (
+						formatWriter,
 						"This user has never been online before, please don't ",
 						"bring them online unless you are sure!");
 
 				}
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -120,11 +134,13 @@ class ChatUserAdminOnlinePart
 					" value=\"bring online\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

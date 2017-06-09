@@ -15,6 +15,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("postgresqlTablesPart")
 public
 class PostgresqlTablesPart
@@ -30,7 +32,8 @@ class PostgresqlTablesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -41,15 +44,19 @@ class PostgresqlTablesPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Table",
 				"Size");
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			htmlParagraphWrite (
+				formatWriter,
 				"TODO");
 
 		}

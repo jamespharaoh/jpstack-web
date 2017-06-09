@@ -5,8 +5,6 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.part.PagePartFactory;
-
 @Accessors (fluent = true)
 @Data
 public
@@ -17,6 +15,6 @@ class SupervisorConfig {
 
 	SupervisorConfigSpec spec;
 
-	List <PagePartFactory> pagePartFactories;
+	List <StatsPagePartFactory> pagePartFactories;
 
 }

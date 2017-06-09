@@ -9,7 +9,7 @@ import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToSpaces;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatLazy;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
@@ -40,6 +40,7 @@ import wbs.platform.media.console.MediaConsoleLogic;
 
 import wbs.sms.gazetteer.logic.GazetteerLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -168,7 +169,8 @@ class ChatUserSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -184,40 +186,48 @@ class ChatUserSummaryPart
 					chatUser.getType (),
 					ChatUserType.user);
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Id",
 				integerToDecimalString (
 					chatUser.getId ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Code",
 				chatUser.getCode ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Type",
 				chatUser.getType ().name ());
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Gender",
 				ifNotNullThenElseEmDash (
 					chatUser.getGender (),
 					() -> chatUser.getGender ().name ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Orient",
 				ifNotNullThenElseEmDash (
 					chatUser.getOrient (),
 					() -> chatUser.getOrient ().name ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Operator label",
 				ifNotNullThenElseEmDash (
 					chatUser.getOperatorLabel (),
 					() -> chatUser.getOperatorLabel ().name ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Date of birth",
 				ifNotNullThenElseEmDash (
 					chatUser.getDob (),
@@ -226,12 +236,14 @@ class ChatUserSummaryPart
 							chatUser.getDob ())));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Name",
 				ifNotNullThenElseEmDash (
 					chatUser.getName (),
 					() -> chatUser.getName ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Info",
 				ifNotNullThenElseEmDash (
 					chatUser.getInfoText (),
@@ -240,14 +252,17 @@ class ChatUserSummaryPart
 			if (! chatUser.getChatUserImageList ().isEmpty ()) {
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Pic",
 					() -> mediaConsoleLogic.writeMediaThumb100 (
 						transaction,
+						formatWriter,
 						chatUser.getChatUserImageList ().get (0).getMedia ()));
 
 			}
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Location",
 				ifNotNullThenElseEmDash (
 					chatUser.getLocationLongLat (),
@@ -257,6 +272,7 @@ class ChatUserSummaryPart
 					).getName ()));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Online",
 				booleanToYesNo (
 					chatUser.getOnline ()));
@@ -264,6 +280,7 @@ class ChatUserSummaryPart
 			if (isUser) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"First join",
 					ifNotNullThenElseEmDash (
 						chatUser.getFirstJoin (),
@@ -273,6 +290,7 @@ class ChatUserSummaryPart
 							chatUser.getFirstJoin ())));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Last join",
 					ifNotNullThenElseEmDash (
 						chatUser.getLastJoin (),
@@ -290,47 +308,59 @@ class ChatUserSummaryPart
 						? chatUser.getChatScheme ().getCharges ()
 						: null;
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				htmlTableDetailsRowWriteRaw (
+					formatWriter,
 					"Number",
 					() -> objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						chatUser.getOldNumber ()));
 
 				htmlTableDetailsRowWriteRaw (
+					formatWriter,
 					"Scheme",
 					() -> objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						chatUser.getChatScheme (),
 						chatUser.getChat ()));
 
 				htmlTableDetailsRowWriteRaw (
+					formatWriter,
 					"Affiliate",
 					() -> ifNotNullThenElse (
 						chatUser.getChatAffiliate (),
 						() -> objectManager.writeTdForObjectMiniLink (
 							transaction,
+							formatWriter,
 							chatUser.getChatAffiliate (),
 							chatUser.getChatScheme ()),
 						() -> htmlTableCellWrite (
+							formatWriter,
 							"—")));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Barred",
 					booleanToYesNo (
 						chatUser.getBarred ()));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Adult verified",
 					booleanToYesNo (
 						chatUser.getAdultVerified ()));
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"User messages",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -339,8 +369,9 @@ class ChatUserSummaryPart
 							chatUser.getUserMessageCount ())));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Monitor messages",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -349,8 +380,9 @@ class ChatUserSummaryPart
 							chatUser.getMonitorMessageCount ())));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Text profile",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -359,8 +391,9 @@ class ChatUserSummaryPart
 							chatUser.getTextProfileCount ())));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Image profile",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -369,8 +402,9 @@ class ChatUserSummaryPart
 							chatUser.getImageProfileCount ())));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Video profile",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -379,8 +413,9 @@ class ChatUserSummaryPart
 							chatUser.getVideoProfileCount ())));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Received message",
-					stringFormat (
+					stringFormatLazy (
 						"%s (%h)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -394,8 +429,9 @@ class ChatUserSummaryPart
 				) {
 
 					htmlTableDetailsRowWriteHtml (
+						formatWriter,
 						chatUserCharge.name,
-						stringFormat (
+						stringFormatLazy (
 							"%s (%h)",
 							chatUserCharge.name,
 							currencyLogic.formatHtml (
@@ -407,13 +443,15 @@ class ChatUserSummaryPart
 				}
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Total spent",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 
 						chatUser.getValueSinceEver ()));
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				long total =
 					chatUser.getValueSinceEver ();
@@ -424,8 +462,9 @@ class ChatUserSummaryPart
 				) {
 
 					htmlTableDetailsRowWriteHtml (
+						formatWriter,
 						chatUserCharge.name,
-						stringFormat (
+						stringFormatLazy (
 							"%s (%h)",
 							chatUserCharge.name,
 							currencyLogic.formatHtml (
@@ -439,59 +478,70 @@ class ChatUserSummaryPart
 				}
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Grand total",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						total));
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCredit ()));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Credit mode",
 					camelToSpaces (
 						chatUser.getCreditMode ().name ()));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Credit check",
 					creditCheckResult.details ());
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit pending strict",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditPendingStrict ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit success",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditSuccess ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit awaiting retry",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditRevoked ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Free usage",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditAdded ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit bought/given",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditBought ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Credit limit",
 					ifThenElse (
 						isNotNull (
@@ -500,7 +550,7 @@ class ChatUserSummaryPart
 							charges.getCreditLimit (),
 							chatUser.getCreditLimit ()),
 
-					() -> stringFormat (
+					() -> stringFormatLazy (
 						"%s (%s)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
@@ -515,15 +565,18 @@ class ChatUserSummaryPart
 
 				);
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Daily Billed",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getCreditDailyAmount ()));
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Last bill date",
 					ifNotNullThenElseEmDash (
 						chatUser.getCreditDailyDate (),
@@ -532,7 +585,8 @@ class ChatUserSummaryPart
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -13,6 +13,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -21,6 +22,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
 
@@ -45,12 +48,16 @@ class ChatAffiliateKeywordsCreatePart
 	@NamedDependency
 	EnumConsoleHelper <?> orientConsoleHelper;
 
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
 	// implementation
 
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -62,12 +69,15 @@ class ChatAffiliateKeywordsCreatePart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatAffiliate.keywords.create"));
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Keyword",
 				stringFormat (
 					"<input",
@@ -78,17 +88,21 @@ class ChatAffiliateKeywordsCreatePart
 						"keyword")));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Join type",
 				() -> chatKeywordJoinTypeConsoleHelper.writeSelect (
+					formatWriter,
 					"joinType",
 					requestContext.formOrEmptyString(
 						"joinType")));
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Gender",
 				() -> {
 
 				genderConsoleHelper.writeSelect (
+					formatWriter,
 					"gender",
 					requestContext.formOrEmptyString (
 						"gender"));
@@ -99,10 +113,12 @@ class ChatAffiliateKeywordsCreatePart
 			});
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Orient",
 				() -> {
 
 				orientConsoleHelper.writeSelect (
+					formatWriter,
 					"orient",
 					requestContext.formOrEmptyString (
 						"orient"));
@@ -112,9 +128,11 @@ class ChatAffiliateKeywordsCreatePart
 
 			});
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -122,9 +140,11 @@ class ChatAffiliateKeywordsCreatePart
 				" value=\"create keyword\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

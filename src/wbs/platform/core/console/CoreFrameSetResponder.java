@@ -1,5 +1,6 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
 
@@ -8,7 +9,6 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsolePrintResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -18,12 +18,15 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
+
+import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("coreFrameSetResponder")
 public
 class CoreFrameSetResponder
-	extends ConsolePrintResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -42,9 +45,19 @@ class CoreFrameSetResponder
 	// implementation
 
 	@Override
+	protected
+	void prepare (
+			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
 	public
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -56,10 +69,12 @@ class CoreFrameSetResponder
 		) {
 
 			goDocType (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goHtml (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -67,7 +82,7 @@ class CoreFrameSetResponder
 
 	@Override
 	public
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -78,9 +93,6 @@ class CoreFrameSetResponder
 					"setHtmlHeaders");
 
 		) {
-
-			super.setHtmlHeaders (
-				transaction);
 
 			requestContext.contentType (
 				"text/html",
@@ -101,7 +113,8 @@ class CoreFrameSetResponder
 
 	public
 	void goDocType (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -121,7 +134,8 @@ class CoreFrameSetResponder
 
 	public
 	void goHtml (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -136,7 +150,8 @@ class CoreFrameSetResponder
 				"<html>");
 
 			goHtmlStuff (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"</html>");
@@ -147,7 +162,8 @@ class CoreFrameSetResponder
 
 	public
 	void goHtmlStuff (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -159,10 +175,12 @@ class CoreFrameSetResponder
 		) {
 
 			goHead (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goFrameset (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -170,7 +188,8 @@ class CoreFrameSetResponder
 
 	public
 	void goHead (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -185,7 +204,8 @@ class CoreFrameSetResponder
 				"<head>");
 
 			goHeadStuff (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</head>");
@@ -196,7 +216,8 @@ class CoreFrameSetResponder
 
 	public
 	void goHeadStuff (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -208,10 +229,12 @@ class CoreFrameSetResponder
 		) {
 
 			goTitle (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goScripts (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<link",
@@ -235,7 +258,8 @@ class CoreFrameSetResponder
 
 	public
 	void goTitle (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -262,7 +286,8 @@ class CoreFrameSetResponder
 
 	public
 	void goScripts (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -273,7 +298,8 @@ class CoreFrameSetResponder
 
 		) {
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormatIncreaseIndent (
 				"function show_inbox (show) {");
@@ -287,7 +313,8 @@ class CoreFrameSetResponder
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}");
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -295,7 +322,8 @@ class CoreFrameSetResponder
 
 	public
 	void goFrameset (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 

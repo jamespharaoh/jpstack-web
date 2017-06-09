@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -28,6 +29,8 @@ import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.imchat.model.ImChatCustomerRec;
 
@@ -49,6 +52,9 @@ class ImChatCustomerSettingsPasswordPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -115,7 +121,8 @@ class ImChatCustomerSettingsPasswordPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -126,13 +133,16 @@ class ImChatCustomerSettingsPasswordPart
 
 		) {
 
-			requestContext.flushNotices ();
+			requestContext.flushNotices (
+				formatWriter);
 
 			renderRequestNewPasswordForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderRecentPasswordEvents (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -140,7 +150,8 @@ class ImChatCustomerSettingsPasswordPart
 
 	private
 	void renderRequestNewPasswordForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -154,24 +165,28 @@ class ImChatCustomerSettingsPasswordPart
 			// heading
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Request new password");
 
 			// information
 
 			htmlParagraphWriteFormat (
-				"This will generate a new password for the customer, and send it ",
-				"it to them via email as usual. It will also display it on the ",
+				formatWriter,
+				"This will generate a new password for the customer, and send ",
+				"it them via email as usual. It will also display it on the ",
 				"screen.");
 
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/imChatCustomer.settings.password"));
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -179,11 +194,13 @@ class ImChatCustomerSettingsPasswordPart
 				" value=\"generate new password\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -191,7 +208,8 @@ class ImChatCustomerSettingsPasswordPart
 
 	private
 	void renderRecentPasswordEvents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -203,6 +221,7 @@ class ImChatCustomerSettingsPasswordPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Recent forgotten password events");
 
 			if (
@@ -211,6 +230,7 @@ class ImChatCustomerSettingsPasswordPart
 			) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"No forgotten password events have been logged for this ",
 					"customer.");
 

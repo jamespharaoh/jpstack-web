@@ -23,6 +23,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeKeywordObjectHelper;
 import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
@@ -79,7 +81,8 @@ class ChatAffiliateKeywordsListPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -92,9 +95,11 @@ class ChatAffiliateKeywordsListPart
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Scheme",
 				"Keyword",
 				"Join type",
@@ -108,36 +113,44 @@ class ChatAffiliateKeywordsListPart
 					: chatSchemeKeywords
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatSchemeKeyword.getChatScheme ().getCode ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatSchemeKeyword.getKeyword ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatSchemeKeyword.getJoinType (),
 						() -> chatSchemeKeyword.getJoinType ().name ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatSchemeKeyword.getJoinGender (),
 						() -> chatSchemeKeyword.getJoinGender ().name ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatSchemeKeyword.getJoinOrient (),
 						() -> chatSchemeKeyword.getJoinOrient ().name ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

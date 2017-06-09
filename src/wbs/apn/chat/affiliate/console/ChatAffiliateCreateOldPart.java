@@ -32,6 +32,7 @@ import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -40,6 +41,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
@@ -76,6 +79,9 @@ class ChatAffiliateCreateOldPart
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -127,7 +133,8 @@ class ChatAffiliateCreateOldPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -148,14 +155,16 @@ class ChatAffiliateCreateOldPart
 
 			}
 
-			renderForm ();
+			renderForm (
+				formatWriter);
 
 		}
 
 	}
 
 	private
-	void renderForm () {
+	void renderForm (
+			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeFormat (
 			"<p>Please select the scheme in which to create the affiliate, ",
@@ -164,18 +173,22 @@ class ChatAffiliateCreateOldPart
 		// open form
 
 		htmlFormOpenPostAction (
+			formatWriter,
 			requestContext.resolveLocalUrl (
 				"/chatAffiliate.create.old"));
 
 		// main elements
 
-		renderMainElements ();
+		renderMainElements (
+			formatWriter);
 
-		renderKeywords ();
+		renderKeywords (
+			formatWriter);
 
 		// controls
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -183,34 +196,43 @@ class ChatAffiliateCreateOldPart
 			" value=\"create affiliate\"",
 			">");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 		// close form
 
-		htmlFormClose ();
+		htmlFormClose (
+			formatWriter);
 
 	}
 
 	private
-	void renderMainElements () {
+	void renderMainElements (
+			@NonNull FormatWriter formatWriter) {
 
 		// open table
 
-		htmlTableOpenDetails ();
+		htmlTableOpenDetails (
+			formatWriter);
 
 		// scheme
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Scheme");
 
-		htmlTableCellOpen ();
+		htmlTableCellOpen (
+			formatWriter);
 
 		htmlSelectOpen (
+			formatWriter,
 			"chatScheme");
 
 		htmlOptionWrite (
+			formatWriter,
 			"",
 			false,
 			"");
@@ -221,6 +243,7 @@ class ChatAffiliateCreateOldPart
 		) {
 
 			htmlOptionWrite (
+				formatWriter,
 				integerToDecimalString (
 					schemeEntry.getValue ()),
 				stringEqualSafe (
@@ -231,15 +254,19 @@ class ChatAffiliateCreateOldPart
 
 		}
 
-		htmlSelectClose ();
+		htmlSelectClose (
+			formatWriter);
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 		// name
 
 		htmlTableDetailsRowWriteHtml (
+			formatWriter,
 			"Name",
 			stringFormat (
 				"<input",
@@ -254,6 +281,7 @@ class ChatAffiliateCreateOldPart
 		// description
 
 		htmlTableDetailsRowWriteHtml (
+			formatWriter,
 			"Description",
 			stringFormat (
 				"<input",
@@ -267,23 +295,29 @@ class ChatAffiliateCreateOldPart
 
 		// close table
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 
 	private
-	void renderKeywords () {
+	void renderKeywords (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"Keywords");
 
 		htmlParagraphWriteFormat (
+			formatWriter,
 			"You can optionally create some join keywords for this affiliate ",
 			"at this point. If not, please remember to create some later.");
 
-		htmlTableOpenList ();
+		htmlTableOpenList (
+			formatWriter);
 
 		htmlTableHeaderRowWrite (
+			formatWriter,
 			"Keyword",
 			"Join type",
 			"Gender",
@@ -297,11 +331,13 @@ class ChatAffiliateCreateOldPart
 
 			// open row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			// keyword
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -314,48 +350,60 @@ class ChatAffiliateCreateOldPart
 					"keyword" + index),
 			">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// join type
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			chatKeywordJoinTypeConsoleHelper.writeSelect (
+				formatWriter,
 				"joinType" + index,
 				requestContext.formOrEmptyString (
 					"joinType" + index));
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// gender
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			genderConsoleHelper.writeSelect (
+				formatWriter,
 				"gender" + index,
 				requestContext.formOrEmptyString (
 					"gender" + index));
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// orient
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			orientConsoleHelper.writeSelect (
+				formatWriter,
 				"orient" + index,
 				requestContext.formOrEmptyString (
 					"orient" + index));
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 			// close row
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 

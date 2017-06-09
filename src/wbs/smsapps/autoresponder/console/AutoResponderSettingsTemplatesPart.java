@@ -12,6 +12,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("autoResponderSettingsTemplatesPart")
 public
 class AutoResponderSettingsTemplatesPart
@@ -27,7 +29,8 @@ class AutoResponderSettingsTemplatesPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -39,6 +42,7 @@ class AutoResponderSettingsTemplatesPart
 		) {
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"This feature is under development and will be available ",
 				"soon.");
 

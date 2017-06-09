@@ -3,6 +3,7 @@ package wbs.console.forms.core;
 import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -10,7 +11,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 
@@ -44,6 +44,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 
@@ -186,7 +188,8 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	void renderFormAlwaysHidden (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull FormatWriter formatWriter,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (
@@ -217,28 +220,28 @@ class HiddenFormField <Container, Generic, Native>
 						csvMapping.genericToInterface (
 							transaction,
 							container,
-							context.hints (),
+							form.hints (),
 							genericValue)));
 
 			if (
 				formValuePresent (
-					context.submission (),
-					context.formName ())
+					form.submission (),
+					form.formName ())
 			) {
 
 				interfaceValue =
 					Optional.of (
 						formToInterface (
-							context.submission (),
-							context.formName ()));
+							form.submission (),
+							form.formName ()));
 
 			}
 
-			context.formatWriter ().writeFormat (
+			formatWriter.writeFormat (
 				"<input",
 				" type=\"hidden\"",
 				" name=\"%h-%h\"",
-				context.formName (),
+				form.formName (),
 				name (),
 				" value=\"%h\"",
 				interfaceValue.or (""),
@@ -252,7 +255,7 @@ class HiddenFormField <Container, Generic, Native>
 	public
 	void implicit (
 			@NonNull Transaction parentTransaction,
-			@NonNull ConsoleForm <Container> context,
+			@NonNull ConsoleForm <Container> form,
 			@NonNull Container container) {
 
 		try (

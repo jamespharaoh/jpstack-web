@@ -266,7 +266,7 @@ class UploadFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <FileUpload> interfaceValue,
@@ -283,6 +283,7 @@ class UploadFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					listAlign ().name ()),
@@ -295,13 +296,14 @@ class UploadFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 
@@ -311,7 +313,7 @@ class UploadFormFieldRenderer <Container>
 	public
 	void renderHtmlTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <FileUpload> interfaceValue,
@@ -328,6 +330,7 @@ class UploadFormFieldRenderer <Container>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					propertiesAlign ().name ()),
@@ -336,13 +339,14 @@ class UploadFormFieldRenderer <Container>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 

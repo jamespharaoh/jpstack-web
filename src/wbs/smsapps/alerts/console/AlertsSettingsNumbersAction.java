@@ -454,8 +454,7 @@ class AlertsSettingsNumbersAction
 
 			transaction.commit ();
 
-			notices.flushOrNoticeFormat (
-				requestContext.formatWriter (),
+			notices.noticeIfEmptyFormat (
 				"No changes to save");
 
 			requestContext.setEmptyFormData ();

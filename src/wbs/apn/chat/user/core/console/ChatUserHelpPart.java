@@ -32,6 +32,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -42,6 +43,7 @@ import wbs.framework.logging.LogContext;
 
 import wbs.sms.message.core.console.MessageConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.help.model.ChatHelpLogRec;
@@ -66,6 +68,9 @@ class ChatUserHelpPart
 
 	@SingletonDependency
 	MessageConsoleLogic messageConsoleLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -107,7 +112,8 @@ class ChatUserHelpPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -122,7 +128,8 @@ class ChatUserHelpPart
 				requestContext.resolveLocalUrl (
 					"/chatUser.helpForm");
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<button",
@@ -132,7 +139,8 @@ class ChatUserHelpPart
 					link),
 				">send message</button>");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			if (
 				collectionIsEmpty (
@@ -140,6 +148,7 @@ class ChatUserHelpPart
 			) {
 
 				htmlParagraphWrite (
+					formatWriter,
 					"No history to display.");
 
 				return;
@@ -148,11 +157,13 @@ class ChatUserHelpPart
 
 			// table open
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// table headers
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Time",
 				"Message",
@@ -194,22 +205,26 @@ class ChatUserHelpPart
 					previousDate =
 						nextDate;
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlStyleAttribute (
 							htmlStyleRuleEntry (
 								"font-weight",
 								"bold")));
 
 					htmlTableCellWrite (
+						formatWriter,
 						timeFormatter.dateStringLong (
 							chatUserLogic.getTimezone (
 								chatUser),
 							chatHelpLog.getTimestamp ()),
 						htmlColumnSpanAttribute (5l));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
@@ -218,10 +233,12 @@ class ChatUserHelpPart
 						chatHelpLog.getDirection ());
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						rowClass));
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					"&nbsp;",
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
@@ -232,6 +249,7 @@ class ChatUserHelpPart
 									0)))));
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timeString (
 						chatUserLogic.getTimezone (
 							chatUser),
@@ -239,22 +257,27 @@ class ChatUserHelpPart
 
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatHelpLog.getText ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatHelpLog.getOurNumber ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatHelpLog.getUser (),
 					() ->
 						chatHelpLog.getUser ().getUsername ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

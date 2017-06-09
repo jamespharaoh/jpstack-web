@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
-import wbs.console.part.PagePart;
 import wbs.console.part.TextPart;
 
 import wbs.framework.builder.Builder;
@@ -68,17 +67,15 @@ class SupervisorTableSeparatorBuilder
 
 		) {
 
-			Provider <PagePart> pagePartFactory =
-				() -> textPartProvider.get ()
+			supervisorTablePartBuilder.pagePartFactories ().add (
+				(transaction, statsPeriod, statsData) ->
+					textPartProvider.get ()
 
 				.text (
 					stringFormat (
 						"<tr class=\"sep\"></tr>\n"))
 
-			;
-
-			supervisorTablePartBuilder.pagePartFactories ().add (
-				pagePartFactory);
+			);
 
 		}
 

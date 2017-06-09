@@ -11,6 +11,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -25,6 +26,8 @@ import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("digitalSelectRouteSummaryAdditionalPart")
 public
 class DigitalSelectRouteSummaryAdditionalPart
@@ -37,6 +40,9 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
@@ -81,7 +87,8 @@ class DigitalSelectRouteSummaryAdditionalPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -93,21 +100,26 @@ class DigitalSelectRouteSummaryAdditionalPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Digital Select route information");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			if (digitalSelectRouteOut != null) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"URL",
 					digitalSelectRouteOut.getUrl ());
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Username",
 					digitalSelectRouteOut.getUsername ());
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Password",
 					ifThenElse (
 						requestContext.canContext ("route.manage"),
@@ -123,6 +135,7 @@ class DigitalSelectRouteSummaryAdditionalPart
 			) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Delivery reports URL",
 					stringFormat (
 						"%s",
@@ -136,7 +149,8 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

@@ -31,6 +31,7 @@ import org.joda.time.Instant;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -47,6 +48,7 @@ import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueUsersPart")
@@ -67,6 +69,9 @@ class QueueUsersPart
 
 	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -164,7 +169,8 @@ class QueueUsersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -175,9 +181,11 @@ class QueueUsersPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"User",
 				"Items",
 				"Oldest",
@@ -189,13 +197,16 @@ class QueueUsersPart
 					: userDatas
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					userData.user);
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						userData.count),
 					htmlAttribute (
@@ -203,6 +214,7 @@ class QueueUsersPart
 						"right"));
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.prettyDuration (
 						userData.oldest,
 						transaction.now ()));
@@ -216,14 +228,17 @@ class QueueUsersPart
 				) {
 
 					htmlTableCellWrite (
+						formatWriter,
 						"");
 
 				} else {
 
-					htmlTableCellOpen ();
+					htmlTableCellOpen (
+						formatWriter);
 
 					htmlFormOpenPostAction (
-						 requestContext.resolveLocalUrl (
+						formatWriter,
+						requestContext.resolveLocalUrl (
 						 	"/queue.users"));
 
 					formatWriter.writeLineFormat (
@@ -242,15 +257,19 @@ class QueueUsersPart
 						" value=\"reclaim\"",
 						">");
 
-					htmlFormClose ();
+					htmlFormClose (
+						formatWriter);
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
 				}
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				htmlFormOpenPostAction (
+					formatWriter,
 					requestContext.resolveLocalUrl (
 						"/queue.users"));
 
@@ -271,15 +290,19 @@ class QueueUsersPart
 					">");
 
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

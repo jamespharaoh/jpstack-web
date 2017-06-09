@@ -1,5 +1,6 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
@@ -12,6 +13,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("coreHomeResponder")
 public
@@ -27,8 +30,18 @@ class CoreHomeResponder
 
 	@Override
 	protected
-	void renderHtmlBodyContents (
+	void prepare (
 			@NonNull Transaction parentTransaction) {
+
+		doNothing ();
+
+	}
+
+	@Override
+	protected
+	void renderHtmlBodyContents (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -40,9 +53,11 @@ class CoreHomeResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				"Home");
 
 			htmlParagraphWrite (
+				formatWriter,
 				"Welcome to the SMS console.");
 
 		}

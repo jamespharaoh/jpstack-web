@@ -24,6 +24,7 @@ import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -32,6 +33,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -55,6 +58,9 @@ class ChatBroadcastSendPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -135,7 +141,8 @@ class ChatBroadcastSendPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -146,13 +153,16 @@ class ChatBroadcastSendPart
 
 		) {
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Recipients");
 
 			form.outputFormAlwaysHidden (
 				transaction,
+				formatWriter,
 				"search",
 				"numbers",
 				"common",
@@ -161,16 +171,20 @@ class ChatBroadcastSendPart
 
 			if (! form.value ().search ()) {
 
-				htmlTableOpenDetails ();
+				htmlTableOpenDetails (
+					formatWriter);
 
 				form.outputFormRows (
 					transaction,
+					formatWriter,
 					"numbers",
 					"common");
 
-				htmlTableClose ();
+				htmlTableClose (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -179,26 +193,32 @@ class ChatBroadcastSendPart
 					" value=\"enable search\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 				form.outputFormTemporarilyHidden (
 					transaction,
+					formatWriter,
 					"search");
 
 			}
 
 			if (form.value ().search ()) {
 
-				htmlTableOpenDetails ();
+				htmlTableOpenDetails (
+					formatWriter);
 
 				form.outputFormRows (
 					transaction,
+					formatWriter,
 					"search",
 					"common");
 
-				htmlTableClose ();
+				htmlTableClose (
+					formatWriter);
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -209,22 +229,28 @@ class ChatBroadcastSendPart
 
 				form.outputFormTemporarilyHidden (
 					transaction,
+					formatWriter,
 					"numbers");
 
 			}
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Message");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			form.outputFormRows (
 				transaction,
+				formatWriter,
 				"message-user");
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -233,13 +259,16 @@ class ChatBroadcastSendPart
 				" value=\"verify\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			form.outputFormTemporarilyHidden (
 				transaction,
+				formatWriter,
 				"message-message");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

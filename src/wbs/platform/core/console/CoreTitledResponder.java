@@ -1,6 +1,5 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
@@ -17,6 +16,7 @@ import lombok.experimental.Accessors;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -29,9 +29,10 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreTitledResponder")
@@ -52,6 +53,9 @@ class CoreTitledResponder
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -80,31 +84,6 @@ class CoreTitledResponder
 
 	@Override
 	protected
-	void setup (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"setup");
-
-		) {
-
-			super.setup (
-				transaction);
-
-			pagePart.setup (
-				transaction,
-				emptyMap ());
-
-		}
-
-	}
-
-	@Override
-	protected
 	void prepare (
 			@NonNull Transaction parentTransaction) {
 
@@ -116,9 +95,6 @@ class CoreTitledResponder
 					"prepare");
 
 		) {
-
-			super.prepare (
-				transaction);
 
 			if (pagePart != null) {
 
@@ -165,7 +141,8 @@ class CoreTitledResponder
 	@Override
 	protected
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -177,7 +154,8 @@ class CoreTitledResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<link",
@@ -188,7 +166,8 @@ class CoreTitledResponder
 				">");
 
 			pagePart.renderHtmlHeadContent (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -201,18 +180,20 @@ class CoreTitledResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					transaction,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"renderHtmlBodyContents");
 
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				title);
 
 			requestContext.flushNotices (
@@ -221,20 +202,22 @@ class CoreTitledResponder
 			if (pagePartThrew != null) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"Unable to show page contents.");
 
 				if (
 					privChecker.canRecursive (
-						taskLogger,
+						transaction,
 						GlobalId.root,
 						"debug")
 				) {
 
 					htmlParagraphWriteHtml (
+						formatWriter,
 						stringFormat (
 							"<pre>%h</pre>",
 							exceptionLogic.throwableDump (
-								taskLogger,
+								transaction,
 								pagePartThrew)));
 
 				}
@@ -242,7 +225,8 @@ class CoreTitledResponder
 			} else if (pagePart != null) {
 
 				pagePart.renderHtmlBodyContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 

@@ -25,6 +25,8 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("subscriptionSendControlPart")
 public
 class SubscriptionSendControlPart
@@ -72,7 +74,8 @@ class SubscriptionSendControlPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -84,13 +87,15 @@ class SubscriptionSendControlPart
 		) {
 
 			goDetails (
-				transaction);
+				transaction,
+				formatWriter);
 
 			switch (subscriptionSend.getState ()) {
 
 			case cancelled:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This send has been cancelled and can no longer be sent.");
 
 				break;
@@ -98,38 +103,45 @@ class SubscriptionSendControlPart
 			case partiallySent:
 
 				htmlParagraphWriteFormat (
-					"This send was partially sent and then cancelled. It can no ",
-					"longer be sent.");
+					formatWriter,
+					"This send was partially sent and then cancelled. It can ",
+					"no longer be sent.");
 
 				break;
 
 			case scheduled:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This send has been scheduled but not yet sent. It can be ",
 					"unscheduled or cancelled.");
 
 				goUnschedule (
-					transaction);
+					transaction,
+					formatWriter);
 
 				goCancel (
-					transaction);
+					transaction,
+					formatWriter);
 
 				break;
 
 			case sending:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This send is being sent. It can be cancelled.");
 
 				goCancel (
-					transaction);
+					transaction,
+					formatWriter);
 
 				break;
 
 			case sent:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This send has already been sent.");
 
 				break;
@@ -137,18 +149,22 @@ class SubscriptionSendControlPart
 			case notSent:
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"This send has not yet been sent. It can be sent now or ",
 					"scheduled to automatically sent at a specific time in ",
 					"the future. Alternatively, it can be cancelled.");
 
 				goSendNow (
-					transaction);
+					transaction,
+					formatWriter);
 
 				goSchedule (
-					transaction);
+					transaction,
+					formatWriter);
 
 				goCancel (
-					transaction);
+					transaction,
+					formatWriter);
 
 				break;
 
@@ -163,7 +179,8 @@ class SubscriptionSendControlPart
 	}
 
 	void goDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -174,20 +191,24 @@ class SubscriptionSendControlPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Description",
 				subscriptionSend.getDescription ());
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goSchedule (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -199,19 +220,23 @@ class SubscriptionSendControlPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Schedule");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Scheduling this send will cause it to be sent automatically ",
 				"at the specified time in the future.");
 
 			// form open
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
 			// time and date
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Time and date<br>");
@@ -226,11 +251,13 @@ class SubscriptionSendControlPart
 					transaction.now ()),
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -239,18 +266,21 @@ class SubscriptionSendControlPart
 				" value=\"schedule\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goUnschedule (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -262,16 +292,20 @@ class SubscriptionSendControlPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Unschedule");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Unscheduling a send will prevent it from being sent. You ",
 				"will be able to add and remove numbers and send or schedule ",
 				"it again");
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -280,16 +314,19 @@ class SubscriptionSendControlPart
 				" value=\"unschedule\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goSendNow (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -301,14 +338,18 @@ class SubscriptionSendControlPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Send now");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Sending a send will begin sending messages immediately.");
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -317,16 +358,19 @@ class SubscriptionSendControlPart
 				" value=\"send\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goCancel (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -338,15 +382,19 @@ class SubscriptionSendControlPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Cancel");
 
 			htmlParagraphWriteFormat (
-				"Cancelling a send will stop it from being sent, now or in the ",
-				"future.");
+				formatWriter,
+				"Cancelling a send will stop it from being sent, now or in ",
+				"the future.");
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -355,9 +403,11 @@ class SubscriptionSendControlPart
 				" value=\"cancel\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

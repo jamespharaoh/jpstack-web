@@ -15,6 +15,7 @@ import lombok.NonNull;
 import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -23,6 +24,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatGraphsUsersPart")
@@ -36,6 +38,9 @@ class ChatGraphsUsersPart
 	LogContext logContext;
 
 	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// implementation
@@ -43,7 +48,8 @@ class ChatGraphsUsersPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -91,10 +97,12 @@ class ChatGraphsUsersPart
 			}
 
 			htmlFormOpenGetAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chat.graphs.users"));
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Date<br>");
@@ -113,9 +121,11 @@ class ChatGraphsUsersPart
 				" value=\"ok\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			if (
 				isNotNull (
@@ -125,10 +135,12 @@ class ChatGraphsUsersPart
 				// write date browser
 
 				htmlParagraphOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"links"));
 
 				htmlLinkWrite (
+					formatWriter,
 					stringFormat (
 						"?date=%u",
 						timeFormatter.dateString (
@@ -136,6 +148,7 @@ class ChatGraphsUsersPart
 					"Prev week");
 
 				htmlLinkWrite (
+					formatWriter,
 					stringFormat (
 						"?date=%h",
 						timeFormatter.dateString (
@@ -143,6 +156,7 @@ class ChatGraphsUsersPart
 					"Prev day");
 
 				htmlLinkWrite (
+					formatWriter,
 					stringFormat (
 						"?date=%u",
 						timeFormatter.dateString (
@@ -150,17 +164,20 @@ class ChatGraphsUsersPart
 						"Next day");
 
 				htmlLinkWrite (
+					formatWriter,
 					stringFormat (
 						"?date=%u",
 						timeFormatter.dateString (
 							date.plusWeeks (1))),
 					"Next week");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 				// write graph image
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<img",
@@ -173,7 +190,8 @@ class ChatGraphsUsersPart
 							dateString)),
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 

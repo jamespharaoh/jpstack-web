@@ -77,6 +77,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -96,6 +97,7 @@ import wbs.platform.user.console.UserSessionLogic;
 
 import wbs.utils.etc.NumberUtils;
 import wbs.utils.etc.PropertyUtils;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchResultsPart")
@@ -116,6 +118,9 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -389,7 +394,8 @@ class ObjectSearchResultsPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -401,33 +407,42 @@ class ObjectSearchResultsPart <
 		) {
 
 			renderNewSearch (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderTotalObjects (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderPageNumbers (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderModeTabs (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderSearchResults (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderPageNumbers (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	void renderNewSearch (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
-		htmlFormOpenPost ();
+		htmlFormOpenPost (
+			formatWriter);
 
-		htmlParagraphOpen ();
+		htmlParagraphOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<input",
@@ -450,16 +465,20 @@ class ObjectSearchResultsPart <
 			" value=\"download csv\"",
 			">");
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
-		htmlFormClose ();
+		htmlFormClose (
+			formatWriter);
 
 	}
 
 	void renderTotalObjects (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		htmlParagraphWriteFormat (
+			formatWriter,
 			"Search returned %h items",
 			integerToDecimalString (
 				totalObjects));
@@ -467,12 +486,14 @@ class ObjectSearchResultsPart <
 	}
 
 	void renderPageNumbers (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		if (pageCount == 1)
 			return;
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
@@ -480,6 +501,7 @@ class ObjectSearchResultsPart <
 			"Select page");
 
 		htmlLinkWrite (
+			formatWriter,
 			stringFormat (
 				"?page=all&mode=%u",
 				requestContext.parameterOrDefault (
@@ -499,6 +521,7 @@ class ObjectSearchResultsPart <
 		) {
 
 			htmlLinkWrite (
+				formatWriter,
 				stringFormat (
 					"?page=%h&mode=%u",
 					integerToDecimalString (
@@ -516,12 +539,14 @@ class ObjectSearchResultsPart <
 
 		}
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	void renderModeTabs (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter) {
 
 		if (
 			collectionHasOneItem (
@@ -531,6 +556,7 @@ class ObjectSearchResultsPart <
 		}
 
 		htmlParagraphOpen (
+			formatWriter,
 			htmlClassAttribute (
 				"links"));
 
@@ -562,12 +588,14 @@ class ObjectSearchResultsPart <
 
 		}
 
-		htmlParagraphClose ();
+		htmlParagraphClose (
+			formatWriter);
 
 	}
 
 	void renderSearchResults (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -578,14 +606,18 @@ class ObjectSearchResultsPart <
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			form.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			LocalDate currentDate =
 				new LocalDate (0);
@@ -602,14 +634,17 @@ class ObjectSearchResultsPart <
 						resultOptional)
 				) {
 
-					htmlTableRowOpen ();
+					htmlTableRowOpen (
+						formatWriter);
 
 					htmlTableCellWrite (
+						formatWriter,
 						"(deleted)",
 						htmlColumnSpanAttribute (
 							form.columnFields ().columns ()));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					continue;
 
@@ -631,14 +666,17 @@ class ObjectSearchResultsPart <
 
 				)  {
 
-					htmlTableRowOpen ();
+					htmlTableRowOpen (
+						formatWriter);
 
 					htmlTableCellWrite (
+						formatWriter,
 						"(restricted)",
 						htmlColumnSpanAttribute (
 							form.columnFields ().columns ()));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					continue;
 
@@ -674,22 +712,26 @@ class ObjectSearchResultsPart <
 						currentDate =
 							rowDate;
 
-						htmlTableRowSeparatorWrite ();
+						htmlTableRowSeparatorWrite (
+							formatWriter);
 
 						htmlTableRowOpen (
+							formatWriter,
 							htmlStyleAttribute (
 								htmlStyleRuleEntry (
 									"font-weight",
 									"bold")));
 
 						htmlTableCellWrite (
+							formatWriter,
 							userConsoleLogic.dateStringLong (
 								transaction,
 								rowTimestamp),
 							htmlColumnSpanAttribute (
 								form.columnFields ().columns ()));
 
-						htmlTableRowClose ();
+						htmlTableRowClose (
+							formatWriter);
 
 					}
 
@@ -702,7 +744,8 @@ class ObjectSearchResultsPart <
 						form.rowFields ())
 				) {
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 				}
 
@@ -711,6 +754,7 @@ class ObjectSearchResultsPart <
 				if (result instanceof Record) {
 
 					htmlTableRowOpen (
+						formatWriter,
 
 						htmlClassAttribute (
 							presentInstances (
@@ -752,16 +796,19 @@ class ObjectSearchResultsPart <
 
 				} else {
 
-					htmlTableRowOpen ();
+					htmlTableRowOpen (
+						formatWriter);
 
 				}
 
 				form.outputTableCellsList (
 					transaction,
+					formatWriter,
 					result,
 					false);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				// output row fields
 
@@ -776,6 +823,7 @@ class ObjectSearchResultsPart <
 					) {
 
 						htmlTableRowOpen (
+							formatWriter,
 							presentInstances (
 
 							optionalOf (
@@ -823,6 +871,7 @@ class ObjectSearchResultsPart <
 
 							rowField.renderTableCellList (
 								transaction,
+								formatWriter,
 								form,
 								result,
 								false,
@@ -840,7 +889,8 @@ class ObjectSearchResultsPart <
 
 						}
 
-						htmlTableRowClose ();
+						htmlTableRowClose (
+							formatWriter);
 
 					}
 
@@ -848,7 +898,8 @@ class ObjectSearchResultsPart <
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

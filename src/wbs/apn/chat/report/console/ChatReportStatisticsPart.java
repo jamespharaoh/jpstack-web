@@ -28,6 +28,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.affiliate.console.ChatAffiliateUsersSummaryConsoleHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateUsersSummaryRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -176,7 +178,8 @@ class ChatReportStatisticsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -197,6 +200,7 @@ class ChatReportStatisticsPart
 			) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"You don't have permission to view any information on ",
 					"this page.");
 
@@ -204,131 +208,185 @@ class ChatReportStatisticsPart
 
 			}
 
-			writeNumberOfAffiliates ();
-			writeTotals ();
-			writeJoiners ();
+			writeNumberOfAffiliates (
+				transaction,
+				formatWriter);
+
+			writeTotals (
+				transaction,
+				formatWriter);
+
+			writeJoiners (
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	private
-	void writeNumberOfAffiliates () {
+	void writeNumberOfAffiliates (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		// write number of affiliates
+		try (
 
-		if (
-			moreThanZero (
-				numAffiliates)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writeNumberOfAffiliates");
+
 		) {
 
-			htmlParagraphWriteFormat (
-				"Number of affiliates: %h",
-				integerToDecimalString (
-					numAffiliates));
+			// write number of affiliates
+
+			if (
+				moreThanZero (
+					numAffiliates)
+			) {
+
+				htmlParagraphWriteFormat (
+					formatWriter,
+					"Number of affiliates: %h",
+					integerToDecimalString (
+						numAffiliates));
+
+			}
 
 		}
 
 	}
 
 	private
-	void writeTotals () {
+	void writeTotals (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		// heading write
+		try (
 
-		htmlHeadingTwoWrite (
-			"Users");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writeTotals");
 
-		// table open
-
-		htmlTableOpenList ();
-
-		// table header row
-
-		htmlTableRowOpen ();
-
-		htmlTableHeaderCellWrite (
-			"Orient");
-
-		htmlTableHeaderCellWrite (
-			"Gender");
-
-		if (
-			moreThanZero (
-				numAffiliates)
 		) {
 
-			htmlTableHeaderCellWrite (
+			// heading write
+
+			htmlHeadingTwoWrite (
+				formatWriter,
 				"Users");
 
-		}
+			// table open
 
-		if (canMonitor) {
+			htmlTableOpenList (
+				formatWriter);
+
+			// table header row
+
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
-				"Monitors");
+				formatWriter,
+				"Orient");
+
+			htmlTableHeaderCellWrite (
+				formatWriter,
+				"Gender");
+
+			if (
+				moreThanZero (
+					numAffiliates)
+			) {
+
+				htmlTableHeaderCellWrite (
+					formatWriter,
+					"Users");
+
+			}
+
+			if (canMonitor) {
+
+				htmlTableHeaderCellWrite (
+					formatWriter,
+					"Monitors");
+
+			}
+
+			htmlTableRowClose (
+				formatWriter);
+
+			// table content
+
+			writeRow (
+				formatWriter,
+				"Gay",
+				"Male",
+				numUsersGayMale,
+				users.getNumMonitorsGayMale ());
+
+			writeRow (
+				formatWriter,
+				"Gay",
+				"Female",
+				numUsersGayFemale,
+				users.getNumMonitorsGayFemale ());
+
+			writeRow (
+				formatWriter,
+				"Bi",
+				"Male",
+				numUsersBiMale,
+				users.getNumMonitorsBiMale ());
+
+			writeRow (
+				formatWriter,
+				"Bi",
+				"Female",
+				numUsersBiFemale,
+				users.getNumMonitorsBiFemale ());
+
+			writeRow (
+				formatWriter,
+				"Straight",
+				"Male",
+				numUsersStraightMale,
+				users.getNumMonitorsStraightMale ());
+
+			writeRow (
+				formatWriter,
+				"Straight",
+				"Female",
+				numUsersStraightFemale,
+				users.getNumMonitorsStraightFemale ());
+
+			// table close
+
+			htmlTableClose (
+				formatWriter);
 
 		}
-
-		htmlTableRowClose ();
-
-		// table content
-
-		writeRow (
-			"Gay",
-			"Male",
-			numUsersGayMale,
-			users.getNumMonitorsGayMale ());
-
-		writeRow (
-			"Gay",
-			"Female",
-			numUsersGayFemale,
-			users.getNumMonitorsGayFemale ());
-
-		writeRow (
-			"Bi",
-			"Male",
-			numUsersBiMale,
-			users.getNumMonitorsBiMale ());
-
-		writeRow (
-			"Bi",
-			"Female",
-			numUsersBiFemale,
-			users.getNumMonitorsBiFemale ());
-
-		writeRow (
-			"Straight",
-			"Male",
-			numUsersStraightMale,
-			users.getNumMonitorsStraightMale ());
-
-		writeRow (
-			"Straight",
-			"Female",
-			numUsersStraightFemale,
-			users.getNumMonitorsStraightFemale ());
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 
 	private
 	void writeRow (
+			@NonNull FormatWriter formatWriter,
 			@NonNull String orient,
 			@NonNull String gender,
 			@NonNull Long users,
 			@NonNull Long monitors) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableCellWrite (
+			formatWriter,
 			"Gay");
 
 		htmlTableCellWrite (
+			formatWriter,
 			"Male");
 
 		if (
@@ -337,88 +395,117 @@ class ChatReportStatisticsPart
 		) {
 
 			htmlTableCellWrite (
+				formatWriter,
 				integerToDecimalString (
 					users));
 
 		}
 
 		htmlTableCellWrite (
+			formatWriter,
 			integerToDecimalString (
 				monitors));
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
 	private
-	void writeJoiners () {
+	void writeJoiners (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		if (
-			notMoreThanZero (
-				numAffiliates)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"writeJoiners");
+
 		) {
-			return;
+
+			if (
+				notMoreThanZero (
+					numAffiliates)
+			) {
+				return;
+			}
+
+			// heading
+
+			htmlHeadingTwoWrite (
+				formatWriter,
+				"User activity");
+
+			// table open
+
+			htmlTableOpenList (
+				formatWriter);
+
+			// table header
+
+			htmlTableHeaderRowWrite (
+				formatWriter,
+				"Timescale",
+				"Joined",
+				"Online");
+
+			// table content
+
+			writeJoinersRow (
+				formatWriter,
+				"Last day",
+				numJoinedLastDay,
+				numOnlineLastDay);
+
+			writeJoinersRow (
+				formatWriter,
+				"Last week",
+				numJoinedLastWeek,
+				numOnlineLastWeek);
+
+			writeJoinersRow (
+				formatWriter,
+				"Last month",
+				numJoinedLastMonth,
+				numOnlineLastMonth);
+
+			// table close
+
+			htmlTableClose (
+				formatWriter);
+
 		}
-
-		// heading
-
-		htmlHeadingTwoWrite (
-			"User activity");
-
-		// table open
-
-		htmlTableOpenList ();
-
-		// table header
-
-		htmlTableHeaderRowWrite (
-			"Timescale",
-			"Joined",
-			"Online");
-
-		// table content
-
-		writeJoinersRow (
-			"Last day",
-			numJoinedLastDay,
-			numOnlineLastDay);
-
-		writeJoinersRow (
-			"Last week",
-			numJoinedLastWeek,
-			numOnlineLastWeek);
-
-		writeJoinersRow (
-			"Last month",
-			numJoinedLastMonth,
-			numOnlineLastMonth);
-
-		// table close
-
-		htmlTableClose ();
 
 	}
 
 	private
 	void writeJoinersRow (
+			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull Long numJoiners,
 			@NonNull Long numOnline) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableCellWrite (
+			formatWriter,
 			name);
 
 		htmlTableCellWrite (
+			formatWriter,
 			integerToDecimalString (
 				numJoiners));
 
 		htmlTableCellWrite (
+			formatWriter,
 			integerToDecimalString (
 				numOnline));
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 

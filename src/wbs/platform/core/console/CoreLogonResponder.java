@@ -49,6 +49,8 @@ import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("coreLogonResponder")
 public
 class CoreLogonResponder
@@ -112,26 +114,37 @@ class CoreLogonResponder
 	void prepare (
 			@NonNull Transaction parentTransaction) {
 
-		Optional <String> sliceCode =
-			requestContext.header (
-				"x-wbs-slice");
+		try (
 
-		if (
-			optionalIsPresent (
-				sliceCode)
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
 		) {
 
-			slice =
-				optionalOf (
-					sliceHelper.findByCodeRequired (
-						transaction,
-						GlobalId.root,
-						sliceCode.get ()));
+			Optional <String> sliceCode =
+				requestContext.header (
+					"x-wbs-slice");
 
-		} else {
+			if (
+				optionalIsPresent (
+					sliceCode)
+			) {
 
-			slice =
-				optionalAbsent ();
+				slice =
+					optionalOf (
+						sliceHelper.findByCodeRequired (
+							transaction,
+							GlobalId.root,
+							sliceCode.get ()));
+
+			} else {
+
+				slice =
+					optionalAbsent ();
+
+			}
 
 		}
 
@@ -140,7 +153,8 @@ class CoreLogonResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -152,20 +166,24 @@ class CoreLogonResponder
 		) {
 
 			htmlHeadingOneWrite (
+				formatWriter,
 				wbsConfig.consoleTitle ());
 
 			goTestUsers (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goLoginForm (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	void goTestUsers (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -184,12 +202,15 @@ class CoreLogonResponder
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Quick login");
 
 			htmlParagraphWrite (
+				formatWriter,
 				"Login shortcuts for development mode only");
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"login-buttons"));
 
@@ -245,14 +266,16 @@ class CoreLogonResponder
 
 			}
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goLoginForm (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -264,13 +287,16 @@ class CoreLogonResponder
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Please log in");
 
-			requestContext.flushNotices ();
+			requestContext.flushNotices (
+				formatWriter);
 
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					"/"),
 				htmlIdAttribute (
@@ -295,7 +321,8 @@ class CoreLogonResponder
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// slice row
 
@@ -305,6 +332,7 @@ class CoreLogonResponder
 			) {
 
 				htmlTableDetailsRowWriteHtml (
+					formatWriter,
 					"Slice",
 					() -> formatWriter.writeLineFormat (
 						"<input",
@@ -323,6 +351,7 @@ class CoreLogonResponder
 			// username row
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Username",
 				() -> formatWriter.writeLineFormat (
 					"<input",
@@ -340,6 +369,7 @@ class CoreLogonResponder
 			// password row
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Password",
 				() -> formatWriter.writeLineFormat (
 					"<input",
@@ -353,11 +383,13 @@ class CoreLogonResponder
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -366,11 +398,13 @@ class CoreLogonResponder
 				" disabled",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

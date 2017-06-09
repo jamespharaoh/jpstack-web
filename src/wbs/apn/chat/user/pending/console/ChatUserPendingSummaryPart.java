@@ -26,6 +26,8 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -85,7 +87,8 @@ class ChatUserPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -96,25 +99,31 @@ class ChatUserPendingSummaryPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Old",
 				"New");
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"User",
 				() -> consoleObjectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					chatUser,
 					2l));
 
 			// name
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Name",
 				() -> htmlTableCellWrite (
+					formatWriter,
 					ifNullThenEmDash (
 						chatUser.getName ()),
 					htmlColumnSpanAttribute (2l)));
@@ -122,6 +131,7 @@ class ChatUserPendingSummaryPart
 			// info
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Info",
 				() -> ifNotNullThenElse (
 					chatUser.getNewChatUserInfo (),
@@ -129,17 +139,20 @@ class ChatUserPendingSummaryPart
 				() -> {
 
 					htmlTableCellWrite (
+						formatWriter,
 						ifNotNullThenElseEmDash (
 							chatUser.getInfoText (),
 							() -> chatUser.getInfoText ().getText ()));
 
 					htmlTableCellWrite (
+						formatWriter,
 						chatUser.getNewChatUserInfo ().getOriginalText ()
 							.getText ());
 
 				},
 
 				() -> htmlTableCellWrite (
+					formatWriter,
 					chatUser.getInfoText ().getText (),
 					htmlColumnSpanAttribute (2l))
 
@@ -168,6 +181,7 @@ class ChatUserPendingSummaryPart
 			);
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Photo",
 				() -> ifNotNullThenElse (
 					newImage,
@@ -175,9 +189,11 @@ class ChatUserPendingSummaryPart
 				() -> {
 
 					htmlTableCellWrite (
+						formatWriter,
 						existingImageHtml);
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						() -> mediaConsoleLogic.writeMediaContent (
 							transaction,
 							formatWriter,
@@ -185,6 +201,7 @@ class ChatUserPendingSummaryPart
 				},
 
 				() -> htmlTableCellWriteHtml (
+					formatWriter,
 					existingImageHtml,
 					htmlColumnSpanAttribute (2l))
 
@@ -204,6 +221,7 @@ class ChatUserPendingSummaryPart
 
 				() -> mediaConsoleLogic.writeMediaContent (
 					transaction,
+					formatWriter,
 					chatUser.getChatUserImageList ().get (0).getMedia ()),
 
 				() -> formatWriter.writeFormat (
@@ -212,6 +230,7 @@ class ChatUserPendingSummaryPart
 			);
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Video",
 				() -> ifNotNullThenElse (
 					newVideo,
@@ -219,16 +238,20 @@ class ChatUserPendingSummaryPart
 				() -> {
 
 					htmlTableCellWrite (
+						formatWriter,
 						existingVideoHtml);
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						() -> mediaConsoleLogic.writeMediaContent (
 							transaction,
+							formatWriter,
 							newVideo.getMedia ()));
 
 				},
 
 				() -> htmlTableCellWriteHtml (
+					formatWriter,
 					existingVideoHtml,
 					htmlColumnSpanAttribute (2l))
 
@@ -248,6 +271,7 @@ class ChatUserPendingSummaryPart
 
 				() -> mediaConsoleLogic.writeMediaContent (
 					transaction,
+					formatWriter,
 					chatUser.getChatUserAudioList ().get (0).getMedia ()),
 
 				() -> formatWriter.writeFormat (
@@ -256,6 +280,7 @@ class ChatUserPendingSummaryPart
 			);
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Audio",
 				() -> ifNotNullThenElse (
 					newAudio,
@@ -263,16 +288,20 @@ class ChatUserPendingSummaryPart
 				() -> {
 
 					htmlTableCellWrite (
+						formatWriter,
 						existingAudioHtml);
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						() -> mediaConsoleLogic.writeMediaContent (
 							transaction,
+							formatWriter,
 							newAudio.getMedia ()));
 
 				},
 
 				() -> htmlTableCellWriteHtml (
+					formatWriter,
 					existingAudioHtml,
 					htmlColumnSpanAttribute (2l))
 
@@ -280,7 +309,8 @@ class ChatUserPendingSummaryPart
 
 			// close table
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

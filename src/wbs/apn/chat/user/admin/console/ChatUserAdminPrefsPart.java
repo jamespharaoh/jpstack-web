@@ -18,6 +18,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -25,6 +26,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -43,6 +46,9 @@ class ChatUserAdminPrefsPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -73,7 +79,8 @@ class ChatUserAdminPrefsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -100,7 +107,8 @@ class ChatUserAdminPrefsPart
 				requestContext.addError (
 					"Cannot change prefs for this user");
 
-				requestContext.flushNotices ();
+				requestContext.flushNotices (
+					formatWriter);
 
 				return;
 
@@ -109,34 +117,41 @@ class ChatUserAdminPrefsPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.prefs"));
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// table contents
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Code",
 				chatUser.getCode ());
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Gender",
 				() -> {
 
 				htmlSelectOpen (
+					formatWriter,
 					"gender");
 
 				if (chatUser.getGender () == Gender.male) {
 
 					htmlOptionWrite (
+						formatWriter,
 						"male",
 						true,
 						"male");
 
 					htmlOptionWrite (
+						formatWriter,
 						"female",
 						false,
 						"female");
@@ -144,11 +159,13 @@ class ChatUserAdminPrefsPart
 				} else if (chatUser.getGender () == Gender.female) {
 
 					htmlOptionWrite (
+						formatWriter,
 						"male",
 						false,
 						"male");
 
 					htmlOptionWrite (
+						formatWriter,
 						"female",
 						true,
 						"female");
@@ -156,11 +173,13 @@ class ChatUserAdminPrefsPart
 				} else if (chatUser.getGender () == null) {
 
 					htmlOptionWrite (
+						formatWriter,
 						"male",
 						false,
 						"male");
 
 					htmlOptionWrite (
+						formatWriter,
 						"female",
 						false,
 						"female");
@@ -171,77 +190,96 @@ class ChatUserAdminPrefsPart
 
 				}
 
-				htmlSelectClose ();
+				htmlSelectClose (
+					formatWriter);
 
 			});
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Orient",
 				() -> {
 
 				htmlSelectOpen (
+					formatWriter,
 					"orient");
 
 				if (chatUser.getOrient () == Orient.gay) {
 
 					htmlOptionWriteSelected (
+						formatWriter,
 						"gay");
 
 					htmlOptionWrite (
+						formatWriter,
 						"bi");
 
 					htmlOptionWrite (
+						formatWriter,
 						"straight");
 
 				} else if (chatUser.getOrient () == Orient.bi) {
 
 					htmlOptionWrite (
+						formatWriter,
 						"gay");
 
 					htmlOptionWriteSelected (
+						formatWriter,
 						"bi");
 
 					htmlOptionWrite (
+						formatWriter,
 						"straight");
 
 				} else if (chatUser.getOrient () == Orient.straight) {
 
 					htmlOptionWrite (
+						formatWriter,
 						"gay");
 
 					htmlOptionWrite (
+						formatWriter,
 						"bi");
 
 					htmlOptionWriteSelected (
+						formatWriter,
 						"straight");
 
 				} else {
 
 					htmlOptionWrite (
+						formatWriter,
 						"—");
 
 					htmlOptionWrite (
+						formatWriter,
 						"gay");
 
 					htmlOptionWrite (
+						formatWriter,
 						"bi");
 
 					htmlOptionWrite (
+						formatWriter,
 						"straight");
 
 				}
 
-				htmlSelectClose ();
+				htmlSelectClose (
+					formatWriter);
 
 			});
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeFormat (
 				"<input",
@@ -249,11 +287,13 @@ class ChatUserAdminPrefsPart
 				" value=\"update prefs\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

@@ -128,14 +128,6 @@ interface ConsoleRequestContextNoticeMethods
 	}
 
 	default
-	void flushNotices () {
-
-		flushNotices (
-			requestContext ().formatWriter ());
-
-	}
-
-	default
 	void flushNotices (
 			@NonNull FormatWriter formatWriter) {
 

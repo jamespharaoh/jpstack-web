@@ -30,6 +30,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -41,6 +42,8 @@ import wbs.framework.logging.LogContext;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -69,6 +72,9 @@ class ChatUserImageListPart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -142,7 +148,8 @@ class ChatUserImageListPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -154,14 +161,17 @@ class ChatUserImageListPart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					stringFormat (
 						"/chatUser.%s.list",
 						type.name ())));
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"I",
 				"S",
 				"Preview",
@@ -172,13 +182,16 @@ class ChatUserImageListPart
 
 			if (chatUserImages.isEmpty ()) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					"No photos/videos to show",
 					htmlColumnSpanAttribute (7l));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
@@ -189,9 +202,11 @@ class ChatUserImageListPart
 					: chatUserImages
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElse (
 						chatUserImage.getIndex (),
 
@@ -203,6 +218,7 @@ class ChatUserImageListPart
 				));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElse (
 						optionalValueEqualWithClass (
 							ChatUserImageRec.class,
@@ -215,11 +231,13 @@ class ChatUserImageListPart
 						() -> ""));
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlAttribute (
 						"style",
 						"text-align: center"));
 
 				htmlLinkWriteHtml (
+					formatWriter,
 					requestContext.resolveLocalUrl (
 						stringFormat (
 							"/chatUser.%u.view",
@@ -232,18 +250,22 @@ class ChatUserImageListPart
 						chatUserImage.getMedia (),
 						() -> mediaConsoleLogic.writeMediaThumb100 (
 							transaction,
+							formatWriter,
 							chatUserImage.getMedia ()),
 						() -> formatWriter.writeLineFormat (
 							"(none)")));
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithoutTimezoneString (
 						transaction,
 						chatUserImage.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatUserImage.getModerator (),
 						() -> objectManager.objectPathMini (
@@ -253,9 +275,11 @@ class ChatUserImageListPart
 								transaction))));
 
 				htmlTableCellWrite (
+					formatWriter,
 					chatUserImage.getClassification ());
 
-				htmlTableCellOpen ();
+				htmlTableCellOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -311,17 +335,21 @@ class ChatUserImageListPart
 					" value=\"S\"",
 					">");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				index ++;
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

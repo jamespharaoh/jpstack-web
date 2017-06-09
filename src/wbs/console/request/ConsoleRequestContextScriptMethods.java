@@ -53,38 +53,30 @@ interface ConsoleRequestContextScriptMethods
 	}
 
 	default
-	void flushScripts () {
+	void flushScripts (
+			@NonNull FormatWriter formatWriter) {
 
 		State state =
 			consoleRequestContextScriptMethodsState ();
 
-		try (
-
-			FormatWriter formatWriter =
-				requestContext ().formatWriter ();
-
+		if (
+			collectionIsNotEmpty (
+				state.scripts)
 		) {
 
-			if (
-				collectionIsNotEmpty (
-					state.scripts)
-			) {
+			htmlScriptBlockOpen (
+				formatWriter);
 
-				htmlScriptBlockOpen (
-					formatWriter);
+			state.scripts.forEach (
+				script ->
+					formatWriter.writeLineFormat (
+						"%s",
+						script));
 
-				state.scripts.forEach (
-					script ->
-						formatWriter.writeLineFormat (
-							"%s",
-							script));
+			htmlScriptBlockClose (
+				formatWriter);
 
-				htmlScriptBlockClose (
-					formatWriter);
-
-				state.scripts.clear ();
-
-			}
+			state.scripts.clear ();
 
 		}
 

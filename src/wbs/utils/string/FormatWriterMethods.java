@@ -11,10 +11,7 @@ interface FormatWriterMethods {
 	// core methods
 
 	void writeString (
-			CharSequence string);
-
-	void writeCharacter (
-			int character);
+			LazyString string);
 
 	String indentString ();
 
@@ -27,6 +24,38 @@ interface FormatWriterMethods {
 			long indentSize);
 
 	// default methods
+
+	default
+	void writeCharacter (
+			int character) {
+
+		writeString (
+			LazyString.singleton (
+				() -> new String (
+					Character.toChars (
+						character))));
+
+	}
+
+	default
+	void writeString (
+			@NonNull String string) {
+
+		writeString (
+			LazyString.singleton (
+				string));
+
+	}
+
+	default
+	void writeString (
+			@NonNull CharSequence charSequence) {
+
+		writeString (
+			LazyString.singleton (
+				charSequence));
+
+	}
 
 	default
 	void writeFormat (
@@ -182,20 +211,6 @@ interface FormatWriterMethods {
 
 		indentSize (
 			indentSize () - 1);
-
-	}
-
-	@SuppressWarnings ("resource")
-	default
-	StringFormatWriter stringBuffer () {
-
-		return new StringFormatWriter ()
-
-			.indentString (
-				indentString ())
-
-			.indentSize (
-				indentSize ());
 
 	}
 

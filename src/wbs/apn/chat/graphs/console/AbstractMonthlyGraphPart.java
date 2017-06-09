@@ -16,11 +16,15 @@ import org.joda.time.YearMonth;
 
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 public abstract
@@ -31,6 +35,9 @@ class AbstractMonthlyGraphPart
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// dependencies
 
@@ -72,7 +79,8 @@ class AbstractMonthlyGraphPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -84,10 +92,12 @@ class AbstractMonthlyGraphPart
 		) {
 
 			htmlFormOpenGetAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					myLocalPart));
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"Month<br>");
@@ -106,9 +116,11 @@ class AbstractMonthlyGraphPart
 				" value=\"ok\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 			if (yearMonth != null) {
 
@@ -119,7 +131,8 @@ class AbstractMonthlyGraphPart
 					emptyMap (),
 					yearMonth.toLocalDate (1));
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<img",
@@ -133,7 +146,8 @@ class AbstractMonthlyGraphPart
 							yearMonth.toString ())),
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
 			}
 

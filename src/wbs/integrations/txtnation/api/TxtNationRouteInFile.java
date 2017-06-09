@@ -7,6 +7,9 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -27,7 +30,9 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -229,13 +234,22 @@ class TxtNationRouteInFile
 
 		try (
 
+			Writer writer =
+				requestContext.writer ();
+
 			FormatWriter formatWriter =
-				requestContext.formatWriter ();
+				new WriterFormatWriter (
+					writer);
 
 		) {
 
 			formatWriter.writeLineFormat (
 				"OK");
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 

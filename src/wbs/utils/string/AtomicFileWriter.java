@@ -1,7 +1,5 @@
 package wbs.utils.string;
 
-import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.File;
@@ -33,8 +31,8 @@ class AtomicFileWriter
 
 	File file;
 
-	StringBuilder stringBuilder =
-		new StringBuilder ();
+	LazyFormatWriter lazyFormatWriter =
+		new LazyFormatWriter ();
 
 	// implementation
 
@@ -50,43 +48,11 @@ class AtomicFileWriter
 
 	@Override
 	public
-	void writeFormat (
-			@NonNull CharSequence ... arguments) {
-
-		stringBuilder.append (
-			stringFormatArray (
-				arguments));
-
-	}
-
-	@Override
-	public
-	void writeFormatArray (
-			@NonNull CharSequence[] arguments) {
-
-		stringBuilder.append (
-			stringFormatArray (
-				arguments));
-
-	}
-
-	@Override
-	public
 	void writeString (
-			@NonNull CharSequence string) {
+			@NonNull LazyString lazyString) {
 
-		stringBuilder.append (
-			string);
-
-	}
-
-	@Override
-	public
-	void writeCharacter (
-			int character) {
-
-		stringBuilder.append (
-			(char) character);
+		lazyFormatWriter.writeString (
+			lazyString);
 
 	}
 
@@ -94,7 +60,7 @@ class AtomicFileWriter
 	void commit () {
 
 		String newContents =
-			stringBuilder.toString ();
+			lazyFormatWriter.toString ();
 
 		if (
 			! contentHasChanged (
@@ -150,7 +116,7 @@ class AtomicFileWriter
 	public
 	void close () {
 
-		doNothing ();
+		lazyFormatWriter.close ();
 
 	}
 

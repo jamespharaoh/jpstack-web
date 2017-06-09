@@ -47,6 +47,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 
@@ -137,7 +139,8 @@ class ChatHelpLogPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -149,9 +152,11 @@ class ChatHelpLogPendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"top.show_inbox (true);");
@@ -223,7 +228,8 @@ class ChatHelpLogPendingFormResponder
 
 			// script close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
@@ -232,7 +238,8 @@ class ChatHelpLogPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -243,49 +250,59 @@ class ChatHelpLogPendingFormResponder
 
 		) {
 
-			requestContext.flushNotices ();
+			requestContext.flushNotices (
+				formatWriter);
 
 			// links
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
 			htmlLinkWrite (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					"/queues/queue.home"),
 				"Queues");
 
 			htmlLinkWrite (
+				formatWriter,
 				"javascript:top.show_inbox (false);",
 				"Close");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// heading
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Respond to chat help request");
 
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/chatHelpLog.pending.form"));
 
 			// table open
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// request
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Request",
 				chatHelpLog.getText ());
 
 			// options
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Options",
 				() -> {
 
@@ -308,14 +325,17 @@ class ChatHelpLogPendingFormResponder
 			// template
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Template",
 				() -> {
 
 				htmlSelectOpen (
+					formatWriter,
 					htmlIdAttribute (
 						"template_id"));
 
-				htmlOptionWrite ();
+				htmlOptionWrite (
+					formatWriter);
 
 				for (
 					ChatHelpTemplateRec chatHelpTemplate
@@ -323,13 +343,15 @@ class ChatHelpLogPendingFormResponder
 				) {
 
 					htmlOptionWrite (
+						formatWriter,
 						integerToDecimalString (
 							chatHelpTemplate.getId ()),
 						chatHelpTemplate.getCode ());
 
 				}
 
-				htmlSelectClose ();
+				htmlSelectClose (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -343,13 +365,16 @@ class ChatHelpLogPendingFormResponder
 			// reply
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"replyTextRow"));
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Reply");
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<textarea",
@@ -371,15 +396,19 @@ class ChatHelpLogPendingFormResponder
 					"149"),
 				"></textarea>");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// chars
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Chars",
 				() -> htmlSpanWrite (
+					formatWriter,
 					"",
 					htmlIdAttribute (
 						"chars")),
@@ -389,6 +418,7 @@ class ChatHelpLogPendingFormResponder
 			// actions
 
 			htmlTableDetailsRowWriteHtml (
+				formatWriter,
 				"Actions",
 				() -> {
 
@@ -425,11 +455,13 @@ class ChatHelpLogPendingFormResponder
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

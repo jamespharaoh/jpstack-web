@@ -20,18 +20,20 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.context.RequestContext;
-import wbs.web.responder.PrintResponder;
+import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("chatInfoSiteViewResponder")
 public
 class ChatInfoSiteViewResponder
-	extends PrintResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -99,7 +101,7 @@ class ChatInfoSiteViewResponder
 
 	@Override
 	protected
-	void goHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -121,8 +123,9 @@ class ChatInfoSiteViewResponder
 
 	@Override
 	protected
-	void goContent (
-			@NonNull Transaction parentTransaction) {
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -140,10 +143,12 @@ class ChatInfoSiteViewResponder
 				"<html>");
 
 			goHead (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goBody (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</html>");
@@ -154,7 +159,8 @@ class ChatInfoSiteViewResponder
 
 	protected
 	void goHead (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -181,7 +187,8 @@ class ChatInfoSiteViewResponder
 
 	protected
 	void goBody (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -215,7 +222,9 @@ class ChatInfoSiteViewResponder
 				}
 
 				htmlParagraphWriteHtml (
+					formatWriter,
 					() -> htmlLinkWriteHtml (
+						formatWriter,
 						stringFormat (
 							"%u/%u/full",
 							infoSite.getToken (),
@@ -230,12 +239,14 @@ class ChatInfoSiteViewResponder
 									currentIndex)))));
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"User: %h",
 					otherUser.getCode ());
 
 				if (otherUser.getName () != null) {
 
 					htmlParagraphWriteFormat (
+						formatWriter,
 						"Name: %h",
 						otherUser.getName ());
 
@@ -244,12 +255,14 @@ class ChatInfoSiteViewResponder
 				if (otherUser.getInfoText () != null) {
 
 					htmlParagraphWriteFormat (
+						formatWriter,
 						"Info: %h",
 						otherUser.getInfoText ().getText ());
 
 				}
 
-				htmlFormOpenPost ();
+				htmlFormOpenPost (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -260,7 +273,8 @@ class ChatInfoSiteViewResponder
 						otherUser.getId ()),
 					">\n");
 
-				htmlParagraphOpen ();
+				htmlParagraphOpen (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<input",
@@ -274,9 +288,11 @@ class ChatInfoSiteViewResponder
 					" value=\"send\"",
 					">");
 
-				htmlParagraphClose ();
+				htmlParagraphClose (
+					formatWriter);
 
-				htmlFormClose ();
+				htmlFormClose (
+					formatWriter);
 
 			}
 

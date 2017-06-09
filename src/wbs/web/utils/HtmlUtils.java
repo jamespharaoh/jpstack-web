@@ -1,6 +1,5 @@
 package wbs.web.utils;
 
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.replaceAll;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 
@@ -281,16 +280,6 @@ class HtmlUtils {
 
 	}
 
-	public static
-	void htmlWriteAttributesFromMap (
-			@NonNull Map <String, String> map) {
-
-		htmlWriteAttributesFromMap (
-			currentFormatWriter (),
-			map);
-
-	}
-
 	// html link
 
 	public static
@@ -316,20 +305,6 @@ class HtmlUtils {
 
 	public static
 	void htmlLinkWriteInline (
-			@NonNull String href,
-			@NonNull String content,
-			@NonNull Iterable <ToHtmlAttribute> attributes) {
-
-		htmlLinkWriteInline (
-			currentFormatWriter (),
-			href,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlLinkWriteInline (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String href,
 			@NonNull String content,
@@ -337,21 +312,6 @@ class HtmlUtils {
 
 		htmlLinkWriteInline (
 			formatWriter,
-			href,
-			content,
-			Arrays.asList (
-				attributes));
-
-	}
-
-	public static
-	void htmlLinkWriteInline (
-			@NonNull String href,
-			@NonNull String content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlLinkWriteInline (
-			currentFormatWriter (),
 			href,
 			content,
 			Arrays.asList (
@@ -386,20 +346,6 @@ class HtmlUtils {
 
 	public static
 	void htmlLinkWrite (
-			@NonNull String href,
-			@NonNull String content,
-			@NonNull Iterable <ToHtmlAttribute> attributes) {
-
-		htmlLinkWrite (
-			currentFormatWriter (),
-			href,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlLinkWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String href,
 			@NonNull String content,
@@ -420,20 +366,6 @@ class HtmlUtils {
 			content);
 
 		formatWriter.writeNewline ();
-
-	}
-
-	public static
-	void htmlLinkWrite (
-			@NonNull String href,
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlLinkWrite (
-			currentFormatWriter (),
-			href,
-			content,
-			attributes);
 
 	}
 
@@ -464,20 +396,6 @@ class HtmlUtils {
 
 	public static
 	void htmlLinkWriteHtml (
-			@NonNull String href,
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlLinkWriteHtml (
-			currentFormatWriter (),
-			href,
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlLinkWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String href,
 			@NonNull Runnable content,
@@ -502,20 +420,6 @@ class HtmlUtils {
 			"</a>");
 
 		formatWriter.writeNewline ();
-
-	}
-
-	public static
-	void htmlLinkWriteHtml (
-			@NonNull String href,
-			@NonNull Runnable content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlLinkWriteHtml (
-			currentFormatWriter (),
-			href,
-			content,
-			attributes);
 
 	}
 

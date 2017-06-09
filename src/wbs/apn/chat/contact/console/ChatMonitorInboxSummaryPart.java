@@ -9,11 +9,11 @@ import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifNullThenEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.ifPresentThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -66,6 +66,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -79,6 +80,7 @@ import wbs.platform.media.console.MediaConsoleLogic;
 
 import wbs.sms.gazetteer.logic.GazetteerLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
@@ -143,6 +145,9 @@ class ChatMonitorInboxSummaryPart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -376,7 +381,8 @@ class ChatMonitorInboxSummaryPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -387,18 +393,23 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlStyleBlockOpen ();
+			htmlStyleBlockOpen (
+				formatWriter);
 
 			htmlStyleRuleOpen (
+				formatWriter,
 				"span.namedNote form input");
 
 			htmlStyleRuleEntryWrite (
+				formatWriter,
 				"width",
 				"50%");
 
-			htmlStyleRuleClose ();
+			htmlStyleRuleClose (
+				formatWriter);
 
-			htmlStyleBlockClose ();
+			htmlStyleBlockClose (
+				formatWriter);
 
 		}
 
@@ -407,7 +418,8 @@ class ChatMonitorInboxSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -418,64 +430,92 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// general details
 
-			goParty ();
-			goPrefs ();
+			goParty (
+				formatWriter);
+
+			goPrefs (
+				formatWriter);
 
 			goCode (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goName (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goInfo (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goPic (
-				transaction);
+				transaction,
+				formatWriter);
 
-			goLocation ();
-			goDob ();
-			goScheme ();
+			goLocation (
+				formatWriter);
+
+			goDob (
+				formatWriter);
+
+			goScheme (
+				formatWriter);
 
 			// notes
 
-			goSep ();
-			goNotesHeader ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
-			goSep ();
-			goNamedNotes ();
+			goNotesHeader (
+				formatWriter);
 
-			goSep ();
-			goGeneralNotes ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
-			goSep ();
-			goAddNote ();
+			goNamedNotes (
+				formatWriter);
 
-			goSep ();
-			goAlarms ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
-			htmlTableClose ();
+			goGeneralNotes (
+				formatWriter);
 
-			goAdultVerified ();
-			goNoAlarmWarning ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
-			goHistory ();
+			goAddNote (
+				formatWriter);
+
+			htmlTableRowSeparatorWrite (
+				formatWriter);
+
+			goAlarms (
+				formatWriter);
+
+			htmlTableClose (
+				formatWriter);
+
+			goAdultVerified (
+				formatWriter);
+
+			goNoAlarmWarning (
+				formatWriter);
+
+			goHistory (
+				formatWriter);
 
 		}
 
 	}
 
-	void goSep () {
-
-		htmlTableRowSeparatorWrite ();
-
-	}
-
-	void goAdultVerified () {
+	void goAdultVerified (
+			@NonNull FormatWriter formatWriter) {
 
 		if (userChatUser.getAdultVerified ()) {
 
@@ -495,7 +535,8 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	void goNoAlarmWarning () {
+	void goNoAlarmWarning (
+			@NonNull FormatWriter formatWriter) {
 
 		if (alarm == null) {
 
@@ -508,11 +549,14 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	void goParty () {
+	void goParty (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Party");
 
 		formatWriter.writeLineFormat (
@@ -521,18 +565,23 @@ class ChatMonitorInboxSummaryPart
 		formatWriter.writeLineFormat (
 			"<td width=\"50%%\"><strong>user</strong></td>");
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goPrefs () {
+	void goPrefs (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Prefs");
 
 		htmlTableCellWriteFormat (
+			formatWriter,
 			"%s %s (%s)",
 
 			ifNotNullThenElseEmDash (
@@ -552,6 +601,7 @@ class ChatMonitorInboxSummaryPart
 		);
 
 		htmlTableCellWriteFormat (
+			formatWriter,
 			"%s %s (%s)",
 
 			ifNotNullThenElseEmDash (
@@ -570,12 +620,14 @@ class ChatMonitorInboxSummaryPart
 
 		);
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
 	void goCode (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -586,29 +638,35 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"User number");
 
 			objectManager.writeTdForObjectMiniLink (
 				transaction,
+				formatWriter,
 				monitorChatUser,
 				chat);
 
 			objectManager.writeTdForObjectMiniLink (
 				transaction,
+				formatWriter,
 				userChatUser,
 				chat);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goName (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -619,27 +677,33 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Name");
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					monitorChatUser.getName ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					userChatUser.getName ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goInfo (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -650,22 +714,27 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Info");
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNotNullThenElseEmDash (
 					monitorChatUser.getInfoText (),
 					() -> monitorChatUser.getInfoText ().getText ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNotNullThenElseEmDash (
 					userChatUser.getInfoText (),
 					() -> userChatUser.getInfoText ().getText ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
@@ -673,7 +742,8 @@ class ChatMonitorInboxSummaryPart
 
 	private
 	void goPic (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -684,12 +754,15 @@ class ChatMonitorInboxSummaryPart
 
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Pic");
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				ifNotEmptyThenElse (
 					monitorChatUser.getChatUserImageList (),
 
@@ -706,6 +779,7 @@ class ChatMonitorInboxSummaryPart
 			));
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				ifNotEmptyThenElse (
 					userChatUser.getChatUserImageList (),
 
@@ -720,20 +794,25 @@ class ChatMonitorInboxSummaryPart
 
 			));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
 	}
 
-	void goLocation () {
+	void goLocation (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Location");
 
 		htmlTableCellWriteHtml (
+			formatWriter,
 			ifNotNullThenElseEmDash (
 				monitorChatUser.getLocationLongLat (),
 				() ->
@@ -743,6 +822,7 @@ class ChatMonitorInboxSummaryPart
 					).getName ()));
 
 		htmlTableCellWriteHtml (
+			formatWriter,
 			ifNotNullThenElseEmDash (
 				userChatUser.getLocationLongLat (),
 				() ->
@@ -751,18 +831,23 @@ class ChatMonitorInboxSummaryPart
 						userChatUser.getLocationLongLat ()
 					).getName ()));
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goDob () {
+	void goDob (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Date of birth");
 
 		htmlTableCellWrite (
+			formatWriter,
 			ifNotNullThenElseEmDash (
 				monitorChatUser.getDob (),
 				() -> stringFormat (
@@ -775,6 +860,7 @@ class ChatMonitorInboxSummaryPart
 							now)))));
 
 		htmlTableCellWrite (
+			formatWriter,
 			ifNotNullThenElseEmDash (
 				userChatUser.getDob (),
 				() -> stringFormat (
@@ -786,15 +872,19 @@ class ChatMonitorInboxSummaryPart
 							userChatUser,
 							now)))));
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goScheme () {
+	void goScheme (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Scheme");
 
 		formatWriter.writeLineFormat (
@@ -803,13 +893,16 @@ class ChatMonitorInboxSummaryPart
 			userChatUser.getChatScheme ().getCode (),
 			userChatUser.getChatScheme ().getRbNumber ());
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goNotesHeader () {
+	void goNotesHeader (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		formatWriter.writeLineFormat (
 			"<th",
@@ -833,11 +926,13 @@ class ChatMonitorInboxSummaryPart
 
 		);
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goNamedNotes () {
+	void goNamedNotes (
+			@NonNull FormatWriter formatWriter) {
 
 		for (
 			ChatNoteNameRec chatNoteName
@@ -851,9 +946,11 @@ class ChatMonitorInboxSummaryPart
 				">");
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				chatNoteName.getName ());
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				goNamedNote (
 					chatNoteName,
 					userNamedNotes.get (
@@ -861,12 +958,14 @@ class ChatMonitorInboxSummaryPart
 					"user"));
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				goNamedNote (
 					chatNoteName,
 					monitorNamedNotes.get (chatNoteName.getId ()),
 					"monitor"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
@@ -922,7 +1021,8 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	void goGeneralNotes () {
+	void goGeneralNotes (
+			@NonNull FormatWriter formatWriter) {
 
 		for (
 			ChatContactNoteRec note
@@ -959,12 +1059,15 @@ class ChatMonitorInboxSummaryPart
 				">");
 
 			htmlTableHeaderCellWrite (
-				"Other");;
+				formatWriter,
+				"Other");
 
 			htmlTableCellWrite (
+				formatWriter,
 				note.getNotes ());
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<form",
@@ -1012,20 +1115,25 @@ class ChatMonitorInboxSummaryPart
 			formatWriter.writeFormat (
 				"</form>");
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
 	}
 
-	void goAddNote () {
+	void goAddNote (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Add");
 
 		htmlTableCellOpen (
+			formatWriter,
 			htmlColumnSpanAttribute (2l));
 
 		formatWriter.writeLineFormat (
@@ -1056,15 +1164,19 @@ class ChatMonitorInboxSummaryPart
 		formatWriter.writeLineFormat (
 			"</form>");
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goAlarms () {
+	void goAlarms (
+			@NonNull FormatWriter formatWriter) {
 
-		htmlTableRowOpen ();
+		htmlTableRowOpen (
+			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			"Alarm time");
 
 		formatWriter.writeLineFormat (
@@ -1111,6 +1223,7 @@ class ChatMonitorInboxSummaryPart
 			">");
 
 		htmlSelectYesNo (
+			formatWriter,
 			"alarmSticky",
 			ifPresentThenElse (
 				requestContext.parameter (
@@ -1167,20 +1280,26 @@ class ChatMonitorInboxSummaryPart
 		formatWriter.writeLineFormat (
 			"</form>");
 
-		htmlTableCellClose ();
+		htmlTableCellClose (
+			formatWriter);
 
-		htmlTableRowClose ();
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
-	void goHistory () {
+	void goHistory (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingTwoWrite (
+			formatWriter,
 			"History");
 
-		htmlTableOpenList ();
+		htmlTableOpenList (
+			formatWriter);
 
 		htmlTableHeaderRowWrite (
+			formatWriter,
 			"Timestamp",
 			"Message",
 			"User");
@@ -1216,7 +1335,8 @@ class ChatMonitorInboxSummaryPart
 				previousDate =
 					newDate;
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				formatWriter.writeLineFormat (
 					"<tr style=\"font-weight: bold\">");
@@ -1231,7 +1351,8 @@ class ChatMonitorInboxSummaryPart
 
 				formatWriter.decreaseIndent ();
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
@@ -1247,17 +1368,20 @@ class ChatMonitorInboxSummaryPart
 			formatWriter.increaseIndent ();
 
 			htmlTableCellWrite (
+				formatWriter,
 				timeFormatter.timeString (
 					chatTimezone,
 					chatMessage.getTimestamp ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNotNullThenElse (
 					chatMessage.getEditedText (),
 					() -> chatMessage.getEditedText ().getText (),
 					() -> chatMessage.getOriginalText ().getText ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifThenElseEmDash (
 					enumEqualSafe (
 						chatMessage.getFromUser ().getType (),
@@ -1266,11 +1390,13 @@ class ChatMonitorInboxSummaryPart
 						chatMessage.getSender ()),
 					() -> chatMessage.getSender ().getUsername ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
-		htmlTableClose ();
+		htmlTableClose (
+			formatWriter);
 
 	}
 

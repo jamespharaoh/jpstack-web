@@ -27,7 +27,7 @@ import wbs.platform.user.model.UserRec;
 
 import wbs.utils.email.EmailLogic;
 import wbs.utils.random.RandomLogic;
-import wbs.utils.string.StringFormatWriter;
+import wbs.utils.string.LazyFormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.imchat.model.ImChatConversationRec;
@@ -146,8 +146,8 @@ class ImChatLogicImplementation
 
 			try (
 
-				StringFormatWriter formatWriter =
-					new StringFormatWriter ();
+				LazyFormatWriter formatWriter =
+					new LazyFormatWriter ();
 
 			) {
 

@@ -7,7 +7,6 @@ import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Provider;
@@ -28,6 +27,8 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFormActionsPart")
@@ -61,22 +62,17 @@ class ConsoleFormActionsPart
 
 	@Override
 	public
-	void setup (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> parameters) {
+	void prepare (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setup");
+					"prepare");
 
 		) {
-
-			super.setup (
-				transaction,
-				parameters);
 
 			pageParts =
 				formActions.stream ()
@@ -131,30 +127,6 @@ class ConsoleFormActionsPart
 
 			pageParts.forEach (
 				pagePart ->
-					pagePart.setup (
-						transaction,
-						parameters));
-
-		}
-
-	}
-
-	@Override
-	public
-	void prepare (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"prepare");
-
-		) {
-
-			pageParts.forEach (
-				pagePart ->
 					pagePart.prepare (
 						transaction));
 
@@ -165,7 +137,8 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -179,7 +152,8 @@ class ConsoleFormActionsPart
 			pageParts.forEach (
 				pagePart ->
 					pagePart.renderHtmlHeadContent (
-						transaction));
+						transaction,
+						formatWriter));
 
 		}
 
@@ -188,7 +162,8 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -207,11 +182,13 @@ class ConsoleFormActionsPart
 				pageParts.forEach (
 					pagePart ->
 						pagePart.renderHtmlBodyContent (
-							transaction));
+							transaction,
+							formatWriter));
 
 			} else {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"No actions can be performed at this time");
 
 			}

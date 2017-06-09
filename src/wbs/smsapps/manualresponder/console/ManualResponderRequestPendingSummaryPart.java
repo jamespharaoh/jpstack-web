@@ -7,11 +7,11 @@ import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
@@ -100,6 +100,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TextualInterval;
 
 import wbs.web.utils.HtmlUtils;
@@ -462,7 +463,8 @@ class ManualResponderRequestPendingSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -483,60 +485,81 @@ class ManualResponderRequestPendingSummaryPart
 			}
 
 			htmlDivOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"manual-responder-request-pending-summary"));
 
 			htmlDivOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"layout-container"));
 
-			htmlTableOpenLayout ();
+			htmlTableOpenLayout (
+				formatWriter);
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				() -> goRequestDetails (
-					transaction),
+					transaction,
+					formatWriter),
 				htmlAttribute (
 					"style",
 					"width: 50%"));
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				() -> {
+
 					goCustomerDetails (
-						transaction);
-					goNotes ();
+						transaction,
+						formatWriter);
+
+					goNotes (
+						formatWriter);
+
 				},
 				htmlAttribute (
 					"style",
 					"width: 50%"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlDivClose ();
+			htmlDivClose (
+				formatWriter);
 
 			goBillHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goOperatorInfo (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goSessionDetails (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goRequestHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlDivClose ();
+			htmlDivClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goRequestDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -547,15 +570,19 @@ class ManualResponderRequestPendingSummaryPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Manual responder",
 				() -> objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					manualResponder));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Description",
 				manualResponder.getDescription ());
 
@@ -567,9 +594,11 @@ class ManualResponderRequestPendingSummaryPart
 			) {
 
 				htmlTableDetailsRowWriteRaw (
+					formatWriter,
 					"Number",
 					() -> objectManager.writeTdForObjectMiniLink (
 						transaction,
+						formatWriter,
 						number));
 
 			}
@@ -580,6 +609,7 @@ class ManualResponderRequestPendingSummaryPart
 			) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Daily limit",
 					currencyLogic.formatText (
 						manualResponder
@@ -590,6 +620,7 @@ class ManualResponderRequestPendingSummaryPart
 							.getDailySpendLimitAmount ()));
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Available to spend",
 					currencyLogic.formatText (
 						manualResponder
@@ -600,18 +631,23 @@ class ManualResponderRequestPendingSummaryPart
 			}
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Network",
 				() -> objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					network));
 
 			htmlTableDetailsRowWriteRaw (
+				formatWriter,
 				"Message",
 				() -> objectManager.writeTdForObjectMiniLink (
 					transaction,
+					formatWriter,
 					message));
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Message text",
 				message.getText ().getText (),
 				htmlClassAttribute (
@@ -628,9 +664,11 @@ class ManualResponderRequestPendingSummaryPart
 				) {
 
 					htmlTableDetailsRowWriteHtml (
+						formatWriter,
 						"Text media",
 						() -> mediaConsoleLogic.writeMediaContent (
 							transaction,
+							formatWriter,
 							media));
 
 				} else if (
@@ -639,8 +677,10 @@ class ManualResponderRequestPendingSummaryPart
 				) {
 
 					htmlTableDetailsRowWriteRaw (
+						formatWriter,
 						"Image media",
 						() -> htmlLinkWriteHtml (
+							formatWriter,
 							mediaConsoleLogic.mediaUrlScaled (
 								transaction,
 								media,
@@ -648,11 +688,13 @@ class ManualResponderRequestPendingSummaryPart
 								600),
 							() -> mediaConsoleLogic.writeMediaThumb100 (
 								transaction,
+								formatWriter,
 								media)));
 
 				} else {
 
 					htmlTableDetailsRowWrite (
+						formatWriter,
 						"Media",
 						"(unsupported media type)");
 
@@ -660,14 +702,16 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goCustomerDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -679,6 +723,7 @@ class ManualResponderRequestPendingSummaryPart
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Customer details");
 
 			if (
@@ -695,15 +740,18 @@ class ManualResponderRequestPendingSummaryPart
 			}
 
 			customerForm.outputDetailsTable (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
-	void goNotes () {
+	void goNotes (
+			@NonNull FormatWriter formatWriter) {
 
 		htmlHeadingThreeWrite (
+			formatWriter,
 			"Notes");
 
 		String notes;
@@ -756,7 +804,8 @@ class ManualResponderRequestPendingSummaryPart
 	}
 
 	void goBillHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -774,11 +823,14 @@ class ManualResponderRequestPendingSummaryPart
 				return;
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Bill history for today");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Route",
 				"All services",
 				"This service");
@@ -788,33 +840,40 @@ class ManualResponderRequestPendingSummaryPart
 					: routeBillInfos
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					routeBillInfo.route ().getCode ());
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					currencyLogic.formatHtml (
 						manualResponder.getCurrency (),
 						routeBillInfo.total ()));
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					currencyLogic.formatHtml (
 						manualResponder.getCurrency (),
 						routeBillInfo.thisService ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goOperatorInfo (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -834,6 +893,7 @@ class ManualResponderRequestPendingSummaryPart
 				return;
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Operator info");
 
 			formatWriter.writeString (
@@ -845,7 +905,8 @@ class ManualResponderRequestPendingSummaryPart
 
 	private
 	void goSessionDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -867,11 +928,14 @@ class ManualResponderRequestPendingSummaryPart
 			}
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Customer session");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableDetailsRowWrite (
+				formatWriter,
 				"Start time",
 				userConsoleLogic.timestampWithTimezoneString (
 					transaction,
@@ -883,6 +947,7 @@ class ManualResponderRequestPendingSummaryPart
 			) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"End time",
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
@@ -893,6 +958,7 @@ class ManualResponderRequestPendingSummaryPart
 			if (smsCustomerSession.getWelcomeMessage () != null) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Welcome message",
 					stringFormat (
 						"%s (sent %s)",
@@ -911,6 +977,7 @@ class ManualResponderRequestPendingSummaryPart
 			if (smsCustomerSession.getWarningMessage () != null) {
 
 				htmlTableDetailsRowWrite (
+					formatWriter,
 					"Warning message",
 					stringFormat (
 						"%s (sent %s)",
@@ -926,7 +993,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -934,7 +1002,8 @@ class ManualResponderRequestPendingSummaryPart
 
 	private
 	void goRequestHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -952,6 +1021,7 @@ class ManualResponderRequestPendingSummaryPart
 			// title
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Request history");
 
 			// warning if we have omitted old requests
@@ -969,9 +1039,11 @@ class ManualResponderRequestPendingSummaryPart
 
 			// begin table
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Timestamp",
 				null,
 				"Message",
@@ -985,7 +1057,8 @@ class ManualResponderRequestPendingSummaryPart
 					: oldRequests
 			) {
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				// iterate replies, which are shown before their requests
 
@@ -997,50 +1070,61 @@ class ManualResponderRequestPendingSummaryPart
 					// print reply
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlClassAttribute (
 							"message-out"));
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						"&nbsp;");
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						userConsoleLogic.timestampWithTimezoneString (
 							transaction,
 							oldReply.getTimestamp ()));
 
 					htmlTableCellWriteHtml (
+						formatWriter,
 						oldReply.getText ().getText ());
 
 					htmlTableCellWrite (
+						formatWriter,
 						"");
 
 					htmlTableCellWrite (
+						formatWriter,
 						ifNotNullThenElseEmDash (
 							oldReply.getUser (),
 							() -> oldReply.getUser ().getUsername ()));
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
 				}
 
 				// print request
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"message-in"));
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.timestampWithTimezoneString (
 						transaction,
 						oldRequest.getTimestamp ()),
 					htmlColumnSpanAttribute (2l));
 
 				htmlTableCellWrite (
+					formatWriter,
 					oldRequest.getMessage ().getText ().getText ());
 
 				// print request medias
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					() -> oldRequest.getMessage ().getMedias ().forEach (
 						media -> {
 
@@ -1051,6 +1135,7 @@ class ManualResponderRequestPendingSummaryPart
 
 						mediaConsoleLogic.writeMediaThumb32 (
 							transaction,
+							formatWriter,
 							media);
 
 					}
@@ -1060,15 +1145,18 @@ class ManualResponderRequestPendingSummaryPart
 				// leave request user blank
 
 				htmlTableCellWrite (
+					formatWriter,
 					"");
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// close table
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

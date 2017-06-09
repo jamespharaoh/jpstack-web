@@ -10,7 +10,7 @@
 	<layer name="api">
 		<component class="api.DialogueApiServletModule"/>
 		<component class="api.DialogueMmsApiServletModule"/>
-		<component class="api.DialogueResponder"/>
+		<component class="api.DialogueResponderFactory"/>
 	</layer>
 
 	<layer name="daemon">

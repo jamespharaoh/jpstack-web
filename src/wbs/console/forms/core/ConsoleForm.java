@@ -35,8 +35,6 @@ interface ConsoleForm <Container> {
 	FormFieldSet <Container> rowFields ();
 	FormFieldSet <Container> allFields ();
 
-	FormatWriter formatWriter ();
-
 	String formName ();
 
 	FormType formType ();
@@ -113,9 +111,6 @@ interface ConsoleForm <Container> {
 	ConsoleForm <Container> submission (
 			FormFieldSubmission submission);
 
-	ConsoleForm <Container> formatWriter (
-			FormatWriter formatWriter);
-
 	ConsoleForm <Container> updateResultSet (
 			FormUpdateResultSet updateResultSet);
 
@@ -180,59 +175,72 @@ interface ConsoleForm <Container> {
 	}
 
 	void outputTableHeadings (
-			Transaction parentTransaction);
+			Transaction parentTransaction,
+			FormatWriter formatWriter);
 
 	void outputCsvHeadings (
-			Transaction parentTransaction);
+			Transaction parentTransaction,
+			FormatWriter formatWriter);
 
 	void outputFormAlwaysHidden (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	default
 	void outputFormAlwaysHidden (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		outputFormAlwaysHidden (
 			parentTransaction,
+			formatWriter,
 			value ());
 
 	}
 
 	void outputFormTemporarilyHidden (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	default
 	void outputFormTemporarilyHidden (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		outputFormTemporarilyHidden (
 			parentTransaction,
+			formatWriter,
 			value ());
 
 	}
 
 	void outputFormRows (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	default
 	void outputFormRows (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		outputFormRows (
 			parentTransaction,
+			formatWriter,
 			value ());
 
 	}
 
 	void outputFormReset (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	void outputFormTable (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object,
 			String method,
 			String actionUrl,
@@ -241,12 +249,14 @@ interface ConsoleForm <Container> {
 	default
 	void outputFormTable (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull String method,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel) {
 
 		outputFormTable (
 			parentTransaction,
+			formatWriter,
 			value (),
 			method,
 			actionUrl,
@@ -256,38 +266,46 @@ interface ConsoleForm <Container> {
 
 	void outputDetailsTable (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	default
 	void outputDetailsTable (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		outputDetailsTable (
 			parentTransaction,
+			formatWriter,
 			value ());
 
 	}
 
 	void outputListTable (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Boolean links);
 
 	void outputCsvRow (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	void outputTableCellsList (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object,
 			Boolean links);
 
 	default
 	void outputTableCellsList (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Boolean links) {
 
 		outputTableCellsList (
 			parentTransaction,
+			formatWriter,
 			value (),
 			links);
 
@@ -295,26 +313,31 @@ interface ConsoleForm <Container> {
 
 	void outputTableRowsList (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object,
 			Boolean links,
 			Long columnSpan);
 
 	void outputTableRows (
 			Transaction parentTransaction,
+			FormatWriter formatWriter,
 			Container object);
 
 	default
 	void outputTableRows (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		outputTableRows (
 			parentTransaction,
+			formatWriter,
 			value ());
 
 	}
 
 	void outputFormDebug (
-			Transaction parentTransaction);
+			Transaction parentTransaction,
+			FormatWriter frmatWriter);
 
 	Map <String, List <String>> exceptionDetails ();
 

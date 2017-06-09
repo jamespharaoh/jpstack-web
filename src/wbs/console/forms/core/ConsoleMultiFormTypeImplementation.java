@@ -148,9 +148,6 @@ class ConsoleMultiFormTypeImplementation <Container>
 							.updateResultSet (
 								updateResults)
 
-							.formatWriter (
-								requestContext.formatWriter ())
-
 						);
 
 					})

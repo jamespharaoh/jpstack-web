@@ -341,7 +341,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	public
 	void renderHtmlTableCellProperties (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
@@ -358,6 +358,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					propertiesAlign ().name ()),
@@ -366,13 +367,14 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 
@@ -382,7 +384,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	public
 	void renderHtmlTableCellList (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
@@ -399,6 +401,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			htmlTableCellOpen (
+				formatWriter,
 				htmlStyleRuleEntry (
 					"text-align",
 					listAlign ().name ()),
@@ -411,13 +414,14 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 			renderHtmlSimple (
 				transaction,
-				htmlWriter,
+				formatWriter,
 				container,
 				hints,
 				interfaceValue,
 				link);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
 		}
 

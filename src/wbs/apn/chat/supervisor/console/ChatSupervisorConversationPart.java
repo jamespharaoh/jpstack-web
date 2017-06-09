@@ -5,8 +5,8 @@ import static wbs.utils.etc.LogicUtils.ifNotEmptyThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifNullThenEmDash;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.spacify;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
@@ -15,8 +15,8 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowHtml;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWriteHtml;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
@@ -34,6 +34,7 @@ import org.joda.time.LocalDate;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -44,6 +45,7 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.console.MediaConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
@@ -82,6 +84,9 @@ class ChatSupervisorConversationPart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -193,7 +198,8 @@ class ChatSupervisorConversationPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -205,10 +211,12 @@ class ChatSupervisorConversationPart
 		) {
 
 			renderDetails (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderHistory (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -216,7 +224,8 @@ class ChatSupervisorConversationPart
 
 	private
 	void renderDetails (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -227,76 +236,96 @@ class ChatSupervisorConversationPart
 
 		) {
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			// party
 
-			htmlTableHeaderRowHtml (
+			htmlTableHeaderRowWriteHtml (
+				formatWriter,
 				"Party",
 				"<strong>monitor</strong>",
 				"<strong>user</strong>");
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"User number");
 
 			objectManager.writeTdForObjectMiniLink (
 				transaction,
+				formatWriter,
 				monitorChatUser,
 				chat);
 
 			objectManager.writeTdForObjectMiniLink (
 				transaction,
+				formatWriter,
 				userChatUser,
 				chat);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// name
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Name");
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					monitorChatUser.getName ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					userChatUser.getName ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// info
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Info");
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNotNullThenElseEmDash (
 					monitorChatUser.getInfoText (),
 					() -> monitorChatUser.getInfoText ().getText ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNotNullThenElseEmDash (
 					userChatUser.getInfoText (),
 					() -> userChatUser.getInfoText ().getText ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// pic
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Pic");
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				ifNotEmptyThenElse (
 					monitorChatUser.getChatUserImageList (),
 
@@ -312,6 +341,7 @@ class ChatSupervisorConversationPart
 			));
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				ifNotEmptyThenElse (
 					userChatUser.getChatUserImageList (),
 
@@ -325,28 +355,35 @@ class ChatSupervisorConversationPart
 
 			));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// location
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Location");
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					monitorChatUser.getLocationPlace ()));
 
 			htmlTableCellWrite (
+				formatWriter,
 				ifNullThenEmDash (
 					userChatUser.getLocationPlace ()));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// close table
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -354,7 +391,8 @@ class ChatSupervisorConversationPart
 
 	private
 	void renderHistory (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -366,15 +404,18 @@ class ChatSupervisorConversationPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"History");
 
 			// open table
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			// header row
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Time",
 				"Message",
 				"Monitor");
@@ -410,7 +451,8 @@ class ChatSupervisorConversationPart
 
 				) {
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 					formatWriter.writeLineFormat (
 						"<tr style=\"font-weight: bold\">");
@@ -423,7 +465,8 @@ class ChatSupervisorConversationPart
 							chatTimezone,
 							chatMessage.getTimestamp ()));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					previousDate =
 						nextDate;
@@ -439,26 +482,31 @@ class ChatSupervisorConversationPart
 				formatWriter.increaseIndent ();
 
 				htmlTableCellWrite (
+					formatWriter,
 					timeFormatter.timeString (
 						chatTimezone,
 						chatMessage.getTimestamp ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatMessage.getEditedText (),
 						() -> spacify (
 							chatMessage.getEditedText ().getText ())));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifNotNullThenElseEmDash (
 						chatMessage.getSender (),
 						() -> chatMessage.getSender ().getUsername ()));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

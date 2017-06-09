@@ -3,7 +3,6 @@ package wbs.console.helper.enums;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.uncapitalise;
@@ -94,6 +93,7 @@ class EnumConsoleHelper <E extends Enum <E>> {
 
 	}
 
+	@Deprecated
 	public
 	void writeSelect (
 			@NonNull FormatWriter formatWriter,
@@ -108,19 +108,7 @@ class EnumConsoleHelper <E extends Enum <E>> {
 
 	}
 
-	public
-	void writeSelect (
-			@NonNull String name,
-			@NonNull String value) {
-
-		htmlSelect (
-			currentFormatWriter (),
-			name,
-			optionsMap,
-			value);
-
-	}
-
+	@Deprecated
 	public
 	void writeSelectOptional (
 			@NonNull FormatWriter formatWriter,
@@ -130,20 +118,6 @@ class EnumConsoleHelper <E extends Enum <E>> {
 
 		htmlSelect (
 			formatWriter,
-			name,
-			nullOptionsMap,
-			value);
-
-	}
-
-	public
-	void writeSelectOptional (
-			@NonNull String name,
-			@NonNull String value,
-			@NonNull String noneName) {
-
-		htmlSelect (
-			currentFormatWriter (),
 			name,
 			nullOptionsMap,
 			value);

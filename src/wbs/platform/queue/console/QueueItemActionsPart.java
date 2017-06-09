@@ -13,6 +13,7 @@ import lombok.NonNull;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -25,6 +26,8 @@ import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("queueItemActionsPart")
 public
@@ -50,6 +53,9 @@ class QueueItemActionsPart
 
 	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -92,7 +98,8 @@ class QueueItemActionsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -106,6 +113,7 @@ class QueueItemActionsPart
 			if (! canSupervise) {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"You do not have permission to perform actions on this queue ",
 					"item.");
 
@@ -114,6 +122,7 @@ class QueueItemActionsPart
 			}
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/queueItem.actions"));
 
@@ -131,10 +140,12 @@ class QueueItemActionsPart
 				) {
 
 					htmlParagraphWriteFormat (
-						"This queue item is claimed by you. You may return it to ",
-						"the queue.");
+						formatWriter,
+						"This queue item is claimed by you. You may return it ",
+						"to the queue.");
 
-					htmlParagraphOpen ();
+					htmlParagraphOpen (
+						formatWriter);
 
 					formatWriter.writeLineFormat (
 						"<input",
@@ -143,11 +154,13 @@ class QueueItemActionsPart
 						" value=\"unclaim\"",
 						">");
 
-					htmlParagraphClose ();
+					htmlParagraphClose (
+						formatWriter);
 
 				} else {
 
 					htmlParagraphWriteFormat (
+						formatWriter,
 						"This queue item is claimed by \"%h\". ",
 						objectManager.objectPathMini (
 							transaction,
@@ -155,7 +168,8 @@ class QueueItemActionsPart
 						"You may return it to the queue or reclaim it ",
 						"yourself.");
 
-					htmlParagraphOpen ();
+					htmlParagraphOpen (
+						formatWriter);
 
 					formatWriter.writeFormat (
 						"<input",
@@ -171,19 +185,22 @@ class QueueItemActionsPart
 						" value=\"reclaim\"",
 						">");
 
-					htmlParagraphClose ();
+					htmlParagraphClose (
+						formatWriter);
 
 				}
 
 			} else {
 
 				htmlParagraphWriteFormat (
+					formatWriter,
 					"There are no actions that you can perform on this queue ",
 					"item at this time.");
 
 			}
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

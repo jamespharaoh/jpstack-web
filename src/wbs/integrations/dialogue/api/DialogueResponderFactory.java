@@ -1,37 +1,43 @@
 package wbs.integrations.dialogue.api;
 
+import static wbs.utils.string.StringUtils.joinWithNewline;
+
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.utils.string.FormatWriter;
+import wbs.platform.text.web.TextResponder;
 
-import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("dialogueResponder")
 public
-class DialogueResponder
-	implements Responder {
+class DialogueResponderFactory
+	implements ComponentFactory <Responder> {
 
 	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	@SingletonDependency
-	RequestContext requestContext;
+	// uninitialized dependencies
+
+	@UninitializedDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// implementation
 
 	@Override
 	public
-	void execute (
+	Responder makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -39,21 +45,20 @@ class DialogueResponder
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"execute");
-
-			FormatWriter formatWriter =
-				requestContext.formatWriter ();
+					"makeComponent");
 
 		) {
 
-			formatWriter.writeLineFormat (
-				"<HTML>");
+			return textResponderProvider.get ()
 
-			formatWriter.writeLineFormat (
-				"<!-- X-E3-Submission-Report: \"00\" -->");
+				.text (
+					joinWithNewline (
+						"<HTML>",
+						"<!-- X-E3-Submission-Report: \"00\" -->",
+						"</HTML>",
+						""))
 
-			formatWriter.writeLineFormat (
-				"</HTML>");
+			;
 
 		}
 
