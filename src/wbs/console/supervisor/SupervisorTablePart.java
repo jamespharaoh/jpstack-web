@@ -41,7 +41,7 @@ class SupervisorTablePart
 	// properties
 
 	@Getter @Setter
-	SupervisorTablePartBuilder supervisorTablePartBuilder;
+	List <StatsPagePartFactory> pagePartFactories;
 
 	@Getter @Setter
 	StatsPeriod statsPeriod;
@@ -75,7 +75,7 @@ class SupervisorTablePart
 
 			for (
 				StatsPagePartFactory pagePartFactory
-					: supervisorTablePartBuilder.pagePartFactories ()
+					: pagePartFactories
 			) {
 
 				PagePart pagePart =

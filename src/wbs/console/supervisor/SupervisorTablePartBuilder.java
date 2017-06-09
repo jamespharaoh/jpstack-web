@@ -52,7 +52,7 @@ class SupervisorTablePartBuilder
 	@BuilderTarget
 	SupervisorConfigBuilder supervisorConfigBuilder;
 
-	// state
+	// properties
 
 	@Getter @Setter
 	List <StatsPagePartFactory> pagePartFactories =
@@ -76,9 +76,19 @@ class SupervisorTablePartBuilder
 
 		) {
 
+			builder.descend (
+				taskLogger,
+				spec,
+				spec.builders (),
+				this,
+				MissingBuilderBehaviour.ignore);
+
 			supervisorConfigBuilder.pagePartFactories ().add (
 				(transaction, statsPeriod, statsData) ->
 					supervisorTablePartProvider.get ()
+
+				.pagePartFactories (
+					pagePartFactories)
 
 				.statsPeriod (
 					statsPeriod)
@@ -87,13 +97,6 @@ class SupervisorTablePartBuilder
 					statsData)
 
 			);
-
-			builder.descend (
-				taskLogger,
-				spec,
-				spec.builders (),
-				this,
-				MissingBuilderBehaviour.ignore);
 
 		}
 
