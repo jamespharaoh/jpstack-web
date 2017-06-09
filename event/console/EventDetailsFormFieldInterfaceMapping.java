@@ -56,6 +56,7 @@ class EventDetailsFormFieldInterfaceMapping
 
 			return successResultPresent (
 				formatWriterConsumerToString (
+					"  ",
 					formatWriter ->
 						eventConsoleLogic.writeEventHtml (
 							transaction,
