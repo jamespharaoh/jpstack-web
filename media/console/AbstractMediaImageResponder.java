@@ -3,17 +3,17 @@ package wbs.platform.media.console;
 import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
+import java.io.OutputStream;
+
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -21,9 +21,11 @@ import wbs.platform.media.logic.RawMediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 
+import wbs.web.responder.BufferedResponder;
+
 public abstract
 class AbstractMediaImageResponder
-	extends ConsoleResponder {
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -90,13 +92,13 @@ class AbstractMediaImageResponder
 
 	protected
 	void transform (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"transform");
 
 		) {
@@ -133,9 +135,9 @@ class AbstractMediaImageResponder
 					rawMediaLogic.writeImage (
 						rawMediaLogic.rotateImage180 (
 							rawMediaLogic.readImageRequired (
-								taskLogger,
+								transaction,
 								getData (
-									taskLogger,
+									transaction,
 									media),
 								getMimeType (
 									media))),
@@ -152,9 +154,9 @@ class AbstractMediaImageResponder
 					rawMediaLogic.writeImage (
 						rawMediaLogic.rotateImage270 (
 							rawMediaLogic.readImageRequired (
-								taskLogger,
+								transaction,
 								getData (
-									taskLogger,
+									transaction,
 									media),
 								getMimeType (
 									media))),
@@ -165,7 +167,7 @@ class AbstractMediaImageResponder
 
 				data =
 					getData (
-						taskLogger,
+						transaction,
 						media);
 
 			}
@@ -176,7 +178,7 @@ class AbstractMediaImageResponder
 
 	@Override
 	protected
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -184,18 +186,13 @@ class AbstractMediaImageResponder
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setHtmlHeaders");
+					"headers");
 
 		) {
 
 			requestContext.contentType (
 				getMimeType (
 					media));
-
-			requestContext.setHeader (
-				"Content-Length",
-				Integer.toString (
-					data.length));
 
 		}
 
@@ -204,7 +201,8 @@ class AbstractMediaImageResponder
 	@Override
 	protected
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
 
 		try (
 

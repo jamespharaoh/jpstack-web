@@ -47,6 +47,8 @@ import wbs.platform.user.console.UserPrivConsoleHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("objectPrivsPart")
 public
@@ -242,7 +244,8 @@ class ObjectPrivsPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -253,9 +256,11 @@ class ObjectPrivsPart <
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Type",
 				"Object",
 				"Priv",
@@ -268,23 +273,29 @@ class ObjectPrivsPart <
 					: privDatas
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					privData.objectType.getCode ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPathMini (
 						transaction,
 						privData.object ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					privData.priv ().getCode ());
 
 				htmlTableCellWrite (
+					formatWriter,
 					privData.priv ().getPrivType ().getDescription ());
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					() -> privData.users ().forEach (
 						user -> formatWriter.writeLineFormat (
 							"%h.%h<br>",
@@ -292,17 +303,20 @@ class ObjectPrivsPart <
 							user.getUsername ())));
 
 				htmlTableCellWrite (
+					formatWriter,
 					() -> privData.groups ().forEach (
 						group -> formatWriter.writeLineFormat (
 							"%h.%h<br>",
 							group.getSlice ().getCode (),
 							group.getCode ())));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

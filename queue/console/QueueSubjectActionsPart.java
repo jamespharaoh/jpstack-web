@@ -7,6 +7,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("queueSubjectActionsPart")
 public
 class QueueSubjectActionsPart
@@ -86,7 +88,8 @@ class QueueSubjectActionsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		/*
 		if (! canSupervise) {

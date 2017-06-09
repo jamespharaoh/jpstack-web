@@ -56,7 +56,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.StringFormatWriter;
+import wbs.utils.string.LazyFormatWriter;
 
 import wbs.web.utils.HtmlUtils;
 
@@ -279,8 +279,8 @@ class EventConsoleLogicImplementation
 
 					try (
 
-						StringFormatWriter objectFormatWriter =
-							new StringFormatWriter ();
+						LazyFormatWriter objectFormatWriter =
+							new LazyFormatWriter ();
 
 					) {
 
@@ -358,6 +358,7 @@ class EventConsoleLogicImplementation
 					object;
 
 				htmlLinkWriteHtml (
+					formatWriter,
 					objectManager.localLink (
 						transaction,
 						media),
@@ -393,7 +394,7 @@ class EventConsoleLogicImplementation
 	public
 	void writeEventsTable (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Iterable <EventRec> events) {
 
 		try (
@@ -405,9 +406,11 @@ class EventConsoleLogicImplementation
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Time",
 				"Details");
 
@@ -431,20 +434,24 @@ class EventConsoleLogicImplementation
 
 				if (newDayNumber != dayNumber) {
 
-					htmlTableRowSeparatorWrite ();
+					htmlTableRowSeparatorWrite (
+						formatWriter);
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlStyleRuleEntry (
 							"font-weight",
 							"bold"));
 
 					htmlTableCellWrite (
+						formatWriter,
 						userConsoleLogic.dateStringLong (
 							transaction,
 							event.getTimestamp ()),
 						htmlColumnSpanAttribute (2l));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 					dayNumber =
 						newDayNumber;
@@ -453,12 +460,13 @@ class EventConsoleLogicImplementation
 
 				writeEventRow (
 					transaction,
-					htmlWriter,
+					formatWriter,
 					event);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -480,17 +488,19 @@ class EventConsoleLogicImplementation
 
 		) {
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableCellWrite (
+				formatWriter,
 				userConsoleLogic.timeString (
 					transaction,
 					event.getTimestamp ()));
 
 			try (
 
-				StringFormatWriter eventFormatWriter =
-					new StringFormatWriter ();
+				LazyFormatWriter eventFormatWriter =
+					new LazyFormatWriter ();
 
 			) {
 
@@ -500,6 +510,7 @@ class EventConsoleLogicImplementation
 					event);
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					eventFormatWriter.toString ());
 
 			} catch (RuntimeException exception) {
@@ -511,11 +522,13 @@ class EventConsoleLogicImplementation
 						event.getId ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					"(error displaying this event)");
 
 			}
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

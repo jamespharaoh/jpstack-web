@@ -75,6 +75,7 @@ class QueueStatsGrouper
 
 			consoleObjectManager.writeTdForObjectMiniLink (
 				transaction,
+				formatWriter,
 				queue);
 
 		}

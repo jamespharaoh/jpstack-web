@@ -29,6 +29,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -40,6 +41,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.scaffold.model.RootObjectHelper;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreatePart")
@@ -60,6 +63,9 @@ class ObjectCreatePart <
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	RootObjectHelper rootHelper;
@@ -330,7 +336,8 @@ debugFormat (
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -342,11 +349,13 @@ debugFormat (
 		) {
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Please enter the details for the new %h",
 				consoleHelper.shortName ());
 
 			form.outputFormTable (
 				transaction,
+				formatWriter,
 				"post",
 				requestContext.resolveLocalUrl (
 					"/" + localFile),

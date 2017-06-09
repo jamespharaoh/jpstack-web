@@ -1,7 +1,6 @@
 package wbs.platform.object.summary;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +20,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPart")
@@ -70,10 +71,6 @@ class ObjectSummaryPart
 					partFactory.buildPagePart (
 						transaction);
 
-				pagePart.setup (
-					transaction,
-					Collections.emptyMap ());
-
 				pagePart.prepare (
 					transaction);
 
@@ -106,7 +103,8 @@ class ObjectSummaryPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -123,7 +121,8 @@ class ObjectSummaryPart
 			) {
 
 				part.renderHtmlHeadContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 
@@ -134,7 +133,8 @@ class ObjectSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -151,7 +151,8 @@ class ObjectSummaryPart
 			) {
 
 				part.renderHtmlBodyContent (
-					transaction);
+					transaction,
+					formatWriter);
 
 			}
 

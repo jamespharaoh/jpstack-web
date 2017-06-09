@@ -41,6 +41,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -59,6 +60,8 @@ import wbs.platform.queue.console.QueueSubjectSorter.SubjectInfo;
 import wbs.platform.queue.logic.MasterQueueCache;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("queueDebugPart")
 public
@@ -83,6 +86,9 @@ class QueueDebugPart
 	@SingletonDependency
 	@NamedDependency
 	ConsoleModule queueConsoleModule;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -181,7 +187,8 @@ class QueueDebugPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -194,14 +201,17 @@ class QueueDebugPart
 
 			form.outputFormTable (
 				transaction,
+				formatWriter,
 				"get",
 				requestContext.resolveLocalUrl (
 					"/queue.debug"),
 				"update");
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Queue",
 				"Own operator activity",
 				"Preferred user",
@@ -228,11 +238,13 @@ class QueueDebugPart
 
 				renderQueueInfo (
 					transaction,
+					formatWriter,
 					queueInfo);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 
@@ -241,6 +253,7 @@ class QueueDebugPart
 	private
 	void renderQueueInfo (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull QueueInfo queueInfo) {
 
 		try (
@@ -265,6 +278,7 @@ class QueueDebugPart
 						queueParent));
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlColumnSpanAttribute (
 					form.value ().allItems ()
 						? 2l * queueInfo.subjectInfos.size ()
@@ -288,6 +302,7 @@ class QueueDebugPart
 					// queue
 
 					htmlTableCellOpen (
+						formatWriter,
 						htmlRowSpanAttribute (
 							2l * subjectInfos.size ()),
 						htmlStyleAttribute (
@@ -348,11 +363,13 @@ class QueueDebugPart
 							? "yes"
 							: "no");
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
 					// operator activity
 
 					htmlTableCellOpen (
+						formatWriter,
 						htmlRowSpanAttribute (
 							2l * subjectInfos.size ()),
 						htmlStyleAttribute (
@@ -417,13 +434,15 @@ class QueueDebugPart
 								: "overflow active"
 							: "no data");
 
-					htmlTableCellClose ();
+					htmlTableCellClose (
+						formatWriter);
 
 				}
 
 				// subject
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlColumnSpanAttribute (3l),
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
@@ -437,6 +456,7 @@ class QueueDebugPart
 					"Subject:");
 
 				htmlLinkWrite (
+					formatWriter,
 					objectManager.localLink (
 						transaction,
 						subjectInfo.subject ()),
@@ -445,15 +465,19 @@ class QueueDebugPart
 						subjectInfo.subject (),
 						queueInfo.queue ()));
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				// preferred user
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
 							"vertical-align",
@@ -493,11 +517,13 @@ class QueueDebugPart
 							subjectInfo.actualPreferredUserDelay ())
 						: "none");
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// overflow
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
 							"vertical-align",
@@ -544,11 +570,13 @@ class QueueDebugPart
 							subjectInfo.overflowDelay ()),
 						() -> "none"));
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
 				// conclusion
 
 				htmlTableCellOpen (
+					formatWriter,
 					htmlStyleAttribute (
 						htmlStyleRuleEntry (
 							"vertical-align",
@@ -648,9 +676,11 @@ class QueueDebugPart
 
 				}
 
-				htmlTableCellClose ();
+				htmlTableCellClose (
+					formatWriter);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				row ++;
 

@@ -30,6 +30,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -44,6 +45,7 @@ import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueListActivePart")
@@ -64,6 +66,9 @@ class QueueListActivePart
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -160,7 +165,8 @@ class QueueListActivePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -171,7 +177,8 @@ class QueueListActivePart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			ConsoleContextType queueContextType =
 				consoleManager.contextType (
@@ -185,6 +192,7 @@ class QueueListActivePart
 					queueContextType);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Object",
 				"Queue",
 				"Available",
@@ -209,6 +217,7 @@ class QueueListActivePart
 				// table row open
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"magic-table-row"),
 					htmlDataAttribute (
@@ -223,6 +232,7 @@ class QueueListActivePart
 				// details
 
 				htmlTableCellWrite (
+					formatWriter,
 					objectManager.objectPath (
 						transaction,
 						objectManager.getParentRequired (
@@ -230,15 +240,18 @@ class QueueListActivePart
 							queue)));
 
 				htmlTableCellWrite (
+					formatWriter,
 					queue.getCode ());
 
 				// available
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.availableItems ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.availableItems ()),
@@ -249,10 +262,12 @@ class QueueListActivePart
 				// claimed
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.claimedItems ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.claimedItems ()),
@@ -263,10 +278,12 @@ class QueueListActivePart
 				// preferred
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.totalUnavailableItems ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.totalUnavailableItems ()),
@@ -277,10 +294,12 @@ class QueueListActivePart
 				// waiting
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.waitingItems ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.waitingItems ()),
@@ -291,10 +310,12 @@ class QueueListActivePart
 				// total
 
 				htmlTableCellWrite (
+					formatWriter,
 					integerToDecimalString (
 						queueInfo.totalItems ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.totalItems ()),
@@ -304,13 +325,15 @@ class QueueListActivePart
 
 				// table row close
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

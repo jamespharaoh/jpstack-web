@@ -14,7 +14,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +35,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("statusResponder")
 public
@@ -114,7 +114,7 @@ class StatusResponder
 
 	@Override
 	protected
-	void setup (
+	void prepare (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -122,12 +122,9 @@ class StatusResponder
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"setup");
+					"prepare");
 
 		) {
-
-			super.setup (
-				transaction);
 
 			for (
 				StatusLine statusLine
@@ -138,9 +135,8 @@ class StatusResponder
 					statusLine.createPagePart (
 						transaction);
 
-				pagePart.setup (
-					transaction,
-					Collections.emptyMap ());
+				pagePart.prepare (
+					transaction);
 
 				pageParts.add (
 					pagePart);
@@ -153,34 +149,9 @@ class StatusResponder
 
 	@Override
 	protected
-	void prepare (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					transaction,
-					"prepare");
-
-		) {
-
-			super.prepare (
-				transaction);
-
-			pageParts.forEach (
-				pagePart ->
-					pagePart.prepare (
-						transaction));
-
-		}
-
-	}
-
-	@Override
-	protected
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -192,12 +163,14 @@ class StatusResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			pageParts.forEach (
 				pagePart ->
 					pagePart.renderHtmlHeadContent (
-						transaction));
+						transaction,
+						formatWriter));
 
 		}
 
@@ -206,7 +179,8 @@ class StatusResponder
 	@Override
 	protected
 	void renderHtmlBody (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -221,7 +195,8 @@ class StatusResponder
 				"<body>");
 
 			renderHtmlBodyContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"</body>");
@@ -233,7 +208,8 @@ class StatusResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -247,6 +223,7 @@ class StatusResponder
 			// table open
 
 			htmlTableOpenList (
+				formatWriter,
 
 				htmlIdAttribute (
 					"statusTable"),
@@ -259,68 +236,84 @@ class StatusResponder
 
 			// heading row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			htmlTableHeaderCellWrite (
+				formatWriter,
 				"Status",
 				htmlIdAttribute (
 					"headerCell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// loading row
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"loadingRow"));
 
 			htmlTableCellWrite (
+				formatWriter,
 				"Loading...",
 				htmlIdAttribute (
 					"loadingCell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// notice row
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"noticeRow"));
 
 			htmlTableCellWrite (
+				formatWriter,
 				"—",
 				htmlIdAttribute (
 					"noticeCell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// time row
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"timeRow"));
 
 			htmlTableCellWrite (
+				formatWriter,
 				"—",
 				htmlIdAttribute (
 					"timeCell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// parts
 
 			pageParts.forEach (
 				pagePart ->
 					pagePart.renderHtmlBodyContent (
-						transaction));
+						transaction,
+						formatWriter));
 
 			// log out row
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				"logoff");
 
 			formatWriter.writeLineFormat (
@@ -329,15 +322,19 @@ class StatusResponder
 				" value=\"log out\"",
 				">");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// table close
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

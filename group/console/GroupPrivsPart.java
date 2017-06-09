@@ -27,6 +27,7 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -42,6 +43,8 @@ import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.RootRec;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("groupPrivsPart")
 public
@@ -64,6 +67,11 @@ class GroupPrivsPart
 
 	@SingletonDependency
 	PrivConsoleHelper privHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
+	// state
 
 	PrivsNode rootNode =
 		new PrivsNode ();
@@ -181,7 +189,8 @@ class GroupPrivsPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -193,7 +202,8 @@ class GroupPrivsPart
 		) {
 
 			renderScriptBlock (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -202,7 +212,8 @@ class GroupPrivsPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -214,6 +225,7 @@ class GroupPrivsPart
 		) {
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/group.privs"),
 				htmlAttributeFormat (
@@ -230,7 +242,8 @@ class GroupPrivsPart
 				" value=\"\"",
 				">");
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -238,12 +251,15 @@ class GroupPrivsPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			htmlScriptBlockWrite (
+				formatWriter,
 				"document.write (buildTree (treeData, treeOpts));");
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -251,9 +267,11 @@ class GroupPrivsPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -361,7 +379,8 @@ class GroupPrivsPart
 
 	private
 	void renderScriptBlock (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -374,7 +393,8 @@ class GroupPrivsPart
 
 			// script block open
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			// new priv data
 
@@ -541,6 +561,7 @@ class GroupPrivsPart
 				"var treeData = [");
 
 			goNode (
+				formatWriter,
 				rootNode);
 
 			formatWriter.writeLineFormatDecreaseIndent (
@@ -548,13 +569,15 @@ class GroupPrivsPart
 
 			// script block close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goNode (
+			@NonNull FormatWriter formatWriter,
 			@NonNull PrivsNode node) {
 
 		for (
@@ -621,6 +644,7 @@ class GroupPrivsPart
 					code);
 
 				goNode (
+					formatWriter,
 					childNode);
 
 				formatWriter.writeLineFormatDecreaseIndent (

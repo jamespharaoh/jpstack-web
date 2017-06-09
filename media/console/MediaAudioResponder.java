@@ -1,14 +1,12 @@
 package wbs.platform.media.console;
 
 import static wbs.utils.etc.IoUtils.writeBytes;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.io.OutputStream;
 
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.ConsoleResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -19,10 +17,12 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.media.model.MediaRec;
 
+import wbs.web.responder.BufferedResponder;
+
 @PrototypeComponent ("mediaAudioResponder")
 public
 class MediaAudioResponder
-	extends ConsoleResponder {
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -35,29 +35,11 @@ class MediaAudioResponder
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	OutputStream out;
+	// state
+
 	byte[] data;
 
-	@Override
-	public
-	void setup (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"setup");
-
-		) {
-
-			out =
-				requestContext.outputStream ();
-
-		}
-
-	}
+	// implementation
 
 	@Override
 	public
@@ -86,7 +68,7 @@ class MediaAudioResponder
 
 	@Override
 	public
-	void setHtmlHeaders (
+	void headers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -101,11 +83,6 @@ class MediaAudioResponder
 			requestContext.contentType (
 				"audio/mpeg");
 
-			requestContext.setHeader (
-				"Content-Length",
-				integerToDecimalString (
-					data.length));
-
 		}
 
 	}
@@ -113,7 +90,8 @@ class MediaAudioResponder
 	@Override
 	public
 	void render (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
 
 		try (
 
@@ -125,7 +103,7 @@ class MediaAudioResponder
 		) {
 
 			writeBytes (
-				out,
+				outputStream,
 				data);
 
 		}

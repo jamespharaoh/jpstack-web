@@ -22,6 +22,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("queueItemsStatusLinePart")
 public
 class QueueItemsStatusLinePart
@@ -52,7 +54,8 @@ class QueueItemsStatusLinePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -64,6 +67,7 @@ class QueueItemsStatusLinePart
 		) {
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"queue-row"),
 				htmlStyleRuleEntry (
@@ -71,11 +75,13 @@ class QueueItemsStatusLinePart
 					"none"));
 
 			htmlTableCellWrite (
+				formatWriter,
 				"—",
 				htmlIdAttribute (
 					"queue-cell"));
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 

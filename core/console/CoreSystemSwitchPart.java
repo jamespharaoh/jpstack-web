@@ -32,6 +32,8 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("coreSystemSwitchPart")
 public
 class CoreSystemSwitchPart
@@ -65,7 +67,8 @@ class CoreSystemSwitchPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -77,22 +80,27 @@ class CoreSystemSwitchPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Switch deployment mode");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Use this control to select which version of the console you ",
 				"are using. This allows you to switch to a newer or older ",
 				"version of the console, in case of problems, and also to ",
 				"test new versions which are not yet ready to be released.");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"The default should be \"current\", and this is what you ",
 				"should select if you are not sure, unless you have been told ",
 				"otherwise.");
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Name",
 				"Description");
@@ -109,11 +117,14 @@ class CoreSystemSwitchPart
 					modeEntry.getValue ();
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlClassAttribute (
 						"core-system-switch-row"));
 
 				htmlTableCellWriteHtml (
+					formatWriter,
 					() -> htmlRadio (
+						formatWriter,
 						"mode",
 						modeName,
 						false),
@@ -121,16 +132,20 @@ class CoreSystemSwitchPart
 						"core-system-switch-mode"));
 
 				htmlTableCellWrite (
+					formatWriter,
 					modeName);
 
 				htmlTableCellWrite (
+					formatWriter,
 					modeDescription);
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

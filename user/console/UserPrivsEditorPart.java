@@ -26,6 +26,7 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -43,6 +44,8 @@ import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("userPrivsEditorPart")
 public
@@ -62,6 +65,9 @@ class UserPrivsEditorPart
 
 	@SingletonDependency
 	PrivConsoleHelper privHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
@@ -318,7 +324,8 @@ class UserPrivsEditorPart
 	@Override
 	public
 	void renderHtmlHeadContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -330,10 +337,12 @@ class UserPrivsEditorPart
 		) {
 
 			super.renderHtmlHeadContent (
-				transaction);
+				transaction,
+				formatWriter);
 
 			renderScriptBlock (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
@@ -341,7 +350,8 @@ class UserPrivsEditorPart
 
 	private
 	void renderScriptBlock (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -354,7 +364,8 @@ class UserPrivsEditorPart
 
 			// script open
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			// new priv data
 
@@ -540,21 +551,25 @@ class UserPrivsEditorPart
 			formatWriter.writeLineFormatIncreaseIndent (
 				"var treeData = [");
 
-			goNode (rootNode);
+			goNode (
+				formatWriter,
+				rootNode);
 
 			formatWriter.writeLineFormatDecreaseIndent (
 				"]");
 
 			// script close
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goNode (
-			PrivsEditorNode node) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull PrivsEditorNode node) {
 
 		for (
 			PrivRec priv
@@ -631,7 +646,9 @@ class UserPrivsEditorPart
 						: "1",
 					code);
 
-				goNode (childNode);
+				goNode (
+					formatWriter,
+					childNode);
 
 				formatWriter.writeLineFormatDecreaseIndent (
 					"]],");
@@ -697,7 +714,8 @@ class UserPrivsEditorPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -711,6 +729,7 @@ class UserPrivsEditorPart
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					"/user.privs.editor"),
 				htmlAttributeFormat (
@@ -731,7 +750,8 @@ class UserPrivsEditorPart
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -739,16 +759,19 @@ class UserPrivsEditorPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// build tree script
 
 			htmlScriptBlockWrite (
+				formatWriter,
 				"document.write (buildTree (treeData, treeOpts));");
 
 			// form controls
 
-			htmlParagraphOpen ();
+			htmlParagraphOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -756,11 +779,13 @@ class UserPrivsEditorPart
 				" value=\"save changes\"",
 				">");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// form close
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 

@@ -59,6 +59,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -72,6 +73,8 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.criteria.CriteriaSpec;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")
@@ -95,6 +98,9 @@ class ObjectListPart <
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -744,7 +750,8 @@ class ObjectListPart <
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -756,20 +763,24 @@ class ObjectListPart <
 		) {
 
 			goBrowser (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goTabs (
-				transaction);
+				transaction,
+				formatWriter);
 
 			goList (
-				transaction);
+				transaction,
+				formatWriter);
 
 		}
 
 	}
 
 	void goBrowser (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -792,9 +803,11 @@ class ObjectListPart <
 					"/" + localName);
 
 			htmlFormOpenGetAction (
+				formatWriter,
 				localUrl);
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
@@ -826,16 +839,19 @@ class ObjectListPart <
 				requestContext.formData (),
 				dateField.date);
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goTabs (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -854,6 +870,7 @@ class ObjectListPart <
 			}
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
@@ -879,14 +896,16 @@ class ObjectListPart <
 
 			}
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void goList (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -897,14 +916,18 @@ class ObjectListPart <
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
-			htmlTableRowOpen ();
+			htmlTableRowOpen (
+				formatWriter);
 
 			form.outputTableHeadings (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 			// render rows
 
@@ -943,6 +966,7 @@ class ObjectListPart <
 
 				form.outputTableCellsList (
 					transaction,
+					formatWriter,
 					object,
 					false);
 

@@ -37,6 +37,8 @@ import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.string.FormatWriter;
+
 @PrototypeComponent ("userPrivsSummaryPart")
 public
 class UserPrivsSummaryPart
@@ -203,7 +205,8 @@ class UserPrivsSummaryPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -214,9 +217,11 @@ class UserPrivsSummaryPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Object",
 				"Priv",
 				"Can",
@@ -228,33 +233,41 @@ class UserPrivsSummaryPart
 					: privStuffs
 			) {
 
-				htmlTableRowOpen ();
+				htmlTableRowOpen (
+					formatWriter);
 
 				htmlTableCellWrite (
+					formatWriter,
 					privStuff.path);
 
 				htmlTableCellWrite (
+					formatWriter,
 					privStuff.privCode);
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						privStuff.userPriv != null
 						&& privStuff.userPriv.getCan ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					booleanToYesNo (
 						privStuff.userPriv != null
 						&& privStuff.userPriv.getCanGrant ()));
 
 				htmlTableCellWrite (
+					formatWriter,
 					joinWithCommaAndSpace (
 						privStuff.groups));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

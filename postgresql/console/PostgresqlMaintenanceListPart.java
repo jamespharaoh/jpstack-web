@@ -29,6 +29,7 @@ import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -42,6 +43,7 @@ import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.etc.NullUtils;
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("postgresqlMaintenanceListPart")
 public
@@ -55,6 +57,9 @@ class PostgresqlMaintenanceListPart
 
 	@SingletonDependency
 	PostgresqlMaintenanceConsoleHelper postgresqlMaintenanceHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -135,7 +140,8 @@ class PostgresqlMaintenanceListPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -146,9 +152,11 @@ class PostgresqlMaintenanceListPart
 
 		) {
 
-			htmlTableOpenList ();
+			htmlTableOpenList (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Seq",
 				"Command",
 				"Last run",
@@ -159,7 +167,8 @@ class PostgresqlMaintenanceListPart
 					: PostgresqlMaintenanceFrequency.values ()
 			) {
 
-				htmlTableRowSeparatorWrite ();
+				htmlTableRowSeparatorWrite (
+					formatWriter);
 
 				Duration totalDuration =
 					maintenancesByFrequency.get (
@@ -183,20 +192,24 @@ class PostgresqlMaintenanceListPart
 						Duration.ZERO);
 
 				htmlTableRowOpen (
+					formatWriter,
 					htmlStyleRuleEntry (
 						"font-weight",
 						"bold"));
 
 				htmlTableCellWrite (
+					formatWriter,
 					frequency.getDescription (),
 					htmlColumnSpanAttribute (3l));
 
 				htmlTableCellWrite (
+					formatWriter,
 					userConsoleLogic.prettyDuration (
 						transaction,
 						totalDuration));
 
-				htmlTableRowClose ();
+				htmlTableRowClose (
+					formatWriter);
 
 				for (
 					PostgresqlMaintenanceRec postgresqlMaintenance
@@ -205,6 +218,7 @@ class PostgresqlMaintenanceListPart
 				) {
 
 					htmlTableRowOpen (
+						formatWriter,
 						htmlClassAttribute (
 							"magic-table-row"),
 						htmlDataAttribute (
@@ -217,13 +231,16 @@ class PostgresqlMaintenanceListPart
 								"/postgresqlMaintenance.summary")));
 
 					htmlTableCellWrite (
+						formatWriter,
 						integerToDecimalString (
 							postgresqlMaintenance.getSequence ()));
 
 					htmlTableCellWrite (
+						formatWriter,
 						postgresqlMaintenance.getCommand ());
 
 					htmlTableCellWrite (
+						formatWriter,
 						ifNotNullThenElseEmDash (
 							postgresqlMaintenance.getLastRun (),
 							() -> userConsoleLogic.timestampWithTimezoneString (
@@ -231,6 +248,7 @@ class PostgresqlMaintenanceListPart
 								postgresqlMaintenance.getLastRun ())));
 
 					htmlTableCellWrite (
+						formatWriter,
 						ifNotNullThenElseEmDash (
 							postgresqlMaintenance.getLastDuration (),
 							() -> userConsoleLogic.prettyDuration (
@@ -238,13 +256,15 @@ class PostgresqlMaintenanceListPart
 								new Duration (
 									postgresqlMaintenance.getLastDuration ()))));
 
-					htmlTableRowClose ();
+					htmlTableRowClose (
+						formatWriter);
 
 				}
 
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 		}
 

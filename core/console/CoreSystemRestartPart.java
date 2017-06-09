@@ -8,6 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatLazy;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -48,7 +49,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.console.ApiDeploymentConsoleHelper;
 import wbs.platform.deployment.console.ConsoleDeploymentConsoleHelper;
@@ -57,6 +57,8 @@ import wbs.platform.deployment.model.ApiDeploymentRec;
 import wbs.platform.deployment.model.ConsoleDeploymentRec;
 import wbs.platform.deployment.model.DaemonDeploymentRec;
 import wbs.platform.deployment.model.DeploymentState;
+
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("coreSystemRestartPart")
 public
@@ -163,7 +165,8 @@ class CoreSystemRestartPart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -175,41 +178,54 @@ class CoreSystemRestartPart
 		) {
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Restart server components");
 
 			htmlParagraphWriteFormat (
+				formatWriter,
 				"Use these controls to restart server compoments. This may be ",
-				"necessary from time to time if they encounter certain types of ",
-				"problem.");
+				"necessary from time to time if they encounter certain types ",
+				"of problem.");
 
-			htmlFormOpenPost ();
+			htmlFormOpenPost (
+				formatWriter);
 
-			htmlTableOpenDetails ();
+			htmlTableOpenDetails (
+				formatWriter);
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"Name",
 				"Description",
 				"Status",
 				"Restart");
 
-			htmlTableRowSeparatorWrite ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
 			renderApiDeployments (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowSeparatorWrite ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
 			renderDaemonDeployments (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableRowSeparatorWrite ();
+			htmlTableRowSeparatorWrite (
+				formatWriter);
 
 			renderConsoleDeployments (
-				transaction);
+				transaction,
+				formatWriter);
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
@@ -217,53 +233,76 @@ class CoreSystemRestartPart
 
 	private
 	void renderApiDeployments (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		if (
-			collectionIsEmpty (
-				apiDeployments)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderApiDeployments");
+
 		) {
 
-			htmlTableRowOpen ();
+			if (
+				collectionIsEmpty (
+					apiDeployments)
+			) {
 
-			htmlTableCellWrite (
-				"(you do not have permission to restart any API deployments)",
-				htmlColumnSpanAttribute (
-					4l));
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					formatWriter,
+					stringFormatLazy (
+						"(you do not have permission to restart any API ",
+						"deployments)"),
+					htmlColumnSpanAttribute (
+						4l));
 
-		}
+				htmlTableRowClose (
+					formatWriter);
 
-		for (
-			ApiDeploymentRec apiDeployment
-				: apiDeployments
-		) {
+			}
 
-			htmlTableRowOpen ();
+			for (
+				ApiDeploymentRec apiDeployment
+					: apiDeployments
+			) {
 
-			htmlTableCellWrite (
-				apiDeployment.getName ());
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableCellWrite (
-				apiDeployment.getDescription ());
+				htmlTableCellWrite (
+					formatWriter,
+					apiDeployment.getName ());
 
-			writeDeploymentState (
-				optionalFromNullable (
-					apiDeployment.getState ()),
-				optionalFromNullable (
-					apiDeployment.getStateTimestamp ()));
+				htmlTableCellWrite (
+					formatWriter,
+					apiDeployment.getDescription ());
 
-			htmlTableCellWriteHtml (
-				() -> formatWriter.writeLineFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"api/%h\"",
-					apiDeployment.getCode (),
-					" value=\"restart\"",
-					">"));
+				writeDeploymentState (
+					formatWriter,
+					optionalFromNullable (
+						apiDeployment.getState ()),
+					optionalFromNullable (
+						apiDeployment.getStateTimestamp ()));
 
-			htmlTableRowClose ();
+				htmlTableCellWriteHtml (
+					formatWriter,
+					() -> formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" name=\"api/%h\"",
+						apiDeployment.getCode (),
+						" value=\"restart\"",
+						">"));
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
 
 		}
 
@@ -271,55 +310,76 @@ class CoreSystemRestartPart
 
 	private
 	void renderConsoleDeployments (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		if (
-			collectionIsEmpty (
-				consoleDeployments)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderConsoleDeployments");
+
 		) {
 
-			htmlTableRowOpen ();
+			if (
+				collectionIsEmpty (
+					consoleDeployments)
+			) {
 
-			htmlTableCellWrite (
-				stringFormat (
-					"(you do not have permission to restart any console ",
-					"deployments)"),
-				htmlColumnSpanAttribute (
-					4l));
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					formatWriter,
+					stringFormatLazy (
+						"(you do not have permission to restart any console ",
+						"deployments)"),
+					htmlColumnSpanAttribute (
+						4l));
 
-		}
+				htmlTableRowClose (
+					formatWriter);
 
-		for (
-			ConsoleDeploymentRec consoleDeployment
-				: consoleDeployments
-		) {
+			}
 
-			htmlTableRowOpen ();
+			for (
+				ConsoleDeploymentRec consoleDeployment
+					: consoleDeployments
+			) {
 
-			htmlTableCellWrite (
-				consoleDeployment.getName ());
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableCellWrite (
-				consoleDeployment.getDescription ());
+				htmlTableCellWrite (
+					formatWriter,
+					consoleDeployment.getName ());
 
-			writeDeploymentState (
-				optionalFromNullable (
-					consoleDeployment.getState ()),
-				optionalFromNullable (
-					consoleDeployment.getStateTimestamp ()));
+				htmlTableCellWrite (
+					formatWriter,
+					consoleDeployment.getDescription ());
 
-			htmlTableCellWriteHtml (
-				() -> formatWriter.writeLineFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"console/%h\"",
-					consoleDeployment.getCode (),
-					" value=\"restart\"",
-					">"));
+				writeDeploymentState (
+					formatWriter,
+					optionalFromNullable (
+						consoleDeployment.getState ()),
+					optionalFromNullable (
+						consoleDeployment.getStateTimestamp ()));
 
-			htmlTableRowClose ();
+				htmlTableCellWriteHtml (
+					formatWriter,
+					() -> formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" name=\"console/%h\"",
+						consoleDeployment.getCode (),
+						" value=\"restart\"",
+						">"));
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
 
 		}
 
@@ -327,55 +387,76 @@ class CoreSystemRestartPart
 
 	private
 	void renderDaemonDeployments (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
-		if (
-			collectionIsEmpty (
-				daemonDeployments)
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderDaemonDeployments");
+
 		) {
 
-			htmlTableRowOpen ();
+			if (
+				collectionIsEmpty (
+					daemonDeployments)
+			) {
 
-			htmlTableCellWrite (
-				stringFormat (
-					"(you do not have permission to restart any daemon ",
-					"deployments)"),
-				htmlColumnSpanAttribute (
-					4l));
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableRowClose ();
+				htmlTableCellWrite (
+					formatWriter,
+					stringFormatLazy (
+						"(you do not have permission to restart any daemon ",
+						"deployments)"),
+					htmlColumnSpanAttribute (
+						4l));
 
-		}
+				htmlTableRowClose (
+					formatWriter);
 
-		for (
-			DaemonDeploymentRec daemonDeployment
-				: daemonDeployments
-		) {
+			}
 
-			htmlTableRowOpen ();
+			for (
+				DaemonDeploymentRec daemonDeployment
+					: daemonDeployments
+			) {
 
-			htmlTableCellWrite (
-				daemonDeployment.getName ());
+				htmlTableRowOpen (
+					formatWriter);
 
-			htmlTableCellWrite (
-				daemonDeployment.getDescription ());
+				htmlTableCellWrite (
+					formatWriter,
+					daemonDeployment.getName ());
 
-			writeDeploymentState (
-				optionalFromNullable (
-					daemonDeployment.getState ()),
-				optionalFromNullable (
-					daemonDeployment.getStateTimestamp ()));
+				htmlTableCellWrite (
+					formatWriter,
+					daemonDeployment.getDescription ());
 
-			htmlTableCellWriteHtml (
-				() -> formatWriter.writeLineFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"daemon/%h\"",
-					daemonDeployment.getCode (),
-					" value=\"restart\"",
-					">"));
+				writeDeploymentState (
+					formatWriter,
+					optionalFromNullable (
+						daemonDeployment.getState ()),
+					optionalFromNullable (
+						daemonDeployment.getStateTimestamp ()));
 
-			htmlTableRowClose ();
+				htmlTableCellWriteHtml (
+					formatWriter,
+					() -> formatWriter.writeLineFormat (
+						"<input",
+						" type=\"submit\"",
+						" name=\"daemon/%h\"",
+						daemonDeployment.getCode (),
+						" value=\"restart\"",
+						">"));
+
+				htmlTableRowClose (
+					formatWriter);
+
+			}
 
 		}
 
@@ -383,6 +464,7 @@ class CoreSystemRestartPart
 
 	private
 	void writeDeploymentState (
+			@NonNull FormatWriter formatWriter,
 			@NonNull Optional <DeploymentState> deploymentState,
 			@NonNull Optional <Instant> deploymentStateTimestamp) {
 
@@ -392,6 +474,7 @@ class CoreSystemRestartPart
 				deploymentStateTimestamp);
 
 		htmlTableCellWrite (
+			formatWriter,
 			deploymentStatePair.getLeft (),
 			htmlClassAttribute (
 				deploymentStatePair.getRight ()));
