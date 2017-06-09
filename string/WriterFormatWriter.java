@@ -42,12 +42,19 @@ class WriterFormatWriter
 	@Override
 	public
 	void writeString (
-			@NonNull CharSequence string) {
+			@NonNull LazyString lazyString) {
 
 		try {
 
-			writer.write (
-				string.toString ());
+			for (
+				String part
+					: lazyString.toParts ()
+			) {
+
+				writer.write (
+					part);
+
+			}
 
 		} catch (IOException exception) {
 

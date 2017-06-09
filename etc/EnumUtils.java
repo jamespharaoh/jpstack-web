@@ -737,10 +737,10 @@ class EnumUtils {
 	}
 
 	public static
-	CharSequence enumNameHyphensLazy (
+	LazyString enumNameHyphensLazy (
 			@NonNull Enum <?> enumValue) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> camelToHyphen (
 				enumValue.name ()));
 

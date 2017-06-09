@@ -70,18 +70,8 @@ class BorrowedFormatWriter
 
 	@Override
 	public
-	void writeCharacter (
-			int character) {
-
-		delegate.writeCharacter (
-			character);
-
-	}
-
-	@Override
-	public
 	void writeString (
-			@NonNull CharSequence string) {
+			@NonNull LazyString string) {
 
 		delegate.writeString (
 			string);

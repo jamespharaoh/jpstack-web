@@ -80,10 +80,10 @@ class NumberUtils {
 	}
 
 	public static
-	CharSequence integerToDecimalStringLazy (
+	LazyString integerToDecimalStringLazy (
 			@NonNull Long integerValue) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> integerToDecimalString (
 				integerValue));
 
@@ -98,10 +98,10 @@ class NumberUtils {
 	}
 
 	public static
-	CharSequence integerToDecimalStringLazy (
+	LazyString integerToDecimalStringLazy (
 			@NonNull Integer integerValue) {
 
-		return new LazyString (
+		return LazyString.singleton (
 			() -> integerToDecimalString (
 				integerValue));
 
