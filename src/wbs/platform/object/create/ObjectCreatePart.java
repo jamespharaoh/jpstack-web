@@ -1,9 +1,7 @@
 package wbs.platform.object.create;
 
 import static wbs.utils.collection.SetUtils.emptySet;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NullUtils.isNullString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -305,11 +303,6 @@ class ObjectCreatePart <
 						"%s.parent",
 						consoleHelper.parentFieldName ()),
 					grandparent);
-
-debugFormat (
-	"parentHelper: %s",
-	isNullString (
-		parentHelper));
 
 				formHintsBuilder.put (
 					stringFormat (

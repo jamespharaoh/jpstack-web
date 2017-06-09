@@ -115,7 +115,10 @@ class ConsoleAsyncConnection
 				) {
 
 					taskLogger.warningFormat (
-						"Async message ignored due to authentication failure");
+						"Async message authentication failure");
+
+					sendAuthFailure (
+						taskLogger);
 
 					return;
 
@@ -177,6 +180,44 @@ class ConsoleAsyncConnection
 				lastMessage,
 				Instant.now ()),
 			freshnessDuration);
+
+	}
+
+	// private implementation
+
+	private
+	void sendAuthFailure (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendAuthFailure");
+
+		) {
+
+			JsonObject message =
+				new JsonObject ();
+
+			message.addProperty (
+				"endpoint",
+				"/authentication-error");
+
+			message.add (
+				"payload",
+				new JsonObject ());
+
+			String messageJson =
+				jsonEncode (
+					message);
+
+			connectionProvider.sendMessage (
+				taskLogger,
+				messageJson);
+
+		}
 
 	}
 

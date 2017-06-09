@@ -270,7 +270,7 @@ class DbPool
 			});
 
 			connectionStuff.realConnection.setTransactionIsolation (
-				Connection.TRANSACTION_SERIALIZABLE);
+				Connection.TRANSACTION_REPEATABLE_READ);
 
 			return connectionStuff.createClientConnection ();
 

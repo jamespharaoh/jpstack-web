@@ -116,6 +116,17 @@ function asyncConnect () {
 		var endpoint = message.endpoint;
 		var payload = message.payload;
 
+		if (endpoint == "/authentication-error") {
+
+			console.error (
+				"Received authentication failure");
+
+			window.top.location = "/";
+
+			return;
+
+		}
+
 		if (! (endpoint in async._subscriptions)) {
 
 			console.error (
@@ -155,6 +166,20 @@ async.send = function asyncSend (endpoint, payload) {
 
 	if (async._state != "connected") {
 		return;
+	}
+
+	var sessionId = Cookies.get ("wbs-session-id");
+	var userId = Cookies.get ("wbs-user-id");
+
+	if (! sessionId || ! userId) {
+
+		console.error (
+			"Authentication cookies not present");
+
+		window.top.location = "/";
+
+		return;
+
 	}
 
 	async._webSocket.send (

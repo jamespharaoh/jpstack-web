@@ -39,6 +39,7 @@ class JsonUtils {
 			@NonNull String source) {
 
 		return formatWriterConsumerToString (
+			"  ",
 			formatWriter ->
 				writeEscapedJsonString (
 					formatWriter,

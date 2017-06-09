@@ -248,6 +248,7 @@ interface ConsoleObjectManagerMethods {
 			@NonNull Boolean mini) {
 
 		return formatWriterConsumerToString (
+			"  ",
 			formatWriter ->
 				writeHtmlForObject (
 					parentTransaction,

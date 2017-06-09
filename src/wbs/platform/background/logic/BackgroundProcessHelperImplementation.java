@@ -268,6 +268,7 @@ class BackgroundProcessHelperImplementation
 			@NonNull TaskLogEvent taskLogEvent) {
 
 		return formatWriterConsumerToString (
+			"  ",
 			formatWriter ->
 				writeTaskLog (
 					formatWriter,

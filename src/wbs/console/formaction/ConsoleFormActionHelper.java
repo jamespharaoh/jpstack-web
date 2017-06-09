@@ -2,7 +2,6 @@ package wbs.console.formaction;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -12,11 +11,9 @@ import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
-import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -65,27 +62,6 @@ interface ConsoleFormActionHelper <FormState, History> {
 	default
 	FormState constructFormState (
 			@NonNull Transaction parentTransaction) {
-
-		debugFormat (
-			"# START #");
-
-		for (
-			Type interfaceClass
-				: classAllGenericInterfaces (
-					getClass ())
-		) {
-
-			debugFormat (
-				"Class %s interface %s",
-				classNameFull (
-					getClass ()),
-				objectToString (
-					interfaceClass));
-
-		}
-
-		debugFormat (
-			"# END #");
 
 		Optional <Class <?>> formStateClassOptional =
 			optionalFromJava (

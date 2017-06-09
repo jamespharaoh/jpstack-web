@@ -3,6 +3,8 @@ package wbs.platform.core.console;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -12,6 +14,7 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -50,6 +53,11 @@ class CoreLogoffAction
 	@SingletonDependency
 	UserSessionLogic userSessionLogic;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <CoreLogoffResponder> coreLogoffResponderProvider;
+
 	// details
 
 	@Override
@@ -57,8 +65,7 @@ class CoreLogoffAction
 	Responder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"coreRedirectResponder");
+		return coreLogoffResponderProvider.get ();
 
 	}
 
