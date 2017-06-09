@@ -40,6 +40,7 @@ import lombok.NonNull;
 import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -50,6 +51,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.currency.logic.CurrencyLogic;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
@@ -70,6 +73,9 @@ class TicketPendingFormResponder
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TicketConsoleHelper ticketHelper;
@@ -117,9 +123,6 @@ class TicketPendingFormResponder
 
 		) {
 
-			super.prepare (
-				transaction);
-
 			ticket =
 				ticketHelper.findFromContextRequired (
 					transaction);
@@ -161,7 +164,8 @@ class TicketPendingFormResponder
 	@Override
 	public
 	void renderHtmlHeadContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -173,11 +177,13 @@ class TicketPendingFormResponder
 		) {
 
 			super.renderHtmlHeadContents (
-				transaction);
+				transaction,
+				formatWriter);
 
 			// script block
 
-			htmlScriptBlockOpen ();
+			htmlScriptBlockOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"top.show_inbox (true);");
@@ -195,13 +201,16 @@ class TicketPendingFormResponder
 			formatWriter.writeLineFormatDecreaseIndent (
 				"}, 1);");
 
-			htmlScriptBlockClose ();
+			htmlScriptBlockClose (
+				formatWriter);
 
 			// style block
 
-			htmlStyleBlockOpen ();
+			htmlStyleBlockOpen (
+				formatWriter);
 
 			htmlStyleRuleWrite (
+				formatWriter,
 				".template-chars.error",
 				htmlStyleRuleEntry (
 					"background-color",
@@ -216,7 +225,8 @@ class TicketPendingFormResponder
 					"padding-right",
 					"10px"));
 
-			htmlStyleBlockClose ();
+			htmlStyleBlockClose (
+				formatWriter);
 
 		}
 
@@ -225,7 +235,8 @@ class TicketPendingFormResponder
 	@Override
 	public
 	void renderHtmlBodyContents (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -242,15 +253,18 @@ class TicketPendingFormResponder
 			// links
 
 			htmlParagraphOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"links"));
 
 			htmlLinkWrite (
+				formatWriter,
 				requestContext.resolveApplicationUrl (
 					"/queues/queue.home"),
 				"Queues");
 
 			htmlLinkWrite (
+				formatWriter,
 				summaryUrl,
 				"Summary",
 				htmlAttribute (
@@ -258,19 +272,23 @@ class TicketPendingFormResponder
 					"main"));
 
 			htmlLinkWrite (
+				formatWriter,
 				"javascript:top.show_inbox (false);",
 				"Close");
 
-			htmlParagraphClose ();
+			htmlParagraphClose (
+				formatWriter);
 
 			// header
 
 			htmlHeadingTwoWrite (
+				formatWriter,
 				"Ticket management");
 
 			// form open
 
 			htmlFormOpenPostAction (
+				formatWriter,
 				requestContext.resolveApplicationUrlFormat (
 					"/ticket.pending",
 					"/%u",
@@ -281,6 +299,7 @@ class TicketPendingFormResponder
 			// table open
 
 			htmlTableOpen (
+				formatWriter,
 				htmlIdAttribute (
 					"templates"),
 				htmlClassAttribute (
@@ -292,6 +311,7 @@ class TicketPendingFormResponder
 			// table header
 
 			htmlTableHeaderRowWrite (
+				formatWriter,
 				"",
 				"Name",
 				"New State",
@@ -308,13 +328,16 @@ class TicketPendingFormResponder
 
 				doTemplate (
 					transaction,
+					formatWriter,
 					template);
 			}
 
-			htmlTableClose ();
+			htmlTableClose (
+				formatWriter);
 
 			addTicketNote (
-				transaction);
+				transaction,
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -324,14 +347,16 @@ class TicketPendingFormResponder
 				" value=\"Send\"",
 				">");
 
-			htmlFormClose ();
+			htmlFormClose (
+				formatWriter);
 
 		}
 
 	}
 
 	void addTicketNote (
-			@NonNull Transaction parentTransaction) {
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
 
 		try (
 
@@ -343,6 +368,7 @@ class TicketPendingFormResponder
 		) {
 
 			htmlHeadingThreeWrite (
+				formatWriter,
 				"Add new note");
 
 			formatWriter.writeLineFormat (
@@ -363,6 +389,7 @@ class TicketPendingFormResponder
 
 	void doTemplate (
 			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter,
 			@NonNull TicketTemplateRec template) {
 
 		try (
@@ -375,6 +402,7 @@ class TicketPendingFormResponder
 		) {
 
 			htmlTableRowOpen (
+				formatWriter,
 				htmlClassAttribute (
 					"template"),
 				htmlDataAttribute (
@@ -432,6 +460,7 @@ class TicketPendingFormResponder
 			*/
 
 			htmlTableCellWriteHtml (
+				formatWriter,
 				htmlEncodeNonBreakingWhitespace (
 					template.getName ()));
 
@@ -443,7 +472,8 @@ class TicketPendingFormResponder
 						.toString ());
 			*/
 
-			htmlTableCellOpen ();
+			htmlTableCellOpen (
+				formatWriter);
 
 			formatWriter.writeLineFormat (
 				"<input",
@@ -465,9 +495,11 @@ class TicketPendingFormResponder
 
 				">");
 
-			htmlTableCellClose ();
+			htmlTableCellClose (
+				formatWriter);
 
-			htmlTableRowClose ();
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
