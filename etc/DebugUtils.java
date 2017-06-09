@@ -9,7 +9,7 @@ public
 class DebugUtils {
 
 	public static
-	void debugFormat (
+	void debugFormat1 (
 			@NonNull String ... arguments) {
 
 		System.err.print (

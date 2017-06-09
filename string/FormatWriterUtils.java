@@ -9,6 +9,7 @@ class FormatWriterUtils {
 
 	public static
 	String formatWriterConsumerToString (
+			@NonNull String indent,
 			@NonNull Consumer <FormatWriter> consumer) {
 
 		try (
@@ -16,7 +17,11 @@ class FormatWriterUtils {
 			LazyFormatWriter formatWriter =
 				new LazyFormatWriter ();
 
+
 		) {
+
+			formatWriter.indentString (
+				"  ");
 
 			consumer.accept (
 				formatWriter);

@@ -1,6 +1,7 @@
 package wbs.utils.string;
 
 import static wbs.utils.collection.CollectionUtils.singletonList;
+import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.List;
@@ -55,7 +56,8 @@ class LazyStringSingleton
 		) {
 
 			value =
-				provider.get ();
+				requiredValue (
+					provider.get ());
 
 			provider =
 				null;
