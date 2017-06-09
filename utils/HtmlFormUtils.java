@@ -1,6 +1,5 @@
 package wbs.web.utils;
 
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 
 import lombok.NonNull;
@@ -34,16 +33,6 @@ class HtmlFormUtils {
 		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlFormOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpen (
-			currentFormatWriter (),
-			attributes);
 
 	}
 
@@ -83,20 +72,6 @@ class HtmlFormUtils {
 	}
 
 	public static
-	void htmlFormOpenMethodAction (
-			@NonNull String method,
-			@NonNull String action,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodAction (
-			currentFormatWriter (),
-			method,
-			action,
-			attributes);
-
-	}
-
-	public static
 	void htmlFormOpenGetAction (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
@@ -111,19 +86,6 @@ class HtmlFormUtils {
 	}
 
 	public static
-	void htmlFormOpenGetAction (
-			@NonNull String action,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodAction (
-			currentFormatWriter (),
-			"get",
-			action,
-			attributes);
-
-	}
-
-	public static
 	void htmlFormOpenPostAction (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
@@ -131,19 +93,6 @@ class HtmlFormUtils {
 
 		htmlFormOpenMethodAction (
 			formatWriter,
-			"post",
-			action,
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenPostAction (
-			@NonNull String action,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodAction (
-			currentFormatWriter (),
 			"post",
 			action,
 			attributes);
@@ -181,35 +130,12 @@ class HtmlFormUtils {
 	}
 
 	public static
-	void htmlFormOpenMethod (
-			@NonNull String method,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethod (
-			currentFormatWriter (),
-			method,
-			attributes);
-
-	}
-
-	public static
 	void htmlFormOpenPost (
 			@NonNull FormatWriter formatWriter,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethod (
 			formatWriter,
-			"post",
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenPost (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethod (
-			currentFormatWriter (),
 			"post",
 			attributes);
 
@@ -256,22 +182,6 @@ class HtmlFormUtils {
 	}
 
 	public static
-	void htmlFormOpenMethodActionEncoding (
-			@NonNull String method,
-			@NonNull String action,
-			@NonNull String encoding,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodActionEncoding (
-			currentFormatWriter (),
-			method,
-			action,
-			encoding,
-			attributes);
-
-	}
-
-	public static
 	void htmlFormOpenPostActionEncoding (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
@@ -280,21 +190,6 @@ class HtmlFormUtils {
 
 		htmlFormOpenMethodActionEncoding (
 			formatWriter,
-			"post",
-			action,
-			encoding,
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenPostActionEncoding (
-			@NonNull String action,
-			@NonNull String encoding,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodActionEncoding (
-			currentFormatWriter (),
 			"post",
 			action,
 			encoding,
@@ -318,19 +213,6 @@ class HtmlFormUtils {
 
 	}
 
-	public static
-	void htmlFormOpenMethodActionMultipart (
-			@NonNull String method,
-			@NonNull String action,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodActionMultipart (
-			currentFormatWriter (),
-			method,
-			action,
-			attributes);
-
-	}
 
 	public static
 	void htmlFormOpenPostActionMultipart (
@@ -340,19 +222,6 @@ class HtmlFormUtils {
 
 		htmlFormOpenMethodActionMultipart (
 			formatWriter,
-			"post",
-			action,
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenPostActionMultipart (
-			@NonNull String action,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodActionMultipart (
-			currentFormatWriter (),
 			"post",
 			action,
 			attributes);
@@ -370,16 +239,6 @@ class HtmlFormUtils {
 
 		formatWriter.writeLineFormat (
 			"</form>");
-
-	}
-
-	public static
-	void htmlFormClose (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlFormClose (
-			currentFormatWriter (),
-			attributes);
 
 	}
 

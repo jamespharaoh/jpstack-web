@@ -1,7 +1,5 @@
 package wbs.web.utils;
 
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
-
 import java.util.Arrays;
 
 import lombok.NonNull;
@@ -23,14 +21,6 @@ class HtmlScriptUtils {
 	}
 
 	public static
-	void htmlScriptBlockOpen () {
-
-		htmlScriptBlockOpen (
-			currentFormatWriter ());
-
-	}
-
-	public static
 	void htmlScriptBlockClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -38,14 +28,6 @@ class HtmlScriptUtils {
 
 		formatWriter.writeLineFormat (
 			"</script>");
-
-	}
-
-	public static
-	void htmlScriptBlockClose () {
-
-		htmlScriptBlockClose (
-			currentFormatWriter ());
 
 	}
 
@@ -62,16 +44,6 @@ class HtmlScriptUtils {
 
 		htmlScriptBlockClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlScriptBlockWrite (
-			@NonNull String ... content) {
-
-		htmlScriptBlockWrite (
-			currentFormatWriter (),
-			content);
 
 	}
 

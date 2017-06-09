@@ -7,7 +7,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notMoreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -44,16 +43,6 @@ class HtmlAttributeUtils {
 	}
 
 	public static
-	void htmlAttributeWrite (
-			@NonNull HtmlAttribute attribute) {
-
-		htmlAttributeWrite (
-			currentFormatWriter (),
-			attribute);
-
-	}
-
-	public static
 	void htmlAttributesWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull Iterable <ToHtmlAttribute> attributes) {
@@ -85,17 +74,6 @@ class HtmlAttributeUtils {
 
 		htmlAttributesWrite (
 			formatWriter,
-			Arrays.asList (
-				attributes));
-
-	}
-
-	public static
-	void htmlAttributesWrite (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlAttributesWrite (
-			currentFormatWriter (),
 			Arrays.asList (
 				attributes));
 

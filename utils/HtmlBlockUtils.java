@@ -1,6 +1,5 @@
 package wbs.web.utils;
 
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
@@ -44,16 +43,6 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlDivOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlDivOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlDivClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -61,14 +50,6 @@ class HtmlBlockUtils {
 
 		formatWriter.writeLineFormat (
 			"</div>");
-
-	}
-
-	public static
-	void htmlDivClose () {
-
-		htmlDivClose (
-			currentFormatWriter ());
 
 	}
 
@@ -88,18 +69,6 @@ class HtmlBlockUtils {
 
 		htmlDivClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlDivWrite (
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlDivWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
 
 	}
 
@@ -129,16 +98,6 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlSpanOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlSpanOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlSpanClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -146,14 +105,6 @@ class HtmlBlockUtils {
 
 		formatWriter.writeLineFormat (
 			"</span>");
-
-	}
-
-	public static
-	void htmlSpanClose () {
-
-		htmlSpanClose (
-			currentFormatWriter ());
 
 	}
 
@@ -177,18 +128,6 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlSpanWrite (
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlSpanWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
-
-	}
-
-	public static
 	void htmlSpanWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String content) {
@@ -202,16 +141,6 @@ class HtmlBlockUtils {
 
 		htmlSpanClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlSpanWriteHtml (
-			@NonNull String content) {
-
-		htmlSpanWriteHtml (
-			currentFormatWriter (),
-			content);
 
 	}
 
@@ -241,16 +170,6 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlParagraphOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlParagraphOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlParagraphClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -262,17 +181,9 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlParagraphClose () {
-
-		htmlParagraphClose (
-			currentFormatWriter ());
-
-	}
-
-	public static
 	void htmlParagraphWrite (
 			@NonNull FormatWriter formatWriter,
-			@NonNull String content,
+			@NonNull CharSequence content,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlParagraphOpen (
@@ -285,18 +196,6 @@ class HtmlBlockUtils {
 
 		htmlParagraphClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlParagraphWrite (
-			@NonNull String content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlParagraphWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
 
 	}
 
@@ -319,16 +218,6 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlParagraphWriteFormat (
-			@NonNull String ... arguments) {
-
-		htmlParagraphWriteFormat (
-			currentFormatWriter (),
-			arguments);
-
-	}
-
-	public static
 	void htmlParagraphWriteFormatWarning (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String ... arguments) {
@@ -343,38 +232,12 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlParagraphWriteFormatWarning (
-			@NonNull String ... arguments) {
-
-		htmlParagraphWrite (
-			currentFormatWriter (),
-			stringFormatArray (
-				arguments),
-			htmlClassAttribute (
-				"warning"));
-
-	}
-
-	public static
 	void htmlParagraphWriteFormatError (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String ... arguments) {
 
 		htmlParagraphWrite (
 			formatWriter,
-			stringFormatArray (
-				arguments),
-			htmlClassAttribute (
-				"error"));
-
-	}
-
-	public static
-	void htmlParagraphWriteFormatError (
-			@NonNull String ... arguments) {
-
-		htmlParagraphWrite (
-			currentFormatWriter (),
 			stringFormatArray (
 				arguments),
 			htmlClassAttribute (
@@ -403,18 +266,6 @@ class HtmlBlockUtils {
 
 	public static
 	void htmlParagraphWriteHtml (
-			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlParagraphWriteHtml (
-			currentFormatWriter (),
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlParagraphWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull Runnable content,
 			@NonNull HtmlAttribute ... attributes) {
@@ -427,18 +278,6 @@ class HtmlBlockUtils {
 
 		htmlParagraphClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlParagraphWriteHtml (
-			@NonNull Runnable content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlParagraphWriteHtml (
-			currentFormatWriter (),
-			content,
-			attributes);
 
 	}
 
@@ -456,32 +295,12 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlHeadingOneWrite (
-			@NonNull String label) {
-
-		htmlHeadingOneWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
-	public static
 	void htmlHeadingTwoWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String label) {
 
 		formatWriter.writeLineFormat (
 			"<h2>%h</h2>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingTwoWrite (
-			@NonNull String label) {
-
-		htmlHeadingTwoWrite (
-			currentFormatWriter (),
 			label);
 
 	}
@@ -498,32 +317,12 @@ class HtmlBlockUtils {
 	}
 
 	public static
-	void htmlHeadingThreeWrite (
-			@NonNull String label) {
-
-		htmlHeadingThreeWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
-	public static
 	void htmlHeadingFourWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String label) {
 
 		formatWriter.writeLineFormat (
 			"<h4>%h</h4>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingFourWrite (
-			@NonNull String label) {
-
-		htmlHeadingFourWrite (
-			currentFormatWriter (),
 			label);
 
 	}

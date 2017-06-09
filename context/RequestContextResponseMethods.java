@@ -8,50 +8,30 @@ import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import lombok.NonNull;
 
 import wbs.utils.io.BorrowedOutputStream;
 import wbs.utils.io.RuntimeIoException;
-import wbs.utils.string.BorrowedFormatWriter;
-import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
 
 public
 interface RequestContextResponseMethods
 	extends RequestContextCoreMethods {
 
 	default
-	FormatWriter formatWriter () {
+	Writer writer () {
 
-		State state =
-			requestContextResponseMethodsState ();
+		try {
 
-		if (
-			isNull (
-				state.formatWriter)
-		) {
+			return response ().getWriter ();
 
-			try {
+		} catch (IOException ioException) {
 
-				state.formatWriter =
-					new WriterFormatWriter (
-						new OutputStreamWriter (
-							response ().getOutputStream (),
-							"utf-8"));
-
-			} catch (IOException ioException) {
-
-				throw new RuntimeIoException (
-					ioException);
-
-			}
+			throw new RuntimeIoException (
+				ioException);
 
 		}
-
-		return new BorrowedFormatWriter (
-			state.formatWriter);
 
 	}
 
@@ -148,7 +128,7 @@ interface RequestContextResponseMethods
 
 		try {
 
-			formatWriter ();
+			writer ();
 
 			return true;
 
@@ -253,8 +233,9 @@ interface RequestContextResponseMethods
 
 	static
 	class State {
+		Long contentLength;
 		OutputStream outputStream;
-		FormatWriter formatWriter;
+		Writer writer;
 	}
 
 }

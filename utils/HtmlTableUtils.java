@@ -1,7 +1,6 @@
 package wbs.web.utils;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 
@@ -110,16 +109,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableHeaderRowWrite (
-			@NonNull String ... headerLabels) {
-
-		htmlTableHeaderRowWrite (
-			currentFormatWriter (),
-			headerLabels);
-
-	}
-
-	public static
 	void htmlTableHeaderRowWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String ... headerLabels) {
@@ -144,16 +133,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableHeaderRowHtml (
-			@NonNull String ... headerLabels) {
-
-		htmlTableHeaderRowWriteHtml (
-			currentFormatWriter (),
-			headerLabels);
-
-	}
-
-	public static
 	void htmlTableOpen (
 			@NonNull FormatWriter formatWriter,
 			@NonNull ToHtmlAttribute ... attributes) {
@@ -164,6 +143,7 @@ class HtmlTableUtils {
 			"<table");
 
 		htmlAttributesWrite (
+			formatWriter,
 			attributes);
 
 		formatWriter.writeFormat (
@@ -172,16 +152,6 @@ class HtmlTableUtils {
 		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlTableOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableOpen (
-			currentFormatWriter (),
-			attributes);
 
 	}
 
@@ -197,14 +167,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableOpenDetails () {
-
-		htmlTableOpenDetails (
-			currentFormatWriter ());
-
-	}
-
-	public static
 	void htmlTableOpenLayout (
 			@NonNull FormatWriter formatWriter) {
 
@@ -212,14 +174,6 @@ class HtmlTableUtils {
 			"<table class=\"layout\">");
 
 		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlTableOpenLayout () {
-
-		htmlTableOpenLayout (
-			currentFormatWriter ());
 
 	}
 
@@ -248,16 +202,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableOpenList (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableOpenList (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlTableClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -265,14 +209,6 @@ class HtmlTableUtils {
 
 		formatWriter.writeLineFormat (
 			"</table>");
-
-	}
-
-	public static
-	void htmlTableClose () {
-
-		htmlTableClose (
-			currentFormatWriter ());
 
 	}
 
@@ -289,6 +225,7 @@ class HtmlTableUtils {
 			"<thead");
 
 		htmlAttributesWrite (
+			formatWriter,
 			attributes);
 
 		formatWriter.writeFormat (
@@ -301,16 +238,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableHeadOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableHeadOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlTableHeadClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -318,14 +245,6 @@ class HtmlTableUtils {
 
 		formatWriter.writeLineFormat (
 			"</thead>");
-
-	}
-
-	public static
-	void htmlTableHeadClose () {
-
-		htmlTableHeadClose (
-			currentFormatWriter ());
 
 	}
 
@@ -342,6 +261,7 @@ class HtmlTableUtils {
 			"<tbody");
 
 		htmlAttributesWrite (
+			formatWriter,
 			attributes);
 
 		formatWriter.writeFormat (
@@ -354,16 +274,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableBodyOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableBodyOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlTableBodyClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -371,14 +281,6 @@ class HtmlTableUtils {
 
 		formatWriter.writeLineFormat (
 			"</tbody>");
-
-	}
-
-	public static
-	void htmlTableBodyClose () {
-
-		htmlTableBodyClose (
-			currentFormatWriter ());
 
 	}
 
@@ -409,32 +311,11 @@ class HtmlTableUtils {
 
 	public static
 	void htmlTableRowOpen (
-			@NonNull Iterable <ToHtmlAttribute> attributes) {
-
-		htmlTableRowOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
-	void htmlTableRowOpen (
 			@NonNull FormatWriter formatWriter,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlTableRowOpen (
 			formatWriter,
-			Arrays.asList (
-				attributes));
-
-	}
-
-	public static
-	void htmlTableRowOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableRowOpen (
-			currentFormatWriter (),
 			Arrays.asList (
 				attributes));
 
@@ -448,14 +329,6 @@ class HtmlTableUtils {
 
 		formatWriter.writeLineFormat (
 			"</tr>");
-
-	}
-
-	public static
-	void htmlTableRowClose () {
-
-		htmlTableRowClose (
-			currentFormatWriter ());
 
 	}
 
@@ -483,16 +356,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableCellOpen (
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableCellOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
 	void htmlTableCellClose (
 			@NonNull FormatWriter formatWriter) {
 
@@ -504,17 +367,9 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableCellClose () {
-
-		htmlTableCellClose (
-			currentFormatWriter ());
-
-	}
-
-	public static
 	void htmlTableCellWrite (
 			@NonNull FormatWriter formatWriter,
-			@NonNull String content,
+			@NonNull CharSequence content,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
@@ -531,18 +386,6 @@ class HtmlTableUtils {
 			content);
 
 		formatWriter.writeNewline ();
-
-	}
-
-	public static
-	void htmlTableCellWrite (
-			@NonNull String content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableCellWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
 
 	}
 
@@ -574,18 +417,6 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableCellWrite (
-			@NonNull Runnable content,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlTableCellWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
-
-	}
-
-	public static
 	void htmlTableCellWriteFormat (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String ... arguments) {
@@ -598,19 +429,9 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableCellWriteFormat (
-			@NonNull String ... arguments) {
-
-		htmlTableCellWriteFormat (
-			currentFormatWriter (),
-			arguments);
-
-	}
-
-	public static
 	void htmlTableCellWriteHtml (
 			@NonNull FormatWriter formatWriter,
-			@NonNull String content,
+			@NonNull CharSequence content,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
@@ -632,18 +453,6 @@ class HtmlTableUtils {
 
 	public static
 	void htmlTableCellWriteHtml (
-			@NonNull String content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableCellWriteHtml (
-			currentFormatWriter (),
-			content,
-			attributes);
-
-	}
-
-	public static
-	void htmlTableCellWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull Runnable content,
 			@NonNull ToHtmlAttribute ... attributes) {
@@ -654,26 +463,15 @@ class HtmlTableUtils {
 
 		content.run ();
 
-		htmlTableCellClose ();
-
-	}
-
-	public static
-	void htmlTableCellWriteHtml (
-			@NonNull Runnable content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableCellWriteHtml (
-			currentFormatWriter (),
-			content,
-			attributes);
+		htmlTableCellClose (
+			formatWriter);
 
 	}
 
 	public static
 	void htmlTableHeaderCellWrite (
 			@NonNull FormatWriter formatWriter,
-			@NonNull String content,
+			@NonNull CharSequence content,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
@@ -690,18 +488,6 @@ class HtmlTableUtils {
 			content);
 
 		formatWriter.writeNewline ();
-
-	}
-
-	public static
-	void htmlTableHeaderCellWrite (
-			@NonNull String content,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableHeaderCellWrite (
-			currentFormatWriter (),
-			content,
-			attributes);
 
 	}
 
@@ -730,24 +516,10 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableDetailsRowWrite (
-			@NonNull String label,
-			@NonNull String value,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableDetailsRowWrite (
-			currentFormatWriter (),
-			label,
-			value,
-			attributes);
-
-	}
-
-	public static
 	void htmlTableDetailsRowWriteHtml (
 			@NonNull FormatWriter formatWriter,
-			@NonNull String label,
-			@NonNull String value,
+			@NonNull CharSequence label,
+			@NonNull CharSequence value,
 			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlTableRowOpen (
@@ -764,20 +536,6 @@ class HtmlTableUtils {
 
 		htmlTableRowClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlTableDetailsRowWriteHtml (
-			@NonNull String label,
-			@NonNull String value,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableDetailsRowWriteHtml (
-			currentFormatWriter (),
-			label,
-			value,
-			attributes);
 
 	}
 
@@ -802,20 +560,6 @@ class HtmlTableUtils {
 
 		htmlTableRowClose (
 			formatWriter);
-
-	}
-
-	public static
-	void htmlTableDetailsRowWriteHtml (
-			@NonNull String label,
-			@NonNull Runnable value,
-			@NonNull ToHtmlAttribute ... attributes) {
-
-		htmlTableDetailsRowWriteHtml (
-			currentFormatWriter (),
-			label,
-			value,
-			attributes);
 
 	}
 
@@ -829,6 +573,7 @@ class HtmlTableUtils {
 			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			label);
 
 		formatWriter.writeString (
@@ -841,18 +586,6 @@ class HtmlTableUtils {
 
 	public static
 	void htmlTableDetailsRowWriteRaw (
-			@NonNull String label,
-			@NonNull String rawValue) {
-
-		htmlTableDetailsRowWrite (
-			currentFormatWriter (),
-			label,
-			rawValue);
-
-	}
-
-	public static
-	void htmlTableDetailsRowWriteRaw (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String label,
 			@NonNull Consumer <FormatWriter> valueCellWriter) {
@@ -861,6 +594,7 @@ class HtmlTableUtils {
 			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			label);
 
 		valueCellWriter.accept (
@@ -873,18 +607,6 @@ class HtmlTableUtils {
 
 	public static
 	void htmlTableDetailsRowWriteRaw (
-			@NonNull String label,
-			@NonNull Consumer <FormatWriter> valueCellWriter) {
-
-		htmlTableDetailsRowWriteRaw (
-			currentFormatWriter (),
-			label,
-			valueCellWriter);
-
-	}
-
-	public static
-	void htmlTableDetailsRowWriteRaw (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String label,
 			@NonNull Runnable valueCellWriter) {
@@ -893,6 +615,7 @@ class HtmlTableUtils {
 			formatWriter);
 
 		htmlTableHeaderCellWrite (
+			formatWriter,
 			label);
 
 		valueCellWriter.run ();
@@ -903,31 +626,11 @@ class HtmlTableUtils {
 	}
 
 	public static
-	void htmlTableDetailsRowWriteRaw (
-			@NonNull String label,
-			@NonNull Runnable valueCellWriter) {
-
-		htmlTableDetailsRowWriteRaw (
-			currentFormatWriter (),
-			label,
-			valueCellWriter);
-
-	}
-
-	public static
 	void htmlTableRowSeparatorWrite (
 			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
 			"<tr class=\"sep\">");
-
-	}
-
-	public static
-	void htmlTableRowSeparatorWrite () {
-
-		htmlTableRowSeparatorWrite (
-			currentFormatWriter ());
 
 	}
 

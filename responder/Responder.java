@@ -7,6 +7,6 @@ interface Responder {
 
 	public
 	void execute (
-			TaskLogger taskLogger);
+			TaskLogger parentTaskLogger);
 
 }
