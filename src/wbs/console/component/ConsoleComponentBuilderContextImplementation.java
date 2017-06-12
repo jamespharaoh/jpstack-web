@@ -13,6 +13,8 @@ class ConsoleComponentBuilderContextImplementation
 
 	ConsoleModuleSpec consoleModule;
 
+	String structuralName;
+
 	String pathPrefix;
 
 	String friendlyName;

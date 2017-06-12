@@ -97,8 +97,8 @@ class ConsoleComponentBuilder
 					ConsoleModuleSpec.class,
 					parentObject))
 
-			.pathPrefix (
-				"")
+			//.pathPrefix (
+			//	"")
 
 			.newComponentNamePrefix (
 				"")

@@ -216,7 +216,7 @@ class ObjectSettingsPart <
 				htmlFormClose (
 					formatWriter);
 
-				if (removeLocalName != null) {
+				if (consoleHelper.ephemeral ()) {
 
 					htmlHeadingTwoWrite (
 						formatWriter,

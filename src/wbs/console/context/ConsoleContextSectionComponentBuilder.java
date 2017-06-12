@@ -74,8 +74,17 @@ class ConsoleContextSectionComponentBuilder
 				.consoleModule (
 					parentContext.consoleModule ())
 
+				.structuralName (
+					stringFormat (
+						"%s.%s",
+						parentContext.structuralName (),
+						spec.name ()))
+
 				.pathPrefix (
-					spec.name ())
+					stringFormat (
+						"%s.%s",
+						parentContext.structuralName (),
+						spec.name ()))
 
 				.newComponentNamePrefix (
 					stringFormat (

@@ -1,11 +1,11 @@
 package wbs.platform.object.create;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamelCapitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Provider;
 
@@ -16,11 +16,6 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.ConsoleFormManager;
 import wbs.console.forms.core.ConsoleFormType;
-import wbs.console.forms.core.FormFieldSet;
-import wbs.console.forms.object.CodeFormFieldSpec;
-import wbs.console.forms.object.DescriptionFormFieldSpec;
-import wbs.console.forms.object.NameFormFieldSpec;
-import wbs.console.forms.object.ParentFormFieldSpec;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -357,74 +352,17 @@ class ObjectCreatePageBuilder <
 			privKey =
 				spec.privKey ();
 
-		}
-
-	}
-
-	FormFieldSet <ObjectType> defaultFields (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"defaultFields");
-
-		) {
-
-			// parent
-
-			List <Object> formFieldSpecs =
-				new ArrayList<> ();
-
-			if (consoleHelper.canGetParent ()) {
-
-				formFieldSpecs.add (
-					new ParentFormFieldSpec ()
-
-					.createPrivDelegate (
-						createPrivDelegate)
-
-					.createPrivCode (
-						createPrivCode));
-
-			}
-
-			if (consoleHelper.codeExists ()
-					&& ! consoleHelper.nameExists ()) {
-
-				formFieldSpecs.add (
-					new CodeFormFieldSpec ());
-
-			}
-
-			if (consoleHelper.nameExists ()) {
-
-				formFieldSpecs.add (
-					new NameFormFieldSpec ());
-
-			}
-
-			if (consoleHelper.descriptionExists ()) {
-
-				formFieldSpecs.add (
-					new DescriptionFormFieldSpec ());
-
-			}
-
-			// build
-
-			String fieldSetName =
-				stringFormat (
-					"%s.create",
-					consoleHelper.objectName ());
-
-			return consoleFormBuilder.buildFormFieldSet (
-				taskLogger,
-				consoleHelper,
-				fieldSetName,
-				formFieldSpecs);
+			formType =
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						taskLogger,
+						stringFormat (
+							"%s%sFormType",
+							hyphenToCamel (
+								container.consoleModule ().name ()),
+							hyphenToCamelCapitalise (
+								spec.formTypeName ())),
+						ConsoleFormType.class));
 
 		}
 

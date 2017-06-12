@@ -71,6 +71,9 @@ class ExtendContextComponentBuilder
 				.consoleModule (
 					parentContext.consoleModule ())
 
+				.structuralName (
+					spec.baseName ())
+
 				.pathPrefix (
 					spec.name ())
 

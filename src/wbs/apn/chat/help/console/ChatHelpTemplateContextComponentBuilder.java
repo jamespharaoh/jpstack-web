@@ -162,6 +162,9 @@ class ChatHelpTemplateContextComponentBuilder
 				.consoleModule (
 					parentContext.consoleModule ())
 
+				.structuralName (
+					contextTypeName)
+
 				.pathPrefix (
 					contextTypeName)
 

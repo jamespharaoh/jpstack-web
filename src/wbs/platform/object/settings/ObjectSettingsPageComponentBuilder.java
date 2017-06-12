@@ -178,7 +178,7 @@ class ObjectSettingsPageComponentBuilder
 
 				.addValuePropertyFormat (
 					"removeLocalName",
-					"%s.remove",
+					"/%s.remove",
 					context.pathPrefix ())
 
 			);

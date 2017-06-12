@@ -74,6 +74,9 @@ class SimpleConsoleContextComponentBuilder
 				.consoleModule (
 					parentContext.consoleModule ())
 
+				.structuralName (
+					spec.name ())
+
 				.pathPrefix (
 					spec.name ())
 

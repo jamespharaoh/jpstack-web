@@ -7,6 +7,8 @@ interface ConsoleComponentBuilderContext {
 
 	ConsoleModuleSpec consoleModule ();
 
+	String structuralName ();
+
 	String pathPrefix ();
 
 	String friendlyName ();
