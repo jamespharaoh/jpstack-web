@@ -12,6 +12,7 @@
 /c/socktest
 /.Trash-*
 /hs_err_*.log
+/wbs-build.xml
 
 # haskell
 /.cabal-sandbox
