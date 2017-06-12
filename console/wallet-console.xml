@@ -25,49 +25,68 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"
+				form="settings"
 				priv-key="walletService.manage"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="wallet">
+	<forms>
 
-		<parent-field/>
-		<code-field/>
+		<form
+			name="list"
+			object-type="wallet"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="wallet">
+				<parent-field/>
+				<code-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="wallet">
+		<form
+			name="summary"
+			object-type="wallet"
+			type="read-only">
 
-		<id-field/>
-		<code-field/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="wallet"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>
