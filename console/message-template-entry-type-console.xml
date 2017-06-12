@@ -30,20 +30,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="fieldType"
@@ -63,45 +63,69 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="messageTemplateEntryType">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="message-template-entry-type"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="messageTemplateEntryType">
+				<name-field/>
+				<description-field/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="summary"
-		object-name="messageTemplateEntryType">
+		<form
+			name="create"
+			object-type="message-template-entry-type"
+			type="create">
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-	</field-set>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="settings"
-		object-name="messageTemplateEntryType">
+			</columns>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="message-template-entry-type"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="message-template-entry-type"
+			type="update">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

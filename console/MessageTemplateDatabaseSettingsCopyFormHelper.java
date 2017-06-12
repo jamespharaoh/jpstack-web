@@ -19,7 +19,7 @@ import wbs.framework.logging.LogContext;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("messageTemplateDatabaseSettingsCopyFormActionHelper")
 public
@@ -50,7 +50,7 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 
 	@Override
 	public
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			@NonNull Transaction parentTransaction,
 			@NonNull MessageTemplateCopyForm state) {
 

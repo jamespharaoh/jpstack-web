@@ -29,89 +29,113 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="messageTemplateParameter">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="message-template-parameter"
+			type="read-only">
 
-		<integer-field
-			name="maximumLength"/>
+			<columns>
 
-		<yes-no-field
-			name="required"/>
+				<name-field/>
+				<description-field/>
 
-	</field-set>
+				<integer-field
+					name="maximumLength"/>
 
-	<field-set
-		name="create"
-		object-name="messageTemplateParameter">
+				<yes-no-field
+					name="required"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<integer-field
-			name="maximumLength"/>
+		</form>
 
-		<yes-no-field
-			name="required"/>
+		<form
+			name="create"
+			object-type="message-template-parameter"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="messageTemplateParameter">
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<integer-field
+					name="maximumLength"/>
 
-		<integer-field
-			name="maximumLength"/>
+				<yes-no-field
+					name="required"/>
 
-		<yes-no-field
-			name="required"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="messageTemplateParameter">
+		<form
+			name="summary"
+			object-type="message-template-parameter"
+			type="read-only">
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-		<integer-field
-			name="maximumLength"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<yes-no-field
-			name="required"/>
+				<integer-field
+					name="maximumLength"/>
 
-	</field-set>
+				<yes-no-field
+					name="required"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="message-template-parameter"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<integer-field
+					name="maximumLength"/>
+
+				<yes-no-field
+					name="required"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

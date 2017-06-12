@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="messageTemplateEntryValue.messageTemplateSet.messageTemplateDatabase"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,70 +52,94 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="messageTemplateFieldValue">
+	<forms>
 
-		<object-field
-			name="messageTemplateFieldType"
-			label="Type"
-			object-type="messageTemplateFieldType"/>
+		<form
+			name="list"
+			object-type="message-template-field-value"
+			type="read-only">
 
-		<text-field
-			name="stringValue"
-			label="value"/>
+			<columns>
 
-	</field-set>
+				<object-field
+					name="messageTemplateFieldType"
+					label="Type"
+					object-type="messageTemplateFieldType"/>
 
-	<field-set
-		name="create"
-		object-name="messageTemplateFieldValue">
+				<text-field
+					name="stringValue"
+					label="value"/>
 
-		<object-field
-			name="messageTemplateFieldType"
-			label="Type"
-			object-type="messageTemplateFieldType"/>
+			</columns>
 
-		<text-field
-			name="stringValue"
-			label="value"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="message-template-field-value"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="messageTemplateFieldValue">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<deleted-field/>
+				<object-field
+					name="messageTemplateFieldType"
+					label="Type"
+					object-type="messageTemplateFieldType"/>
 
-		<object-field
-			name="messageTemplateFieldType"
-			label="Type"
-			object-type="messageTemplateFieldType"/>
+				<text-field
+					name="stringValue"
+					label="value"/>
 
-		<text-field
-			name="stringValue"
-			label="value"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="messageTemplateFieldValue">
+		<form
+			name="summary"
+			object-type="message-template-field-value"
+			type="read-only">
 
-		<deleted-field/>
+			<columns>
 
-		<object-field
-			name="messageTemplateFieldType"
-			label="Type"
-			object-type="messageTemplateFieldType"/>
+				<id-field/>
+				<parent-field/>
+				<deleted-field/>
 
-		<text-field
-			name="stringValue"
-			label="value"/>
+				<object-field
+					name="messageTemplateFieldType"
+					label="Type"
+					object-type="messageTemplateFieldType"/>
 
-	</field-set>
+				<text-field
+					name="stringValue"
+					label="value"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="message-template-field-value"
+			type="update">
+
+			<columns>
+
+				<deleted-field/>
+
+				<object-field
+					name="messageTemplateFieldType"
+					label="Type"
+					object-type="messageTemplateFieldType"/>
+
+				<text-field
+					name="stringValue"
+					label="value"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>
