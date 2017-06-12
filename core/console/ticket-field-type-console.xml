@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"
+				form="settings"
 				priv-key="ticketManager.manage"/>
 
 			<object-events-page/>
@@ -51,74 +51,98 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="ticketFieldType">
+	<forms>
 
-		<name-field/>
+		<form
+			name="list"
+			object-type="ticket-field-type"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="ticketFieldType">
+				<name-field/>
 
-		<parent-field/>
+			</columns>
 
-		<name-field/>
+		</form>
 
-		<yes-no-field
-			name="required"/>
+		<form
+			name="create"
+			object-type="ticket-field-type"
+			type="read-only">
 
-		<object-field
-			name="objectType"
-			object-type="objectType"/>
+			<columns>
 
-		<yes-no-field
-			name="visible"/>
+				<parent-field/>
 
-	</field-set>
+				<name-field/>
 
-	<field-set
-		name="summary"
-		object-name="ticketFieldType">
+				<yes-no-field
+					name="required"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
+				<object-field
+					name="objectType"
+					object-type="objectType"/>
 
-		<name-field/>
+				<yes-no-field
+					name="visible"/>
 
-		<yes-no-field
-			name="required"/>
+			</columns>
 
-		<object-field
-			name="objectType"
-			object-type="objectType"/>
+		</form>
 
-		<yes-no-field
-			name="visible"/>
+		<form
+			name="summary"
+			object-type="ticket-field-type"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="settings"
-		object-name="ticketFieldType">
+				<id-field/>
+				<parent-field/>
+				<code-field/>
 
-		<parent-field/>
+				<name-field/>
 
-		<name-field/>
+				<yes-no-field
+					name="required"/>
 
-		<yes-no-field
-			name="required"/>
+				<object-field
+					name="objectType"
+					object-type="objectType"/>
 
-		<object-field
-			name="objectType"
-			object-type="objectType"/>
+				<yes-no-field
+					name="visible"/>
 
-		<yes-no-field
-			name="visible"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="ticket-field-type"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+
+				<name-field/>
+
+				<yes-no-field
+					name="required"/>
+
+				<object-field
+					name="objectType"
+					object-type="objectType"/>
+
+				<yes-no-field
+					name="visible"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

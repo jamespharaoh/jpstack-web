@@ -3,7 +3,7 @@
 
 	<object-context
 		name="ticket.pending"
-		bean-name="ticketPending"
+		component-name="ticketPending"
 		object-name="ticket">
 
 		<object>
@@ -25,7 +25,7 @@
 			object-type="ticket"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<code-field/>
 
@@ -43,7 +43,7 @@
 					label="State"
 					object-type="ticketState"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -52,14 +52,14 @@
 			object-type="ticket-note"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<index-field/>
 
 				<text-field
 					name="noteText"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -68,7 +68,7 @@
 			object-type="ticket-state"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<name-field/>
 
@@ -81,7 +81,7 @@
 				<integer-field
 					name="maximum"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

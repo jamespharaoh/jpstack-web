@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"
+				form="settings"
 				priv-key="ticketManager.manage"/>
 
 			<object-events-page/>
@@ -51,71 +51,95 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="ticketState">
+	<forms>
 
-		<name-field/>
+		<form
+			name="list"
+			object-type="ticket-state"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="ticketState">
+				<name-field/>
 
-		<parent-field/>
+			</columns>
 
-		<name-field/>
+		</form>
 
-		<seconds-field
-			name="minimum"/>
+		<form
+			name="create"
+			object-type="ticket-state"
+			type="create">
 
-		<seconds-field
-			name="maximum"/>
+			<columns>
 
-		<yes-no-field
-			name="showInQueue"/>
+				<parent-field/>
 
-	</field-set>
+				<name-field/>
 
-	<field-set
-		name="summary"
-		object-name="ticketState">
+				<seconds-field
+					name="minimum"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
+				<seconds-field
+					name="maximum"/>
 
-		<name-field/>
+				<yes-no-field
+					name="showInQueue"/>
 
-		<seconds-field
-			name="minimum"/>
+			</columns>
 
-		<seconds-field
-			name="maximum"/>
+		</form>
 
-		<yes-no-field
-			name="showInQueue"/>
+		<form
+			name="summary"
+			object-type="ticket-state"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="settings"
-		object-name="ticketState">
+				<id-field/>
+				<parent-field/>
+				<code-field/>
 
-		<parent-field/>
+				<name-field/>
 
-		<name-field/>
+				<seconds-field
+					name="minimum"/>
 
-		<seconds-field
-			name="minimum"/>
+				<seconds-field
+					name="maximum"/>
 
-		<seconds-field
-			name="maximum"/>
+				<yes-no-field
+					name="showInQueue"/>
 
-		<yes-no-field
-			name="showInQueue"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="ticket-state"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+
+				<name-field/>
+
+				<seconds-field
+					name="minimum"/>
+
+				<seconds-field
+					name="maximum"/>
+
+				<yes-no-field
+					name="showInQueue"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>
