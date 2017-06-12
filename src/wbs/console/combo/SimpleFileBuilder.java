@@ -87,22 +87,35 @@ class SimpleFileBuilder
 	void buildFile (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addFile (
-			path,
-			consoleFileProvider.get ()
+		try (
 
-				.getResponderName (
-					getResponderName)
-
-				.getActionName (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					optionalFromNullable (
-						getActionName))
+					"buildFile");
 
-				.postActionName (
-					parentTaskLogger,
-					optionalFromNullable (
-						postActionName)));
+		) {
+
+			consoleModule.addFile (
+				path,
+				consoleFileProvider.get ()
+
+					.getResponderName (
+						taskLogger,
+						optionalFromNullable (
+							getResponderName))
+
+					.getActionName (
+						parentTaskLogger,
+						optionalFromNullable (
+							getActionName))
+
+					.postActionName (
+						parentTaskLogger,
+						optionalFromNullable (
+							postActionName)));
+
+		}
 
 	}
 

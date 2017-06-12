@@ -7,6 +7,7 @@
 		<bootstrap-component class="SupervisorAdditionOperandSpec"/>
 		<bootstrap-component class="SupervisorAdditionStatsResolverSpec"/>
 		<bootstrap-component class="SupervisorConditionSpec"/>
+		<bootstrap-component class="SupervisorConfigComponentBuilder"/>
 		<bootstrap-component class="SupervisorConfigSpec"/>
 		<bootstrap-component class="SupervisorDataSetSpec"/>
 		<bootstrap-component class="SupervisorHeadingPartSpec"/>
@@ -15,6 +16,7 @@
 		<bootstrap-component class="SupervisorIntegerStatsFormatterSpec"/>
 		<bootstrap-component class="SupervisorMultiplicationOperandSpec"/>
 		<bootstrap-component class="SupervisorMultiplicationStatsResolverSpec"/>
+		<bootstrap-component class="SupervisorPageComponentBuilder"/>
 		<bootstrap-component class="SupervisorPageSpec"/>
 		<bootstrap-component class="SupervisorSimplePartSpec"/>
 		<bootstrap-component class="SupervisorSimpleStatsResolverSpec"/>

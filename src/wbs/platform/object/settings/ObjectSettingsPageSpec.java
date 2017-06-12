@@ -30,12 +30,9 @@ class ObjectSettingsPageSpec
 	String objectName;
 
 	@DataAttribute (
-		name = "fields")
-	String formFieldsName;
-
-	@DataAttribute (
-		name = "fields-provider")
-	String formFieldsProviderName;
+		name = "form",
+		required = true)
+	String formTypeName;
 
 	@DataAttribute
 	String privKey;

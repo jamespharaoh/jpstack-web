@@ -36,6 +36,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -60,15 +61,15 @@ import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
-import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
 import wbs.web.file.WebFile;
+import wbs.web.mvc.WebAction;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.pathhandler.RegexpPathHandler.Entry;
-import wbs.web.responder.Responder;
 import wbs.web.responder.WebModule;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("dialogueApiServletModule")
 public
@@ -109,12 +110,12 @@ class DialogueApiServletModule
 
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Provider <ApiFile> apiFileProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("dialogueResponder")
-	Provider <Responder> dialogueResponderProvider;
+	Provider <WebResponder> dialogueResponderProvider;
 
 	@PrototypeDependency
 	Provider <RegexpPathHandler> regexpPathHandlerProvider;
@@ -480,12 +481,12 @@ class DialogueApiServletModule
 	};
 
 	private final
-	Provider <Action> reportActionProvider =
-		() -> new Action () {
+	Provider <WebAction> reportActionProvider =
+		() -> new WebAction () {
 
 		@Override
 		public
-		Responder handle (
+		WebResponder handle (
 				@NonNull TaskLogger parentTaskLogger) {
 
 			try (

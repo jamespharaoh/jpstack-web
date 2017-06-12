@@ -21,9 +21,13 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("simpleActionPageBuilder")
 public
@@ -31,6 +35,9 @@ class SimpleActionPageBuilder
 	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -57,7 +64,8 @@ class SimpleActionPageBuilder
 	String path;
 	String actionName;
 	String responderName;
-	String responderBeanName;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -106,6 +114,7 @@ class SimpleActionPageBuilder
 				consoleFileProvider.get ()
 
 				.getResponderName (
+					taskLogger,
 					responderName)
 
 				.postActionName (
@@ -130,11 +139,11 @@ class SimpleActionPageBuilder
 
 		) {
 
-			consoleModule.addResponder (
-				responderName,
-				consoleModule.beanResponder (
+			responderProvider =
+				componentManager.getComponentProviderRequired (
 					taskLogger,
-					responderBeanName));
+					responderName,
+					WebResponder.class);
 
 		}
 
@@ -164,6 +173,7 @@ class SimpleActionPageBuilder
 					simpleContainerSpec.newBeanNamePrefix (),
 					capitalise (name)));
 
+		/*
 		responderBeanName =
 			ifNull (
 				simpleActionPageSpec.responderBeanName (),
@@ -171,6 +181,7 @@ class SimpleActionPageBuilder
 					"%s%sResponder",
 					simpleContainerSpec.existingBeanNamePrefix (),
 					capitalise (name)));
+		*/
 
 	}
 

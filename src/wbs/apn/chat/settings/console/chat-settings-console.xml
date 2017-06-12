@@ -5,7 +5,9 @@
 		name="chat.settings"
 		base-name="chat"
 		extension-point="chat.settings"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<section
 			name="settings"
@@ -13,7 +15,7 @@
 
 			<object-settings-page
 				short-name="general"
-				fields="settings-general"/>
+				form="settings-general"/>
 
 			<section
 				name="templates"
@@ -88,185 +90,194 @@
 
 	</extend-context>
 
-	<field-set
-		name="settings-general"
-		object-name="chat">
+	<forms>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<seconds-field
-			name="timeLogoff"
-			label="Time to logoff"/>
-
-		<seconds-field
-			name="timeReceive"
-			label="Min info time after receive"/>
-
-		<seconds-field
-			name="timeSend"
-			label="Min info time after send"/>
-
-		<seconds-field
-			name="timeInfo"
-			label="Min info time after info"/>
-
-		<seconds-field
-			name="timeName"
-			label="Time between name hints"/>
-
-		<seconds-field
-			name="timeNameJoin"
-			label="Tme after join before name hint"/>
-
-		<seconds-field
-			name="timePicHint"
-			label="Time between pic hints"/>
-
-		<timestamp-field
-			name="lastMonitorSwap"
-			read-only="yes"/>
-
-		<seconds-field
-			name="timeMonitorSwap"
-			label="Time between monitor swaps"/>
-
-		<object-field
-			name="locator"
-			object-type="locator"
-			nullable="yes"/>
-
-		<seconds-field
-			name="timeJoinOutboundMin"
-			label="Min outbound time after join"/>
-
-		<seconds-field
-			name="timeJoinOutboundMax"
-			label="Max outbound time after join"/>
-
-		<seconds-field
-			name="timeQuietOutbound"
-			label="Quiet user outbound time"/>
-
-		<seconds-field
-			name="timeWebLogoff"
-			label="Web/iphone automatic logoff time"/>
-
-		<seconds-field
-			name="timeSignupTimeout"
-			label="Signup timeout"/>
-
-		<integer-field
-			name="minMonitorMessageLength"
-			label="Minimum monitor message length"/>
-
-		<!--
-		<chat-user-code-field
-			name="systemChatUser"
-			label="Chat user for system messages"/>
-		-->
-
-		<yes-no-field
-			name="autoJoinChat"/>
-
-		<yes-no-field
-			name="autoJoinDate"
-			label="Auto join dating"/>
-
-		<yes-no-field
-			name="datingEnabled"
-			label="Dating sends enabled"/>
-
-		<yes-no-field
-			name="joinWarningEnabled"/>
-
-		<yes-no-field
-			name="errorOnUnrecognised"
-			label="Error on unrecognised keyword"/>
-
-		<yes-no-field
-			name="sendWarningFromShortcode"/>
-
-		<yes-no-field
-			name="sendDobRequestFromShortcode"/>
-
-		<yes-no-field
-			name="billDuringJoin"/>
-
-		<yes-no-field
-			name="confirmCharges"/>
-
-		<seconds-field
-			name="maxAlarmTime"
-			label="Maximum alarm time"/>
-
-		<integer-field
-			name="sessionInfoLimit"
-			label="Maximum profiles per chat session"
-			nullable="yes"/>
-
-		<object-field
-			name="adultAdsChat"
-			label="Adult ads chat service"
+		<form
+			name="settings-general"
 			object-type="chat"
-			nullable="yes"/>
+			type="update">
 
-		<seconds-field
-			name="adultAdsTime"/>
+			<columns>
 
-		<seconds-field
-			name="adTimeFirst"
-			label="Automatic ad first time"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<seconds-field
-			name="adTime"
-			label="Automatic ad regular time"/>
+				<seconds-field
+					name="timeLogoff"
+					label="Time to logoff"/>
 
-		<integer-field
-			name="adCount"
-			label="Automatic ad regular count"/>
+				<seconds-field
+					name="timeReceive"
+					label="Min info time after receive"/>
 
-		<yes-no-field
-			name="billBlockedUsers"/>
+				<seconds-field
+					name="timeSend"
+					label="Min info time after send"/>
 
-		<seconds-field
-			name="billTimeLimit"/>
+				<seconds-field
+					name="timeInfo"
+					label="Min info time after info"/>
 
-		<seconds-field
-			name="chatQueuePreferredTime"/>
+				<seconds-field
+					name="timeName"
+					label="Time between name hints"/>
 
-		<seconds-field
-			name="messageQueuePreferredTime"/>
+				<seconds-field
+					name="timeNameJoin"
+					label="Tme after join before name hint"/>
 
-		<seconds-field
-			name="helpQueuePreferredTime"/>
+				<seconds-field
+					name="timePicHint"
+					label="Time between pic hints"/>
 
-		<seconds-field
-			name="infoQueuePreferredTime"/>
+				<timestamp-field
+					name="lastMonitorSwap"
+					read-only="yes"/>
 
-		<object-field
-			name="currency"
-			object-type="currency"/>
+				<seconds-field
+					name="timeMonitorSwap"
+					label="Time between monitor swaps"/>
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+				<object-field
+					name="locator"
+					object-type="locator"
+					nullable="yes"/>
 
-		<object-field
-			name="gazetteer"
-			object-type="gazetteer"/>
+				<seconds-field
+					name="timeJoinOutboundMin"
+					label="Min outbound time after join"/>
 
-		<text-field
-			name="defaultBrandName"/>
+				<seconds-field
+					name="timeJoinOutboundMax"
+					label="Max outbound time after join"/>
 
-		<timezone-field
-			name="timezone"
-			nullable="yes"/>
+				<seconds-field
+					name="timeQuietOutbound"
+					label="Quiet user outbound time"/>
 
-	</field-set>
+				<seconds-field
+					name="timeWebLogoff"
+					label="Web/iphone automatic logoff time"/>
+
+				<seconds-field
+					name="timeSignupTimeout"
+					label="Signup timeout"/>
+
+				<integer-field
+					name="minMonitorMessageLength"
+					label="Minimum monitor message length"/>
+
+				<!--
+				<chat-user-code-field
+					name="systemChatUser"
+					label="Chat user for system messages"/>
+				-->
+
+				<yes-no-field
+					name="autoJoinChat"/>
+
+				<yes-no-field
+					name="autoJoinDate"
+					label="Auto join dating"/>
+
+				<yes-no-field
+					name="datingEnabled"
+					label="Dating sends enabled"/>
+
+				<yes-no-field
+					name="joinWarningEnabled"/>
+
+				<yes-no-field
+					name="errorOnUnrecognised"
+					label="Error on unrecognised keyword"/>
+
+				<yes-no-field
+					name="sendWarningFromShortcode"/>
+
+				<yes-no-field
+					name="sendDobRequestFromShortcode"/>
+
+				<yes-no-field
+					name="billDuringJoin"/>
+
+				<yes-no-field
+					name="confirmCharges"/>
+
+				<seconds-field
+					name="maxAlarmTime"
+					label="Maximum alarm time"/>
+
+				<integer-field
+					name="sessionInfoLimit"
+					label="Maximum profiles per chat session"
+					nullable="yes"/>
+
+				<object-field
+					name="adultAdsChat"
+					label="Adult ads chat service"
+					object-type="chat"
+					nullable="yes"/>
+
+				<seconds-field
+					name="adultAdsTime"/>
+
+				<seconds-field
+					name="adTimeFirst"
+					label="Automatic ad first time"/>
+
+				<seconds-field
+					name="adTime"
+					label="Automatic ad regular time"/>
+
+				<integer-field
+					name="adCount"
+					label="Automatic ad regular count"/>
+
+				<yes-no-field
+					name="billBlockedUsers"/>
+
+				<seconds-field
+					name="billTimeLimit"/>
+
+				<seconds-field
+					name="chatQueuePreferredTime"/>
+
+				<seconds-field
+					name="messageQueuePreferredTime"/>
+
+				<seconds-field
+					name="helpQueuePreferredTime"/>
+
+				<seconds-field
+					name="infoQueuePreferredTime"/>
+
+				<object-field
+					name="currency"
+					object-type="currency"/>
+
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
+
+				<object-field
+					name="gazetteer"
+					object-type="gazetteer"/>
+
+				<text-field
+					name="defaultBrandName"/>
+
+				<timezone-field
+					name="timezone"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

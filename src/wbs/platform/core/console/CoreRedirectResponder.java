@@ -14,15 +14,15 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreRedirectResponder")
 public
 class CoreRedirectResponder
 	implements
-		Provider <Responder>,
-		Responder {
+		Provider <WebResponder>,
+		WebResponder {
 
 	// singleton dependencies
 
@@ -57,7 +57,7 @@ class CoreRedirectResponder
 
 	@Override
 	public
-	Responder get () {
+	WebResponder get () {
 
 		return this;
 

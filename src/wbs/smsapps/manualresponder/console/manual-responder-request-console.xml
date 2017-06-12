@@ -25,8 +25,9 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"
+				search-class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
+				search-form="search"
+				results-form="results"
 				priv-key="manualResponder.manage"
 				parent-id-key="manualResponderId"
 				parent-id-name="manualResponderId"/>
@@ -36,70 +37,89 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch">
+	<forms>
 
-		<text-field
-			name="numberLike"
-			label="Number"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
+			type="search">
 
-		<interval-field
-			name="createdTime"
-			nullable="yes"/>
+			<columns>
 
-	</field-set>
+				<text-field
+					name="numberLike"
+					label="Number"
+					nullable="yes"/>
 
-	<field-set
-		name="results"
-		object-name="manualResponderRequest">
+				<interval-field
+					name="createdTime"
+					nullable="yes"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<object-field
-			name="number"
-			object-type="number"/>
+		</form>
 
-	</field-set>
+		<form
+			name="results"
+			object-type="manual-responder-request"
+			type="read-only">
 
-	<field-set
-		name="summary"
-		object-name="manualResponderRequest">
+			<columns>
 
-		<parent-field/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<object-field
-			name="message"
-			object-type="message"/>
+				<object-field
+					name="number"
+					object-type="number"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+		</form>
 
-		<yes-no-field
-			name="pending"/>
+		<form
+			name="summary"
+			object-type="manual-responder-request"
+			type="read-only">
 
-		<object-field
-			name="number"
-			object-type="number"/>
+			<columns>
 
-		<object-field
-			name="queueItem"
-			object-type="queueItem"/>
+				<parent-field/>
 
-		<!-- TODO replies -->
+				<object-field
+					name="message"
+					object-type="message"/>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
+
+				<object-field
+					name="user"
+					object-type="user"/>
+
+				<yes-no-field
+					name="pending"/>
+
+				<object-field
+					name="number"
+					object-type="number"/>
+
+				<object-field
+					name="queueItem"
+					object-type="queueItem"/>
+
+				<!-- TODO replies -->
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

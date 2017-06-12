@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="root"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,81 +52,105 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="clockworkSmsDeliveryStatus">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="clockwork-sms-delivery-status"
+			type="read-only">
 
-		<description-field/>
+			<columns>
 
-		<enum-field
-			name="messageStatus"/>
+				<code-field/>
 
-		<text-field
-			name="theirDescription"/>
+				<description-field/>
 
-	</field-set>
+				<enum-field
+					name="messageStatus"/>
 
-	<field-set
-		name="create"
-		object-name="clockworkSmsDeliveryStatus">
+				<text-field
+					name="theirDescription"/>
 
-		<code-field/>
+			</columns>
 
-		<description-field/>
+		</form>
 
-		<enum-field
-			name="messageStatus"/>
+		<form
+			name="create"
+			object-type="clockwork-sms-delivery-status"
+			type="create">
 
-		<text-field
-			name="theirDescription"/>
+			<columns>
 
-		<text-area-field
-			name="theirCommonCauses"
-			nullable="yes"/>
+				<code-field/>
 
-	</field-set>
+				<description-field/>
 
-	<field-set
-		name="summary"
-		object-name="clockworkSmsDeliveryStatus">
+				<enum-field
+					name="messageStatus"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="theirDescription"/>
 
-		<enum-field
-			name="messageStatus"/>
+				<text-area-field
+					name="theirCommonCauses"
+					nullable="yes"/>
 
-		<text-field
-			name="theirDescription"/>
+			</columns>
 
-		<text-area-field
-			name="theirCommonCauses"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="clockwork-sms-delivery-status"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="clockworkSmsDeliveryStatus">
+			<columns>
 
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<enum-field
-			name="messageStatus"/>
+				<enum-field
+					name="messageStatus"/>
 
-		<text-field
-			name="theirDescription"/>
+				<text-field
+					name="theirDescription"/>
 
-		<text-area-field
-			name="theirCommonCauses"
-			nullable="yes"/>
+				<text-area-field
+					name="theirCommonCauses"/>
 
-	</field-set>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="clockwork-sms-delivery-status"
+			type="update">
+
+			<columns>
+
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<enum-field
+					name="messageStatus"/>
+
+				<text-field
+					name="theirDescription"/>
+
+				<text-area-field
+					name="theirCommonCauses"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

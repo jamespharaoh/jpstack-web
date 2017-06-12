@@ -8,7 +8,9 @@
 		name="chat.namedNote"
 		base-name="chat.settings"
 		extension-point="chat.noteName"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<context-tab-action-page
 			name="noteNames"/>

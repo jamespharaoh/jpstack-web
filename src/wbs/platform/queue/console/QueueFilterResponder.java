@@ -22,12 +22,12 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.time.TimeFormatter;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("queueFilterResponder")
 public
 class QueueFilterResponder
-	implements Responder {
+	implements WebResponder {
 
 	// singleton dependencies
 

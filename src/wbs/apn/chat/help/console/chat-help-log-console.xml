@@ -19,7 +19,7 @@
 
 	<object-context
 		name="chatHelpLog.pending"
-		bean-name="chatHelpLogPending"
+		component-name="chatHelpLogPending"
 		object-name="chatHelpLog">
 
 		<object>

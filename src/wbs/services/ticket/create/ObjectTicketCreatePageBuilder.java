@@ -47,7 +47,8 @@ import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 public
@@ -122,9 +123,7 @@ class ObjectTicketCreatePageBuilder
 	String tabLabel;
 	String localFile;
 	Boolean hideTab;
-	String responderName;
 	String targetContextTypeName;
-	String targetResponderName;
 	ConsoleFormType <TicketRec> formContextBuilder;
 	String createTimeFieldName;
 	String createUserFieldName;
@@ -132,6 +131,9 @@ class ObjectTicketCreatePageBuilder
 	String createPrivCode;
 	String privKey;
 	String ticketManagerPath;
+
+	Provider <WebResponder> responderProvider;
+	Provider <WebResponder> targetResponderProvider;
 
 	// build
 
@@ -165,6 +167,7 @@ class ObjectTicketCreatePageBuilder
 					extensionPoint);
 
 				buildFile (
+					taskLogger,
 					extensionPoint);
 
 			}
@@ -204,55 +207,63 @@ class ObjectTicketCreatePageBuilder
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		Provider <Action> createActionProvider =
-			() -> objectTicketCreateActionProvider.get ()
+		try (
 
-			.consoleHelper (
-				consoleHelper)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-			.typeCode (
-				typeCode)
+		) {
 
-			.responderName (
-				responderName)
+			Provider <WebAction> createActionProvider =
+				() -> objectTicketCreateActionProvider.get ()
 
-			.targetContextTypeName (
-				targetContextTypeName)
+				.consoleHelper (
+					consoleHelper)
 
-			.targetResponderName (
-				targetResponderName)
+				.typeCode (
+					typeCode)
 
-			.createPrivDelegate (
-				createPrivDelegate)
+				.responderProvider (
+					responderProvider)
 
-			.createPrivCode (
-				createPrivCode)
+				.targetContextTypeName (
+					targetContextTypeName)
 
-			.formContextBuilder (
-				formContextBuilder)
+				.targetResponderProvider (
+					targetResponderProvider)
 
-			.ticketFieldSpecs(
-					ticketFields)
+				.createPrivDelegate (
+					createPrivDelegate)
 
-			.ticketManagerPath(
-				ticketManagerPath)
+				.createPrivCode (
+					createPrivCode)
 
-			.createTimeFieldName (
-				createTimeFieldName)
+				.formContextBuilder (
+					formContextBuilder)
 
-			.createUserFieldName (
-				createUserFieldName);
+				.ticketFieldSpecs(
+						ticketFields)
+
+				.ticketManagerPath(
+					ticketManagerPath)
+
+				.createTimeFieldName (
+					createTimeFieldName)
+
+				.createUserFieldName (
+					createUserFieldName);
 
 			consoleModule.addContextFile (
-
 				localFile,
-
 				consoleFileProvider.get ()
 
-					.getResponderName (
-						responderName)
+					.getResponderProvider (
+						responderProvider)
 
 					.postActionProvider (
 						createActionProvider)
@@ -260,7 +271,10 @@ class ObjectTicketCreatePageBuilder
 					/*.privKeys (
 						Collections.singletonList (privKey)*/,
 
-				resolvedExtensionPoint.contextTypeNames ());
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
@@ -296,21 +310,20 @@ class ObjectTicketCreatePageBuilder
 
 		};
 
-		consoleModule.addResponder (
+		responderProvider =
+			() -> tabContextResponderProvider.get ()
 
-			responderName,
+			.tab (
+				tabName)
 
-			tabContextResponderProvider.get ()
+			.title (
+				capitalise (
+					consoleHelper.friendlyName () + " create"))
 
-				.tab (
-					tabName)
+			.pagePartFactory (
+				partFactory)
 
-				.title (
-					capitalise (
-						consoleHelper.friendlyName () + " create"))
-
-				.pagePartFactory (
-					partFactory));
+		;
 
 	}
 
@@ -341,18 +354,23 @@ class ObjectTicketCreatePageBuilder
 						"%s.create",
 						container.pathPrefix ()));
 
+			/*
 			responderName =
 				ifNull (
 					spec.responderName (),
 					stringFormat (
 						"%sCreateResponder",
 						container.newBeanNamePrefix ()));
+			*/
 
 			targetContextTypeName =
 				"Ticket";
 
-			targetResponderName =
-				"TicketSettingsResponder";
+			targetResponderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					"ticketSettingsResponder",
+					WebResponder.class);
 
 			createPrivDelegate =
 				spec.createPrivDelegate ();
@@ -384,13 +402,14 @@ class ObjectTicketCreatePageBuilder
 						"%s.create",
 						container.pathPrefix ()));
 
-
+			/*
 			responderName =
 				ifNull (
 					spec.responderName (),
 					stringFormat (
 						"%sCreateResponder",
 						container.newBeanNamePrefix ()));
+			*/
 
 			ticketManagerPath =
 				spec.ticketManager ();

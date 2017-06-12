@@ -26,7 +26,7 @@ import wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper.Cha
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("chatUserAdminLocationFormActionHelper")
 public
@@ -98,7 +98,7 @@ class ChatUserAdminLocationFormActionHelper
 
 	@Override
 	public
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserAdminLocationForm formState) {
 

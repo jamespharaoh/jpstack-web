@@ -29,10 +29,10 @@
 		<list>
 
 	`		<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="parent"
 				create-priv-code="manage"/>
 
@@ -41,77 +41,101 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatRouteNetwork">
+	<forms>
 
-		<object-field
-			name="chatRoute"
-			object-type="chatRoute"/>
+		<form
+			name="list"
+			object-type="chat-route-network"
+			type="read-only">
 
-		<object-field
-			name="network"
-			object-type="network"/>
+			<columns>
 
-		<integer-field
-			name="outRev"/>
+				<object-field
+					name="chatRoute"
+					object-type="chatRoute"/>
 
-	</field-set>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-	<field-set
-		name="create"
-		object-name="chatRouteNetwork">
+				<integer-field
+					name="outRev"/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+		</form>
 
-		<integer-field
-			name="outRev"/>
+		<form
+			name="create"
+			object-type="chat-route-network"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="chatRouteNetwork">
+				<parent-field/>
 
-		<id-field/>
-		<parent-field/>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+				<integer-field
+					name="outRev"/>
 
-		<integer-field
-			name="outRev"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="chatRouteNetwork">
+		<form
+			name="summary"
+			object-type="chat-route-network"
+			type="read-only">
 
-		<id-field/>
-		<parent-field/>
+			<columns>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+				<id-field/>
+				<parent-field/>
 
-		<integer-field
-			name="outRev"/>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-	</field-set>
+				<integer-field
+					name="outRev"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-route-network"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+
+				<object-field
+					name="network"
+					object-type="network"/>
+
+				<integer-field
+					name="outRev"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -42,7 +42,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextTabFormActionsPageBuilder")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -98,14 +99,14 @@ class ContextTabFormActionsPageBuilder
 	String tabName;
 	String tabLabel;
 	String localFile;
-	String responderName;
 	String actionName;
 	String title;
 
+	Provider <WebResponder> responderProvider;
 	List <ConsoleFormAction> formActions;
 
 	PagePartFactory pagePartFactory;
-	Provider <Action> actionProvider;
+	Provider <WebAction> actionProvider;
 
 	// build
 
@@ -323,46 +324,57 @@ class ContextTabFormActionsPageBuilder
 				genericCastUnchecked (
 					formActions))
 
-			.responderName (
-				responderName);
+			.responderProvider (
+				responderProvider);
 
 	}
 
 	void buildFile (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			localFile,
-			consoleFileProvider.get ()
+		try (
 
-				.getResponderName (
-					responderName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-				.postActionProvider (
-					actionProvider),
+		) {
 
-			resolvedExtensionPoint.contextTypeNames ());
+			consoleModule.addContextFile (
+				localFile,
+				consoleFileProvider.get ()
+
+					.getResponderProvider (
+						responderProvider)
+
+					.postActionProvider (
+						actionProvider),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
 	void buildResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponderProvider.get ()
+		responderProvider =
+			() -> tabContextResponderProvider.get ()
 
-				.tab (
-					tabName)
+			.tab (
+				tabName)
 
-				.title (
-					title)
+			.title (
+				title)
 
-				.pagePartFactory (
-					pagePartFactory)
+			.pagePartFactory (
+				pagePartFactory)
 
-		);
+		;
 
 	}
 
@@ -391,13 +403,6 @@ class ContextTabFormActionsPageBuilder
 				"%s.%s",
 				container.pathPrefix (),
 				name);
-
-		responderName =
-			stringFormat (
-				"%s%sFormResponder",
-				container.newBeanNamePrefix (),
-				capitalise (
-					name));
 
 		actionName =
 			stringFormat (

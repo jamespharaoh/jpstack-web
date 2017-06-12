@@ -22,19 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -42,66 +43,100 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="dialogueLocator">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="dialogue-locator"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="dialogueLocator">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<text-field
-			name="url"
-			label="URL"/>
+		</form>
 
-		<text-field
-			name="account"/>
+		<form
+			name="create"
+			object-type="dialogue-locator"
+			type="create">
 
-		<text-field
-			name="organiser"/>
+			<columns>
 
-		<text-field
-			name="password"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="dialogueLocator">
+		</form>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+		<form
+			name="summary"
+			object-type="dialogue-locator"
+			type="read-only">
 
-		<text-field
-			name="url"
-			label="URL"/>
+			<columns>
 
-		<text-field
-			name="account"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-field
-			name="organiser"/>
+				<text-field
+					name="url"
+					label="URL"/>
 
-		<text-field
-			name="password"/>
+				<text-field
+					name="account"/>
 
-	</field-set>
+				<text-field
+					name="organiser"/>
+
+				<text-field
+					name="password"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="dialogue-locator"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="url"
+					label="URL"/>
+
+				<text-field
+					name="account"/>
+
+				<text-field
+					name="organiser"/>
+
+				<text-field
+					name="password"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

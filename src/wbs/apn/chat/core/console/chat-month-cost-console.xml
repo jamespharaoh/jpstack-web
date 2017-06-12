@@ -30,91 +30,115 @@
 		<list>
 
 	`		<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatMonthCost">
+	<forms>
 
-		<object-field
-			name="chat"
-			object-type="chat"/>
+		<form
+			name="list"
+			object-type="chat-month-cost"
+			type="read-only">
 
-		<code-field
-			name="yearMonth"
-			pattern="^\d{4}-\d{2}$"/>
+			<columns>
 
-		<integer-field
-			name="staffCost"/>
+				<object-field
+					name="chat"
+					object-type="chat"/>
 
-	</field-set>
+				<code-field
+					name="yearMonth"
+					pattern="^\d{4}-\d{2}$"/>
 
-	<field-set
-		name="create"
-		object-name="chatMonthCost">
+				<integer-field
+					name="staffCost"/>
 
-		<object-field
-			name="chat"
-			object-type="chat"/>
+			</columns>
 
-		<code-field
-			name="yearMonth"
-			pattern="^\d{4}-\d{2}$"/>
+		</form>
 
-		<integer-field
-			name="staffCost"/>
+		<form
+			name="create"
+			object-type="chat-month-cost"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="chatMonthCost">
+				<object-field
+					name="chat"
+					object-type="chat"/>
 
-		<object-field
-			name="chat"
-			object-type="chat"/>
+				<code-field
+					name="yearMonth"
+					pattern="^\d{4}-\d{2}$"/>
 
-		<code-field
-			name="yearMonth"
-			pattern="^\d{4}-\d{2}$"/>
+				<integer-field
+					name="staffCost"/>
 
-		<integer-field
-			name="staffCost"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="chatMonthCost">
+		<form
+			name="summary"
+			object-type="chat-month-cost"
+			type="read-only">
 
-		<object-field
-			name="chat"
-			object-type="chat"/>
+			<columns>
 
-		<code-field
-			name="yearMonth"
-			pattern="^\d{4}-\d{2}$"/>
+				<object-field
+					name="chat"
+					object-type="chat"/>
 
-		<integer-field
-			name="staffCost"/>
+				<code-field
+					name="yearMonth"
+					pattern="^\d{4}-\d{2}$"/>
 
-	</field-set>
+				<integer-field
+					name="staffCost"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-month-cost"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="chat"
+					object-type="chat"/>
+
+				<code-field
+					name="yearMonth"
+					pattern="^\d{4}-\d{2}$"/>
+
+				<integer-field
+					name="staffCost"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

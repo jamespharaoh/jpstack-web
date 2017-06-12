@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="grandparent"
 				create-priv-code="manager"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,58 +52,82 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="subscriptionSendPart">
+	<forms>
 
-		<object-field
-			name="subscriptionList"
-			object-type="subscriptionList"/>
+		<form
+			name="list"
+			object-type="subscription-send-part"
+			type="read-only">
 
-		<text-area-field
-			name="text"/>
+			<columns>
 
-	</field-set>
+				<object-field
+					name="subscriptionList"
+					object-type="subscriptionList"/>
 
-	<field-set
-		name="create"
-		object-name="subscriptionSendPart">
+				<text-area-field
+					name="text"/>
 
-		<object-field
-			name="subscriptionList"
-			object-type="subscriptionList"/>
+			</columns>
 
-		<text-area-field
-			name="text"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="subscription-send-part"
+			type="read-only">
 
-	<field-set
-		name="summary"
-		object-name="subscriptionSendPart">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<deleted-field/>
+				<object-field
+					name="subscriptionList"
+					object-type="subscriptionList"/>
 
-		<object-field
-			name="subscriptionList"
-			object-type="subscriptionList"/>
+				<text-area-field
+					name="text"/>
 
-		<text-area-field
-			name="text"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="subscriptionSendPart">
+		<form
+			name="summary"
+			object-type="subscription-send-part"
+			type="read-only">
 
-		<deleted-field/>
+			<columns>
 
-		<text-area-field
-			name="text"/>
+				<id-field/>
+				<parent-field/>
+				<deleted-field/>
 
-	</field-set>
+				<object-field
+					name="subscriptionList"
+					object-type="subscriptionList"/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="subscription-send-part"
+			type="update">
+
+			<columns>
+
+				<deleted-field/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

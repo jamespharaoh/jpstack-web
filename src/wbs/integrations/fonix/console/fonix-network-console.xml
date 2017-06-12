@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="root"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,63 +52,87 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="fonixNetwork">
+	<forms>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+		<form
+			name="list"
+			object-type="fonix-network"
+			type="read-only">
 
-		<text-field
-			name="theirCode"/>
+			<columns>
 
-	</field-set>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-	<field-set
-		name="create"
-		object-name="fonixNetwork">
+				<text-field
+					name="theirCode"/>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+			</columns>
 
-		<text-field
-			name="theirCode"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="fonix-network"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="fonixNetwork">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+				<text-field
+					name="theirCode"/>
 
-		<deleted-field/>
+			</columns>
 
-		<text-field
-			name="theirCode"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="fonix-network"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="fonixNetwork">
+			<columns>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+				<id-field/>
+				<parent-field/>
 
-		<deleted-field/>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-		<text-field
-			name="theirCode"/>
+				<deleted-field/>
 
-	</field-set>
+				<text-field
+					name="theirCode"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="fonix-network"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="network"
+					object-type="network"/>
+
+				<deleted-field/>
+
+				<text-field
+					name="theirCode"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

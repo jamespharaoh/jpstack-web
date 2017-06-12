@@ -3,6 +3,8 @@ package wbs.apn.chat.affiliate.console;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -12,7 +14,9 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -30,7 +34,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreateAction")
 public
@@ -63,15 +67,24 @@ class ChatAffiliateKeywordsCreateAction
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatAffiliateKeywordsCreateResponder")
+	Provider <WebResponder> createResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatAffiliateKeywordsListResponder")
+	Provider <WebResponder> listResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatAffiliateKeywordsCreateResponder");
+		return createResponderProvider.get ();
 
 	}
 
@@ -79,7 +92,7 @@ class ChatAffiliateKeywordsCreateAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -214,8 +227,7 @@ class ChatAffiliateKeywordsCreateAction
 
 			requestContext.setEmptyFormData ();
 
-			return responder (
-				"chatAffiliateKeywordsListResponder");
+			return listResponderProvider.get ();
 
 		}
 

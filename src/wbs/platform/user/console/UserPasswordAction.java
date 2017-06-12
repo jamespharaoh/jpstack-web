@@ -5,6 +5,8 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import org.apache.commons.codec.binary.Base64;
@@ -14,7 +16,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -24,7 +28,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.model.UserRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("userPasswordAction")
 public
@@ -54,21 +58,26 @@ class UserPasswordAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("userPasswordResponder")
+	Provider <WebResponder> passwordResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"userPasswordResponder");
+		return passwordResponderProvider.get ();
 
 	}
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

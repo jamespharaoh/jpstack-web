@@ -3,6 +3,7 @@ package wbs.platform.rpc.xml;
 import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -17,14 +18,14 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
-
-import wbs.api.mvc.WebApiAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -41,7 +42,6 @@ import wbs.platform.rpc.core.RpcException;
 import wbs.platform.rpc.core.RpcHandler;
 import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
-import wbs.platform.rpc.web.ReusableRpcHandler;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -53,13 +53,14 @@ import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
 import wbs.web.context.RequestContext;
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlRpcAction")
 public
 class XmlRpcAction
-	implements WebApiAction {
+	implements WebAction {
 
 	// singleton dependencies
 
@@ -75,47 +76,43 @@ class XmlRpcAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <XmlResponder> xmlResponder;
+	Provider <XmlResponder> xmlResponderProvider;
 
 	// properties
 
 	@Getter @Setter
-	ReusableRpcHandler rpcHandler;
+	Provider <? extends RpcHandler> rpcHandlerProvider;
+
+	// property setters
 
 	public
 	XmlRpcAction rpcHandlerName (
-			final String name) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String name) {
 
-		ReusableRpcHandler rpcHandler =
-			new ReusableRpcHandler () {
+		try (
 
-			@Override
-			public
-			RpcResult handle (
-					@NonNull TaskLogger parentTaskLogger,
-					@NonNull RpcSource source) {
-
-				RpcHandler delegate =
-					componentManager.getComponentRequired (
-						parentTaskLogger,
-						name,
-						RpcHandler.class);
-
-				return delegate.handle (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					source);
+					"rpcHandlerName");
 
-			}
+		) {
 
-		};
+			return rpcHandlerProvider (
+				componentManager.getComponentProviderRequired (
+					parentTaskLogger,
+					name,
+					RpcHandler.class));
 
-		return rpcHandler (
-			rpcHandler);
+		}
 
 	}
 
+	// implementation
+
 	public
-	Responder xmlInternalErrorResponder () {
+	WebResponder xmlInternalErrorResponder () {
 
 		return makeRpcResponder (
 			Rpc.rpcError (
@@ -128,27 +125,30 @@ class XmlRpcAction
 
 	@Override
 	public
-	Provider<Responder> makeFallbackResponder () {
+	Optional <WebResponder> defaultResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return new Provider<Responder> () {
+		try (
 
-			@Override
-			public
-			Responder get () {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultResponder");
 
-				return xmlInternalErrorResponder ();
+		) {
 
-			}
+			return optionalOf (
+				xmlInternalErrorResponder ());
 
-		};
+		}
 
 	}
 
 	private
-	Responder makeRpcResponder (
+	WebResponder makeRpcResponder (
 			RpcResult result) {
 
-		return xmlResponder.get ()
+		return xmlResponderProvider.get ()
 
 			.data (
 				result.getStruct ())
@@ -160,16 +160,27 @@ class XmlRpcAction
 
 	@Override
 	public
-	Responder go (
+	WebResponder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		RpcResult ret =
-			realGo (
-				parentTaskLogger);
+		try (
 
-		return ret != null
-			? makeRpcResponder (ret)
-			: null;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
+		) {
+
+			RpcResult ret =
+				realGo (
+					parentTaskLogger);
+
+			return ret != null
+				? makeRpcResponder (ret)
+				: null;
+
+		}
 
 	}
 
@@ -252,6 +263,9 @@ class XmlRpcAction
 				parse (
 					taskLogger,
 					requestContext.inputStream ());
+
+			RpcHandler rpcHandler =
+				rpcHandlerProvider.get ();
 
 			return rpcHandler.handle (
 				taskLogger,

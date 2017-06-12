@@ -33,15 +33,15 @@ import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
-import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
+import wbs.web.mvc.WebAction;
 import wbs.web.responder.JsonResponder;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("messageTemplateMessagesGetAction")
 public
 class MessageTemplateMessagesGetAction
-	implements Action {
+	implements WebAction {
 
 	// singleton dependencies
 
@@ -72,7 +72,7 @@ class MessageTemplateMessagesGetAction
 
 	@Override
 	public
-	Responder handle (
+	WebResponder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

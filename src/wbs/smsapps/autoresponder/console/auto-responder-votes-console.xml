@@ -5,7 +5,9 @@
 		name="autoResponder.votes"
 		base-name="autoResponder"
 		extension-point="autoResponder.plugins"
-		object-name="autoResponder">
+		object-name="autoResponder"
+		component-name="autoResponder"
+		friendly-name="auto responder">
 
 		<context-tab-responder-page
 			name="votes"/>
@@ -19,12 +21,12 @@
 			class="wbs.smsapps.autoresponder.console.AutoResponderVotesForm"
 			type="search">
 
-			<column-fields>
+			<columns>
 
 				<interval-field
 					name="timePeriod"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

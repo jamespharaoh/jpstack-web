@@ -28,7 +28,9 @@
 		name="chat.settings.templates.help"
 		base-name="chat.settings.templates"
 		extension-point="chat.helpTemplates"
-		object-name="chat">
+		object-name="chat"
+		component-name="chatHelpTemplate"
+		friendly-name="chat">
 
 		<chat-help-template-context
 			type="system"/>
@@ -53,54 +55,78 @@
 
 	</extend-context>
 
-	<field-set
-		name="list"
-		object-name="chatHelpTemplate">
+	<forms>
 
-		<code-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="chat-help-template"
+			type="read-only">
 
-		<text-field
-			name="text"/>
+			<columns>
 
-	</field-set>
+				<code-field/>
+				<description-field/>
 
-	<field-set
-		name="create"
-		object-name="chatHelpTemplate">
+				<text-field
+					name="text"/>
 
-		<code-field/>
-		<description-field/>
+			</columns>
 
-		<text-area-field
-			name="text"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="chat-help-template"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="chatHelpTemplate">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
+				<code-field/>
+				<description-field/>
 
-		<text-area-field
-			name="text"/>
+				<text-area-field
+					name="text"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="chatHelpTemplate">
+		</form>
 
-		<code-field/>
-		<description-field/>
+		<form
+			name="summary"
+			object-type="chat-help-template"
+			type="read-only">
 
-		<text-area-field
-			name="text"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-help-template"
+			type="update">
+
+			<columns>
+
+				<code-field/>
+				<description-field/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

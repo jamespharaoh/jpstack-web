@@ -5,7 +5,9 @@
 		name="chat.supervisor"
 		base-name="chat"
 		extension-point="chat.supervisor"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<supervisor-page
 			title="Chat service supervisor"

@@ -29,14 +29,14 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-events-page/>
 
@@ -44,33 +44,47 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="subscriptionSendNumber">
+	<forms>
 
-		<object-field
-			name="number"
-			object-type="number"/>
+		<form
+			name="list"
+			object-type="subscription-send-number"
+			type="read-only">
 
-		<enum-field
-			name="state"/>
+			<columns>
 
-	</field-set>
+				<object-field
+					name="number"
+					object-type="number"/>
 
-	<field-set
-		name="summary"
-		object-name="subscriptionSendNumber">
+				<enum-field
+					name="state"/>
 
-		<id-field/>
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="number"
-			object-type="number"/>
+		</form>
 
-		<enum-field
-			name="state"/>
+		<form
+			name="summary"
+			object-type="subscription-send-number"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+
+				<object-field
+					name="number"
+					object-type="number"/>
+
+				<enum-field
+					name="state"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

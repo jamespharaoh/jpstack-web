@@ -25,11 +25,17 @@
 	<layer name="api">
 		<component class="api.ForwarderApiLogicImplementation"/>
 		<component class="api.ForwarderApiModule"/>
-		<component class="api.ForwarderInAction"/>
-		<component class="api.ForwarderOutAction"/>
+		<component class="api.ForwarderInApiAction"/>
+		<component class="api.ForwarderOutApiAction"/>
 		<component class="api.ForwarderPeekExRequestDef"/>
-		<component class="api.ForwarderQueryExRequestDef"/>
+		<component class="api.ForwarderPeekExRpcHandler"/>
 		<component class="api.ForwarderQueryExMessageChecker"/>
+		<component class="api.ForwarderQueryExRequestDef"/>
+		<component class="api.ForwarderQueryExRpcHandler"/>
+		<component class="api.ForwarderSendExRequestDef"/>
+		<component class="api.ForwarderSendExRpcHandler"/>
+		<component class="api.ForwarderSendRequestDef"/>
+		<component class="api.ForwarderSendRpcHandler"/>
 		<component class="api.ForwarderUnqueueExRpcHandler"/>
 		<component class="api.ForwarderUnqueueExRequestDef"/>
 	</layer>

@@ -29,130 +29,186 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatSchemeKeyword">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="chat-scheme-keyword"
+			type="read-only">
 
-		<enum-field
-			name="joinType"
-			label="Type"/>
+			<columns>
 
-		<enum-field
-			name="joinGender"
-			label="Gender"/>
+				<code-field/>
 
-		<enum-field
-			name="joinOrient"
-			label="Orient"/>
+				<enum-field
+					name="joinType"
+					label="Type"/>
 
-		<object-field
-			name="joinChatAffiliate"
-			label="Affiliate"
-			object-type="chatAffiliate"/>
+				<enum-field
+					name="joinGender"
+					label="Gender"/>
 
-		<yes-no-field
-			name="confirmCharges"
-			label="Charges"/>
+				<enum-field
+					name="joinOrient"
+					label="Orient"/>
 
-		<object-field
-			name="command"
-			object-type="command"/>
+				<object-field
+					name="joinChatAffiliate"
+					label="Affiliate"
+					object-type="chatAffiliate"/>
 
-		<yes-no-field
-			name="noCreditCheck"/>
+				<yes-no-field
+					name="confirmCharges"
+					label="Charges"/>
 
-	</field-set>
+				<object-field
+					name="command"
+					object-type="command"/>
 
-	<field-set
-		name="summary"
-		object-name="chatSchemeKeyword">
+				<yes-no-field
+					name="noCreditCheck"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
+			</columns>
 
-		<enum-field
-			name="joinType"/>
+		</form>
 
-		<enum-field
-			name="joinGender"/>
+		<form
+			name="create"
+			object-type="chat-scheme-keyword"
+			type="create">
 
-		<enum-field
-			name="joinOrient"/>
+			<columns>
 
-		<object-field
-			name="joinChatAffiliate"
-			object-type="chatAffiliate"
-			root-field="chatScheme"/>
+				<code-field/>
 
-		<yes-no-field
-			name="confirmCharges"/>
+				<enum-field
+					name="joinType"/>
 
-		<object-field
-			name="command"
-			object-type="command"/>
+				<enum-field
+					name="joinGender"/>
 
-		<yes-no-field
-			name="noCreditCheck"/>
+				<enum-field
+					name="joinOrient"/>
 
-	</field-set>
+				<object-field
+					name="joinChatAffiliate"
+					object-type="chatAffiliate"/>
 
-	<field-set
-		name="settings"
-		object-name="chatSchemeKeyword">
+				<yes-no-field
+					name="confirmCharges"/>
 
-		<id-field/>
-		<code-field/>
+				<object-field
+					name="command"
+					object-type="command"/>
 
-		<enum-field
-			name="joinType"
-			nullable="yes"/>
+				<yes-no-field
+					name="noCreditCheck"/>
 
-		<enum-field
-			name="joinGender"
-			nullable="yes"/>
+			</columns>
 
-		<enum-field
-			name="joinOrient"
-			nullable="yes"/>
+		</form>
 
-		<object-field
-			name="joinChatAffiliate"
-			object-type="chatAffiliate"
-			root-field="chatScheme"
-			nullable="yes"/>
+		<form
+			name="summary"
+			object-type="chat-scheme-keyword"
+			type="read-only">
 
-		<yes-no-field
-			name="confirmCharges"/>
+			<columns>
 
-		<object-field
-			name="command"
-			object-type="command"
-			nullable="yes"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
 
-		<yes-no-field
-			name="noCreditCheck"/>
+				<enum-field
+					name="joinType"/>
 
-	</field-set>
+				<enum-field
+					name="joinGender"/>
+
+				<enum-field
+					name="joinOrient"/>
+
+				<object-field
+					name="joinChatAffiliate"
+					object-type="chatAffiliate"
+					root-field="chatScheme"/>
+
+				<yes-no-field
+					name="confirmCharges"/>
+
+				<object-field
+					name="command"
+					object-type="command"/>
+
+				<yes-no-field
+					name="noCreditCheck"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-scheme-keyword"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+
+				<enum-field
+					name="joinType"
+					nullable="yes"/>
+
+				<enum-field
+					name="joinGender"
+					nullable="yes"/>
+
+				<enum-field
+					name="joinOrient"
+					nullable="yes"/>
+
+				<object-field
+					name="joinChatAffiliate"
+					object-type="chatAffiliate"
+					root-field="chatScheme"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="confirmCharges"/>
+
+				<object-field
+					name="command"
+					object-type="command"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="noCreditCheck"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

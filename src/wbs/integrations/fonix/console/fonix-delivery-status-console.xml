@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="root"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,70 +52,94 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="fonixDeliveryStatus">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="fonix-delivery-status"
+			type="read-only">
 
-		<description-field/>
+			<columns>
 
-		<enum-field
-			name="messageStatus"/>
+				<code-field/>
 
-		<yes-no-field
-			name="permanent"/>
+				<description-field/>
 
-	</field-set>
+				<enum-field
+					name="messageStatus"/>
 
-	<field-set
-		name="create"
-		object-name="fonixDeliveryStatus">
+				<yes-no-field
+					name="permanent"/>
 
-		<code-field/>
+			</columns>
 
-		<description-field/>
+		</form>
 
-		<enum-field
-			name="messageStatus"/>
+		<form
+			name="create"
+			object-type="fonix-delivery-status"
+			type="create">
 
-		<yes-no-field
-			name="permanent"/>
+			<columns>
 
-	</field-set>
+				<code-field/>
 
-	<field-set
-		name="summary"
-		object-name="fonixDeliveryStatus">
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
+				<enum-field
+					name="messageStatus"/>
 
-		<enum-field
-			name="messageStatus"/>
+				<yes-no-field
+					name="permanent"/>
 
-		<yes-no-field
-			name="permanent"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="fonixDeliveryStatus">
+		<form
+			name="summary"
+			object-type="fonix-delivery-status"
+			type="read-only">
 
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-		<enum-field
-			name="messageStatus"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<yes-no-field
-			name="permanent"/>
+				<enum-field
+					name="messageStatus"/>
 
-	</field-set>
+				<yes-no-field
+					name="permanent"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="fonix-delivery-status"
+			type="update">
+
+			<columns>
+
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<enum-field
+					name="messageStatus"/>
+
+				<yes-no-field
+					name="permanent"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

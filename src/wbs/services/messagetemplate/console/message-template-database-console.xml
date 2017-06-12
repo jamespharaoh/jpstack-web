@@ -33,10 +33,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				target-responder="messageTemplateDatabaseSettingsGeneralResponder"/>
 
 		</list>
@@ -44,14 +44,14 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
 				label="Settings">
 
 				<object-settings-page
-					fields="settings"
+					form="settings"
 					short-name="general"/>
 
 				<context-link
@@ -79,63 +79,82 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="messageTemplateDatabase">
-
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="messageTemplateDatabase">
-
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="messageTemplateDatabase">
-
-		<id-field/>
-		<code-field/>
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="messageTemplateDatabase">
-
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="list"
+			object-type="message-template-database"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="message-template-database"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="message-template-database"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="copy"
 			class="wbs.services.messagetemplate.console.MessageTemplateCopyForm"
 			type="perform">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="sourceMessageTemplateDatabaseId"
 					object-type="messageTemplateDatabase"/>
 
-			</column-fields>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="message-template-database"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
 
 		</form>
 

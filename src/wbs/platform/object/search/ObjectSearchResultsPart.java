@@ -220,7 +220,7 @@ class ObjectSearchResultsPart <
 					resultsModeName);
 
 			form =
-				resultsMode.formContextBuilder ().buildResponse (
+				resultsMode.formType ().buildResponse (
 					transaction,
 					emptyMap (),
 					emptyList ());

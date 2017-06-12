@@ -29,9 +29,11 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"
+				target-responder="manualResponderSettingsGeneralResponder"/>
 
 			<context-link
 				name="sharedReport"
@@ -43,7 +45,7 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
@@ -51,7 +53,7 @@
 
 				<object-settings-page
 					short-name="general"
-					fields="settings"/>
+					form="settings"/>
 
 				<context-link
 					name="template"
@@ -103,151 +105,185 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="manualResponder">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="manual-responder"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="manualResponder">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<yes-no-field
-			name="canIgnore"/>
+		</form>
 
-		<yes-no-field
-			name="canSendMultiple"/>
+		<form
+			name="create"
+			object-type="manual-responder"
+			type="create">
 
-		<text-area-field
-			name="infoText"
-			label="Operator info (html)"/>
+			<columns>
 
-		<yes-no-field
-			name="showDailyBillInfo"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<seconds-field
-			name="preferredQueueTime"/>
+			</columns>
 
-		<object-field
-			name="unblockNumberList"
-			object-type="numberList"/>
+		</form>
 
-		<object-field
-			name="smsSpendLimiter"
-			object-type="smsSpendLimiter"
-			feature="sms_spend_limit"/>
+		<form
+			name="summary"
+			object-type="manual-responder"
+			type="read-only">
 
-		<object-field
-			name="smsCustomerManager"
-			object-type="smsCustomerManager"/>
+			<columns>
 
-		<integer-field
-			name="requiredAge"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<object-field
-			name="dateOfBirthTemplate"
-			object-type="manualResponderTemplate"
-			root-field="this"/>
+				<yes-no-field
+					name="canIgnore"/>
 
-		<object-field
-			name="dateOfBirthErrorTemplate"
-			object-type="manualResponderTemplate"
-			root-field="this"/>
+				<yes-no-field
+					name="canSendMultiple"/>
 
-		<object-field
-			name="tooYoungTemplate"
-			object-type="manualResponderTemplate"
-			root-field="this"/>
+				<text-area-field
+					name="infoText"
+					label="Operator info (html)"/>
 
-	</field-set>
+				<yes-no-field
+					name="showDailyBillInfo"/>
 
-	<field-set
-		name="settings"
-		object-name="manualResponder">
+				<seconds-field
+					name="preferredQueueTime"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<object-field
+					name="unblockNumberList"
+					object-type="numberList"/>
 
-		<yes-no-field
-			name="canIgnore"
-			nullable="yes"/>
+				<object-field
+					name="smsSpendLimiter"
+					object-type="smsSpendLimiter"
+					feature="sms_spend_limit"/>
 
-		<yes-no-field
-			name="canSendMultiple"
-			nullable="yes"/>
+				<object-field
+					name="smsCustomerManager"
+					object-type="smsCustomerManager"/>
 
-		<text-area-field
-			name="infoText"
-			label="Operator info (html)"
-			nullable="yes"/>
+				<integer-field
+					name="requiredAge"/>
 
-		<yes-no-field
-			name="showDailyBillInfo"
-			nullable="yes"/>
+				<object-field
+					name="dateOfBirthTemplate"
+					object-type="manualResponderTemplate"
+					root-field="this"/>
 
-		<seconds-field
-			name="preferredQueueTime"
-			nullable="yes"/>
+				<object-field
+					name="dateOfBirthErrorTemplate"
+					object-type="manualResponderTemplate"
+					root-field="this"/>
 
-		<object-field
-			name="currency"
-			object-type="currency"
-			nullable="yes"/>
+				<object-field
+					name="tooYoungTemplate"
+					object-type="manualResponderTemplate"
+					root-field="this"/>
 
-		<object-field
-			name="unblockNumberList"
-			object-type="numberList"
-			nullable="yes"/>
+			</columns>
 
-		<object-field
-			name="smsSpendLimiter"
-			object-type="smsSpendLimiter"
-			nullable="yes"
-			feature="sms_spend_limit"/>
+		</form>
 
-		<object-field
-			name="smsCustomerManager"
-			object-type="smsCustomerManager"
-			nullable="yes"/>
+		<form
+			name="settings"
+			object-type="manual-responder"
+			type="update">
 
-		<integer-field
-			name="requiredAge"
-			nullable="yes"/>
+			<columns>
 
-		<object-field
-			name="dateOfBirthTemplate"
-			object-type="manualResponderTemplate"
-			nullable="yes"
-			root-field="this"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<object-field
-			name="dateOfBirthErrorTemplate"
-			object-type="manualResponderTemplate"
-			nullable="yes"
-			root-field="this"/>
+				<yes-no-field
+					name="canIgnore"
+					nullable="yes"/>
 
-		<object-field
-			name="tooYoungTemplate"
-			object-type="manualResponderTemplate"
-			nullable="yes"
-			root-field="this"/>
+				<yes-no-field
+					name="canSendMultiple"
+					nullable="yes"/>
 
-	</field-set>
+				<text-area-field
+					name="infoText"
+					label="Operator info (html)"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="showDailyBillInfo"
+					nullable="yes"/>
+
+				<seconds-field
+					name="preferredQueueTime"
+					nullable="yes"/>
+
+				<object-field
+					name="currency"
+					object-type="currency"
+					nullable="yes"/>
+
+				<object-field
+					name="unblockNumberList"
+					object-type="numberList"
+					nullable="yes"/>
+
+				<object-field
+					name="smsSpendLimiter"
+					object-type="smsSpendLimiter"
+					nullable="yes"
+					feature="sms_spend_limit"/>
+
+				<object-field
+					name="smsCustomerManager"
+					object-type="smsCustomerManager"
+					nullable="yes"/>
+
+				<integer-field
+					name="requiredAge"
+					nullable="yes"/>
+
+				<object-field
+					name="dateOfBirthTemplate"
+					object-type="manualResponderTemplate"
+					nullable="yes"
+					root-field="this"/>
+
+				<object-field
+					name="dateOfBirthErrorTemplate"
+					object-type="manualResponderTemplate"
+					nullable="yes"
+					root-field="this"/>
+
+				<object-field
+					name="tooYoungTemplate"
+					object-type="manualResponderTemplate"
+					nullable="yes"
+					root-field="this"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

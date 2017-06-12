@@ -4,9 +4,10 @@
 
 	<layer name="web">
 
-		<component class="action.ActionRequestHandler"/>
-
 		<component class="context.RequestContextImplementation"/>
+
+		<component class="mvc.WebActionRequestHandler"/>
+		<component class="mvc.WebResponderRequestHandler"/>
 
 		<component class="pathhandler.DelegatingPathHandler"/>
 		<component class="pathhandler.RegexpPathHandler"/>

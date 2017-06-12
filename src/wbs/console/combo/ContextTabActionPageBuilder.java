@@ -125,8 +125,6 @@ class ContextTabActionPageBuilder <
 
 			}
 
-			buildResponder ();
-
 		}
 
 	}
@@ -190,6 +188,7 @@ class ContextTabActionPageBuilder <
 				consoleFile.get ()
 
 					.getResponderName (
+						taskLogger,
 						responderName)
 
 					.postActionName (
@@ -202,25 +201,6 @@ class ContextTabActionPageBuilder <
 				resolvedExtensionPoint.contextTypeNames ());
 
 		}
-
-	}
-
-	void buildResponder () {
-
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
-
-			.tab (
-				tabName)
-
-			.title (
-				title)
-
-			.pagePartName (
-				pagePartName)
-
-		);
 
 	}
 

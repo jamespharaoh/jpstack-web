@@ -3,7 +3,7 @@
 
 	<object-context
 		name="manualResponderRequest.pending"
-		bean-name="manualResponderRequestPending"
+		component-name="manualResponderRequestPending"
 		object-name="manualResponderRequest">
 
 		<object>
@@ -28,14 +28,14 @@
 			object-type="sms-customer"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<code-field/>
 
 				<date-field
 					name="dateOfBirth"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

@@ -5,7 +5,9 @@
 		name="chat.rebill"
 		base-name="chat"
 		extension-point="chat.rebill"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<section
 			name="rebill"
@@ -31,7 +33,7 @@
 			class="wbs.apn.chat.bill.console.ChatRebillSearch"
 			type="search">
 
-			<column-fields>
+			<columns>
 
 				<timestamp-from-field
 					name="lastAction"/>
@@ -49,7 +51,7 @@
 					name="includeFailed"
 					nullable="no"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -58,7 +60,7 @@
 			object-type="chat-user"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<code-field/>
 
@@ -79,7 +81,7 @@
 				<timestamp-from-field
 					name="lastAction"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -88,7 +90,7 @@
 			class="wbs.apn.chat.bill.console.ChatRebillNonBillResult"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<text-field
 					name="code"
@@ -118,7 +120,7 @@
 				<text-field
 					name="reason"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

@@ -1,9 +1,9 @@
 package wbs.console.forms.core;
 
-import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrNull;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -79,11 +79,9 @@ class StaticObjectFieldsProviderFactory <
 		) {
 
 			Class <Parent> parentClass =
-				genericCastUnchecked (
-					ifThenElse (
-						consoleHelper.parentTypeIsFixed (),
-						() -> consoleHelper.parentClassRequired (),
-						() -> null));
+				genericCastUncheckedNullSafe (
+					optionalOrNull (
+						consoleHelper.parentClass ()));
 
 			return staticFieldsProviderProvider.get ()
 

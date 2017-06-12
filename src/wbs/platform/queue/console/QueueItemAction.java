@@ -1,12 +1,16 @@
 package wbs.platform.queue.console;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -15,7 +19,7 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("queueItemAction")
 public
@@ -39,21 +43,26 @@ class QueueItemAction
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"queueHomeResponder");
+		return queueHomeResponderProvider.get ();
 
 	}
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

@@ -3,6 +3,8 @@ package wbs.services.ticket.core.console;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -11,7 +13,9 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -24,7 +28,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("ticketPendingFormAction")
 public
@@ -60,22 +64,32 @@ class TicketPendingFormAction
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("ticketPendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"ticketPendingFormResponder");
+		return pendingFormResponderProvider.get ();
+
 	}
 
 	// implementation
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -205,12 +219,10 @@ class TicketPendingFormAction
 
 			// return
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 
 	}
-
 
 }

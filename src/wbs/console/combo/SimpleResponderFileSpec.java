@@ -38,7 +38,9 @@ class SimpleResponderFileSpec
 		name = "responder")
 	String responderName;
 
+	/*
 	@DataAttribute
 	String responderBeanName;
+	*/
 
 }

@@ -22,17 +22,17 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -40,104 +40,123 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="backgroundProcess">
+	<forms>
 
-		<object-field
-			name="parentType"
-			object-type="objectType"/>
+		<form
+			name="list"
+			object-type="background-process"
+			type="read-only">
 
-		<name-field/>
-		<description-field/>
+			<columns>
 
-		<duration-field
-			name="frequency"/>
+				<object-field
+					name="parentType"
+					object-type="objectType"/>
 
-		<yes-no-field
-			name="enabled"/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="debug"/>
+				<duration-field
+					name="frequency"/>
 
-		<timestamp-field
-			name="lastRunTime"/>
+				<yes-no-field
+					name="enabled"/>
 
-		<duration-field
-			name="lastRunDuration"/>
+				<yes-no-field
+					name="debug"/>
 
-		<yes-no-field
-			name="lastRunSuccess"/>
+				<timestamp-field
+					name="lastRunTime"/>
 
-	</field-set>
+				<duration-field
+					name="lastRunDuration"/>
 
-	<field-set
-		name="summary"
-		object-name="backgroundProcess">
+				<yes-no-field
+					name="lastRunSuccess"/>
 
-		<id-field/>
+			</columns>
 
-		<object-field
-			name="parentType"
-			object-type="objectType"/>
+		</form>
 
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+		<form
+			name="summary"
+			object-type="background-process"
+			type="read-only">
 
-		<integer-field
-			name="numRuns"/>
+			<columns>
 
-		<yes-no-field
-			name="lastRunSuccess"/>
+				<id-field/>
 
-		<timestamp-field
-			name="lastRunTime"/>
+				<object-field
+					name="parentType"
+					object-type="objectType"/>
 
-		<duration-field
-			name="lastRunDuration"/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<timestamp-field
-			name="nextRunTime"/>
+				<integer-field
+					name="numRuns"/>
 
-		<yes-no-field
-			name="running"/>
+				<yes-no-field
+					name="lastRunSuccess"/>
 
-		<object-field
-			name="runningDaemonDeployment"
-			object-type="daemonDeployment"/>
+				<timestamp-field
+					name="lastRunTime"/>
 
-		<timestamp-field
-			name="runningStartTime"/>
+				<duration-field
+					name="lastRunDuration"/>
 
-		<timestamp-field
-			name="runningWatchdogTime"/>
+				<timestamp-field
+					name="nextRunTime"/>
 
-		<text-area-field
-			name="lastTaskLog"/>
+				<yes-no-field
+					name="running"/>
 
-	</field-set>
+				<object-field
+					name="runningDaemonDeployment"
+					object-type="daemonDeployment"/>
 
-	<field-set
-		name="settings"
-		object-name="backgroundProcess">
+				<timestamp-field
+					name="runningStartTime"/>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<timestamp-field
+					name="runningWatchdogTime"/>
 
-		<yes-no-field
-			name="enabled"/>
+				<text-area-field
+					name="lastTaskLog"/>
 
-		<yes-no-field
-			name="debug"/>
+			</columns>
 
-		<duration-field
-			name="frequency"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="background-process"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<yes-no-field
+					name="enabled"/>
+
+				<yes-no-field
+					name="debug"/>
+
+				<duration-field
+					name="frequency"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,49 +47,73 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="mediaburstNetwork">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="mediaburst-network"
+			type="read-only">
 
-		<integer-field
-			name="otherId"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
 
-	<field-set
-		name="create"
-		object-name="mediaburstNetwork">
+				<integer-field
+					name="otherId"/>
 
-		<parent-field/>
+			</columns>
 
-		<integer-field
-			name="otherId"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="mediaburst-network"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="mediaburstNetwork">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
+				<parent-field/>
 
-		<integer-field
-			name="otherId"/>
+				<integer-field
+					name="otherId"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="mediaburstNetwork">
+		</form>
 
-		<parent-field/>
+		<form
+			name="summary"
+			object-type="mediaburst-network"
+			type="read-only">
 
-		<integer-field
-			name="otherId"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+
+				<integer-field
+					name="otherId"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="mediaburst-network"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+
+				<integer-field
+					name="otherId"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

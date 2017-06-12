@@ -33,16 +33,17 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
+				search-class="wbs.apn.chat.user.core.model.ChatUserSearch"
+				search-form="search"
 				priv-key="chat.supervisor">
 
 				<results-mode
 					name="normal"
-					fields="results-normal"/>
+					form="results-normal"/>
 
 				<results-mode
 					name="credit"
-					fields="results-credit"/>
+					form="results-credit"/>
 
 			</object-search-page>
 
@@ -50,7 +51,7 @@
 				name="online"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-time="created"
 				target-responder="chatUserCreateResponder"/>
 
@@ -86,213 +87,236 @@
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.apn.chat.user.core.model.ChatUserSearch">
+	<forms>
 
-		<enum-field
-			name="type"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.apn.chat.user.core.model.ChatUserSearch"
+			type="search">
 
-		<text-field
-			name="code"
-			nullable="yes"/>
+			<columns>
 
-		<text-field
-			name="numberLike"
-			label="Number"
-			nullable="yes"/>
+				<enum-field
+					name="type"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="deleted"
-			default="no"
-			nullable="yes"/>
+				<text-field
+					name="code"
+					nullable="yes"/>
 
-		<enum-field
-			name="gender"
-			nullable="yes"/>
+				<text-field
+					name="numberLike"
+					label="Number"
+					nullable="yes"/>
 
-		<enum-field
-			name="orient"
-			nullable="yes"/>
+				<yes-no-field
+					name="deleted"
+					default="no"
+					nullable="yes"/>
 
-		<object-field
-			name="categoryId"
-			object-type="chatCategory"
-			root-field="chat"
-			nullable="yes"/>
+				<enum-field
+					name="gender"
+					nullable="yes"/>
 
-		<text-field
-			name="name"
-			nullable="yes"/>
+				<enum-field
+					name="orient"
+					nullable="yes"/>
 
-		<text-field
-			name="info"
-			nullable="yes"/>
+				<object-field
+					name="categoryId"
+					object-type="chatCategory"
+					root-field="chat"
+					nullable="yes"/>
 
-		<text-field
-			name="location"
-			nullable="yes"/>
+				<text-field
+					name="name"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="hasPicture"
-			nullable="yes"/>
+				<text-field
+					name="info"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="hasVideo"
-			nullable="yes"/>
+				<text-field
+					name="location"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="adultVerified"
-			nullable="yes"/>
+				<yes-no-field
+					name="hasPicture"
+					nullable="yes"/>
 
-		<enum-field
-			name="creditMode"
-			nullable="yes"/>
+				<yes-no-field
+					name="hasVideo"
+					nullable="yes"/>
 
-		<currency-field
-			name="creditFailed"
-			currency="chat.currency"
-			nullable="yes"/>
+				<yes-no-field
+					name="adultVerified"
+					nullable="yes"/>
 
-		<currency-field
-			name="creditNoReports"
-			currency="chat.currency"
-			nullable="yes"/>
+				<enum-field
+					name="creditMode"
+					nullable="yes"/>
 
-		<currency-field
-			name="valueSinceEver"
-			label="Total spent"
-			currency="chat.currency"
-			nullable="yes"/>
+				<currency-field
+					name="creditFailed"
+					currency="chat.currency"
+					nullable="yes"/>
 
-		<interval-field
-			name="firstJoin"
-			nullable="yes"/>
+				<currency-field
+					name="creditNoReports"
+					currency="chat.currency"
+					nullable="yes"/>
 
-		<enum-field
-			name="datingMode"
-			nullable="yes"/>
+				<currency-field
+					name="valueSinceEver"
+					label="Total spent"
+					currency="chat.currency"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="online"
-			nullable="yes"/>
+				<interval-field
+					name="firstJoin"
+					nullable="yes"/>
 
-	</field-set>
+				<enum-field
+					name="datingMode"
+					nullable="yes"/>
 
-	<field-set
-		name="results-normal"
-		object-name="chatUser">
+				<yes-no-field
+					name="online"
+					nullable="yes"/>
 
-		<code-field/>
+			</columns>
 
-		<enum-field
-			name="type"/>
+		</form>
 
-		<enum-field
-			name="gender"/>
+		<form
+			name="results-normal"
+			object-type="chat-user"
+			type="read-only">
 
-		<enum-field
-			name="orient"/>
+			<columns>
 
-		<text-field
-			name="name"/>
+				<code-field/>
 
-		<image-field
-			name="pic"
-			field="mainChatUserImage.media"
-			show-filename="no"/>
+				<enum-field
+					name="type"/>
 
-		<text-field
-			name="infoText"
-			label="Info"/>
+				<enum-field
+					name="gender"/>
 
-	</field-set>
+				<enum-field
+					name="orient"/>
 
-	<field-set
-		name="results-credit"
-		object-name="chatUser">
+				<text-field
+					name="name"/>
 
-		<code-field/>
+				<image-field
+					name="pic"
+					field="mainChatUserImage.media"
+					show-filename="no"/>
 
-		<enum-field
-			name="type"/>
+				<text-field
+					name="infoText"
+					label="Info"/>
 
-		<enum-field
-			name="gender"/>
+			</columns>
 
-		<enum-field
-			name="orient"/>
+		</form>
 
-		<currency-field
-			name="valueSinceEver"
-			label="Spent"
-			currency="chat.currency"/>
+		<form
+			name="results-credit"
+			object-type="chat-user"
+			type="read-only">
 
-		<currency-field
-			name="credit"
-			currency="chat.currency"/>
+			<columns>
 
-		<enum-field
-			name="creditMode"
-			label="Mode"/>
+				<code-field/>
 
-		<currency-field
-			name="creditPending"
-			label="Pending"
-			currency="chat.currency"/>
+				<enum-field
+					name="type"/>
 
-		<currency-field
-			name="creditSuccess"
-			label="Success"
-			currency="chat.currency"/>
+				<enum-field
+					name="gender"/>
 
-		<object-field
-			name="chatScheme"
-			label="Scheme"
-			root-field="chat"/>
+				<enum-field
+					name="orient"/>
 
-		<date-field
-			name="lastAction"/>
+				<currency-field
+					name="valueSinceEver"
+					label="Spent"
+					currency="chat.currency"/>
 
-	</field-set>
+				<currency-field
+					name="credit"
+					currency="chat.currency"/>
 
-	<field-set
-		name="create"
-		object-name="chatUser">
+				<enum-field
+					name="creditMode"
+					label="Mode"/>
 
-		<gsm-field
-			name="name"
-			minimum-length="1"
-			maximum-length="16"/>
+				<currency-field
+					name="creditPending"
+					label="Pending"
+					currency="chat.currency"/>
 
-		<enum-field
-			name="gender"/>
+				<currency-field
+					name="creditSuccess"
+					label="Success"
+					currency="chat.currency"/>
 
-		<enum-field
-			name="orient"/>
+				<object-field
+					name="chatScheme"
+					label="Scheme"
+					root-field="chat"/>
 
-		<gazetteer-field
-			name="postcode"
-			field="locationPlace"
-			gazetteer="chat.gazetteer"/>
+				<date-field
+					name="lastAction"/>
 
-		<gsm-field
-			name="infoText"
-			label="Info"
-			minimum-length="1"
-			maximum-length="160"/>
+			</columns>
 
-		<date-field
-			name="dob"
-			label="Date of birth"/>
+		</form>
 
-		<object-field
-			name="category"
-			object-type="chatCategory"
-			root-field="chat"
-			nullable="yes"/>
+		<form
+			name="create"
+			object-type="chat-user"
+			type="create">
 
-	</field-set>
+			<columns>
 
+				<gsm-field
+					name="name"
+					minimum-length="1"
+					maximum-length="16"/>
+
+				<enum-field
+					name="gender"/>
+
+				<enum-field
+					name="orient"/>
+
+				<gazetteer-field
+					name="postcode"
+					field="locationPlace"
+					gazetteer="chat.gazetteer"/>
+
+				<gsm-field
+					name="infoText"
+					label="Info"
+					minimum-length="1"
+					maximum-length="160"/>
+
+				<date-field
+					name="dob"
+					label="Date of birth"/>
+
+				<object-field
+					name="category"
+					object-type="chatCategory"
+					root-field="chat"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 </console-module>

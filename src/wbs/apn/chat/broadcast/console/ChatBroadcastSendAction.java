@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -32,6 +34,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -75,7 +78,7 @@ import wbs.apn.chat.user.core.model.ChatUserDao;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatBroadcastSendAction")
 public
@@ -158,11 +161,21 @@ class ChatBroadcastSendAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatBroadcastSendResponder")
+	Provider <WebResponder> sendResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatBroadcastVerifyResponder")
+	Provider <WebResponder> verifyResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
@@ -171,13 +184,11 @@ class ChatBroadcastSendAction
 					"send"))
 		) {
 
-			return responder (
-				"chatBroadcastVerifyResponder");
+			return verifyResponderProvider.get ();
 
 		}
 
-		return responder (
-			"chatBroadcastSendResponder");
+		return sendResponderProvider.get ();
 
 	}
 
@@ -185,7 +196,7 @@ class ChatBroadcastSendAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -312,8 +323,7 @@ class ChatBroadcastSendAction
 							"Chat user not found: %s",
 							form.value ().fromUser ()));
 
-					return responder (
-						"chatBroadcastSendResponder");
+					return sendResponderProvider.get ();
 
 				}
 
@@ -337,8 +347,7 @@ class ChatBroadcastSendAction
 							"Chat user is not a monitor: %s",
 							fromChatUser.getCode ()));
 
-					return responder (
-						"chatBroadcastSendResponder");
+					return sendResponderProvider.get ();
 
 				}
 
@@ -481,8 +490,7 @@ class ChatBroadcastSendAction
 						requestContext.addError (
 							"Invalid mobile number");
 
-						return responder (
-							"chatBroadcastSendResponder");
+						return sendResponderProvider.get ();
 
 					}
 
@@ -585,10 +593,7 @@ class ChatBroadcastSendAction
 					remainingChatUserIds);
 
 				if (verify) {
-
-					return responder (
-						"chatBroadcastVerifyResponder");
-
+					return verifyResponderProvider.get ();
 				}
 
 				// perform send
@@ -786,13 +791,9 @@ class ChatBroadcastSendAction
 
 				requestContext.setEmptyFormData ();
 
-				return responder (
-					"chatBroadcastSendResponder");
-
 			}
 
-			return responder (
-				"chatBroadcastSendResponder");
+			return sendResponderProvider.get ();
 
 		}
 

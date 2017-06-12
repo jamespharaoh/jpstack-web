@@ -1,12 +1,9 @@
 package wbs.platform.event.console;
 
-import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.model.EventRec;
 
@@ -18,10 +15,6 @@ interface EventConsoleLogic {
 	PagePart makeEventsPart (
 			Transaction parentTransaction,
 			PermanentRecord <?> object);
-
-	PagePartFactory makeEventsPartFactory (
-			TaskLogger parentTaskLogger,
-			ObjectLookup <?> objectLookup);
 
 	void writeEventHtml (
 			Transaction parentTransaction,

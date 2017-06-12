@@ -69,6 +69,9 @@ class ConsoleModuleFactory <ObjectType extends Record <ObjectType>>
 			SimpleConsoleBuilderContainer container =
 				new SimpleConsoleBuilderContainerImplementation ()
 
+				.consoleModule (
+					consoleModuleSpec)
+
 				.newBeanNamePrefix (
 					hyphenToSpaces (
 						consoleModuleSpec.name ()))

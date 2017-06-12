@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -50,104 +50,128 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatProfile">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="im-chat-profile"
+			type="read-only">
 
-		<text-field
-			name="publicName"/>
+			<columns>
 
-		<image-field
-			name="profileImage"/>
+				<name-field/>
+				<description-field/>
 
-	</field-set>
+				<text-field
+					name="publicName"/>
 
-	<field-set
-		name="create"
-		object-name="imChatProfile">
+				<image-field
+					name="profileImage"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<enum-field
-			name="state"/>
+		</form>
 
-		<text-field
-			name="publicName"
-			nullable="yes"/>
+		<form
+			name="create"
+			object-type="im-chat-profile"
+			type="create">
 
-		<text-area-field
-			name="publicDescription"
-			nullable="yes"/>
+			<columns>
 
-		<text-area-field
-			name="publicDescriptionShort"
-			nullable="yes"/>
+				<name-field/>
+				<description-field/>
 
-		<image-field
-			name="profileImage"
-			nullable="yes"/>
+				<enum-field
+					name="state"/>
 
-	</field-set>
+				<text-field
+					name="publicName"
+					nullable="yes"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatProfile">
+				<text-area-field
+					name="publicDescription"
+					nullable="yes"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-area-field
+					name="publicDescriptionShort"
+					nullable="yes"/>
 
-		<enum-field
-			name="state"/>
+				<image-field
+					name="profileImage"
+					nullable="yes"/>
 
-		<text-field
-			name="publicName"/>
+			</columns>
 
-		<text-area-field
-			name="publicDescription"/>
+		</form>
 
-		<text-area-field
-			name="publicDescriptionShort"/>
+		<form
+			name="summary"
+			object-type="im-chat-profile"
+			type="read-only">
 
-		<image-field
-			name="profileImage"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-	<field-set
-		name="settings"
-		object-name="imChatProfile">
+				<enum-field
+					name="state"/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="publicName"/>
 
-		<enum-field
-			name="state"/>
+				<text-area-field
+					name="publicDescription"/>
 
-		<text-field
-			name="publicName"
-			nullable="yes"/>
+				<text-area-field
+					name="publicDescriptionShort"/>
 
-		<text-area-field
-			name="publicDescription"
-			nullable="yes"/>
+				<image-field
+					name="profileImage"/>
 
-		<text-area-field
-			name="publicDescriptionShort"
-			nullable="yes"/>
+			</columns>
 
-		<image-field
-			name="profileImage"
-			nullable="yes"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="im-chat-profile"
+			type="update">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<enum-field
+					name="state"/>
+
+				<text-field
+					name="publicName"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicDescription"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicDescriptionShort"
+					nullable="yes"/>
+
+				<image-field
+					name="profileImage"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

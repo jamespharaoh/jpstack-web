@@ -1,5 +1,6 @@
 package wbs.smsapps.forwarder.api;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -14,6 +15,7 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -38,6 +40,8 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.web.TextResponder;
 
+import wbs.sms.message.core.model.MessageStatus;
+
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
@@ -47,7 +51,7 @@ import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 import wbs.web.context.RequestContext;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("forwarderApiLogic")
 public
@@ -167,7 +171,7 @@ class ForwarderApiLogicImplementation
 	 */
 	@Override
 	public
-	Responder controlActionGet (
+	WebResponder controlActionGet (
 			@NonNull Transaction parentTransaction,
 			@NonNull RequestContext requestContext,
 			@NonNull ForwarderRec forwarder) {
@@ -229,7 +233,7 @@ class ForwarderApiLogicImplementation
 	 */
 	@Override
 	public
-	Responder controlActionBorrow (
+	WebResponder controlActionBorrow (
 			@NonNull Transaction parentTransaction,
 			@NonNull RequestContext requestContext,
 			@NonNull ForwarderRec forwarder) {
@@ -277,7 +281,7 @@ class ForwarderApiLogicImplementation
 
 	@Override
 	public
-	Responder controlActionUnqueue (
+	WebResponder controlActionUnqueue (
 			@NonNull Transaction parentTransaction,
 			@NonNull RequestContext requestContext,
 			@NonNull ForwarderRec forwarder)
@@ -532,5 +536,64 @@ class ForwarderApiLogicImplementation
 		}
 
 	}
+
+	@Override
+	public
+	ForwarderMessageStatus messageStatusMap (
+			@NonNull MessageStatus messageStatus) {
+
+		return mapItemForKeyRequired (
+			messageStatusMap,
+			messageStatus);
+
+	}
+
+	// data
+
+	private final static
+	Map <MessageStatus, ForwarderMessageStatus> messageStatusMap =
+		ImmutableMap.<MessageStatus, ForwarderMessageStatus> builder ()
+
+			.put (
+				MessageStatus.blacklisted,
+				ForwarderMessageStatus.undelivered)
+
+			.put (
+				MessageStatus.held,
+				ForwarderMessageStatus.pending)
+
+			.put (
+				MessageStatus.pending,
+				ForwarderMessageStatus.pending)
+
+			.put (
+				MessageStatus.cancelled,
+				ForwarderMessageStatus.cancelled)
+
+			.put (
+				MessageStatus.failed,
+				ForwarderMessageStatus.failed)
+
+			.put (
+				MessageStatus.sent,
+				ForwarderMessageStatus.sent)
+
+			.put (
+				MessageStatus.delivered,
+				ForwarderMessageStatus.delivered)
+
+			.put (
+				MessageStatus.undelivered,
+				ForwarderMessageStatus.undelivered)
+
+			.put (
+				MessageStatus.submitted,
+				ForwarderMessageStatus.sentUpstream)
+
+			.put (
+				MessageStatus.reportTimedOut,
+				ForwarderMessageStatus.reportTimedOut)
+
+			.build ();
 
 }

@@ -7,6 +7,8 @@ import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -14,7 +16,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -43,7 +47,7 @@ import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatMonitorInboxFormAction")
 public
@@ -103,15 +107,24 @@ class ChatMonitorInboxFormAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatMonitorInboxFormResponder")
+	Provider <WebResponder> formResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatMonitorInboxFormResponder");
+		return formResponderProvider.get ();
 
 	}
 
@@ -119,7 +132,7 @@ class ChatMonitorInboxFormAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -437,8 +450,7 @@ class ChatMonitorInboxFormAction
 
 			// and return
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 

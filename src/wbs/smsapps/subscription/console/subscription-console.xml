@@ -29,16 +29,18 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"
+				target-responder="subscriptionSettingsGeneralResponder"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
@@ -46,7 +48,7 @@
 
 				<object-settings-page
 					short-name="general"
-					fields="settings"/>
+					form="settings"/>
 
 				<context-link
 					name="keyword"
@@ -102,111 +104,145 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="subscription">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="subscription"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="subscription">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<!-- settings -->
+		</form>
 
-		<object-field
-			name="billedRoute"
-			object-type="route"/>
+		<form
+			name="create"
+			object-type="subscription"
+			type="create">
 
-		<text-field
-			name="billedNumber"/>
+			<columns>
 
-		<text-area-field
-			name="billedMessage"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<object-field
-			name="freeRouter"
-			object-type="router"/>
+			</columns>
 
-		<text-field
-			name="freeNumber"/>
+		</form>
 
-		<integer-field
-			name="creditsPerBill"/>
+		<form
+			name="summary"
+			object-type="subscription"
+			type="read-only">
 
-		<integer-field
-			name="debitsPerSend"/>
+			<columns>
 
-		<text-area-field
-			name="subscribeMessageText"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-area-field
-			name="unsubscribeMessageText"/>
+				<!-- settings -->
 
-		<!-- statistics -->
+				<object-field
+					name="billedRoute"
+					object-type="route"/>
 
-		<integer-field
-			name="numSubscribers"/>
+				<text-field
+					name="billedNumber"/>
 
-	</field-set>
+				<text-area-field
+					name="billedMessage"/>
 
-	<field-set
-		name="settings"
-		object-name="subscription">
+				<object-field
+					name="freeRouter"
+					object-type="router"/>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="freeNumber"/>
 
-		<object-field
-			name="billedRoute"
-			object-type="route"
-			nullable="yes"/>
+				<integer-field
+					name="creditsPerBill"/>
 
-		<text-field
-			name="billedNumber"
-			nullable="yes"/>
+				<integer-field
+					name="debitsPerSend"/>
 
-		<text-area-field
-			name="billedMessage"
-			nullable="yes"/>
+				<text-area-field
+					name="subscribeMessageText"/>
 
-		<object-field
-			name="freeRouter"
-			object-type="router"
-			nullable="yes"/>
+				<text-area-field
+					name="unsubscribeMessageText"/>
 
-		<text-field
-			name="freeNumber"
-			nullable="yes"/>
+				<!-- statistics -->
 
-		<integer-field
-			name="creditsPerBill"
-			nullable="yes"/>
+				<integer-field
+					name="numSubscribers"/>
 
-		<integer-field
-			name="debitsPerSend"
-			nullable="yes"/>
+			</columns>
 
-		<text-area-field
-			name="subscribeMessageText"/>
+		</form>
 
-		<text-area-field
-			name="unsubscribeMessageText"/>
+		<form
+			name="settings"
+			object-type="subscription"
+			type="update">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<object-field
+					name="billedRoute"
+					object-type="route"
+					nullable="yes"/>
+
+				<text-field
+					name="billedNumber"
+					nullable="yes"/>
+
+				<text-area-field
+					name="billedMessage"
+					nullable="yes"/>
+
+				<object-field
+					name="freeRouter"
+					object-type="router"
+					nullable="yes"/>
+
+				<text-field
+					name="freeNumber"
+					nullable="yes"/>
+
+				<integer-field
+					name="creditsPerBill"
+					nullable="yes"/>
+
+				<integer-field
+					name="debitsPerSend"
+					nullable="yes"/>
+
+				<text-area-field
+					name="subscribeMessageText"/>
+
+				<text-area-field
+					name="unsubscribeMessageText"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -2,6 +2,8 @@ package wbs.framework.component.registry;
 
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.lang.reflect.Method;
@@ -18,6 +20,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.annotations.DataAttribute;
@@ -69,7 +73,17 @@ class ComponentDefinition {
 
 	@DataChildren
 	@Getter @Setter
-	Map <String, String> referenceProperties =
+	Map <String, Pair <String, String>> referenceProperties =
+		new LinkedHashMap<> ();
+
+	@DataChildren
+	@Getter @Setter
+	Map <String, Pair <String, List <String>>> referenceListProperties =
+		new LinkedHashMap<> ();
+
+	@DataChildren
+	@Getter @Setter
+	Map <String, Pair <String, Map <Object, String>>> referenceMapProperties =
 		new LinkedHashMap<> ();
 
 	@DataChildren
@@ -101,6 +115,18 @@ class ComponentDefinition {
 	@Getter @Setter
 	Set <String> weakDependencies =
 		new HashSet<> ();
+
+	// property setters
+
+	public
+	ComponentDefinition nameFormat (
+			@NonNull CharSequence ... arguments) {
+
+		return name (
+			stringFormat (
+				arguments));
+
+	}
 
 	public
 	ComponentDefinition addValueProperty (
@@ -140,11 +166,38 @@ class ComponentDefinition {
 	public
 	ComponentDefinition addReferenceProperty (
 			@NonNull String name,
-			@NonNull String referencedComponentName) {
+			@NonNull String targetScope,
+			@NonNull String targetName) {
 
 		referenceProperties.put (
 			name,
-			referencedComponentName);
+			Pair.of (
+				targetScope,
+				targetName));
+
+		return this;
+
+	}
+
+	public
+	ComponentDefinition addReferenceProperty (
+			@NonNull String name,
+			@NonNull String targetScope,
+			@NonNull Optional <String> targetName) {
+
+		if (
+			optionalIsPresent (
+				targetName)
+		) {
+
+			referenceProperties.put (
+				name,
+				Pair.of (
+					targetScope,
+					optionalGetRequired (
+						targetName)));
+
+		}
 
 		return this;
 
@@ -153,12 +206,48 @@ class ComponentDefinition {
 	public
 	ComponentDefinition addReferencePropertyFormat (
 			@NonNull String name,
-			@NonNull String ... referencedComponentNameArguments) {
+			@NonNull String targetScope,
+			@NonNull String ... targetNameArguments) {
 
 		referenceProperties.put (
 			name,
-			stringFormatArray (
-				referencedComponentNameArguments));
+			Pair.of (
+				targetScope,
+				stringFormatArray (
+					targetNameArguments)));
+
+		return this;
+
+	}
+
+	public
+	ComponentDefinition addReferenceListProperty (
+			@NonNull String name,
+			@NonNull String targetScope,
+			@NonNull List <String> targetNames) {
+
+		referenceListProperties.put (
+			name,
+			Pair.of (
+				targetScope,
+				targetNames));
+
+		return this;
+
+	}
+
+	public
+	ComponentDefinition addReferenceMapProperty (
+			@NonNull String name,
+			@NonNull String targetScope,
+			@NonNull Map <?, String> targetNames) {
+
+		referenceMapProperties.put (
+			name,
+			Pair.of (
+				targetScope,
+				genericCastUnchecked (
+					targetNames)));
 
 		return this;
 

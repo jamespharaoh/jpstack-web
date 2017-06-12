@@ -31,7 +31,7 @@ class ObjectSummaryFieldsSpec
 	// attributes
 
 	@DataAttribute (
-		name = "fields")
-	String fieldsName;
+		name = "form")
+	String formTypeName;
 
 }

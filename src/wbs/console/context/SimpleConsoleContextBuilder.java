@@ -141,6 +141,9 @@ class SimpleConsoleContextBuilder <
 			ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					null)
 

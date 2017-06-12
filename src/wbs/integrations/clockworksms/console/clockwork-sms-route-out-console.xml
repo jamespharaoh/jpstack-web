@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,93 +47,117 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="clockworkSmsRouteOut">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="clockwork-sms-route-out"
+			type="read-only">
 
-		<object-field
-			name="clockworkSmsConfig"
-			label="Config"
-			object-type="clockworkSmsConfig"/>
+			<columns>
 
-		<text-field
-			name="url"/>
+				<parent-field/>
 
-		<text-field
-			name="key"/>
+				<object-field
+					name="clockworkSmsConfig"
+					label="Config"
+					object-type="clockworkSmsConfig"/>
 
-	</field-set>
+				<text-field
+					name="url"/>
 
-	<field-set
-		name="create"
-		object-name="clockworkSmsRouteOut">
+				<text-field
+					name="key"/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="clockworkSmsConfig"
-			label="Config"
-			object-type="clockworkSmsConfig"/>
+		</form>
 
-		<text-field
-			name="url"/>
+		<form
+			name="create"
+			object-type="clockwork-sms-route-out"
+			type="create">
 
-		<text-field
-			name="key"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
 
-	<field-set
-		name="summary"
-		object-name="clockworkSmsRouteOut">
+				<object-field
+					name="clockworkSmsConfig"
+					label="Config"
+					object-type="clockworkSmsConfig"/>
 
-		<id-field/>
-		<parent-field/>
+				<text-field
+					name="url"/>
 
-		<object-field
-			name="clockworkSmsConfig"
-			label="Config"
-			object-type="clockworkSmsConfig"/>
+				<text-field
+					name="key"/>
 
-		<text-field
-			name="url"/>
+			</columns>
 
-		<text-field
-			name="key"/>
+		</form>
 
-		<integer-field
-			name="maxParts"/>
+		<form
+			name="summary"
+			object-type="clockwork-sms-route-out"
+			type="read-only">
 
-		<yes-no-field
-			name="simulateMultipart"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
 
-	<field-set
-		name="settings"
-		object-name="clockworkSmsRouteOut">
+				<object-field
+					name="clockworkSmsConfig"
+					label="Config"
+					object-type="clockworkSmsConfig"/>
 
-		<object-field
-			name="clockworkSmsConfig"
-			label="Config"
-			object-type="clockworkSmsConfig"/>
+				<text-field
+					name="url"/>
 
-		<text-field
-			name="url"/>
+				<text-field
+					name="key"/>
 
-		<text-field
-			name="key"/>
+				<integer-field
+					name="maxParts"/>
 
-		<integer-field
-			name="maxParts"
-			minimum="1"
-			maximum="3"/>
+				<yes-no-field
+					name="simulateMultipart"/>
 
-		<yes-no-field
-			name="simulateMultipart"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="clockwork-sms-route-out"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="clockworkSmsConfig"
+					label="Config"
+					object-type="clockworkSmsConfig"/>
+
+				<text-field
+					name="url"/>
+
+				<text-field
+					name="key"/>
+
+				<integer-field
+					name="maxParts"
+					minimum="1"
+					maximum="3"/>
+
+				<yes-no-field
+					name="simulateMultipart"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -26,6 +26,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -61,7 +62,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("manualResponderRequestPendingFormAction")
 public
@@ -126,15 +127,22 @@ class ManualResponderRequestPendingFormAction
 	@PrototypeDependency
 	Provider <SmsMessageSender> messageSenderProvider;
 
+	@PrototypeDependency
+	@NamedDependency ("manualResponderRequestPendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"manualResponderRequestPendingFormResponder");
+		return pendingFormResponderProvider.get ();
 
 	}
 
@@ -142,7 +150,7 @@ class ManualResponderRequestPendingFormAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -186,7 +194,7 @@ class ManualResponderRequestPendingFormAction
 
 	}
 
-	Responder goIgnore (
+	WebResponder goIgnore (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long manualResponderRequestId) {
 
@@ -230,14 +238,13 @@ class ManualResponderRequestPendingFormAction
 			requestContext.addNotice (
 				"Request ignored");
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 
 	}
 
-	Responder goSend (
+	WebResponder goSend (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long manualResponderRequestId,
 			@NonNull String templateIdString) {
@@ -671,13 +678,11 @@ class ManualResponderRequestPendingFormAction
 
 			if (sendAgain) {
 
-				return responder (
-					"manualResponderRequestPendingFormResponder");
+				return pendingFormResponderProvider.get ();
 
 			} else {
 
-				return responder (
-					"queueHomeResponder");
+				return queueHomeResponderProvider.get ();
 
 			}
 

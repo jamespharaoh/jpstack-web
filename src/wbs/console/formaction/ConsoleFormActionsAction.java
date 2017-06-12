@@ -8,6 +8,8 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -27,7 +29,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextFormActionsAction")
 @Accessors (fluent = true)
@@ -52,23 +54,22 @@ class ConsoleFormActionsAction
 	List <ConsoleFormAction <?, ?>> formActions;
 
 	@Getter @Setter
-	String responderName;
+	Provider <WebResponder> responderProvider;
 
 	// implementation
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			responderName);
+		return responderProvider.get ();
 
 	}
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -117,7 +118,7 @@ class ConsoleFormActionsAction
 				return null;
 			}
 
-			Optional <Responder> responder =
+			Optional <WebResponder> responder =
 				formAction.helper ().processFormSubmission (
 					transaction,
 					genericCastUnchecked (

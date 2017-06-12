@@ -49,6 +49,7 @@ import wbs.console.module.ConsoleModuleFactory;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecManager;
 
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -71,6 +72,9 @@ class ConsoleComponentPlugin
 	implements ComponentPlugin {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ConsoleComponentBuilder consoleComponentBuilder;
 
 	@SingletonDependency
 	ConsoleModuleSpecManager consoleModuleSpecManager;
@@ -515,6 +519,15 @@ class ConsoleComponentPlugin
 
 			}
 
+			// descend console component builders
+
+			consoleComponentBuilder.descend (
+				taskLogger,
+				consoleModuleSpec,
+				consoleModuleSpec.builders (),
+				componentRegistry,
+				MissingBuilderBehaviour.error);
+
 		}
 
 	}
@@ -643,6 +656,7 @@ class ConsoleComponentPlugin
 
 						.addReferencePropertyFormat (
 							"consoleHelper",
+							"singleton",
 							"%sConsoleHelper",
 							hyphenToCamel (
 								formSpec.objectTypeName ()))
@@ -729,9 +743,9 @@ class ConsoleComponentPlugin
 						"singleton")
 
 					.addValueProperty (
-						"consoleModuleName",
+						"containerClass",
 						optionalOf (
-							moduleSpec.name ()))
+							formClass))
 
 					.addValueProperty (
 						"formName",
@@ -745,6 +759,7 @@ class ConsoleComponentPlugin
 
 					.addReferenceProperty (
 						"fieldsProvider",
+						"singleton",
 						fieldsProviderName)
 
 				;
@@ -756,6 +771,7 @@ class ConsoleComponentPlugin
 
 					componentDefinition.addReferencePropertyFormat (
 						"consoleHelper",
+						"singleton",
 						"%sConsoleHelper",
 						hyphenToCamel (
 							formSpec.objectTypeName ()));
@@ -831,6 +847,7 @@ class ConsoleComponentPlugin
 
 					componentDefinition.addReferencePropertyFormat (
 						"consoleHelper",
+						"singleton",
 						"%sConsoleHelper",
 						hyphenToCamel (
 							formSpec.objectTypeName ()));

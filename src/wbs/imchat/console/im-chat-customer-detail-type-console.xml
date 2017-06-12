@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -50,189 +50,213 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatCustomerDetailType">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="im-chat-customer-detail-type"
+			type="read-only">
 
-		<yes-no-field
-			name="required"/>
+			<columns>
 
-		<yes-no-field
-			name="restricted"/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="whenCreatingAccount"
-			label="Create"/>
+				<yes-no-field
+					name="required"/>
 
-		<enum-field
-			name="dataType"/>
+				<yes-no-field
+					name="restricted"/>
 
-		<integer-field
-			name="minimumAge"/>
+				<yes-no-field
+					name="whenCreatingAccount"
+					label="Create"/>
 
-		<integer-field
-			name="ordering"/>
+				<enum-field
+					name="dataType"/>
 
-	</field-set>
+				<integer-field
+					name="minimumAge"/>
 
-	<field-set
-		name="create"
-		object-name="imChatCustomerDetailType">
+				<integer-field
+					name="ordering"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<text-field
-			name="label"/>
+		</form>
 
-		<text-field
-			name="help"/>
+		<form
+			name="create"
+			object-type="im-chat-customer-detail-type"
+			type="create">
 
-		<yes-no-field
-			name="required"/>
+			<columns>
 
-		<text-field
-			name="requiredLabel"/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="restricted"/>
+				<text-field
+					name="label"/>
 
-		<yes-no-field
-			name="whenCreatingAccount"/>
+				<text-field
+					name="help"/>
 
-		<enum-field
-			name="dataType"/>
+				<yes-no-field
+					name="required"/>
 
-		<integer-field
-			name="minimumAge"
-			nullable="yes"/>
+				<text-field
+					name="requiredLabel"/>
 
-		<integer-field
-			name="ordering"/>
+				<yes-no-field
+					name="restricted"/>
 
-	</field-set>
+				<yes-no-field
+					name="whenCreatingAccount"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatCustomerDetailType">
+				<enum-field
+					name="dataType"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<integer-field
+					name="minimumAge"
+					nullable="yes"/>
 
-		<text-field
-			name="label"/>
+				<integer-field
+					name="ordering"/>
 
-		<text-field
-			name="help"/>
+			</columns>
 
-		<yes-no-field
-			name="required"/>
+		</form>
 
-		<text-field
-			name="requiredLabel"/>
+		<form
+			name="summary"
+			object-type="im-chat-customer-detail-type"
+			type="read-only">
 
-		<yes-no-field
-			name="restricted"/>
+			<columns>
 
-		<yes-no-field
-			name="whenCreatingAccount"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<enum-field
-			name="dataType"/>
+				<text-field
+					name="label"/>
 
-		<integer-field
-			name="minimumAge"/>
+				<text-field
+					name="help"/>
 
-		<integer-field
-			name="ordering"/>
+				<yes-no-field
+					name="required"/>
 
-		<text-field
-			name="requiredErrorTitle"/>
+				<text-field
+					name="requiredLabel"/>
 
-		<text-area-field
-			name="requiredErrorMessage"/>
+				<yes-no-field
+					name="restricted"/>
 
-		<text-field
-			name="invalidErrorTitle"/>
+				<yes-no-field
+					name="whenCreatingAccount"/>
 
-		<text-area-field
-			name="invalidErrorMessage"/>
+				<enum-field
+					name="dataType"/>
 
-		<text-field
-			name="ageErrorTitle"/>
+				<integer-field
+					name="minimumAge"/>
 
-		<text-area-field
-			name="ageErrorMessage"/>
+				<integer-field
+					name="ordering"/>
 
-	</field-set>
+				<text-field
+					name="requiredErrorTitle"/>
 
-	<field-set
-		name="settings"
-		object-name="imChatCustomerDetailType">
+				<text-area-field
+					name="requiredErrorMessage"/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="invalidErrorTitle"/>
 
-		<text-field
-			name="label"/>
+				<text-area-field
+					name="invalidErrorMessage"/>
 
-		<text-field
-			name="help"/>
+				<text-field
+					name="ageErrorTitle"/>
 
-		<yes-no-field
-			name="required"/>
+				<text-area-field
+					name="ageErrorMessage"/>
 
-		<text-field
-			name="requiredLabel"/>
+			</columns>
 
-		<yes-no-field
-			name="restricted"/>
+		</form>
 
-		<yes-no-field
-			name="whenCreatingAccount"/>
+		<form
+			name="settings"
+			object-type="im-chat-customer-detail-type"
+			type="update">
 
-		<enum-field
-			name="dataType"/>
+			<columns>
 
-		<integer-field
-			name="minimumAge"
-			nullable="yes"/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<integer-field
-			name="ordering"/>
+				<text-field
+					name="label"/>
 
-		<text-field
-			name="requiredErrorTitle"
-			nullable="yes"/>
+				<text-field
+					name="help"/>
 
-		<text-area-field
-			name="requiredErrorMessage"
-			nullable="yes"/>
+				<yes-no-field
+					name="required"/>
 
-		<text-field
-			name="invalidErrorTitle"
-			nullable="yes"/>
+				<text-field
+					name="requiredLabel"/>
 
-		<text-area-field
-			name="invalidErrorMessage"
-			nullable="yes"/>
+				<yes-no-field
+					name="restricted"/>
 
-		<text-field
-			name="ageErrorTitle"
-			nullable="yes"/>
+				<yes-no-field
+					name="whenCreatingAccount"/>
 
-		<text-area-field
-			name="ageErrorMessage"
-			nullable="yes"/>
+				<enum-field
+					name="dataType"/>
 
-	</field-set>
+				<integer-field
+					name="minimumAge"
+					nullable="yes"/>
+
+				<integer-field
+					name="ordering"/>
+
+				<text-field
+					name="requiredErrorTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="requiredErrorMessage"
+					nullable="yes"/>
+
+				<text-field
+					name="invalidErrorTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="invalidErrorMessage"
+					nullable="yes"/>
+
+				<text-field
+					name="ageErrorTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="ageErrorMessage"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

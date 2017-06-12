@@ -434,15 +434,14 @@ class DataFromXmlImplementation
 							attributeName))
 						continue;
 
-					throw new RuntimeException (
-						stringFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"Don't understand attribute %s on <%s>, using %s",
-							attributeName,
-							element.getName (),
-							object.getClass ().getSimpleName ()));
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't understand attribute %s on <%s>, using %s",
+						attributeName,
+						element.getName (),
+						object.getClass ().getSimpleName ());
 
 				}
 

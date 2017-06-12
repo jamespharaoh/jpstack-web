@@ -3,6 +3,8 @@ package wbs.platform.group.console;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -10,7 +12,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -26,7 +30,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("groupPrivsAction")
 public
@@ -65,15 +69,20 @@ class GroupPrivsAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("groupPrivsResponder")
+	Provider <WebResponder> privsResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"groupPrivsResponder");
+		return privsResponderProvider.get ();
 
 	}
 
@@ -81,7 +90,7 @@ class GroupPrivsAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

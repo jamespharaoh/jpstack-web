@@ -50,14 +50,18 @@ class ConsoleFormSpec
 		required = true)
 	FormType formType;
 
+	@DataAttribute (
+		name = "fields-provider")
+	String fieldsProviderName;
+
 	// children
 
 	@DataChildren (
-		childrenElement = "column-fields")
+		childrenElement = "columns")
 	List <Object> columnFields;
 
 	@DataChildren (
-		childrenElement = "row-fields")
+		childrenElement = "rows")
 	List <Object> rowFields;
 
 	@DataChildren (

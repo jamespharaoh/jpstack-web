@@ -3,13 +3,17 @@ package wbs.imchat.console;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -21,14 +25,14 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.imchat.logic.ImChatLogic;
 import wbs.imchat.model.ImChatCustomerRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("imChatCustomerSettingsPasswordAction")
 public
 class ImChatCustomerSettingsPasswordAction
 	extends ConsoleAction {
 
-	// implementation
+	// singleton dependencies
 
 	@SingletonDependency
 	Database database;
@@ -51,15 +55,20 @@ class ImChatCustomerSettingsPasswordAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("imChatCustomerSettingsPasswordResponder")
+	Provider <WebResponder> passswordResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"imChatCustomerSettingsPasswordResponder");
+		return passswordResponderProvider.get ();
 
 	}
 
@@ -67,7 +76,7 @@ class ImChatCustomerSettingsPasswordAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

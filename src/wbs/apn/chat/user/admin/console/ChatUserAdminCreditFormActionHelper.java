@@ -37,7 +37,7 @@ import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("chatUserAdminCreditFormActionHelper")
 public
@@ -239,7 +239,7 @@ class ChatUserAdminCreditFormActionHelper
 
 	@Override
 	public
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserAdminCreditForm formState) {
 

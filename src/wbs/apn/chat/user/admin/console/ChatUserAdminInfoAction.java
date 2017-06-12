@@ -3,13 +3,17 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.framework.entity.record.IdObject.objectId;
 import static wbs.utils.etc.Misc.toEnum;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -32,7 +36,7 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserAdminInfoAction")
 public
@@ -74,15 +78,20 @@ class ChatUserAdminInfoAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserAdminInfoResponder")
+	Provider <WebResponder> infoResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatUserAdminInfoResponder");
+		return infoResponderProvider.get ();
 
 	}
 
@@ -90,7 +99,7 @@ class ChatUserAdminInfoAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

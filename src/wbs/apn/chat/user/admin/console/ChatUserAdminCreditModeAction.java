@@ -2,13 +2,17 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -23,7 +27,7 @@ import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserAdminCreditModeAction")
 public
@@ -56,15 +60,20 @@ class ChatUserAdminCreditModeAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserAdminCreditModeResponder")
+	Provider <WebResponder> creditModeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatUserAdminCreditModeResponder");
+		return creditModeResponderProvider.get ();
 
 	}
 
@@ -72,7 +81,7 @@ class ChatUserAdminCreditModeAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

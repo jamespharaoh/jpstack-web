@@ -3,6 +3,8 @@ package wbs.apn.chat.contact.console;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
@@ -14,7 +16,9 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -35,7 +39,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatMonitorInboxAlarmAction")
 public
@@ -71,6 +75,12 @@ class ChatMonitorInboxAlarmAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatMonitorInboxSummaryResponder")
+	Provider <WebResponder> summaryResponderProvider;
+
 	// state
 
 	DateTimeZone timeZone;
@@ -79,11 +89,10 @@ class ChatMonitorInboxAlarmAction
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatMonitorInboxSummaryResponder");
+		return summaryResponderProvider.get ();
 
 	}
 
@@ -91,7 +100,7 @@ class ChatMonitorInboxAlarmAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

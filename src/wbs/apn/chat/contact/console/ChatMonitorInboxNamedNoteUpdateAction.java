@@ -36,7 +36,7 @@ import wbs.apn.chat.namednote.console.ChatNoteNameConsoleHelper;
 import wbs.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("chatMonitorInboxNamedNoteUpdateAction")
@@ -93,7 +93,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

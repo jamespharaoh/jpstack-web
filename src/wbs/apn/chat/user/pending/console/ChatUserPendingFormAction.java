@@ -20,6 +20,8 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -29,7 +31,9 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -70,7 +74,7 @@ import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserPendingFormAction")
 public
@@ -127,11 +131,21 @@ class ChatUserPendingFormAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserPendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -159,7 +173,7 @@ class ChatUserPendingFormAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -308,7 +322,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goDismiss (
+	WebResponder goDismiss (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -325,7 +339,7 @@ class ChatUserPendingFormAction
 				chatUserHelper.findFromContextRequired (
 					transaction);
 
-			Responder responder =
+			WebResponder responder =
 				updateQueueItem (
 					transaction,
 					chatUser,
@@ -341,7 +355,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goApproveName (
+	WebResponder goApproveName (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -422,7 +436,7 @@ class ChatUserPendingFormAction
 
 			// remove the queue item and create any new one
 
-			Responder responder =
+			WebResponder responder =
 				updateQueueItem (
 					transaction,
 					chatUser,
@@ -445,7 +459,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goApproveInfo (
+	WebResponder goApproveInfo (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -534,7 +548,7 @@ class ChatUserPendingFormAction
 
 			// update queue item stuff
 
-			Responder responder =
+			WebResponder responder =
 				updateQueueItem (
 					transaction,
 					chatUser,
@@ -557,7 +571,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goApproveImage (
+	WebResponder goApproveImage (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PendingMode mode) {
 
@@ -571,7 +585,7 @@ class ChatUserPendingFormAction
 
 		) {
 
-			Responder responder;
+			WebResponder responder;
 
 			ChatUserImageType imageType =
 				chatUserLogic.imageTypeForMode (
@@ -698,7 +712,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goRejectName (
+	WebResponder goRejectName (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -799,7 +813,7 @@ class ChatUserPendingFormAction
 						chatUserName.getThreadId ()),
 					messageParam);
 
-				Responder responder =
+				WebResponder responder =
 					updateQueueItem (
 						transaction,
 						chatUser,
@@ -820,7 +834,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goRejectInfo (
+	WebResponder goRejectInfo (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -934,7 +948,7 @@ class ChatUserPendingFormAction
 						chatUserInfo.getThreadId ()),
 					messageParam);
 
-				Responder responder =
+				WebResponder responder =
 					updateQueueItem (
 						transaction,
 						chatUser,
@@ -1082,7 +1096,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goRejectImage (
+	WebResponder goRejectImage (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PendingMode mode) {
 
@@ -1284,7 +1298,7 @@ class ChatUserPendingFormAction
 
 			// clear queue item
 
-			Responder responder =
+			WebResponder responder =
 				updateQueueItem (
 					transaction,
 					chatUser,
@@ -1309,7 +1323,7 @@ class ChatUserPendingFormAction
 	 * creates a new one if there is still anything to approve.
 	 */
 	private
-	Responder updateQueueItem (
+	WebResponder updateQueueItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser,
 			@NonNull UserRec myUser) {
@@ -1328,10 +1342,7 @@ class ChatUserPendingFormAction
 					transaction,
 					chatUser)
 			) {
-
-				return responder (
-					"chatUserPendingFormResponder");
-
+				return pendingFormResponderProvider.get ();
 			}
 
 			queueLogic.processQueueItem (
@@ -1344,8 +1355,7 @@ class ChatUserPendingFormAction
 				.setQueueItem (
 					null);
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 
@@ -1399,7 +1409,7 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder nextResponder (
+	WebResponder nextResponder (
 			@NonNull Transaction parentTransaction,
 			@NonNull ChatUserRec chatUser) {
 
@@ -1412,13 +1422,12 @@ class ChatUserPendingFormAction
 
 		) {
 
-			return responder (
-				ifThenElse (
-					moreToApprove (
-						transaction,
-						chatUser),
-					() -> "chatUserPendingFormResponder",
-					() -> "queueHomeResponder"));
+			return ifThenElse (
+				moreToApprove (
+					transaction,
+					chatUser),
+				() -> pendingFormResponderProvider.get (),
+				() -> queueHomeResponderProvider.get ());
 
 		}
 

@@ -3,13 +3,17 @@ package wbs.apn.chat.help.console;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -25,7 +29,7 @@ import wbs.sms.gsm.GsmUtils;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatHelpLogPendingFormAction")
 public
@@ -58,15 +62,24 @@ class ChatHelpLogPendingFormAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatHelpLogPendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatHelpLogPendingFormResponder");
+		return pendingFormResponderProvider.get ();
 
 	}
 
@@ -74,7 +87,7 @@ class ChatHelpLogPendingFormAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -170,8 +183,7 @@ class ChatHelpLogPendingFormAction
 					? "Request ignored"
 					: "Reply sent");
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 

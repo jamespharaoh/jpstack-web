@@ -3,7 +3,7 @@
 
 	<object-context
 		name="chatMessage.pending"
-		bean-name="chatMessagePending"
+		component-name="chatMessagePending"
 		object-name="chatMessage">
 
 		<object>

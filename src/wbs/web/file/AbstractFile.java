@@ -10,18 +10,17 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.ActionRequestHandler;
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpMethodNotAllowedException;
-import wbs.web.handler.RequestHandler;
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebActionRequestHandler;
+import wbs.web.mvc.WebRequestHandler;
+import wbs.web.mvc.WebResponderRequestHandler;
 
 /**
  * WebFile which delegates to "RequestHandlers".
@@ -46,16 +45,19 @@ class AbstractFile
 
 	// prototype dependencies
 
-	@PrototypeDependency
-	Provider <ActionRequestHandler> actionRequestHandlerProvider;
+	@StrongPrototypeDependency
+	Provider <WebActionRequestHandler> actionRequestHandlerProvider;
+
+	@StrongPrototypeDependency
+	Provider <WebResponderRequestHandler> responderRequestHandlerProvider;
 
 	// extension points
 
 	public abstract
-	RequestHandler getHandler ();
+	Provider <? extends WebRequestHandler> getHandlerProvider ();
 
 	public abstract
-	RequestHandler postHandler ();
+	Provider <? extends WebRequestHandler> postHandlerProvider ();
 
 	public abstract
 	Map <String, Object> requestParams ();
@@ -81,11 +83,11 @@ class AbstractFile
 	void doGet (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (getHandler () != null) {
+		if (getHandlerProvider () != null) {
 
 			setRequestParams ();
 
-			getHandler ().handle (
+			getHandlerProvider ().get ().handle (
 				parentTaskLogger);
 
 		} else {
@@ -103,11 +105,11 @@ class AbstractFile
 	void doPost (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (postHandler () != null) {
+		if (postHandlerProvider () != null) {
 
 			setRequestParams ();
 
-			postHandler ().handle (
+			postHandlerProvider ().get ().handle (
 				parentTaskLogger);
 
 		} else {
@@ -124,114 +126,6 @@ class AbstractFile
 	public
 	void doOptions (
 			@NonNull TaskLogger parentTaskLogger) {
-
-	}
-
-	public
-	RequestHandler handlerNameToRequestHandler (
-			@NonNull String handlerName) {
-
-		return new RequestHandler () {
-
-			@Override
-			public
-			void handle (
-					@NonNull TaskLogger parentTaskLogger) {
-
-				try (
-
-					OwnedTaskLogger taskLogger =
-						logContext.nestTaskLogger (
-							parentTaskLogger,
-							"handlerNameToRequestHandler.handle");
-
-				) {
-
-					RequestHandler handler =
-						componentManager.getComponentRequired (
-							parentTaskLogger,
-							handlerName,
-							RequestHandler.class);
-
-					handler.handle (
-						parentTaskLogger);
-
-				}
-
-			}
-
-		};
-
-	}
-
-	public
-	RequestHandler responderToRequestHandler (
-			final Provider<Responder> responderProvider) {
-
-		return new RequestHandler () {
-
-			@Override
-			public
-			void handle (
-					@NonNull TaskLogger parentTaskLogger) {
-
-				try (
-
-					OwnedTaskLogger taskLogger =
-						logContext.nestTaskLogger (
-							parentTaskLogger,
-							"responderToRequestHandler.handle");
-
-				) {
-
-					Responder responder =
-						responderProvider.get ();
-
-					responder.execute (
-						parentTaskLogger);
-
-				}
-
-			}
-
-		};
-
-	}
-
-	public
-	RequestHandler responderToRequestHandler (
-			final String responderName) {
-
-		return new RequestHandler () {
-
-			@Override
-			public
-			void handle (
-					@NonNull TaskLogger parentTaskLogger) {
-
-				try (
-
-					OwnedTaskLogger taskLogger =
-						logContext.nestTaskLogger (
-							parentTaskLogger,
-							"responderToRequestHandler.handle");
-
-				) {
-
-					Responder responder =
-						componentManager.getComponentRequired (
-							parentTaskLogger,
-							responderName,
-							Responder.class);
-
-					responder.execute (
-						parentTaskLogger);
-
-				}
-
-			}
-
-		};
 
 	}
 

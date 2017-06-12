@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -50,107 +50,131 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatPricePoint">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="im-chat-price-point"
+			type="read-only">
 
-		<currency-field
-			name="price"
-			currency="imChat.billingCurrency"/>
+			<columns>
 
-		<currency-field
-			name="value"
-			currency="imChat.creditCurrency"/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="order"/>
+				<currency-field
+					name="price"
+					currency="imChat.billingCurrency"/>
 
-	</field-set>
+				<currency-field
+					name="value"
+					currency="imChat.creditCurrency"/>
 
-	<field-set
-		name="create"
-		object-name="imChatPricePoint">
+				<integer-field
+					name="order"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<text-field
-			name="publicName"/>
+		</form>
 
-		<text-field
-			name="publicDescription"/>
+		<form
+			name="create"
+			object-type="im-chat-price-point"
+			type="create">
 
-		<currency-field
-			name="price"
-			currency="imChat.billingCurrency"/>
+			<columns>
 
-		<currency-field
-			name="value"
-			currency="imChat.creditCurrency"/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="order"/>
+				<text-field
+					name="publicName"/>
 
-	</field-set>
+				<text-field
+					name="publicDescription"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatPricePoint">
+				<currency-field
+					name="price"
+					currency="imChat.billingCurrency"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<currency-field
+					name="value"
+					currency="imChat.creditCurrency"/>
 
-		<text-field
-			name="publicName"/>
+				<integer-field
+					name="order"/>
 
-		<text-field
-			name="publicDescription"/>
+			</columns>
 
-		<currency-field
-			name="price"
-			currency="imChat.billingCurrency"/>
+		</form>
 
-		<currency-field
-			name="value"
-			currency="imChat.creditCurrency"/>
+		<form
+			name="summary"
+			object-type="im-chat-price-point"
+			type="read-only">
 
-		<integer-field
-			name="order"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-	<field-set
-		name="settings"
-		object-name="imChatPricePoint">
+				<text-field
+					name="publicName"/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="publicDescription"/>
 
-		<text-field
-			name="publicName"/>
+				<currency-field
+					name="price"
+					currency="imChat.billingCurrency"/>
 
-		<text-field
-			name="publicDescription"/>
+				<currency-field
+					name="value"
+					currency="imChat.creditCurrency"/>
 
-		<currency-field
-			name="price"
-			currency="imChat.billingCurrency"/>
+				<integer-field
+					name="order"/>
 
-		<currency-field
-			name="value"
-			currency="imChat.creditCurrency"/>
+			</columns>
 
-		<integer-field
-			name="order"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="im-chat-price-point"
+			type="update">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+				<text-field
+					name="publicDescription"/>
+
+				<currency-field
+					name="price"
+					currency="imChat.billingCurrency"/>
+
+				<currency-field
+					name="value"
+					currency="imChat.creditCurrency"/>
+
+				<integer-field
+					name="order"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

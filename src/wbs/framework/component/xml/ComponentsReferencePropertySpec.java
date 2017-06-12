@@ -44,6 +44,10 @@ class ComponentsReferencePropertySpec
 
 	@DataAttribute
 	@Getter @Setter
+	String scope;
+
+	@DataAttribute
+	@Getter @Setter
 	String target;
 
 	// public implementation
@@ -65,6 +69,7 @@ class ComponentsReferencePropertySpec
 
 			componentDefinition.addReferenceProperty (
 				name,
+				scope,
 				target);
 
 		}

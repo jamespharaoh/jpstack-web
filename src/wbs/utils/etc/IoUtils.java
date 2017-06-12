@@ -1,10 +1,14 @@
 package wbs.utils.etc;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 
 import lombok.NonNull;
+
+import org.apache.commons.io.IOUtils;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -77,6 +81,42 @@ class IoUtils {
 
 			target.write (
 				value);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public static
+	byte[] readBytes (
+			@NonNull InputStream source) {
+
+		try {
+
+			return IOUtils.toByteArray (
+				source);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public static
+	String readString (
+			@NonNull Reader source) {
+
+		try {
+
+			return IOUtils.toString (
+				source);
 
 		} catch (IOException ioException) {
 

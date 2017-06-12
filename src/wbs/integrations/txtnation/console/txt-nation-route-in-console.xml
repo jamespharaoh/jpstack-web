@@ -22,20 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -43,52 +43,76 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="txtNationRouteIn">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="txt-nation-route-in"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="txtNationRouteIn">
+				<parent-field/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="txt-nation-route-in"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="txtNationRouteIn">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<deleted-field/>
+				<parent-field/>
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="txtNationRouteIn">
+		</form>
 
-		<id-field/>
-		<parent-field read-only="yes"/>
-		<deleted-field/>
+		<form
+			name="summary"
+			object-type="txt-nation-route-in"
+			type="read-only">
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<deleted-field/>
+
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="txt-nation-route-in"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field read-only="yes"/>
+				<deleted-field/>
+
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

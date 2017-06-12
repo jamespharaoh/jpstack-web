@@ -37,20 +37,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -58,142 +58,166 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatPromo">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="chat-promo"
+			type="read-only">
 
-		<timestamp-field
-			name="startTime"/>
+			<columns>
 
-		<timestamp-field
-			name="endTime"/>
+				<name-field/>
+				<description-field/>
 
-		<currency-field
-			name="amount"
-			currency="chat.currency"/>
+				<timestamp-field
+					name="startTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="endTime"/>
 
-	<field-set
-		name="create"
-		object-name="chatPromo">
+				<currency-field
+					name="amount"
+					currency="chat.currency"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<timestamp-field
-			name="startTime"/>
+		</form>
 
-		<timestamp-field
-			name="endTime"/>
+		<form
+			name="create"
+			object-type="chat-promo"
+			type="create">
 
-		<currency-field
-			name="amount"
-			currency="chat.currency"/>
+			<columns>
 
-		<text-area-field
-			name="successText"/>
+				<name-field/>
+				<description-field/>
 
-		<text-area-field
-			name="alreadyClaimedText"/>
+				<timestamp-field
+					name="startTime"/>
 
-		<text-area-field
-			name="promoNotStartedText"/>
+				<timestamp-field
+					name="endTime"/>
 
-		<text-area-field
-			name="promoEndedText"/>
+				<currency-field
+					name="amount"
+					currency="chat.currency"/>
 
-		<yes-no-field
-			name="joinChat"/>
+				<text-area-field
+					name="successText"/>
 
-		<yes-no-field
-			name="joinDating"/>
+				<text-area-field
+					name="alreadyClaimedText"/>
 
-	</field-set>
+				<text-area-field
+					name="promoNotStartedText"/>
 
-	<field-set
-		name="summary"
-		object-name="chatPromo">
+				<text-area-field
+					name="promoEndedText"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<yes-no-field
+					name="joinChat"/>
 
-		<timestamp-field
-			name="startTime"/>
+				<yes-no-field
+					name="joinDating"/>
 
-		<timestamp-field
-			name="endTime"/>
+			</columns>
 
-		<currency-field
-			name="amount"
-			currency="chat.currency"/>
+		</form>
 
-		<text-area-field
-			name="successText"/>
+		<form
+			name="summary"
+			object-type="chat-promo"
+			type="read-only">
 
-		<text-area-field
-			name="alreadyClaimedText"/>
+			<columns>
 
-		<text-area-field
-			name="promoNotStartedText"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-area-field
-			name="promoEndedText"/>
+				<timestamp-field
+					name="startTime"/>
 
-		<yes-no-field
-			name="joinChat"/>
+				<timestamp-field
+					name="endTime"/>
 
-		<yes-no-field
-			name="joinDating"/>
+				<currency-field
+					name="amount"
+					currency="chat.currency"/>
 
-		<integer-field
-			name="numUsers"/>
+				<text-area-field
+					name="successText"/>
 
-	</field-set>
+				<text-area-field
+					name="alreadyClaimedText"/>
 
-	<field-set
-		name="settings"
-		object-name="chatPromo">
+				<text-area-field
+					name="promoNotStartedText"/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-area-field
+					name="promoEndedText"/>
 
-		<timestamp-field
-			name="startTime"/>
+				<yes-no-field
+					name="joinChat"/>
 
-		<timestamp-field
-			name="endTime"/>
+				<yes-no-field
+					name="joinDating"/>
 
-		<currency-field
-			name="amount"
-			currency="chat.currency"/>
+				<integer-field
+					name="numUsers"/>
 
-		<text-area-field
-			name="successText"/>
+			</columns>
 
-		<text-area-field
-			name="alreadyClaimedText"/>
+		</form>
 
-		<text-area-field
-			name="promoNotStartedText"/>
+		<form
+			name="settings"
+			object-type="chat-promo"
+			type="update">
 
-		<text-area-field
-			name="promoEndedText"/>
+			<columns>
 
-		<yes-no-field
-			name="joinChat"/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<yes-no-field
-			name="joinDating"/>
+				<timestamp-field
+					name="startTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="endTime"/>
+
+				<currency-field
+					name="amount"
+					currency="chat.currency"/>
+
+				<text-area-field
+					name="successText"/>
+
+				<text-area-field
+					name="alreadyClaimedText"/>
+
+				<text-area-field
+					name="promoNotStartedText"/>
+
+				<text-area-field
+					name="promoEndedText"/>
+
+				<yes-no-field
+					name="joinChat"/>
+
+				<yes-no-field
+					name="joinDating"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

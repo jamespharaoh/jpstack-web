@@ -34,6 +34,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.web.responder.WebResponder;
+
 @PrototypeComponent ("contextTabPageBuilder")
 public
 class ContextTabPageBuilder <
@@ -66,9 +68,10 @@ class ContextTabPageBuilder <
 	String tabLabel;
 	String fileName;
 	Boolean hideTab;
-	String responderName;
 	String title;
 	String pagePartName;
+
+	Provider <WebResponder> responderProvider;
 
 	// builder
 
@@ -101,6 +104,8 @@ class ContextTabPageBuilder <
 
 			setDefaults ();
 
+			buildResponder ();
+
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
@@ -112,6 +117,7 @@ class ContextTabPageBuilder <
 					resolvedExtensionPoint);
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
@@ -151,24 +157,47 @@ class ContextTabPageBuilder <
 	}
 
 	void buildFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			fileName,
-			consoleFile.get ()
-				.getResponderName (responderName),
-			extensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
+
+		) {
+
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
+
+					.getResponderProvider (
+						responderProvider),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
 	void buildResponder () {
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
-				.tab (tabName)
-				.title (title)
-				.pagePartName (pagePartName));
+		responderProvider =
+			() -> tabContextResponder.get ()
+
+			.tab (
+				tabName)
+
+			.title (
+				title)
+
+			.pagePartName (
+				pagePartName)
+
+		;
 
 	}
 
@@ -201,14 +230,6 @@ class ContextTabPageBuilder <
 					"%s.%s",
 					container.pathPrefix (),
 					name));
-
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%s%sResponder",
-					container.newBeanNamePrefix (),
-					capitalise (name)));
 
 		title =
 			ifNull (

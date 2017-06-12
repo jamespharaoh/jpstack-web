@@ -29,69 +29,88 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatAdTemplate">
+	<forms>
 
-		<text-field
-			name="genericText"/>
+		<form
+			name="list"
+			object-type="chat-ad-template"
+			type="read-only">
 
-		<text-field
-			name="gayMaleText"/>
+			<columns>
 
-		<text-field
-			name="gayFemaleText"/>
+				<text-field
+					name="genericText"/>
 
-	</field-set>
+				<text-field
+					name="gayMaleText"/>
 
-	<field-set
-		name="create"
-		object-name="chatAdTemplate">
+				<text-field
+					name="gayFemaleText"/>
 
-		<parent-field/>
+			</columns>
 
-		<text-field
-			name="genericText"/>
+		</form>
 
-		<text-field
-			name="gayMaleText"/>
+		<form
+			name="create"
+			object-type="chat-ad-template"
+			type="create">
 
-		<text-field
-			name="gayFemaleText"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
 
-	<field-set
-		name="settings"
-		object-name="chatAdTemplate">
+				<text-field
+					name="genericText"/>
 
-		<id-field/>
+				<text-field
+					name="gayMaleText"/>
 
-		<text-field
-			name="genericText"/>
+				<text-field
+					name="gayFemaleText"/>
 
-		<text-field
-			name="gayMaleText"/>
+			</columns>
 
-		<text-field
-			name="gayFemaleText"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="chat-ad-template"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+
+				<text-field
+					name="genericText"/>
+
+				<text-field
+					name="gayMaleText"/>
+
+				<text-field
+					name="gayFemaleText"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -43,7 +44,7 @@ class ChatInfoSiteApiModule
 
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Provider <ApiFile> apiFile;
 
 	@PrototypeDependency
@@ -85,7 +86,12 @@ class ChatInfoSiteApiModule
 
 			infoSiteImageFile =
 				apiFile.get ()
-					.getResponderName ("chatInfoSiteImageResponder");
+
+				.getResponderName (
+					taskLogger,
+					"chatInfoSiteImageResponder")
+
+			;
 
 			infoSiteEntry =
 				new RegexpPathHandler.Entry (

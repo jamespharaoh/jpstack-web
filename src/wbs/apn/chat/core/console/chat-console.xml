@@ -72,9 +72,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
+				form="create"
 				target-responder="chatSummaryResponder"/>
 
 			<context-link
@@ -87,7 +88,7 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<extension-point
 				name="chat.settings"/>
@@ -138,27 +139,56 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chat">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="chat"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="chat">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="create"
+			object-type="chat"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="chat"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

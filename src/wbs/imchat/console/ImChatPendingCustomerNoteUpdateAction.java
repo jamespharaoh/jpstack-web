@@ -30,7 +30,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("imChatPendingCustomerNoteUpdateAction")
@@ -73,7 +73,7 @@ class ImChatPendingCustomerNoteUpdateAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

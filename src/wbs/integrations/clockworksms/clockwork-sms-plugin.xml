@@ -23,8 +23,8 @@
 	</sql-scripts>
 
 	<layer name="api">
-		<component class="api.ClockworkSmsRouteInAction"/>
-		<component class="api.ClockworkSmsRouteReportAction"/>
+		<component class="api.ClockworkSmsRouteInApiLoggingAction"/>
+		<component class="api.ClockworkSmsRouteReportApiLoggingAction"/>
 		<component class="api.ClockworkSmsRouteReportRequestReader"/>
 	</layer>
 

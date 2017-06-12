@@ -15,7 +15,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreAuthAction")
@@ -34,14 +34,14 @@ class CoreAuthAction
 	BooleanLookup lookup;
 
 	@Getter @Setter
-	Provider<Responder> normalResponder;
+	Provider <WebResponder> normalResponderProvider;
 
 	@Getter @Setter
-	Provider<Responder> deniedResponder;
+	Provider <WebResponder> deniedResponderProvider;
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
@@ -52,11 +52,11 @@ class CoreAuthAction
 			requestContext.addError (
 				"Access denied");
 
-			return deniedResponder.get ();
+			return deniedResponderProvider.get ();
 
 		}
 
-		return normalResponder.get ();
+		return normalResponderProvider.get ();
 
 	}
 

@@ -29,81 +29,95 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatSession">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="im-chat-session"
+			type="read-only">
 
-		<timestamp-field
-			name="startTime"
-			label="Start"/>
+			<columns>
 
-		<timestamp-field
-			name="updateTime"
-			label="Update"/>
+				<code-field/>
 
-		<timestamp-field
-			name="endTime"
-			label="End"/>
+				<timestamp-field
+					name="startTime"
+					label="Start"/>
 
-		<yes-no-field
-			name="active"/>
+				<timestamp-field
+					name="updateTime"
+					label="Update"/>
 
-		<text-field
-			name="userAgentText"
-			label="User agent"/>
+				<timestamp-field
+					name="endTime"
+					label="End"/>
 
-		<text-field
-			name="ipAddress"
-			label="IP address"/>
+				<yes-no-field
+					name="active"/>
 
-	</field-set>
+				<text-field
+					name="userAgentText"
+					label="User agent"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatSession">
+				<text-field
+					name="ipAddress"
+					label="IP address"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
+			</columns>
 
-		<timestamp-field
-			name="startTime"
-			label="Start"/>
+		</form>
 
-		<timestamp-field
-			name="updateTime"
-			label="Update"/>
+		<form
+			name="summary"
+			object-type="im-chat-session"
+			type="read-only">
 
-		<timestamp-field
-			name="endTime"
-			label="End"/>
+			<columns>
 
-		<yes-no-field
-			name="active"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
 
-		<text-field
-			name="userAgentText"
-			label="User agent"/>
+				<timestamp-field
+					name="startTime"
+					label="Start"/>
 
-		<text-field
-			name="ipAddress"
-			label="IP address"/>
+				<timestamp-field
+					name="updateTime"
+					label="Update"/>
 
-	</field-set>
+				<timestamp-field
+					name="endTime"
+					label="End"/>
+
+				<yes-no-field
+					name="active"/>
+
+				<text-field
+					name="userAgentText"
+					label="User agent"/>
+
+				<text-field
+					name="ipAddress"
+					label="IP address"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -433,10 +433,23 @@ class ComponentManagerBuilder {
 						: plugins
 				) {
 
-					componentPlugin.registerComponents (
-						taskLogger,
-						componentRegistry,
-						plugin);
+					try {
+
+						componentPlugin.registerComponents (
+							taskLogger,
+							componentRegistry,
+							plugin);
+
+					} catch (Exception exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"Error running component plugin %s ",
+							buildLayerPlugin.name (),
+							"on plugin module %s",
+							plugin.name ());
+
+					}
 
 				}
 
@@ -522,6 +535,7 @@ class ComponentManagerBuilder {
 
 				.addReferenceProperty (
 					"apiModuleSpec",
+					"singleton",
 					apiModuleSpecComponentName)
 
 			);

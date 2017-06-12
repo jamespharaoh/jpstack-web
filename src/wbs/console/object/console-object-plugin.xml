@@ -4,7 +4,9 @@
 
 	<layer name="console">
 
+		<bootstrap-component class="ExtendContextComponentBuilder"/>
 		<bootstrap-component class="ExtendContextSpec"/>
+		<bootstrap-component class="ObjectContextComponentBuilder"/>
 		<bootstrap-component class="ObjectContextSpec"/>
 
 		<component class="ExtendContextBuilder"/>

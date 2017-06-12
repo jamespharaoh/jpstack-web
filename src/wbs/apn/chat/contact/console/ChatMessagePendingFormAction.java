@@ -7,13 +7,17 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -38,7 +42,7 @@ import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatMessagePendingFormAction")
 public
@@ -89,21 +93,30 @@ class ChatMessagePendingFormAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatMessagePendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("queueHomeResponder")
+	Provider <WebResponder> queueHomeResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatMessagePendingFormResponder");
+		return pendingFormResponderProvider.get ();
 
 	}
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -162,7 +175,7 @@ class ChatMessagePendingFormAction
 	}
 
 	private
-	Responder goSend (
+	WebResponder goSend (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -229,7 +242,7 @@ class ChatMessagePendingFormAction
 				requestContext.addError (
 					"Message is already approved");
 
-				return responder ("queueHomeResponder");
+				return queueHomeResponderProvider.get ();
 
 			}
 
@@ -373,15 +386,14 @@ class ChatMessagePendingFormAction
 			requestContext.addNotice (
 				"Message approved");
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 
 	}
 
 	private
-	Responder goReject (
+	WebResponder goReject (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -432,8 +444,7 @@ class ChatMessagePendingFormAction
 				requestContext.addError (
 					"Message is already approved");
 
-				return responder (
-					"queueHomeResponder");
+				return queueHomeResponderProvider.get ();
 
 			}
 
@@ -485,8 +496,7 @@ class ChatMessagePendingFormAction
 			requestContext.addNotice (
 				"Rejection sent");
 
-			return responder (
-				"queueHomeResponder");
+			return queueHomeResponderProvider.get ();
 
 		}
 

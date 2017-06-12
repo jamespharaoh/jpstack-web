@@ -24,10 +24,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextActionPageBuilder")
 public
@@ -37,6 +40,9 @@ class ContextActionPageBuilder <
 	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -66,7 +72,8 @@ class ContextActionPageBuilder <
 	String fileName;
 	String actionName;
 	String responderName;
-	String responderBeanName;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -88,6 +95,12 @@ class ContextActionPageBuilder <
 
 			setDefaults ();
 
+			responderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					responderName,
+					WebResponder.class);
+
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
@@ -98,8 +111,8 @@ class ContextActionPageBuilder <
 					fileName,
 					consoleFile.get ()
 
-						.getResponderName (
-							responderName)
+						.getResponderProvider (
+							responderProvider)
 
 						.postActionName (
 							taskLogger,
@@ -108,12 +121,6 @@ class ContextActionPageBuilder <
 					resolvedExtensionPoint.contextTypeNames ());
 
 			}
-
-			consoleModule.addResponder (
-				responderName,
-				consoleModule.beanResponder (
-					taskLogger,
-					responderBeanName));
 
 		}
 
@@ -152,6 +159,7 @@ class ContextActionPageBuilder <
 					capitalise (
 						name)));
 
+		/*
 		responderBeanName =
 			ifNull (
 				contextActionPageSpec.responderBeanName (),
@@ -160,6 +168,7 @@ class ContextActionPageBuilder <
 					container.existingBeanNamePrefix (),
 					capitalise (
 						name)));
+		*/
 
 	}
 

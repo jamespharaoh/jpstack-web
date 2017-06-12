@@ -123,6 +123,7 @@ class ContextFileBuilder <
 				consoleFileProvider.get ()
 
 					.getResponderName (
+						taskLogger,
 						getResponderName)
 
 					.getActionName (

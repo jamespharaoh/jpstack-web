@@ -2,31 +2,36 @@ package wbs.smsapps.autoresponder.console;
 
 import lombok.NonNull;
 
-import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("autoResponderSettingsTemplatesAction")
 public
 class AutoResponderSettingsTemplatesAction
-	extends ConsoleAction {
+	implements WebAction {
 
 	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
 	// public implementation
 
 	@Override
-	protected
-	Responder goReal (
+	public
+	WebResponder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -34,7 +39,7 @@ class AutoResponderSettingsTemplatesAction
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"goReal");
+					"handle");
 
 		) {
 

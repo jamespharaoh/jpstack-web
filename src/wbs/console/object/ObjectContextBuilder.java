@@ -106,7 +106,7 @@ class ObjectContextBuilder <
 
 	String name;
 	String structuralName;
-	String beanName;
+	String componentName;
 
 	String objectTitle;
 	Optional <String> defaultFileName;
@@ -168,6 +168,9 @@ class ObjectContextBuilder <
 			ConsoleContextBuilderContainer <ObjectType> listContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					consoleHelper)
 
@@ -181,17 +184,17 @@ class ObjectContextBuilder <
 					name)
 
 				.newBeanNamePrefix (
-					beanName)
+					componentName)
 
 				.existingBeanNamePrefix (
-					beanName)
+					componentName)
 
 				.tabLocation (
 					"end")
 
 				.friendlyName (
 					camelToSpaces (
-						beanName));
+						componentName));
 
 			builder.descend (
 				taskLogger,
@@ -202,6 +205,9 @@ class ObjectContextBuilder <
 
 			ConsoleContextBuilderContainer <ObjectType> objectContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
+
+				.consoleModule (
+					container.consoleModule ())
 
 				.consoleHelper (
 					consoleHelper)
@@ -216,16 +222,16 @@ class ObjectContextBuilder <
 					name)
 
 				.newBeanNamePrefix (
-					beanName)
+					componentName)
 
 				.existingBeanNamePrefix (
-					beanName)
+					componentName)
 
 				.tabLocation (
 					"end")
 
 				.friendlyName (
-					camelToSpaces (beanName));
+					camelToSpaces (componentName));
 
 			builder.descend (
 				taskLogger,
@@ -566,12 +572,12 @@ class ObjectContextBuilder <
 			structuralName =
 				name;
 
-			beanName =
+			componentName =
 				ifNull (
-					spec.beanName (),
+					spec.componentName (),
 					name);
 
-			if (beanName.contains ("_")) {
+			if (componentName.contains ("_")) {
 
 				throw new RuntimeException (
 					stringFormat (

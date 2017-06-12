@@ -29,18 +29,19 @@
 		<list>
 
 			<object-search-page
-				search-fields="search-form"
-				results-column-fields="search-results"/>
+				search-class="wbs.smsapps.manualresponder.model.ManualResponderNumberSearch"
+				search-form="search-form"
+				results-form="search-results"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -48,103 +49,127 @@
 
 	</object-context>
 
-	<field-set
-		name="search-form"
-		class="wbs.smsapps.manualresponder.model.ManualResponderNumberSearch">
+	<forms>
 
-		<text-field
-			name="number"
-			nullable="yes"/>
+		<form
+			name="search-form"
+			class="wbs.smsapps.manualresponder.model.ManualResponderNumberSearch"
+			type="search">
 
-		<interval-field
-			name="firstRequest"
-			nullable="yes"/>
+			<columns>
 
-		<interval-field
-			name="lastRequest"
-			nullable="yes"/>
+				<text-field
+					name="number"
+					nullable="yes"/>
 
-		<text-field
-			name="notes"
-			nullable="yes"/>
+				<interval-field
+					name="firstRequest"
+					nullable="yes"/>
 
-	</field-set>
+				<interval-field
+					name="lastRequest"
+					nullable="yes"/>
 
-	<field-set
-		name="search-results"
-		object-name="manualResponderNumber">
+				<text-field
+					name="notes"
+					nullable="yes"/>
 
-		<object-field
-			name="number"
-			object-type="number"/>
+			</columns>
 
-		<object-field
-			name="smsCustomer"
-			label="Customer"
-			object-type="smsCustomer"
-			root-field="manualResponder.smsCustomerManager"/>
+		</form>
 
-		<integer-field
-			name="numRequests"
-			label="Requests"/>
+		<form
+			name="search-results"
+			object-type="manual-responder-number"
+			type="read-only">
 
-		<timestamp-field
-			name="firstRequest"
-			label="First"/>
+			<columns>
 
-		<timestamp-field
-			name="lastRequest"
-			label="Last"/>
+				<object-field
+					name="number"
+					object-type="number"/>
 
-		<text-field
-			name="notesText"
-			label="Notes"/>
+				<object-field
+					name="smsCustomer"
+					label="Customer"
+					object-type="smsCustomer"
+					root-field="manualResponder.smsCustomerManager"/>
 
-	</field-set>
+				<integer-field
+					name="numRequests"
+					label="Requests"/>
 
-	<field-set
-		name="summary"
-		object-name="manualResponderNumber">
+				<timestamp-field
+					name="firstRequest"
+					label="First"/>
 
-		<id-field/>
-		<parent-field/>
+				<timestamp-field
+					name="lastRequest"
+					label="Last"/>
 
-		<object-field
-			name="number"
-			object-type="number"/>
+				<text-field
+					name="notesText"
+					label="Notes"/>
 
-		<object-field
-			name="smsCustomer"
-			label="Customer"
-			object-type="smsCustomer"
-			root-field="manualResponder.smsCustomerManager"/>
+			</columns>
 
-		<integer-field
-			name="numRequests"
-			label="Requests"/>
+		</form>
 
-		<timestamp-field
-			name="firstRequest"
-			label="First"/>
+		<form
+			name="summary"
+			object-type="manual-responder-number"
+			type="read-only">
 
-		<timestamp-field
-			name="lastRequest"
-			label="Last"/>
+			<columns>
 
-		<text-area-field
-			name="notesText"
-			label="Notes"/>
+				<id-field/>
+				<parent-field/>
 
-	</field-set>
+				<object-field
+					name="number"
+					object-type="number"/>
 
-	<field-set
-		name="settings"
-		object-name="manualResponderNumber">
+				<object-field
+					name="smsCustomer"
+					label="Customer"
+					object-type="smsCustomer"
+					root-field="manualResponder.smsCustomerManager"/>
 
-		<text-area-field
-			name="notesText"
-			label="Notes"/>
+				<integer-field
+					name="numRequests"
+					label="Requests"/>
 
-	</field-set>
+				<timestamp-field
+					name="firstRequest"
+					label="First"/>
+
+				<timestamp-field
+					name="lastRequest"
+					label="Last"/>
+
+				<text-area-field
+					name="notesText"
+					label="Notes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="manual-responder-number"
+			type="update">
+
+			<columns>
+
+				<text-area-field
+					name="notesText"
+					label="Notes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

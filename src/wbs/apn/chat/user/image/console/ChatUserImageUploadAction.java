@@ -12,6 +12,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -24,6 +26,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -43,7 +46,7 @@ import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserImageUploadAction")
 public
@@ -86,6 +89,16 @@ class ChatUserImageUploadAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserImageListResponder")
+	Provider <WebResponder> imageListResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserImageUploadResponder")
+	Provider <WebResponder> imageUploadResponderProvider;
+
 	// state
 
 	ChatUserImageType chatUserImageType;
@@ -96,11 +109,10 @@ class ChatUserImageUploadAction
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatUserImageUploadResponder");
+		return imageUploadResponderProvider.get ();
 
 	}
 
@@ -108,7 +120,7 @@ class ChatUserImageUploadAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -303,8 +315,7 @@ class ChatUserImageUploadAction
 				capitalise (
 					chatUserImageType.name ()));
 
-			return responder (
-				"chatUserImageListResponder");
+			return imageListResponderProvider.get ();
 
 		}
 

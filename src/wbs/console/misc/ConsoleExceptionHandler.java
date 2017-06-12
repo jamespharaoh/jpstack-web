@@ -1,5 +1,6 @@
 package wbs.console.misc;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
@@ -34,7 +35,7 @@ import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
-import wbs.web.handler.WebExceptionHandler;
+import wbs.web.mvc.WebExceptionHandler;
 
 @SingletonComponent ("exceptionHandler")
 public
@@ -92,11 +93,11 @@ class ConsoleExceptionHandler
 
 	}
 
-	// TODO use this from other places? or what?
 	@Override
 	public
-	void handleException (
+	void handleExceptionRetry (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long attempt,
 			@NonNull Throwable throwable) {
 
 		try (
@@ -108,14 +109,70 @@ class ConsoleExceptionHandler
 
 		) {
 
-			// log it the old fashioned way
+			// log it via task logger
+
+			taskLogger.warningFormatException (
+				throwable,
+				"Request generated exception on attempt %s, ",
+				integerToDecimalString (
+					attempt),
+				"will retry: %s",
+				requestContext.requestUri ());
+
+			// log it in database
+
+			try {
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"console",
+					stringFormat (
+						"%s %s",
+						requestContext.method (),
+						requestContext.requestUri ()),
+					throwable,
+					consoleUserHelper.loggedInUserId (),
+					GenericExceptionResolution.tryAgainNow);
+
+			} catch (RuntimeException localException) {
+
+				taskLogger.fatalFormatException (
+					localException,
+					"Error creating exception log");
+
+			}
+
+		}
+
+	}
+
+	@Override
+	public
+	void handleExceptionFinal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long attempt,
+			@NonNull Throwable throwable) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handleExceptionFinal");
+
+		) {
+
+			// log it via task logger
 
 			taskLogger.errorFormatException (
 				throwable,
-				"Request generated exception: %s",
+				"Request generated exception on attempt %s, ",
+				integerToDecimalString (
+					attempt),
+				"giving up: %s",
 				requestContext.requestUri ());
 
-			// make an exception log of this calamity
+			// log it in database
 
 			try {
 
@@ -138,7 +195,7 @@ class ConsoleExceptionHandler
 
 			}
 
-			// now if possible reset the output buffer
+			// reset output buffer if possible
 
 			if (requestContext.canGetWriter ()) {
 
@@ -171,8 +228,8 @@ class ConsoleExceptionHandler
 							"<p class=\"error\">Internal error</p>");
 
 						formatWriter.writeLineFormat (
-							"<p>This page cannot be displayed properly, due to an ",
-							"internal error.</p>");
+							"<p>This page cannot be displayed properly, due ",
+							"to an internal error.</p>");
 
 						formatWriter.writeLineFormatIncreaseIndent (
 							"<form method=\"%h\">",

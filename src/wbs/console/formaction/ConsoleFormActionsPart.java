@@ -99,7 +99,7 @@ class ConsoleFormActionsPart
 						genericCastUnchecked (
 							showSubmitFormAction.getRight ().helper ()))
 
-					.actionFormContextBuilder (
+					.actionFormType (
 						genericCastUncheckedNullSafe (
 							showSubmitFormAction.getRight ()
 								.actionFormContextBuilder ()))

@@ -8,7 +8,9 @@
 		name="chatUser.images"
 		base-name="chatUser"
 		extension-point="chatUser.images"
-		object-name="chatUser">
+		object-name="chatUser"
+		component-name="chatUser"
+		friendly-name="chat user">
 
 		<section
 			name="image"
@@ -58,6 +60,30 @@
 
 		</section>
 
+		<section
+			name="audio"
+			alias-of="image"
+			label="Audio">
+
+			<context-stuff
+				name="chatUserImageType"
+				value="audio"/>
+
+			<context-tab-action-page
+				name="list"/>
+
+			<context-tab-responder-page
+				name="history"/>
+
+			<context-tab-action-page
+				name="upload"/>
+
+			<context-tab-responder-page
+				name="view"
+				hide-tab="yes"/>
+
+		</section>
+
 	</extend-context>
 
 	<forms>
@@ -67,7 +93,7 @@
 			class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm"
 			type="perform">
 
-			<column-fields>
+			<columns>
 
 				<upload-field
 					name="upload"
@@ -76,7 +102,7 @@
 				<yes-no-field
 					name="setAsPrimary"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

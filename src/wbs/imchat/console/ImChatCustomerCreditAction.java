@@ -2,6 +2,8 @@ package wbs.imchat.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -12,6 +14,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -21,7 +24,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("imChatCustomerCreditAction")
 public
@@ -55,15 +58,20 @@ class ImChatCustomerCreditAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("imChatCustomerCreditResponder")
+	Provider <WebResponder> customerCreditResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"imChatCustomerCreditResponder");
+		return customerCreditResponderProvider.get ();
 
 	}
 
@@ -71,7 +79,7 @@ class ImChatCustomerCreditAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

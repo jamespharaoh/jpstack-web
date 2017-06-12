@@ -12,6 +12,6 @@ class ObjectSearchResultsMode <Container> {
 
 	String name;
 
-	ConsoleFormType <Container> formContextBuilder;
+	ConsoleFormType <Container> formType;
 
 }

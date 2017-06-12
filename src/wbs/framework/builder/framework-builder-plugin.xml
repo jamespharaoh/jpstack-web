@@ -3,8 +3,10 @@
 	package="wbs.framework.builder">
 
 	<layer name="utils">
-		<component class="BuilderFactoryImplementation"/>
-		<component class="BuilderImplementation"/>
+
+		<bootstrap-component class="BuilderFactoryImplementation"/>
+		<bootstrap-component class="BuilderImplementation"/>
+
 	</layer>
 
 </plugin>

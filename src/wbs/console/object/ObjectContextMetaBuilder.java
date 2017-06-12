@@ -60,7 +60,7 @@ class ObjectContextMetaBuilder
 	// state
 
 	String contextTypeName;
-	String beanName;
+	String componentName;
 
 	Boolean hasListChildren;
 	Boolean hasObjectChildren;
@@ -192,12 +192,12 @@ class ObjectContextMetaBuilder
 		contextTypeName =
 			spec.name ();
 
-		beanName =
+		componentName =
 			ifNull (
-				spec.beanName (),
+				spec.componentName (),
 				contextTypeName);
 
-		if (beanName.contains ("_")) {
+		if (componentName.contains ("_")) {
 
 			throw new RuntimeException (
 				stringFormat (

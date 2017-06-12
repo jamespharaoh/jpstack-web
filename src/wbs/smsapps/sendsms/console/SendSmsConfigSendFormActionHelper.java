@@ -30,7 +30,7 @@ import wbs.sms.number.core.model.NumberRec;
 
 import wbs.smsapps.sendsms.model.SendSmsConfigRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("sendSmsConfigSendFormActionHelper")
 public
@@ -100,7 +100,7 @@ class SendSmsConfigSendFormActionHelper
 
 	@Override
 	public
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			@NonNull Transaction parentTransaction,
 			@NonNull SendSmsConfigSendForm form) {
 

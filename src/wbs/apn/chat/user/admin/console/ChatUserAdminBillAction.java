@@ -2,6 +2,8 @@ package wbs.apn.chat.user.admin.console;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -12,7 +14,9 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -28,7 +32,7 @@ import wbs.apn.chat.bill.model.ChatUserBillLogRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserDao;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserAdminBillAction")
 public
@@ -64,15 +68,20 @@ class ChatUserAdminBillAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserAdminBillResponder")
+	Provider <WebResponder> billResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatUserAdminBillResponder");
+		return billResponderProvider.get ();
 
 	}
 
@@ -80,7 +89,7 @@ class ChatUserAdminBillAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

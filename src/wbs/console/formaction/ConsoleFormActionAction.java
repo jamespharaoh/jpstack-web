@@ -2,6 +2,8 @@ package wbs.console.formaction;
 
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -22,7 +24,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextFormActionAction")
 @Accessors (fluent = true)
@@ -53,23 +55,22 @@ class ConsoleFormActionAction <FormState, History>
 	ConsoleFormActionHelper <FormState, History> formActionHelper;
 
 	@Getter @Setter
-	String responderName;
+	Provider <WebResponder> responderProvider;
 
 	// implementation
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			responderName);
+		return responderProvider.get ();
 
 	}
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -112,7 +113,7 @@ class ConsoleFormActionAction <FormState, History>
 
 			}
 
-			Optional <Responder> responder =
+			Optional <WebResponder> responder =
 				formActionHelper.processFormSubmission (
 					transaction,
 					formState);

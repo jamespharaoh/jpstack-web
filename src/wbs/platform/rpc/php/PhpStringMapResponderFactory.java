@@ -9,7 +9,7 @@ import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("phpStringMapResponderFactory")
 public
@@ -25,7 +25,7 @@ class PhpStringMapResponderFactory
 
 	@Override
 	public
-	Responder makeResponder (
+	WebResponder makeResponder (
 			Map<String,?> map) {
 
 		return phpMapResponder.get ()

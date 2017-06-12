@@ -32,10 +32,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				target-responder="imChatSettingsGeneralResponder"/>
 
 		</list>
@@ -43,14 +43,14 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
 				label="Settings">
 
 				<object-settings-page
-					fields="settings"
+					form="settings"
 					short-name="general"/>
 
 				<context-link
@@ -117,192 +117,216 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChat">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="im-chat"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="imChat">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="summary"
-		object-name="imChat">
+		<form
+			name="create"
+			object-type="im-chat"
+			type="create">
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-		<object-field
-			name="billingCurrency"
-			object-type="currency"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<object-field
-			name="creditCurrency"
-			object-type="currency"/>
+			</columns>
 
-		<object-field
-			name="messageTemplateDatabase"
-			object-type="messageTemplateDatabase"
-			nullable="yes"/>
+		</form>
 
-		<seconds-field
-			name="preferredQueueTime"/>
+		<form
+			name="summary"
+			object-type="im-chat"
+			type="read-only">
 
-		<object-field
-			name="paypalAccount"
-			object-type="paypalAccount"/>
+			<columns>
 
-		<currency-field
-			name="messageCost"
-			currency="creditCurrency"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<integer-field
-			name="freeMessageLimit"/>
+				<object-field
+					name="billingCurrency"
+					object-type="currency"/>
 
-		<yes-no-field
-			name="billMessageEnabled"/>
+				<object-field
+					name="creditCurrency"
+					object-type="currency"/>
 
-		<integer-field
-			name="billMessageMinChars"/>
+				<object-field
+					name="messageTemplateDatabase"
+					object-type="messageTemplateDatabase"
+					nullable="yes"/>
 
-		<integer-field
-			name="billMessageMaxChars"/>
+				<seconds-field
+					name="preferredQueueTime"/>
 
-		<yes-no-field
-			name="freeMessageEnabled"/>
+				<object-field
+					name="paypalAccount"
+					object-type="paypalAccount"/>
 
-		<integer-field
-			name="freeMessageMinChars"/>
+				<currency-field
+					name="messageCost"
+					currency="creditCurrency"/>
 
-		<integer-field
-			name="freeMessageMaxChars"/>
+				<integer-field
+					name="freeMessageLimit"/>
 
-		<text-field
-			name="emailFromName"/>
+				<yes-no-field
+					name="billMessageEnabled"/>
 
-		<text-field
-			name="emailFromAddress"/>
+				<integer-field
+					name="billMessageMinChars"/>
 
-		<text-field
-			name="emailReplyToAddress"/>
+				<integer-field
+					name="billMessageMaxChars"/>
 
-		<text-field
-			name="emailSubjectForgotPassword"/>
+				<yes-no-field
+					name="freeMessageEnabled"/>
 
-		<yes-no-field
-			name="profilePageBeforeLogin"/>
+				<integer-field
+					name="freeMessageMinChars"/>
 
-		<yes-no-field
-			name="detailsPageOnFirstLogin"/>
+				<integer-field
+					name="freeMessageMaxChars"/>
 
-	</field-set>
+				<text-field
+					name="emailFromName"/>
 
-	<field-set
-		name="settings"
-		object-name="imChat">
+				<text-field
+					name="emailFromAddress"/>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="emailReplyToAddress"/>
 
-		<object-field
-			name="billingCurrency"
-			object-type="currency"
-			nullable="yes"/>
+				<text-field
+					name="emailSubjectForgotPassword"/>
 
-		<object-field
-			name="creditCurrency"
-			object-type="currency"
-			nullable="yes"/>
+				<yes-no-field
+					name="profilePageBeforeLogin"/>
 
-		<object-field
-			name="messageTemplateDatabase"
-			object-type="messageTemplateDatabase"
-			nullable="yes"/>
+				<yes-no-field
+					name="detailsPageOnFirstLogin"/>
 
-		<seconds-field
-			name="preferredQueueTime"
-			nullable="yes"/>
+			</columns>
 
-		<object-field
-			name="paypalAccount"
-			object-type="paypalAccount"
-			nullable="yes"/>
+		</form>
 
-		<currency-field
-			name="messageCost"
-			currency="creditCurrency"
-			nullable="yes"/>
+		<form
+			name="settings"
+			object-type="im-chat"
+			type="update">
 
-		<integer-field
-			name="freeMessageLimit"
-			nullable="yes"/>
+			<columns>
 
-		<yes-no-field
-			name="billMessageEnabled"
-			nullable="yes"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<integer-field
-			name="billMessageMinChars"
-			nullable="yes"/>
+				<object-field
+					name="billingCurrency"
+					object-type="currency"
+					nullable="yes"/>
 
-		<integer-field
-			name="billMessageMaxChars"
-			nullable="yes"/>
+				<object-field
+					name="creditCurrency"
+					object-type="currency"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="freeMessageEnabled"
-			nullable="yes"/>
+				<object-field
+					name="messageTemplateDatabase"
+					object-type="messageTemplateDatabase"
+					nullable="yes"/>
 
-		<integer-field
-			name="freeMessageMinChars"
-			nullable="yes"/>
+				<seconds-field
+					name="preferredQueueTime"
+					nullable="yes"/>
 
-		<integer-field
-			name="freeMessageMaxChars"
-			nullable="yes"/>
+				<object-field
+					name="paypalAccount"
+					object-type="paypalAccount"
+					nullable="yes"/>
 
-		<text-field
-			name="emailFromName"
-			nullable="yes"/>
+				<currency-field
+					name="messageCost"
+					currency="creditCurrency"
+					nullable="yes"/>
 
-		<text-field
-			name="emailFromAddress"
-			nullable="yes"/>
+				<integer-field
+					name="freeMessageLimit"
+					nullable="yes"/>
 
-		<text-field
-			name="emailReplyToAddress"
-			nullable="yes"/>
+				<yes-no-field
+					name="billMessageEnabled"
+					nullable="yes"/>
 
-		<text-field
-			name="emailSubjectForgotPassword"
-			nullable="yes"/>
+				<integer-field
+					name="billMessageMinChars"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="profilePageBeforeLogin"
-			nullable="yes"/>
+				<integer-field
+					name="billMessageMaxChars"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="detailsPageOnFirstLogin"
-			nullable="yes"/>
+				<yes-no-field
+					name="freeMessageEnabled"
+					nullable="yes"/>
 
-	</field-set>
+				<integer-field
+					name="freeMessageMinChars"
+					nullable="yes"/>
+
+				<integer-field
+					name="freeMessageMaxChars"
+					nullable="yes"/>
+
+				<text-field
+					name="emailFromName"
+					nullable="yes"/>
+
+				<text-field
+					name="emailFromAddress"
+					nullable="yes"/>
+
+				<text-field
+					name="emailReplyToAddress"
+					nullable="yes"/>
+
+				<text-field
+					name="emailSubjectForgotPassword"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="profilePageBeforeLogin"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="detailsPageOnFirstLogin"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

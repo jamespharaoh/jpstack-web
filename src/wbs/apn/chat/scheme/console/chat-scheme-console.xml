@@ -32,25 +32,27 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
+				form="create"
 				target-responder="chatSchemeSummaryResponder"/>
 
 		</list>
 
 		<object>
 
-			<object-summary-page/>
+			<object-summary-page
+				form="summary"/>
 
 			<object-settings-page
 				short-name="general"
-				fields="settings-general"/>
+				form="settings-general"/>
 
 			<object-settings-page
 				short-name="charges"
 				object-name="chatSchemeCharges"
-				fields="settings-charges"
+				form="settings-charges"
 				priv-key="chatScheme.manage"/>
 
 			<context-link
@@ -65,240 +67,278 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatScheme">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="chat-scheme"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="chatScheme">
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<object-field
-			name="rbBillRoute"
-			label="Reverse bill route"
-			object-type="route"/>
+		</form>
 
-		<object-field
-			name="rbFreeRouter"
-			label="Reverse bill free router"
-			object-type="router"/>
+		<form
+			name="create"
+			object-type="chat-scheme"
+			type="create">
 
-		<text-field
-			name="rbNumber"
-			label="Reverse bill number"/>
+			<columns>
 
-		<object-field
-			name="magicNumberSet"
-			object-type="magicNumberSet"/>
+				<name-field/>
+				<description-field/>
 
-		<object-field
-			name="magicRouter"
-			object-type="router"/>
+			</columns>
 
-		<object-field
-			name="mmsRoute"
-			label="MMS route"
-			object-type="route"/>
+		</form>
 
-		<object-field
-			name="mmsFreeRouter"
-			label="MMS free router"
-			object-type="router"/>
+		<form
+			name="summary"
+			object-type="chat-scheme"
+			type="read-only">
 
-		<text-field
-			name="mmsNumber"
-			label="MMS number"/>
+			<columns>
 
-		<object-field
-			name="mmsKeywordSet"
-			label="MMS keyword set"
-			object-type="keywordSet"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<object-field
-			name="wapRouter"
-			label="WAP router"
-			object-type="router"/>
+				<object-field
+					name="rbBillRoute"
+					label="Reverse bill route"
+					object-type="route"/>
 
-		<integer-field
-			name="initialCredit"/>
+				<object-field
+					name="rbFreeRouter"
+					label="Reverse bill free router"
+					object-type="router"/>
 
-		<text-field
-			name="style"/>
+				<text-field
+					name="rbNumber"
+					label="Reverse bill number"/>
 
-		<yes-no-field
-			name="approvals"/>
+				<object-field
+					name="magicNumberSet"
+					object-type="magicNumberSet"/>
 
-		<object-field
-			name="adultAdsScheme"
-			object-type="chatScheme"/>
+				<object-field
+					name="magicRouter"
+					object-type="router"/>
 
-		<seconds-field
-			name="adultExpirySeconds"
-			label="Adult expiry time"/>
+				<object-field
+					name="mmsRoute"
+					label="MMS route"
+					object-type="route"/>
 
-	</field-set>
+				<object-field
+					name="mmsFreeRouter"
+					label="MMS free router"
+					object-type="router"/>
 
-	<field-set
-		name="settings-general"
-		object-name="chatScheme">
+				<text-field
+					name="mmsNumber"
+					label="MMS number"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<object-field
+					name="mmsKeywordSet"
+					label="MMS keyword set"
+					object-type="keywordSet"/>
 
-		<object-field
-			name="rbBillRoute"
-			label="Reverse bill route"
-			object-type="route"/>
+				<object-field
+					name="wapRouter"
+					label="WAP router"
+					object-type="router"/>
 
-		<object-field
-			name="rbFreeRouter"
-			label="Reverse bill free router"
-			object-type="router"/>
+				<integer-field
+					name="initialCredit"/>
 
-		<text-field
-			name="rbNumber"
-			label="Reverse bill number"/>
+				<text-field
+					name="style"/>
 
-		<object-field
-			name="magicNumberSet"
-			object-type="magicNumberSet"/>
+				<yes-no-field
+					name="approvals"/>
 
-		<object-field
-			name="magicRouter"
-			object-type="router"/>
+				<object-field
+					name="adultAdsScheme"
+					object-type="chatScheme"/>
 
-		<object-field
-			name="mmsRoute"
-			label="MMS route"
-			object-type="route"/>
+				<seconds-field
+					name="adultExpirySeconds"
+					label="Adult expiry time"/>
 
-		<object-field
-			name="mmsFreeRouter"
-			label="MMS free router"
-			object-type="router"/>
+			</columns>
 
-		<text-field
-			name="mmsNumber"
-			label="MMS number"/>
+		</form>
 
-		<object-field
-			name="mmsKeywordSet"
-			label="MMS keyword set"
-			object-type="keywordSet"
-			nullable="yes"/>
+		<form
+			name="settings-general"
+			object-type="chat-scheme"
+			type="update">
 
-		<object-field
-			name="wapRouter"
-			label="WAP router"
-			object-type="router"
-			nullable="yes"/>
+			<columns>
 
-		<integer-field
-			name="initialCredit"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-field
-			name="style"/>
+				<object-field
+					name="rbBillRoute"
+					label="Reverse bill route"
+					object-type="route"/>
 
-		<yes-no-field
-			name="approvals"/>
+				<object-field
+					name="rbFreeRouter"
+					label="Reverse bill free router"
+					object-type="router"/>
 
-		<timezone-field
-			name="timezone"/>
+				<text-field
+					name="rbNumber"
+					label="Reverse bill number"/>
 
-		<enum-field
-			name="operatorLabel"/>
+				<object-field
+					name="magicNumberSet"
+					object-type="magicNumberSet"/>
 
-		<object-field
-			name="adultAdsScheme"
-			object-type="chatScheme"
-			nullable="yes"/>
+				<object-field
+					name="magicRouter"
+					object-type="router"/>
 
-		<seconds-field
-			name="adultExpirySeconds"
-			label="Adult expiry time"
-			nullable="yes"/>
+				<object-field
+					name="mmsRoute"
+					label="MMS route"
+					object-type="route"/>
 
-	</field-set>
+				<object-field
+					name="mmsFreeRouter"
+					label="MMS free router"
+					object-type="router"/>
 
-	<field-set
-		name="settings-charges"
-		object-name="chatSchemeCharges">
+				<text-field
+					name="mmsNumber"
+					label="MMS number"/>
 
-		<currency-field
-			name="chargeChatSend"
-			label="Charge to send message"
-			currency="chatScheme.chat.currency"/>
+				<object-field
+					name="mmsKeywordSet"
+					label="MMS keyword set"
+					object-type="keywordSet"
+					nullable="yes"/>
 
-		<currency-field
-			name="chargeChatReceive"
-			label="Charge to receive message"
-			currency="chatScheme.chat.currency"/>
+				<object-field
+					name="wapRouter"
+					label="WAP router"
+					object-type="router"
+					nullable="yes"/>
 
-		<currency-field
-			name="chargeChatInfo"
-			label="Charge to receive info"
-			currency="chatScheme.chat.currency"/>
+				<integer-field
+					name="initialCredit"/>
 
-		<currency-field
-			name="chargeChatPic"
-			label="Charge to receive pictures"
-			currency="chatScheme.chat.currency"/>
+				<text-field
+					name="style"/>
 
-		<integer-field
-			name="chargeChatPicDiv"
-			label="Pictures received per charge"/>
+				<yes-no-field
+					name="approvals"/>
 
-		<currency-field
-			name="chargeChatVideo"
-			label="Charge to receive videos"
-			currency="chatScheme.chat.currency"/>
+				<timezone-field
+					name="timezone"/>
 
-		<integer-field
-			name="chargeChatVideoDiv"
-			label="Videos received per charge"/>
+				<enum-field
+					name="operatorLabel"/>
 
-		<currency-field
-			name="creditLimit"
-			label="Credit limit"
-			currency="chatScheme.chat.currency"/>
+				<object-field
+					name="adultAdsScheme"
+					object-type="chatScheme"
+					nullable="yes"/>
 
-		<currency-field
-			name="adultVerifyCredit"
-			currency="chatScheme.chat.currency"/>
+				<seconds-field
+					name="adultExpirySeconds"
+					label="Adult expiry time"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="billLimitEnabled"/>
+			</columns>
 
-		<currency-field
-			name="billLimitLow"
-			currency="chatScheme.chat.currency"/>
+		</form>
 
-		<currency-field
-			name="billLimitHigh"
-			currency="chatScheme.chat.currency"/>
+		<form
+			name="settings-charges"
+			object-type="chat-scheme-charges"
+			type="update">
 
-		<currency-field
-			name="spendWarningEvery"
-			currency="chatScheme.chat.currency"
-			nullable="yes"
-			minimum="1"/>
+			<columns>
 
-	</field-set>
+				<currency-field
+					name="chargeChatSend"
+					label="Charge to send message"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="chargeChatReceive"
+					label="Charge to receive message"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="chargeChatInfo"
+					label="Charge to receive info"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="chargeChatPic"
+					label="Charge to receive pictures"
+					currency="chatScheme.chat.currency"/>
+
+				<integer-field
+					name="chargeChatPicDiv"
+					label="Pictures received per charge"/>
+
+				<currency-field
+					name="chargeChatVideo"
+					label="Charge to receive videos"
+					currency="chatScheme.chat.currency"/>
+
+				<integer-field
+					name="chargeChatVideoDiv"
+					label="Videos received per charge"/>
+
+				<currency-field
+					name="creditLimit"
+					label="Credit limit"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="adultVerifyCredit"
+					currency="chatScheme.chat.currency"/>
+
+				<yes-no-field
+					name="billLimitEnabled"/>
+
+				<currency-field
+					name="billLimitLow"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="billLimitHigh"
+					currency="chatScheme.chat.currency"/>
+
+				<currency-field
+					name="spendWarningEvery"
+					currency="chatScheme.chat.currency"
+					nullable="yes"
+					minimum="1"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

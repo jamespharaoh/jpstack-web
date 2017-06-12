@@ -1,7 +1,6 @@
 package wbs.platform.object.browse;
 
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -132,6 +131,7 @@ class ObjectBrowsePageBuilder <
 					resolvedExtensionPoint);
 
 				buildContextFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
@@ -177,20 +177,34 @@ class ObjectBrowsePageBuilder <
 	}
 
 	void buildContextFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
+		try (
 
-			container.pathPrefix () + ".browse",
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextFile");
 
-			consoleFile.get ()
+		) {
 
-				.getResponderName (
-					stringFormat (
-						"%sBrowseResponder",
-						container.newBeanNamePrefix ())),
+			consoleModule.addContextFile (
 
-			extensionPoint.contextTypeNames ());
+				container.pathPrefix () + ".browse",
+
+				consoleFile.get ()
+
+					.getResponderName (
+						taskLogger,
+						stringFormat (
+							"%sBrowseResponder",
+							container.newBeanNamePrefix ())),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
@@ -231,6 +245,7 @@ class ObjectBrowsePageBuilder <
 
 		};
 
+/*
 		consoleModule.addResponder (
 			container.newBeanNamePrefix () + "BrowseResponder",
 			tabContextResponder.get ()
@@ -244,6 +259,7 @@ class ObjectBrowsePageBuilder <
 
 				.pagePartFactory (
 					partFactory));
+*/
 
 	}
 

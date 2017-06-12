@@ -12,6 +12,8 @@ import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -19,7 +21,9 @@ import wbs.console.notice.ConsoleNotices;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -29,7 +33,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatNoteNamesAction")
 public
@@ -53,15 +57,20 @@ class ChatNoteNamesAction
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatNoteNamesResponder")
+	Provider <WebResponder> noteNamesResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatNoteNamesResponder");
+		return noteNamesResponderProvider.get ();
 
 	}
 
@@ -69,7 +78,7 @@ class ChatNoteNamesAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

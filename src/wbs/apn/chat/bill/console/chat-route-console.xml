@@ -29,20 +29,20 @@
 		<list>
 
 	`		<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="network"
@@ -54,97 +54,121 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatRoute">
+	<forms>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+		<form
+			name="list"
+			object-type="chat-route"
+			type="read-only">
 
-		<integer-field
-			name="mmsCost"/>
+			<columns>
 
-		<integer-field
-			name="smsCost"/>
+				<object-field
+					name="route"
+					object-type="route"/>
 
-		<integer-field
-			name="inRev"/>
+				<integer-field
+					name="mmsCost"/>
 
-		<integer-field
-			name="outRev"/>
+				<integer-field
+					name="smsCost"/>
 
-	</field-set>
+				<integer-field
+					name="inRev"/>
 
-	<field-set
-		name="create"
-		object-name="chatRoute">
+				<integer-field
+					name="outRev"/>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+			</columns>
 
-		<integer-field
-			name="mmsCost"/>
+		</form>
 
-		<integer-field
-			name="smsCost"/>
+		<form
+			name="create"
+			object-type="chat-route"
+			type="create">
 
-		<integer-field
-			name="inRev"/>
+			<columns>
 
-		<integer-field
-			name="outRev"/>
+				<object-field
+					name="route"
+					object-type="route"/>
 
-	</field-set>
+				<integer-field
+					name="mmsCost"/>
 
-	<field-set
-		name="summary"
-		object-name="chatRoute">
+				<integer-field
+					name="smsCost"/>
 
-		<id-field/>
-		<parent-field/>
+				<integer-field
+					name="inRev"/>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+				<integer-field
+					name="outRev"/>
 
-		<integer-field
-			name="mmsCost"/>
+			</columns>
 
-		<integer-field
-			name="smsCost"/>
+		</form>
 
-		<integer-field
-			name="inRev"/>
+		<form
+			name="summary"
+			object-type="chat-route"
+			type="read-only">
 
-		<integer-field
-			name="outRev"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
 
-	<field-set
-		name="settings"
-		object-name="chatRoute">
+				<object-field
+					name="route"
+					object-type="route"/>
 
-		<id-field/>
+				<integer-field
+					name="mmsCost"/>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+				<integer-field
+					name="smsCost"/>
 
-		<integer-field
-			name="mmsCost"/>
+				<integer-field
+					name="inRev"/>
 
-		<integer-field
-			name="smsCost"/>
+				<integer-field
+					name="outRev"/>
 
-		<integer-field
-			name="inRev"/>
+			</columns>
 
-		<integer-field
-			name="outRev"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="chat-route"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+
+				<object-field
+					name="route"
+					object-type="route"/>
+
+				<integer-field
+					name="mmsCost"/>
+
+				<integer-field
+					name="smsCost"/>
+
+				<integer-field
+					name="inRev"/>
+
+				<integer-field
+					name="outRev"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

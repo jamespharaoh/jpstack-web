@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-time="createdTime"
 				create-user="createdUser"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="part"
@@ -67,92 +67,116 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="subscriptionSend">
+	<forms>
 
-		<index-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="subscription-send"
+			type="read-only">
 
-		<object-field
-			name="createdUser"
-			object-type="user"/>
+			<columns>
 
-		<timestamp-field
-			name="createdTime"/>
+				<index-field/>
+				<description-field/>
 
-		<integer-field
-			name="numRecipients"/>
+				<object-field
+					name="createdUser"
+					object-type="user"/>
 
-		<enum-field
-			name="state"/>
+				<timestamp-field
+					name="createdTime"/>
 
-	</field-set>
+				<integer-field
+					name="numRecipients"/>
 
-	<field-set
-		name="create"
-		object-name="subscriptionSend">
+				<enum-field
+					name="state"/>
 
-		<description-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="summary"
-		object-name="subscriptionSend">
+		<form
+			name="create"
+			object-type="subscription-send"
+			type="create">
 
-		<id-field/>
-		<index-field/>
-		<description-field/>
+			<columns>
 
-		<object-field
-			name="batch"
-			object-type="batch"/>
+				<description-field/>
 
-		<object-field
-			name="createdUser"
-			label="Created by"
-			object-type="user"/>
+			</columns>
 
-		<object-field
-			name="sentUser"
-			label="Sent by"
-			object-type="user"/>
+		</form>
 
-		<object-field
-			name="cancelledUser"
-			label="Cancelled by"
-			object-type="user"/>
+		<form
+			name="summary"
+			object-type="subscription-send"
+			type="read-only">
 
-		<timestamp-field
-			name="createdTime"/>
+			<columns>
 
-		<timestamp-field
-			name="sentTime"/>
+				<id-field/>
+				<index-field/>
+				<description-field/>
 
-		<timestamp-field
-			name="cancelledTime"/>
+				<object-field
+					name="batch"
+					object-type="batch"/>
 
-		<timestamp-field
-			name="scheduledTime"/>
+				<object-field
+					name="createdUser"
+					label="Created by"
+					object-type="user"/>
 
-		<timestamp-field
-			name="scheduledForTime"/>
+				<object-field
+					name="sentUser"
+					label="Sent by"
+					object-type="user"/>
 
-		<integer-field
-			name="numRecipients"/>
+				<object-field
+					name="cancelledUser"
+					label="Cancelled by"
+					object-type="user"/>
 
-		<enum-field
-			name="state"/>
+				<timestamp-field
+					name="createdTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="sentTime"/>
 
-	<field-set
-		name="settings"
-		object-name="subscriptionSend">
+				<timestamp-field
+					name="cancelledTime"/>
 
-		<description-field/>
+				<timestamp-field
+					name="scheduledTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="scheduledForTime"/>
+
+				<integer-field
+					name="numRecipients"/>
+
+				<enum-field
+					name="state"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="subscription-send"
+			type="update">
+
+			<columns>
+
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -32,7 +32,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
 import wbs.web.responder.JsonResponder;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("simulatorSessionPollAction")
 public
@@ -65,7 +65,7 @@ class SimulatorSessionPollAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

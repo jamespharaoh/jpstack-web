@@ -30,10 +30,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextTabResponderPageBuilder")
 public
@@ -42,6 +45,9 @@ class ContextTabResponderPageBuilder <
 > implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -77,10 +83,11 @@ class ContextTabResponderPageBuilder <
 	String tabName;
 	String tabLabel;
 	String fileName;
-	String responderName;
 	String pageTitle;
 	String pagePartName;
 	Boolean hideTab;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -100,7 +107,8 @@ class ContextTabResponderPageBuilder <
 
 		) {
 
-			setDefaults ();
+			setDefaults (
+				taskLogger);
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -114,11 +122,10 @@ class ContextTabResponderPageBuilder <
 
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
-
-			buildResponder ();
 
 		}
 
@@ -163,95 +170,118 @@ class ContextTabResponderPageBuilder <
 	}
 
 	void buildFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
+		try (
 
-			fileName,
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-			consoleFile.get ()
+		) {
 
-				.getResponderName (
-					responderName),
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
 
-			extensionPoint.contextTypeNames ());
+					.getResponderProvider (
+						responderProvider),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
 	void buildResponder () {
 
-		consoleModule.addResponder (
+		responderProvider =
+			() -> tabContextResponder.get ()
 
-			responderName,
+			.tab (
+				tabName)
 
-			tabContextResponder.get ()
+			.title (
+				pageTitle)
 
-				.tab (
-					tabName)
+			.pagePartName (
+				pagePartName)
 
-				.title (
-					pageTitle)
-
-				.pagePartName (
-					pagePartName));
+		;
 
 	}
 
 	// defaults
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		String name =
-			spec.name ();
+		try (
 
-		tabName =
-			ifNull (
-				spec.tabName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		tabLabel =
-			ifNull (
-				spec.tabLabel (),
-				capitalise (
-					camelToSpaces (
-						name)));
+		) {
 
-		fileName =
-			ifNull (
-				spec.fileName (),
-				stringFormat (
-					"%s.%s",
-					container.pathPrefix (),
-					name));
+			String name =
+				spec.name ();
 
-		responderName =
-			ifNull (
-				spec.responderName (),
-				stringFormat (
-					"%s%sResponder",
-					container.newBeanNamePrefix (),
+			tabName =
+				ifNull (
+					spec.tabName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
+
+			tabLabel =
+				ifNull (
+					spec.tabLabel (),
 					capitalise (
-						name)));
+						camelToSpaces (
+							name)));
 
-		pageTitle =
-			ifNull (
-				spec.pageTitle (),
-				capitalise (camelToSpaces (name)));
+			fileName =
+				ifNull (
+					spec.fileName (),
+					stringFormat (
+						"%s.%s",
+						container.pathPrefix (),
+						name));
 
-		pagePartName =
-			ifNull (
-				spec.pagePartName (),
-				stringFormat (
-					"%s%sPart",
-					container.existingBeanNamePrefix (),
-					capitalise (
-						name)));
+			pageTitle =
+				ifNull (
+					spec.pageTitle (),
+					capitalise (camelToSpaces (name)));
 
-		hideTab =
-			spec.hideTab ();
+			pagePartName =
+				ifNull (
+					spec.pagePartName (),
+					stringFormat (
+						"%s%sPart",
+						container.existingBeanNamePrefix (),
+						capitalise (
+							name)));
+
+			hideTab =
+				spec.hideTab ();
+
+			responderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					stringFormat (
+						"%s%sResponder",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)),
+					WebResponder.class);
+
+		}
 
 	}
 

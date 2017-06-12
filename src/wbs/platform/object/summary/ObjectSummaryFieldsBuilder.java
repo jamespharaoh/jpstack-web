@@ -1,5 +1,7 @@
 package wbs.platform.object.summary;
 
+import static wbs.utils.etc.Misc.todo;
+
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -66,9 +68,13 @@ class ObjectSummaryFieldsBuilder <
 
 		) {
 
+			throw todo ();
+
+			/*
 			objectSummaryPageBuilder.addFieldsPart (
 				taskLogger,
-				objectSummaryFieldsSpec.fieldsName ());
+				objectSummaryFieldsSpec.formTypeName ());
+			*/
 
 		}
 

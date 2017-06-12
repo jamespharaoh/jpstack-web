@@ -2,6 +2,6 @@
 	name="chat-stats">
 
 	<console-helper-provider
-		object-name="chatStats"/>a
+		object-name="chatStats"/>
 
 </console-module>

@@ -3,19 +3,20 @@ package wbs.apn.chat.user.image.console;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -26,7 +27,9 @@ import wbs.console.notice.ConsoleNotices;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -41,7 +44,7 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserImageListAction")
 public
@@ -71,11 +74,25 @@ class ChatUserImageListAction
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserAudioListResponder")
+	Provider <WebResponder> audioListResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserImageListResponder")
+	Provider <WebResponder> imageListResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserVideoListResponder")
+	Provider <WebResponder> videoListResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		ChatUserImageType type =
@@ -84,17 +101,31 @@ class ChatUserImageListAction
 				(String) requestContext.stuff (
 					"chatUserImageType"));
 
-		return responder (
-			stringFormat (
-				"chatUser%sListResponder",
-				capitalise (
-					type.toString ())));
+		switch (type) {
+
+		case audio:
+
+			return audioListResponderProvider.get ();
+
+		case image:
+
+			return imageListResponderProvider.get ();
+
+		case video:
+
+			return videoListResponderProvider.get ();
+
+		default:
+
+			throw shouldNeverHappen ();
+
+		}
 
 	}
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

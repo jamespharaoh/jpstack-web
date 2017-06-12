@@ -1,8 +1,11 @@
 package wbs.framework.component.registry;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.IterableUtils.iterableChainToList;
 import static wbs.utils.collection.IterableUtils.iterableCount;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -24,6 +27,7 @@ import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.classNotInSafe;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -65,6 +69,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
@@ -80,6 +85,7 @@ import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.manager.ComponentManagerImplementation;
 import wbs.framework.component.registry.InjectedProperty.CollectionType;
+import wbs.framework.component.tools.ComponentWrapper;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.ValueComponentFactory;
@@ -115,6 +121,9 @@ class ComponentRegistryImplementation
 	@SingletonDependency
 	LoggingLogic loggingLogic;
 
+	@SingletonDependency
+	Map <String, ComponentWrapper <?>> componentWrappersByName;
+
 	// prototype depdendencies
 
 	@PrototypeDependency
@@ -127,10 +136,10 @@ class ComponentRegistryImplementation
 
 	// state
 
-	DataFromXml dataFromXml;
-
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
+
+	DataFromXml dataFromXml;
 
 	List <ComponentDefinition> definitions =
 		new ArrayList<> ();
@@ -321,7 +330,6 @@ class ComponentRegistryImplementation
 				ComponentPropertyValueSpec.class)
 
 			.build ();
-
 
 		}
 
@@ -751,6 +759,30 @@ class ComponentRegistryImplementation
 					}
 
 				}
+
+			}
+
+			// call wrappers
+
+			for (
+				ComponentWrapper <?> componentWrapper
+					: componentWrappersByName.values ()
+			) {
+
+				if (
+					isNotSubclassOf (
+						componentWrapper.componentClass (),
+						ifNull (
+							componentDefinition.interfaceClass (),
+							componentDefinition.componentClass ()))
+				) {
+					continue;
+				}
+
+				componentWrapper.wrapComponent (
+					taskLogger,
+					this,
+					componentDefinition);
 
 			}
 
@@ -1314,7 +1346,23 @@ class ComponentRegistryImplementation
 					componentDefinition.componentClass ());
 
 			componentDefinition.strongDependencies ().addAll (
-				componentDefinition.referenceProperties ().values ());
+				iterableMapToList (
+					componentDefinition.referenceProperties ().values (),
+					Pair::getRight));
+
+			componentDefinition.strongDependencies ().addAll (
+				iterableChainToList (
+					iterableMap (
+						(name, values) ->
+							values,
+						componentDefinition.referenceListProperties ().values ())));
+
+			componentDefinition.strongDependencies ().addAll (
+				iterableChainToList (
+					iterableMap (
+						(name, values) ->
+							values.values (),
+						componentDefinition.referenceMapProperties ().values ())));
 
 			initComponentDefinitionFields (
 				taskLogger,

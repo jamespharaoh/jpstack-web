@@ -22,20 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-form-actions-page
 				name="actions">
@@ -51,97 +51,117 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="consoleDeployment">
-
-		<name-field/>
-		<description-field/>
-
-		<text-field
-			name="host"/>
-
-		<enum-field
-			name="state"/>
-
-		<timestamp-field
-			name="stateTimestamp"/>
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="consoleDeployment">
-
-		<name-field/>
-		<description-field/>
-
-		<text-field
-			name="host"
-			nullable="yes"/>
-
-		<text-field
-			name="serviceName"
-			nullable="yes"/>
-
-		<text-field
-			name="statusLabel"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="consoleDeployment">
-
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="host"/>
-
-		<text-field
-			name="serviceName"/>
-
-		<enum-field
-			name="state"/>
-
-		<timestamp-field
-			name="stateTimestamp"/>
-
-		<text-field
-			name="statusLabel"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="consoleDeployment">
-
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="host"
-			nullable="yes"/>
-
-		<text-field
-			name="serviceName"
-			nullable="yes"/>
-
-		<text-field
-			name="statusLabel"
-			nullable="yes"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="list"
+			object-type="console-deployment"
+			type="read-only">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="host"/>
+
+				<enum-field
+					name="state"/>
+
+				<timestamp-field
+					name="stateTimestamp"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="console-deployment"
+			type="create">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="host"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceName"
+					nullable="yes"/>
+
+				<text-field
+					name="statusLabel"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="console-deployment"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="host"/>
+
+				<text-field
+					name="serviceName"/>
+
+				<enum-field
+					name="state"/>
+
+				<timestamp-field
+					name="stateTimestamp"/>
+
+				<text-field
+					name="statusLabel"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="console-deployment"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="host"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceName"
+					nullable="yes"/>
+
+				<text-field
+					name="statusLabel"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="restart-action"

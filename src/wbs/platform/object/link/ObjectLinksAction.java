@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -38,7 +40,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.etc.PropertyUtils;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksAction")
@@ -72,7 +74,7 @@ class ObjectLinksAction
 	// properties
 
 	@Getter @Setter
-	String responderName;
+	Provider <WebResponder> responderProvider;
 
 	@Getter @Setter
 	ConsoleHelper<?> contextHelper;
@@ -120,11 +122,10 @@ class ObjectLinksAction
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			responderName);
+		return responderProvider.get ();
 
 	}
 
@@ -132,7 +133,7 @@ class ObjectLinksAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

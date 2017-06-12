@@ -50,8 +50,6 @@ import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 
 import wbs.api.mvc.ApiFile;
-import wbs.api.mvc.WebApiAction;
-import wbs.api.mvc.WebApiManager;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
@@ -59,6 +57,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
@@ -89,9 +88,7 @@ import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.core.RpcStructure;
 import wbs.platform.rpc.core.RpcType;
 import wbs.platform.rpc.php.PhpRpcAction;
-import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
-import wbs.platform.rpc.xml.XmlRpcFile;
 import wbs.platform.user.model.UserRec;
 
 import wbs.sms.locator.logic.LocatorLogic;
@@ -142,6 +139,8 @@ import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
 import wbs.web.file.WebFile;
 import wbs.web.misc.HttpStatus;
+import wbs.web.mvc.WebAction;
+import wbs.web.mvc.WebActionRequestHandler;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.responder.WebModule;
@@ -226,15 +225,12 @@ class ChatApiServletModule
 	RequestContext requestContext;
 
 	@SingletonDependency
-	WebApiManager webApiManager;
-
-	@SingletonDependency
 	@NamedDependency
 	MercatorProjection ukNationalGrid;
 
 	// prototype dependencies
 
-	@PrototypeDependency
+	@StrongPrototypeDependency
 	Provider <ApiFile> apiFile;
 
 	@PrototypeDependency
@@ -243,11 +239,11 @@ class ChatApiServletModule
 	@PrototypeDependency
 	Provider <RegexpPathHandler> regexpPathHandlerProvider;
 
-	@PrototypeDependency
-	Provider <XmlRpcAction> xmlRpcAction;
+	@StrongPrototypeDependency
+	Provider <WebActionRequestHandler> webActionRequestHandlerProvider;
 
 	@PrototypeDependency
-	Provider <XmlRpcFile> xmlRpcFile;
+	Provider <XmlRpcAction> xmlRpcAction;
 
 	// life cycle
 
@@ -495,14 +491,30 @@ class ChatApiServletModule
 			ret.put (
 				"/chat/php/" + name,
 				apiFile.get ()
-					.postHandler (
-						webApiManager.makeWebApiActionRequestHandler (
-							actions.get ("php_" + name))));
+
+				.postHandlerProvider (
+					() -> webActionRequestHandlerProvider.get ()
+
+					.actionProvider (
+						() -> actions.get (
+							"php_" + name))
+
+				)
+
+			);
 
 			ret.put (
 				"/chat/xml/" + name,
-				xmlRpcFile.get ()
-					.action (actions.get ("xml_" + name)));
+				apiFile.get ()
+
+				.postHandlerProvider (
+					() -> webActionRequestHandlerProvider.get ()
+
+					.actionProvider (
+						() -> actions.get (
+							"xml_" + name)))
+
+			);
 
 		}
 
@@ -512,23 +524,28 @@ class ChatApiServletModule
 
 	// ================================= rpc handlers
 
-	Map <String,ReusableRpcHandler> handlers =
+	Map <String, Provider <RpcHandler>> handlers =
 		new HashMap<> ();
 
 	private
 	void initRpcHandlers () {
 
-		for (Class<? extends RpcHandler> handlerClass
-				: handlerClasses) {
+		for (
+			Class <? extends RpcHandler> handlerClass
+				: handlerClasses
+		) {
 
 			String name =
 				handlerClass
-					.getAnnotation (RpcExport.class)
-					.value ();
+
+				.getAnnotation (
+					RpcExport.class)
+
+				.value ();
 
 			handlers.put (
 				name,
-				new RpcHandlerFactory (
+				() -> new RpcHandlerFactory (
 					handlerClass,
 					this));
 
@@ -586,8 +603,8 @@ class ChatApiServletModule
 
 	}
 
-	Map<String,WebApiAction> actions =
-		new HashMap<String,WebApiAction> ();
+	Map <String, WebAction> actions =
+		new HashMap<> ();
 
 	private
 	void initActions () {
@@ -603,12 +620,22 @@ class ChatApiServletModule
 			actions.put (
 				"php_" + name,
 				phpRpcAction.get ()
-					.rpcHandler (handlers.get (name)));
+
+				.rpcHandlerProvider (
+					handlers.get (
+						name))
+
+			);
 
 			actions.put (
 				"xml_" + name,
 				xmlRpcAction.get ()
-					.rpcHandler (handlers.get (name)));
+
+				.rpcHandlerProvider (
+					handlers.get (
+						name))
+
+			);
 
 		}
 

@@ -24,55 +24,67 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary">
-
-			</object-summary-page>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="alertsAlert">
+	<forms>
 
-		<index-field/>
+		<form
+			name="list"
+			object-type="alerts-alert"
+			type="read-only">
 
-		<timestamp-field
-			name="timestamp"/>
+			<columns>
 
-		<integer-field
-			name="unclaimedItems"/>
+				<index-field/>
 
-		<seconds-field
-			name="maximumDuration"/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<integer-field
-			name="recipients"/>
+				<integer-field
+					name="unclaimedItems"/>
 
-	</field-set>
+				<seconds-field
+					name="maximumDuration"/>
 
-	<field-set
-		name="summary"
-		object-name="alertsAlert">
+				<integer-field
+					name="recipients"/>
 
-		<id-field/>
-		<parent-field/>
-		<index-field/>
+			</columns>
 
-		<timestamp-field name="timestamp"/>
-		<integer-field name="unclaimedItems"/>
-		<seconds-field name="maximumDuration"/>
-		<text-area-field name="text"/>
-		<integer-field name="recipients"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="alerts-alert"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<index-field/>
+
+				<timestamp-field name="timestamp"/>
+				<integer-field name="unclaimedItems"/>
+				<seconds-field name="maximumDuration"/>
+				<text-area-field name="text"/>
+				<integer-field name="recipients"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

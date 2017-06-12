@@ -29,45 +29,77 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatApprovalRegexp">
+	<forms>
 
-		<text-field
-			name="regexp"/>
+		<form
+			name="list"
+			object-type="chat-approval-regexp"
+			type="read-only">
 
-		<yes-no-field
-			name="auto"/>
+			<columns>
 
-	</field-set>
+				<text-field
+					name="regexp"/>
 
-	<field-set
-		name="settings"
-		object-name="chatApprovalRegexp">
+				<yes-no-field
+					name="auto"/>
 
-		<id-field/>
+			</columns>
 
-		<text-field
-			name="regexp"/>
+		</form>
 
-		<yes-no-field
-			name="auto"/>
+		<form
+			name="create"
+			object-type="chat-approval-regexp"
+			type="create">
 
-	</field-set>
+			<columns>
+
+				<text-field
+					name="regexp"/>
+
+				<yes-no-field
+					name="auto"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-approval-regexp"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+
+				<text-field
+					name="regexp"/>
+
+				<yes-no-field
+					name="auto"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

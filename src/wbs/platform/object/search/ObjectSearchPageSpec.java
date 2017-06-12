@@ -40,12 +40,14 @@ class ObjectSearchPageSpec
 	String sessionKey;
 
 	@DataAttribute (
-		name = "search-class")
+		name = "search-class",
+		required = true)
 	String searchClassName;
 
 	@DataAttribute (
-		name = "search-fields")
-	String searchFormFieldsName;
+		name = "search-form",
+		required = true)
+	String searchFormTypeName;
 
 	@DataAttribute (
 		name = "search-dao-method")
@@ -56,12 +58,8 @@ class ObjectSearchPageSpec
 	String resultsClassName;
 
 	@DataAttribute (
-		name = "results-column-fields")
-	String resultsColumnFormFieldsName;
-
-	@DataAttribute (
-		name = "results-row-fields")
-	String resultsRowFormFieldsName;
+		name = "results-form")
+	String resultsFormTypeName;
 
 	@DataAttribute (
 		name = "results-dao-method")

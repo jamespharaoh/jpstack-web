@@ -58,7 +58,7 @@ import wbs.test.simulator.model.SimulatorRouteRec;
 import wbs.test.simulator.model.SimulatorSessionNumberRec;
 import wbs.test.simulator.model.SimulatorSessionRec;
 import wbs.web.responder.JsonResponder;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("simulatorSessionCreateEventAction")
 public
@@ -130,7 +130,7 @@ class SimulatorSessionCreateEventAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -228,7 +228,7 @@ class SimulatorSessionCreateEventAction
 
 	}
 
-	Responder sendMessage (
+	WebResponder sendMessage (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -408,7 +408,7 @@ class SimulatorSessionCreateEventAction
 
 	}
 
-	Responder deliveryReport (
+	WebResponder deliveryReport (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

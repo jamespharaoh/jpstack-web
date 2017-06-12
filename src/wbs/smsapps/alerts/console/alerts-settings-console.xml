@@ -28,9 +28,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
@@ -39,7 +40,7 @@
 			<object-summary-page>
 
 				<fields
-					fields="summary"/>
+					form="summary"/>
 
 				<heading
 					label="Subjects"/>
@@ -50,7 +51,7 @@
 			</object-summary-page>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-action-page
 				name="numbers"/>
@@ -77,140 +78,173 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="alertsSettings">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="alerts-settings"
+			type="read-only">
 
-		<yes-no-field
-			name="enabled"/>
+			<columns>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="maxItemsInQueue"
-			label="Items"/>
+				<yes-no-field
+					name="enabled"/>
 
-		<seconds-field
-			name="maxDurationInQueue"
-			label="Duration"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<seconds-field
-			name="maxAlertFrequency"
-			label="Frequency"/>
+				<integer-field
+					name="maxItemsInQueue"
+					label="Items"/>
 
-		<integer-field
-			name="startHour"
-			label="Start"/>
+				<seconds-field
+					name="maxDurationInQueue"
+					label="Duration"/>
 
-		<integer-field
-			name="endHour"
-			label="End"/>
+				<seconds-field
+					name="maxAlertFrequency"
+					label="Frequency"/>
 
-	</field-set>
+				<integer-field
+					name="startHour"
+					label="Start"/>
 
-	<field-set
-		name="summary"
-		object-name="alertsSettings">
+				<integer-field
+					name="endHour"
+					label="End"/>
 
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<yes-no-field
-			name="enabled"/>
+		</form>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+		<form
+			name="create"
+			object-type="alerts-settings"
+			type="create">
 
-		<text-field
-			name="numFrom"/>
+			<columns>
 
-		<text-area-field
-			name="template"/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="maxItemsInQueue"/>
+			</columns>
 
-		<seconds-field
-			name="maxDurationInQueue"/>
+		</form>
 
-		<seconds-field
-			name="maxAlertFrequency"/>
+		<form
+			name="summary"
+			object-type="alerts-settings"
+			type="read-only">
 
-		<integer-field
-			name="startHour"/>
+			<columns>
 
-		<integer-field
-			name="endHour"/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<timestamp-field
-			name="lastAlert"/>
+				<yes-no-field
+					name="enabled"/>
 
-		<integer-field
-			name="numAlerts"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<timestamp-field
-			name="lastStatusCheck"/>
+				<text-field
+					name="numFrom"/>
 
-		<integer-field
-			name="numStatusChecks"/>
+				<text-area-field
+					name="template"/>
 
-	</field-set>
+				<integer-field
+					name="maxItemsInQueue"/>
 
-	<field-set
-		name="settings"
-		object-name="alertsSettings">
+				<seconds-field
+					name="maxDurationInQueue"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<seconds-field
+					name="maxAlertFrequency"/>
 
-		<yes-no-field
-			name="enabled"/>
+				<integer-field
+					name="startHour"/>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<integer-field
+					name="endHour"/>
 
-		<text-field
-			name="numFrom"/>
+				<timestamp-field
+					name="lastAlert"/>
 
-		<text-area-field
-			name="template"/>
+				<integer-field
+					name="numAlerts"/>
 
-		<integer-field
-			name="maxItemsInQueue"/>
+				<timestamp-field
+					name="lastStatusCheck"/>
 
-		<seconds-field
-			name="maxDurationInQueue"/>
+				<integer-field
+					name="numStatusChecks"/>
 
-		<seconds-field
-			name="maxAlertFrequency"/>
+			</columns>
 
-		<integer-field
-			name="startHour"
-			nullable="yes"
-			minimum="0"
-			maximum="24"/>
+		</form>
 
-		<integer-field
-			name="endHour"
-			nullable="yes"
-			minimum="0"
-			maximum="24"/>
+		<form
+			name="settings"
+			object-type="alerts-settings"
+			type="update">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<yes-no-field
+					name="enabled"/>
+
+				<object-field
+					name="router"
+					object-type="router"/>
+
+				<text-field
+					name="numFrom"/>
+
+				<text-area-field
+					name="template"/>
+
+				<integer-field
+					name="maxItemsInQueue"/>
+
+				<seconds-field
+					name="maxDurationInQueue"/>
+
+				<seconds-field
+					name="maxAlertFrequency"/>
+
+				<integer-field
+					name="startHour"
+					nullable="yes"
+					minimum="0"
+					maximum="24"/>
+
+				<integer-field
+					name="endHour"
+					nullable="yes"
+					minimum="0"
+					maximum="24"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

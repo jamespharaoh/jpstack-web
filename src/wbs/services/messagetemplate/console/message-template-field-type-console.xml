@@ -30,10 +30,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="messageTemplateDatabase"
 				create-priv-code="manage"/>
 
@@ -42,10 +42,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -53,97 +53,121 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="messageTemplateFieldType">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="message-template-field-type"
+			type="read-only">
 
-		<text-area-field
-			name="defaultValue"/>
+			<columns>
 
-	</field-set>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="create"
-		object-name="messageTemplateFieldType">
+				<text-area-field
+					name="defaultValue"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<text-area-field
-			name="defaultValue"/>
+		</form>
 
-		<text-field
-			name="helpText"/>
+		<form
+			name="create"
+			object-type="message-template-field-type"
+			type="create">
 
-		<integer-field
-			name="minLength"
-			nullable="yes"/>
+			<columns>
 
-		<integer-field
-			name="maxLength"
-			nullable="yes"/>
+				<name-field/>
+				<description-field/>
 
-		<enum-field
-			name="charset"/>
+				<text-area-field
+					name="defaultValue"/>
 
-	</field-set>
+				<text-field
+					name="helpText"/>
 
-	<field-set
-		name="summary"
-		object-name="messageTemplateFieldType">
+				<integer-field
+					name="minLength"
+					nullable="yes"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<integer-field
+					name="maxLength"
+					nullable="yes"/>
 
-		<text-field
-			name="defaultValue"/>
+				<enum-field
+					name="charset"/>
 
-		<text-field
-			name="helpText"/>
+			</columns>
 
-		<integer-field
-			name="minLength"/>
+		</form>
 
-		<integer-field
-			name="maxLength"/>
+		<form
+			name="summary"
+			object-type="message-template-field-type"
+			type="read-only">
 
-		<enum-field
-			name="charset"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-	<field-set
-		name="settings"
-		object-name="messageTemplateFieldType">
+				<text-field
+					name="defaultValue"/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="helpText"/>
 
-		<text-area-field
-			name="defaultValue"/>
+				<integer-field
+					name="minLength"/>
 
-		<text-field
-			name="helpText"/>
+				<integer-field
+					name="maxLength"/>
 
-		<integer-field
-			name="minLength"
-			nullable="yes"/>
+				<enum-field
+					name="charset"/>
 
-		<integer-field
-			name="maxLength"
-			nullable="yes"/>
+			</columns>
 
-		<enum-field
-			name="charset"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="message-template-field-type"
+			type="update">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-area-field
+					name="defaultValue"/>
+
+				<text-field
+					name="helpText"/>
+
+				<integer-field
+					name="minLength"
+					nullable="yes"/>
+
+				<integer-field
+					name="maxLength"
+					nullable="yes"/>
+
+				<enum-field
+					name="charset"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

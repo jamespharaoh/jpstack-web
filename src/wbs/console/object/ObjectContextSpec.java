@@ -38,7 +38,7 @@ class ObjectContextSpec
 	String name;
 
 	@DataAttribute
-	String beanName;
+	String componentName;
 
 	@DataAttribute (
 		required = true)

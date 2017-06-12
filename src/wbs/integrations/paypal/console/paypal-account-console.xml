@@ -28,20 +28,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -49,144 +49,168 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="paypalAccount">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="paypal-account"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="paypalAccount">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="summary"
-		object-name="paypalAccount">
+		<form
+			name="create"
+			object-type="paypal-account"
+			type="create">
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-		<text-field
-			name="username"
-			nullable="yes"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<text-field
-			name="password"
-			nullable="yes"/>
+			</columns>
 
-		<text-field
-			name="signature"
-			nullable="yes"/>
+		</form>
 
-		<text-field
-			name="appId"
-			nullable="yes"/>
+		<form
+			name="summary"
+			object-type="paypal-account"
+			type="read-only">
 
-		<text-field
-			name="serviceEndpointPaypalApi"
-			nullable="yes"/>
+			<columns>
 
-		<text-field
-			name="serviceEndpointPaypalApiAa"
-			nullable="yes"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-field
-			name="serviceEndpointPermissions"
-			nullable="yes"/>
+				<text-field
+					name="username"
+					nullable="yes"/>
 
-		<text-field
-			name="serviceEndpointAdaptivePayments"
-			nullable="yes"/>
+				<text-field
+					name="password"
+					nullable="yes"/>
 
-		<text-field
-			name="serviceEndpointAdaptiveAccounts"
-			nullable="yes"/>
+				<text-field
+					name="signature"
+					nullable="yes"/>
 
-		<text-field
-			name="serviceEndpointInvoice"
-			nullable="yes"/>
+				<text-field
+					name="appId"
+					nullable="yes"/>
 
-		<text-field
-			name="checkoutUrl"
-			nullable="yes"/>
+				<text-field
+					name="serviceEndpointPaypalApi"
+					nullable="yes"/>
 
-		<text-field
-			name="mode"
-			nullable="yes"/>
+				<text-field
+					name="serviceEndpointPaypalApiAa"
+					nullable="yes"/>
 
-	</field-set>
+				<text-field
+					name="serviceEndpointPermissions"
+					nullable="yes"/>
 
-	<field-set
-		name="settings"
-		object-name="paypalAccount">
+				<text-field
+					name="serviceEndpointAdaptivePayments"
+					nullable="yes"/>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="serviceEndpointAdaptiveAccounts"
+					nullable="yes"/>
 
-		<text-field
-			name="username"
-			nullable="yes"/>
+				<text-field
+					name="serviceEndpointInvoice"
+					nullable="yes"/>
 
-		<text-field
-			name="password"
-			nullable="yes"/>
+				<text-field
+					name="checkoutUrl"
+					nullable="yes"/>
 
-		<text-field
-			name="signature"
-			nullable="yes"/>
+				<text-field
+					name="mode"
+					nullable="yes"/>
 
-		<text-field
-			name="appId"
-			nullable="yes"/>
+			</columns>
 
-		<text-field
-			name="serviceEndpointPaypalApi"
-			nullable="yes"/>
+		</form>
 
-		<text-field
-			name="serviceEndpointPaypalApiAa"
-			nullable="yes"/>
+		<form
+			name="settings"
+			object-type="paypal-account"
+			type="update">
 
-		<text-field
-			name="serviceEndpointPermissions"
-			nullable="yes"/>
+			<columns>
 
-		<text-field
-			name="serviceEndpointAdaptivePayments"
-			nullable="yes"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-field
-			name="serviceEndpointAdaptiveAccounts"
-			nullable="yes"/>
+				<text-field
+					name="username"
+					nullable="yes"/>
 
-		<text-field
-			name="serviceEndpointInvoice"
-			nullable="yes"/>
+				<text-field
+					name="password"
+					nullable="yes"/>
 
-		<text-field
-			name="checkoutUrl"
-			nullable="yes"/>
+				<text-field
+					name="signature"
+					nullable="yes"/>
 
-		<text-field
-			name="mode"
-			nullable="yes"/>
+				<text-field
+					name="appId"
+					nullable="yes"/>
 
-	</field-set>
+				<text-field
+					name="serviceEndpointPaypalApi"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceEndpointPaypalApiAa"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceEndpointPermissions"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceEndpointAdaptivePayments"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceEndpointAdaptiveAccounts"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceEndpointInvoice"
+					nullable="yes"/>
+
+				<text-field
+					name="checkoutUrl"
+					nullable="yes"/>
+
+				<text-field
+					name="mode"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

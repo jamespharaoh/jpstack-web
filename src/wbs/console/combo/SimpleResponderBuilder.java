@@ -21,6 +21,8 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -31,6 +33,9 @@ class SimpleResponderBuilder
 	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -96,11 +101,13 @@ class SimpleResponderBuilder
 
 		) {
 
+			/*
 			consoleModule.addResponder (
 				responderName,
 				consoleModule.beanResponder (
 					taskLogger,
 					responderBeanName));
+			*/
 
 		}
 

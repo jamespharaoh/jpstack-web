@@ -9,6 +9,7 @@
 
 	<console-modules>
 		<console-module name="chat-report"/>
+		<console-module name="chat-shared-report"/>
 	</console-modules>
 
 </plugin>

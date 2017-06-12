@@ -125,7 +125,7 @@ class ChatHelpTemplateContextBuilder
 	List <Object> listChildren =
 		new ArrayList<> ();
 
-	List <Object> objectBuilders =
+	List <Object> objectChildren =
 		new ArrayList<> ();
 
 	// build
@@ -172,6 +172,9 @@ class ChatHelpTemplateContextBuilder
 					ChatHelpTemplateRec
 				> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					chatHelpTemplateHelper)
 
@@ -210,6 +213,9 @@ class ChatHelpTemplateContextBuilder
 						ChatHelpTemplateRec
 					> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					chatHelpTemplateHelper)
 
@@ -237,7 +243,7 @@ class ChatHelpTemplateContextBuilder
 			builder.descend (
 				taskLogger,
 				objectContainer,
-				objectBuilders,
+				objectChildren,
 				consoleModule,
 				MissingBuilderBehaviour.error);
 
@@ -430,7 +436,7 @@ class ChatHelpTemplateContextBuilder
 				.typeCode (
 					typeCode)
 
-				.formFieldsName (
+				.formTypeName (
 					"list")
 
 				.targetContextTypeName (
@@ -466,7 +472,7 @@ class ChatHelpTemplateContextBuilder
 				.typeCode (
 					typeCode)
 
-				.formFieldsName (
+				.formTypeName (
 					"create")
 
 				.targetContextTypeName (
@@ -492,13 +498,13 @@ class ChatHelpTemplateContextBuilder
 
 		) {
 
-			objectBuilders.add (
+			objectChildren.add (
 				objectSettingsPageSpecProvider.get ()
 
 				.consoleSpec (
 					spec.consoleSpec ())
 
-				.formFieldsName (
+				.formTypeName (
 					"settings")
 
 				.listContextTypeName (

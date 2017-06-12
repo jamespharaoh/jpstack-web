@@ -25,248 +25,272 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"
+				form="settings"
 				priv-key="manualResponder.manage"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="manualResponderTemplate">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="manual-responder-template"
+			type="read-only">
 
-		<object-field
-			name="router"
-			object-type="router"/>
+			<columns>
 
-		<yes-no-field
-			name="customisable"
-			label="Cust"/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="maximumMessages"
-			label="Max"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<integer-field
-			name="minimumMessageParts"
-			label="MinParts"/>
+				<yes-no-field
+					name="customisable"
+					label="Cust"/>
 
-	</field-set>
+				<integer-field
+					name="maximumMessages"
+					label="Max"/>
 
-	<field-set
-		name="create"
-		object-name="manualResponderTemplate">
+				<integer-field
+					name="minimumMessageParts"
+					label="MinParts"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+		</form>
 
-		<text-field
-			name="number"/>
+		<form
+			name="create"
+			object-type="manual-responder-template"
+			type="create">
 
-		<text-area-field
-			name="defaultText"/>
+			<columns>
 
-		<yes-no-field
-			name="customisable"/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="hidden"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<object-field
-			name="replyKeywordSet"
-			object-type="keywordSet"/>
+				<text-field
+					name="number"/>
 
-		<integer-field
-			name="maximumMessages"
-			nullable="yes"/>
+				<text-area-field
+					name="defaultText"/>
 
-		<integer-field
-			name="minimumMessageParts"
-			nullable="yes"/>
+				<yes-no-field
+					name="customisable"/>
 
-		<yes-no-field
-			name="splitLong"/>
+				<yes-no-field
+					name="hidden"/>
 
-		<yes-no-field
-			name="sequenceParts"/>
+				<object-field
+					name="replyKeywordSet"
+					object-type="keywordSet"/>
 
-		<yes-no-field
-			name="applyTemplates"/>
+				<integer-field
+					name="maximumMessages"
+					nullable="yes"/>
 
-		<text-area-field
-			name="singleTemplate"
-			nullable="yes"/>
+				<integer-field
+					name="minimumMessageParts"
+					nullable="yes"/>
 
-		<text-area-field
-			name="firstTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="splitLong"/>
 
-		<text-area-field
-			name="middleTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="sequenceParts"/>
 
-		<text-area-field
-			name="lastTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="applyTemplates"/>
 
-	</field-set>
+				<text-area-field
+					name="singleTemplate"
+					nullable="yes"/>
 
-	<field-set
-		name="summary"
-		object-name="manualResponderTemplate">
+				<text-area-field
+					name="firstTemplate"
+					nullable="yes"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
+				<text-area-field
+					name="middleTemplate"
+					nullable="yes"/>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<text-area-field
+					name="lastTemplate"
+					nullable="yes"/>
 
-		<text-field
-			name="number"/>
+			</columns>
 
-		<text-area-field
-			name="defaultText"/>
+		</form>
 
-		<yes-no-field
-			name="customisable"/>
+		<form
+			name="summary"
+			object-type="manual-responder-template"
+			type="read-only">
 
-		<yes-no-field
-			name="hidden"/>
+			<columns>
 
-		<object-field
-			name="replyKeywordSet"
-			object-type="keywordSet"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="maximumMessages"
-			nullable="yes"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<integer-field
-			name="minimumMessageParts"
-			nullable="yes"/>
+				<text-field
+					name="number"/>
 
-		<yes-no-field
-			name="splitLong"/>
+				<text-area-field
+					name="defaultText"/>
 
-		<yes-no-field
-			name="sequenceParts"/>
+				<yes-no-field
+					name="customisable"/>
 
-		<yes-no-field
-			name="applyTemplates"/>
+				<yes-no-field
+					name="hidden"/>
 
-		<text-area-field
-			name="singleTemplate"
-			nullable="yes"/>
+				<object-field
+					name="replyKeywordSet"
+					object-type="keywordSet"/>
 
-		<text-area-field
-			name="firstTemplate"
-			nullable="yes"/>
+				<integer-field
+					name="maximumMessages"
+					nullable="yes"/>
 
-		<text-area-field
-			name="middleTemplate"
-			nullable="yes"/>
+				<integer-field
+					name="minimumMessageParts"
+					nullable="yes"/>
 
-		<text-area-field
-			name="lastTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="splitLong"/>
 
-		<text-field
-			name="rules"
-			nullable="yes"/>
+				<yes-no-field
+					name="sequenceParts"/>
 
-	</field-set>
+				<yes-no-field
+					name="applyTemplates"/>
 
-	<field-set
-		name="settings"
-		object-name="manualResponderTemplate">
+				<text-area-field
+					name="singleTemplate"
+					nullable="yes"/>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
+				<text-area-field
+					name="firstTemplate"
+					nullable="yes"/>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<text-area-field
+					name="middleTemplate"
+					nullable="yes"/>
 
-		<text-field
-			name="number"/>
+				<text-area-field
+					name="lastTemplate"
+					nullable="yes"/>
 
-		<text-area-field
-			name="defaultText"/>
+				<text-field
+					name="rules"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="customisable"/>
+			</columns>
 
-		<yes-no-field
-			name="hidden"/>
+		</form>
 
-		<object-field
-			name="replyKeywordSet"
-			object-type="keywordSet"/>
+		<form
+			name="settings"
+			object-type="manual-responder-template"
+			type="update">
 
-		<integer-field
-			name="maximumMessages"
-			nullable="yes"/>
+			<columns>
 
-		<integer-field
-			name="minimumMessageParts"
-			nullable="yes"/>
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="splitLong"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<yes-no-field
-			name="sequenceParts"/>
+				<text-field
+					name="number"/>
 
-		<yes-no-field
-			name="applyTemplates"/>
+				<text-area-field
+					name="defaultText"/>
 
-		<text-area-field
-			name="singleTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="customisable"/>
 
-		<text-area-field
-			name="firstTemplate"
-			nullable="yes"/>
+				<yes-no-field
+					name="hidden"/>
 
-		<text-area-field
-			name="middleTemplate"
-			nullable="yes"/>
+				<object-field
+					name="replyKeywordSet"
+					object-type="keywordSet"/>
 
-		<text-area-field
-			name="lastTemplate"
-			nullable="yes"/>
+				<integer-field
+					name="maximumMessages"
+					nullable="yes"/>
 
-		<text-field
-			name="rules"
-			nullable="yes"/>
+				<integer-field
+					name="minimumMessageParts"
+					nullable="yes"/>
 
-	</field-set>
+				<yes-no-field
+					name="splitLong"/>
+
+				<yes-no-field
+					name="sequenceParts"/>
+
+				<yes-no-field
+					name="applyTemplates"/>
+
+				<text-area-field
+					name="singleTemplate"
+					nullable="yes"/>
+
+				<text-area-field
+					name="firstTemplate"
+					nullable="yes"/>
+
+				<text-area-field
+					name="middleTemplate"
+					nullable="yes"/>
+
+				<text-area-field
+					name="lastTemplate"
+					nullable="yes"/>
+
+				<text-field
+					name="rules"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -31,7 +31,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectRemoveAction")
@@ -65,16 +65,16 @@ class ObjectRemoveAction
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> objectHelper;
+	ConsoleHelper <?> objectHelper;
 
 	@Getter @Setter
-	ConsoleHelper<?> parentHelper;
+	ConsoleHelper <?> parentHelper;
 
 	@Getter @Setter
-	Provider<Responder> settingsResponder;
+	Provider <WebResponder> settingsResponderProvider;
 
 	@Getter @Setter
-	Provider<Responder> listResponder;
+	Provider <WebResponder> listResponderProvider;
 
 	@Getter @Setter
 	String nextContextTypeName;
@@ -86,10 +86,10 @@ class ObjectRemoveAction
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return settingsResponder.get ();
+		return settingsResponderProvider.get ();
 
 	}
 
@@ -97,7 +97,7 @@ class ObjectRemoveAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -160,8 +160,7 @@ class ObjectRemoveAction
 				targetContext,
 				"/" + parentObject.getId ());
 
-			return listResponder
-				.get ();
+			return listResponderProvider.get ();
 
 		}
 

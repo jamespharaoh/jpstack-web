@@ -29,40 +29,49 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="chatUserCredit">
+	<forms>
 
-		<id-field/>
-		<parent-field/>
+		<form
+			name="summary"
+			object-type="chat-user-credit"
+			type="read-only">
 
-		<timestamp-field
-			name="timestamp"/>
+			<columns>
 
-		<currency-field
-			name="creditAmount"
-			currency="chatUser.chat.currency"/>
+				<id-field/>
+				<parent-field/>
 
-		<currency-field
-			name="billAmount"
-			currency="chatUser.chat.currency"/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+				<currency-field
+					name="creditAmount"
+					currency="chatUser.chat.currency"/>
 
-		<yes-no-field
-			name="gift"/>
+				<currency-field
+					name="billAmount"
+					currency="chatUser.chat.currency"/>
 
-		<text-field
-			name="details"/>
+				<object-field
+					name="user"
+					object-type="user"/>
 
-	</field-set>
+				<yes-no-field
+					name="gift"/>
+
+				<text-field
+					name="details"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

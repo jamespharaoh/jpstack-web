@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -27,6 +29,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
@@ -34,6 +37,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
@@ -45,6 +50,7 @@ import wbs.sms.core.logic.DateFinder;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.imchat.model.ImChatConversationRec;
+import wbs.imchat.model.ImChatCustomerCreditRec;
 import wbs.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.imchat.model.ImChatCustomerDetailValueObjectHelper;
 import wbs.imchat.model.ImChatCustomerDetailValueRec;
@@ -54,6 +60,8 @@ import wbs.imchat.model.ImChatPricePointRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatPurchaseRec;
 import wbs.imchat.model.ImChatRec;
+import wbs.web.responder.JsonResponder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("imChatApiLogic")
 public
@@ -82,6 +90,11 @@ class ImChatApiLogicImplementation
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -620,6 +633,53 @@ class ImChatApiLogicImplementation
 
 	@Override
 	public
+	ImChatPurchaseHistoryData purchaseHistoryData (
+			@NonNull Transaction parentTransaction,
+			@NonNull ImChatCustomerCreditRec credit) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"purchaseHistoryData");
+
+		) {
+
+			ImChatCustomerRec customer =
+				credit.getImChatCustomer ();
+
+			ImChatRec imChat =
+				customer.getImChat ();
+
+			return new ImChatPurchaseHistoryData ()
+
+				.priceString (
+					currencyLogic.formatText (
+						imChat.getBillingCurrency (),
+						credit.getBillAmount ()))
+
+				.valueString (
+					currencyLogic.formatText (
+						imChat.getCreditCurrency (),
+						credit.getCreditAmount ()))
+
+				.timestampString (
+					timeFormatter.timestampString (
+						timeFormatter.timezone (
+							ifNull (
+								imChat.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
+						credit.getTimestamp ()))
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
 	Map <String, String> updateCustomerDetails (
 			@NonNull Transaction parentTransaction,
 			@NonNull ImChatCustomerRec customer,
@@ -791,6 +851,44 @@ class ImChatApiLogicImplementation
 			}
 
 			return returnBuilder.build ();
+
+		}
+
+	}
+
+	@Override
+	public
+	WebResponder failureResponse (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String reason,
+			@NonNull String message) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"failureResponse");
+
+		) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					reason)
+
+				.message (
+					message)
+
+			;
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse)
+
+			;
 
 		}
 

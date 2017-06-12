@@ -86,13 +86,14 @@ class ContextRequestHandlerBuilder <
 			setDefaults ();
 
 			for (
-				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+				ResolvedConsoleContextExtensionPoint extensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
 						container.extensionPointName ())
 			) {
 
 				buildFile (
-					resolvedExtensionPoint);
+					taskLogger,
+					extensionPoint);
 
 			}
 
@@ -101,14 +102,33 @@ class ContextRequestHandlerBuilder <
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			fileName,
-			consoleFileProvider.get ()
-				.getHandlerName (requestHandlerName)
-				.postHandlerName (requestHandlerName),
-			resolvedExtensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
+
+		) {
+
+			consoleModule.addContextFile (
+				fileName,
+				consoleFileProvider.get ()
+
+					.getHandlerName (
+						taskLogger,
+						requestHandlerName)
+
+					.postHandlerName (
+						taskLogger,
+						requestHandlerName),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 

@@ -23,7 +23,6 @@ import wbs.console.forms.core.FormFieldSet;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
-import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -39,7 +38,6 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
-import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @DataClass ("console-module")
@@ -60,9 +58,6 @@ class ConsoleModuleImplementation
 
 	@PrototypeDependency
 	Provider <ConsoleContextTab> contextTabProvider;
-
-	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponderProvider;
 
 	// properties
 
@@ -105,11 +100,6 @@ class ConsoleModuleImplementation
 
 	@DataChildren
 	@Getter @Setter
-	Map <String, Provider <Responder>> responders =
-		new LinkedHashMap<> ();
-
-	@DataChildren
-	@Getter @Setter
 	Map <String, PathHandler> paths =
 		new LinkedHashMap<> ();
 
@@ -127,31 +117,6 @@ class ConsoleModuleImplementation
 	@Getter @Setter
 	Map <String, SupervisorConfig> supervisorConfigs =
 		new LinkedHashMap<> ();
-
-	// utils
-
-	public
-	Provider <Responder> beanResponder (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String name) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"beanResponder");
-
-		) {
-
-			return componentManager.getComponentProviderRequired (
-				taskLogger,
-				name,
-				Responder.class);
-
-		}
-
-	}
 
 	// builder tools
 
@@ -271,17 +236,6 @@ class ConsoleModuleImplementation
 			contextTypeFiles.add (name);
 
 		}
-
-	}
-
-	public
-	void addResponder (
-			@NonNull String name,
-			@NonNull Provider<Responder> responder) {
-
-		responders.put (
-			name,
-			responder);
 
 	}
 

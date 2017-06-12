@@ -58,7 +58,7 @@ import wbs.platform.user.model.UserRec;
 
 import wbs.utils.etc.NumberUtils;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchAction")
@@ -123,13 +123,13 @@ class ObjectSearchPostAction <
 	String parentIdName;
 
 	@Getter @Setter
-	ConsoleFormType <SearchType> searchFormContextBuilder;
+	ConsoleFormType <SearchType> searchFormType;
 
 	@Getter @Setter
 	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
 	@Getter @Setter
-	String searchResponderName;
+	Provider <WebResponder> searchResponderProvider;
 
 	@Getter @Setter
 	String fileName;
@@ -138,7 +138,7 @@ class ObjectSearchPostAction <
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -248,7 +248,7 @@ class ObjectSearchPostAction <
 							searchClass)));
 
 			ConsoleForm <SearchType> searchFormContext =
-				searchFormContextBuilder.buildAction (
+				searchFormType.buildAction (
 					transaction,
 					emptyMap (),
 					search);
@@ -307,8 +307,7 @@ class ObjectSearchPostAction <
 
 				transaction.commit ();
 
-				return responder (
-					searchResponderName);
+				return searchResponderProvider.get ();
 
 			}
 
@@ -361,8 +360,7 @@ class ObjectSearchPostAction <
 
 				transaction.commit ();
 
-				return responder (
-					searchResponderName);
+				return searchResponderProvider.get ();
 
 			} else if (
 

@@ -29,19 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="route"
@@ -59,148 +60,182 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="forwarder">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="forwarder"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="forwarder">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<integer-field
-			name="maxReplies"/>
+		</form>
 
-		<integer-field
-			name="maxBillReplies"
-			label="Max billed replies"/>
+		<form
+			name="create"
+			object-type="forwarder"
+			type="create">
 
-		<integer-field
-			name="maxFreeReplies"/>
+			<columns>
 
-		<yes-no-field
-			name="allowNewSends"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<yes-no-field
-			name="allowNullOtherId"
-			label="Allow no id"/>
+			</columns>
 
-		<text-field
-			name="password"/>
+		</form>
 
-		<text-field
-			name="url"
-			label="URL"/>
+		<form
+			name="summary"
+			object-type="forwarder"
+			type="read-only">
 
-		<text-field
-			name="urlParams"
-			label="URL params"/>
+			<columns>
 
-		<yes-no-field
-			name="urlPost"
-			label="URL method"
-			yes-label="POST"
-			no-label="GET"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<integer-field
-			name="maxPri"
-			label="Max priority"/>
+				<integer-field
+					name="maxReplies"/>
 
-		<integer-field
-			name="defaultPri"
-			label="Default priority"/>
+				<integer-field
+					name="maxBillReplies"
+					label="Max billed replies"/>
 
-		<seconds-field
-			name="inboundTimeoutSecs"
-			label="Inbound message timeout"/>
+				<integer-field
+					name="maxFreeReplies"/>
 
-		<yes-no-field
-			name="reportEnabled"/>
+				<yes-no-field
+					name="allowNewSends"/>
 
-		<object-field
-			name="smsTracker"
-			label="SMS tracker"
-			object-type="smsTracker"/>
+				<yes-no-field
+					name="allowNullOtherId"
+					label="Allow no id"/>
 
-	</field-set>
+				<text-field
+					name="password"/>
 
-	<field-set
-		name="settings"
-		object-name="forwarder">
+				<text-field
+					name="url"
+					label="URL"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="urlParams"
+					label="URL params"/>
 
-		<integer-field
-			name="maxReplies"/>
+				<yes-no-field
+					name="urlPost"
+					label="URL method"
+					yes-label="POST"
+					no-label="GET"/>
 
-		<integer-field
-			name="maxBillReplies"
-			label="Max billed replies"/>
+				<integer-field
+					name="maxPri"
+					label="Max priority"/>
 
-		<integer-field
-			name="maxFreeReplies"/>
+				<integer-field
+					name="defaultPri"
+					label="Default priority"/>
 
-		<yes-no-field
-			name="allowNewSends"/>
+				<seconds-field
+					name="inboundTimeoutSecs"
+					label="Inbound message timeout"/>
 
-		<yes-no-field
-			name="allowNullOtherId"
-			label="Allow no id"/>
+				<yes-no-field
+					name="reportEnabled"/>
 
-		<text-field
-			name="password"/>
+				<object-field
+					name="smsTracker"
+					label="SMS tracker"
+					object-type="smsTracker"/>
 
-		<text-field
-			name="url"
-			label="URL"/>
+			</columns>
 
-		<text-field
-			name="urlParams"
-			label="URL params"/>
+		</form>
 
-		<yes-no-field
-			name="urlPost"
-			label="URL method"
-			yes-label="POST"
-			no-label="GET"/>
+		<form
+			name="settings"
+			object-type="forwarder"
+			type="update">
 
-		<integer-field
-			name="maxPri"
-			label="Max priority"/>
+			<columns>
 
-		<integer-field
-			name="defaultPri"
-			label="Default priority"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<seconds-field
-			name="inboundTimeoutSecs"
-			label="Inbound message timeout"/>
+				<integer-field
+					name="maxReplies"/>
 
-		<yes-no-field
-			name="reportEnabled"/>
+				<integer-field
+					name="maxBillReplies"
+					label="Max billed replies"/>
 
-		<object-field
-			name="smsTracker"
-			label="SMS tracker"
-			object-type="smsTracker"/>
+				<integer-field
+					name="maxFreeReplies"/>
 
-	</field-set>
+				<yes-no-field
+					name="allowNewSends"/>
+
+				<yes-no-field
+					name="allowNullOtherId"
+					label="Allow no id"/>
+
+				<text-field
+					name="password"/>
+
+				<text-field
+					name="url"
+					label="URL"/>
+
+				<text-field
+					name="urlParams"
+					label="URL params"/>
+
+				<yes-no-field
+					name="urlPost"
+					label="URL method"
+					yes-label="POST"
+					no-label="GET"/>
+
+				<integer-field
+					name="maxPri"
+					label="Max priority"/>
+
+				<integer-field
+					name="defaultPri"
+					label="Default priority"/>
+
+				<seconds-field
+					name="inboundTimeoutSecs"
+					label="Inbound message timeout"/>
+
+				<yes-no-field
+					name="reportEnabled"/>
+
+				<object-field
+					name="smsTracker"
+					label="SMS tracker"
+					object-type="smsTracker"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

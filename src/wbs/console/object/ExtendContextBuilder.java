@@ -128,6 +128,9 @@ class ExtendContextBuilder <
 			ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
 				new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					consoleHelper)
 

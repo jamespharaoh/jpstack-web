@@ -4,9 +4,13 @@
 
 	<layer name="console">
 
+		<bootstrap-component class="ObjectSummaryPageComponentBuilder"/>
 		<bootstrap-component class="ObjectSummaryPageSpec"/>
+		<bootstrap-component class="ObjectSummaryBeanPartComponentBuilder"/>
 		<bootstrap-component class="ObjectSummaryBeanPartSpec"/>
+		<bootstrap-component class="ObjectSummaryFieldsComponentBuilder"/>
 		<bootstrap-component class="ObjectSummaryFieldsSpec"/>
+		<bootstrap-component class="ObjectSummaryHeadingComponentBuilder"/>
 		<bootstrap-component class="ObjectSummaryHeadingSpec"/>
 
 		<component class="ObjectSummaryPageBuilder"/>

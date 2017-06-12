@@ -660,6 +660,12 @@ writeBuildFile world = do
 			sattr "value" value
 		] []
 
+	let makeEnvKeyValue key value =
+		mkelem "env" [
+			sattr "key" key,
+			sattr "value" value
+		] []
+
 	let makeExec exec elems =
 		mkelem "exec" [
 			sattr "failonerror" "false",
@@ -741,6 +747,7 @@ writeBuildFile world = do
 				(tomcatDir ++ "/apps/api/host-manager"),
 
 			makeExec (tomcatDir ++ "/bin/catalina.sh") [
+				makeEnvKeyValue "WBS_CONFIG_XML" "config/wbs-api-config.xml",
 				makeArgLine "run"
 			]
 
@@ -808,6 +815,7 @@ writeBuildFile world = do
 				(tomcatDir ++ "/apps/api/host-manager"),
 
 			makeExec (tomcatDir ++ "/bin/catalina.sh") [
+				makeEnvKeyValue "WBS_CONFIG_XML" "config/wbs-console-config.xml",
 				makeArgLine "run"
 			]
 

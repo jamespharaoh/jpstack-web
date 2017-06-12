@@ -3,6 +3,7 @@ package wbs.platform.text.web;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,7 +26,7 @@ import wbs.web.responder.BufferedTextResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("textResponder")
-public
+public final
 class TextResponder
 	extends BufferedTextResponder {
 
@@ -48,6 +49,18 @@ class TextResponder
 
 	@Getter @Setter
 	String filename;
+
+	// property setters
+
+	public
+	TextResponder textFormat (
+			@NonNull CharSequence ... arguments) {
+
+		return text (
+			stringFormatArray (
+				arguments));
+
+	}
 
 	// implementation
 

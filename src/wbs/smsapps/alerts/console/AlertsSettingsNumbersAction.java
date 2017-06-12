@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -13,19 +14,25 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.inject.Provider;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
-import wbs.console.action.ConsoleAction;
 import wbs.console.notice.ConsoleNotices;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -38,12 +45,13 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("alertsSettingsNumbersAction")
 public
 class AlertsSettingsNumbersAction
-	extends ConsoleAction {
+	implements WebAction {
 
 	// singleton dependencies
 
@@ -77,23 +85,40 @@ class AlertsSettingsNumbersAction
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("alertsSettingsNumbersResponder")
+	Provider <WebResponder> numbersResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	Optional <WebResponder> defaultResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"alertsSettingsNumbersResponder");
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultResponder");
+
+		) {
+
+			return optionalOf (
+				numbersResponderProvider.get ());
+
+		}
 
 	}
 
 	// implementation
 
 	@Override
-	protected
-	Responder goReal (
+	public
+	WebResponder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -102,11 +127,14 @@ class AlertsSettingsNumbersAction
 				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
-					"goReal");
+					"handle");
 
 		) {
 
-			if (! requestContext.canContext ("alertsSettings.manage")) {
+			if (
+				! requestContext.canContext (
+					"alertsSettings.manage")
+			) {
 
 				requestContext.addError (
 					"Access denied");

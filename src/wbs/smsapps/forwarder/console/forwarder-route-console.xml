@@ -29,19 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -49,54 +50,94 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="forwarderRoute">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="forwarder-route"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="forwarderRoute">
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+		</form>
 
-		<text-field
-			name="number"/>
+		<form
+			name="create"
+			object-type="forwarder-route"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="settings"
-		object-name="forwarderRoute">
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field read-only="yes"/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<text-field
+					name="number"/>
 
-		<text-field
-			name="number"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="summary"
+			object-type="forwarder-route"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<object-field
+					name="router"
+					object-type="router"/>
+
+				<text-field
+					name="number"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="forwarder-route"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field read-only="yes"/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<object-field
+					name="router"
+					object-type="router"/>
+
+				<text-field
+					name="number"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

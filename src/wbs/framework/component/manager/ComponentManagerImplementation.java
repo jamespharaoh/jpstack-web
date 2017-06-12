@@ -12,6 +12,7 @@ import static wbs.utils.collection.MapUtils.iterableTransformToMap;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.collection.MapUtils.mapTransformToMap;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
@@ -915,6 +916,14 @@ class ComponentManagerImplementation
 					taskLogger,
 					componentData);
 
+				setComponentReferenceListProperties (
+					taskLogger,
+					componentData);
+
+				setComponentReferenceMapProperties (
+					taskLogger,
+					componentData);
+
 				setComponentInjectedProperties (
 					taskLogger,
 					componentData);
@@ -1100,6 +1109,14 @@ class ComponentManagerImplementation
 				taskLogger,
 				componentData);
 
+			setComponentReferenceListProperties (
+				taskLogger,
+				componentData);
+
+			setComponentReferenceMapProperties (
+				taskLogger,
+				componentData);
+
 			setComponentInjectedProperties (
 				taskLogger,
 				componentData);
@@ -1197,7 +1214,7 @@ class ComponentManagerImplementation
 				componentData.definition ();
 
 			for (
-				Map.Entry <String, String> entry
+				Map.Entry <String, Pair <String, String>> entry
 					: componentDefinition.referenceProperties ().entrySet ()
 			) {
 
@@ -1206,17 +1223,237 @@ class ComponentManagerImplementation
 					componentDefinition.name (),
 					entry.getKey ());
 
-				Object target =
-					getComponentRequired (
-						taskLogger,
-						entry.getValue (),
-						Object.class);
+				String targetScope =
+					entry.getValue ().getLeft ();
 
-				PropertyUtils.propertySetSimple (
-					optionalGetRequired (
-						componentData.optionalComponent),
-					entry.getKey (),
-					target);
+				String targetName =
+					entry.getValue ().getRight ();
+
+				if (
+					stringEqualSafe (
+						targetScope,
+						"singleton")
+				) {
+
+					Object target =
+						getComponentRequired (
+							taskLogger,
+							targetName,
+							Object.class);
+
+					PropertyUtils.propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						target);
+
+				} else if (
+					stringEqualSafe (
+						targetScope,
+						"prototype")
+				) {
+
+					Provider <?> targetProvider =
+						getComponentProviderRequired (
+							taskLogger,
+							targetName,
+							Object.class);
+
+					propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						targetProvider);
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
+			}
+
+		}
+
+	}
+
+	private
+	void setComponentReferenceListProperties (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setComponentReferenceListProperties");
+
+			HeldLock heldlock =
+				lock.read ();
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
+			for (
+				Map.Entry <String, Pair <String, List <String>>> entry
+					: componentDefinition.referenceListProperties ().entrySet ()
+			) {
+
+				taskLogger.debugFormat (
+					"Setting reference list property %s.%s",
+					componentDefinition.name (),
+					entry.getKey ());
+
+				String targetScope =
+					entry.getValue ().getLeft ();
+
+				List <String> targetNames =
+					entry.getValue ().getRight ();
+
+				if (
+					stringEqualSafe (
+						targetScope,
+						"singleton")
+				) {
+
+					List <Object> targets =
+						iterableMapToList (
+							targetNames,
+							targetName ->
+								getComponentRequired (
+									taskLogger,
+									targetName,
+									Object.class));
+
+					PropertyUtils.propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						targets);
+
+				} else if (
+					stringEqualSafe (
+						targetScope,
+						"prototype")
+				) {
+
+					List <Provider <?>> targetProviders =
+						iterableMapToList (
+							targetNames,
+							targetName ->
+								getComponentProviderRequired (
+									taskLogger,
+									targetName,
+									Object.class));
+
+					propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						targetProviders);
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
+			}
+
+		}
+
+	}
+
+	private
+	void setComponentReferenceMapProperties (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setComponentReferenceMapProperties");
+
+			HeldLock heldlock =
+				lock.read ();
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				componentData.definition ();
+
+			for (
+				Map.Entry <String, Pair <String, Map <Object, String>>> entry
+					: componentDefinition.referenceMapProperties ().entrySet ()
+			) {
+
+				taskLogger.debugFormat (
+					"Setting reference list property %s.%s",
+					componentDefinition.name (),
+					entry.getKey ());
+
+				String targetScope =
+					entry.getValue ().getLeft ();
+
+				Map <Object, String> targetMap =
+					entry.getValue ().getRight ();
+
+				if (
+					stringEqualSafe (
+						targetScope,
+						"singleton")
+				) {
+
+					Map <Object, Object> targets =
+						mapTransformToMap (
+							targetMap,
+							(key, targetName) ->
+								key,
+							(key, targetName) ->
+								getComponentRequired (
+									taskLogger,
+									targetName,
+									Object.class));
+
+					PropertyUtils.propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						targets);
+
+				} else if (
+					stringEqualSafe (
+						targetScope,
+						"prototype")
+				) {
+
+					Map <Object, Provider <Object>> targetProviders =
+						mapTransformToMap (
+							targetMap,
+							(key, targetName) ->
+								key,
+							(key, targetName) ->
+								getComponentProviderRequired (
+									taskLogger,
+									targetName,
+									Object.class));
+
+					propertySetSimple (
+						optionalGetRequired (
+							componentData.optionalComponent),
+						entry.getKey (),
+						targetProviders);
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
 
 			}
 

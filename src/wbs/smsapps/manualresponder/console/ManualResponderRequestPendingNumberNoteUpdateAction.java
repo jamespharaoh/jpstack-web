@@ -41,7 +41,7 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingNumberNoteUpdateAction")
@@ -106,7 +106,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -187,7 +187,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	}
 
-	Responder updateNumber (
+	WebResponder updateNumber (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -278,7 +278,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	}
 
-	Responder updateCustomer (
+	WebResponder updateCustomer (
 			@NonNull Transaction parentTransaction) {
 
 		try (

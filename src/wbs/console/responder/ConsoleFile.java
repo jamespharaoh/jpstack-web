@@ -28,7 +28,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -36,12 +38,13 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
-import wbs.web.action.ActionRequestHandler;
 import wbs.web.exceptions.HttpForbiddenException;
 import wbs.web.file.AbstractFile;
-import wbs.web.handler.RequestHandler;
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.mvc.WebActionRequestHandler;
+import wbs.web.mvc.WebRequestHandler;
+import wbs.web.mvc.WebResponderRequestHandler;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFile")
@@ -51,6 +54,9 @@ class ConsoleFile
 	extends AbstractFile {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@WeakSingletonDependency
 	ConsoleManager consoleManager;
@@ -63,21 +69,24 @@ class ConsoleFile
 
 	// prototype dependencies
 
-	@PrototypeDependency
-	Provider <ActionRequestHandler> actionRequestHandlerProvider;
+	@StrongPrototypeDependency
+	Provider <WebActionRequestHandler> actionRequestHandlerProvider;
 
 	@PrototypeDependency
 	Provider <ConsoleContextPrivLookup> contextPrivLookupProvider;
+
+	@StrongPrototypeDependency
+	Provider <WebResponderRequestHandler> responderRequestHandlerProvider;
 
 	// properties
 
 	@DataAttribute
 	@Getter @Setter
-	RequestHandler getHandler;
+	Provider <? extends WebRequestHandler> getHandlerProvider;
 
 	@DataAttribute
 	@Getter @Setter
-	RequestHandler postHandler;
+	Provider <? extends WebRequestHandler> postHandlerProvider;
 
 	@DataAttribute
 	@Getter @Setter
@@ -92,72 +101,94 @@ class ConsoleFile
 
 	public
 	ConsoleFile getHandlerName (
-			String handlerName) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String handlerName) {
 
-		if (handlerName == null)
-			return this;
+		try (
 
-		return getHandler (
-			handlerNameToRequestHandler (
-				handlerName));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getHandlerName");
+
+		) {
+
+			return getHandlerProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					handlerName,
+					WebRequestHandler.class));
+
+		}
 
 	}
 
 	public
-	ConsoleFile getResponder (
-			Provider <Responder> responder) {
+	ConsoleFile getResponderProvider (
+			@NonNull Provider <WebResponder> responder) {
 
-		return getHandler (
-			responderToRequestHandler (
-				responder));
+		return getHandlerProvider (
+			() -> responderRequestHandlerProvider.get ()
+
+			.responderProvider (
+				responder)
+
+		);
 
 	}
 
 	public
 	ConsoleFile getResponderName (
-			String responderName) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String responderName) {
 
-		if (responderName == null)
-			return this;
+		try (
 
-		return getHandler (
-			responderToRequestHandler (
-				responder (responderName)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getResponderName");
+
+		) {
+
+			return getResponderProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					responderName,
+					WebResponder.class));
+
+		}
 
 	}
 
 	public
-	Provider <Responder> responder (
-			final String responderName) {
+	ConsoleFile getResponderName (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Optional <String> responderName) {
 
-		return new Provider<Responder> () {
+		if (
+			optionalIsNotPresent (
+				responderName)
+		) {
+			return this;
+		}
 
-			@Override
-			public
-			Responder get () {
-
-				Provider <Responder> responderProvider =
-					consoleManager.responder (
-						responderName,
-						true);
-
-				return responderProvider.get ();
-
-			}
-
-		};
+		return getResponderName (
+			parentTaskLogger,
+			optionalGetRequired (
+				responderName));
 
 	}
 
 	public
 	ConsoleFile getActionProvider (
-			Provider <Action> actionProvider) {
+			@NonNull Provider <WebAction> actionProvider) {
 
-		return getHandler (
+		return getHandlerProvider (
+			() -> actionRequestHandlerProvider.get ()
 
-			actionRequestHandlerProvider.get ()
-				.actionProvider (
-					actionProvider)
+			.actionProvider (
+				actionProvider)
 
 		);
 
@@ -168,12 +199,22 @@ class ConsoleFile
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String actionName) {
 
-		return getHandler (
-			actionRequestHandlerProvider.get ()
+		try (
 
-			.actionName (
-				parentTaskLogger,
-				actionName));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getActionName");
+
+		) {
+
+			return getActionProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					actionName,
+					WebAction.class));
+
+		}
 
 	}
 
@@ -189,31 +230,43 @@ class ConsoleFile
 			return this;
 		}
 
-		return getHandler (
-			actionRequestHandlerProvider.get ()
-
-			.actionName (
-				parentTaskLogger,
-				actionName.get ()));
+		return getActionName (
+			parentTaskLogger,
+			optionalGetRequired (
+				actionName));
 
 	}
 
 	public
 	ConsoleFile postHandlerName (
-			String handlerName) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String handlerName) {
 
-		return postHandler (
-			handlerNameToRequestHandler (
-				handlerName));
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"postHandlerName");
+
+		) {
+
+			return postHandlerProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					handlerName,
+					WebRequestHandler.class));
+
+		}
 
 	}
 
 	public
 	ConsoleFile postActionProvider (
-			@NonNull Provider <Action> actionProvider) {
+			@NonNull Provider <WebAction> actionProvider) {
 
-		return postHandler (
-			actionRequestHandlerProvider.get ()
+		return postHandlerProvider (
+			() -> actionRequestHandlerProvider.get ()
 
 			.actionProvider (
 				actionProvider)
@@ -227,12 +280,22 @@ class ConsoleFile
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String actionName) {
 
-		return postHandler (
-			actionRequestHandlerProvider.get ()
+		try (
 
-			.actionName (
-				parentTaskLogger,
-				actionName));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"postActionName");
+
+		) {
+
+			return postActionProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					actionName,
+					WebAction.class));
+
+		}
 
 	}
 
@@ -248,13 +311,10 @@ class ConsoleFile
 			return this;
 		}
 
-		return postHandler (
-			actionRequestHandlerProvider.get ()
-
-			.actionName (
-				parentTaskLogger,
-				optionalGetRequired (
-					actionName)));
+		return postActionName (
+			parentTaskLogger,
+			optionalGetRequired (
+				actionName));
 
 	}
 

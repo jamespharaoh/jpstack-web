@@ -40,8 +40,10 @@ class ContextActionPageSpec
 		name = "responder")
 	String responderName;
 
+	/*
 	@DataAttribute (
 		name = "responder-bean")
 	String responderBeanName;
+	*/
 
 }

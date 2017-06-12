@@ -25,37 +25,46 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="broadcastNumber">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="summary"
+			object-type="broadcast-number"
+			type="read-only">
 
-		<object-field
-			name="number"
-			object-type="number"/>
+			<columns>
 
-		<enum-field
-			name="state"/>
+				<parent-field/>
 
-		<object-field
-			name="addedByUser"
-			object-type="user"/>
+				<object-field
+					name="number"
+					object-type="number"/>
 
-		<object-field
-			name="removedByUser"
-			object-type="user"/>
+				<enum-field
+					name="state"/>
 
-		<object-field
-			name="message"
-			object-type="message"/>
+				<object-field
+					name="addedByUser"
+					object-type="user"/>
 
-	</field-set>
+				<object-field
+					name="removedByUser"
+					object-type="user"/>
+
+				<object-field
+					name="message"
+					object-type="message"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

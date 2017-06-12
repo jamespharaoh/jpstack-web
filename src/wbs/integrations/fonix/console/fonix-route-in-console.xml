@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,55 +47,79 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="fonixRouteIn">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="fonix-route-in"
+			type="read-only">
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
 
-	<field-set
-		name="create"
-		object-name="fonixRouteIn">
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="fonix-route-in"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="fonixRouteIn">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
+				<parent-field/>
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="fonixRouteIn">
+		</form>i
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+		<form
+			name="summary"
+			object-type="fonix-route-in"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="fonix-route-in"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

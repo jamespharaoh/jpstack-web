@@ -4,7 +4,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
 import javax.validation.ConstraintViolationException;
 
 import lombok.NonNull;
@@ -24,12 +23,12 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 public abstract
 class ConsoleAction
-	implements Action {
+	implements WebAction {
 
 	// singleton dependencies
 
@@ -62,7 +61,7 @@ class ConsoleAction
 	int maxTries = 3;
 
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return null;
@@ -72,7 +71,7 @@ class ConsoleAction
 	// implementation
 
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return null;
@@ -81,7 +80,7 @@ class ConsoleAction
 
 	@Override
 	public final
-	Responder handle (
+	WebResponder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -95,14 +94,14 @@ class ConsoleAction
 
 			try {
 
-				Responder responder =
+				WebResponder responder =
 					goWithRetry (
 						taskLogger);
 
 				if (responder != null)
 					return responder;
 
-				Responder backupResponder =
+				WebResponder backupResponder =
 					backupResponder (
 						taskLogger);
 
@@ -130,7 +129,7 @@ class ConsoleAction
 	}
 
 	private
-	Responder goWithRetry (
+	WebResponder goWithRetry (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -192,7 +191,7 @@ class ConsoleAction
 
 	}
 
-	Responder handleException (
+	WebResponder handleException (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
 
@@ -207,7 +206,7 @@ class ConsoleAction
 
 			// if we have no backup page just die
 
-			Responder backupResponder = null;
+			WebResponder backupResponder = null;
 
 			try {
 
@@ -266,29 +265,6 @@ class ConsoleAction
 			return backupResponder;
 
 		}
-
-	}
-
-	protected
-	Provider <Responder> reusableResponder (
-			@NonNull String responderName) {
-
-		return consoleManager.responder (
-			responderName,
-			true);
-
-	}
-
-	protected
-	Responder responder (
-			@NonNull String responderName) {
-
-		Provider <Responder> responderProvider =
-			consoleManager.responder (
-				responderName,
-				true);
-
-		return responderProvider.get ();
 
 	}
 

@@ -22,9 +22,13 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("simpleResponderFileBuilder")
 public
@@ -32,6 +36,9 @@ class SimpleResponderFileBuilder
 	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -55,10 +62,12 @@ class SimpleResponderFileBuilder
 	// state
 
 	ConsoleHelper<?> consoleHelper;
+
 	String path;
 	String name;
 	String responderName;
-	String responderBeanName;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -80,7 +89,8 @@ class SimpleResponderFileBuilder
 
 			setDefaults ();
 
-			buildFile ();
+			buildFile (
+				taskLogger);
 
 			buildResponder (
 				taskLogger);
@@ -89,12 +99,29 @@ class SimpleResponderFileBuilder
 
 	}
 
-	void buildFile () {
+	void buildFile (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addFile (
-			path,
-			consoleFileProvider.get ()
-				.getResponderName (responderName));
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
+
+		) {
+
+			consoleModule.addFile (
+				path,
+				consoleFileProvider.get ()
+
+					.getResponderName (
+						taskLogger,
+						responderName)
+
+			);
+
+		}
 
 	}
 
@@ -110,11 +137,11 @@ class SimpleResponderFileBuilder
 
 		) {
 
-			consoleModule.addResponder (
-				responderName,
-				consoleModule.beanResponder (
+			responderProvider =
+				componentManager.getComponentProviderRequired (
 					taskLogger,
-					responderBeanName));
+					responderName,
+					WebResponder.class);
 
 		}
 
@@ -138,6 +165,7 @@ class SimpleResponderFileBuilder
 					simpleContainerSpec.newBeanNamePrefix (),
 					capitalise (name)));
 
+		/*
 		responderBeanName =
 			ifNull (
 				simpleResponderFileSpec.responderBeanName (),
@@ -145,6 +173,7 @@ class SimpleResponderFileBuilder
 					"%s%sResponder",
 					simpleContainerSpec.newBeanNamePrefix (),
 					capitalise (name)));
+		*/
 
 	}
 

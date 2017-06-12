@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="root"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,70 +52,94 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="clockworkSmsDeliveryStatusDetailCode">
+	<forms>
 
-		<code-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="clockwork-sms-delivery-status-detail-code"
+			type="read-only">
 
-		<text-field
-			name="theirDescription"/>
+			<columns>
 
-		<yes-no-field
-			name="permanent"/>
+				<code-field/>
+				<description-field/>
 
-	</field-set>
+				<text-field
+					name="theirDescription"/>
 
-	<field-set
-		name="create"
-		object-name="clockworkSmsDeliveryStatusDetailCode">
+				<yes-no-field
+					name="permanent"/>
 
-		<code-field pattern="0|[1-9][0-9]*"/>
-		<description-field/>
+			</columns>
 
-		<text-field
-			name="theirDescription"/>
+		</form>
 
-		<yes-no-field
-			name="permanent"
-			nullable="yes"/>
+		<form
+			name="create"
+			object-type="clockwork-sms-delivery-status-detail-code"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="clockworkSmsDeliveryStatusDetailCode">
+				<code-field pattern="0|[1-9][0-9]*"/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="theirDescription"/>
 
-		<text-field
-			name="theirDescription"/>
+				<yes-no-field
+					name="permanent"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="permanent"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="clockworkSmsDeliveryStatusDetailCode">
+		<form
+			name="summary"
+			object-type="clockwork-sms-delivery-status-detail-code"
+			type="read-only">
 
-		<code-field pattern="0|[1-9][0-9]*"/>
-		<description-field/>
-		<deleted-field/>
+			<columns>
 
-		<text-field
-			name="theirDescription"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<yes-no-field
-			name="permanent"
-			nullable="yes"/>
+				<text-field
+					name="theirDescription"/>
 
-	</field-set>
+				<yes-no-field
+					name="permanent"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="clockwork-sms-delivery-status-detail-code"
+			type="update">
+
+			<columns>
+
+				<code-field pattern="0|[1-9][0-9]*"/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="theirDescription"/>
+
+				<yes-no-field
+					name="permanent"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

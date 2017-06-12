@@ -28,10 +28,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="parent"
 				create-priv-code="manage"/>
 
@@ -40,10 +40,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -51,85 +51,109 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="menuItem">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="menu-item"
+			type="read-only">
 
-		<text-field
-			name="label"/>
+			<columns>
 
-		<text-field
-			name="targetPath"/>
+				<name-field/>
+				<description-field/>
 
-		<text-field
-			name="targetFrame"/>
+				<text-field
+					name="label"/>
 
-	</field-set>
+				<text-field
+					name="targetPath"/>
 
-	<field-set
-		name="create"
-		object-name="menuItem">
+				<text-field
+					name="targetFrame"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<text-field
-			name="label"/>
+		</form>
 
-		<text-field
-			name="targetPath"/>
+		<form
+			name="create"
+			object-type="menu-item"
+			type="create">
 
-		<text-field
-			name="targetFrame"/>
+			<columns>
 
-	</field-set>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="summary"
-		object-name="menuItem">
+				<text-field
+					name="label"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="targetPath"/>
 
-		<text-field
-			name="label"/>
+				<text-field
+					name="targetFrame"/>
 
-		<text-field
-			name="targetPath"/>
+			</columns>
 
-		<text-field
-			name="targetFrame"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="menu-item"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="menuItem">
+			<columns>
 
-		<parent-field
-			create-priv-delegate="root"
-			create-priv-code="manage"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="label"/>
 
-		<text-field
-			name="label"/>
+				<text-field
+					name="targetPath"/>
 
-		<text-field
-			name="targetPath"/>
+				<text-field
+					name="targetFrame"/>
 
-		<text-field
-			name="targetFrame"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="menu-item"
+			type="update">
+
+			<columns>
+
+				<parent-field
+					create-priv-delegate="root"
+					create-priv-code="manage"/>
+
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="label"/>
+
+				<text-field
+					name="targetPath"/>
+
+				<text-field
+					name="targetFrame"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

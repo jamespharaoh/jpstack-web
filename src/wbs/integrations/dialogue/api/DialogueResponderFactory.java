@@ -16,12 +16,12 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.web.TextResponder;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("dialogueResponder")
 public
 class DialogueResponderFactory
-	implements ComponentFactory <Responder> {
+	implements ComponentFactory <WebResponder> {
 
 	// singleton dependencies
 
@@ -37,7 +37,7 @@ class DialogueResponderFactory
 
 	@Override
 	public
-	Responder makeComponent (
+	WebResponder makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

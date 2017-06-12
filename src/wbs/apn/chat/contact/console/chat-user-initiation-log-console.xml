@@ -29,39 +29,48 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="chatUserInitiationLog">
+	<forms>
 
-		<id-field/>
+		<form
+			name="summary"
+			object-type="chat-user-initiation-log"
+			type="read-only">
 
-		<object-field
-			name="chatUser"
-			object-type="chatUser"/>
+			<columns>
 
-		<object-field
-			name="monitorChatUser"
-			object-type="chatUser"/>
+				<id-field/>
 
-		<object-field
-			name="monitorUser"
-			object-type="user"/>
+				<object-field
+					name="chatUser"
+					object-type="chatUser"/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<object-field
+					name="monitorChatUser"
+					object-type="chatUser"/>
 
-		<timestamp-field
-			name="alarmTime"/>
+				<object-field
+					name="monitorUser"
+					object-type="user"/>
 
-		<enum-field
-			name="reason"/>
+				<timestamp-field
+					name="timestamp"/>
 
-	</field-set>
+				<timestamp-field
+					name="alarmTime"/>
+
+				<enum-field
+					name="reason"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

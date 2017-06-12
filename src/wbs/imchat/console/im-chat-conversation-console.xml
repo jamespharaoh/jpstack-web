@@ -29,14 +29,14 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<context-link
 				name="message"
@@ -48,51 +48,65 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatConversation">
+	<forms>
 
-		<object-field
-			name="imChatProfile"
-			label="Profile"
-			object-type="imChatProfile"
-			root-field="imChatCustomer.imChat"/>
+		<form
+			name="list"
+			object-type="im-chat-conversation"
+			type="read-only">
 
-		<integer-field
-			name="numMessages"
-			label="Messages"/>
+			<columns>
 
-		<timestamp-field
-			name="startTime"/>
+				<object-field
+					name="imChatProfile"
+					label="Profile"
+					object-type="imChatProfile"
+					root-field="imChatCustomer.imChat"/>
 
-		<timestamp-field
-			name="endTime"/>
+				<integer-field
+					name="numMessages"
+					label="Messages"/>
 
-	</field-set>
+				<timestamp-field
+					name="startTime"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatConversation">
+				<timestamp-field
+					name="endTime"/>
 
-		<id-field/>
-		<parent-field/>
-		<index-field/>
+			</columns>
 
-		<object-field
-			name="imChatProfile"
-			label="Profile"
-			object-type="imChatProfile"
-			root-field="imChatCustomer.imChat"/>
+		</form>
 
-		<integer-field
-			name="numMessages"/>
+		<form
+			name="summary"
+			object-type="im-chat-conversation"
+			type="read-only">
 
-		<timestamp-field
-			name="startTime"/>
+			<columns>
 
-		<timestamp-field
-			name="endTime"/>
+				<id-field/>
+				<parent-field/>
+				<index-field/>
 
-	</field-set>
+				<object-field
+					name="imChatProfile"
+					label="Profile"
+					object-type="imChatProfile"
+					root-field="imChatCustomer.imChat"/>
+
+				<integer-field
+					name="numMessages"/>
+
+				<timestamp-field
+					name="startTime"/>
+
+				<timestamp-field
+					name="endTime"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

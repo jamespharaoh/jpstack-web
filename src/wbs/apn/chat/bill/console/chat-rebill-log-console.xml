@@ -29,112 +29,132 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"/>
+				search-class="wbs.apn.chat.bill.model.ChatRebillLogSearch"
+				search-form="search"
+				results-form="results"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.apn.chat.bill.model.ChatRebillLogSearch">
+	<forms>
 
-		<interval-field
-			name="timestamp"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.apn.chat.bill.model.ChatRebillLogSearch"
+			type="search">
 
-		<object-field
-			name="userId"
-			object-type="user"
-			nullable="yes"/>
+			<columns>
 
-		<interval-field
-			name="lastAction"
-			nullable="yes"/>
+				<interval-field
+					name="timestamp"
+					nullable="yes"/>
 
-		<integer-field
-			name="minimumCreditOwed"
-			nullable="yes"/>
+				<object-field
+					name="userId"
+					object-type="user"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="includeBlocked"
-			nullable="yes"/>
+				<interval-field
+					name="lastAction"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="includeFailed"
-			nullable="yes"/>
+				<integer-field
+					name="minimumCreditOwed"
+					nullable="yes"/>
 
-		<integer-field
-			name="numChatUsers"
-			nullable="yes"/>
+				<yes-no-field
+					name="includeBlocked"
+					nullable="yes"/>
 
-	</field-set>
+				<yes-no-field
+					name="includeFailed"
+					nullable="yes"/>
 
-	<field-set
-		name="results"
-		object-name="chatRebillLog">
+				<integer-field
+					name="numChatUsers"
+					nullable="yes"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+		</form>
 
-		<timestamp-field
-			name="lastAction"/>
+		<form
+			name="results"
+			object-type="chat-rebill-log"
+			type="read-only">
 
-		<yes-no-field
-			name="includeBlocked"
-			label="Blocked"/>
+			<columns>
 
-		<yes-no-field
-			name="includeFailed"
-			label="Failed"/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<integer-field
-			name="numChatUsers"
-			label="Chat users"/>
+				<object-field
+					name="user"
+					object-type="user"/>
 
-	</field-set>
+				<timestamp-field
+					name="lastAction"/>
 
-	<field-set
-		name="summary"
-		object-name="chatRebillLog">
+				<yes-no-field
+					name="includeBlocked"
+					label="Blocked"/>
 
-		<id-field/>
-		<parent-field/>
+				<yes-no-field
+					name="includeFailed"
+					label="Failed"/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<integer-field
+					name="numChatUsers"
+					label="Chat users"/>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+			</columns>
 
-		<timestamp-field
-			name="lastAction"/>
+		</form>
 
-		<integer-field
-			name="minimumCreditOwed"/>
+		<form
+			name="summary"
+			object-type="chat-rebill-log"
+			type="read-only">
 
-		<yes-no-field
-			name="includeBlocked"/>
+			<columns>
 
-		<yes-no-field
-			name="includeFailed"/>
+				<id-field/>
+				<parent-field/>
 
-		<integer-field
-			name="numChatUsers"/>
+				<timestamp-field
+					name="timestamp"/>
 
-	</field-set>
+				<object-field
+					name="user"
+					object-type="user"/>
+
+				<timestamp-field
+					name="lastAction"/>
+
+				<integer-field
+					name="minimumCreditOwed"/>
+
+				<yes-no-field
+					name="includeBlocked"/>
+
+				<yes-no-field
+					name="includeFailed"/>
+
+				<integer-field
+					name="numChatUsers"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

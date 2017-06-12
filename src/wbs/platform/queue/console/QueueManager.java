@@ -36,7 +36,7 @@ import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("queueManager")
 public
@@ -129,7 +129,7 @@ class QueueManager {
 	// implementation
 
 	public
-	Responder getItemResponder (
+	WebResponder getItemResponder (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext  requestContext,
 			@NonNull QueueItemRec queueItem) {

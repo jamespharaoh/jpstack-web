@@ -9,40 +9,54 @@
 			tab-label="Operators"
 			object-type="imChatMessage"
 			search-class="wbs.imchat.model.ImChatMessageSearch"
-			search-fields="operator-report-search"
+			search-form="operator-report-search"
 			search-dao-method="searchOperatorReportIds"
 			results-class="wbs.imchat.model.ImChatOperatorReport"
-			results-column-fields="operator-report-results"
+			results-form="operator-report-results"
 			results-dao-method="findOperatorReports"/>
 
 	</simple-context>
 
-	<field-set
-		name="operator-report-search"
-		class="wbs.imchat.model.ImChatMessageSearch">
+	<forms>
 
-		<interval-field
-			name="timestamp"
-			label="Time range"/>
+		<form
+			name="operator-report-search"
+			class="wbs.imchat.model.ImChatMessageSearch"
+			type="search">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="operator-report-results"
-		class="wbs.imchat.model.ImChatOperatorReport">
+				<interval-field
+					name="timestamp"
+					label="Time range"/>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+			</columns>
 
-		<integer-field
-			name="numFreeMessages"
-			label="Free"/>
+		</form>
 
-		<integer-field
-			name="numBilledMessages"
-			label="Billed"/>
+		<form
+			name="operator-report-results"
+			class="wbs.imchat.model.ImChatOperatorReport"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<object-field
+					name="user"
+					object-type="user"/>
+
+				<integer-field
+					name="numFreeMessages"
+					label="Free"/>
+
+				<integer-field
+					name="numBilledMessages"
+					label="Billed"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

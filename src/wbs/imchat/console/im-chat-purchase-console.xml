@@ -29,99 +29,113 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatPurchase">
+	<forms>
 
-		<index-field/>
+		<form
+			name="list"
+			object-type="im-chat-purchase"
+			type="read-only">
 
-		<object-field
-			name="imChatPricePoint"
-			label="Price point"
-			object-type="imChatPricePoint"
-			root-field="imChatCustomer.imChat"/>
+			<columns>
 
-		<currency-field
-			name="price"
-			currency="imChatCustomer.imChat.billingCurrency"/>
+				<index-field/>
 
-		<currency-field
-			name="value"
-			currency="imChatCustomer.imChat.creditCurrency"/>
+				<object-field
+					name="imChatPricePoint"
+					label="Price point"
+					object-type="imChatPricePoint"
+					root-field="imChatCustomer.imChat"/>
 
-		<enum-field
-			name="state"/>
+				<currency-field
+					name="price"
+					currency="imChatCustomer.imChat.billingCurrency"/>
 
-		<timestamp-field
-			name="createdTime"
-			label="Created"/>
+				<currency-field
+					name="value"
+					currency="imChatCustomer.imChat.creditCurrency"/>
 
-		<timestamp-field
-			name="completedTime"
-			label="Completed"/>
+				<enum-field
+					name="state"/>
 
-		<timestamp-field
-			name="cancelledTime"
-			label="Cancelled"/>
+				<timestamp-field
+					name="createdTime"
+					label="Created"/>
 
-	</field-set>
+				<timestamp-field
+					name="completedTime"
+					label="Completed"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatPurchase">
+				<timestamp-field
+					name="cancelledTime"
+					label="Cancelled"/>
 
-		<id-field/>
+			</columns>
 
-		<parent-field/>
+		</form>
 
-		<index-field/>
+		<form
+			name="summary"
+			object-type="im-chat-purchase"
+			type="read-only">
 
-		<object-field
-			name="imChatPricePoint"
-			label="Price point"
-			object-type="imChatPricePoint"
-			root-field="imChatCustomer.imChat"/>
+			<columns>
 
-		<currency-field
-			name="price"
-			currency="imChatCustomer.imChat.billingCurrency"/>
+				<id-field/>
 
-		<currency-field
-			name="value"
-			currency="imChatCustomer.imChat.creditCurrency"/>
+				<parent-field/>
 
-		<enum-field
-			name="state"/>
+				<index-field/>
 
-		<timestamp-field
-			name="createdTime"/>
+				<object-field
+					name="imChatPricePoint"
+					label="Price point"
+					object-type="imChatPricePoint"
+					root-field="imChatCustomer.imChat"/>
 
-		<timestamp-field
-			name="completedTime"/>
+				<currency-field
+					name="price"
+					currency="imChatCustomer.imChat.billingCurrency"/>
 
-		<timestamp-field
-			name="cancelledTime"/>
+				<currency-field
+					name="value"
+					currency="imChatCustomer.imChat.creditCurrency"/>
 
-		<object-field
-			name="paypalPayment"
-			object-type="paypalPayment"/>
+				<enum-field
+					name="state"/>
 
-		<yes-no-field
-			name="developerMode"/>
+				<timestamp-field
+					name="createdTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="completedTime"/>
+
+				<timestamp-field
+					name="cancelledTime"/>
+
+				<object-field
+					name="paypalPayment"
+					object-type="paypalPayment"/>
+
+				<yes-no-field
+					name="developerMode"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

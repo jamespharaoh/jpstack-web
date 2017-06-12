@@ -29,21 +29,21 @@
 		<list>
 
 			<object-list-page
-				fields-provider="ticketListFieldsProvider"/>
+				form="list"/>
 
 			<object-create-page
-				fields-provider="ticketCreateFieldsProvider"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields-provider="ticketSummaryFieldsProvider"
+				form="summary"
 				priv-key="ticketManager.manage"/>
 
 			<object-settings-page
-				fields-provider="ticketSettingsFieldsProvider"
+				form="settings"
 				priv-key="ticketManager.manage"/>
 
 			<context-link
@@ -57,5 +57,33 @@
 		</object>
 
 	</object-context>
+
+	<forms>
+
+		<form
+			name="list"
+			object-type="ticket"
+			type="read-only"
+			fields-provider="ticketListFieldsProvider"/>
+
+		<form
+			name="create"
+			object-type="ticket"
+			type="create"
+			fields-provider="ticketCreateFieldsProvider"/>
+
+		<form
+			name="summary"
+			object-type="ticket"
+			type="read-only"
+			fields-provider="ticketSummaryFieldsProvider"/>
+
+		<form
+			name="settings"
+			object-type="ticket"
+			type="update"
+			fields-provider="ticketSettingsFieldsProvider"/>
+
+	</forms>
 
 </console-module>

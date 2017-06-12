@@ -11,6 +11,8 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -21,6 +23,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -40,7 +43,7 @@ import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("subscriptionNumberAddRemoveAction")
 public
@@ -80,15 +83,20 @@ class SubscriptionNumberAddRemoveAction
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("subscriptionNumberAddRemoveResponder")
+	Provider <WebResponder> addRemoveResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"subscriptionNumberAddRemoveResponder");
+		return addRemoveResponderProvider.get ();
 
 	}
 
@@ -96,7 +104,7 @@ class SubscriptionNumberAddRemoveAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

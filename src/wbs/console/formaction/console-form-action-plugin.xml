@@ -5,7 +5,9 @@
 	<layer name="console">
 
 		<bootstrap-component class="ConsoleFormActionSpec"/>
+		<bootstrap-component class="ContextTabFormActionPageComponentBuilder"/>
 		<bootstrap-component class="ContextTabFormActionPageSpec"/>
+		<bootstrap-component class="ContextTabFormActionsPageComponentBuilder"/>
 		<bootstrap-component class="ContextTabFormActionsPageSpec"/>
 
 		<component class="ConsoleFormActionAction"/>

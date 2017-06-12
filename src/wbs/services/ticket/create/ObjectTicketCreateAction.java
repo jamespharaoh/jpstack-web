@@ -11,6 +11,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -53,7 +55,7 @@ import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
@@ -120,13 +122,13 @@ class ObjectTicketCreateAction <
 	String typeCode;
 
 	@Getter @Setter
-	String responderName;
+	Provider <WebResponder> responderProvider;
 
 	@Getter @Setter
 	String targetContextTypeName;
 
 	@Getter @Setter
-	String targetResponderName;
+	Provider <WebResponder> targetResponderProvider;
 
 	@Getter @Setter
 	String createPrivDelegate;
@@ -160,17 +162,16 @@ class ObjectTicketCreateAction <
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			responderName ());
+		return responderProvider.get ();
 
 	}
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -469,7 +470,7 @@ class ObjectTicketCreateAction <
 
 			requestContext.setEmptyFormData ();
 
-			return null;
+			return targetResponderProvider.get ();
 
 		}
 

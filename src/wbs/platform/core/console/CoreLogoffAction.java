@@ -26,7 +26,7 @@ import wbs.platform.user.console.UserSessionLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("coreLogoffAction")
 public
@@ -62,7 +62,7 @@ class CoreLogoffAction
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return coreLogoffResponderProvider.get ();
@@ -73,7 +73,7 @@ class CoreLogoffAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

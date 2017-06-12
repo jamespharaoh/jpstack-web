@@ -19,8 +19,8 @@
 	</models>
 
 	<layer name="api">
-		<component class="api.FonixRouteInAction"/>
-		<component class="api.FonixRouteReportAction"/>
+		<component class="api.FonixRouteInApiLoggingAction"/>
+		<component class="api.FonixRouteReportApiLoggingAction"/>
 	</layer>
 
 	<layer name="daemon">

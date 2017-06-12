@@ -21,68 +21,88 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"/>
+				search-class="wbs.platform.event.model.EventSearch"
+				search-form="search"
+				results-form="results"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.platform.event.model.EventSearch">
+	<forms>
 
-		<timestamp-field
-			name="timestampAfter"
-			label="Time from"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.platform.event.model.EventSearch"
+			type="search">
 
-		<timestamp-field
-			name="timestampBefore"
-			label="Time to"
-			nullable="yes"/>
+			<columns>
 
-		<yes-no-field
-			name="admin"
-			nullable="yes"/>
+				<timestamp-field
+					name="timestampAfter"
+					label="Time from"
+					nullable="yes"/>
 
-	</field-set>
+				<timestamp-field
+					name="timestampBefore"
+					label="Time to"
+					nullable="yes"/>
 
-	<field-set
-		name="results"
-		object-name="event">
+				<yes-no-field
+					name="admin"
+					nullable="yes"/>
 
-		<timestamp-field
-			name="timestamp"
-			label="Time"
-			format="time"/>
+			</columns>
 
-		<event-details-field/>
+		</form>
 
-	</field-set>
+		<form
+			name="results"
+			object-type="event"
+			type="read-only">
 
-	<field-set
-		name="summary"
-		object-name="event">
+			<columns>
 
-		<id-field/>
+				<timestamp-field
+					name="timestamp"
+					label="Time"
+					format="time"/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<event-details-field/>
 
-		<object-field
-			name="eventType"
-			object-type="eventType"/>
+			</columns>
 
-		<event-details-field/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="event"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+
+				<timestamp-field
+					name="timestamp"/>
+
+				<object-field
+					name="eventType"
+					object-type="eventType"/>
+
+				<event-details-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

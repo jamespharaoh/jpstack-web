@@ -22,20 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -43,56 +43,80 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="txtNationNetwork">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="txt-nation-network"
+			type="read-only">
 
-		<object-field
-			name="network"
-			object-type="network"/>
+			<columns>
 
-	</field-set>
+				<code-field/>
 
-	<field-set
-		name="create"
-		object-name="txtNationNetwork">
+				<object-field
+					name="network"
+					object-type="network"/>
 
-		<code-field/>
+			</columns>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="txt-nation-network"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="txtNationNetwork">
+			<columns>
 
-		<id-field/>
-		<code-field/>
-		<deleted-field/>
+				<code-field/>
 
-		<object-field
-			name="network"
-			object-type="network"/>
+				<object-field
+					name="network"
+					object-type="network"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="txtNationNetwork">
+		</form>
 
-		<id-field/>
-		<code-field/>
-		<deleted-field/>
+		<form
+			name="summary"
+			object-type="txt-nation-network"
+			type="read-only">
 
-		<object-field
-			name="network"
-			object-type="network"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<code-field/>
+				<deleted-field/>
+
+				<object-field
+					name="network"
+					object-type="network"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="txt-nation-network"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<deleted-field/>
+
+				<object-field
+					name="network"
+					object-type="network"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

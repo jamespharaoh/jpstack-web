@@ -5,18 +5,13 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleManager;
 
 import wbs.framework.component.annotations.SingletonDependency;
-
-import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 public abstract
@@ -46,16 +41,6 @@ class AbstractQueueConsolePlugin
 				"%s.%s",
 				parentType,
 				queueType));
-
-	}
-
-	protected
-	Provider <Responder> responder (
-			@NonNull String responderName) {
-
-		return consoleManager.responder (
-			responderName,
-			true);
 
 	}
 

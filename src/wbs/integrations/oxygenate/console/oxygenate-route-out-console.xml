@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,153 +47,177 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="oxygenateRouteOut">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="oxygenate-route-out"
+			type="read-only">
 
-		<object-field
-			name="oxygenateConfig"
-			label="Config"
-			object-type="oxygenateConfig"/>
+			<columns>
 
-		<text-field
-			name="shortcode"/>
+				<parent-field/>
 
-		<yes-no-field
-			name="premium"/>
+				<object-field
+					name="oxygenateConfig"
+					label="Config"
+					object-type="oxygenateConfig"/>
 
-		<text-field
-			name="username"/>
+				<text-field
+					name="shortcode"/>
 
-		<text-field
-			name="campaignId"/>
+				<yes-no-field
+					name="premium"/>
 
-		<yes-no-field
-			name="multipart"
-			label="Multi"/>
+				<text-field
+					name="username"/>
 
-	</field-set>
+				<text-field
+					name="campaignId"/>
 
-	<field-set
-		name="create"
-		object-name="oxygenateRouteOut">
+				<yes-no-field
+					name="multipart"
+					label="Multi"/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="oxygenateConfig"
-			object-type="oxygenateConfig"/>
+		</form>
 
-		<text-field
-			name="relayUrl"/>
+		<form
+			name="create"
+			object-type="oxygenate-route-out"
+			type="create">
 
-		<text-field
-			name="shortcode"/>
+			<columns>
 
-		<yes-no-field
-			name="premium"/>
+				<parent-field/>
 
-		<text-field
-			name="username"/>
+				<object-field
+					name="oxygenateConfig"
+					object-type="oxygenateConfig"/>
 
-		<text-field
-			name="password"/>
+				<text-field
+					name="relayUrl"/>
 
-		<text-field
-			name="campaignId"
-			nullable="yes"/>
+				<text-field
+					name="shortcode"/>
 
-		<yes-no-field
-			name="multipart"/>
+				<yes-no-field
+					name="premium"/>
 
-		<seconds-field
-			name="connectTimeout"/>
+				<text-field
+					name="username"/>
 
-		<seconds-field
-			name="readTimeout"/>
+				<text-field
+					name="password"/>
 
-	</field-set>
+				<text-field
+					name="campaignId"
+					nullable="yes"/>
 
-	<field-set
-		name="summary"
-		object-name="oxygenateRouteOut">
+				<yes-no-field
+					name="multipart"/>
 
-		<id-field/>
-		<parent-field/>
+				<seconds-field
+					name="connectTimeout"/>
 
-		<object-field
-			name="oxygenateConfig"
-			object-type="oxygenateConfig"/>
+				<seconds-field
+					name="readTimeout"/>
 
-		<text-field
-			name="relayUrl"/>
+			</columns>
 
-		<text-field
-			name="shortcode"/>
+		</form>
 
-		<yes-no-field
-			name="premium"/>
+		<form
+			name="summary"
+			object-type="oxygenate-route-out"
+			type="read-only">
 
-		<text-field
-			name="username"/>
+			<columns>
 
-		<text-field
-			name="password"/>
+				<id-field/>
+				<parent-field/>
 
-		<text-field
-			name="campaignId"/>
+				<object-field
+					name="oxygenateConfig"
+					object-type="oxygenateConfig"/>
 
-		<yes-no-field
-			name="multipart"/>
+				<text-field
+					name="relayUrl"/>
 
-		<seconds-field
-			name="connectTimeout"/>
+				<text-field
+					name="shortcode"/>
 
-		<seconds-field
-			name="readTimeout"/>
+				<yes-no-field
+					name="premium"/>
 
-	</field-set>
+				<text-field
+					name="username"/>
 
-	<field-set
-		name="settings"
-		object-name="oxygenateRouteOut">
+				<text-field
+					name="password"/>
 
-		<parent-field/>
+				<text-field
+					name="campaignId"/>
 
-		<object-field
-			name="oxygenateConfig"
-			object-type="oxygenateConfig"/>
+				<yes-no-field
+					name="multipart"/>
 
-		<text-field
-			name="relayUrl"/>
+				<seconds-field
+					name="connectTimeout"/>
 
-		<text-field
-			name="shortcode"/>
+				<seconds-field
+					name="readTimeout"/>
 
-		<yes-no-field
-			name="premium"/>
+			</columns>
 
-		<text-field
-			name="username"/>
+		</form>
 
-		<text-field
-			name="password"/>
+		<form
+			name="settings"
+			object-type="oxygenate-route-out"
+			type="update">
 
-		<text-field
-			name="campaignId"
-			nullable="yes"/>
+			<columns>
 
-		<yes-no-field
-			name="multipart"/>
+				<parent-field/>
 
-		<seconds-field
-			name="connectTimeout"/>
+				<object-field
+					name="oxygenateConfig"
+					object-type="oxygenateConfig"/>
 
-		<seconds-field
-			name="readTimeout"/>
+				<text-field
+					name="relayUrl"/>
 
-	</field-set>
+				<text-field
+					name="shortcode"/>
+
+				<yes-no-field
+					name="premium"/>
+
+				<text-field
+					name="username"/>
+
+				<text-field
+					name="password"/>
+
+				<text-field
+					name="campaignId"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="multipart"/>
+
+				<seconds-field
+					name="connectTimeout"/>
+
+				<seconds-field
+					name="readTimeout"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

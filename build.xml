@@ -145,6 +145,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
+      <fileset dir="src/wbs/api/component/files"/>
       <fileset dir="src/wbs/api/misc/files"/>
       <fileset dir="src/wbs/api/module/files"/>
       <fileset dir="src/wbs/api/mvc/files"/>
@@ -328,6 +329,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
+      <fileset dir="src/wbs/api/component/console/files"/>
       <fileset dir="src/wbs/api/misc/console/files"/>
       <fileset dir="src/wbs/api/module/console/files"/>
       <fileset dir="src/wbs/api/mvc/console/files"/>
@@ -531,6 +533,7 @@
       <fileset dir="work/api-test/webapps/host-manager"/>
     </copy>
     <exec failonerror="false" executable="work/api-test/bin/catalina.sh">
+      <env key="WBS_CONFIG_XML" value="config/wbs-api-config.xml"/>
       <arg line="run"/>
     </exec>
   </target>

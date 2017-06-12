@@ -11,8 +11,8 @@
 
 		<bootstrap-component class="core.ConsoleFormSectionSpec"/>
 		<bootstrap-component class="core.ConsoleFormSpec"/>
+		<bootstrap-component class="core.ConsoleFormsComponentBuilder"/>
 		<bootstrap-component class="core.ConsoleFormsSpec"/>
-		<bootstrap-component class="core.FormFieldSetSpec"/>
 
 		<bootstrap-component class="object.CodeFormFieldSpec"/>
 		<bootstrap-component class="object.DeletedFormFieldSpec"/>
@@ -73,7 +73,6 @@
 		<component class="core.ConsoleFormPluginManagerImplementation"/>
 		<component class="core.ConsoleFormTypeImplementation"/>
 		<component class="core.ConsoleMultiFormTypeImplementation"/>
-		<component class="core.FormFieldSetBuilder"/>
 		<component class="core.HiddenFormField"/>
 		<component class="core.ReadOnlyFormField"/>
 		<component class="core.StaticFieldsProvider"/>

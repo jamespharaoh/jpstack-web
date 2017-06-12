@@ -3,7 +3,10 @@
 	package="wbs.console.component">
 
 	<layer name="console">
+
+		<bootstrap-component class="ConsoleComponentBuilder"/>
 		<bootstrap-component class="ConsoleComponentPlugin"/>
+
 	</layer>
 
 </plugin>

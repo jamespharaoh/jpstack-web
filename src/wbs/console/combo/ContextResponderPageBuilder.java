@@ -24,10 +24,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextResponderPageBuilder")
 public
@@ -37,6 +40,9 @@ class ContextResponderPageBuilder <
 	implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -66,7 +72,8 @@ class ContextResponderPageBuilder <
 	String beanName;
 	String fileName;
 	String responderName;
-	String responderBeanName;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -89,13 +96,14 @@ class ContextResponderPageBuilder <
 			setDefaults ();
 
 			for (
-				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+				ResolvedConsoleContextExtensionPoint extensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
 						container.extensionPointName ())
 			) {
 
 				buildFile (
-					resolvedExtensionPoint);
+					taskLogger,
+					extensionPoint);
 
 			}
 
@@ -107,13 +115,30 @@ class ContextResponderPageBuilder <
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			fileName,
-			consoleFileProvider.get ()
-				.getResponderName (responderName),
-			resolvedExtensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
+
+		) {
+
+			consoleModule.addContextFile (
+				fileName,
+				consoleFileProvider.get ()
+
+					.getResponderName (
+						taskLogger,
+						responderName),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
@@ -129,11 +154,11 @@ class ContextResponderPageBuilder <
 
 		) {
 
-			consoleModule.addResponder (
-				responderName,
-				consoleModule.beanResponder (
+			responderProvider =
+				componentManager.getComponentProviderRequired (
 					taskLogger,
-					responderBeanName));
+					responderName,
+					WebResponder.class);
 
 		}
 
@@ -168,6 +193,7 @@ class ContextResponderPageBuilder <
 					capitalise (
 						beanName)));
 
+		/*
 		responderBeanName =
 			ifNull (
 				spec.responderBeanName (),
@@ -176,6 +202,7 @@ class ContextResponderPageBuilder <
 					container.newBeanNamePrefix (),
 					capitalise (
 						beanName)));
+		*/
 
 	}
 

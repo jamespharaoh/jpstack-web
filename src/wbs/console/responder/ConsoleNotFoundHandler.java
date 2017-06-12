@@ -28,7 +28,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.handler.WebNotFoundHandler;
+import wbs.web.mvc.WebNotFoundHandler;
 
 @SingletonComponent ("notFoundHandler")
 public

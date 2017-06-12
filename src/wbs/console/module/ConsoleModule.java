@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -23,7 +21,6 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
 
 import wbs.web.file.WebFile;
-import wbs.web.responder.Responder;
 import wbs.web.responder.WebModule;
 
 public
@@ -43,8 +40,6 @@ interface ConsoleModule
 	Map <String, WebFile> contextFiles ();
 
 	Map <String, List <String>> contextFilesByContextType ();
-
-	Map <String, Provider <Responder>> responders ();
 
 	Map <String, FormFieldSet <?>> formFieldSets ();
 

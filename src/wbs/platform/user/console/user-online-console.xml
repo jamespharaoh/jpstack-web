@@ -22,45 +22,59 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="userOnline">
+	<forms>
 
-		<id-field/>
+		<form
+			name="list"
+			object-type="user-online"
+			type="read-only">
 
-		<text-field
-			name="sessionId"/>
+			<columns>
 
-		<timestamp-field
-			name="timestamp"/>
+				<id-field/>
 
-	</field-set>
+				<text-field
+					name="sessionId"/>
 
-	<field-set
-		name="summary"
-		object-name="userOnline">
+				<timestamp-field
+					name="timestamp"/>
 
-		<id-field/>
+			</columns>
 
-		<text-field
-			name="sessionId"/>
+		</form>
 
-		<timestamp-field
-			name="timestamp"/>
+		<form
+			name="summary"
+			object-type="user-online"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+
+				<text-field
+					name="sessionId"/>
+
+				<timestamp-field
+					name="timestamp"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

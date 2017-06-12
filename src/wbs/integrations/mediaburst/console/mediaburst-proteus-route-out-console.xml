@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,85 +47,109 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="mediaburstProteusRouteOut">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="mediaburst-proteus-route-out"
+			type="read-only">
 
-		<text-field
-			name="url"/>
+			<columns>
 
-		<text-field
-			name="username"/>
+				<parent-field/>
 
-		<text-field
-			name="password"/>
+				<text-field
+					name="url"/>
 
-		<text-field
-			name="servType"/>
+				<text-field
+					name="username"/>
 
-	</field-set>
+				<text-field
+					name="password"/>
 
-	<field-set
-		name="create"
-		object-name="mediaburstProteusRouteOut">
+				<text-field
+					name="servType"/>
 
-		<parent-field/>
+			</columns>
 
-		<text-field
-			name="url"/>
+		</form>
 
-		<text-field
-			name="username"/>
+		<form
+			name="create"
+			object-type="mediaburst-proteus-route-out"
+			type="create">
 
-		<text-field
-			name="password"/>
+			<columns>
 
-		<text-field
-			name="servType"/>
+				<parent-field/>
 
-	</field-set>
+				<text-field
+					name="url"/>
 
-	<field-set
-		name="summary"
-		object-name="mediaburstProteusRouteOut">
+				<text-field
+					name="username"/>
 
-		<id-field/>
-		<parent-field/>
+				<text-field
+					name="password"/>
 
-		<text-field
-			name="url"/>
+				<text-field
+					name="servType"/>
 
-		<text-field
-			name="username"/>
+			</columns>
 
-		<text-field
-			name="password"/>
+		</form>
 
-		<text-field
-			name="servType"/>
+		<form
+			name="summary"
+			object-type="mediaburst-proteus-route-out"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="settings"
-		object-name="mediaburstProteusRouteOut">
+				<id-field/>
+				<parent-field/>
 
-		<parent-field/>
+				<text-field
+					name="url"/>
 
-		<text-field
-			name="url"/>
+				<text-field
+					name="username"/>
 
-		<text-field
-			name="username"/>
+				<text-field
+					name="password"/>
 
-		<text-field
-			name="password"/>
+				<text-field
+					name="servType"/>
 
-		<text-field
-			name="servType"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="mediaburst-proteus-route-out"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+
+				<text-field
+					name="url"/>
+
+				<text-field
+					name="username"/>
+
+				<text-field
+					name="password"/>
+
+				<text-field
+					name="servType"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

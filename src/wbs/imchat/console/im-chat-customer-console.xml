@@ -33,8 +33,9 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"
+				search-class="wbs.imchat.model.ImChatCustomerSearch"
+				search-form="search"
+				results-form="results"
 				priv-key="imChat.manage"
 				parent-id-key="imChatId"
 				parent-id-name="imChatId"/>
@@ -44,14 +45,14 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
 				label="Settings">
 
 				<object-settings-page
-					fields="settings"
+					form="settings"
 					short-name="general"/>
 
 				<context-tab-action-page
@@ -88,119 +89,121 @@
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.imchat.model.ImChatCustomerSearch">
-
-		<text-field
-			name="code"
-			nullable="yes"/>
-
-		<text-field
-			name="email"
-			nullable="yes"/>
-
-		<interval-field
-			name="firstSession"
-			nullable="yes"/>
-
-		<interval-field
-			name="lastSession"
-			nullable="yes"/>
-
-		<enum-field
-			name="order"/>
-
-	</field-set>
-
-	<field-set
-		name="results"
-		object-name="imChatCustomer">
-
-		<code-field/>
-
-		<text-field
-			name="email"/>
-
-		<integer-field
-			name="numConversations"
-			label="Convs"/>
-
-		<integer-field
-			name="numPurchases"
-			label="Purchs"/>
-
-		<currency-field
-			name="balance"
-			currency="imChat.creditCurrency"/>
-
-		<currency-field
-			name="totalSpend"
-			label="Spend"
-			currency="imChat.creditCurrency"/>
-
-		<currency-field
-			name="totalPurchasePrice"
-			label="Purchase"
-			currency="imChat.billingCurrency"/>
-
-		<timestamp-field
-			name="lastSession"/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="imChatCustomer">
-
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-
-		<text-field
-			name="email"
-			view-priv="imChat:supervisor"/>
-
-		<integer-field
-			name="numConversations"/>
-
-		<integer-field
-			name="numPurchases"/>
-
-		<currency-field
-			name="balance"
-			currency="imChat.creditCurrency"/>
-
-		<text-area-field
-			name="notesText"
-			label="Notes"/>
-
-		<yes-no-field
-			name="developerMode"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="imChatCustomer">
-
-		<text-area-field
-			name="notesText"
-			label="Notes"/>
-
-		<yes-no-field
-			name="developerMode"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="search"
+			class="wbs.imchat.model.ImChatCustomerSearch"
+			type="search">
+
+			<columns>
+
+				<text-field
+					name="code"
+					nullable="yes"/>
+
+				<text-field
+					name="email"
+					nullable="yes"/>
+
+				<interval-field
+					name="firstSession"
+					nullable="yes"/>
+
+				<interval-field
+					name="lastSession"
+					nullable="yes"/>
+
+				<enum-field
+					name="order"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="results"
+			object-type="im-chat-customer"
+			type="read-only">
+
+			<columns>
+
+				<code-field/>
+
+				<text-field
+					name="email"/>
+
+				<integer-field
+					name="numConversations"
+					label="Convs"/>
+
+				<integer-field
+					name="numPurchases"
+					label="Purchs"/>
+
+				<currency-field
+					name="balance"
+					currency="imChat.creditCurrency"/>
+
+				<currency-field
+					name="totalSpend"
+					label="Spend"
+					currency="imChat.creditCurrency"/>
+
+				<currency-field
+					name="totalPurchasePrice"
+					label="Purchase"
+					currency="imChat.billingCurrency"/>
+
+				<timestamp-field
+					name="lastSession"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="im-chat-customer"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+
+				<text-field
+					name="email"
+					view-priv="imChat:supervisor"/>
+
+				<integer-field
+					name="numConversations"/>
+
+				<integer-field
+					name="numPurchases"/>
+
+				<currency-field
+					name="balance"
+					currency="imChat.creditCurrency"/>
+
+				<text-area-field
+					name="notesText"
+					label="Notes"/>
+
+				<yes-no-field
+					name="developerMode"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="credit-action"
 			class="wbs.imchat.console.ImChatCustomerCreditRequest"
 			type="perform">
 
-			<column-fields>
+			<columns>
 
 				<currency-field
 					name="creditAmount"
@@ -213,7 +216,7 @@
 				<text-field
 					name="reason"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -222,7 +225,7 @@
 			object-type="im-chat-customer"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<code-field/>
 
@@ -239,7 +242,7 @@
 					name="balance"
 					currency="imChat.creditCurrency"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -248,7 +251,7 @@
 			object-type="im-chat-customer-credit"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<timestamp-field
 					name="timestamp"/>
@@ -275,7 +278,25 @@
 					label="Bill"
 					currency="imChatCustomer.imChat.billingCurrency"/>
 
-			</column-fields>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="im-chat-customer"
+			type="update">
+
+			<columns>
+
+				<text-area-field
+					name="notesText"
+					label="Notes"/>
+
+				<yes-no-field
+					name="developerMode"/>
+
+			</columns>
 
 		</form>
 

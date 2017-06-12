@@ -11,7 +11,6 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.forms.core.ConsoleFormsSpec;
-import wbs.console.forms.core.FormFieldSetSpec;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.helper.provider.ConsoleHelperProviderSpec;
 
@@ -114,13 +113,6 @@ class ConsoleModuleBuilder
 			) {
 
 				doNothing ();
-
-			} else if (
-				childObject instanceof FormFieldSetSpec
-			) {
-
-				firstPass.add (
-					childObject);
 
 			} else {
 

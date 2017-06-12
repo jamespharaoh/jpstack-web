@@ -13,8 +13,8 @@
 			tab-label="Recent users"
 			object-type="chatUser"
 			search-class="wbs.apn.chat.user.core.model.ChatUserSearch"
-			search-fields="recent-user-search"
-			results-column-fields="recent-user-results"/>
+			search-form="recent-user-search"
+			results-form="recent-user-results"/>
 
 		<extension-point
 			name="chatReport.graphs"/>
@@ -24,203 +24,98 @@
 
 	</simple-context>
 
-	<simple-context
-		name="chatSharedReport">
-
-		<object-search-page
-			name="adminCredit"
-			tab-label="Admin credit"
-			object-type="chatUserCredit"
-			search-class="wbs.apn.chat.bill.model.ChatUserCreditSearch"
-			search-fields="admin-credit-search"
-			results-column-fields="admin-credit-results"/>
-
-		<object-search-page
-			name="alarms"
-			tab-label="Alarms"
-			object-type="chatUserInitiationLog"
-			search-class="wbs.apn.chat.contact.model.ChatUserInitiationLogSearch"
-			search-fields="initiation-log-search"
-			results-column-fields="initiation-log-results"/>
-
-	</simple-context>
-
-	<field-set
-		name="recent-user-search"
-		class="wbs.apn.chat.user.core.model.ChatUserSearch">
-
-		<enum-field
-			name="type"
-			hidden="yes"
-			implicit="user"/>
-
-		<interval-field
-			name="lastJoin"
-			nullable="yes"/>
-
-		<enum-field
-			name="gender"
-			nullable="yes"/>
-
-		<enum-field
-			name="orient"
-			nullable="yes"/>
-
-		<yes-no-field
-			name="blockAll"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="recent-user-results"
-		object-name="chatUser">
-
-		<code-field/>
-
-		<text-field
-			name="number"
-			field="number.number"
-			label="Number"/>
-
-		<enum-field
-			name="gender"/>
-
-		<enum-field
-			name="orient"/>
-
-		<yes-no-field
-			name="adultVerified"/>
-
-		<image-field
-			name="image"
-			field="mainChatUserImage.media"/>
-
-		<currency-field
-			name="creditBought"
-			currency="chat.currency"/>
-
-		<currency-field
-			name="credit"
-			currency="chat.currency"/>
-
-		<text-field
-			name="locationPlace"/>
-
-		<object-field
-			name="chatAffiliate"
-			object-type="chatAffiliate"
-			root-field="chat"/>
-
-	</field-set>
-
-	<field-set
-		name="admin-credit-search"
-		class="wbs.apn.chat.bill.model.ChatUserCreditSearch">
-
-		<interval-field
-			name="timestamp"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="admin-credit-results"
-		object-name="chatUserCredit">
-
-		<object-field
-			name="chat"
-			field="chatUser.chat"
-			object-type="chat"/>
-
-		<text-field
-			name="chatUserCode"
-			field="chatUser.code"
-			label="User"/>
-
-		<timestamp-field
-			name="timestamp"/>
-
-		<currency-field
-			name="creditAmount"
-			currency="chatUser.chat.currency"/>
-
-		<currency-field
-			name="billAmount"
-			currency="chatUser.chat.currency"/>
-
-		<text-field
-			name="details"/>
-
-		<object-field
-			name="user"
-			object-type="user"/>
-
-	</field-set>
-
-	<field-set
-		name="initiation-log-search"
-		class="wbs.apn.chat.contact.model.ChatUserInitiationLogSearch">
-
-		<interval-field
-			name="timestamp"
-			nullable="yes"/>
-
-		<enum-field
-			name="reason"
-			nullable="yes"/>
-
-		<object-field
-			name="monitorUserId"
-			label="User"
-			object-type="user"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="initiation-log-results"
-		object-name="chatUserInitiationLog">
-
-		<timestamp-field
-			name="timestamp"/>
-
-		<object-field
-			name="chatUser"
-			label="Chat user"
-			object-type="chatUser"/>
-
-		<object-field
-			name="monitorChatUser"
-			label="Monitor"
-			object-type="chatUser"/>
-
-		<object-field
-			name="monitorUser"
-			label="User"
-			object-type="user"/>
-
-		<timestamp-field
-			name="alarmTime"/>
-
-		<enum-field
-			name="reason"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="recent-user-search"
+			class="wbs.apn.chat.user.core.model.ChatUserSearch"
+			type="search">
+
+			<columns>
+
+				<enum-field
+					name="type"
+					hidden="yes"
+					implicit="user"/>
+
+				<interval-field
+					name="lastJoin"
+					nullable="yes"/>
+
+				<enum-field
+					name="gender"
+					nullable="yes"/>
+
+				<enum-field
+					name="orient"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="blockAll"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="recent-user-results"
+			object-type="chat-user"
+			type="read-only">
+
+			<columns>
+
+				<code-field/>
+
+				<text-field
+					name="number"
+					field="number.number"
+					label="Number"/>
+
+				<enum-field
+					name="gender"/>
+
+				<enum-field
+					name="orient"/>
+
+				<yes-no-field
+					name="adultVerified"/>
+
+				<image-field
+					name="image"
+					field="mainChatUserImage.media"/>
+
+				<currency-field
+					name="creditBought"
+					currency="chat.currency"/>
+
+				<currency-field
+					name="credit"
+					currency="chat.currency"/>
+
+				<text-field
+					name="locationPlace"/>
+
+				<object-field
+					name="chatAffiliate"
+					object-type="chatAffiliate"
+					root-field="chat"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="rev-share-search"
 			class="wbs.apn.chat.report.console.ChatReportRevShareForm"
 			type="search">
 
-			<column-fields>
+			<columns>
 
 				<text-field
 					name="month"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -229,7 +124,7 @@
 			class="wbs.apn.chat.report.console.ChatReportRevShareItem"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<text-field
 					name="path"
@@ -294,7 +189,7 @@
 					label="Total"
 					currency="currency"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

@@ -3,13 +3,17 @@ package wbs.apn.chat.user.core.console;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -24,7 +28,7 @@ import wbs.platform.user.model.UserObjectHelper;
 
 import wbs.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserNotesAction")
 public
@@ -60,15 +64,20 @@ class ChatUserNotesAction
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserNotesResponder")
+	Provider <WebResponder> notesResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatUserNotesResponder");
+		return notesResponderProvider.get ();
 
 	}
 
@@ -76,7 +85,7 @@ class ChatUserNotesAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

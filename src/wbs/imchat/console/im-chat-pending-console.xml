@@ -3,7 +3,7 @@
 
 	<object-context
 		name="imChat.pending"
-		bean-name="imChatPending"
+		component-name="imChatPending"
 		object-name="imChatMessage">
 
 		<object>
@@ -28,7 +28,7 @@
 			object-type="im-chat-customer"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="imChat"
@@ -47,7 +47,7 @@
 					name="balance"
 					currency="imChat.creditCurrency"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -56,7 +56,7 @@
 			object-type="im-chat-profile"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="profile"
@@ -76,7 +76,7 @@
 					name="profileImage"
 					show-filename="no"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -85,7 +85,7 @@
 			object-type="im-chat-message"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="senderUser"
@@ -103,7 +103,7 @@
 					name="price"
 					currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

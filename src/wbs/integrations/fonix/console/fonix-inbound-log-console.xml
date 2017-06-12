@@ -22,89 +22,109 @@
 		<list>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"/>
+				search-class="wbs.integrations.fonix.model.FonixInboundLogSearch"
+				search-form="search"
+				results-form="results"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.integrations.fonix.model.FonixInboundLogSearch">
+	<forms>
 
-		<object-field
-			name="routeId"
-			label="Route"
-			object-type="route"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.integrations.fonix.model.FonixInboundLogSearch"
+			type="search">
 
-		<interval-field
-			name="timestamp"
-			nullable="yes"/>
+			<columns>
 
-		<text-field
-			name="details"
-			nullable="yes"/>
+				<object-field
+					name="routeId"
+					label="Route"
+					object-type="route"
+					nullable="yes"/>
 
-		<enum-field
-			name="type"
-			nullable="yes"/>
+				<interval-field
+					name="timestamp"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="success"
-			nullable="yes"/>
+				<text-field
+					name="details"
+					nullable="yes"/>
 
-	</field-set>
+				<enum-field
+					name="type"
+					nullable="yes"/>
 
-	<field-set
-		name="results"
-		object-name="fonixInboundLog">
+				<yes-no-field
+					name="success"
+					nullable="yes"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+		</form>
 
-		<enum-field
-			name="type"/>
+		<form
+			name="results"
+			object-type="fonix-inbound-log"
+			type="read-only">
 
-		<yes-no-field
-			name="success"/>
+			<columns>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
 
-	<field-set
-		name="summary"
-		object-name="fonixInboundLog">
+				<object-field
+					name="route"
+					object-type="route"/>
 
-		<id-field/>
+				<enum-field
+					name="type"/>
 
-		<timestamp-field
-			name="timestamp"/>
+				<yes-no-field
+					name="success"/>
 
-		<object-field
-			name="route"
-			object-type="route"/>
+			</columns>
+n
+		</form>
 
-		<enum-field
-			name="type"/>
+		<form
+			name="summary"
+			object-type="fonix-inbound-log"
+			type="read-only">
 
-		<yes-no-field
-			name="success"/>
+			<columns>
 
-		<text-area-field
-			name="details"/>
+				<id-field/>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
+
+				<object-field
+					name="route"
+					object-type="route"/>
+
+				<enum-field
+					name="type"/>
+
+				<yes-no-field
+					name="success"/>
+
+				<text-area-field
+					name="details"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

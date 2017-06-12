@@ -9,6 +9,8 @@ public
 class SimpleConsoleBuilderContainerImplementation
 	implements SimpleConsoleBuilderContainer {
 
+	ConsoleModuleSpec consoleModule;
+
 	String newBeanNamePrefix;
 	String existingBeanNamePrefix;
 

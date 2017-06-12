@@ -4,13 +4,15 @@ import wbs.framework.database.Transaction;
 
 import wbs.platform.rpc.core.RpcSource;
 
+import wbs.sms.message.core.model.MessageStatus;
+
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 import wbs.web.context.RequestContext;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 public
 interface ForwarderApiLogic {
@@ -25,17 +27,17 @@ interface ForwarderApiLogic {
 			ForwarderNotFoundException,
 			IncorrectPasswordException;
 
-	Responder controlActionGet (
+	WebResponder controlActionGet (
 			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder);
 
-	Responder controlActionBorrow (
+	WebResponder controlActionBorrow (
 			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder);
 
-	Responder controlActionUnqueue (
+	WebResponder controlActionUnqueue (
 			Transaction parentTransaction,
 			RequestContext requestContext,
 			ForwarderRec forwarder)
@@ -44,5 +46,8 @@ interface ForwarderApiLogic {
 	ForwarderRec rpcAuth (
 			Transaction parentTransaction,
 			RpcSource source);
+
+	ForwarderMessageStatus messageStatusMap (
+			MessageStatus messageStatus);
 
 }

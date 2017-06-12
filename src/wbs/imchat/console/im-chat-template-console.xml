@@ -29,20 +29,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -50,59 +50,83 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatTemplate">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="im-chat-template"
+			type="read-only">
 
-		<text-field
-			name="text"/>
+			<columns>
 
-	</field-set>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="create"
-		object-name="imChatTemplate">
+				<text-field
+					name="text"/>
 
-		<name-field/>
-		<description-field/>
+			</columns>
 
-		<text-field
-			name="text"/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="im-chat-template"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="imChatTemplate">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<name-field/>
+				<description-field/>
 
-		<text-area-field
-			name="text"/>
+				<text-field
+					name="text"/>
 
-	</field-set>
+			</columns>
 
-	<field-set
-		name="settings"
-		object-name="imChatTemplate">
+		</form>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+		<form
+			name="summary"
+			object-type="im-chat-template"
+			type="read-only">
 
-		<text-area-field
-			name="text"/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="im-chat-template"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-area-field
+					name="text"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

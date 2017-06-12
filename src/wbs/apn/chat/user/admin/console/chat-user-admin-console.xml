@@ -5,7 +5,9 @@
 		name="chatUser.admin"
 		base-name="chatUser"
 		extension-point="chatUser.admin"
-		object-name="chatUser">
+		object-name="chatUser"
+		component-name="chatUser"
+		friendly-name="chat user">
 
 		<section
 			name="admin"
@@ -51,7 +53,7 @@
 
 			<object-settings-page
 				short-name="other"
-				fields="settings"
+				form="settings"
 				priv-key="chat.userAdmin"/>
 
 			<context-tab-action-page
@@ -73,30 +75,6 @@
 
 	</extend-context>
 
-	<field-set
-		name="settings"
-		object-name="chatUser">
-
-		<yes-no-field
-			name="hiddenFromChatTube"/>
-
-		<yes-no-field
-			name="stealthMonitor"/>
-
-		<enum-field
-			name="imageMode"
-			nullable="yes"/>
-
-		<yes-no-field
-			name="broadcastOptOut"/>
-
-		<object-field
-			name="category"
-			object-type="chatCategory"
-			nullable="yes"/>
-
-	</field-set>
-
 	<forms>
 
 		<form
@@ -104,7 +82,7 @@
 			class="wbs.apn.chat.user.admin.console.ChatUserAdminCreditForm"
 			type="perform">
 
-			<column-fields>
+			<columns>
 
 				<currency-field
 					name="currentCredit"
@@ -123,7 +101,7 @@
 					name="details"
 					minimum-length="1"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -132,7 +110,7 @@
 			object-type="chat-user-credit"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<id-field
 					label="Ref"/>
@@ -157,7 +135,7 @@
 					name="user"
 					object-type="user"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 
@@ -166,7 +144,7 @@
 			class="wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper$ChatUserAdminLocationForm"
 			type="perform">
 
-			<column-fields>
+			<columns>
 
 				<text-field
 					name="currentLocationName"
@@ -184,7 +162,36 @@
 					name="newLocationName"
 					nullable="yes"/>
 
-			</column-fields>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-user"
+			type="update">
+
+			<columns>
+
+				<yes-no-field
+					name="hiddenFromChatTube"/>
+
+				<yes-no-field
+					name="stealthMonitor"/>
+
+				<enum-field
+					name="imageMode"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="broadcastOptOut"/>
+
+				<object-field
+					name="category"
+					object-type="chatCategory"
+					nullable="yes"/>
+
+			</columns>
 
 		</form>
 

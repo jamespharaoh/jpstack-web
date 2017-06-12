@@ -44,9 +44,6 @@ class ConsoleFormTypeFactory <Container>
 	// properties
 
 	@Getter @Setter
-	String consoleModuleName;
-
-	@Getter @Setter
 	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter

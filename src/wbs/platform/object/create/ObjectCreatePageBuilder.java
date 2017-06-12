@@ -1,10 +1,6 @@
 package wbs.platform.object.create;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -25,12 +21,10 @@ import wbs.console.forms.object.CodeFormFieldSpec;
 import wbs.console.forms.object.DescriptionFormFieldSpec;
 import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.forms.object.ParentFormFieldSpec;
-import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -45,13 +39,13 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("objectCreatePageBuilder")
 public
@@ -117,9 +111,7 @@ class ObjectCreatePageBuilder <
 	String tabName;
 	String tabLabel;
 	String localFile;
-	String responderName;
 	String targetContextTypeName;
-	String targetResponderName;
 	//FieldsProvider <ObjectType, ParentType> fieldsProvider;
 	ConsoleFormType <ObjectType> formType;
 	String createTimeFieldName;
@@ -127,6 +119,9 @@ class ObjectCreatePageBuilder <
 	String createPrivDelegate;
 	String createPrivCode;
 	String privKey;
+
+	Provider <WebResponder> responderProvider;
+	Provider <WebResponder> targetResponderProvider;
 
 	// build
 
@@ -150,21 +145,20 @@ class ObjectCreatePageBuilder <
 				taskLogger);
 
 			for (
-				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+				ResolvedConsoleContextExtensionPoint extensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
 						container.extensionPointName ())
 			) {
 
 				buildTab (
 					taskLogger,
-					resolvedExtensionPoint);
+					extensionPoint);
 
 				buildFile (
-					resolvedExtensionPoint);
+					taskLogger,
+					extensionPoint);
 
 			}
-
-			buildResponder ();
 
 		}
 
@@ -208,107 +202,69 @@ class ObjectCreatePageBuilder <
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		Provider <Action> createActionProvider =
-			() -> objectCreateActionProvider.get ()
+		try (
 
-			.consoleHelper (
-				consoleHelper)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-			.typeCode (
-				typeCode)
+		) {
 
-			.responderName (
-				responderName)
+			Provider <WebAction> createActionProvider =
+				() -> objectCreateActionProvider.get ()
 
-			.targetContextTypeName (
-				targetContextTypeName)
+				.consoleHelper (
+					consoleHelper)
 
-			.targetResponderName (
-				targetResponderName)
+				.typeCode (
+					typeCode)
 
-			.createPrivDelegate (
-				createPrivDelegate)
+				.responderProvider (
+					responderProvider)
 
-			.createPrivCode (
-				createPrivCode)
+				.targetContextTypeName (
+					targetContextTypeName)
 
-			.formType (
-				formType)
+				.targetResponderProvider (
+					targetResponderProvider)
 
-			.createTimeFieldName (
-				createTimeFieldName)
+				.createPrivDelegate (
+					createPrivDelegate)
 
-			.createUserFieldName (
-				createUserFieldName);
+				.createPrivCode (
+					createPrivCode)
 
-		consoleModule.addContextFile (
+				.formType (
+					formType)
 
-			localFile,
+				.createTimeFieldName (
+					createTimeFieldName)
 
-			consoleFileProvider.get ()
+				.createUserFieldName (
+					createUserFieldName);
 
-				.getResponderName (
-					responderName)
+			consoleModule.addContextFile (
 
-				.postActionProvider (
-					createActionProvider)
+				localFile,
 
-				/*.privKeys (
-					Collections.singletonList (privKey)*/,
+				consoleFileProvider.get ()
 
-			resolvedExtensionPoint.contextTypeNames ());
+					.getResponderProvider (
+						responderProvider)
 
-	}
+					.postActionProvider (
+						createActionProvider)
 
-	void buildResponder () {
+					/*.privKeys (
+						Collections.singletonList (privKey)*/,
 
-		PagePartFactory partFactory =
-			parentTransaction -> {
+				extensionPoint.contextTypeNames ());
 
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"buildResponder");
-
-			) {
-
-				return objectCreatePartProvider.get ()
-
-					.consoleHelper (
-						consoleHelper)
-
-					.formType (
-						formType)
-
-					.parentPrivCode (
-						createPrivCode)
-
-					.localFile (
-						localFile);
-
-			}
-
-		};
-
-		consoleModule.addResponder (
-
-			responderName,
-
-			tabContextResponderProvider.get ()
-
-				.tab (
-					tabName)
-
-				.title (
-					capitalise (
-						consoleHelper.friendlyName () + " create"))
-
-				.pagePartFactory (
-					partFactory));
+		}
 
 	}
 
@@ -355,26 +311,32 @@ class ObjectCreatePageBuilder <
 						container.pathPrefix (),
 						name));
 
-			responderName =
-				ifNull (
-					spec.responderName (),
-					stringFormat (
-						"%s%sResponder",
-						container.newBeanNamePrefix (),
-						capitalise (
-							name)));
+			responderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					ifNull (
+						spec.responderName (),
+						stringFormat (
+							"%s%sResponder",
+							container.newBeanNamePrefix (),
+							capitalise (
+								name))),
+					WebResponder.class);
 
 			targetContextTypeName =
 				ifNull (
 					spec.targetContextTypeName (),
 					consoleHelper.objectName () + ":combo");
 
-			targetResponderName =
-				ifNull (
-					spec.targetResponderName (),
-					stringFormat (
-						"%sSettingsResponder",
-						consoleHelper.objectName ()));
+			targetResponderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					ifNull (
+						spec.targetResponderName (),
+						stringFormat (
+							"%sSettingsResponder",
+							consoleHelper.objectName ())),
+					WebResponder.class);
 
 			createPrivDelegate =
 				spec.createPrivDelegate ();
@@ -385,48 +347,6 @@ class ObjectCreatePageBuilder <
 					stringFormat (
 						"%s_create",
 						consoleHelper.objectTypeCode ()));
-
-			formType =
-				genericCastUnchecked (
-					ifNotNullThenElse (
-						spec.formFieldsName,
-						() -> formContextManager.createFormType (
-							taskLogger,
-							consoleModule,
-							name,
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.create,
-							optionalOf (
-								spec.formFieldsName ()),
-							optionalAbsent ()),
-						() -> formContextManager.createFormType (
-							taskLogger,
-							name,
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.create,
-							optionalOf (
-								defaultFields (
-									taskLogger)),
-							optionalAbsent ())));
-
-			// if a provider name is provided
-
-			/*
-			if (spec.fieldsProviderName () != null) {
-
-				fieldsProvider =
-					genericCastUnchecked (
-						componentManager.getComponentRequired (
-							taskLogger,
-							spec.fieldsProviderName (),
-							FieldsProvider.class));
-
-			}
-			*/
 
 			createTimeFieldName =
 				spec.createTimeFieldName ();

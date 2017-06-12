@@ -35,6 +35,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.web.responder.WebResponder;
+
 @PrototypeComponent ("objectPrivsPageBuilder")
 public
 class ObjectPrivsPageBuilder <
@@ -82,7 +84,8 @@ class ObjectPrivsPageBuilder <
 	String tabName;
 	String tabLabel;
 	String fileName;
-	String responderName;
+
+	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -170,25 +173,34 @@ class ObjectPrivsPageBuilder <
 
 	void buildContextFile (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ResolvedConsoleContextExtensionPoint
-				resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
+		try (
 
-			fileName,
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextFile");
 
-			consoleFile.get ()
+		) {
 
-				.getResponderName (
-					responderName)
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
 
-				.privKeys (
-					ImmutableList.of (
-						stringFormat (
-							"%s.manage",
-							consoleHelper.objectName ()))),
+					.getResponderProvider (
+						responderProvider)
 
-			resolvedExtensionPoint.contextTypeNames ());
+					.privKeys (
+						ImmutableList.of (
+							stringFormat (
+								"%s.manage",
+								consoleHelper.objectName ()))),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
@@ -204,9 +216,8 @@ class ObjectPrivsPageBuilder <
 
 		;
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
+		responderProvider =
+			() -> tabContextResponder.get ()
 
 			.tab (
 				tabName)
@@ -220,7 +231,7 @@ class ObjectPrivsPageBuilder <
 			.pagePartFactory (
 				privsPartFactory)
 
-		);
+		;
 
 	}
 
@@ -255,14 +266,6 @@ class ObjectPrivsPageBuilder <
 					"%s.%s",
 					container.pathPrefix (),
 					name));
-
-		responderName =
-			stringFormat (
-				"%s%sResponder",
-				container.newBeanNamePrefix (),
-				capitalise (
-					name));
-
 
 	}
 

@@ -46,7 +46,7 @@ class ConsoleFormActionPart <FormState, History>
 	ConsoleFormActionHelper <FormState, History> helper;
 
 	@Getter @Setter
-	ConsoleFormType <FormState> actionFormContextBuilder;
+	ConsoleFormType <FormState> actionFormType;
 
 	@Getter @Setter
 	String name;
@@ -67,12 +67,12 @@ class ConsoleFormActionPart <FormState, History>
 	String historyHeading;
 
 	@Getter @Setter
-	ConsoleFormType <History> historyFormContextBuilder;
+	ConsoleFormType <History> historyFormType;
 
 	// state
 
-	ConsoleForm <FormState> actionFormContext;
-	ConsoleForm <History> historyFormContext;
+	ConsoleForm <FormState> actionForm;
+	ConsoleForm <History> historyForm;
 
 	List <History> history;
 
@@ -106,8 +106,8 @@ class ConsoleFormActionPart <FormState, History>
 				transaction,
 				formState);
 
-			actionFormContext =
-				actionFormContextBuilder.buildResponse (
+			actionForm =
+				actionFormType.buildResponse (
 					transaction,
 					formHints,
 					formState);
@@ -116,11 +116,11 @@ class ConsoleFormActionPart <FormState, History>
 
 			if (
 				isNotNull (
-					historyFormContextBuilder)
+					historyFormType)
 			) {
 
-				historyFormContext =
-					historyFormContextBuilder.buildResponse (
+				historyForm =
+					historyFormType.buildResponse (
 						transaction,
 						formHints,
 						helper.history (
@@ -181,7 +181,7 @@ class ConsoleFormActionPart <FormState, History>
 					submitLabel)
 			) {
 
-				actionFormContext.outputFormTable (
+				actionForm.outputFormTable (
 					transaction,
 					formatWriter,
 					"post",
@@ -195,14 +195,14 @@ class ConsoleFormActionPart <FormState, History>
 
 			if (
 				isNotNull (
-					historyFormContext)
+					historyForm)
 			) {
 
 				htmlHeadingTwoWrite (
 					formatWriter,
 					historyHeading);
 
-				historyFormContext.outputListTable (
+				historyForm.outputListTable (
 					transaction,
 					formatWriter,
 					true);

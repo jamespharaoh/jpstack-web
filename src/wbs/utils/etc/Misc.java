@@ -728,6 +728,15 @@ class Misc {
 	}
 
 	public static
+	long minus (
+			long left,
+			long right) {
+
+		return left - right;
+
+	}
+
+	public static
 	long sum (
 			long value0,
 			long value1,

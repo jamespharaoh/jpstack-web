@@ -8,7 +8,9 @@
 		name="chat.broadcast"
 		base-name="chat"
 		extension-point="chat.broadcast"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<section
 			name="broadcast"
@@ -129,7 +131,7 @@
 			object-type="chat-user"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="number"
@@ -162,7 +164,7 @@
 					name="adultVerified"
 					label="Adult"/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

@@ -44,6 +44,14 @@ class ExtendContextSpec
 	@DataAttribute
 	String objectName;
 
+	@DataAttribute (
+		required = true)
+	String componentName;
+
+	@DataAttribute (
+		required = true)
+	String friendlyName;
+
 	// children
 
 	@DataChildren (

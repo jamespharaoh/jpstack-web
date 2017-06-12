@@ -2,8 +2,6 @@ package wbs.console.module;
 
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import wbs.console.context.ConsoleContext;
@@ -14,8 +12,6 @@ import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.web.responder.Responder;
 
 public
 interface ConsoleManager {
@@ -34,10 +30,6 @@ interface ConsoleManager {
 			boolean required);
 
 	ConsoleContextTab tab (
-			String name,
-			boolean required);
-
-	Provider <Responder> responder (
 			String name,
 			boolean required);
 

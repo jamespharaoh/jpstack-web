@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.anyIsNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.hyphenToSpaces;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
@@ -19,7 +17,6 @@ import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -38,7 +35,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("contextTabFormActionPageBuilder")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -95,18 +93,17 @@ class ContextTabFormActionPageBuilder
 	String tabName;
 	String tabLabel;
 	String localFile;
-	String responderName;
 	String actionName;
 	String title;
 	String pagePartName;
 
+	Provider <WebResponder> responderProvider;
 	Provider <ConsoleFormActionHelper> formActionHelperProvider;
 
 	ConsoleFormType <?> actionFormType;
 	ConsoleFormType <?> historyFormType;
 
-	PagePartFactory pagePartFactory;
-	Provider <Action> actionProvider;
+	Provider <WebAction> actionProvider;
 
 	// build
 
@@ -126,7 +123,8 @@ class ContextTabFormActionPageBuilder
 
 		) {
 
-			setDefaults ();
+			setDefaults (
+				taskLogger);
 
 			initFormFields (
 				taskLogger);
@@ -134,11 +132,7 @@ class ContextTabFormActionPageBuilder
 			initFormActionHelper (
 				taskLogger);
 
-			buildPagePartFactory ();
 			buildAction ();
-
-			buildResponder (
-				taskLogger);
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -151,6 +145,7 @@ class ContextTabFormActionPageBuilder
 					resolvedExtensionPoint);
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
@@ -254,47 +249,6 @@ class ContextTabFormActionPageBuilder
 
 	}
 
-	void buildPagePartFactory () {
-
-		pagePartFactory =
-			parentTaskLogger ->
-				consoleFormActionPartProvider.get ()
-
-			.name (
-				"action")
-
-			.heading (
-				capitalise (
-					joinWithSpace (
-						hyphenToSpaces (
-							consoleModule.name ()),
-						spec.name ())))
-
-			.helper (
-				formActionHelperProvider.get ())
-
-			.actionFormContextBuilder (
-				actionFormType)
-
-			.helpText (
-				spec.helpText ())
-
-			.submitLabel (
-				spec.submitLabel ())
-
-			.localFile (
-				"/" + localFile)
-
-			.historyHeading (
-				spec.historyHeading ())
-
-			.historyFormContextBuilder (
-				historyFormType)
-
-		;
-
-	}
-
 	void buildAction () {
 
 		actionProvider =
@@ -309,103 +263,110 @@ class ContextTabFormActionPageBuilder
 			.formActionHelper (
 				formActionHelperProvider.get ())
 
-			.responderName (
-				responderName);
+			.responderProvider (
+				responderProvider);
 
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint
-				resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			localFile,
-			consoleFileProvider.get ()
+		try (
 
-				.getResponderName (
-					responderName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-				.postActionProvider (
-					actionProvider),
+		) {
 
-			resolvedExtensionPoint.contextTypeNames ());
+			consoleModule.addContextFile (
+				localFile,
+				consoleFileProvider.get ()
 
-	}
+					.getResponderProvider (
+						responderProvider)
 
-	void buildResponder (
-			@NonNull TaskLogger parentTaskLogger) {
+					.postActionProvider (
+						actionProvider),
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponderProvider.get ()
+				extensionPoint.contextTypeNames ()
+			);
 
-				.tab (
-					tabName)
-
-				.title (
-					title)
-
-				.pagePartFactory (
-					pagePartFactory)
-
-		);
+		}
 
 	}
 
 	// defaults
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		name =
-			spec.name ();
+		try (
 
-		helperBeanName =
-			stringFormat (
-				"%s%sFormActionHelper",
-				container.newBeanNamePrefix (),
-				capitalise (
-					ifNull (
-						spec.helperName (),
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setDefaults");
 
-		tabName =
-			stringFormat (
-				"%s.%s",
-				container.pathPrefix (),
-				name);
+		) {
 
-		tabLabel =
-			capitalise (
-				camelToSpaces (
-					name));
+			name =
+				spec.name ();
 
-		localFile =
-			stringFormat (
-				"%s.%s",
-				container.pathPrefix (),
-				name);
-
-		responderName =
-			stringFormat (
-				"%s%sFormResponder",
-				container.newBeanNamePrefix (),
-				capitalise (
-					name));
-
-		actionName =
-			stringFormat (
-				"%s%sFormAction",
-				container.existingBeanNamePrefix (),
-				capitalise (
-					name));
-
-		title =
-			capitalise (
+			helperBeanName =
 				stringFormat (
-					"%s %s",
-					container.friendlyName (),
+					"%s%sFormActionHelper",
+					container.newBeanNamePrefix (),
+					capitalise (
+						ifNull (
+							spec.helperName (),
+							name)));
+
+			tabName =
+				stringFormat (
+					"%s.%s",
+					container.pathPrefix (),
+					name);
+
+			tabLabel =
+				capitalise (
 					camelToSpaces (
-						name)));
+						name));
+
+			localFile =
+				stringFormat (
+					"%s.%s",
+					container.pathPrefix (),
+					name);
+
+			responderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					stringFormat (
+						"%s%sFormResponder",
+						container.newBeanNamePrefix (),
+						capitalise (
+							name)),
+					WebResponder.class);
+
+			actionName =
+				stringFormat (
+					"%s%sFormAction",
+					container.existingBeanNamePrefix (),
+					capitalise (
+						name));
+
+			title =
+				capitalise (
+					stringFormat (
+						"%s %s",
+						container.friendlyName (),
+						camelToSpaces (
+							name)));
+
+		}
 
 	}
 

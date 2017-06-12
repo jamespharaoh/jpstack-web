@@ -26,138 +26,163 @@
 				priv="root:manage"/>
 
 			<object-search-page
-				search-fields="search"
-				results-column-fields="results"/>
+				search-class="wbs.platform.exception.model.ExceptionLogSearch"
+				search-form="search"
+				results-form="results"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="search"
-		class="wbs.platform.exception.model.ExceptionLogSearch">
+	<forms>
 
-		<interval-field
-			name="timestamp"
-			nullable="yes"/>
+		<form
+			name="search"
+			class="wbs.platform.exception.model.ExceptionLogSearch"
+			type="search">
 
-		<object-field
-			name="typeId"
-			object-type="exceptionLogType"
-			nullable="yes"/>
+			<columns>
 
-		<object-field
-			name="userSliceId"
-			object-type="slice"
-			nullable="yes"/>
+				<interval-field
+					name="timestamp"
+					nullable="yes"/>
 
-		<object-field
-			name="userId"
-			object-type="user"
-			nullable="yes"/>
+				<object-field
+					name="typeId"
+					object-type="exceptionLogType"
+					nullable="yes"/>
 
-		<text-field
-			name="sourceContains"
-			label="Source"
-			nullable="yes"/>
+				<object-field
+					name="userSliceId"
+					object-type="slice"
+					nullable="yes"/>
 
-		<text-field
-			name="summaryContains"
-			label="Summary"
-			nullable="yes"/>
+				<object-field
+					name="userId"
+					object-type="user"
+					nullable="yes"/>
 
-		<text-field
-			name="dumpContains"
-			label="Dump"
-			nullable="yes"/>
+				<text-field
+					name="sourceContains"
+					label="Source"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="alert"
-			nullable="yes"/>
+				<text-field
+					name="summaryContains"
+					label="Summary"
+					nullable="yes"/>
 
-		<yes-no-field
-			name="fatal"
-			nullable="yes"/>
+				<text-field
+					name="dumpContains"
+					label="Dump"
+					nullable="yes"/>
 
-		<enum-field
-			name="resolution"
-			nullable="yes"/>
+				<yes-no-field
+					name="alert"
+					nullable="yes"/>
 
-	</field-set>
+				<yes-no-field
+					name="fatal"
+					nullable="yes"/>
 
-	<field-set
-		name="results"
-		object-name="exceptionLog">
+				<enum-field
+					name="resolution"
+					nullable="yes"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<object-field
-			name="type"
-			object-type="exceptionLogType"/>
+		</form>
 
-		<text-field
-			name="source"/>
+		<form
+			name="results"
+			object-type="exception-log"
+			type="read-only">
 
-		<object-field
-			name="user"
-			object-type="user"/>
+			<columns>
 
-		<yes-no-field
-			name="fatal"/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<text-area-field
-			name="summary"/>
+				<object-field
+					name="type"
+					object-type="exceptionLogType"/>
 
-	</field-set>
+				<text-field
+					name="source"/>
 
-	<field-set
-		name="summary"
-		object-name="exceptionLog">
+				<object-field
+					name="user"
+					object-type="user"/>
 
-		<id-field/>
+				<yes-no-field
+					name="fatal"/>
 
-		<object-field
-			name="type"
-			object-type="exceptionLogType"/>
+				<text-area-field
+					name="summary"/>
 
-		<timestamp-field
-			name="timestamp"/>
+			</columns>
 
-		<yes-no-field
-			name="alert"/>
+		</form>
 
-		<yes-no-field
-			name="fatal"/>
+		<form
+			name="summary"
+			object-type="exception-log"
+			type="read-only">
 
-		<text-field
-			name="source"/>
+			<columns>
 
-		<text-field
-			name="summary"/>
+				<id-field/>
 
-		<text-area-field
-			name="dump"/>
+				<object-field
+					name="type"
+					object-type="exceptionLogType"/>
 
-	</field-set>
+				<timestamp-field
+					name="timestamp"/>
 
-	<field-set
-		name="settings"
-		object-name="exceptionLog">
+				<yes-no-field
+					name="alert"/>
 
-		<yes-no-field
-			name="alert"/>
+				<yes-no-field
+					name="fatal"/>
 
-	</field-set>
+				<text-field
+					name="source"/>
+
+				<text-field
+					name="summary"/>
+
+				<text-area-field
+					name="dump"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="exception-log"
+			type="update">
+
+			<columns>
+
+				<yes-no-field
+					name="alert"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -196,7 +196,7 @@ class Rpc {
 
 	public static
 	RpcChecker.EnumRpcChecker rpcEnumChecker (
-			Map<String,?> map) {
+			Map <String, ?> map) {
 
 		return new RpcChecker.EnumRpcChecker (
 			map);

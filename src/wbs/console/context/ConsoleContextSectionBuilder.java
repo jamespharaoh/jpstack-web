@@ -128,6 +128,9 @@ class ConsoleContextSectionBuilder <
 						ObjectType
 					> ()
 
+				.consoleModule (
+					container.consoleModule ())
+
 				.consoleHelper (
 					consoleHelper)
 

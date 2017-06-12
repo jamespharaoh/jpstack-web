@@ -65,7 +65,6 @@ import wbs.web.exceptions.ExternalRedirectException;
 import wbs.web.exceptions.HttpNotFoundException;
 import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
-import wbs.web.responder.Responder;
 import wbs.web.responder.WebModule;
 
 @Accessors (fluent = true)
@@ -126,9 +125,6 @@ class ConsoleManagerImplementation
 		new HashMap<> ();
 
 	Map <String, WebFile> contextFiles =
-		new HashMap<> ();
-
-	Map <String, Provider <Responder>> responders =
 		new HashMap<> ();
 
 	Map <Pair <String, String>, List <ConsoleContext>> contextsByParentAndType =
@@ -219,9 +215,6 @@ class ConsoleManagerImplementation
 				taskLogger);
 
 			// find responders
-
-			findResponders (
-				taskLogger);
 
 			collectContextTypes (
 				taskLogger);
@@ -1024,86 +1017,6 @@ class ConsoleManagerImplementation
 
 	}
 
-	void findResponders (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"findResponders");
-
-		) {
-
-			for (
-				Map.Entry<String,ConsoleModule> consoleModuleEntry
-					: consoleModules.entrySet ()
-			) {
-
-				String consoleModuleName =
-					consoleModuleEntry.getKey ();
-
-				ConsoleModule consoleModule =
-					consoleModuleEntry.getValue ();
-
-				taskLogger.debugFormat (
-					"Collecting responders from console module %s",
-					consoleModuleName);
-
-				for (
-					Map.Entry<String,Provider<Responder>> responderEntry
-						: consoleModule.responders ().entrySet ()
-				) {
-
-					String responderName =
-						responderEntry.getKey ();
-
-					if (
-						responderName == null
-						|| responderName.isEmpty ()
-					) {
-
-						taskLogger.errorFormat (
-							"Empty repsponder name in %s",
-							consoleModuleName);
-
-						continue;
-
-					}
-
-					if (responders.containsKey (responderName)) {
-
-						taskLogger.errorFormat (
-							"Duplicate responder name: %s",
-							responderName);
-
-						continue;
-
-					}
-
-					Provider<Responder> responder =
-						responderEntry.getValue ();
-
-					if (responder == null)
-						throw new RuntimeException ();
-
-					taskLogger.debugFormat (
-						"Got reponder %s",
-						responderName);
-
-					responders.put (
-						responderName,
-						responder);
-
-				}
-
-			}
-
-		}
-
-	}
-
 	void initPaths (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -1629,29 +1542,6 @@ class ConsoleManagerImplementation
 			throw new IllegalArgumentException ();
 
 		return path.substring (0, position);
-
-	}
-
-	@Override
-	public
-	Provider<Responder> responder (
-			@NonNull String responderName,
-			boolean required) {
-
-		Provider<Responder> responder =
-			responders.get (
-				responderName);
-
-		if (responder == null && required) {
-
-			throw new IllegalArgumentException (
-				stringFormat (
-					"No such responder: %s",
-					responderName));
-
-		}
-
-		return responder;
 
 	}
 

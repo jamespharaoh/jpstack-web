@@ -26,20 +26,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -47,79 +47,103 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="fonixRouteOut">
+	<forms>
 
-		<parent-field/>
+		<form
+			name="list"
+			object-type="fonix-route-out"
+			type="read-only">
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+			<columns>
 
-		<text-field
-			name="url"/>
+				<parent-field/>
 
-		<text-field
-			name="apiKey"/>
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
 
-	</field-set>
+				<text-field
+					name="url"/>
 
-	<field-set
-		name="create"
-		object-name="fonixRouteOut">
+				<text-field
+					name="apiKey"/>
 
-		<parent-field/>
+			</columns>
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+		</form>
 
-		<text-field
-			name="url"/>
+		<form
+			name="create"
+			object-type="fonix-route-out"
+			type="create">
 
-		<text-field
-			name="apiKey"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
 
-	<field-set
-		name="summary"
-		object-name="fonixRouteOut">
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
 
-		<id-field/>
-		<parent-field/>
+				<text-field
+					name="url"/>
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+				<text-field
+					name="apiKey"/>
 
-		<text-field
-			name="url"/>
+			</columns>
 
-		<text-field
-			name="apiKey"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="fonix-route-out"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="fonixRouteOut">
+			<columns>
 
-		<object-field
-			name="fonixConfig"
-			label="Config"
-			object-type="fonixConfig"/>
+				<id-field/>
+				<parent-field/>
 
-		<text-field
-			name="url"/>
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
 
-		<text-field
-			name="apiKey"/>
+				<text-field
+					name="url"/>
 
-	</field-set>
+				<text-field
+					name="apiKey"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="fonix-route-out"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="fonixConfig"
+					label="Config"
+					object-type="fonixConfig"/>
+
+				<text-field
+					name="url"/>
+
+				<text-field
+					name="apiKey"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

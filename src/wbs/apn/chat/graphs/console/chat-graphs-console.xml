@@ -5,7 +5,9 @@
 		name="chatReport.graphs"
 		base-name="chatReport"
 		extension-point="chatReport.graphs"
-		object-name="chat">
+		object-name="chat"
+		component-name="chat"
+		friendly-name="chat">
 
 		<section
 			name="graphs"

@@ -24,7 +24,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.string.FormatWriter;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("apiDeploymentRestartFormActionHelper")
 public
@@ -130,7 +130,7 @@ class ApiDeploymentRestartFormActionHelper
 
 	@Override
 	public
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			@NonNull Transaction parentTransaction,
 			@NonNull Object formState) {
 

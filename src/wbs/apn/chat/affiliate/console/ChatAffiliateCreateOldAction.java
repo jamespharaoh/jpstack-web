@@ -6,6 +6,8 @@ import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -20,7 +22,9 @@ import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -41,7 +45,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatAffiliateCreateOldAction")
@@ -90,15 +94,24 @@ class ChatAffiliateCreateOldAction
 	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatAffiliateCreateOldResponder")
+	Provider <WebResponder> createOldResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("chatAffiliateSettingsResponder")
+	Provider <WebResponder> settingsResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"chatAffiliateCreateResponder");
+		return createOldResponderProvider.get ();
 
 	}
 
@@ -106,7 +119,7 @@ class ChatAffiliateCreateOldAction
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -380,8 +393,7 @@ class ChatAffiliateCreateOldAction
 				targetContext,
 				"/" + chatAffiliateId);
 
-			return responder (
-				"chatAffiliateSettingsResponder");
+			return settingsResponderProvider.get ();
 
 		}
 

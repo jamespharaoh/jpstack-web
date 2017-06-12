@@ -29,9 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
+				form="create"
 				target-context-type="autoResponder:combo/autoResponder.settings"
 				target-responder="autoResponderSettingsGeneralResponder"/>
 
@@ -40,7 +41,7 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<section
 				name="settings"
@@ -48,7 +49,7 @@
 
 				<object-settings-page
 					short-name="General"
-					fields="settings"/>
+					form="settings"/>
 
 				<object-sms-message-set-page
 					name="responses"
@@ -72,67 +73,101 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="autoResponder">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="auto-responder"
+			type="read-only">
 
-		<object-field
-			name="addToNumberList"
-			label="Add to"
-			object-type="numberList"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="summary"
-		object-name="autoResponder">
+				<object-field
+					name="addToNumberList"
+					label="Add to"
+					object-type="numberList"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<text-field
-			name="emailAddress"/>
+		</form>
 
-		<object-field
-			name="addToNumberList"
-			object-type="numberList"/>
+		<form
+			name="create"
+			object-type="auto-responder"
+			type="create">
 
-		<yes-no-field
-			name="sequenceResponses"/>
+			<columns>
 
-	</field-set>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-	<field-set
-		name="settings"
-		object-name="autoResponder">
+			</columns>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+		</form>
 
-		<text-field
-			name="emailAddress"/>
+		<form
+			name="summary"
+			object-type="auto-responder"
+			type="read-only">
 
-		<object-field
-			name="addToNumberList"
-			object-type="numberList"
-			nullable="yes"/>
+			<columns>
 
-		<yes-no-field
-			name="sequenceResponses"
-			nullable="no"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-	</field-set>
+				<text-field
+					name="emailAddress"/>
+
+				<object-field
+					name="addToNumberList"
+					object-type="numberList"/>
+
+				<yes-no-field
+					name="sequenceResponses"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="auto-responder"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="emailAddress"/>
+
+				<object-field
+					name="addToNumberList"
+					object-type="numberList"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="sequenceResponses"
+					nullable="no"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

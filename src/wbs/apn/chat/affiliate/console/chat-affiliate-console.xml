@@ -36,7 +36,7 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<context-tab-responder-page
 				name="compare"/>
@@ -47,7 +47,7 @@
 
 				<object-create-page
 					name="new"
-					fields="create"
+					form="create"
 					target-context-type="chatAffiliate:combo"/>
 
 				<context-tab-action-page
@@ -60,10 +60,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<section
 				name="keywords"
@@ -93,85 +93,109 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatAffiliate">
+	<forms>
 
-		<text-field
-			name="chatSchemeName"
-			field="chatScheme.name"
-			label="Scheme"/>
+		<form
+			name="list"
+			object-type="chat-affiliate"
+			type="read-only">
 
-		<name-field/>
-		<description-field/>
+			<columns>
 
-		<text-field
-			name="brandName"/>
+				<text-field
+					name="chatSchemeName"
+					field="chatScheme.name"
+					label="Scheme"/>
 
-		<object-field
-			name="category"
-			object-type="chatCategory"/>
+				<name-field/>
+				<description-field/>
 
-	</field-set>
+				<text-field
+					name="brandName"/>
 
-	<field-set
-		name="create"
-		object-name="chatAffiliate">
+				<object-field
+					name="category"
+					object-type="chatCategory"/>
 
-		<object-field
-			name="chatScheme"
-			label="Scheme"
-			object-type="chatScheme"
-			root-field="chatScheme.chat"/>
+			</columns>
 
-		<name-field/>
-		<description-field/>
+		</form>
 
-	</field-set>
+		<form
+			name="create"
+			object-type="chat-affiliate"
+			type="create">
 
-	<field-set
-		name="summary"
-		object-name="chatAffiliate">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<object-field
+					name="chatScheme"
+					label="Scheme"
+					object-type="chatScheme"
+					root-field="chatScheme.chat"/>
 
-		<text-field
-			name="brandName"/>
+				<name-field/>
+				<description-field/>
 
-		<object-field
-			name="category"
-			object-type="chatCategory"/>
+			</columns>
 
-		<integer-field
-			name="numUsers"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="chat-affiliate"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="chatAffiliate">
+			<columns>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-field
-			name="brandName"
-			nullable="yes"/>
+				<text-field
+					name="brandName"/>
 
-		<object-field
-			name="category"
-			object-type="chatCategory"
-			nullable="yes"/>
+				<object-field
+					name="category"
+					object-type="chatCategory"/>
 
-	</field-set>
+				<integer-field
+					name="numUsers"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-affiliate"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="brandName"
+					nullable="yes"/>
+
+				<object-field
+					name="category"
+					object-type="chatCategory"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

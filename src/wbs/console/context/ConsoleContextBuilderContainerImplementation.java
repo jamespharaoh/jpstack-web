@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.module.ConsoleModuleSpec;
 
 import wbs.framework.entity.record.Record;
 
@@ -14,6 +15,8 @@ class ConsoleContextBuilderContainerImplementation <
 	ObjectType extends Record <ObjectType>
 >
 	implements ConsoleContextBuilderContainer <ObjectType> {
+
+	ConsoleModuleSpec consoleModule;
 
 	String existingBeanNamePrefix;
 	String newBeanNamePrefix;

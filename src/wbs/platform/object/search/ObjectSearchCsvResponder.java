@@ -156,7 +156,7 @@ class ObjectSearchCsvResponder <ResultType>
 			// form context
 
 			formContext =
-				resultsMode.formContextBuilder ().buildResponse (
+				resultsMode.formType ().buildResponse (
 					transaction,
 					emptyMap (),
 					emptyList ());

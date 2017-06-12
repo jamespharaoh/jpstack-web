@@ -29,10 +29,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-priv-delegate="root"
 				create-priv-code="manage"/>
 
@@ -41,10 +41,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -52,63 +52,87 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="oxygenateReportCode">
+	<forms>
 
-		<code-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="oxygenate-report-code"
+			type="read-only">
 
-		<enum-field
-			name="messageStatus"/>
+			<columns>
 
-	</field-set>
+				<code-field/>
+				<description-field/>
 
-	<field-set
-		name="create"
-		object-name="oxygenateReportCode">
+				<enum-field
+					name="messageStatus"/>
 
-		<code-field pattern=".+"/>
-		<description-field/>
+			</columns>
 
-		<enum-field
-			name="messageStatus"/>
+		</form>
 
-		<text-area-field
-			name="additionalInformation"/>
+		<form
+			name="create"
+			object-type="oxygenate-report-code"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="oxygenateReportCode">
+				<code-field pattern=".+"/>
+				<description-field/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
+				<enum-field
+					name="messageStatus"/>
 
-		<enum-field
-			name="messageStatus"/>
+				<text-area-field
+					name="additionalInformation"/>
 
-		<text-area-field
-			name="additionalInformation"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="oxygenateReportCode">
+		<form
+			name="summary"
+			object-type="oxygenate-report-code"
+			type="read-only">
 
-		<code-field pattern=".+"/>
-		<description-field/>
+			<columns>
 
-		<enum-field
-			name="messageStatus"/>
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
 
-		<text-area-field
-			name="additionalInformation"/>
+				<enum-field
+					name="messageStatus"/>
 
-	</field-set>
+				<text-area-field
+					name="additionalInformation"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="oxygenate-report-code"
+			type="update">
+
+			<columns>
+
+				<code-field pattern=".+"/>
+				<description-field/>
+
+				<enum-field
+					name="messageStatus"/>
+
+				<text-area-field
+					name="additionalInformation"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

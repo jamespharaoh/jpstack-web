@@ -21,7 +21,7 @@
 		<list>
 
 			<object-list-page
-				fields="list">
+				form="list">
 
 				<list-tab
 					name="all"
@@ -56,17 +56,17 @@
 			</object-list-page>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-action-page
 				name="password"/>
@@ -107,98 +107,118 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="user">
-
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-
-		<text-field
-			name="fullname"
-			label="Full name"/>
-
-		<yes-no-field
-			name="active"/>
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="user">
-
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-
-		<text-field
-			name="fullname"
-			label="Full name"/>
-
-		<yes-no-field
-			name="active"/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="user">
-
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="fullname"
-			label="Full name"/>
-
-		<yes-no-field
-			name="active"/>
-
-		<timezone-field
-			name="defaultTimezone"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="user">
-
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="fullname"
-			label="Full name"/>
-
-		<yes-no-field
-			name="active"/>
-
-		<timezone-field
-			name="defaultTimezone"
-			nullable="yes"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="list"
+			object-type="user"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+
+				<text-field
+					name="fullname"
+					label="Full name"/>
+
+				<yes-no-field
+					name="active"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="user"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+
+				<text-field
+					name="fullname"
+					label="Full name"/>
+
+				<yes-no-field
+					name="active"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="user"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="fullname"
+					label="Full name"/>
+
+				<yes-no-field
+					name="active"/>
+
+				<timezone-field
+					name="defaultTimezone"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="user"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="fullname"
+					label="Full name"/>
+
+				<yes-no-field
+					name="active"/>
+
+				<timezone-field
+					name="defaultTimezone"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="groups"
 			object-type="group"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<parent-field/>
 				<name-field/>
 				<description-field/>
 
-			</column-fields>
+			</columns>
 
 		</form>
 

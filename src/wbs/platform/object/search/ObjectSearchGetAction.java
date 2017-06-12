@@ -9,6 +9,8 @@ import static wbs.utils.string.StringUtils.stringSplitComma;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -33,7 +35,7 @@ import wbs.platform.user.model.UserRec;
 
 import wbs.utils.etc.NumberUtils;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchGetAction")
@@ -61,10 +63,10 @@ class ObjectSearchGetAction
 	// properties
 
 	@Getter @Setter
-	String searchResponderName;
+	Provider <WebResponder> searchResponderProvider;
 
 	@Getter @Setter
-	String searchResultsResponderName;
+	Provider <WebResponder> resultsResponderProvider;
 
 	@Getter @Setter
 	String sessionKey;
@@ -73,11 +75,10 @@ class ObjectSearchGetAction
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			searchResponderName);
+		return searchResponderProvider.get ();
 
 	}
 
@@ -85,7 +86,7 @@ class ObjectSearchGetAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -143,15 +144,13 @@ class ObjectSearchGetAction
 
 				transaction.commit ();
 
-				return responder (
-					searchResponderName);
+				return searchResponderProvider.get ();
 
 			} else {
 
 				transaction.commit ();
 
-				return responder (
-					searchResultsResponderName);
+				return resultsResponderProvider.get ();
 
 			}
 

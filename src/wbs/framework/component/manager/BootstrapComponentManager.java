@@ -3,6 +3,7 @@ package wbs.framework.component.manager;
 import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.IterableUtils.iterableOnlyItemRequired;
@@ -28,6 +29,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
@@ -44,6 +46,7 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -72,6 +75,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.ComponentInterface;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -1084,6 +1088,24 @@ class BootstrapComponentManager
 					taskLogger,
 					component,
 					field);
+
+			}
+
+			for (
+				Method method
+					: iterableFilter (
+						method ->
+							isNotNull (
+								method.getAnnotation (
+									NormalLifecycleSetup.class)),
+						Arrays.asList (
+							component.getClass ().getMethods ()))
+			) {
+
+				methodInvoke (
+					method,
+					component,
+					taskLogger);
 
 			}
 

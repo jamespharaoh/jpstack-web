@@ -14,6 +14,8 @@ import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -22,7 +24,9 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -36,7 +40,7 @@ import wbs.platform.user.console.UserSessionLogic;
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("coreLogonAction")
 public
@@ -66,15 +70,24 @@ class CoreLogonAction
 	@SingletonDependency
 	WbsConfig wbsConfig;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("coreLogonResponder")
+	Provider <WebResponder> logonResponderProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("coreRedirectResponder")
+	Provider <WebResponder> redirectResponderProvider;
+
 	// details
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"coreLogonResponder");
+		return logonResponderProvider.get ();
 
 	}
 
@@ -82,7 +95,7 @@ class CoreLogonAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -238,8 +251,7 @@ class CoreLogonAction
 
 			// and redirect to the console proper
 
-			return responder (
-				"coreRedirectResponder");
+			return redirectResponderProvider.get ();
 
 		}
 

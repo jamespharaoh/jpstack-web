@@ -25,9 +25,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
+				form="create"
 				create-time="createdTime"
 				create-user="createdUser"/>
 
@@ -36,10 +37,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-action-page
 				name="numbers"/>
@@ -57,110 +58,134 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="broadcast">
+	<forms>
 
-		<index-field/>
+		<form
+			name="list"
+			object-type="broadcast"
+			type="read-only">
 
-		<enum-field
-			name="state"/>
+			<columns>
 
-		<object-field
-			name="createdUser"
-			label="Created by"
-			object-type="user"/>
+				<index-field/>
 
-		<timestamp-field
-			name="createdTime"
-			label="Created"/>
+				<enum-field
+					name="state"/>
 
-		<timestamp-field
-			name="scheduledTime"
-			label="Scheduled"/>
+				<object-field
+					name="createdUser"
+					label="Created by"
+					object-type="user"/>
 
-		<timestamp-field
-			name="sentTime"
-			label="Sent"/>
+				<timestamp-field
+					name="createdTime"
+					label="Created"/>
 
-		<integer-field
-			name="numTotal"
-			label="Numbers"/>
+				<timestamp-field
+					name="scheduledTime"
+					label="Scheduled"/>
 
-	</field-set>
+				<timestamp-field
+					name="sentTime"
+					label="Sent"/>
 
-	<field-set
-		name="summary"
-		object-name="broadcast">
+				<integer-field
+					name="numTotal"
+					label="Numbers"/>
 
-		<parent-field/>
-		<index-field/>
+			</columns>
 
-		<enum-field
-			name="state"/>
+		</form>
 
-		<timestamp-field
-			name="createdTime"/>
+		<form
+			name="create"
+			object-type="broadcast"
+			type="create"/>
 
-		<timestamp-field
-			name="scheduledTime"/>
+		<form
+			name="summary"
+			object-type="broadcast"
+			type="read-only">
 
-		<timestamp-field
-			name="sentTime"/>
+			<columns>
 
-		<timestamp-field
-			name="cancelledTime"/>
+				<parent-field/>
+				<index-field/>
 
-		<object-field
-			name="createdUser"
-			object-type="user"/>
+				<enum-field
+					name="state"/>
 
-		<object-field
-			name="sentUser"
-			object-type="user"/>
+				<timestamp-field
+					name="createdTime"/>
 
-		<object-field
-			name="cancelledUser"
-			object-type="user"/>
+				<timestamp-field
+					name="scheduledTime"/>
 
-		<!--
-		<integer-field
-			name="numTotal"/>
-		-->
+				<timestamp-field
+					name="sentTime"/>
 
-		<integer-field
-			name="numAccepted"/>
+				<timestamp-field
+					name="cancelledTime"/>
 
-		<integer-field
-			name="numRejected"/>
+				<object-field
+					name="createdUser"
+					object-type="user"/>
 
-		<integer-field
-			name="numSent"/>
+				<object-field
+					name="sentUser"
+					object-type="user"/>
 
-		<integer-field
-			name="numRemoved"/>
+				<object-field
+					name="cancelledUser"
+					object-type="user"/>
 
-	</field-set>
+				<!--
+				<integer-field
+					name="numTotal"/>
+				-->
 
-	<field-set
-		name="settings"
-		object-name="broadcast">
+				<integer-field
+					name="numAccepted"/>
 
-		<jquery-script-ref/>
-		<script-ref path="/js/gsm.js"/>
+				<integer-field
+					name="numRejected"/>
 
-		<id-field/>
-		<parent-field read-only="yes"/>
-		<index-field/>
-		<description-field/>
+				<integer-field
+					name="numSent"/>
 
-		<text-field
-			name="messageOriginator"/>
+				<integer-field
+					name="numRemoved"/>
 
-		<text-area-field
-			name="messageText"
-			char-count-function="gsmCharCountMultiple"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="broadcast"
+			type="update">
+
+			<columns>
+
+				<jquery-script-ref/>
+				<script-ref path="/js/gsm.js"/>
+
+				<id-field/>
+				<parent-field read-only="yes"/>
+				<index-field/>
+				<description-field/>
+
+				<text-field
+					name="messageOriginator"/>
+
+				<text-area-field
+					name="messageText"
+					char-count-function="gsmCharCountMultiple"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

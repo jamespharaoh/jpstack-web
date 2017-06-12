@@ -29,65 +29,78 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="imChatMessage">
+	<forms>
 
-		<timestamp-field
-			name="timestamp"/>
+		<form
+			name="list"
+			object-type="im-chat-message"
+			type="read-only">
 
-		<object-field
-			name="senderUser"
-			label="Sender"
-			object-type="user"/>
+			<columns>
 
-		<currency-field
-			name="price"
-			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+				<timestamp-field
+					name="timestamp"/>
 
-		<text-field
-			name="messageText"
-			label="Message"/>
+				<object-field
+					name="senderUser"
+					label="Sender"
+					object-type="user"/>
 
-	</field-set>
+				<currency-field
+					name="price"
+					currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
 
-	<field-set
-		name="summary"
-		object-name="imChatMessage">
+				<text-field
+					name="messageText"
+					label="Message"/>
 
-		<id-field/>
-		<parent-field/>
-		<index-field/>
+			</columns>
 
-		<timestamp-field
-			name="timestamp"/>
+		</form>
 
-		<object-field
-			name="senderUser"
-			object-type="user"/>
+		<form
+			name="summary"
+			object-type="im-chat-message"
+			type="read-only">
 
-		<currency-field
-			name="price"
-			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+			<columns>
 
-		<text-field
-			name="messageText"
-			nullable="yes"/>
+				<id-field/>
+				<parent-field/>
+				<index-field/>
 
+				<timestamp-field
+					name="timestamp"/>
 
-	</field-set>
+				<object-field
+					name="senderUser"
+					object-type="user"/>
+
+				<currency-field
+					name="price"
+					currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+
+				<text-field
+					name="messageText"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

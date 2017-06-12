@@ -27,7 +27,7 @@ import wbs.framework.database.Transaction;
 
 import wbs.utils.string.FormatWriter;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 public
 interface ConsoleFormActionHelper <FormState, History> {
@@ -132,7 +132,7 @@ interface ConsoleFormActionHelper <FormState, History> {
 
 	}
 
-	Optional <Responder> processFormSubmission (
+	Optional <WebResponder> processFormSubmission (
 			Transaction parentTransaction,
 			FormState formState);
 

@@ -29,85 +29,129 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="chatKeyword">
+	<forms>
 
-		<code-field/>
+		<form
+			name="list"
+			object-type="chat-keyword"
+			type="read-only">
 
-		<yes-no-field
-			name="global"/>
+			<columns>
 
-		<yes-no-field
-			name="chatBlock"/>
+				<code-field/>
 
-		<yes-no-field
-			name="chatInfo"/>
+				<yes-no-field
+					name="global"/>
 
-		<object-field
-			name="command"
-			object-type="command"/>
+				<yes-no-field
+					name="chatBlock"/>
 
-		<yes-no-field
-			name="noCreditCheck"/>
+				<yes-no-field
+					name="chatInfo"/>
 
-	</field-set>
+				<object-field
+					name="command"
+					object-type="command"/>
 
-	<field-set
-		name="settings"
-		object-name="chatKeyword">
+				<yes-no-field
+					name="noCreditCheck"/>
 
-		<id-field/>
-		<code-field/>
+			</columns>
 
-		<yes-no-field
-			name="global"/>
+		</form>
 
-		<yes-no-field
-			name="chatBlock"/>
+		<form
+			name="create"
+			object-type="chat-keyword"
+			type="create">
 
-		<yes-no-field
-			name="chatInfo"/>
+			<columns>
 
-		<enum-field
-			name="joinGender"
-			nullable="yes"/>
+				<code-field/>
 
-		<enum-field
-			name="joinOrient"
-			nullable="yes"/>
+				<yes-no-field
+					name="global"/>
 
-		<enum-field
-			name="joinType"
-			nullable="yes"/>
+				<yes-no-field
+					name="chatBlock"/>
 
-		<object-field
-			name="joinChatAffiliate"
-			object-type="chatAffiliate"
-			root-field="chat"/>
+				<yes-no-field
+					name="chatInfo"/>
 
-		<object-field
-			name="command"
-			object-type="command"/>
+				<object-field
+					name="command"
+					object-type="command"/>
 
-		<yes-no-field
-			name="noCreditCheck"/>
+				<yes-no-field
+					name="noCreditCheck"/>
 
-	</field-set>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="chat-keyword"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+
+				<yes-no-field
+					name="global"/>
+
+				<yes-no-field
+					name="chatBlock"/>
+
+				<yes-no-field
+					name="chatInfo"/>
+
+				<enum-field
+					name="joinGender"
+					nullable="yes"/>
+
+				<enum-field
+					name="joinOrient"
+					nullable="yes"/>
+
+				<enum-field
+					name="joinType"
+					nullable="yes"/>
+
+				<object-field
+					name="joinChatAffiliate"
+					object-type="chatAffiliate"
+					root-field="chat"/>
+
+				<object-field
+					name="command"
+					object-type="command"/>
+
+				<yes-no-field
+					name="noCreditCheck"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

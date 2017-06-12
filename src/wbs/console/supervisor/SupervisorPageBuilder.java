@@ -37,6 +37,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.web.responder.WebResponder;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPageBuilder")
 public
@@ -89,8 +91,9 @@ class SupervisorPageBuilder <
 	String tabLocation;
 	String tabLabel;
 	String fileName;
-	String responderName;
 	String title;
+
+	Provider <WebResponder> responderProvider;
 
 	PagePartFactory pagePartFactory;
 
@@ -114,6 +117,10 @@ class SupervisorPageBuilder <
 
 			setDefaults ();
 
+			buildPagePartFactory ();
+
+			buildResponder ();
+
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
@@ -125,13 +132,10 @@ class SupervisorPageBuilder <
 					resolvedExtensionPoint);
 
 				buildContextFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
-
-			buildPagePartFactory ();
-
-			buildResponder ();
 
 		}
 
@@ -164,13 +168,28 @@ class SupervisorPageBuilder <
 	}
 
 	void buildContextFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
-			fileName,
-			consoleFile.get ()
-				.getResponderName (responderName),
-			extensionPoint.contextTypeNames ());
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextFile");
+
+		) {
+
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
+
+					.getResponderProvider (
+						responderProvider),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -204,9 +223,8 @@ class SupervisorPageBuilder <
 
 	void buildResponder () {
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
+		responderProvider =
+			() -> tabContextResponder.get ()
 
 			.tab (
 				tabName)
@@ -217,7 +235,7 @@ class SupervisorPageBuilder <
 			.pagePartFactory (
 				pagePartFactory)
 
-		);
+		;
 
 	}
 
@@ -257,6 +275,7 @@ class SupervisorPageBuilder <
 					container.pathPrefix (),
 					name));
 
+		/*
 		responderName =
 			ifNull (
 				spec.responderName (),
@@ -264,6 +283,7 @@ class SupervisorPageBuilder <
 					"%s%sResponder",
 					container.newBeanNamePrefix (),
 					capitalise (name)));
+		*/
 
 		title =
 			ifNull (

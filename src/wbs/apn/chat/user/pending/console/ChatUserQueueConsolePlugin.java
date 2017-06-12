@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.pending.console;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContext;
@@ -7,7 +9,9 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -17,7 +21,7 @@ import wbs.platform.queue.console.AbstractQueueConsolePlugin;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("chatUserQueueConsolePlugin")
 public
@@ -35,6 +39,12 @@ class ChatUserQueueConsolePlugin
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("chatUserPendingFormResponder")
+	Provider <WebResponder> pendingFormResponderProvider;
+
 	// details
 
 	{
@@ -45,7 +55,7 @@ class ChatUserQueueConsolePlugin
 
 	@Override
 	public
-	Responder makeResponder (
+	WebResponder makeResponder (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemRec queueItem) {
 
@@ -71,9 +81,7 @@ class ChatUserQueueConsolePlugin
 				targetContext,
 				"/" + queueSubject.getObjectId ());
 
-			return responder (
-				"chatUserPendingFormResponder"
-			).get ();
+			return pendingFormResponderProvider.get ();
 
 		}
 

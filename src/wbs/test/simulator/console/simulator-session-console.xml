@@ -30,10 +30,10 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"
+				form="create"
 				create-time="createdTime"
 				create-user="createdUser"/>
 
@@ -42,10 +42,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-responder-page
 				name="console"/>
@@ -62,52 +62,76 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="simulatorSession">
+	<forms>
 
-		<description-field/>
+		<form
+			name="list"
+			object-type="simulator-session"
+			type="read-only">
 
-		<timestamp-field
-			name="createdTime"/>
+			<columns>
 
-		<object-field
-			name="createdUser"
-			object-type="user"/>
+				<description-field/>
 
-	</field-set>
+				<timestamp-field
+					name="createdTime"/>
 
-	<field-set
-		name="create"
-		object-name="simulatorSession">
+				<object-field
+					name="createdUser"
+					object-type="user"/>
 
-		<description-field/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="summary"
-		object-name="simulatorSession">
+		<form
+			name="create"
+			object-type="simulator-session"
+			type="create">
 
-		<id-field/>
-		<parent-field/>
-		<description-field/>
+			<columns>
 
-		<timestamp-field
-			name="createdTime"/>
+				<description-field/>
 
-		<object-field
-			name="createdUser"
-			object-type="user"/>
+			</columns>
 
-	</field-set>
+		</form>
 
-	<field-set
-		name="settings"
-		object-name="simulatorSession">
+		<form
+			name="summary"
+			object-type="simulator-session"
+			type="read-only">
 
-		<description-field/>
+			<columns>
 
-	</field-set>
+				<id-field/>
+				<parent-field/>
+				<description-field/>
+
+				<timestamp-field
+					name="createdTime"/>
+
+				<object-field
+					name="createdUser"
+					object-type="user"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="simulator-session"
+			type="update">
+
+			<columns>
+
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

@@ -42,19 +42,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="broadcast"
@@ -72,110 +73,144 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="broadcastConfig">
+	<forms>
 
-		<parent-field/>
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="broadcast-config"
+			type="read-only">
 
-		<integer-field
-			name="numTotal"
-			label="Count"/>
+			<columns>
 
-		<integer-field
-			name="numUnsent"
-			label="Unsent"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="numScheduled"
-			label="Scheduled"/>
+				<integer-field
+					name="numTotal"
+					label="Count"/>
 
-		<integer-field
-			name="numSending"
-			label="Sending"/>
+				<integer-field
+					name="numUnsent"
+					label="Unsent"/>
 
-	</field-set>
+				<integer-field
+					name="numScheduled"
+					label="Scheduled"/>
 
-	<field-set
-		name="summary"
-		object-name="broadcastConfig">
+				<integer-field
+					name="numSending"
+					label="Sending"/>
 
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<integer-field
-			name="numTotal"
-			label="Total"/>
+		</form>
 
-		<integer-field
-			name="numUnsent"
-			label="Unsent"/>
+		<form
+			name="create"
+			object-type="broadcast-config"
+			type="create">
 
-		<integer-field
-			name="numScheduled"
-			label="Scheduled"/>
+			<columns>
 
-		<integer-field
-			name="numSending"
-			label="Sending"/>
+				<parent-field/>
+				<name-field/>
+				<description-field/>
 
-		<integer-field
-			name="numSent"
-			label="Sent"/>
+			</columns>
 
-		<integer-field
-			name="numPartiallySent"
-			label="Partially sent"/>
+		</form>
 
-		<integer-field
-			name="numCancelled"
-			label="Cancelled"/>
+		<form
+			name="summary"
+			object-type="broadcast-config"
+			type="read-only">
 
-		<object-field
-			name="router"
-			object-type="router"/>
+			<columns>
 
-		<object-field
-			name="blockNumberLookup"
-			object-type="numberLookup"/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<text-area-field
-			name="defaultNumbers"/>
+				<integer-field
+					name="numTotal"
+					label="Total"/>
 
-	</field-set>
+				<integer-field
+					name="numUnsent"
+					label="Unsent"/>
 
-	<field-set
-		name="settings"
-		object-name="broadcastConfig">
+				<integer-field
+					name="numScheduled"
+					label="Scheduled"/>
 
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<integer-field
+					name="numSending"
+					label="Sending"/>
 
-		<object-field
-			name="router"
-			object-type="router"/>
+				<integer-field
+					name="numSent"
+					label="Sent"/>
 
-		<object-field
-			name="blockNumberLookup"
-			object-type="numberLookup"/>
+				<integer-field
+					name="numPartiallySent"
+					label="Partially sent"/>
 
-		<object-field
-			name="numberFormat"
-			object-type="numberFormat"/>
+				<integer-field
+					name="numCancelled"
+					label="Cancelled"/>
 
-		<text-area-field
-			name="defaultNumbers"
-			nullable="yes"/>
+				<object-field
+					name="router"
+					object-type="router"/>
 
-	</field-set>
+				<object-field
+					name="blockNumberLookup"
+					object-type="numberLookup"/>
+
+				<text-area-field
+					name="defaultNumbers"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="broadcast-config"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<object-field
+					name="router"
+					object-type="router"/>
+
+				<object-field
+					name="blockNumberLookup"
+					object-type="numberLookup"/>
+
+				<object-field
+					name="numberFormat"
+					object-type="numberFormat"/>
+
+				<text-area-field
+					name="defaultNumbers"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>
