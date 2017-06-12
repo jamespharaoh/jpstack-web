@@ -1,4 +1,4 @@
-package wbs.web.handler;
+package wbs.web.mvc;
 
 import wbs.framework.logging.TaskLogger;
 
@@ -8,7 +8,7 @@ import wbs.framework.logging.TaskLogger;
  * These are delegated to by SimpleWebFile depending on the method.
  */
 public
-interface RequestHandler {
+interface WebRequestHandler {
 
 	public
 	void handle (

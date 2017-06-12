@@ -25,7 +25,7 @@ import wbs.web.context.RequestContext;
 
 public abstract
 class BufferedResponder
-	implements Responder {
+	implements WebResponder {
 
 	// singleton components
 

@@ -28,8 +28,8 @@ import wbs.web.context.RequestContext;
 public
 class JsonResponder
 	implements
-		Provider <Responder>,
-		Responder {
+		Provider <WebResponder>,
+		WebResponder {
 
 	// singleton dependencies
 
@@ -93,7 +93,7 @@ class JsonResponder
 
 	@Override
 	public
-	Responder get () {
+	WebResponder get () {
 
 		return this;
 

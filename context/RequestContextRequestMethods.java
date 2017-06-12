@@ -1,10 +1,13 @@
 package wbs.web.context;
 
+import static wbs.utils.etc.IoUtils.readBytes;
+import static wbs.utils.etc.IoUtils.readString;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -13,8 +16,6 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import com.google.common.base.Optional;
-
-import org.apache.commons.io.IOUtils;
 
 import wbs.utils.io.BorrowedInputStream;
 import wbs.utils.io.RuntimeIoException;
@@ -126,19 +127,58 @@ interface RequestContextRequestMethods
 	}
 
 	default
-	byte[] requestBodyRaw () {
+	byte[] requestBodyBytes () {
 
-		try {
+		State state =
+			requestContextRequestMethodsState ();
 
-			return IOUtils.toByteArray (
-				inputStream ());
+		if (
+			isNotNull (
+				state.requestBodyString)
+		) {
+			throw new IllegalStateException ();
+		}
 
-		} catch (IOException ioException) {
+		if (
+			isNull (
+				state.requestBodyBytes)
+		) {
 
-			throw new RuntimeIoException (
-				ioException);
+			state.requestBodyBytes =
+				readBytes (
+					inputStream ());
 
 		}
+
+		return state.requestBodyBytes;
+
+	}
+
+	default
+	String requestBodyString () {
+
+		State state =
+			requestContextRequestMethodsState ();
+
+		if (
+			isNotNull (
+				state.requestBodyBytes)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		if (
+			isNull (
+				state.requestBodyString)
+		) {
+
+			state.requestBodyString =
+				readString (
+					reader ());
+
+		}
+
+		return state.requestBodyString;
 
 	}
 
@@ -174,8 +214,13 @@ interface RequestContextRequestMethods
 
 	static
 	class State {
+
 		InputStream inputStream;
 		Reader reader;
+
+		byte[] requestBodyBytes;
+		String requestBodyString;
+
 	}
 
 }

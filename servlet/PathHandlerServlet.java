@@ -19,8 +19,8 @@ import wbs.framework.logging.TaskLogger;
 import wbs.web.exceptions.ExternalRedirectException;
 import wbs.web.exceptions.HttpNotFoundException;
 import wbs.web.file.WebFile;
-import wbs.web.handler.WebExceptionHandler;
-import wbs.web.handler.WebNotFoundHandler;
+import wbs.web.mvc.WebExceptionHandler;
+import wbs.web.mvc.WebNotFoundHandler;
 import wbs.web.pathhandler.PathHandler;
 
 @SingletonComponent ("pathHandlerServlet")
@@ -118,8 +118,9 @@ class PathHandlerServlet
 
 			} else if (exceptionHandler != null) {
 
-				exceptionHandler.handleException (
+				exceptionHandler.handleExceptionFinal (
 					taskLogger,
+					0l,
 					exception);
 
 			} else {

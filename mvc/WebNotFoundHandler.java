@@ -1,4 +1,4 @@
-package wbs.web.handler;
+package wbs.web.mvc;
 
 import wbs.framework.logging.TaskLogger;
 
