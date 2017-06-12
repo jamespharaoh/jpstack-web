@@ -4,6 +4,7 @@
 
 	<layer name="console">
 
+		<bootstrap-component class="ObjectSearchPageComponentBuilder"/>
 		<bootstrap-component class="ObjectSearchPageSpec"/>
 		<bootstrap-component class="ObjectSearchResultsModeSpec"/>
 

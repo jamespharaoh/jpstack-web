@@ -78,7 +78,7 @@ class ObjectSettingsPart <
 	String localName;
 
 	@Getter @Setter
-	ConsoleFormType <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	@Getter @Setter
 	String removeLocalName;
@@ -134,7 +134,7 @@ class ObjectSettingsPart <
 			);
 
 			form =
-				formContextBuilder.buildResponse (
+				formType.buildResponse (
 					transaction,
 					emptyMap (),
 					objectLookup.lookupObject (

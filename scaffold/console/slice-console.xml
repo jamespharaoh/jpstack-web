@@ -21,19 +21,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -41,100 +42,133 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="slice">
+	<forms>
 
-		<name-field/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="slice"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="slice">
+				<name-field/>
+				<description-field/>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<!-- settings -->
+		</form>
 
-		<text-field
-			name="adminEmail"/>
+		<form
+			name="create"
+			object-type="slice"
+			type="create">
 
-		<timezone-field
-			name="defaultTimezone"/>
+			<columns>
 
-		<integer-field
-			name="defaultHourOffset"/>
+				<name-field/>
+				<description-field/>
 
-		<text-field
-			name="supervisorConfigNames"/>
+			</columns>
 
-		<text-area-field
-			name="filter"/>
+		</form>
 
-		<seconds-field
-			name="queueOverflowInactivityTime"/>
+		<form
+			name="summary"
+			object-type="slice"
+			type="read-only">
 
-		<seconds-field
-			name="queueOverflowOverloadTime"/>
+			<columns>
 
-		<seconds-field
-			name="queueOverflowGraceTime"/>
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
 
-		<!-- statistics -->
+				<!-- settings -->
 
-		<timestamp-field
-			name="currentQueueInactivityTime"/>
+				<text-field
+					name="adminEmail"/>
 
-	</field-set>
+				<timezone-field
+					name="defaultTimezone"/>
 
-	<field-set
-		name="settings"
-		object-name="slice">
+				<integer-field
+					name="defaultHourOffset"/>
 
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
+				<text-field
+					name="supervisorConfigNames"/>
 
-		<text-field
-			name="adminEmail"/>
+				<text-area-field
+					name="filter"/>
 
-		<timezone-field
-			name="defaultTimezone"
-			nullable="yes"/>
+				<seconds-field
+					name="queueOverflowInactivityTime"/>
 
-		<integer-field
-			name="defaultHourOffset"
-			minimum="0"
-			maximum="23"/>
+				<seconds-field
+					name="queueOverflowOverloadTime"/>
 
-		<text-field
-			name="supervisorConfigNames"
-			nullable="yes"/>
+				<seconds-field
+					name="queueOverflowGraceTime"/>
 
-		<seconds-field
-			name="queueOverflowInactivityTime"
-			nullable="yes"/>
+				<!-- statistics -->
 
-		<seconds-field
-			name="queueOverflowOverloadTime"
-			nullable="yes"/>
+				<timestamp-field
+					name="currentQueueInactivityTime"/>
 
-		<seconds-field
-			name="queueOverflowGraceTime"
-			nullable="yes"/>
+			</columns>
 
-		<text-area-field
-			name="filter"
-			nullable="yes"/>
+		</form>
 
-	</field-set>
+		<form
+			name="settings"
+			object-type="slice"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="adminEmail"/>
+
+				<timezone-field
+					name="defaultTimezone"
+					nullable="yes"/>
+
+				<integer-field
+					name="defaultHourOffset"
+					minimum="0"
+					maximum="23"/>
+
+				<text-field
+					name="supervisorConfigNames"
+					nullable="yes"/>
+
+				<seconds-field
+					name="queueOverflowInactivityTime"
+					nullable="yes"/>
+
+				<seconds-field
+					name="queueOverflowOverloadTime"
+					nullable="yes"/>
+
+				<seconds-field
+					name="queueOverflowGraceTime"
+					nullable="yes"/>
+
+				<text-area-field
+					name="filter"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

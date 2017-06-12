@@ -1,16 +1,12 @@
 package wbs.platform.object.summary;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Provider;
 
@@ -23,28 +19,19 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.ConsoleFormManager;
 import wbs.console.forms.core.ConsoleFormType;
-import wbs.console.forms.core.FormFieldSet;
-import wbs.console.forms.object.CodeFormFieldSpec;
-import wbs.console.forms.object.DescriptionFormFieldSpec;
-import wbs.console.forms.object.IdFormFieldSpec;
-import wbs.console.forms.object.NameFormFieldSpec;
 import wbs.console.forms.object.ParentFormFieldSpec;
-import wbs.console.forms.types.FieldsProvider;
 import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 import wbs.console.part.TextPart;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -54,7 +41,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -133,9 +119,6 @@ class ObjectSummaryPageBuilder <
 
 	String privKey;
 
-	List <PagePartFactory> pagePartFactories =
-		new ArrayList<> ();
-
 	// build meta
 
 	public
@@ -165,8 +148,6 @@ class ObjectSummaryPageBuilder <
 			setDefaults (
 				taskLogger);
 
-			buildResponder ();
-
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
@@ -178,16 +159,19 @@ class ObjectSummaryPageBuilder <
 					resolvedExtensionPoint);
 
 				buildContextFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
 
+/*
 			builder.descend (
 				taskLogger,
 				spec,
 				spec.builders (),
 				this,
 				MissingBuilderBehaviour.error);
+*/
 
 		}
 
@@ -235,72 +219,40 @@ class ObjectSummaryPageBuilder <
 	}
 
 	void buildContextFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
+		try (
 
-			stringFormat (
-				"%s.summary",
-				container.pathPrefix ()),
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextFile");
 
-			consoleFileProvider.get ()
+		) {
 
-				.getResponderName (
-					stringFormat (
-						"%sSummaryResponder",
-						container.newBeanNamePrefix ()))
+			consoleModule.addContextFile (
 
-				.privKeys (
-					privKey != null
-						? Collections.singletonList (privKey)
-						: Collections.<String>emptyList ()),
+				stringFormat (
+					"%s.summary",
+					container.pathPrefix ()),
 
-			extensionPoint.contextTypeNames ());
+				consoleFileProvider.get ()
 
-	}
-
-	void buildResponder () {
-
-		PagePartFactory partFactory =
-			parentTransaction -> {
-
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"buildResponder");
-
-			) {
-
-				return objectSummaryPartProvider.get ().partFactories (
-					pagePartFactories);
-
-			}
-
-		};
-
-		consoleModule.addResponder (
-
-			stringFormat (
-				"%sSummaryResponder",
-				container.newBeanNamePrefix ()),
-
-			tabContextResponder.get ()
-
-				.tab (
-					stringFormat (
-						"%s.summary",
-						container.pathPrefix ()))
-
-				.title (
-					capitalise (
+					.getResponderName (
+						taskLogger,
 						stringFormat (
-							"%s summary",
-							consoleHelper.friendlyName ())))
+							"%sSummaryResponder",
+							container.newBeanNamePrefix ()))
 
-				.pagePartFactory (
-					partFactory));
+					.privKeys (
+						privKey != null
+							? Collections.singletonList (privKey)
+							: Collections.<String>emptyList ()),
+
+				extensionPoint.contextTypeNames ());
+
+		}
 
 	}
 
@@ -349,6 +301,9 @@ class ObjectSummaryPageBuilder <
 
 		) {
 
+			throw todo ();
+
+			/*
 			PagePartFactory partFactory =
 				parentTransaction -> {
 
@@ -379,6 +334,7 @@ class ObjectSummaryPageBuilder <
 				partFactory);
 
 			return this;
+			*/
 
 		}
 
@@ -388,6 +344,9 @@ class ObjectSummaryPageBuilder <
 	ObjectSummaryPageBuilder <ObjectType, ParentType> addHeading (
 			@NonNull String heading) {
 
+		throw todo ();
+
+		/*
 		String html =
 			stringFormat (
 				"<h2>%h</h2>\n",
@@ -418,6 +377,7 @@ class ObjectSummaryPageBuilder <
 			pagePartFactory);
 
 		return this;
+		*/
 
 	}
 
@@ -425,6 +385,9 @@ class ObjectSummaryPageBuilder <
 	ObjectSummaryPageBuilder<ObjectType,ParentType> addPart (
 			@NonNull String beanName) {
 
+		throw todo ();
+
+		/*
 		PagePartFactory partFactory =
 			parentTransaction -> {
 
@@ -467,6 +430,7 @@ class ObjectSummaryPageBuilder <
 			partFactory);
 
 		return this;
+		*/
 
 	}
 
@@ -485,58 +449,10 @@ class ObjectSummaryPageBuilder <
 			consoleHelper =
 				container.consoleHelper ();
 
-			if (
-				isNotNull (
-					spec.fieldsProviderName ())
-			) {
-
-				formType =
-					consoleFormManager.createFormType (
-						taskLogger,
-						"summary",
-						consoleHelper.objectClass (),
-						genericCastUnchecked (
-							consoleHelper.parentClass ()),
-						FormType.update,
-						genericCastUnchecked (
-							componentManager.getComponentRequired (
-								taskLogger,
-								spec.fieldsProviderName (),
-								FieldsProvider.class)));
-
-			} else {
-
-				formType =
-					ifNotNullThenElse (
-						spec.formFieldsName,
-						() -> formContextManager.createFormType (
-							taskLogger,
-							consoleModule,
-							"summary",
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.readOnly,
-							optionalOf (
-								spec.formFieldsName ()),
-							optionalAbsent ()),
-						() -> formContextManager.createFormType (
-							taskLogger,
-							"summary",
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.readOnly,
-							optionalOf (
-								defaultFields (
-									taskLogger)),
-							optionalAbsent ()));
-
-			}
-
 			privKey =
 				spec.privKey ();
 
+			/*
 			if (spec.builders ().isEmpty ()) {
 
 				addFieldsPart (
@@ -545,7 +461,6 @@ class ObjectSummaryPageBuilder <
 
 			}
 
-			/*
 			// if a provider name is provided
 
 			if (spec.fieldsProviderName () != null) {
@@ -564,84 +479,6 @@ class ObjectSummaryPageBuilder <
 
 			}
 			*/
-
-		}
-
-	}
-
-	private
-	FormFieldSet <ObjectType> defaultFields (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"defaultFields");
-
-		) {
-
-			List <Object> formFieldSpecs =
-				new ArrayList<> ();
-
-			formFieldSpecs.add (
-				new IdFormFieldSpec ());
-
-			if (consoleHelper.parentTypeIsFixed ()) {
-
-				// TODO this should not be disabled!
-
-				/*
-				ConsoleObjectHelper parentHelper =
-					objectManager.getConsoleObjectHelper (
-						maintSchedConsoleHelper.parentClass ());
-
-				if (! parentHelper.isRoot ())
-					fields.add (parentField.get ());
-				*/
-
-			} else {
-
-				formFieldSpecs.add (
-					new ParentFormFieldSpec ());
-
-			}
-
-			if (consoleHelper.codeExists ()) {
-
-				formFieldSpecs.add (
-					new CodeFormFieldSpec ());
-
-			}
-
-			if (
-				consoleHelper.nameExists ()
-				&& ! consoleHelper.nameIsCode ()
-			) {
-
-				formFieldSpecs.add (
-					new NameFormFieldSpec ());
-
-			}
-
-			if (consoleHelper.descriptionExists ()) {
-
-				formFieldSpecs.add (
-					new DescriptionFormFieldSpec ());
-
-			}
-
-			String fieldSetName =
-				stringFormat (
-					"%s.summary",
-					consoleHelper.objectName ());
-
-			return consoleFormBuilder.buildFormFieldSet (
-				taskLogger,
-				consoleHelper,
-				fieldSetName,
-				formFieldSpecs);
 
 		}
 

@@ -22,20 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-form-actions-page
 				name="actions">
@@ -51,86 +51,106 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="apiDeployment">
-
-		<name-field/>
-		<description-field/>
-
-		<text-field
-			name="host"/>
-
-		<enum-field
-			name="state"/>
-
-		<timestamp-field
-			name="stateTimestamp"/>
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="apiDeployment">
-
-		<name-field/>
-		<description-field/>
-
-		<text-field
-			name="host"
-			nullable="yes"/>
-
-		<text-field
-			name="serviceName"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="apiDeployment">
-
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="host"/>
-
-		<text-field
-			name="serviceName"/>
-
-		<enum-field
-			name="state"/>
-
-		<timestamp-field
-			name="stateTimestamp"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="apiDeployment">
-
-		<id-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-		<text-field
-			name="host"
-			nullable="yes"/>
-
-		<text-field
-			name="serviceName"
-			nullable="yes"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="list"
+			object-type="api-deployment"
+			type="read-only">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="host"/>
+
+				<enum-field
+					name="state"/>
+
+				<timestamp-field
+					name="stateTimestamp"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="api-deployment"
+			type="create">
+
+			<columns>
+
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="host"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceName"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="api-deployment"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="host"/>
+
+				<text-field
+					name="serviceName"/>
+
+				<enum-field
+					name="state"/>
+
+				<timestamp-field
+					name="stateTimestamp"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="api-deployment"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="host"
+					nullable="yes"/>
+
+				<text-field
+					name="serviceName"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="restart-action"

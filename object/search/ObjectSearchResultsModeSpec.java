@@ -25,7 +25,7 @@ class ObjectSearchResultsModeSpec
 	String name;
 
 	@DataAttribute (
-		name = "fields")
-	String formFieldsName;
+		name = "form")
+	String formTypeName;
 
 }

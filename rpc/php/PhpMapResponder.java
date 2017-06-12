@@ -24,14 +24,14 @@ import wbs.platform.php.PhpUnserializer;
 
 import wbs.web.context.RequestContext;
 import wbs.web.misc.HttpStatus;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("phpMapResponder")
 public
 class PhpMapResponder
-	implements Responder {
+	implements WebResponder {
 
 	// singleton dependencies
 

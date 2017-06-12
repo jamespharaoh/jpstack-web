@@ -32,10 +32,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-tab-action-page
 				name="actions"/>
@@ -46,41 +46,55 @@
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="queueSubject">
+	<forms>
 
-		<id-field/>
-		<parent-field/>
+		<form
+			name="summary"
+			object-type="queue-subject"
+			type="read-only">
 
-		<integer-field
-			name="objectId"/>
+			<columns>
 
-		<object-field
-			name="preferredUser"
-			object-type="user"/>
+				<id-field/>
+				<parent-field/>
 
-		<object-field
-			name="forcePreferredUser"
-			object-type="user"/>
+				<integer-field
+					name="objectId"/>
 
-		<integer-field
-			name="totalItems"/>
+				<object-field
+					name="preferredUser"
+					object-type="user"/>
 
-		<integer-field
-			name="activeItems"/>
+				<object-field
+					name="forcePreferredUser"
+					object-type="user"/>
 
-	</field-set>
+				<integer-field
+					name="totalItems"/>
 
-	<field-set
-		name="settings"
-		object-name="queueSubject">
+				<integer-field
+					name="activeItems"/>
 
-		<object-field
-			name="forcePreferredUser"
-			object-type="user"
-			nullable="yes"/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="settings"
+			object-type="queue-subject"
+			type="update">
+
+			<columns>
+
+				<object-field
+					name="forcePreferredUser"
+					object-type="user"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

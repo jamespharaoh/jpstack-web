@@ -21,19 +21,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-links-page
 				name="members"
@@ -56,50 +57,61 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="group">
-
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="group">
-
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="group">
-
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		<name-field/>
-		<description-field/>
-		<deleted-field/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="list"
+			object-type="group"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="group"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="group"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="members"
 			object-type="user"
 			type="read-only">
 
-			<column-fields>
+			<columns>
 
 				<parent-field/>
 				<code-field/>
@@ -110,7 +122,25 @@
 
 				<description-field/>
 
-			</column-fields>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="group"
+			type="update">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+			</columns>
 
 		</form>
 

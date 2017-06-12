@@ -31,13 +31,13 @@ import nu.xom.Element;
 import nu.xom.Serializer;
 import wbs.web.context.RequestContext;
 import wbs.web.misc.HttpStatus;
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlResponder")
 public
 class XmlResponder
-	implements Responder {
+	implements WebResponder {
 
 	// singleton dependencies
 

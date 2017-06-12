@@ -2,17 +2,12 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Provider;
 
@@ -23,20 +18,12 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.core.ConsoleFormBuilder;
 import wbs.console.forms.core.ConsoleFormManager;
 import wbs.console.forms.core.ConsoleFormType;
-import wbs.console.forms.core.FormFieldSet;
-import wbs.console.forms.object.CodeFormFieldSpec;
-import wbs.console.forms.object.DescriptionFormFieldSpec;
-import wbs.console.forms.object.IdFormFieldSpec;
-import wbs.console.forms.object.NameFormFieldSpec;
-import wbs.console.forms.types.FieldsProvider;
-import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -52,13 +39,13 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("objectSettingsPageBuilder")
 public
@@ -135,12 +122,12 @@ class ObjectSettingsPageBuilder <
 	String longName;
 	String friendlyLongName;
 	String friendlyShortName;
-	String responderName;
 	String fileName;
 	String tabName;
 	String tabLocation;
 
-	Provider <Action> settingsActionProvider;
+	Provider <WebResponder> responderProvider;
+	Provider <WebAction> settingsActionProvider;
 
 	// build
 
@@ -163,8 +150,8 @@ class ObjectSettingsPageBuilder <
 			setDefaults (
 				taskLogger);
 
-			buildAction ();
-			buildResponder ();
+			buildAction (
+				taskLogger);
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -177,6 +164,7 @@ class ObjectSettingsPageBuilder <
 					resolvedExtensionPoint);
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
@@ -222,159 +210,31 @@ class ObjectSettingsPageBuilder <
 
 	}
 
-	void buildAction () {
+	void buildAction (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (consoleHelper.ephemeral ()) {
+		try (
 
-			settingsActionProvider =
-				() -> objectSettingsActionProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildAction");
 
-				.detailsResponder (
-					consoleManager.responder (
-						responderName,
-						true))
+		) {
 
-				.accessDeniedResponder (
-					consoleManager.responder (
-						responderName,
-						true))
+			if (consoleHelper.ephemeral ()) {
 
-				.editPrivKey (
-					privKey)
+				settingsActionProvider =
+					() -> objectSettingsActionProvider.get ()
 
-				.objectLookup (
-					consoleHelper)
+					.detailsResponderProvider (
+						responderProvider)
 
-				.consoleHelper (
-					consoleHelper)
+					.accessDeniedResponderProvider (
+						responderProvider)
 
-				.formType (
-					formType)
-
-				.objectRefName (
-					consoleHelper.codeExists ()
-						? consoleHelper.codeFieldName ()
-						: "id")
-
-				.objectType (
-					consoleHelper.objectTypeCode ());
-
-		} else {
-
-			settingsActionProvider =
-				() -> objectSettingsActionProvider.get ()
-
-				.detailsResponder (
-					consoleManager.responder (
-						responderName,
-						true))
-
-				.accessDeniedResponder (
-					consoleManager.responder (
-						responderName,
-						true))
-
-				.editPrivKey (
-					privKey)
-
-				.objectLookup (
-					consoleHelper)
-
-				.consoleHelper (
-						consoleHelper)
-
-				.formType (
-					formType)
-
-			;
-
-		}
-
-	}
-
-	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
-
-		consoleModule.addContextFile (
-
-			fileName,
-
-			consoleFile.get ()
-
-				.getResponderName (
-					responderName)
-
-				.postActionProvider (
-					settingsActionProvider)
-
-				.privName (
-					privKey),
-
-			resolvedExtensionPoint.contextTypeNames ());
-
-		if (consoleHelper.ephemeral ()) {
-
-			Provider <Action> removeActionProvider =
-				() -> objectRemoveAction.get ()
-
-				.objectHelper (
-					consoleHelper)
-
-				.settingsResponder (
-					consoleManager.responder (
-						responderName,
-						true))
-
-				.listResponder (
-					consoleManager.responder (
-						stringFormat (
-							"%sListResponder",
-							container.newBeanNamePrefix ()),
-						true))
-
-				.nextContextTypeName (
-					ifNull (
-						spec.listContextTypeName (),
-					consoleHelper.objectName () + ":list"))
-
-				.editPrivKey (
-					privKey);
-
-			consoleModule.addContextFile (
-
-				stringFormat (
-					"%s.remove",
-					container.structuralName ()),
-
-				consoleFile.get ()
-
-					.postActionProvider (
-						removeActionProvider)
-
-					.privName (
-						privKey),
-
-				resolvedExtensionPoint.contextTypeNames ());
-
-		}
-
-	}
-
-	void buildResponder () {
-
-		PagePartFactory partFactory =
-			parentTransaction -> {
-
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"buildPagePart");
-
-			) {
-
-				return objectSettingsPartProvider.get ()
+					.editPrivKey (
+						privKey)
 
 					.objectLookup (
 						consoleHelper)
@@ -382,41 +242,123 @@ class ObjectSettingsPageBuilder <
 					.consoleHelper (
 						consoleHelper)
 
+					.formType (
+						formType)
+
+					.objectRefName (
+						consoleHelper.codeExists ()
+							? consoleHelper.codeFieldName ()
+							: "id")
+
+					.objectType (
+						consoleHelper.objectTypeCode ());
+
+			} else {
+
+				settingsActionProvider =
+					() -> objectSettingsActionProvider.get ()
+
+					.detailsResponderProvider (
+						responderProvider)
+
+					.accessDeniedResponderProvider (
+						responderProvider)
+
 					.editPrivKey (
 						privKey)
 
-					.localName (
-						"/" + fileName)
+					.objectLookup (
+						consoleHelper)
 
-					.formContextBuilder (
+					.consoleHelper (
+							consoleHelper)
+
+					.formType (
 						formType)
 
-					.removeLocalName (
-						consoleHelper.ephemeral ()
-							? stringFormat (
-								"/%s.remove",
-								container.structuralName ())
-							: null);
+				;
 
 			}
 
-		};
+		}
 
-		consoleModule.addResponder (
+	}
 
-			responderName,
+	void buildFile (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-			tabContextResponder.get ()
+		try (
 
-				.tab (
-					tabName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-				.title (
-					capitalise (
-						friendlyLongName))
+		) {
 
-				.pagePartFactory (
-					partFactory));
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
+
+					.getResponderProvider (
+						responderProvider)
+
+					.postActionProvider (
+						settingsActionProvider)
+
+					.privName (
+						privKey),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+			if (consoleHelper.ephemeral ()) {
+
+				Provider <WebAction> removeActionProvider =
+					() -> objectRemoveAction.get ()
+
+					.objectHelper (
+						consoleHelper)
+
+					.settingsResponderProvider (
+						responderProvider)
+
+					.listResponderProvider (
+						componentManager.getComponentProviderRequired (
+							taskLogger,
+							stringFormat (
+								"%sListResponder",
+								container.newBeanNamePrefix ()),
+							WebResponder.class))
+
+					.nextContextTypeName (
+						ifNull (
+							spec.listContextTypeName (),
+						consoleHelper.objectName () + ":list"))
+
+					.editPrivKey (
+						privKey);
+
+				consoleModule.addContextFile (
+
+					stringFormat (
+						"%s.remove",
+						container.structuralName ()),
+
+					consoleFile.get ()
+
+						.postActionProvider (
+							removeActionProvider)
+
+						.privName (
+							privKey),
+
+					extensionPoint.contextTypeNames ());
+
+			}
+
+		}
 
 	}
 
@@ -468,14 +410,17 @@ class ObjectSettingsPageBuilder <
 						camelToSpaces (
 							longName)));
 
-			responderName =
-				ifNull (
-					spec.responderName (),
-					stringFormat (
-						"%s%s%s",
-						container.newBeanNamePrefix (),
-						capitalise (shortName),
-						"Responder"));
+			responderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					ifNull (
+						spec.responderName (),
+						stringFormat (
+							"%s%s%s",
+							container.newBeanNamePrefix (),
+							capitalise (shortName),
+							"Responder")),
+					WebResponder.class);
 
 			fileName =
 				ifNull (
@@ -499,135 +444,6 @@ class ObjectSettingsPageBuilder <
 					stringFormat (
 						"%s.manage",
 						consoleHelper.objectName ()));
-
-			if (
-				isNotNull (
-					spec.formFieldsProviderName ())
-			) {
-
-				formType =
-					consoleFormManager.createFormType (
-						taskLogger,
-						shortName,
-						consoleHelper.objectClass (),
-						genericCastUnchecked (
-							consoleHelper.parentClass ()),
-						FormType.update,
-						genericCastUnchecked (
-							componentManager.getComponentRequired (
-								taskLogger,
-								spec.formFieldsProviderName (),
-								FieldsProvider.class)));
-
-			} else {
-
-				formType =
-					ifNotNullThenElse (
-						spec.formFieldsName (),
-						() -> consoleFormManager.createFormType (
-							taskLogger,
-							consoleModule,
-							shortName,
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.update,
-							optionalOf (
-								spec.formFieldsName ()),
-							optionalAbsent ()),
-						() -> consoleFormManager.createFormType (
-							taskLogger,
-							shortName,
-							consoleHelper.objectClass (),
-							genericCastUnchecked (
-								consoleHelper.parentClass ()),
-							FormType.update,
-							optionalOf (
-								defaultFields (
-									taskLogger)),
-							optionalAbsent ()));
-
-			}
-
-			// if a provider name is provided
-
-			/*
-			if (spec.fieldsProviderName () != null) {
-
-				fieldsProvider =
-					genericCastUnchecked (
-						componentManager.getComponentRequired (
-							parentTaskLogger,
-							spec.fieldsProviderName (),
-							FieldsProvider.class));
-
-			}
-
-			else {
-
-				fieldsProvider =
-					null;
-
-			}
-			*/
-
-		}
-
-	}
-
-	private
-	FormFieldSet <ObjectType> defaultFields (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"defaultFields");
-
-		) {
-
-			List <Object> formFieldSpecs =
-				new ArrayList<> ();
-
-			formFieldSpecs.add (
-				new IdFormFieldSpec ());
-
-			if (consoleHelper.codeExists ()) {
-
-				formFieldSpecs.add (
-					new CodeFormFieldSpec ());
-
-			}
-
-			if (
-				consoleHelper.nameExists ()
-				&& ! consoleHelper.nameIsCode ()
-			) {
-
-				formFieldSpecs.add (
-					new NameFormFieldSpec ());
-
-			}
-
-			if (consoleHelper.descriptionExists ()) {
-
-				formFieldSpecs.add (
-					new DescriptionFormFieldSpec ());
-
-			}
-
-			String fieldSetName =
-				stringFormat (
-					"%s.settings",
-					consoleHelper.objectName ());
-
-			return consoleFormBuilder.buildFormFieldSet (
-				taskLogger,
-				consoleHelper,
-				fieldSetName,
-				formFieldSpecs);
 
 		}
 

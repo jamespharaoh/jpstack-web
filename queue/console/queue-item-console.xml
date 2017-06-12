@@ -29,7 +29,7 @@
 		<list>
 
 			<object-list-page
-				fields="list">
+				form="list">
 
 				<list-browser
 					field="createdTime"
@@ -61,7 +61,7 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<context-link
 				name="claim"
@@ -76,80 +76,94 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="queueItem">
+	<forms>
 
-		<integer-field
-			name="id"
-			field="queueSubject.id"
-			label="Subject"/>
+		<form
+			name="list"
+			object-type="queue-item"
+			type="read-only">
 
-		<index-field/>
+			<columns>
 
-		<text-field
-			name="source"/>
+				<integer-field
+					name="id"
+					field="queueSubject.id"
+					label="Subject"/>
 
-		<text-field
-			name="details"/>
+				<index-field/>
 
-		<timestamp-field
-			name="createdTime"
-			label="Created"/>
+				<text-field
+					name="source"/>
 
-		<enum-field
-			name="state"/>
+				<text-field
+					name="details"/>
 
-	</field-set>
+				<timestamp-field
+					name="createdTime"
+					label="Created"/>
 
-	<field-set
-		name="summary"
-		object-name="queueItem">
+				<enum-field
+					name="state"/>
 
-		<id-field/>
-		<parent-field/>
+			</columns>
 
-		<integer-field
-			name="index"/>
+		</form>
 
-		<text-field
-			name="source"/>
+		<form
+			name="summary"
+			object-type="queue-item"
+			type="read-only">
 
-		<text-field
-			name="details"/>
+			<columns>
 
-		<integer-field
-			name="refObjectId"/>
+				<id-field/>
+				<parent-field/>
 
-		<object-field
-			name="processedUser"
-			object-type="user"/>
+				<integer-field
+					name="index"/>
 
-		<yes-no-field
-			name="processedByPreferredUser"/>
+				<text-field
+					name="source"/>
 
-		<integer-field
-			name="priority"/>
+				<text-field
+					name="details"/>
 
-		<enum-field
-			name="state"/>
+				<integer-field
+					name="refObjectId"/>
 
-		<object-field
-			name="queueItemClaim"
-			object-type="queueItemClaim"/>
+				<object-field
+					name="processedUser"
+					object-type="user"/>
 
-		<timestamp-field
-			name="createdTime"/>
+				<yes-no-field
+					name="processedByPreferredUser"/>
 
-		<timestamp-field
-			name="pendingTime"/>
+				<integer-field
+					name="priority"/>
 
-		<timestamp-field
-			name="cancelledTime"/>
+				<enum-field
+					name="state"/>
 
-		<timestamp-field
-			name="processedTime"/>
+				<object-field
+					name="queueItemClaim"
+					object-type="queueItemClaim"/>
 
-	</field-set>
+				<timestamp-field
+					name="createdTime"/>
+
+				<timestamp-field
+					name="pendingTime"/>
+
+				<timestamp-field
+					name="cancelledTime"/>
+
+				<timestamp-field
+					name="processedTime"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

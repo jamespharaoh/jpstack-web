@@ -25,58 +25,72 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="userSession">
+	<forms>
 
-		<id-field/>
+		<form
+			name="list"
+			object-type="user-session"
+			type="read-only">
 
-		<timestamp-field
-			name="startTime"/>
+			<columns>
 
-		<timestamp-field
-			name="endTime"/>
+				<id-field/>
 
-		<text-field
-			name="userAgent"/>
+				<timestamp-field
+					name="startTime"/>
 
-		<object-field
-			name="consoleDeployment"/>
+				<timestamp-field
+					name="endTime"/>
 
-	</field-set>
+				<text-field
+					name="userAgent"/>
 
-	<field-set
-		name="summary"
-		object-name="userSession">
+				<object-field
+					name="consoleDeployment"/>
 
-		<id-field/>
-		<parent-field/>
+			</columns>
 
-		<timestamp-field
-			name="startTime"/>
+		</form>
 
-		<timestamp-field
-			name="endTime"/>
+		<form
+			name="summary"
+			object-type="user-session"
+			type="read-only">
 
-		<text-field
-			name="userAgent"/>
+			<columns>
 
-		<object-field
-			name="consoleDeployment"/>
+				<id-field/>
+				<parent-field/>
 
-	</field-set>
+				<timestamp-field
+					name="startTime"/>
+
+				<timestamp-field
+					name="endTime"/>
+
+				<text-field
+					name="userAgent"/>
+
+				<object-field
+					name="consoleDeployment"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

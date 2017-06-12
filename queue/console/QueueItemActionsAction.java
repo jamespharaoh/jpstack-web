@@ -4,12 +4,16 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -23,7 +27,7 @@ import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("queueItemActionsAction")
 public
@@ -47,6 +51,12 @@ class QueueItemActionsAction
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("queueItemActionsResponder")
+	Provider <WebResponder> actionsResponderProvider;
+
 	// state
 
 	UserRec user;
@@ -59,11 +69,10 @@ class QueueItemActionsAction
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"queueItemActionsResponder");
+		return actionsResponderProvider.get ();
 
 	}
 
@@ -71,7 +80,7 @@ class QueueItemActionsAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -139,7 +148,7 @@ class QueueItemActionsAction
 	}
 
 	private
-	Responder unclaimQueueItem (
+	WebResponder unclaimQueueItem (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -183,7 +192,7 @@ class QueueItemActionsAction
 	}
 
 	private
-	Responder reclaimQueueItem (
+	WebResponder reclaimQueueItem (
 			@NonNull Transaction parentTransaction) {
 
 		try (

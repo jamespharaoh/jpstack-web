@@ -22,20 +22,20 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 			<object-create-page
-				fields="create"/>
+				form="create"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -43,64 +43,88 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="deploymentVersion">
+	<forms>
 
-		<name-field label="Version"/>
-		<description-field/>
+		<form
+			name="list"
+			object-type="deployment-version"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="create"
-		object-name="deploymentVersion">
+				<name-field label="Version"/>
+				<description-field/>
 
-		<name-field
-			label="Version"
-			pattern="^(\d+)\.(\d+)$"
-			pattern-error="Version number must match 'x.y'"
-			code-pattern="^(\d+)_(\d+)$"/>
+			</columns>
 
-		<description-field/>
+		</form>
 
-		<text-area-field
-			name="releaseNotes"/>
+		<form
+			name="create"
+			object-type="deployment-version"
+			type="create">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="deploymentVersion">
+				<name-field
+					label="Version"
+					pattern="^(\d+)\.(\d+)$"
+					pattern-error="Version number must match 'x.y'"
+					code-pattern="^(\d+)_(\d+)$"/>
 
-		<id-field/>
-		<code-field/>
+				<description-field/>
 
-		<name-field
-			label="Version"/>
+				<text-area-field
+					name="releaseNotes"/>
 
-		<description-field/>
-		<deleted-field/>
+			</columns>
 
-		<text-area-field
-			name="releaseNotes"/>
+		</form>
 
-	</field-set>
+		<form
+			name="summary"
+			object-type="deployment-version"
+			type="read-only">
 
-	<field-set
-		name="settings"
-		object-name="deploymentVersion">
+			<columns>
 
-		<name-field
-			label="Version"
-			read-only="yes"/>
+				<id-field/>
+				<code-field/>
 
-		<description-field/>
-		<deleted-field/>
+				<name-field
+					label="Version"/>
 
-		<text-area-field
-			name="releaseNotes"/>
+				<description-field/>
+				<deleted-field/>
 
-	</field-set>
+				<text-area-field
+					name="releaseNotes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="deployment-version"
+			type="update">
+
+			<columns>
+
+				<name-field
+					label="Version"
+					read-only="yes"/>
+
+				<description-field/>
+				<deleted-field/>
+
+				<text-area-field
+					name="releaseNotes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

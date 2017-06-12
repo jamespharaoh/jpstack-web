@@ -61,14 +61,14 @@ class ObjectSummaryFieldsPart <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	ConsoleFormType <ObjectType> formContextBuilder;
+	ConsoleFormType <ObjectType> formType;
 
 	// state
 
 	ObjectType object;
 	ParentType parent;
 
-	ConsoleForm <ObjectType> formContext;
+	ConsoleForm <ObjectType> form;
 
 	// implementation
 
@@ -103,8 +103,8 @@ class ObjectSummaryFieldsPart <
 			}
 			*/
 
-			formContext =
-				formContextBuilder.buildResponse (
+			form =
+				formType.buildResponse (
 					transaction,
 					emptyMap (),
 					object);
@@ -195,7 +195,7 @@ class ObjectSummaryFieldsPart <
 			htmlTableOpenDetails (
 				formatWriter);
 
-			formContext.outputTableRows (
+			form.outputTableRows (
 				transaction,
 				formatWriter);
 

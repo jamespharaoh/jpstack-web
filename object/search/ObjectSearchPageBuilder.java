@@ -1,19 +1,15 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
-import static wbs.utils.collection.IterableUtils.iterableMap;
-import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamelCapitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
@@ -23,7 +19,6 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -31,13 +26,11 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.core.ConsoleFormManager;
 import wbs.console.forms.core.ConsoleFormType;
-import wbs.console.forms.types.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -51,14 +44,15 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.NestedTransaction;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("objectSearchPageBuilder")
 public
@@ -69,6 +63,9 @@ class ObjectSearchPageBuilder <
 > implements ConsoleModuleBuilderComponent {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -115,7 +112,7 @@ class ObjectSearchPageBuilder <
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectSearchPageSpec spec;
@@ -142,12 +139,12 @@ class ObjectSearchPageBuilder <
 	String tabName;
 	String tabLabel;
 	String fileName;
-	String searchResponderName;
-	String searchResultsResponderName;
-	Long itemsPerPage;
 
-	Provider <Action> searchGetActionProvider;
-	Provider <Action> searchPostActionProvider;
+	Provider <WebResponder> searchResponderProvider;
+	Provider <WebResponder> resultsResponderProvider;
+
+	Provider <WebAction> searchGetActionProvider;
+	Provider <WebAction> searchPostActionProvider;
 
 	// build
 
@@ -172,9 +169,6 @@ class ObjectSearchPageBuilder <
 
 			buildGetAction ();
 			buildPostAction ();
-
-			buildSearchResponder ();
-			buildResultsResponder ();
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -239,11 +233,11 @@ class ObjectSearchPageBuilder <
 		searchGetActionProvider =
 			() -> objectSearchGetAction.get ()
 
-			.searchResponderName (
-				searchResponderName)
+			.searchResponderProvider (
+				searchResponderProvider)
 
-			.searchResultsResponderName (
-				searchResultsResponderName)
+			.resultsResponderProvider (
+				resultsResponderProvider)
 
 			.sessionKey (
 				sessionKey);
@@ -276,14 +270,14 @@ class ObjectSearchPageBuilder <
 			.parentIdName (
 				parentIdName)
 
-			.searchFormContextBuilder (
+			.searchFormType (
 				searchFormType)
 
 			.resultsModes (
 				resultsModes)
 
-			.searchResponderName (
-				searchResponderName)
+			.searchResponderProvider (
+				searchResponderProvider)
 
 			.fileName (
 				fileName);
@@ -312,124 +306,6 @@ class ObjectSearchPageBuilder <
 						: Collections.<String>emptyList ()),
 
 			resolvedExtensionPoint.contextTypeNames ());
-
-	}
-
-	void buildSearchResponder () {
-
-		PagePartFactory searchPartFactory =
-			parentTransaction -> {
-
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"buildPagePart");
-
-			) {
-
-				return objectSearchPart.get ()
-
-					.consoleHelper (
-						consoleHelper)
-
-					.searchClass (
-						searchClass)
-
-					.sessionKey (
-						sessionKey)
-
-					.searchFormType (
-						searchFormType)
-
-					.fileName (
-						fileName);
-
-			}
-
-		};
-
-		consoleModule.addResponder (
-
-			searchResponderName,
-
-			tabContextResponder.get ()
-
-				.tab (
-					tabName)
-
-				.title (
-					capitalise (
-						stringFormat (
-							"%s search",
-							consoleHelper.friendlyName ())))
-
-				.pagePartFactory (
-					searchPartFactory)
-
-		);
-
-	}
-
-	void buildResultsResponder () {
-
-		PagePartFactory searchResultsPartFactory =
-			parentTransaction -> {
-
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"buildPagePart");
-
-			) {
-
-				return objectSearchResultsPartProvider.get ()
-
-					.consoleHelper (
-						consoleHelper)
-
-					.sessionKey (
-						sessionKey)
-
-					.resultsModes (
-						resultsModes)
-
-					.resultsClass (
-						resultClass)
-
-					.resultsDaoMethodName (
-						spec.resultsDaoMethodName ())
-
-					.itemsPerPage (
-						itemsPerPage)
-
-					.targetContextTypeName (
-						consoleHelper.objectName () + ":combo");
-
-			}
-
-		};
-
-		consoleModule.addResponder (
-
-			searchResultsResponderName,
-
-			tabContextResponder.get ()
-
-				.tab (
-					tabName)
-
-				.title (
-					capitalise (
-						stringFormat (
-							"%s search results",
-							consoleHelper.friendlyName ())))
-
-				.pagePartFactory (
-					searchResultsPartFactory));
 
 	}
 
@@ -508,97 +384,6 @@ class ObjectSearchPageBuilder <
 							spec.resultsClassName ()),
 						() -> consoleHelper.objectClass ()));
 
-			searchFormType =
-				formContextManager.createFormType (
-					taskLogger,
-					consoleModule,
-					name,
-					searchClass,
-					optionalAbsent (),
-					FormType.search,
-					optionalOf (
-						spec.searchFormFieldsName ()),
-					optionalAbsent ());
-
-			boolean haveResultsColumnsFormFieldsName =
-				isNotNull (
-					spec.resultsColumnFormFieldsName ());
-
-			boolean haveResultsRowFormFieldsName =
-				isNotNull (
-					spec.resultsColumnFormFieldsName ());
-
-			boolean haveResultsFormFieldsNames =
-				haveResultsColumnsFormFieldsName
-				|| haveResultsRowFormFieldsName;
-
-			boolean haveResultsModes =
-				collectionIsNotEmpty (
-					spec.resultsModes ());
-
-			if (haveResultsFormFieldsNames && haveResultsModes) {
-				throw new RuntimeException ();
-			}
-
-			if (haveResultsFormFieldsNames) {
-
-				resultsModes =
-					ImmutableMap.<
-						String,
-						ObjectSearchResultsMode <ResultType>
-					> of (
-						"normal",
-						new ObjectSearchResultsMode <ResultType> ()
-
-					.name (
-						"normal")
-
-					.formContextBuilder (
-						formContextManager.createFormType (
-							taskLogger,
-							consoleModule,
-							name,
-							resultClass,
-							optionalAbsent (),
-							FormType.readOnly,
-							optionalFromNullable (
-								spec.resultsColumnFormFieldsName ()),
-							optionalFromNullable (
-								spec.resultsRowFormFieldsName ())))
-
-				);
-
-			} else {
-
-				resultsModes =
-					mapWithDerivedKey (
-						iterableMap (
-							resultsModeSpec ->
-								new ObjectSearchResultsMode <ResultType> ()
-
-							.name (
-								resultsModeSpec.name ())
-
-							.formContextBuilder (
-								formContextManager.createFormType (
-									taskLogger,
-									consoleModule,
-									stringFormat (
-										"%s-%s",
-										name,
-										resultsModeSpec.name ()),
-									resultClass,
-									optionalAbsent (),
-									FormType.search,
-									optionalOf (
-										resultsModeSpec.formFieldsName ()),
-									optionalAbsent ())),
-
-						spec.resultsModes ()),
-					ObjectSearchResultsMode::name);
-
-			}
-
 			privKey =
 				spec.privKey ();
 
@@ -635,26 +420,37 @@ class ObjectSearchPageBuilder <
 						container.pathPrefix (),
 						name));
 
-			searchResponderName =
-				ifNull (
-					spec.searchResponderName (),
+			searchResponderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
 					stringFormat (
 						"%s%sResponder",
 						container.newBeanNamePrefix (),
 						capitalise (
-							name)));
+							name)),
+					WebResponder.class);
 
-			searchResultsResponderName =
-				ifNull (
-					spec.searchResultsResponderName (),
+			resultsResponderProvider =
+				componentManager.getComponentProviderRequired (
+					taskLogger,
 					stringFormat (
 						"%s%sResultsResponder",
 						container.newBeanNamePrefix (),
 						capitalise (
-							name)));
+							name)),
+					WebResponder.class);
 
-			itemsPerPage =
-				100l;
+			searchFormType =
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						taskLogger,
+						stringFormat (
+							"%s%sFormType",
+							hyphenToCamel (
+								container.consoleModule ().name ()),
+							hyphenToCamelCapitalise (
+								spec.searchFormTypeName ())),
+						ConsoleFormType.class));
 
 		}
 

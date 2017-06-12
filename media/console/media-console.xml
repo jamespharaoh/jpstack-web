@@ -19,7 +19,7 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<context-responder-page
 				name="audio"/>
@@ -47,13 +47,22 @@
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="media">
+	<forms>
 
-		<id-field/>
+		<form
+			name="summary"
+			object-type="media"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 	<!--
 	final StringLookup mediaTitleLookup =

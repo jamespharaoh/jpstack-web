@@ -1,15 +1,19 @@
 package wbs.platform.queue.console;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("queueSubjectActionsAction")
 public
@@ -21,15 +25,20 @@ class QueueSubjectActionsAction
 	@SingletonDependency
 	Database database;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("queueSubjectActionsResponder")
+	Provider <WebResponder> actionsResponderProvider;
+
 	// details
 
 	@Override
 	protected
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"queueSubjectActionsResponder");
+		return actionsResponderProvider.get ();
 
 	}
 
@@ -37,7 +46,7 @@ class QueueSubjectActionsAction
 
 	@Override
 	protected
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		/*

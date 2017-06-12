@@ -23,18 +23,27 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="text">
+	<forms>
 
-		<id-field/>
+		<form
+			name="summary"
+			object-type="text"
+			type="read-only">
 
-	</field-set>
+			<columns>
+
+				<id-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

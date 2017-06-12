@@ -3,7 +3,6 @@ package wbs.platform.event.console;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 import static wbs.utils.time.TimeUtils.millisecondsToDuration;
@@ -28,9 +27,7 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
-import wbs.console.part.PagePartFactory;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -44,7 +41,6 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
@@ -138,39 +134,6 @@ class EventConsoleLogicImplementation
 					objectGlobalIds);
 
 		}
-
-	}
-
-	@Override
-	public
-	PagePartFactory makeEventsPartFactory (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ObjectLookup <?> objectLookup) {
-
-		return parentTransaction -> {
-
-			try (
-
-				NestedTransaction transaction =
-					parentTransaction.nestTransaction (
-						logContext,
-						"makeEventsPartFactory");
-
-			) {
-
-				PermanentRecord <?> object =
-					genericCastUnchecked (
-						objectLookup.lookupObject (
-							transaction,
-							requestContext.consoleContextStuffRequired ()));
-
-				return makeEventsPart (
-					transaction,
-					object);
-
-			}
-
-		};
 
 	}
 

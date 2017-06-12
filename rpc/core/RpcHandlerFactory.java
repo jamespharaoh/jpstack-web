@@ -7,21 +7,19 @@ import lombok.NonNull;
 
 import wbs.framework.logging.TaskLogger;
 
-import wbs.platform.rpc.web.ReusableRpcHandler;
-
 public
 class RpcHandlerFactory
-	implements ReusableRpcHandler {
+	implements RpcHandler {
 
 	private
-	Class<? extends RpcHandler> handlerClass;
+	Class <? extends RpcHandler> handlerClass;
 
 	private
 	Object parentObject;
 
 	public
 	RpcHandlerFactory (
-			Class<? extends RpcHandler> newHandlerClass,
+			Class <? extends RpcHandler> newHandlerClass,
 			Object newParentObject) {
 
 		handlerClass =

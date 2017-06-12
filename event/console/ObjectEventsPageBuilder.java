@@ -1,7 +1,6 @@
 package wbs.platform.event.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -17,7 +16,6 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -45,10 +44,13 @@ class ObjectEventsPageBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
+	ComponentManager componentManager;
+
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	@SingletonDependency
-	EventConsoleLogic eventConsoleModule;
+	EventConsoleLogic eventConsoleLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -123,12 +125,10 @@ class ObjectEventsPageBuilder <
 					resolvedExtensionPoint);
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
-
-			buildResponder (
-				taskLogger);
 
 		}
 
@@ -162,48 +162,31 @@ class ObjectEventsPageBuilder <
 	}
 
 	void buildFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
-
-		consoleModule.addContextFile (
-			fileName,
-			consoleFile.get ()
-				.getResponderName (responderName)
-				.privName (privKey),
-			extensionPoint.contextTypeNames ());
-
-	}
-
-	void buildResponder (
-			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"buildResponder");
+					"buildFile");
 
 		) {
 
-			PagePartFactory eventsPartFactory =
-				eventConsoleModule.makeEventsPartFactory (
-					taskLogger,
-					consoleHelper);
+			consoleModule.addContextFile (
+				fileName,
+				consoleFile.get ()
 
-			consoleModule.addResponder (
-				responderName,
-				tabContextResponder.get ()
+					.getResponderName (
+						taskLogger,
+						responderName)
 
-					.tab (
-						tabName)
+					.privName (
+						privKey),
 
-					.title (
-						stringFormat (
-							"%s events",
-							capitalise (consoleHelper.friendlyName () + " events")))
-
-					.pagePartFactory (
-						eventsPartFactory));
+				extensionPoint.contextTypeNames ()
+			);
 
 		}
 

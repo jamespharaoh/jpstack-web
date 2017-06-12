@@ -33,12 +33,8 @@ class ObjectListPageSpec
 	String typeCode;
 
 	@DataAttribute (
-		name = "fields")
-	String formFieldsName;
-
-	@DataAttribute (
-		name = "fields-provider")
-	String fieldsProviderName;
+		name = "form")
+	String formTypeName;
 
 	@DataAttribute (
 		name = "target-context-type")
@@ -49,17 +45,17 @@ class ObjectListPageSpec
 	@DataChildren (
 		direct = true,
 		childElement = "list-browser")
-	List<ObjectListBrowserSpec> listBrowsers;
+	List <ObjectListBrowserSpec> listBrowsers;
 
 	@DataChildrenIndex
-	Map<String,ObjectListBrowserSpec> listBrowsersByFieldName;
+	Map <String, ObjectListBrowserSpec> listBrowsersByFieldName;
 
 	@DataChildren (
 		direct = true,
 		childElement = "list-tab")
-	List<ObjectListTabSpec> listTabs;
+	List <ObjectListTabSpec> listTabs;
 
 	@DataChildrenIndex
-	Map<String,ObjectListTabSpec> listTabsByName;
+	Map <String, ObjectListTabSpec> listTabsByName;
 
 }

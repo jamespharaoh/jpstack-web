@@ -45,18 +45,18 @@
 					tab-label="Queue items"
 					object-type="queueItem"
 					search-class="wbs.platform.queue.model.QueueItemSearch"
-					search-fields="queue-item-report-search"
-					results-column-fields="queue-item-report-results"/>
+					search-form="queue-item-report-search"
+					results-form="queue-item-report-results"/>
 
 				<object-search-page
 					name="user"
 					tab-label="Users"
 					object-type="queueItem"
 					search-class="wbs.platform.queue.model.QueueItemSearch"
-					search-fields="user-queue-search"
+					search-form="user-queue-search"
 					search-dao-method="searchUserQueueReportIds"
 					results-class="wbs.platform.queue.model.UserQueueReport"
-					results-column-fields="user-queue-results"
+					results-form="user-queue-results"
 					results-dao-method="searchUserQueueReports"/>
 
 			</section>
@@ -84,10 +84,10 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				form="settings"/>
 
 			<context-link
 				name="item"
@@ -101,172 +101,179 @@
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="queue">
-
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-
-		<text-field
-			name="backgroundColour"/>
-
-		<text-field
-			name="foregroundColour"/>
-
-		<integer-field
-			name="defaultPriority"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="queue">
-
-		<text-field
-			name="backgroundColour"
-			nullable="yes"/>
-
-		<text-field
-			name="foregroundColour"
-			nullable="yes"/>
-
-		<integer-field
-			name="defaultPriority"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="queue-item-report-search"
-		class="wbs.platform.queue.model.QueueItemSearch">
-
-		<object-field
-			name="sliceId"
-			object-type="slice"
-			nullable="yes"/>
-
-		<object-field
-			name="queueParentTypeId"
-			object-type="objectType"
-			nullable="yes"/>
-
-		<object-field
-			name="queueTypeId"
-			object-type="queueType"
-			nullable="yes"/>
-
-		<object-field
-			name="queueId"
-			object-type="queue"
-			nullable="yes"/>
-
-		<interval-field
-			name="createdTime"
-			label="Created time"
-			nullable="yes"/>
-
-		<object-field
-			name="claimedUserId"
-			object-type="user"
-			nullable="yes"/>
-
-		<object-field
-			name="processedUserId"
-			object-type="user"
-			nullable="yes"/>
-
-		<enum-field
-			name="state"
-			nullable="yes"/>
-
-	</field-set>
-
-	<field-set
-		name="queue-item-report-results"
-		object-name="queueItem">
-
-		<object-field
-			name="processedUser"
-			object-type="user"/>
-
-		<object-field
-			name="claimedUser"
-			field="queueItemClaim.user"
-			object-type="user"/>
-
-		<object-field
-			name="object"
-			field="greatgrandparent"/>
-
-		<object-field
-			name="queue"
-			object-type="queue"
-			field="grandparent"
-			root-field="greatgrandparent"/>
-
-		<object-field
-			name="item"
-			object-type="queueItem"
-			field="this"
-			root-field="grandparent"/>
-
-		<timestamp-field
-			name="createdTime"
-			label="Created"/>
-
-		<timestamp-field
-			name="pendingTime"
-			label="Pending"/>
-
-		<timestamp-field
-			name="processedTime"
-			label="Processed"/>
-
-	</field-set>
-
-	<field-set
-		name="user-queue-search"
-		class="wbs.platform.queue.model.QueueItemSearch">
-
-		<interval-field
-			name="createdTime"
-			label="Time"/>
-
-	</field-set>
-
-	<field-set
-		name="user-queue-results"
-		class="wbs.platform.queue.model.UserQueueReport">
-
-		<object-field
-			name="user"
-			object-type="user"/>
-
-		<integer-field
-			name="messageCount"/>
-
-		<timestamp-field
-			name="firstMessage"/>
-
-		<timestamp-field
-			name="lastMessage"/>
-
-		<seconds-field
-			name="timeToProcess"
-			format="numeric"/>
-
-	</field-set>
-
 	<forms>
+
+		<form
+			name="queue-item-report-search"
+			class="wbs.platform.queue.model.QueueItemSearch"
+			type="search">
+
+			<columns>
+
+				<object-field
+					name="sliceId"
+					object-type="slice"
+					nullable="yes"/>
+
+				<object-field
+					name="queueParentTypeId"
+					object-type="objectType"
+					nullable="yes"/>
+
+				<object-field
+					name="queueTypeId"
+					object-type="queueType"
+					nullable="yes"/>
+
+				<object-field
+					name="queueId"
+					object-type="queue"
+					nullable="yes"/>
+
+				<interval-field
+					name="createdTime"
+					label="Created time"
+					nullable="yes"/>
+
+				<object-field
+					name="claimedUserId"
+					object-type="user"
+					nullable="yes"/>
+
+				<object-field
+					name="processedUserId"
+					object-type="user"
+					nullable="yes"/>
+
+				<enum-field
+					name="state"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="queue-item-report-results"
+			object-type="queue-item"
+			type="read-only">
+
+			<columns>
+
+				<object-field
+					name="processedUser"
+					object-type="user"/>
+
+				<object-field
+					name="claimedUser"
+					field="queueItemClaim.user"
+					object-type="user"/>
+
+				<object-field
+					name="object"
+					field="greatgrandparent"/>
+
+				<object-field
+					name="queue"
+					object-type="queue"
+					field="grandparent"
+					root-field="greatgrandparent"/>
+
+				<object-field
+					name="item"
+					object-type="queueItem"
+					field="this"
+					root-field="grandparent"/>
+
+				<timestamp-field
+					name="createdTime"
+					label="Created"/>
+
+				<timestamp-field
+					name="pendingTime"
+					label="Pending"/>
+
+				<timestamp-field
+					name="processedTime"
+					label="Processed"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="user-queue-search"
+			class="wbs.platform.queue.model.QueueItemSearch"
+			type="search">
+
+			<columns>
+
+				<interval-field
+					name="createdTime"
+					label="Time"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="user-queue-results"
+			class="wbs.platform.queue.model.UserQueueReport"
+			type="search">
+
+			<columns>
+
+				<object-field
+					name="user"
+					object-type="user"/>
+
+				<integer-field
+					name="messageCount"/>
+
+				<timestamp-field
+					name="firstMessage"/>
+
+				<timestamp-field
+					name="lastMessage"/>
+
+				<seconds-field
+					name="timeToProcess"
+					format="numeric"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="queue"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+
+				<text-field
+					name="backgroundColour"/>
+
+				<text-field
+					name="foregroundColour"/>
+
+				<integer-field
+					name="defaultPriority"/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="debug"
 			class="wbs.platform.queue.console.QueueDebugForm"
 			type="search">
 
-			<column-fields>
+			<columns>
 
 				<object-field
 					name="userId"
@@ -286,7 +293,30 @@
 					name="claimedItems"
 					nullable="no"/>
 
-			</column-fields>
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="queue"
+			type="update">
+
+			<columns>
+
+				<text-field
+					name="backgroundColour"
+					nullable="yes"/>
+
+				<text-field
+					name="foregroundColour"
+					nullable="yes"/>
+
+				<integer-field
+					name="defaultPriority"
+					nullable="yes"/>
+
+			</columns>
 
 		</form>
 

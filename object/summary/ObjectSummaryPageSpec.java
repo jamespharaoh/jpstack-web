@@ -29,12 +29,8 @@ class ObjectSummaryPageSpec
 	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute (
-		name = "fields")
-	String formFieldsName;
-
-	@DataAttribute (
-		name = "fields-provider")
-	String fieldsProviderName;
+		name = "form")
+	String formTypeName;
 
 	@DataAttribute
 	String privKey;

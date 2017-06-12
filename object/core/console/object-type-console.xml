@@ -22,14 +22,14 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 			<object-events-page/>
 
@@ -37,22 +37,36 @@
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="objectType">
+	<forms>
 
-		<id-field/>
-		<code-field/>
+		<form
+			name="list"
+			object-type="object-type"
+			type="read-only">
 
-	</field-set>
+			<columns>
 
-	<field-set
-		name="summary"
-		object-name="objectType">
+				<id-field/>
+				<code-field/>
 
-		<id-field/>
-		<code-field/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="summary"
+			object-type="object-type"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<code-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

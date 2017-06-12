@@ -14,6 +14,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
@@ -28,7 +29,7 @@ import wbs.framework.servlet.FilterComponent;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("coreAuthFilter")
 public
@@ -57,6 +58,11 @@ class CoreAuthFilter
 
 	@SingletonDependency
 	UserSessionLogic userSessionLogic;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <CoreLogonResponder> logonResponderProvider;
 
 	// implementation
 
@@ -122,15 +128,11 @@ class CoreAuthFilter
 
 					} else {
 
-						Provider <Responder> logonResponder =
-							consoleManager.responder (
-								"coreLogonResponder",
-								true);
+						WebResponder logonResponder =
+							logonResponderProvider.get ();
 
-						logonResponder
-							.get ()
-							.execute (
-								taskLogger);
+						logonResponder.execute (
+							taskLogger);
 
 					}
 

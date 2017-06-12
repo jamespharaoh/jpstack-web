@@ -29,48 +29,62 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				form="list"/>
 
 		</list>
 
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="list"
-		object-name="queueItemClaim">
+	<forms>
 
-		<object-field
-			name="user"
-			object-type="user"/>
+		<form
+			name="list"
+			object-type="queue-item-claim"
+			type="read-only">
 
-		<object-field
-			name="unclaimUser"
-			object-type="user"/>
+			<columns>
 
-		<timestamp-field
-			name="startTime"/>
+				<object-field
+					name="user"
+					object-type="user"/>
 
-		<timestamp-field
-			name="endTime"/>
+				<object-field
+					name="unclaimUser"
+					object-type="user"/>
 
-		<enum-field
-			name="status"/>
+				<timestamp-field
+					name="startTime"/>
 
-	</field-set>
+				<timestamp-field
+					name="endTime"/>
 
-	<field-set
-		name="summary"
-		object-name="queueItemClaim">
+				<enum-field
+					name="status"/>
 
-		<id-field/>
+			</columns>
 
-	</field-set>
+		</form>
+
+		<form
+			name="summary"
+			object-type="queue-item-claim"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

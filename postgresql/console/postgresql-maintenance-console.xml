@@ -29,38 +29,47 @@
 		<object>
 
 			<object-summary-page
-				fields="summary"/>
+				form="summary"/>
 
 		</object>
 
 	</object-context>
 
-	<field-set
-		name="summary"
-		object-name="postgresqlMaintenance">
+	<forms>
 
-		<id-field/>
+		<form
+			name="summary"
+			object-type="postgresql-maintenance"
+			type="read-only">
 
-		<text-field
-			name="command"/>
+			<columns>
 
-		<!--
-		<integer-field
-			name="frequency"/>
-		-->
+				<id-field/>
 
-		<integer-field
-			name="sequence"/>
+				<text-field
+					name="command"/>
 
-		<timestamp-field
-			name="lastRun"/>
+				<!--
+				<integer-field
+					name="frequency"/>
+				-->
 
-		<seconds-field
-			name="lastDuration"/>
+				<integer-field
+					name="sequence"/>
 
-		<text-area-field
-			name="lastOutput"/>
+				<timestamp-field
+					name="lastRun"/>
 
-	</field-set>
+				<seconds-field
+					name="lastDuration"/>
+
+				<text-area-field
+					name="lastOutput"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
 
 </console-module>

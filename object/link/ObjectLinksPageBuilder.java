@@ -38,7 +38,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.action.Action;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("objectLinksPageBuilder")
 public
@@ -98,7 +99,8 @@ class ObjectLinksPageBuilder <
 	String tabLabel;
 	String localFile;
 	String privKey;
-	String responderName;
+
+	Provider <WebResponder> responderProvider;
 
 	String pageTitle;
 	ModelField linksField;
@@ -133,6 +135,8 @@ class ObjectLinksPageBuilder <
 			setDefaults (
 				taskLogger);
 
+			buildResponder ();
+
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
@@ -144,11 +148,10 @@ class ObjectLinksPageBuilder <
 					resolvedExtensionPoint);
 
 				buildFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
-
-			buildResponder ();
 
 		}
 
@@ -182,58 +185,71 @@ class ObjectLinksPageBuilder <
 	}
 
 	void buildFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		Provider <Action> actionProvider =
-			() -> objectLinksAction.get ()
+		try (
 
-			.responderName (
-				responderName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildFile");
 
-			.contextHelper (
-				consoleHelper)
+		) {
 
-			.contextLinkField (
-				linksField.name ())
+			Provider <WebAction> actionProvider =
+				() -> objectLinksAction.get ()
 
-			.targetHelper (
-				targetConsoleHelper)
+				.responderProvider (
+					responderProvider)
 
-			.targetLinkField (
-				targetLinksField.name ())
+				.contextHelper (
+					consoleHelper)
 
-			.addEventName (
-				addEventName)
+				.contextLinkField (
+					linksField.name ())
 
-			.removeEventName (
-				removeEventName)
+				.targetHelper (
+					targetConsoleHelper)
 
-			.eventOrder (
-				eventOrder)
+				.targetLinkField (
+					targetLinksField.name ())
 
-			.contextUpdateSignalName (
-				updateSignalName)
+				.addEventName (
+					addEventName)
 
-			.targetUpdateSignalName (
-				targetUpdateSignalName)
+				.removeEventName (
+					removeEventName)
 
-			.successNotice (
-				successNotice);
+				.eventOrder (
+					eventOrder)
 
-		consoleModule.addContextFile (
-			localFile,
-			consoleFile.get ()
+				.contextUpdateSignalName (
+					updateSignalName)
 
-				.getResponderName (
-					responderName)
+				.targetUpdateSignalName (
+					targetUpdateSignalName)
 
-				.postActionProvider (
-					actionProvider)
+				.successNotice (
+					successNotice);
 
-				.privName (
-					privKey),
+			consoleModule.addContextFile (
+				localFile,
+				consoleFile.get ()
 
-			extensionPoint.contextTypeNames ());
+					.getResponderProvider (
+						responderProvider)
+
+					.postActionProvider (
+						actionProvider)
+
+					.privName (
+						privKey),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 
@@ -274,9 +290,8 @@ class ObjectLinksPageBuilder <
 
 		};
 
-		consoleModule.addResponder (
-			responderName,
-			tabContextResponder.get ()
+		responderProvider =
+			() -> tabContextResponder.get ()
 
 			.tab (
 				tabName)
@@ -287,7 +302,7 @@ class ObjectLinksPageBuilder <
 			.pagePartFactory (
 				partFactory)
 
-		);
+		;
 
 	}
 
@@ -334,13 +349,6 @@ class ObjectLinksPageBuilder <
 				stringFormat (
 					"%s.manage",
 					container.pathPrefix ());
-
-			responderName =
-				stringFormat (
-					"%s%sResponder",
-					container.newBeanNamePrefix (),
-					capitalise (
-						name));
 
 			pageTitle =
 				stringFormat (

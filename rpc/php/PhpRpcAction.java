@@ -1,6 +1,8 @@
 package wbs.platform.rpc.php;
 
 import static wbs.utils.etc.EnumUtils.enumName;
+import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -14,14 +16,14 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
-
-import wbs.api.mvc.WebApiAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -42,19 +44,19 @@ import wbs.platform.rpc.core.RpcException;
 import wbs.platform.rpc.core.RpcHandler;
 import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
-import wbs.platform.rpc.web.ReusableRpcHandler;
 
 import wbs.utils.io.BorrowedInputStream;
 import wbs.utils.io.RuntimeIoException;
 
 import wbs.web.context.RequestContext;
-import wbs.web.responder.Responder;
+import wbs.web.mvc.WebAction;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("phpRpcAction")
 public
 class PhpRpcAction
-	implements WebApiAction {
+	implements WebAction {
 
 	// singleton dependencies
 
@@ -75,67 +77,101 @@ class PhpRpcAction
 	// properties
 
 	@Getter @Setter
-	ReusableRpcHandler rpcHandler;
+	Provider <? extends RpcHandler> rpcHandlerProvider;
+
+	// property setters
 
 	public
 	PhpRpcAction rpcHandlerName (
-			final String name) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String name) {
 
-		ReusableRpcHandler rpcHandler =
-			new ReusableRpcHandler () {
+		try (
 
-			@Override
-			public
-			RpcResult handle (
-					@NonNull TaskLogger parentTaskLogger,
-					@NonNull RpcSource source) {
-
-				RpcHandler delegate =
-					componentManager.getComponentRequired (
-						parentTaskLogger,
-						name,
-						RpcHandler.class);
-
-				return delegate.handle (
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
 					parentTaskLogger,
-					source);
+					"rpcHandlerName");
+
+		) {
+
+			return rpcHandlerProvider (
+				componentManager.getComponentProviderRequired (
+					taskLogger,
+					name,
+					RpcHandler.class));
+
+		}
+
+	}
+
+	// public implementation
+
+	@Override
+	public
+	Optional <WebResponder> defaultResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"defaultResponder");
+
+		) {
+
+			return optionalOf (
+				makeRpcResponder (
+					Rpc.rpcError (
+						"FIXME",
+						Rpc.stInternalError,
+						"internal-error",
+						"An internal error has occurred")));
+
+		}
+
+	}
+
+	@Override
+	public
+	WebResponder handle (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
+		) {
+
+			RpcResult rpcResult =
+				realGo (
+					parentTaskLogger);
+
+
+			if (
+				isNull (
+					rpcResult)
+			) {
+
+				return null;
 
 			}
 
-		};
-
-		return rpcHandler (
-			rpcHandler);
-
-	}
-
-	@Override
-	public
-	Provider<Responder> makeFallbackResponder () {
-
-		return phpInternalErrorResponder ();
-
-	}
-
-	@Override
-	public
-	Responder go (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		RpcResult ret =
-			realGo (
-				parentTaskLogger);
-
-		return ret != null
-			? phpMapResponderProvider.get ()
+			return phpMapResponderProvider.get ()
 
 				.map (
-					ret.getStruct ().getNative ())
+					rpcResult.getStruct ().getNative ())
 
 				.status (
-					ret.getHttpStatus ())
+					rpcResult.getHttpStatus ())
 
-			: null;
+			;
+
+		}
 
 	}
 
@@ -225,6 +261,9 @@ class PhpRpcAction
 
 			try {
 
+				RpcHandler rpcHandler =
+					rpcHandlerProvider.get ();
+
 				return rpcHandler.handle (
 					taskLogger,
 					new PhpRpcSource (
@@ -247,34 +286,18 @@ class PhpRpcAction
 	}
 
 	private
-	Provider<Responder> makeRpcResponder (
-			final RpcResult result) {
+	WebResponder makeRpcResponder (
+			RpcResult result) {
 
-		return new Provider<Responder> () {
+		return phpMapResponderProvider.get ()
 
-			@Override
-			public
-			Responder get () {
+			.map (
+				result.getStruct ().getNative ())
 
-				return phpMapResponderProvider.get ()
-					.map (result.getStruct ().getNative ())
-					.status (result.getHttpStatus ());
+			.status (
+				result.getHttpStatus ())
 
-			}
-
-		};
-
-	}
-
-	public
-	Provider<Responder> phpInternalErrorResponder () {
-
-		return makeRpcResponder (
-			Rpc.rpcError (
-				"FIXME",
-				Rpc.stInternalError,
-				"internal-error",
-				"An internal error has occurred"));
+		;
 
 	}
 

@@ -50,12 +50,9 @@ class ObjectCreatePageSpec
 	String targetResponderName;
 
 	@DataAttribute (
-		name = "fields")
-	String formFieldsName;
-
-	@DataAttribute (
-		name = "fields-provider")
-	String fieldsProviderName;
+		name = "form",
+		required = true)
+	String formTypeName;
 
 	@DataAttribute (
 		name = "create-time")

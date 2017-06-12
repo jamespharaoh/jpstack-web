@@ -3,6 +3,8 @@ package wbs.platform.user.console;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -10,7 +12,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -24,7 +28,7 @@ import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("userPrivsEditorAction")
 public
@@ -63,23 +67,28 @@ class UserPrivsEditorAction
 	@SingletonDependency
 	UserPrivConsoleHelper userPrivHelper;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("userPrivsEditorResponder")
+	Provider <WebResponder> privsEditorResponderProvider;
+
 	static
 	Pattern privDataPattern =
 		Pattern.compile ("(\\d+)-(can|cangrant)=(0|1)");
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responder (
-			"userPrivsEditorResponder");
+		return privsEditorResponderProvider.get ();
 
 	}
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (

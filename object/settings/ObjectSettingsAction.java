@@ -38,7 +38,7 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
-import wbs.web.responder.Responder;
+import wbs.web.responder.WebResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
@@ -72,10 +72,10 @@ class ObjectSettingsAction <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	Provider <Responder> detailsResponder;
+	Provider <WebResponder> detailsResponderProvider;
 
 	@Getter @Setter
-	Provider <Responder> accessDeniedResponder;
+	Provider <WebResponder> accessDeniedResponderProvider;
 
 	@Getter @Setter
 	String editPrivKey;
@@ -98,10 +98,10 @@ class ObjectSettingsAction <
 
 	@Override
 	public
-	Responder backupResponder (
+	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return detailsResponder.get ();
+		return detailsResponderProvider.get ();
 
 	}
 
@@ -109,7 +109,7 @@ class ObjectSettingsAction <
 
 	@Override
 	public
-	Responder goReal (
+	WebResponder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -129,8 +129,7 @@ class ObjectSettingsAction <
 				requestContext.addError (
 					"Access denied");
 
-				return accessDeniedResponder
-					.get ();
+				return accessDeniedResponderProvider.get ();
 
 			}
 
@@ -222,7 +221,7 @@ class ObjectSettingsAction <
 			requestContext.addNotice (
 				"Settings updated");
 
-			return detailsResponder.get ();
+			return detailsResponderProvider.get ();
 
 		}
 
