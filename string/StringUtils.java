@@ -3,21 +3,29 @@ package wbs.utils.string;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.EnumUtils.enumNameHyphensLazy;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.Misc.minus;
+import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.nullIf;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.integerToDecimalStringLazy;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -591,6 +599,90 @@ class StringUtils {
 	}
 
 	public static
+	List <String> camelToList (
+			@NonNull String string) {
+
+		ImmutableList.Builder <String> listBuilder =
+			ImmutableList.builder ();
+
+		StringBuilder itemBuilder =
+			new StringBuilder ();
+
+		itemBuilder.append (
+			Character.toLowerCase (
+				string.charAt (0)));
+
+		for (
+			int position = 1;
+			position < string.length ();
+			position ++
+		) {
+
+			char character =
+				string.charAt (
+					position);
+
+			if (
+				Character.isUpperCase (
+					character)
+			) {
+
+				listBuilder.add (
+					itemBuilder.toString ());
+
+				itemBuilder =
+					new StringBuilder ();
+
+				itemBuilder.append (
+					Character.toLowerCase (
+						character));
+
+			} else {
+
+				itemBuilder.append (
+					character);
+
+			}
+
+		}
+
+		listBuilder.add (
+			itemBuilder.toString ());
+
+		return listBuilder.build ();
+
+	}
+
+	public static
+	String camelFromIterable (
+			@NonNull Iterable <String> parts) {
+
+		Iterator <String> iterator =
+			parts.iterator ();
+
+		if (! iterator.hasNext ()) {
+			return "";
+		}
+
+		StringBuilder stringBuilder =
+			new StringBuilder ();
+
+		stringBuilder.append (
+			iterator.next ());
+
+		while (iterator.hasNext ()) {
+
+			stringBuilder.append (
+				capitalise (
+					iterator.next ()));
+
+		}
+
+		return stringBuilder.toString ();
+
+	}
+
+	public static
 	String camelToDelimited (
 			String string,
 			String delimiter) {
@@ -1091,6 +1183,16 @@ class StringUtils {
 				string.charAt (0))
 			+ string.substring (1)
 		);
+
+	}
+
+	public static
+	String capitaliseFormat (
+			@NonNull CharSequence ... arguments) {
+
+		return capitalise (
+			stringFormatArray (
+				arguments));
 
 	}
 
@@ -1738,6 +1840,144 @@ class StringUtils {
 			@NonNull String string) {
 
 		return string.length ();
+
+	}
+
+	public static
+	boolean stringStartsWith (
+			@NonNull String prefix,
+			@NonNull String input) {
+
+		if (
+			lessThan (
+				stringLength (
+					input),
+				stringLength (
+					prefix))
+		) {
+			return false;
+		}
+
+		return stringEqualSafe (
+			prefix,
+			substring (
+				input,
+				0,
+				stringLength (
+					prefix)));
+
+	}
+
+	public static
+	boolean stringDoesNotStartWith (
+			@NonNull String prefix,
+			@NonNull String input) {
+
+		return ! stringStartsWith (
+			prefix,
+			input);
+
+	}
+
+	public static
+	boolean stringEndsWith (
+			@NonNull String suffix,
+			@NonNull String input) {
+
+		if (
+			lessThan (
+				stringLength (
+					input),
+				stringLength (
+					suffix))
+		) {
+			return false;
+		}
+
+		return stringEqualSafe (
+			suffix,
+			substring (
+				input,
+				minus (
+					stringLength (
+						input),
+					stringLength (
+						suffix)),
+				stringLength (
+					input)));
+
+	}
+
+	public static
+	boolean stringDoesNotEndWith (
+			@NonNull String suffix,
+			@NonNull String input) {
+
+		return ! stringEndsWith (
+			suffix,
+			input);
+
+	}
+
+	public static
+	Optional <String> stringExtract (
+			@NonNull String prefix,
+			@NonNull String suffix,
+			@NonNull String input) {
+
+		if (
+			lessThan (
+				stringLength (
+					input),
+				sum (
+					stringLength (
+						prefix),
+					stringLength (
+						suffix)))
+		) {
+			return optionalAbsent ();
+		}
+
+		if (
+			stringDoesNotStartWith (
+				prefix,
+				input)
+		) {
+			return optionalAbsent ();
+		}
+
+		if (
+			stringDoesNotEndWith (
+				suffix,
+				input)
+		) {
+			return optionalAbsent ();
+		}
+
+		return optionalOf (
+			substring (
+				input,
+				stringLength (
+					prefix),
+				minus (
+					stringLength (
+						input),
+					stringLength (
+						suffix))));
+
+	}
+
+	public static
+	String stringExtractRequired (
+			@NonNull String prefix,
+			@NonNull String suffix,
+			@NonNull String input) {
+
+		return optionalGetRequired (
+			stringExtract (
+				prefix,
+				suffix,
+				input));
 
 	}
 

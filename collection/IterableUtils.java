@@ -1,5 +1,7 @@
 package wbs.utils.collection;
 
+import static wbs.utils.collection.ArrayUtils.arrayStream;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -10,6 +12,7 @@ import static wbs.utils.etc.TypeUtils.dynamicCast;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -21,6 +24,7 @@ import java.util.stream.StreamSupport;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 
@@ -124,6 +128,42 @@ class IterableUtils {
 
 	}
 
+	public static <InLeft, InRight, OutKey, OutValue>
+	Map <OutKey, OutValue> iterableMapToMap (
+			@NonNull Iterable <Pair <InLeft, InRight>> input,
+			@NonNull BiFunction <
+				? super InLeft,
+				? super InRight,
+				? extends OutKey
+			> keyFunction,
+			@NonNull BiFunction <
+				? super InLeft,
+				? super InRight,
+				? extends OutValue
+			> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> builder =
+			ImmutableMap.builder ();
+
+		for (
+			Pair <InLeft, InRight> item
+				: input
+		) {
+
+			builder.put (
+				keyFunction.apply (
+					item.getLeft (),
+					item.getRight ()),
+				valueFunction.apply (
+					item.getLeft (),
+					item.getRight ()));
+
+		}
+
+		return builder.build ();
+
+	}
+
 	public static <InputType, OutputType>
 	Set <OutputType> iterableMapToSet (
 			@NonNull Function <
@@ -208,10 +248,33 @@ class IterableUtils {
 			.map (
 				mapping::apply)
 
-			.iterator ();
+			.iterator ()
+
+		;
 
 	}
 
+	public static <InputType, OutputType>
+	List <OutputType> iterableFilterMapToList (
+			@NonNull Iterable <? extends InputType> iterable,
+			@NonNull Predicate <? super InputType> predicate,
+			@NonNull Function <? super InputType, OutputType> mapping) {
+
+		return Streams.stream (
+			iterable)
+
+			.filter (
+				predicate)
+
+			.map (
+				mapping::apply)
+
+			.collect (
+				Collectors.toList ())
+
+		;
+
+	}
 
 	public static <ItemType>
 	Stream <ItemType> iterableStream (
@@ -345,7 +408,10 @@ class IterableUtils {
 			}
 
 			if (foundItem != null) {
-				throw new IllegalArgumentException ();
+
+				throw new IllegalArgumentException (
+					"Multiple items matched");
+
 			}
 
 			foundItem =
@@ -407,6 +473,75 @@ class IterableUtils {
 						optionalItem))
 
 			.iterator ()
+
+		;
+
+	}
+
+	public static <Type>
+	Iterable <Type> iterableChainArguments () {
+
+		return emptyList ();
+
+	}
+
+	public static <Type>
+	Iterable <Type> iterableChainArguments (
+			@NonNull Iterable <Type> iterable0) {
+
+		return iterable0;
+
+	}
+
+	@SafeVarargs
+	public static <Type>
+	Iterable <Type> iterableChainArguments (
+			@NonNull Iterable <Type> ... iterables) {
+
+		return () ->
+			arrayStream (
+				iterables)
+
+			.flatMap (
+				iterable ->
+					iterableStream (
+						iterable))
+
+			.iterator ();
+
+	}
+
+	public static <Type>
+	Iterable <Type> iterableChain (
+			@NonNull Iterable <Iterable <Type>> iterables) {
+
+		return () ->
+			iterableStream (
+				iterables)
+
+			.flatMap (
+				iterable ->
+					iterableStream (
+						iterable))
+
+			.iterator ();
+
+	}
+
+	public static <Type>
+	List <Type> iterableChainToList (
+			@NonNull Iterable <Iterable <Type>> iterables) {
+
+		return iterableStream (
+			iterables)
+
+			.flatMap (
+				iterable ->
+					iterableStream (
+						iterable))
+
+			.collect (
+				Collectors.toList ())
 
 		;
 
