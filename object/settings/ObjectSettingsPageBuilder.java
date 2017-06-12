@@ -5,6 +5,8 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamelCapitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -444,6 +446,18 @@ class ObjectSettingsPageBuilder <
 					stringFormat (
 						"%s.manage",
 						consoleHelper.objectName ()));
+
+			formType =
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						taskLogger,
+						stringFormat (
+							"%s%sFormType",
+							hyphenToCamel (
+								container.consoleModule ().name ()),
+							hyphenToCamelCapitalise (
+								spec.formTypeName ())),
+						ConsoleFormType.class));
 
 		}
 
