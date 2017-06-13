@@ -1,0 +1,43 @@
+<model-meta
+	name="shnProductType"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="publicName"
+			nullable="yes"/>
+
+	</fields>
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a product type"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

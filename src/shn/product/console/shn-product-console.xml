@@ -1,0 +1,213 @@
+<console-module
+	name="shn-product">
+
+	<console-helper-provider
+		object-name="shnProduct">
+
+		<priv-key
+			name="shnProduct.manage"
+			priv="manage"/>
+
+		<context-stuff
+			name="shnProductName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="shnProduct"
+		object-name="shnProduct">
+
+		<list>
+
+			<object-search-page
+				search-class="shn.product.model.ShnProductSearch"
+				search-form="search"
+				results-form="results"/>
+
+			<object-create-page
+				form="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				form="summary"/>
+
+			<object-settings-page
+				form="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<forms>
+
+		<form
+			name="search"
+			class="shn.product.model.ShnProductSearch"
+			type="search">
+
+			<columns>
+
+				<object-field
+					name="sliceId"
+					object-type="slice"
+					nullable="yes"/>
+
+				<text-field
+					name="name"
+					nullable="yes"/>
+
+				<text-field
+					name="description"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="deleted"
+					nullable="yes"/>
+
+				<text-field
+					name="publicTitle"
+					nullable="yes"/>
+
+				<text-field
+					name="publicDescription"
+					nullable="yes"/>
+
+				<object-field
+					name="productTypeId"
+					object-type="shnProductType"
+					nullable="yes"/>
+
+				<text-field
+					name="sku"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="results"
+			object-type="shn-product"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicTitle"/>
+
+				<object-field
+					name="productType"
+					label="type"
+					object-type="shnProductType"/>
+
+				<text-field
+					name="sku"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="shn-product"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="shn-product"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicTitle"/>
+
+				<text-area-field
+					name="publicDescription"/>
+
+				<object-field
+					name="productType"
+					object-type="shnProductType"/>
+
+				<!--
+				<reference-field
+					name="vendor"
+					type="vendor"/>
+				-->
+
+				<text-field
+					name="sku"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="shn-product"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicDescription"
+					nullable="yes"/>
+
+				<object-field
+					name="productType"
+					object-type="shnProductType"
+					nullable="yes"/>
+
+				<!--
+				<reference-field
+					name="vendor"
+					type="vendor"/>
+				-->
+
+				<text-field
+					name="sku"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
+
+</console-module>

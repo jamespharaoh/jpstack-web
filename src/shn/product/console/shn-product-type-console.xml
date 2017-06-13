@@ -1,0 +1,125 @@
+<console-module
+	name="shn-product-type">
+
+	<console-helper-provider
+		object-name="shnProductType">
+
+		<priv-key
+			name="shnProductType.manage"
+			priv="manage"/>
+
+		<context-stuff
+			name="shnProductTypeName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="shnProductType"
+		object-name="shnProductType">
+
+		<list>
+
+			<object-list-page
+				form="list"/>
+
+			<object-create-page
+				form="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				form="summary"/>
+
+			<object-settings-page
+				form="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<forms>
+
+		<form
+			name="list"
+			object-type="shn-product-type"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="shn-product-type"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="shn-product-type"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="shn-product-type"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
+
+</console-module>

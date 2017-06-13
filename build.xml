@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="wbs-hades" basedir="." default="build" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
+<project name="shopping-nation" basedir="." default="build" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
   <property environment="env"/>
   <property file="${env.WBS_BUILD_PROPERTIES}"/>
   <path id="classpath">
@@ -67,7 +67,9 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
       <include name="wbs/web/**"/>
+      <include name="shn/**/generate/**"/>
       <include name="wbs/**/generate/**"/>
+      <include name="shn/**/metamodel/**"/>
       <include name="wbs/**/metamodel/**"/>
     </javac>
     <copy todir="work/bin">
@@ -89,10 +91,15 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
       <include name="wbs/web/**"/>
+      <include name="shn/**/generate/**"/>
       <include name="wbs/**/generate/**"/>
+      <include name="shn/**/hibernate/**"/>
       <include name="wbs/**/hibernate/**"/>
+      <include name="shn/**/metamodel/**"/>
       <include name="wbs/**/metamodel/**"/>
+      <include name="shn/**/build/**"/>
       <include name="wbs/**/build/**"/>
+      <include name="shn/**/model/**"/>
       <include name="wbs/**/model/**"/>
     </javac>
     <copy todir="work/bin">
@@ -242,58 +249,11 @@
       <fileset dir="src/wbs/sms/message/wap/api/files"/>
       <fileset dir="src/wbs/sms/customer/api/files"/>
       <fileset dir="src/wbs/sms/spendlimit/api/files"/>
-      <fileset dir="src/wbs/smsapps/common/api/files"/>
-      <fileset dir="src/wbs/smsapps/alerts/api/files"/>
-      <fileset dir="src/wbs/smsapps/autoresponder/api/files"/>
-      <fileset dir="src/wbs/smsapps/broadcast/api/files"/>
-      <fileset dir="src/wbs/smsapps/forwarder/api/files"/>
-      <fileset dir="src/wbs/smsapps/manualresponder/api/files"/>
-      <fileset dir="src/wbs/smsapps/sendsms/api/files"/>
-      <fileset dir="src/wbs/smsapps/subscription/api/files"/>
-      <fileset dir="src/wbs/apn/misc/api/files"/>
-      <fileset dir="src/wbs/apn/chat/core/api/files"/>
-      <fileset dir="src/wbs/apn/chat/ad/api/files"/>
-      <fileset dir="src/wbs/apn/chat/adult/api/files"/>
-      <fileset dir="src/wbs/apn/chat/affiliate/api/files"/>
-      <fileset dir="src/wbs/apn/chat/api/api/files"/>
-      <fileset dir="src/wbs/apn/chat/approval/api/files"/>
-      <fileset dir="src/wbs/apn/chat/bill/api/files"/>
-      <fileset dir="src/wbs/apn/chat/broadcast/api/files"/>
-      <fileset dir="src/wbs/apn/chat/category/api/files"/>
-      <fileset dir="src/wbs/apn/chat/contact/api/files"/>
-      <fileset dir="src/wbs/apn/chat/date/api/files"/>
-      <fileset dir="src/wbs/apn/chat/graphs/api/files"/>
-      <fileset dir="src/wbs/apn/chat/help/api/files"/>
-      <fileset dir="src/wbs/apn/chat/infosite/api/files"/>
-      <fileset dir="src/wbs/apn/chat/keyword/api/files"/>
-      <fileset dir="src/wbs/apn/chat/namednote/api/files"/>
-      <fileset dir="src/wbs/apn/chat/report/api/files"/>
-      <fileset dir="src/wbs/apn/chat/scheme/api/files"/>
-      <fileset dir="src/wbs/apn/chat/settings/api/files"/>
-      <fileset dir="src/wbs/apn/chat/supervisor/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/core/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/image/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/info/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/join/api/files"/>
-      <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
-      <fileset dir="src/wbs/allstar/misc/api/files"/>
-      <fileset dir="src/wbs/imchat/api/files"/>
       <fileset dir="src/wbs/services/wallet/api/files"/>
       <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
-      <fileset dir="src/wbs/integrations/common/api/files"/>
-      <fileset dir="src/wbs/integrations/clockworksms/api/files"/>
-      <fileset dir="src/wbs/integrations/comshen/api/files"/>
-      <fileset dir="src/wbs/integrations/dialogue/api/files"/>
-      <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
-      <fileset dir="src/wbs/integrations/fonix/api/files"/>
-      <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
-      <fileset dir="src/wbs/integrations/oxygenate/api/files"/>
-      <fileset dir="src/wbs/integrations/paypal/api/files"/>
-      <fileset dir="src/wbs/integrations/txtnation/api/files"/>
-      <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
-      <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
+      <fileset dir="src/shn/core/api/files"/>
+      <fileset dir="src/shn/product/api/files"/>
       <fileset dir="src/wbs/test/simulator/api/files"/>
       <fileset dir="src/wbs/test/common/api/files"/>
       <fileset dir="src/wbs/web/api/files"/>
@@ -426,58 +386,11 @@
       <fileset dir="src/wbs/sms/message/wap/console/files"/>
       <fileset dir="src/wbs/sms/customer/console/files"/>
       <fileset dir="src/wbs/sms/spendlimit/console/files"/>
-      <fileset dir="src/wbs/smsapps/common/console/files"/>
-      <fileset dir="src/wbs/smsapps/alerts/console/files"/>
-      <fileset dir="src/wbs/smsapps/autoresponder/console/files"/>
-      <fileset dir="src/wbs/smsapps/broadcast/console/files"/>
-      <fileset dir="src/wbs/smsapps/forwarder/console/files"/>
-      <fileset dir="src/wbs/smsapps/manualresponder/console/files"/>
-      <fileset dir="src/wbs/smsapps/sendsms/console/files"/>
-      <fileset dir="src/wbs/smsapps/subscription/console/files"/>
-      <fileset dir="src/wbs/apn/misc/console/files"/>
-      <fileset dir="src/wbs/apn/chat/core/console/files"/>
-      <fileset dir="src/wbs/apn/chat/ad/console/files"/>
-      <fileset dir="src/wbs/apn/chat/adult/console/files"/>
-      <fileset dir="src/wbs/apn/chat/affiliate/console/files"/>
-      <fileset dir="src/wbs/apn/chat/api/console/files"/>
-      <fileset dir="src/wbs/apn/chat/approval/console/files"/>
-      <fileset dir="src/wbs/apn/chat/bill/console/files"/>
-      <fileset dir="src/wbs/apn/chat/broadcast/console/files"/>
-      <fileset dir="src/wbs/apn/chat/category/console/files"/>
-      <fileset dir="src/wbs/apn/chat/contact/console/files"/>
-      <fileset dir="src/wbs/apn/chat/date/console/files"/>
-      <fileset dir="src/wbs/apn/chat/graphs/console/files"/>
-      <fileset dir="src/wbs/apn/chat/help/console/files"/>
-      <fileset dir="src/wbs/apn/chat/infosite/console/files"/>
-      <fileset dir="src/wbs/apn/chat/keyword/console/files"/>
-      <fileset dir="src/wbs/apn/chat/namednote/console/files"/>
-      <fileset dir="src/wbs/apn/chat/report/console/files"/>
-      <fileset dir="src/wbs/apn/chat/scheme/console/files"/>
-      <fileset dir="src/wbs/apn/chat/settings/console/files"/>
-      <fileset dir="src/wbs/apn/chat/supervisor/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/admin/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/core/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/image/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/info/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/join/console/files"/>
-      <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
-      <fileset dir="src/wbs/allstar/misc/console/files"/>
-      <fileset dir="src/wbs/imchat/console/files"/>
       <fileset dir="src/wbs/services/wallet/console/files"/>
       <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
-      <fileset dir="src/wbs/integrations/common/console/files"/>
-      <fileset dir="src/wbs/integrations/clockworksms/console/files"/>
-      <fileset dir="src/wbs/integrations/comshen/console/files"/>
-      <fileset dir="src/wbs/integrations/dialogue/console/files"/>
-      <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
-      <fileset dir="src/wbs/integrations/fonix/console/files"/>
-      <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
-      <fileset dir="src/wbs/integrations/oxygenate/console/files"/>
-      <fileset dir="src/wbs/integrations/paypal/console/files"/>
-      <fileset dir="src/wbs/integrations/txtnation/console/files"/>
-      <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
-      <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
+      <fileset dir="src/shn/core/console/files"/>
+      <fileset dir="src/shn/product/console/files"/>
       <fileset dir="src/wbs/test/simulator/console/files"/>
       <fileset dir="src/wbs/test/common/console/files"/>
       <fileset dir="src/wbs/web/console/files"/>
@@ -522,16 +435,6 @@
     <copy todir="work/api-test/apps/api/host-manager">
       <fileset dir="work/api-test/webapps/host-manager"/>
     </copy>
-    <delete dir="work/api-test/apps/api/ROOT"/>
-    <copy todir="work/api-test/apps/api/ROOT">
-      <fileset dir="work/api/root"/>
-    </copy>
-    <copy todir="work/api-test/apps/api/manager">
-      <fileset dir="work/api-test/webapps/manager"/>
-    </copy>
-    <copy todir="work/api-test/apps/api/host-manager">
-      <fileset dir="work/api-test/webapps/host-manager"/>
-    </copy>
     <exec failonerror="false" executable="work/api-test/bin/catalina.sh">
       <env key="WBS_CONFIG_XML" value="config/wbs-api-config.xml"/>
       <arg line="run"/>
@@ -557,17 +460,8 @@
     <copy todir="work/console-test/apps/console/host-manager">
       <fileset dir="work/console-test/webapps/host-manager"/>
     </copy>
-    <delete dir="work/console-test/apps/api/ROOT"/>
-    <copy todir="work/console-test/apps/api/ROOT">
-      <fileset dir="work/api/root"/>
-    </copy>
-    <copy todir="work/console-test/apps/api/manager">
-      <fileset dir="work/console-test/webapps/manager"/>
-    </copy>
-    <copy todir="work/console-test/apps/api/host-manager">
-      <fileset dir="work/console-test/webapps/host-manager"/>
-    </copy>
     <exec failonerror="false" executable="work/console-test/bin/catalina.sh">
+      <env key="WBS_CONFIG_XML" value="config/wbs-console-config.xml"/>
       <arg line="run"/>
     </exec>
   </target>
@@ -650,22 +544,6 @@
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
       <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
       <script name="src/wbs/sms/spendlimit/model/sms-spend-limit.sql"/>
-      <script name="src/wbs/smsapps/autoresponder/model/auto-responder.sql"/>
-      <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
-      <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
-      <script name="src/wbs/apn/chat/core/model/chat-stats.sql"/>
-      <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
-      <script name="src/wbs/apn/chat/bill/model/chat-bill.sql"/>
-      <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast.sql"/>
-      <script name="src/wbs/apn/chat/contact/model/chat-message.sql"/>
-      <script name="src/wbs/apn/chat/namednote/model/chat-named-note.sql"/>
-      <script name="src/wbs/apn/chat/user/core/model/chat-user.sql"/>
-      <script name="src/wbs/apn/chat/user/core/model/chat-user-session.sql"/>
-      <script name="src/wbs/apn/chat/user/core/model/chat-users-summary.sql"/>
-      <script name="src/wbs/apn/chat/user/image/model/chat-user-image.sql"/>
-      <script name="src/wbs/imchat/model/im-chat-core.sql"/>
-      <script name="src/wbs/integrations/clockworksms/model/clockwork-sms.sql"/>
-      <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
     </database-init>
   </target>
   <target name="just-sql-data">

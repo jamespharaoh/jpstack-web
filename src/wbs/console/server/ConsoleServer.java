@@ -1,8 +1,8 @@
 package wbs.console.server;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -190,12 +190,14 @@ class ConsoleServer {
 
 			try {
 
-				httpServer.shutdown ().wait ();
+				httpServer.shutdown ().get ();
 
-			} catch (InterruptedException interruptedException) {
+			} catch (Exception exception) {
 
-				taskLogger.warningFormat (
-					"Interrupted while waiting for console server to stop");
+				taskLogger.warningFormatException (
+					exception,
+					"Error waiting for console server to stop, requesting ",
+					"immediate shutdown");
 
 				httpServer.shutdownNow ();
 

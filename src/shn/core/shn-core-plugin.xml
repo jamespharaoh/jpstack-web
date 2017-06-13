@@ -1,0 +1,13 @@
+<plugin
+	name="shn-core"
+	package="shn.core">
+
+	<plugin-dependencies>
+		<plugin-dependency name="platform-scaffold"/>
+	</plugin-dependencies>
+
+	<fixtures>
+		<fixture name="shnCore"/>
+	</fixtures>
+
+</plugin>

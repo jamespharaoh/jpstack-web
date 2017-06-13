@@ -1,0 +1,63 @@
+<model-meta
+	name="shnProduct"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="publicTitle"
+			nullable="yes"/>
+
+		<reference-field
+			name="publicDescription"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
+			name="productType"
+			type="shnProductType"
+			nullable="yes"/>
+
+		<!--
+		<reference-field
+			name="vendor"
+			type="vendor"/>
+		-->
+
+		<string-field
+			name="sku"
+			nullable="yes"/>
+
+	</fields>
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a product"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

@@ -1,9 +1,8 @@
-package wbs.platform.menu.fixture;
+package shn.core.fixture;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -12,12 +11,10 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
-@PrototypeComponent ("menuFixtureProvider")
 public
-class MenuFixtureProvider
+class ShnCoreFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
@@ -29,12 +26,9 @@ class MenuFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@SingletonDependency
-	MenuItemObjectHelper menuItemHelper;
-
-	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	// implementation
+	// public implementation
 
 	@Override
 	public
@@ -50,6 +44,28 @@ class MenuFixtureProvider
 
 		) {
 
+			createMenuGroups (
+				transaction);
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void createMenuGroups (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createMenuItems");
+
+		) {
+
 			menuGroupHelper.insert (
 				transaction,
 				menuGroupHelper.createInstance ()
@@ -61,19 +77,19 @@ class MenuFixtureProvider
 						"test"))
 
 				.setOrder (
-					10l)
+					5l)
 
 				.setCode (
-					"facility")
+					"shopping_nation")
 
 				.setName (
-					"Facility")
+					"Shopping Nation")
 
 				.setDescription (
-					"General facilities")
+					"Shopping Nation")
 
 				.setLabel (
-					"Facilities")
+					"Shopping Nation")
 
 			);
 

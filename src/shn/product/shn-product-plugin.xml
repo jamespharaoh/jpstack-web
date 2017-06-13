@@ -1,0 +1,24 @@
+<plugin
+	name="shn-product"
+	package="shn.product">
+
+	<plugin-dependencies>
+		<plugin-dependency name="platform-scaffold"/>
+		<plugin-dependency name="shn-core"/>
+	</plugin-dependencies>
+
+	<models>
+		<model name="shnProduct"/>
+		<model name="shnProductType"/>
+	</models>
+
+	<fixtures>
+		<fixture name="shnProduct"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="shn-product"/>
+		<console-module name="shn-product-type"/>
+	</console-modules>
+
+</plugin>
