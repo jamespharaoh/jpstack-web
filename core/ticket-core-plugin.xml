@@ -3,7 +3,7 @@
 	package="wbs.services.ticket.core">
 
 	<plugin-dependencies>
-		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="menu"/>
 		<plugin-dependency name="platform-scaffold"/>
 	</plugin-dependencies>
 

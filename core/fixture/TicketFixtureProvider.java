@@ -20,17 +20,13 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 
 import wbs.utils.random.RandomLogic;
 
-import wbs.services.ticket.core.model.TicketFieldDataType;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketNoteObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
-import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
-import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateObjectHelper;
 
 @PrototypeComponent ("ticketFixtureProvider")
@@ -199,10 +195,9 @@ class TicketFixtureProvider
 
 			transaction.flush ();
 
-			TicketStateRec submittedState =
-				ticketStateHelper.insert (
-					transaction,
-					ticketStateHelper.createInstance ()
+			ticketStateHelper.insert (
+				transaction,
+				ticketStateHelper.createInstance ()
 
 				.setTicketManager (
 					ticketManager)
@@ -360,6 +355,7 @@ class TicketFixtureProvider
 
 			transaction.flush ();
 
+			/*
 			TicketRec ticket =
 				ticketHelper.insert (
 					transaction,
@@ -598,7 +594,6 @@ class TicketFixtureProvider
 
 			// ticket template
 
-			/*
 			for (
 				TicketStateState state
 					: TicketStateState.values ()
