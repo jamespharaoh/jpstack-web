@@ -55,11 +55,11 @@ class IterableUtils {
 
 	public static <InputType, OutputType>
 	Iterable <OutputType> iterableMap (
+			@NonNull Iterable <? extends InputType> iterable,
 			@NonNull Function <
 				? super InputType,
 				OutputType
-			> mapFunction,
-			@NonNull Iterable <? extends InputType> iterable) {
+			> mapFunction) {
 
 		return () ->
 			Streams.stream (
@@ -107,8 +107,8 @@ class IterableUtils {
 
 		return ImmutableList.copyOf (
 			iterableMap (
-				mapFunction,
-				input));
+				input,
+				mapFunction));
 
 	}
 
@@ -174,8 +174,8 @@ class IterableUtils {
 
 		return ImmutableSet.copyOf (
 			iterableMap (
-				mapFunction,
-				input));
+				input,
+				mapFunction));
 
 	}
 
