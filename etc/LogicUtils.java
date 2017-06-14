@@ -227,6 +227,26 @@ class LogicUtils {
 
 	}
 
+	public static <ReturnType>
+	ReturnType ifNotNullThenElseNull (
+			Object notNullObject,
+			@NonNull Supplier <ReturnType> trueValue) {
+
+		if (
+			isNotNull (
+				notNullObject)
+		) {
+
+			return trueValue.get ();
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+
 	public static
 	String ifThenElseEmDash (
 			@NonNull Boolean condition,
