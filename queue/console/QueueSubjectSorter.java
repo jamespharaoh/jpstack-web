@@ -6,6 +6,7 @@ import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -597,7 +598,10 @@ class QueueSubjectSorter {
 			// check special states
 
 			queueInfo.isOverflowUser =
-				queueInfo.canReplyOverflowImplicit
+				referenceNotEqualSafe (
+					effectiveUser.getSlice (),
+					queueInfo.slice)
+				&& queueInfo.canReplyOverflowImplicit
 				&& ! queueInfo.canReplyExplicit;
 
 			queueInfo.ownOperatorsActive =

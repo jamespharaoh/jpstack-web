@@ -1,8 +1,10 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
@@ -15,6 +17,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import javax.inject.Provider;
 
@@ -167,8 +171,11 @@ class ObjectSearchPageBuilder <
 			setDefaults (
 				taskLogger);
 
-			buildGetAction ();
-			buildPostAction ();
+			buildGetAction (
+				taskLogger);
+
+			buildPostAction (
+				taskLogger);
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -228,59 +235,87 @@ class ObjectSearchPageBuilder <
 
 	}
 
-	void buildGetAction () {
+	private
+	void buildGetAction (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		searchGetActionProvider =
-			() -> objectSearchGetAction.get ()
+		try (
 
-			.searchResponderProvider (
-				searchResponderProvider)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildGetAction");
 
-			.resultsResponderProvider (
-				resultsResponderProvider)
+		) {
 
-			.sessionKey (
-				sessionKey);
+			searchGetActionProvider =
+				() -> objectSearchGetAction.get ()
+
+				.searchResponderProvider (
+					searchResponderProvider)
+
+				.resultsResponderProvider (
+					resultsResponderProvider)
+
+				.sessionKey (
+					sessionKey);
+
+		}
 
 	}
 
-	void buildPostAction () {
+	private
+	void buildPostAction (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		searchPostActionProvider =
-			() -> objectSearchPostAction.get ()
+		try (
 
-			.consoleHelper (
-				consoleHelper)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildPostAction");
 
-			.searchClass (
-				searchClass)
+		) {
 
-			.searchDaoMethodName (
-				spec.searchDaoMethodName ())
+			searchPostActionProvider =
+				() -> objectSearchPostAction.get ()
 
-			.resultsDaoMethodName (
-				spec.resultsDaoMethodName ())
+				.consoleHelper (
+					consoleHelper)
 
-			.sessionKey (
-				sessionKey)
+				.searchClass (
+					searchClass)
 
-			.parentIdKey (
-				parentIdKey)
+				.searchDaoMethodName (
+					spec.searchDaoMethodName ())
 
-			.parentIdName (
-				parentIdName)
+				.resultsDaoMethodName (
+					spec.resultsDaoMethodName ())
 
-			.searchFormType (
-				searchFormType)
+				.sessionKey (
+					sessionKey)
 
-			.resultsModes (
-				resultsModes)
+				.parentIdKey (
+					parentIdKey)
 
-			.searchResponderProvider (
-				searchResponderProvider)
+				.parentIdName (
+					parentIdName)
 
-			.fileName (
-				fileName);
+				.searchFormType (
+					searchFormType)
+
+				.resultsModes (
+					resultsModes)
+
+				.searchResponderProvider (
+					searchResponderProvider)
+
+				.fileName (
+					fileName)
+
+			;
+
+		}
 
 	}
 
@@ -451,6 +486,41 @@ class ObjectSearchPageBuilder <
 							hyphenToCamelCapitalise (
 								spec.searchFormTypeName ())),
 						ConsoleFormType.class));
+
+			long numResultsModes =
+				ifNotNullThenElse (
+					spec.resultsFormTypeName (),
+					() -> 1l,
+					() -> collectionSize (
+						spec.resultsModes ()));
+
+			resultsModes =
+				LongStream.range (
+					0l,
+					numResultsModes)
+
+				.mapToObj (
+					index ->
+						componentManager.getComponentRequired (
+							taskLogger,
+							stringFormat (
+								"%s%sResultsMode%s",
+								container.newBeanNamePrefix (),
+								capitalise (
+									name),
+								integerToDecimalString (
+									index)),
+							ObjectSearchResultsMode.class))
+
+				.collect (
+					Collectors.toMap (
+						resultsMode ->
+							resultsMode.name (),
+						resultsMode ->
+							genericCastUnchecked (
+								resultsMode)))
+
+			;
 
 		}
 

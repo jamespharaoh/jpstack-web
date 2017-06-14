@@ -1,18 +1,26 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.etc.NullUtils.ifNull;
+
 import java.util.List;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleSpec;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.data.annotations.DataSetupMethod;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Data
@@ -21,6 +29,11 @@ import wbs.framework.data.annotations.DataClass;
 public
 class ObjectSearchPageSpec
 	implements ConsoleSpec {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// tree attributes
 
@@ -95,5 +108,30 @@ class ObjectSearchPageSpec
 		direct = true,
 		childElement = "results-mode")
 	List <ObjectSearchResultsModeSpec> resultsModes;
+
+	// setup
+
+	@DataSetupMethod
+	public
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			name =
+				ifNull (
+					name,
+					"search");
+
+		}
+
+	}
 
 }
