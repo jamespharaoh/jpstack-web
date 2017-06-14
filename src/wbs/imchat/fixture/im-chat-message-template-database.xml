@@ -849,4 +849,22 @@
 
 	</entry>
 
+	<entry name="Conversation email">
+
+		<field name="Subject">
+			Your recent conversation with ${profile-name}
+		</field>
+
+		<field name="Introduction">
+			Thanks for using the psychic chat service. For your future
+			reference, we have included a transcript of your recent conversation
+			with ${profile-name}.
+		</field>
+
+		<field name="Charged message">
+			(you were charged ${amount} for this message)
+		</field>
+
+	</entry>
+
 </message-template-database>

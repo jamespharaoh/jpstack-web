@@ -1,7 +1,6 @@
 package wbs.imchat.fixture;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.io.FileUtils.fileReadBytes;
 import static wbs.utils.string.StringUtils.joinWithSlash;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -23,6 +22,7 @@ import wbs.framework.logging.LogContext;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 
 import wbs.platform.currency.model.CurrencyObjectHelper;
+import wbs.platform.media.fixture.MediaFixtureLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -100,6 +100,9 @@ class ImChatCoreFixtureProvider
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	MediaFixtureLogic mediaFixtureLogic;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
@@ -653,27 +656,15 @@ class ImChatCoreFixtureProvider
 
 			// im chat profile
 
-			MediaRec dougalMedia =
-				mediaLogic.createMediaFromImageRequired (
-					transaction,
-					fileReadBytes (
-						"binaries/test/dougal.jpg"),
-					"image/jpeg",
-					"dougal.jpg");
+			List <MediaRec> testMedias =
+				mediaFixtureLogic.testImages (
+					transaction);
 
-			MediaRec ermintrudeMedia =
-				mediaLogic.createMediaFromImageRequired (
-					transaction,
-					fileReadBytes (
-						"binaries/test/dougal.jpg"),
-					"image/jpeg",
-					"ermintrude.jpg");
-
-			List<ImChatProfileRec> profiles =
-				new ArrayList<ImChatProfileRec> ();
+			List <ImChatProfileRec> profiles =
+				new ArrayList<> ();
 
 			for (
-				int index = 0;
+				long index = 0;
 				index < 10;
 				index ++
 			) {
@@ -726,9 +717,11 @@ class ImChatCoreFixtureProvider
 								index)))
 
 					.setProfileImage (
-						index % 2 == 0
-							? dougalMedia
-							: ermintrudeMedia)
+						randomLogic.sample (
+							testMedias))
+
+					.setOrder (
+						index)
 
 				));
 

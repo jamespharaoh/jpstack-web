@@ -173,8 +173,7 @@
 
 				<object-field
 					name="messageTemplateDatabase"
-					object-type="messageTemplateDatabase"
-					nullable="yes"/>
+					object-type="messageTemplateDatabase"/>
 
 				<seconds-field
 					name="preferredQueueTime"/>
@@ -182,6 +181,9 @@
 				<object-field
 					name="paypalAccount"
 					object-type="paypalAccount"/>
+
+				<timezone-field
+					name="defaultTimezone"/>
 
 				<currency-field
 					name="messageCost"
@@ -264,6 +266,10 @@
 				<object-field
 					name="paypalAccount"
 					object-type="paypalAccount"
+					nullable="yes"/>
+
+				<timezone-field
+					name="defaultTimezone"
 					nullable="yes"/>
 
 				<currency-field

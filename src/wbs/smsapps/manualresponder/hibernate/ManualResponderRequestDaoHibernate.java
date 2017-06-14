@@ -594,6 +594,10 @@ class ManualResponderRequestDaoHibernate
 					transaction,
 					search);
 
+			criteria.add (
+				Restrictions.isNotNull (
+					"_manualResponderRequest.user"));
+
 			criteria.setProjection (
 				Projections.projectionList ()
 

@@ -2,8 +2,12 @@ package wbs.console.forms.time;
 
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
@@ -20,9 +24,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import wbs.console.forms.types.FormFieldInterfaceMapping;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.misc.ConsoleUserHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -31,6 +37,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.time.TimeFormatter;
 
 import fj.data.Either;
 
@@ -46,7 +54,13 @@ class TimestampFormFieldInterfaceMapping <Container>
 	LogContext logContext;
 
 	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
 	ConsoleUserHelper preferences;
+
+	@SingletonDependency
+	TimeFormatter timeFormatter;
 
 	// properties
 
@@ -55,6 +69,9 @@ class TimestampFormFieldInterfaceMapping <Container>
 
 	@Getter @Setter
 	TimestampFormFieldSpec.Format format;
+
+	@Getter @Setter
+	String timezonePath;
 
 	// implementation
 
@@ -147,32 +164,88 @@ class TimestampFormFieldInterfaceMapping <Container>
 
 			}
 
-			switch (format) {
+			Optional <String> timezoneNameOptional =
+				optionalCast (
+					String.class,
+					optionalMapOptional (
+						optionalFromNullable (
+							timezonePath),
+						timezonePath ->
+							objectManager.dereference (
+								transaction,
+								container,
+								timezonePath,
+								hints)));
 
-			case timestamp:
+			if (
+				optionalIsPresent (
+					timezoneNameOptional)
+			) {
 
-				return successResultPresent (
-					preferences.timestampWithTimezoneString (
-						transaction,
-						genericValue.get ()));
+				DateTimeZone timezone =
+					DateTimeZone.forID (
+						optionalGetRequired (
+							timezoneNameOptional));
 
-			case date:
+				switch (format) {
 
-				return successResultPresent (
-					preferences.dateStringShort (
-						transaction,
-						genericValue.get ()));
+				case timestamp:
 
-			case time:
+					return successResultPresent (
+						timeFormatter.timestampTimezoneString (
+							genericValue.get ().toDateTime (
+								timezone)));
 
-				return successResultPresent (
-					preferences.timeString (
-						transaction,
-						genericValue.get ()));
+				case date:
 
-			default:
+					return successResultPresent (
+						timeFormatter.dateStringShort (
+							timezone,
+							genericValue.get ()));
 
-				throw new RuntimeException ();
+				case time:
+
+					return successResultPresent (
+						timeFormatter.timeString (
+							timezone,
+							genericValue.get ()));
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
+
+			} else {
+
+				switch (format) {
+
+				case timestamp:
+
+					return successResultPresent (
+						preferences.timestampWithTimezoneString (
+							transaction,
+							genericValue.get ()));
+
+				case date:
+
+					return successResultPresent (
+						preferences.dateStringShort (
+							transaction,
+							genericValue.get ()));
+
+				case time:
+
+					return successResultPresent (
+						preferences.timeString (
+							transaction,
+							genericValue.get ()));
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
 
 			}
 

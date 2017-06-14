@@ -4,7 +4,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.Map;
 
 import lombok.Getter;
@@ -21,6 +20,8 @@ import wbs.platform.php.PhpEntity;
 import wbs.platform.php.PhpFormatter;
 import wbs.platform.php.PhpSerializer;
 import wbs.platform.php.PhpUnserializer;
+
+import wbs.utils.io.BorrowedOutputStream;
 
 import wbs.web.context.RequestContext;
 import wbs.web.misc.HttpStatus;
@@ -61,38 +62,43 @@ class PhpMapResponder
 			"application/vnd.php.serialized",
 			"utf-8");
 
-		@SuppressWarnings ("resource")
-		OutputStream outputStream =
-			requestContext.outputStream ();
+		try (
 
-		PhpSerializer.serialize (
-			outputStream,
-			map,
-			"utf-8");
+			BorrowedOutputStream outputStream =
+				requestContext.outputStream ();
 
-		if (log.isDebugEnabled ()) {
-
-			ByteArrayOutputStream baos =
-				new ByteArrayOutputStream ();
+		) {
 
 			PhpSerializer.serialize (
-				baos,
+				outputStream,
 				map,
 				"utf-8");
 
-			ByteArrayInputStream byteArrayInputStream =
-				new ByteArrayInputStream (
-					baos.toByteArray ());
+			if (log.isDebugEnabled ()) {
 
-			PhpEntity entity =
-				PhpUnserializer.unserialize (
-					byteArrayInputStream);
+				ByteArrayOutputStream baos =
+					new ByteArrayOutputStream ();
 
-			log.debug (
-				stringFormat (
-					"PHP response:\n",
-					"%s",
-					PhpFormatter.DEFAULT.format (entity)));
+				PhpSerializer.serialize (
+					baos,
+					map,
+					"utf-8");
+
+				ByteArrayInputStream byteArrayInputStream =
+					new ByteArrayInputStream (
+						baos.toByteArray ());
+
+				PhpEntity entity =
+					PhpUnserializer.unserialize (
+						byteArrayInputStream);
+
+				log.debug (
+					stringFormat (
+						"PHP response:\n",
+						"%s",
+						PhpFormatter.DEFAULT.format (entity)));
+
+			}
 
 		}
 

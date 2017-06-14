@@ -1,7 +1,21 @@
 package wbs.services.messagetemplate.logic;
 
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.StringUtils.substring;
+import static wbs.utils.string.StringUtils.substringFrom;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -23,8 +37,14 @@ import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
 
 @SingletonComponent ("messageTemplateLogic")
@@ -47,7 +67,13 @@ class MessageTemplateLogicImplementation
 	MessageTemplateEntryTypeObjectHelper messageTemplateEntryTypeHelper;
 
 	@SingletonDependency
+	MessageTemplateEntryValueObjectHelper messageTemplateEntryValueHelper;
+
+	@SingletonDependency
 	MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper;
+
+	@SingletonDependency
+	MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper;
 
 	@SingletonDependency
 	MessageTemplateParameterObjectHelper messageTemplateParameterHelper;
@@ -208,5 +234,149 @@ class MessageTemplateLogicImplementation
 		}
 
 	}
+
+	@Override
+	public
+	Optional <String> lookupFieldValue (
+			@NonNull Transaction parentTransaction,
+			@NonNull MessageTemplateSetRec messageTemplateSet,
+			@NonNull String entryCode,
+			@NonNull String fieldCode,
+			@NonNull Map <String, String> mappings) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"lookupFieldValue");
+
+		) {
+
+			// lookup value
+
+			MessageTemplateDatabaseRec messageTemplateDatabase =
+				messageTemplateSet.getMessageTemplateDatabase ();
+
+			MessageTemplateEntryTypeRec entryType =
+				messageTemplateEntryTypeHelper.findByCodeRequired (
+					transaction,
+					messageTemplateDatabase,
+					entryCode);
+
+			MessageTemplateFieldTypeRec fieldType =
+				messageTemplateFieldTypeHelper.findByCodeRequired (
+					transaction,
+					entryType,
+					fieldCode);
+
+			Optional <MessageTemplateEntryValueRec> entryValueOptional =
+				mapItemForKey (
+					messageTemplateSet.getMessageTemplateEntryValues (),
+					entryType.getId ());
+
+			Optional <MessageTemplateFieldValueRec> fieldValueOptional;
+
+			if (
+				optionalIsPresent (
+					entryValueOptional)
+			) {
+
+				MessageTemplateEntryValueRec entryValue =
+					optionalGetRequired (
+						entryValueOptional);
+
+				fieldValueOptional =
+					mapItemForKey (
+						entryValue.getFields (),
+						fieldType.getId ());
+
+			} else {
+
+				fieldValueOptional =
+					optionalAbsent ();
+
+			}
+
+			String value;
+
+			if (
+				optionalIsPresent (
+					fieldValueOptional)
+			) {
+
+				MessageTemplateFieldValueRec fieldValue =
+					optionalGetRequired (
+						fieldValueOptional);
+
+				value =
+					fieldValue.getStringValue ();
+
+			} else {
+
+				value =
+					fieldType.getDefaultValue ();
+
+			}
+
+			// replace placeholders
+
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			Matcher matcher =
+				placeholderPattern.matcher (
+					value);
+
+			int position = 0;
+
+			while (matcher.find ()) {
+
+				stringBuilder.append (
+					substring (
+						value,
+						position,
+						matcher.start ()));
+
+				Optional <String> replacementOptional =
+					mapItemForKey (
+						mappings,
+						matcher.group (1));
+
+				if (
+					optionalIsNotPresent (
+						replacementOptional)
+				) {
+					return optionalAbsent ();
+				}
+
+				stringBuilder.append (
+					optionalGetRequired (
+						replacementOptional));
+
+				position =
+					matcher.end ();
+
+			}
+
+			stringBuilder.append (
+				substringFrom (
+					value,
+					position));
+
+			// return
+
+			return optionalOfFormat (
+				stringBuilder.toString ());
+
+		}
+
+	}
+
+	// data
+
+	Pattern placeholderPattern =
+		Pattern.compile (
+			"\\$\\{([^}]+)\\}");
 
 }

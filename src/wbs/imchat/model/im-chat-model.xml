@@ -47,6 +47,10 @@
 			type="paypalAccount"
 			nullable="yes"/>
 
+		<string-field
+			name="defaultTimezone"
+			nullable="yes"/>
+
 		<integer-field
 			name="messageCost"
 			nullable="yes"/>

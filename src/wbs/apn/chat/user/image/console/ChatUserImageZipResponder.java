@@ -108,7 +108,7 @@ class ChatUserImageZipResponder
 
 			ZipOutputStream zipOutputStream =
 				new ZipOutputStream (
-					requestContext.outputStream ());
+					outputStream);
 
 		) {
 

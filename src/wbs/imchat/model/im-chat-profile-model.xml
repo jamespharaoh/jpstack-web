@@ -43,6 +43,9 @@
 			type="media"
 			nullable="yes"/>
 
+		<integer-field
+			name="order"/>
+
 	</fields>
 
 </model-meta>

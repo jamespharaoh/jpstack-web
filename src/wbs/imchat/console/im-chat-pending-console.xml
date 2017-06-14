@@ -97,7 +97,8 @@
 					label="Message"/>
 
 				<timestamp-field
-					name="timestamp"/>
+					name="timestamp"
+					timezone="imChatConversation.imChatCustomer.imChat.defaultTimezone"/>
 
 				<currency-field
 					name="price"

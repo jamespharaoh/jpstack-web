@@ -68,6 +68,9 @@
 				<image-field
 					name="profileImage"/>
 
+				<integer-field
+					name="order"/>
+
 			</columns>
 
 		</form>
@@ -100,6 +103,9 @@
 				<image-field
 					name="profileImage"
 					nullable="yes"/>
+
+				<integer-field
+					name="order"/>
 
 			</columns>
 
@@ -134,6 +140,9 @@
 				<image-field
 					name="profileImage"/>
 
+				<integer-field
+					name="order"/>
+
 			</columns>
 
 		</form>
@@ -167,6 +176,9 @@
 				<image-field
 					name="profileImage"
 					nullable="yes"/>
+
+				<integer-field
+					name="order"/>
 
 			</columns>
 

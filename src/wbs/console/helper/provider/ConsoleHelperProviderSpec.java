@@ -6,16 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleSpec;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.data.annotations.DataInitMethod;
+import wbs.framework.data.annotations.DataSetupMethod;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Data
@@ -24,6 +29,11 @@ import wbs.framework.data.annotations.DataInitMethod;
 public
 class ConsoleHelperProviderSpec
 	implements ConsoleSpec {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// attributes
 
@@ -71,16 +81,28 @@ class ConsoleHelperProviderSpec
 
 	// defaults
 
-	@DataInitMethod
+	@DataSetupMethod
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (idKey () == null) {
+		try (
 
-			idKey (
-				stringFormat (
-					"%sId",
-					objectName ()));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			if (idKey () == null) {
+
+				idKey (
+					stringFormat (
+						"%sId",
+						objectName ()));
+
+			}
 
 		}
 

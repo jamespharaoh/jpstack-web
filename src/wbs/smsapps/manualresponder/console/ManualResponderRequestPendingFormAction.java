@@ -6,6 +6,7 @@ import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
@@ -600,8 +601,13 @@ class ManualResponderRequestPendingFormAction
 			// record spend
 
 			if (
+
 				isNotNull (
 					manualResponder.getSmsSpendLimiter ())
+
+				&& moreThanZero (
+					route.getOutCharge ())
+
 			) {
 
 				smsSpendLimitLogic.spend (

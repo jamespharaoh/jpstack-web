@@ -151,11 +151,11 @@ class ImChatMessageListApiAction
 
 			// retrieve messages
 
-			List<ImChatMessageRec> allMessages =
+			List <ImChatMessageRec> allMessages =
 				ImmutableList.copyOf (
 					conversation.getMessages ());
 
-			List<ImChatMessageRec> newMessages =
+			List <ImChatMessageRec> newMessages =
 				ImmutableList.copyOf (
 					allMessages.subList (
 						toJavaIntegerRequired (

@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 
@@ -95,7 +97,13 @@ class ImChatProfileListApiAction
 					imChat);
 
 			Collections.sort (
-				profiles);
+				profiles,
+				Ordering.compound (
+					ImmutableList.of (
+						Ordering.natural ().onResultOf (
+							ImChatProfileRec::getOrder),
+						Ordering.natural ().onResultOf (
+							ImChatProfileRec::getCode))));
 
 			// create response
 

@@ -8,11 +8,13 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.NumberUtils.notEqualToOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.ReflectionUtils.fieldParameterizedType;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -72,8 +74,8 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataContent;
 import wbs.framework.data.annotations.DataIgnore;
-import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
+import wbs.framework.data.annotations.DataSetupMethod;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -488,19 +490,26 @@ class DataFromXmlImplementation
 						: object.getClass ().getMethods ()
 				) {
 
-					DataInitMethod dataInitMethodAnnotation =
-						method.getAnnotation (DataInitMethod.class);
+					DataSetupMethod dataSetupMethodAnnotation =
+						method.getAnnotation (
+							DataSetupMethod.class);
 
-					if (dataInitMethodAnnotation == null)
+					if (dataSetupMethodAnnotation == null)
 						continue;
 
-					if (method.getParameterTypes ().length > 0)
+					if (
+						notEqualToOne (
+							method.getParameterTypes ().length)
+					) {
 						throw new RuntimeException ();
+					}
 
 					try {
 
-						method.invoke (
-							object);
+						methodInvoke (
+							method,
+							object,
+							taskLogger);
 
 					} catch (Exception exception) {
 
@@ -509,7 +518,7 @@ class DataFromXmlImplementation
 							"%s: ",
 							joinWithFullStop (
 								context),
-							"Error invoking data init method %s.%s",
+							"Error invoking data setup method %s.%s",
 							object.getClass ().getName (),
 							method.getName ());
 

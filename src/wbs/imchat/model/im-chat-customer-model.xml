@@ -40,6 +40,11 @@
 			name="developerMode"
 			default="no"/>
 
+		<reference-field
+			name="messageTemplateSet"
+			type="messageTemplateSet"
+			nullable="yes"/>
+
 		<!-- statistics -->
 
 		<integer-field

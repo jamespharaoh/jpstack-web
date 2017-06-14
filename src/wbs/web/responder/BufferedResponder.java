@@ -19,6 +19,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.io.BorrowedOutputStream;
 import wbs.utils.io.RuntimeIoException;
 
 import wbs.web.context.RequestContext;
@@ -128,7 +129,7 @@ class BufferedResponder
 
 			try (
 
-				OutputStream outputStream =
+				BorrowedOutputStream outputStream =
 					requestContext.outputStream ();
 
 			) {
@@ -136,11 +137,6 @@ class BufferedResponder
 				writeBytes (
 					outputStream,
 					bytes);
-
-			} catch (IOException ioException) {
-
-				throw new RuntimeIoException (
-					ioException);
 
 			}
 

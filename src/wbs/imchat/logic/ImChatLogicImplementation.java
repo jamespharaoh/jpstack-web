@@ -1,5 +1,6 @@
 package wbs.imchat.logic;
 
+import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -7,8 +8,11 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.util.Map;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -35,6 +39,7 @@ import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatRec;
+import wbs.services.messagetemplate.logic.MessageTemplateLogic;
 
 @SingletonComponent ("imChatLogic")
 public
@@ -57,6 +62,9 @@ class ImChatLogicImplementation
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	MessageTemplateLogic messageTemplateLogic;
 
 	@SingletonDependency
 	RandomLogic randomLogic;
@@ -144,6 +152,8 @@ class ImChatLogicImplementation
 
 			// construct email content
 
+			String emailContent;
+
 			try (
 
 				LazyFormatWriter formatWriter =
@@ -151,14 +161,28 @@ class ImChatLogicImplementation
 
 			) {
 
-				formatWriter.writeFormat (
-					"Thanks for using the psychic chat service. For your future ",
-					"reference, we have included a transcript of your recent ",
-					"conversation with %s.\n",
-					profile.getPublicName ());
+				Map <String, String> introductionMappings =
+					ImmutableMap.<String, String> builder ()
 
-				formatWriter.writeFormat (
-					"\n");
+					.put (
+						"profile-name",
+						profile.getPublicName ())
+
+					.build ();
+
+				String introduction =
+					messageTemplateLogic.lookupFieldValueRequired (
+						transaction,
+						customer.getMessageTemplateSet (),
+						"conversation_email",
+						"introduction",
+						introductionMappings);
+
+				formatWriter.writeLineFormat (
+					"%s",
+					introduction);
+
+				formatWriter.writeNewline ();;
 
 				for (
 					ImChatMessageRec message
@@ -186,11 +210,28 @@ class ImChatLogicImplementation
 							message.getPrice ())
 					) {
 
-						formatWriter.writeFormat (
-							"(you were charged %s for this message)\n",
-							currencyLogic.formatText (
-								imChat.getCreditCurrency (),
-								message.getPrice ()));
+						Map <String, String> chargedMessageMappings =
+							ImmutableMap.<String, String> builder ()
+
+							.put (
+								"amount",
+								currencyLogic.formatText (
+									imChat.getBillingCurrency (),
+									message.getPrice ()))
+
+							.build ();
+
+						String chargedMessage =
+							messageTemplateLogic.lookupFieldValueRequired (
+								transaction,
+								customer.getMessageTemplateSet (),
+								"conversation_email",
+								"charged_message",
+								chargedMessageMappings);
+
+						formatWriter.writeLineFormat (
+							"%s",
+							chargedMessage);
 
 					}
 
@@ -199,20 +240,38 @@ class ImChatLogicImplementation
 
 				}
 
-				// send email
-
-				emailLogic.sendEmail (
-					imChat.getEmailFromName (),
-					imChat.getEmailFromAddress (),
-					imChat.getEmailReplyToAddress (),
-					ImmutableList.<String>of (
-						customer.getEmail ()),
-					stringFormat (
-						"Your recent conversation with %s",
-						profile.getPublicName ()),
-					formatWriter.toString ());
+				emailContent =
+					formatWriter.toString ();
 
 			}
+
+			// send email
+
+			Map <String, String> subjectMappings =
+				ImmutableMap.<String, String> builder ()
+
+				.put (
+					"profile-name",
+					profile.getPublicName ())
+
+				.build ();
+
+			String subject =
+				messageTemplateLogic.lookupFieldValueRequired (
+					transaction,
+					customer.getMessageTemplateSet (),
+					"conversation_email",
+					"subject",
+					subjectMappings);
+
+			emailLogic.sendEmail (
+				imChat.getEmailFromName (),
+				imChat.getEmailFromAddress (),
+				imChat.getEmailReplyToAddress (),
+				singletonList (
+					customer.getEmail ()),
+				subject,
+				emailContent);
 
 		}
 

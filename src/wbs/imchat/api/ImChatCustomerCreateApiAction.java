@@ -5,6 +5,7 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.hyphenToUnderscore;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,6 +42,8 @@ import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
+import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
 import wbs.web.responder.WebResponder;
@@ -69,6 +72,9 @@ class ImChatCustomerCreateApiAction
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	MessageTemplateSetObjectHelper messageTemplateSetHelper;
 
 	@SingletonDependency
 	RandomLogic randomLogic;
@@ -124,6 +130,13 @@ class ImChatCustomerCreateApiAction
 					parseIntegerRequired (
 						requestContext.requestStringRequired (
 							"imChatId")));
+
+			MessageTemplateSetRec messageTemplateSet =
+				messageTemplateSetHelper.findByCodeRequired (
+					transaction,
+					imChat.getMessageTemplateDatabase (),
+					hyphenToUnderscore (
+						createRequest.messagesCode ()));
 
 			// check for existing
 
@@ -189,6 +202,9 @@ class ImChatCustomerCreateApiAction
 
 				.setPassword (
 					createRequest.password ())
+
+				.setMessageTemplateSet (
+					messageTemplateSet)
 
 				.setFirstSession (
 					transaction.now ())

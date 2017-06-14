@@ -79,12 +79,15 @@ class ImChatCustomerCreditPart
 
 		) {
 
+			customer =
+				imChatCustomerHelper.findFromContextRequired (
+					transaction);
+
 			customerForm =
 				customerFormType.buildResponse (
 					transaction,
 					emptyMap (),
-					imChatCustomerHelper.findFromContextRequired (
-						transaction));
+					customer);
 
 			requestForm =
 				requestFormType.buildResponse (
@@ -93,8 +96,7 @@ class ImChatCustomerCreditPart
 					new ImChatCustomerCreditRequest ()
 
 				.customer (
-					imChatCustomerHelper.findFromContextRequired (
-						transaction))
+					customer)
 
 			);
 

@@ -21,4 +21,7 @@ class ImChatSessionStartRequest {
 	@DataAttribute
 	String userAgent;
 
+	@DataAttribute
+	String messagesCode;
+
 }

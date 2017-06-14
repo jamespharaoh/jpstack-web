@@ -1,9 +1,11 @@
 package wbs.platform.object.search;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
@@ -90,11 +92,6 @@ class ObjectSearchPageComponentBuilder <
 
 		) {
 
-			String name =
-				ifNull (
-					spec.name (),
-					"search");
-
 			String objectType =
 				ifNull (
 					spec.objectTypeName (),
@@ -113,7 +110,7 @@ class ObjectSearchPageComponentBuilder <
 						"%s%sPartFactory",
 						context.newComponentNamePrefix (),
 						capitalise (
-							name)));
+							spec.name ())));
 
 			String searchResponderName =
 				ifNull (
@@ -122,7 +119,7 @@ class ObjectSearchPageComponentBuilder <
 						"%s%sResponder",
 						context.newComponentNamePrefix (),
 						capitalise (
-							name)));
+							spec.name ())));
 
 			String resultsPartFactoryName =
 				ifNull (
@@ -131,7 +128,7 @@ class ObjectSearchPageComponentBuilder <
 						"%s%sResultsPartFactory",
 						context.newComponentNamePrefix (),
 						capitalise (
-							name)));
+							spec.name ())));
 
 			String resultsResponderName =
 				ifNull (
@@ -140,7 +137,7 @@ class ObjectSearchPageComponentBuilder <
 						"%s%sResultsResponder",
 						context.newComponentNamePrefix (),
 						capitalise (
-							name)));
+							spec.name ())));
 
 			Class <?> searchClass =
 				classForNameRequired (
@@ -158,7 +155,7 @@ class ObjectSearchPageComponentBuilder <
 				stringFormat (
 					"%s.%s",
 					context.pathPrefix (),
-					name);
+					spec.name ());
 
 			String fileName =
 				ifNull (
@@ -166,7 +163,7 @@ class ObjectSearchPageComponentBuilder <
 					stringFormat (
 						"%s.%s",
 						context.pathPrefix (),
-						name));
+						spec.name ()));
 
 			String tabName =
 				ifNull (
@@ -174,7 +171,7 @@ class ObjectSearchPageComponentBuilder <
 					stringFormat (
 						"%s.%s",
 						context.pathPrefix (),
-						name));
+						spec.name ()));
 
 			String searchTitle =
 				capitalise (
@@ -207,10 +204,10 @@ class ObjectSearchPageComponentBuilder <
 
 				String resultsModeName =
 					stringFormat (
-						"%s%sResultsMode",
+						"%s%sResultsMode0",
 						context.newComponentNamePrefix (),
 						capitalise (
-							name));
+							spec.name ()));
 
 				target.registerDefinition (
 					taskLogger,
@@ -260,9 +257,10 @@ class ObjectSearchPageComponentBuilder <
 							"%s%sResultsMode%s",
 							context.newComponentNamePrefix (),
 							capitalise (
-								name),
-							hyphenToCamelCapitalise (
-								resultsModeSpec.name ()));
+								spec.name ()),
+							integerToDecimalString (
+								collectionSize (
+									resultsModes)));
 
 					target.registerDefinition (
 						taskLogger,
