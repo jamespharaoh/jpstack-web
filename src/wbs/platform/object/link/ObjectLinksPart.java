@@ -139,7 +139,7 @@ class ObjectLinksPart <
 						contextLinksField));
 
 			targetObjects =
-				targetHelper.findAll (
+				targetHelper.findNotDeleted (
 					transaction);
 
 			Collections.sort (

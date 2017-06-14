@@ -1,6 +1,10 @@
 package wbs.apn.chat.supervisor.console;
 
+import static wbs.utils.collection.IterableUtils.iterableChainToList;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableMapToSet;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.presentInstancesSet;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +28,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.etc.NumberUtils;
 
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
@@ -54,7 +60,7 @@ class ChatUserInitiationStatsProvider
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 
@@ -81,18 +87,30 @@ class ChatUserInitiationStatsProvider
 
 			// retrieve messages
 
-			ChatRec chat =
-				chatHelper.findRequired (
-					transaction,
-					(Long)
+			Set <Long> chatIds =
+				iterableMapToSet (
+					NumberUtils::parseIntegerRequired,
 					conditions.get (
 						"chatId"));
 
+			Set <ChatRec> chats =
+				presentInstancesSet (
+					iterableMap (
+						chatIds,
+						chatId ->
+							chatHelper.find (
+								transaction,
+								chatId)));
+
 			List <ChatUserInitiationLogRec> logs =
-				chatUserInitiationLogHelper.findByTimestamp (
-					transaction,
-					chat,
-					period.toInterval ());
+				iterableChainToList (
+					iterableMap (
+						chats,
+						chat ->
+							chatUserInitiationLogHelper.findByTimestamp (
+								transaction,
+								chat,
+								period.toInterval ())));
 
 			// aggregate stats
 

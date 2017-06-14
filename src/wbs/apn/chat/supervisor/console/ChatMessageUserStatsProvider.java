@@ -1,6 +1,9 @@
 package wbs.apn.chat.supervisor.console;
 
+import static wbs.utils.collection.CollectionUtils.singletonSet;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.ArrayList;
@@ -27,6 +30,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.etc.NumberUtils;
 
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -61,7 +66,7 @@ class ChatMessageUserStatsProvider
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 
@@ -80,15 +85,17 @@ class ChatMessageUserStatsProvider
 
 			if (conditions.containsKey ("chatId")) {
 
-				ChatRec chat =
-					chatHelper.findRequired (
-						transaction,
-						(Long)
+				List <Long> chatIds =
+					iterableMapToList (
 						conditions.get (
-							"chatId"));
+							"chatId"),
+						NumberUtils::parseIntegerRequired);
 
-				chats.add (
-					chat);
+				chats =
+					presentInstancesList (
+						chatHelper.findMany (
+							transaction,
+							chatIds));
 
 			} else {
 
@@ -174,9 +181,18 @@ class ChatMessageUserStatsProvider
 				new ChatMessageSearch ();
 
 			chatMessageSearch
-				.chatId (chat.getId ())
-				.timestampAfter (period.startTime ())
-				.timestampBefore (period.endTime ());
+
+				.chatIdIn (
+					singletonSet (
+						chat.getId ()))
+
+				.timestampAfter (
+					period.startTime ())
+
+				.timestampBefore (
+					period.endTime ())
+
+			;
 
 			List <ChatMessageRec> chatMessages =
 				chatMessageHelper.search (

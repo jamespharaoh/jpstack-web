@@ -14,16 +14,16 @@ import lombok.experimental.Accessors;
 public
 class StatsDataSet {
 
-	Map<String,Set<Object>> indexValues =
-		new LinkedHashMap<String,Set<Object>> ();
+	Map <String, Set <Object>> indexValues =
+		new LinkedHashMap<> ();
 
-	List<StatsDatum> data =
-		new ArrayList<StatsDatum> ();
+	List <StatsDatum> data =
+		new ArrayList<> ();
 
 	public
 	StatsDataSet addIndexValues (
 			String key,
-			Set<Object> indexValues) {
+			Set <Object> indexValues) {
 
 		this.indexValues.put (
 			key,

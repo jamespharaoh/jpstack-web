@@ -1,5 +1,6 @@
 package wbs.apn.chat.contact.hibernate;
 
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
@@ -358,12 +359,15 @@ class ChatMessageDaoHibernate
 					"originalText",
 					"_originalText");
 
-			if (search.chatId () != null) {
+			if (
+				isNotNull (
+					search.chatIdIn ())
+			) {
 
 				criteria.add (
-					Restrictions.eq (
+					Restrictions.in (
 						"_chat.id",
-						search.chatId ()));
+						search.chatIdIn ()));
 
 			}
 

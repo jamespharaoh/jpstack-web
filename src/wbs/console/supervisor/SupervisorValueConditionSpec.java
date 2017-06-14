@@ -15,10 +15,10 @@ import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("integer-in-condition")
-@PrototypeComponent ("supervisorIntegerInConditionSpec")
+@DataClass ("value-condition")
+@PrototypeComponent ("supervisorValueConditionSpec")
 public
-class SupervisorIntegerInConditionSpec
+class SupervisorValueConditionSpec
 	implements ConsoleSpec {
 
 	@DataParent
@@ -32,6 +32,6 @@ class SupervisorIntegerInConditionSpec
 		direct = true,
 		childElement = "item",
 		valueAttribute = "value")
-	List <Long> values;
+	List <String> values;
 
 }

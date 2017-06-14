@@ -189,10 +189,10 @@ class BuilderFactoryImplementation <Context>
 						"has invalid type signature (%s)",
 						joinWithCommaAndSpace (
 							iterableMap (
+								buildMethodParameters,
 								parameterType ->
 									classNameSimple (
-										parameterType),
-								buildMethodParameters)));
+										parameterType))));
 
 					return this;
 

@@ -12,10 +12,10 @@ import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("condition")
-@PrototypeComponent ("supervisorConditionSpec")
+@DataClass ("context-condition")
+@PrototypeComponent ("supervisorContextConditionSpec")
 public
-class SupervisorConditionSpec
+class SupervisorContextConditionSpec
 	implements ConsoleSpec {
 
 	@DataParent

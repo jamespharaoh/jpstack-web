@@ -120,12 +120,25 @@ interface ObjectManagerMethods {
 			Transaction parentTransaction,
 			Record <?> object);
 
-	public
-	abstract <ObjectType extends Record <ObjectType>>
+	<ObjectType extends Record <ObjectType>>
 	Optional <ObjectType> getAncestor (
 			Transaction parentTransaction,
 			Class <ObjectType> ancestorClass,
 			Record <?> object);
+
+	default <ObjectType extends Record <ObjectType>>
+	ObjectType getAncestorRequired (
+			@NonNull Transaction parentTransaction,
+			@NonNull Class <ObjectType> ancestorClass,
+			@NonNull Record <?> object) {
+
+		return optionalGetRequired (
+			getAncestor (
+				parentTransaction,
+				ancestorClass,
+				object));
+
+	}
 
 	// data access
 
@@ -167,13 +180,13 @@ interface ObjectManagerMethods {
 	Long objectClassToTypeId (
 			Class <?> objectClass);
 
-	boolean isParent (
+	boolean isAncestor (
 			Transaction parentTransaction,
 			Record <?> object,
 			Record <?> parent);
 
 	<ObjectType extends Record <?>>
-	ObjectType firstParent (
+	Optional <ObjectType> firstAncestor (
 			Transaction parentTransaction,
 			Record <?> object,
 			Set <ObjectType> parents);

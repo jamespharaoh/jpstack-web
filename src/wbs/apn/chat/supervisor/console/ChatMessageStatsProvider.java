@@ -1,9 +1,11 @@
 package wbs.apn.chat.supervisor.console;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToSet;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.NonNull;
 
@@ -21,6 +23,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+
+import wbs.utils.etc.NumberUtils;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
@@ -47,7 +51,7 @@ class ChatMessageStatsProvider
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod period,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 
@@ -93,10 +97,11 @@ class ChatMessageStatsProvider
 					transaction,
 					new ChatMessageSearch ()
 
-				.chatId (
-					(Long)
-					conditions.get (
-						"chatId"))
+				.chatIdIn (
+					iterableMapToSet (
+						NumberUtils::parseIntegerRequired,
+						conditions.get (
+							"chatId")))
 
 				.timestampAfter (
 					period.startTime ())

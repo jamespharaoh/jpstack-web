@@ -1207,13 +1207,13 @@ class JavaClassWriter
 				"public <%s>",
 				joinWithCommaAndSpace (
 					iterableMap (
+						Arrays.asList (
+							method.getTypeParameters ()),
 						typeParameter ->
 							typeVariableSourceDeclaration (
 								imports,
 								typeParameterMappings,
-								typeParameter),
-						Arrays.asList (
-							method.getTypeParameters ()))));
+								typeParameter))));
 
 		} else {
 

@@ -58,7 +58,7 @@ class UserPrivCheckerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init (
+	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -66,7 +66,7 @@ class UserPrivCheckerImplementation
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"init");
+					"setup");
 
 		) {
 
@@ -226,7 +226,7 @@ class UserPrivCheckerImplementation
 		privDataLoader.refresh (
 			parentTaskLogger);
 
-		init (
+		setup (
 			parentTaskLogger);
 
 	}

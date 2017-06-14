@@ -17,6 +17,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseOptional;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localTime;
@@ -31,6 +32,7 @@ import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -123,7 +125,7 @@ class SupervisorPart
 
 	StatsPeriod statsPeriod;
 
-	Map <String, Object> statsConditions;
+	Map <String, Set <String>> statsConditions;
 	Map <String, StatsDataSet> statsDataSets;
 
 	List <PagePart> pageParts =
@@ -418,7 +420,7 @@ class SupervisorPart
 
 		) {
 
-			ImmutableMap.Builder <String, Object> conditionsBuilder =
+			ImmutableMap.Builder <String, Set <String>> conditionsBuilder =
 				ImmutableMap.builder ();
 
 			for (
@@ -426,40 +428,30 @@ class SupervisorPart
 					: supervisorConfig.get ().spec ().builders ()
 			) {
 
-				if (object instanceof SupervisorConditionSpec) {
+				if (object instanceof SupervisorContextConditionSpec) {
 
-					SupervisorConditionSpec supervisorConditionSpec =
-						(SupervisorConditionSpec)
+					SupervisorContextConditionSpec contextCondition =
+						(SupervisorContextConditionSpec)
 						object;
 
 					conditionsBuilder.put (
-						supervisorConditionSpec.name (),
-						requestContext.stuff (
-							supervisorConditionSpec.stuffKey ()));
+						contextCondition.name (),
+						ImmutableSet.of (
+							objectToString (
+								requestContext.stuff (
+									contextCondition.stuffKey ()))));
 
 				}
 
-				if (object instanceof SupervisorIntegerConditionSpec) {
+				if (object instanceof SupervisorValueConditionSpec) {
 
-					SupervisorIntegerConditionSpec integerConditionSpec =
-						(SupervisorIntegerConditionSpec)
-						object;
-
-					conditionsBuilder.put (
-						integerConditionSpec.name (),
-						integerConditionSpec.value ());
-
-				}
-
-				if (object instanceof SupervisorIntegerInConditionSpec) {
-
-					SupervisorIntegerInConditionSpec integerInConditionSpec =
-						(SupervisorIntegerInConditionSpec) object;
+					SupervisorValueConditionSpec valueCondition =
+						(SupervisorValueConditionSpec) object;
 
 					conditionsBuilder.put (
-						integerInConditionSpec.name (),
+						valueCondition.name (),
 						ImmutableSet.copyOf (
-							integerInConditionSpec.values ()));
+							valueCondition.values ()));
 
 				}
 

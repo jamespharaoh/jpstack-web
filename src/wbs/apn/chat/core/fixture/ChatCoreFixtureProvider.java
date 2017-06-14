@@ -687,18 +687,18 @@ class ChatCoreFixtureProvider
 
 				.addAll (
 					iterableMap (
+						MediaTestImagesFixtureProvider.testMediaIdsByName.values (),
 						mediaId ->
 							optionalOf (
 								mediaHelper.findRequired (
 									transaction,
-									mediaId)),
-						MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
+									mediaId))))
 
 				.addAll (
 					iterableMap (
+						MediaTestImagesFixtureProvider.testMediaIdsByName.values (),
 						mediaId ->
-							optionalAbsent (),
-						MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
+							optionalAbsent ()))
 
 				.build ();
 

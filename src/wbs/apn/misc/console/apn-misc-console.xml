@@ -6,47 +6,33 @@
 		label="APN default"
 		offset-hours="7">
 
-		<integer-condition
-			name="sliceId"
-			value="1"/>
+		<!-- conditions -->
 
-		<integer-in-condition
-			name="queueId">
+		<value-condition
+			name="sliceCode">
 
-			<!-- uk -->
+			<item value="apn"/>
 
-			<item value="46"/>
-			<item value="47"/>
-			<item value="48"/>
-			<item value="49"/>
-			<item value="232"/>
-			<item value="235"/>
-			<item value="238"/>
-			<item value="241"/>
+		</value-condition>
 
-			<!-- adult -->
+		<value-condition
+			name="queueTypeCode">
 
-			<item value="215"/>
-			<item value="216"/>
-			<item value="218"/>
-			<item value="219"/>
-			<item value="230"/>
-			<item value="233"/>
-			<item value="239"/>
-			<item value="236"/>
+			<item value="chat.chat_gay_male"/>
+			<item value="chat.chat_gay_female"/>
+			<item value="chat.chat_straight_male"/>
+			<item value="chat.chat_straight_female"/>
 
-			<!-- australia -->
+			<item value="chat.chat_gay_male_alarm"/>
+			<item value="chat.chat_gay_female_alarm"/>
+			<item value="chat.chat_straight_male_alarm"/>
+			<item value="chat.chat_straight_female_alarm"/>
 
-			<item value="475"/>
-			<item value="478"/>
-			<item value="479"/>
-			<item value="480"/>
-			<item value="481"/>
-			<item value="482"/>
-			<item value="483"/>
-			<item value="484"/>
+			<item value="manual_responder.default"/>
 
-		</integer-in-condition>
+			<item value="im_chat.reply"/>
+
+		</value-condition>
 
 		<!-- aggregators -->
 
@@ -257,9 +243,14 @@
 		label="APN All"
 		offset-hours="7">
 
-		<integer-condition
-			name="sliceId"
-			value="1"/>
+		<!-- conditions -->
+
+		<value-condition
+			name="sliceCode">
+
+			<item value="apn"/>
+
+		</value-condition>
 
 		<!-- aggregators -->
 

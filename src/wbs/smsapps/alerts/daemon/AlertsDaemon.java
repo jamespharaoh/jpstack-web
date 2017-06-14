@@ -2,10 +2,12 @@ package wbs.smsapps.alerts.daemon;
 
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.shorterThan;
 
@@ -15,6 +17,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -722,17 +726,26 @@ class AlertsDaemon
 
 		) {
 
-			Record <?> parent =
-				objectManager.firstParent (
+			Optional <Record <?>> parentOptional =
+				objectManager.firstAncestor (
 					transaction,
 					object,
 					subjects.keySet ());
 
-			if (parent == null)
+			if (
+				optionalIsNotPresent (
+					parentOptional)
+			) {
 				return false;
+			}
+
+			Record <?> parent =
+				optionalGetRequired (
+					parentOptional);
 
 			AlertsSubjectRec alertsSubject =
-				subjects.get (parent);
+				subjects.get (
+					parent);
 
 			return alertsSubject.getInclude ();
 

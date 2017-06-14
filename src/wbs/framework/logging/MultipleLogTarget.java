@@ -56,10 +56,10 @@ class MultipleLogTarget
 
 		return anyOf (
 			iterableMap (
+				logTargets,
 				logTarget ->
 					(Supplier <Boolean>)
-					() -> logTarget.debugEnabled (),
-				logTargets));
+					() -> logTarget.debugEnabled ()));
 
 	}
 

@@ -363,8 +363,8 @@ class PluginManagerFactory
 			Set <String> allPluginNames =
 				ImmutableSet.copyOf (
 					iterableMap (
-						PluginSpec::name,
-						plugins));
+						plugins,
+						PluginSpec::name));
 
 			for (
 				PluginSpec plugin
@@ -378,8 +378,8 @@ class PluginManagerFactory
 								allPluginNames,
 								dependencyName),
 						iterableMap (
-							PluginDependencySpec::name,
-							plugin.pluginDependencies ()));
+							plugin.pluginDependencies (),
+							PluginDependencySpec::name));
 
 				if (
 					collectionIsNotEmpty (

@@ -2009,10 +2009,10 @@ class ComponentManagerImplementation
 						"has invalid type signature (%s)",
 						joinWithCommaAndSpace (
 							iterableMap (
+								methodParameterTypes,
 								parameterType ->
 									classNameSimple (
-										parameterType),
-								methodParameterTypes)));
+										parameterType))));
 
 					continue;
 

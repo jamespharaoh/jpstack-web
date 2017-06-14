@@ -11,12 +11,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -788,6 +790,16 @@ class OptionalUtils {
 			@NonNull Iterable <Optional <Type>> arguments) {
 
 		return ImmutableList.copyOf (
+			Optional.presentInstances (
+				arguments));
+
+	}
+
+	public static <Type>
+	Set <Type> presentInstancesSet (
+			@NonNull Iterable <Optional <Type>> arguments) {
+
+		return ImmutableSet.copyOf (
 			Optional.presentInstances (
 				arguments));
 

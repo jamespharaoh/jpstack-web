@@ -65,7 +65,7 @@ class QueueItemQueueStatsProvider
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
 			@NonNull StatsPeriod statsPeriod,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 

@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -27,6 +28,15 @@ class CollectionUtils {
 			@NonNull ValueType item) {
 
 		return ImmutableList.<ValueType> of (
+			item);
+
+	}
+
+	public static <ValueType>
+	ImmutableSet <ValueType> singletonSet (
+			@NonNull ValueType item) {
+
+		return ImmutableSet.<ValueType> of (
 			item);
 
 	}

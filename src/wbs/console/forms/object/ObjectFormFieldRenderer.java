@@ -196,7 +196,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 				.filter (
 					root.isPresent ()
-						? item -> objectManager.isParent (
+						? item -> objectManager.isAncestor (
 							transaction,
 							item,
 							root.get ())

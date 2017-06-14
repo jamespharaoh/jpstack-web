@@ -5,9 +5,14 @@
 		name="all-star"
 		label="All Star">
 
-		<integer-condition
-			name="sliceId"
-			value="8"/>
+		<!-- conditions -->
+
+		<value-condition
+			name="sliceCode">
+
+			<item value="psychic"/>
+
+		</value-condition>
 
 		<!-- aggregators -->
 

@@ -1,6 +1,7 @@
 package wbs.console.reporting;
 
 import java.util.Map;
+import java.util.Set;
 
 import wbs.framework.database.Transaction;
 
@@ -10,6 +11,6 @@ interface StatsProvider {
 	StatsDataSet getStats (
 			Transaction parentTransaction,
 			StatsPeriod period,
-			Map <String, Object> conditions);
+			Map <String, Set <String>> conditions);
 
 }

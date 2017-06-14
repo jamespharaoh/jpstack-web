@@ -776,12 +776,12 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	boolean isParent (
+	boolean isAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Record <?> parent) {
 
-		return objectManager.isParent (
+		return objectManager.isAncestor (
 			parentTransaction,
 			object,
 			parent);
@@ -790,12 +790,12 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public <ObjectType extends Record <?>>
-	ObjectType firstParent (
+	Optional <ObjectType> firstAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Set <ObjectType> parents) {
 
-		return objectManager.firstParent (
+		return objectManager.firstAncestor (
 			parentTransaction,
 			object,
 			parents);

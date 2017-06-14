@@ -30,7 +30,7 @@
 		label="Chat"
 		offset-hours="7">
 
-		<condition
+		<context-condition
 			name="chatId"
 			stuff-key="chatId"/>
 

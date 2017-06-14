@@ -1,9 +1,20 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,12 +29,17 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectManager;
 
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
+import wbs.platform.queue.model.QueueTypeObjectHelper;
+import wbs.platform.queue.model.QueueTypeRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 
@@ -40,28 +56,28 @@ class QueueStatsFilter {
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	@SingletonDependency
 	QueueObjectHelper queueHelper;
+
+	@SingletonDependency
+	QueueTypeObjectHelper queueTypeHelper;
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// state
 
-	Optional <SliceRec> slice;
-	Optional <Set <QueueRec>> queues;
-
-	Set <QueueRec> includeQueues =
-		new HashSet<QueueRec> ();
-
-	Set <QueueRec> excludeQueues =
-		new HashSet <QueueRec> ();
+	Optional <Set <SliceRec>> slices;
+	Optional <Set <QueueTypeRec>> queueTypes;
 
 	// implementation
 
 	public
 	void conditions (
 			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 
@@ -72,53 +88,57 @@ class QueueStatsFilter {
 
 		) {
 
-			if (conditions.containsKey ("sliceId")) {
+			// handle slice code
 
-				slice =
-					Optional.of (
-						sliceHelper.findRequired (
-							transaction,
-							(Long)
-							conditions.get (
-								"sliceId")));
+			if (conditions.containsKey ("sliceCode")) {
+
+				Set <String> sliceCodes =
+					mapItemForKeyRequired (
+						conditions,
+						"sliceCode");
+
+				slices =
+					optionalOf (
+						ImmutableSet.copyOf (
+							presentInstances (
+								iterableMap (
+									sliceCodes,
+									sliceCode ->
+										sliceHelper.findByCode (
+											transaction,
+											GlobalId.root,
+											sliceCode)))));
 
 			} else {
 
-				slice =
-					Optional.absent ();
+				slices =
+					optionalAbsent ();
 
 			}
 
-			if (conditions.containsKey ("queueId")) {
+			// handle queue type code
 
-				ImmutableSet.Builder <QueueRec> queuesBuilder =
-					ImmutableSet.builder ();
+			if (conditions.containsKey ("queueTypeCode")) {
 
-				Set <?> queueIds =
-					(Set <?>)
-					conditions.get (
-						"queueId");
+				Set <String> queueTypeCodes =
+					mapItemForKeyRequired (
+						conditions,
+						"queueTypeCode");
 
-				for (
-					Object queueId
-						: queueIds
-				) {
-
-					queuesBuilder.add (
-						queueHelper.findRequired (
-							transaction,
-							(Long)
-							queueId));
-
-				}
-
-				queues =
-					Optional.of (
-						queuesBuilder.build ());
+				queueTypes =
+					optionalOf (
+						ImmutableSet.copyOf (
+							presentInstances (
+								iterableMap (
+									queueTypeCodes,
+									queueTypeCode ->
+										this.lookupQueueType (
+											transaction,
+											queueTypeCode)))));
 
 			} else {
 
-				queues =
+				queueTypes =
 					optionalAbsent ();
 
 			}
@@ -141,61 +161,62 @@ class QueueStatsFilter {
 
 		) {
 
-			if (
-				includeQueues.contains (
-					queue)
-			) {
-				return true;
-			}
+			// filter by slice
 
 			if (
-				excludeQueues.contains (
-					queue)
+				optionalIsPresent (
+					slices)
 			) {
-				return false;
+
+				Optional <SliceRec> sliceOptional =
+					objectManager.getAncestor (
+						transaction,
+						SliceRec.class,
+						queue);
+
+				if (
+					optionalIsNotPresent (
+						sliceOptional)
+				) {
+					return false;
+				}
+
+				SliceRec slice =
+					optionalGetRequired (
+						sliceOptional);
+
+				if (
+					doesNotContain (
+						optionalGetRequired (
+							slices),
+						slice)
+				) {
+					return false;
+				}
+
 			}
 
-			boolean exclude = false;
+			// filter by queue type
 
 			if (
-
-				slice.isPresent ()
-
-				&& ! objectManager.isParent (
-					transaction,
-					queue,
-					slice.get ())
-
+				optionalIsPresent (
+					queueTypes)
 			) {
-				exclude = true;
-			}
 
-			if (
-
-				queues.isPresent ()
-
-				&& ! queues.get ().contains (
-					queue)
-
-			) {
-				exclude = true;
-			}
-
-			if (exclude) {
-
-				excludeQueues.add (
-					queue);
-
-				return false;
-
-			} else {
-
-				includeQueues.add (
-					queue);
-
-				return true;
+				if (
+					doesNotContain (
+						optionalGetRequired (
+							queueTypes),
+						queue.getQueueType ())
+				) {
+					return false;
+				}
 
 			}
+
+			// return success
+
+			return true;
 
 		}
 
@@ -240,6 +261,73 @@ class QueueStatsFilter {
 			}
 
 			return filteredQueueItems;
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	Optional <QueueTypeRec> lookupQueueType (
+			@NonNull Transaction parentTransaction,
+			@NonNull String queueTypeCodeCombined) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"lookupQueueType");
+
+		) {
+
+			// deconstruct combined queue type code
+
+			List <String> queueTypeCodeParts =
+				stringSplitFullStop (
+					queueTypeCodeCombined);
+
+			if (
+				collectionDoesNotHaveTwoElements (
+					queueTypeCodeParts)
+			) {
+				throw new IllegalArgumentException ();
+			}
+
+			String parentTypeCode =
+				listFirstElementRequired (
+					queueTypeCodeParts);
+
+			String queueTypeCode =
+				listSecondElementRequired (
+					queueTypeCodeParts);
+
+			// lookup parent type
+
+			Optional <ObjectTypeRec> parentTypeOptional =
+				objectTypeHelper.findByCode (
+					transaction,
+					GlobalId.root,
+					parentTypeCode);
+
+			if (
+				optionalIsNotPresent (
+					parentTypeOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ObjectTypeRec parentType =
+				optionalGetRequired (
+					parentTypeOptional);
+
+			// lookup queue type
+
+			return queueTypeHelper.findByCode (
+				transaction,
+				parentType,
+				queueTypeCode);
 
 		}
 

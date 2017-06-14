@@ -15,7 +15,7 @@ public
 class ChatMessageSearch
 	implements Serializable {
 
-	Long chatId;
+	Set <Long> chatIdIn;
 
 	Long fromUserId;
 	Long toUserId;
