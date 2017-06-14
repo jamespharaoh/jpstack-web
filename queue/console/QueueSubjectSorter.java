@@ -597,12 +597,24 @@ class QueueSubjectSorter {
 
 			// check special states
 
-			queueInfo.isOverflowUser =
-				referenceNotEqualSafe (
-					effectiveUser.getSlice (),
-					queueInfo.slice)
+			queueInfo.isOverflowUser = (
+
+				(
+
+					isNotNull (
+						effectiveUser)
+
+					&& referenceNotEqualSafe (
+						effectiveUser.getSlice (),
+						queueInfo.slice)
+
+				)
+
 				&& queueInfo.canReplyOverflowImplicit
-				&& ! queueInfo.canReplyExplicit;
+
+				&& ! queueInfo.canReplyExplicit
+
+			);
 
 			queueInfo.ownOperatorsActive =
 				queueLogic.sliceHasQueueActivity (
