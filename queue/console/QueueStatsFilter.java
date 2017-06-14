@@ -164,54 +164,33 @@ class QueueStatsFilter {
 			// filter by slice
 
 			if (
+
 				optionalIsPresent (
 					slices)
-			) {
 
-				Optional <SliceRec> sliceOptional =
-					objectManager.getAncestor (
-						transaction,
-						SliceRec.class,
-						queue);
-
-				if (
-					optionalIsNotPresent (
-						sliceOptional)
-				) {
-					return false;
-				}
-
-				SliceRec slice =
+				&& doesNotContain (
 					optionalGetRequired (
-						sliceOptional);
+						slices),
+					queue.getSlice ())
 
-				if (
-					doesNotContain (
-						optionalGetRequired (
-							slices),
-						slice)
-				) {
-					return false;
-				}
-
+			) {
+				return false;
 			}
 
 			// filter by queue type
 
 			if (
+
 				optionalIsPresent (
 					queueTypes)
+
+				&& doesNotContain (
+					optionalGetRequired (
+						queueTypes),
+					queue.getQueueType ())
+
 			) {
-
-				if (
-					doesNotContain (
-						optionalGetRequired (
-							queueTypes),
-						queue.getQueueType ())
-				) {
-					return false;
-				}
-
+				return false;
 			}
 
 			// return success
