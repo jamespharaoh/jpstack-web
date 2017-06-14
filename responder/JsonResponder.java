@@ -1,10 +1,10 @@
 package wbs.web.responder;
 
-import static wbs.utils.collection.CollectionUtils.arrayLength;
 import static wbs.utils.etc.IoUtils.writeBytes;
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
-import javax.inject.Provider;
+import java.io.OutputStream;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,9 +17,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToJson;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.web.context.RequestContext;
 
@@ -27,9 +27,7 @@ import wbs.web.context.RequestContext;
 @PrototypeComponent ("jsonResponder")
 public
 class JsonResponder
-	implements
-		Provider <WebResponder>,
-		WebResponder {
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -47,16 +45,37 @@ class JsonResponder
 	// implementation
 
 	@Override
-	public
-	void execute (
-			@NonNull TaskLogger parentTaskLogger) {
+	protected
+	void prepare (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"execute");
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			doNothing ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull OutputStream outputStream) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
 
 		) {
 
@@ -75,16 +94,8 @@ class JsonResponder
 				stringToUtf8 (
 					stringValue);
 
-			requestContext.contentType (
-				"application/json",
-				"utf-8");
-
-			requestContext.contentLength (
-				arrayLength (
-					bytesValue));
-
 			writeBytes (
-				requestContext.outputStream (),
+				outputStream,
 				bytesValue);
 
 		}
@@ -92,10 +103,24 @@ class JsonResponder
 	}
 
 	@Override
-	public
-	WebResponder get () {
+	protected
+	void headers (
+			@NonNull Transaction parentTransaction) {
 
-		return this;
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"headers");
+
+		) {
+
+			requestContext.contentType (
+				"application/json",
+				"utf-8");
+
+		}
 
 	}
 
