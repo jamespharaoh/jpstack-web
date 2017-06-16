@@ -39,7 +39,7 @@
 		<background-process
 			object-type="oxygen8-inbound-log"
 			name="Removal"
-			description="Remove old oxygenate inbound logs"
+			description="Remove old Oxygen8 inbound logs"
 			frequency="60 seconds"/>
 
 	</background-processes>
