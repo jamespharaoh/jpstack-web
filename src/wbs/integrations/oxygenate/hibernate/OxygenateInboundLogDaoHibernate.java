@@ -1,6 +1,10 @@
 package wbs.integrations.oxygenate.hibernate;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsString;
+import static wbs.utils.string.StringUtils.objectToString;
 
 import java.util.List;
 
@@ -10,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -150,6 +155,52 @@ class OxygenateInboundLogDaoHibernate
 				transaction,
 				Long.class,
 				criteria);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <OxygenateInboundLogRec> findOlderThanLimit (
+			@NonNull Transaction parentTransaction,
+			@NonNull Instant timestamp,
+			@NonNull Long maxResults) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findOlderThanLimit",
+					keyEqualsString (
+						"timestamp",
+						objectToString (
+							timestamp)),
+					keyEqualsDecimalInteger (
+						"maxItems",
+						maxResults));
+
+		) {
+
+			return findMany (
+				transaction,
+				OxygenateInboundLogRec.class,
+
+				createCriteria (
+					transaction,
+					OxygenateInboundLogRec.class)
+
+				.add (
+					Restrictions.lt (
+						"timestamp",
+						timestamp))
+
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
 
 		}
 

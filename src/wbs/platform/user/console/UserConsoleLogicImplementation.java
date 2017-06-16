@@ -1,9 +1,19 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.IterableUtils.iterableToSet;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.etc.OptionalUtils.presentInstancesSet;
+
+import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 
@@ -15,6 +25,7 @@ import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
 
 import wbs.console.misc.ConsoleUserHelper;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -23,6 +34,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.feature.console.FeatureConsoleHelper;
@@ -59,6 +71,9 @@ class UserConsoleLogicImplementation
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -359,6 +374,82 @@ class UserConsoleLogicImplementation
 				timezone (
 					transaction),
 				timestamp);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorSearchUserIds (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorSearchUserIds");
+
+		) {
+
+			Optional <Set <String>> userIdStringsOptional =
+				mapItemForKey (
+					conditions,
+					"user-id");
+
+			Set <UserRec> users =
+				ifThenElse (
+					optionalIsPresent (
+						userIdStringsOptional),
+					() -> presentInstancesSet (
+						userHelper.findMany (
+							transaction,
+							iterableMapToList (
+								optionalGetRequired (
+									userIdStringsOptional),
+								NumberUtils::parseIntegerRequired))),
+					() -> iterableToSet (
+						userHelper.findAll (
+							transaction)));
+
+			return iterableFilterMapToSet (
+				users,
+				user ->
+					privChecker.canRecursive (
+						transaction,
+						user,
+						"supervisor"),
+				IdObject::getId);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorFilterUserIds (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorFilterUserIds");
+
+		) {
+
+			return iterableFilterMapToSet (
+				userHelper.findAll (
+					transaction),
+				user ->
+					privChecker.canRecursive (
+						transaction,
+						user,
+						"supervisor"),
+				UserRec::getId);
 
 		}
 

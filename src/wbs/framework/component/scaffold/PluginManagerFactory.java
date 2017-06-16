@@ -373,13 +373,13 @@ class PluginManagerFactory
 
 				List <String> missingDependencies =
 					iterableFilterToList (
+						iterableMap (
+							plugin.pluginDependencies (),
+							PluginDependencySpec::name),
 						dependencyName ->
 							doesNotContain (
 								allPluginNames,
-								dependencyName),
-						iterableMap (
-							plugin.pluginDependencies (),
-							PluginDependencySpec::name));
+								dependencyName));
 
 				if (
 					collectionIsNotEmpty (

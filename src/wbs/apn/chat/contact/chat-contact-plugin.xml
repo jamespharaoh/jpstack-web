@@ -14,6 +14,7 @@
 		<model name="chatContact"/>
 		<model name="chatContactNote"/>
 		<model name="chatMessage"/>
+		<model name="chatMessageView"/>
 		<model name="chatMonitorInbox"/>
 		<model name="chatUserInitiationLog"/>
 	</models>
@@ -47,6 +48,7 @@
 		<console-module name="chat-contact"/>
 		<console-module name="chat-contact-note"/>
 		<console-module name="chat-message"/>
+		<console-module name="chat-message-view"/>
 		<console-module name="chat-monitor-inbox"/>
 		<console-module name="chat-message-pending"/>
 		<console-module name="chat-user-initiation-log"/>

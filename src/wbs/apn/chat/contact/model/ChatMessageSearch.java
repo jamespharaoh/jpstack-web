@@ -7,7 +7,7 @@ import java.util.Set;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Instant;
+import wbs.utils.time.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -15,15 +15,15 @@ public
 class ChatMessageSearch
 	implements Serializable {
 
-	Set <Long> chatIdIn;
+	Set <Long> chatIds;
+	Set <Long> senderUserIds;
 
 	Long fromUserId;
 	Long toUserId;
 
 	Long originalTextId;
 
-	Instant timestampAfter;
-	Instant timestampBefore;
+	TextualInterval timestamp;
 
 	Boolean hasSender;
 
@@ -34,8 +34,13 @@ class ChatMessageSearch
 
 	ChatMessageMethod method;
 
-	Set<ChatMessageStatus> statusIn =
-		new HashSet<ChatMessageStatus> ();
+	Set <ChatMessageStatus> statusIn =
+		new HashSet<> ();
+
+	Boolean filter = false;
+
+	Set <Long> filterChatIds;
+	Set <Long> filterSenderUserIds;
 
 	Order orderBy;
 

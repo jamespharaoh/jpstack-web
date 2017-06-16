@@ -26,6 +26,7 @@
 		<model name="imChatConversation"/>
 		<model name="imChatEvent"/>
 		<model name="imChatMessage"/>
+		<model name="imChatMessageView"/>
 		<model name="imChatPricePoint"/>
 		<model name="imChatProfile"/>
 		<model name="imChatPurchase"/>
@@ -75,6 +76,7 @@
 		<component class="console.ImChatCustomerSettingsPasswordAction"/>
 		<component class="console.ImChatCustomerSettingsPasswordPart"/>
 		<component class="console.ImChatMessageConsoleHooks"/>
+		<component class="console.ImChatMessageUserStatsProvider"/>
 		<component class="console.ImChatQueueConsole"/>
 		<component class="console.ImChatPendingCustomerNoteUpdateAction"/>
 		<component class="console.ImChatPendingFormAction"/>
@@ -103,6 +105,7 @@
 		<console-module name="im-chat-customer-detail-value"/>
 		<console-module name="im-chat-event"/>
 		<console-module name="im-chat-message"/>
+		<console-module name="im-chat-message-view"/>
 		<console-module name="im-chat-pending"/>
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>

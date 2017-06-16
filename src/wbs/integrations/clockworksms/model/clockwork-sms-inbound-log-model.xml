@@ -31,4 +31,14 @@
 
 	</fields>
 
+	<background-processes>
+
+		<background-process
+			object-type="clockwork-sms-inbound-log"
+			name="Removal"
+			description="Remove old Clockwork SMS inbound logs"
+			frequency="60 seconds"/>
+
+	</background-processes>
+
 </model-meta>

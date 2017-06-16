@@ -58,6 +58,12 @@ class ChatSpendWarningDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat user spend warning";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.spend-warning";
 	}

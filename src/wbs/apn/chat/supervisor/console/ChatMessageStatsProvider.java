@@ -1,15 +1,14 @@
 package wbs.apn.chat.supervisor.console;
 
-import static wbs.utils.collection.IterableUtils.iterableMapToSet;
-import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.NonNull;
 
-import org.joda.time.Instant;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
@@ -24,12 +23,14 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
-import wbs.utils.etc.NumberUtils;
+import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.contact.model.ChatMessageStats;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
 
 @SingletonComponent ("chatMessageStatsProvider")
 public
@@ -39,10 +40,16 @@ class ChatMessageStatsProvider
 	// singleton dependencies
 
 	@SingletonDependency
+	ChatConsoleLogic chatConsoleLogic;
+
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
 
 	// implementation
 
@@ -62,130 +69,113 @@ class ChatMessageStatsProvider
 
 		) {
 
-			if (period.granularity () != StatsGranularity.hour)
+			if (period.granularity () != StatsGranularity.hour) {
 				throw new IllegalArgumentException ();
-
-			if (! conditions.containsKey ("chatId"))
-				throw new IllegalArgumentException ();
-
-			// setup data structures
-
-			long[] receivedTotal =
-				new long [
-					toJavaIntegerRequired (
-						period.size ())];
-
-			long[] sentTotal =
-				new long [
-					toJavaIntegerRequired (
-						period.size ())];
-
-			long[] missedTotal =
-				new long [
-					toJavaIntegerRequired (
-						period.size ())];
-
-			long[] charsTotal =
-				new long [
-					toJavaIntegerRequired (
-						period.size ())];
-
-			// retrieve messages
-
-			List <ChatMessageRec> chatMessages =
-				chatMessageHelper.search (
-					transaction,
-					new ChatMessageSearch ()
-
-				.chatIdIn (
-					iterableMapToSet (
-						NumberUtils::parseIntegerRequired,
-						conditions.get (
-							"chatId")))
-
-				.timestampAfter (
-					period.startTime ())
-
-				.timestampBefore (
-					period.endTime ())
-
-			);
-
-			// aggregate stats
-
-			for (
-				ChatMessageRec chatMessage
-					: chatMessages
-			) {
-
-				Instant chatMessageTimestamp =
-					chatMessage.getTimestamp ();
-
-				int hour =
-					period.assign (
-						chatMessageTimestamp);
-
-				int length =
-					chatMessage.getOriginalText ().getText ().length ();
-
-				if (chatMessage.getSender () != null) {
-
-					sentTotal [hour] ++;
-					missedTotal [hour] --;
-					charsTotal [hour] += length;
-
-				}
-
-				if (chatMessage.getToUser ().getType () == ChatUserType.monitor) {
-
-					receivedTotal [hour]++;
-					missedTotal [hour]++;
-
-				}
-
 			}
 
-			// create return value
+			// get conditions
 
-			StatsDataSet dataSet =
+			Set <Long> searchChatIds =
+				chatConsoleLogic.getSupervisorSearchChatIds (
+					transaction,
+					conditions);
+
+			Set <Long> searchUserIds =
+				userConsoleLogic.getSupervisorSearchUserIds (
+					transaction,
+					conditions);
+
+			// get filters
+
+			Set <Long> filterChatIds =
+				chatConsoleLogic.getSupervisorFilterChatIds (
+					transaction);
+
+			Set <Long> filterUserIds =
+				userConsoleLogic.getSupervisorFilterUserIds (
+					transaction);
+
+			// fetch stats
+
+			StatsDataSet statsDataSet =
 				new StatsDataSet ();
 
+			Set <Object> indexChatIds =
+				new HashSet<> ();
+
 			for (
-				int hour = 0;
-				hour < period.size ();
-				hour ++
+				Interval interval
+					: period
 			) {
 
-				dataSet.data ().add (
-					new StatsDatum ()
+				List <ChatMessageStats> messageStatsList =
+					chatMessageHelper.searchStats (
+						transaction,
+						new ChatMessageSearch ()
 
-					.startTime (
-						period.step (hour))
+					.chatIds (
+						searchChatIds)
 
-					.addIndex (
-						"chatId",
-						conditions.get (
-							"chatId"))
+					.senderUserIds (
+						searchUserIds)
 
-					.addValue (
-						"messagesReceived",
-						receivedTotal [hour])
+					.timestamp (
+						TextualInterval.forInterval (
+							DateTimeZone.UTC,
+							interval))
 
-					.addValue (
-						"messagesSent",
-						sentTotal [hour])
+					.filter (
+						true)
 
-					.addValue (
-						"messagesMissed",
-						missedTotal [hour])
+					.filterChatIds (
+						filterChatIds)
 
-					.addValue (
-						"charactersSent",
-						charsTotal [hour]));
+					.filterSenderUserIds (
+						filterUserIds)
+
+				);
+
+				for (
+					ChatMessageStats messageStats
+						: messageStatsList
+				) {
+
+					statsDataSet.data ().add (
+						new StatsDatum ()
+
+						.startTime (
+							interval.getStart ().toInstant ())
+
+						.addIndex (
+							"chatId",
+							messageStats.getChat ().getId ())
+
+						.addValue (
+							"numMessages",
+							messageStats.getNumMessages ())
+
+						.addValue (
+							"numCharacters",
+							messageStats.getNumCharacters ())
+
+						.addValue (
+							"numFinal",
+							messageStats.getNumFinalMessages ())
+
+					);
+
+					indexChatIds.add (
+						messageStats.getChat ().getId ());
+
+				}
 
 			}
 
-			return dataSet;
+			statsDataSet.indexValues ().put (
+				"chatId",
+				indexChatIds);
+
+			return statsDataSet;
 
 		}
 

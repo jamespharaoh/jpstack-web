@@ -51,6 +51,12 @@ class ChatAdultExpiryDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat user adult expiry";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.adult-expiry";
 	}

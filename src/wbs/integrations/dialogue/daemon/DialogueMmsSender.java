@@ -71,6 +71,12 @@ class DialogueMmsSender
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Dialogue mms sender";
+	}
+
+	@Override
+	protected
 	String getThreadName () {
 		return "DlgMmsSnd";
 	}

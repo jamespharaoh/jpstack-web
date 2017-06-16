@@ -97,6 +97,12 @@ class ChatAdDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat user ads";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.ads";
 	}

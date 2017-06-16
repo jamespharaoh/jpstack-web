@@ -65,6 +65,12 @@ class DigitalSelectSender
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Digital select sender";
+	}
+
+	@Override
+	protected
 	String getThreadName () {
 		return "DigSelSndr";
 	}

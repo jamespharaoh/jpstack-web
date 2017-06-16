@@ -1,6 +1,7 @@
 package wbs.integrations.clockworksms.hibernate;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.database.NestedTransaction;
@@ -149,6 +151,45 @@ class ClockworkSmsInboundLogDaoHibernate
 				transaction,
 				Long.class,
 				criteria);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <ClockworkSmsInboundLogRec> findOlderThanLimit (
+			@NonNull Transaction parentTransaction,
+			@NonNull Instant timestamp,
+			@NonNull Long maxResults) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findOlderThan");
+
+		) {
+
+			return findMany (
+				transaction,
+				ClockworkSmsInboundLogRec.class,
+
+				createCriteria (
+					transaction,
+					ClockworkSmsInboundLogRec.class)
+
+				.add (
+					Restrictions.lt (
+						"timestamp",
+						timestamp))
+
+				.setMaxResults (
+					toJavaIntegerRequired (
+						maxResults))
+
+			);
 
 		}
 

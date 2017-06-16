@@ -107,12 +107,12 @@ class SimpleStatsResolver
 					? datum.indexes ().get (indexName)
 					: StatsDatum.UNARY;
 
-			Pair<Object,Instant> key =
-				Pair.<Object,Instant>of (
+			Pair <Object, Instant> key =
+				Pair.of (
 					indexValue,
 					datum.startTime ());
 
-			List<Object> stepValues =
+			List <Object> stepValues =
 				unaggregatedSteps.get (key);
 
 			if (stepValues == null) {

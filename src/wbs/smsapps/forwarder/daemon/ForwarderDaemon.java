@@ -81,6 +81,14 @@ class ForwarderDaemon
 		new QueueBuffer<> (
 			bufferSize);
 
+	// details
+
+	@Override
+	protected
+	String friendlyName () {
+		return "Forwarder";
+	}
+
 	private
 	class MainThread
 		implements Runnable {

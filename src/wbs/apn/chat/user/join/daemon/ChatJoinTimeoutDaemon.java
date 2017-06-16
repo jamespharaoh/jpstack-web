@@ -48,6 +48,12 @@ class ChatJoinTimeoutDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat join timeout";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.join-timeout";
 	}

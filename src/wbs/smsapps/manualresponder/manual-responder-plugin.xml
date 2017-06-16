@@ -19,6 +19,7 @@
 		<model name="manualResponderNumber"/>
 		<model name="manualResponderRequest"/>
 		<model name="manualResponderReply"/>
+		<model name="manualResponderReplyView"/>
 		<model name="manualResponderTemplate"/>
 	</models>
 
@@ -31,6 +32,7 @@
 		<component class="console.ManualResponderNumTodayCache"/>
 		<component class="console.ManualResponderNumberConsoleHooks"/>
 		<component class="console.ManualResponderQueueConsolePlugin"/>
+		<component class="console.ManualResponderReplyUserStatsProvider"/>
 		<component class="console.ManualResponderRequestConsoleHooks"/>
 		<component class="console.ManualResponderRequestPendingFormAction"/>
 		<component class="console.ManualResponderRequestPendingFormResponder"/>
@@ -54,6 +56,7 @@
 		<console-module name="manual-responder-affiliate"/>
 		<console-module name="manual-responder-number"/>
 		<console-module name="manual-responder-reply"/>
+		<console-module name="manual-responder-reply-view"/>
 		<console-module name="manual-responder-request"/>
 		<console-module name="manual-responder-request-pending"/>
 		<console-module name="manual-responder-shared-report" />

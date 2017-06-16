@@ -1,5 +1,10 @@
 package wbs.console.supervisor;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterByClass;
+import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,24 +61,24 @@ class SupervisorConfigBuilder
 	// properties
 
 	@Getter @Setter
-	Map<String,StatsProvider> statsProvidersByName =
-		new LinkedHashMap<String,StatsProvider> ();
+	Map <String, StatsProvider> statsProvidersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsAggregator> statsAggregatorsByName =
-		new LinkedHashMap<String,StatsAggregator> ();
+	Map <String, StatsAggregator> statsAggregatorsByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsFormatter> statsFormattersByName =
-		new LinkedHashMap<String,StatsFormatter> ();
+	Map <String, StatsFormatter> statsFormattersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsGrouper> statsGroupersByName =
-		new LinkedHashMap<String,StatsGrouper> ();
+	Map <String, StatsGrouper> statsGroupersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsResolver> statsResolversByName =
-		new LinkedHashMap<String,StatsResolver> ();
+	Map <String, StatsResolver> statsResolversByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
 	List <StatsPagePartFactory> pagePartFactories =
@@ -97,10 +102,36 @@ class SupervisorConfigBuilder
 
 		) {
 
+			List <Object> children =
+				new ArrayList<> ();
+
+			if (
+				isNotNull (
+					spec.templateName ())
+			) {
+
+				SupervisorConfigSpec templateSpec =
+					iterableFindExactlyOneRequired (
+						iterableFilterByClass (
+							container.consoleModule ().builders (),
+							SupervisorConfigSpec.class),
+						otherSpec ->
+							stringEqualSafe (
+								spec.templateName (),
+								otherSpec.name ()));
+
+				children.addAll (
+					templateSpec.builders ());
+
+			}
+
+			children.addAll (
+				spec.builders ());
+
 			builder.descend (
 				taskLogger,
 				spec,
-				spec.builders (),
+				children,
 				this,
 				MissingBuilderBehaviour.ignore);
 

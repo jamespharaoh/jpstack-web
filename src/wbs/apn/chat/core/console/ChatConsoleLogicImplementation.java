@@ -1,22 +1,43 @@
 package wbs.apn.chat.core.console;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.LogicUtils.predicatesCombineAll;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlInputUtils.htmlSelect;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.string.FormatWriter;
 
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
@@ -25,6 +46,17 @@ import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 public
 class ChatConsoleLogicImplementation
 	implements ChatConsoleLogic {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	ChatConsoleHelper chatHelper;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	// implementation
 
@@ -312,6 +344,130 @@ class ChatConsoleLogicImplementation
 			name,
 			options,
 			value);
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorSearchChatIds (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorChatIds");
+
+		) {
+
+			List <Predicate <ChatRec>> predicates =
+				new ArrayList<> ();
+
+			// handle slice code condition
+
+			Optional <Set <String>> sliceCodes =
+				mapItemForKey (
+					conditions,
+					"slice-code");
+
+			if (
+				optionalIsPresent (
+					sliceCodes)
+			) {
+
+				predicates.add (
+					chat ->
+						contains (
+							optionalGetRequired (
+								sliceCodes),
+							chat.getSlice ().getCode ()));
+
+			}
+
+			// handle chat slice code condition
+
+			Optional <Set <String>> chatSliceCodes =
+				mapItemForKey (
+					conditions,
+					"clat-slice-code");
+
+			if (
+				optionalIsPresent (
+					chatSliceCodes)
+			) {
+
+				predicates.add (
+					chat ->
+						contains (
+							optionalGetRequired (
+								chatSliceCodes),
+							chat.getSlice ().getCode ()));
+
+			}
+
+			// handle chat code condition
+
+			Optional <Set <String>> chatCodes =
+				mapItemForKey (
+					conditions,
+					"chat-code");
+
+			if (
+				optionalIsPresent (
+					chatCodes)
+			) {
+
+				predicates.add (
+					chat ->
+						contains (
+							optionalGetRequired (
+								chatCodes),
+							joinWithFullStop (
+								chat.getSlice ().getCode (),
+								chat.getCode ())));
+
+			}
+
+			// return
+
+			return iterableFilterMapToSet (
+				chatHelper.findAll (
+					transaction),
+				predicatesCombineAll (
+					predicates),
+				IdObject::getId);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorFilterChatIds (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorFilterChatIds");
+
+		) {
+
+			return iterableFilterMapToSet (
+				chatHelper.findAll (
+					transaction),
+				chat ->
+					privChecker.canRecursive (
+						transaction,
+						chat,
+						"supervisor"),
+				ChatRec::getId);
+
+		}
 
 	}
 

@@ -32,6 +32,12 @@ class BroadcastScheduleDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Broadcast schedule";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 
 		return stringFormat (

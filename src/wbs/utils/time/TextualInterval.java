@@ -884,6 +884,20 @@ class TextualInterval
 	}
 
 	public static
+	TextualInterval forInterval (
+			@NonNull DateTimeZone timezone,
+			@NonNull ReadableInstant start,
+			@NonNull ReadableInstant end) {
+
+		return forInterval (
+			timezone,
+			new Interval (
+				start,
+				end));
+
+	}
+
+	public static
 	Optional <TextualInterval> forInterval (
 			@NonNull DateTimeZone timezone,
 			@NonNull Optional <Interval> interval) {

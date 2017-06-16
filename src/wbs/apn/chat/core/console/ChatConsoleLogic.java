@@ -1,5 +1,10 @@
 package wbs.apn.chat.core.console;
 
+import java.util.Map;
+import java.util.Set;
+
+import wbs.framework.database.Transaction;
+
 import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.user.core.model.ChatUserEditReason;
@@ -39,5 +44,12 @@ interface ChatConsoleLogic {
 			FormatWriter formatWriter,
 			String name,
 			String value);
+
+	Set <Long> getSupervisorSearchChatIds (
+			Transaction parentTransaction,
+			Map <String, Set <String>> conditions);
+
+	Set <Long> getSupervisorFilterChatIds (
+			Transaction parentTransaction);
 
 }

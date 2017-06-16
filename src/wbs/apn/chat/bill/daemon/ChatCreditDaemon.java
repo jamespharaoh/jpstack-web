@@ -60,6 +60,12 @@ class ChatCreditDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat credit";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.billed-messages";
 	}

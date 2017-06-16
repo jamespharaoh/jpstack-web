@@ -121,6 +121,12 @@ class AlertsDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Alerts settings sender";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "alerts-settings.alert-sender";
 	}
@@ -276,14 +282,16 @@ class AlertsDaemon
 
 			// look up subjects
 
-			Map<Record<?>,AlertsSubjectRec> subjects =
-				new HashMap<Record<?>,AlertsSubjectRec> ();
+			Map <Record <?>, AlertsSubjectRec> subjects =
+				new HashMap<> ();
 
-			for (AlertsSubjectRec alertsSubject
-					: alertsSettings.getAlertsSubjects ()) {
+			for (
+				AlertsSubjectRec alertsSubject
+					: alertsSettings.getAlertsSubjects ()
+			) {
 
-				Record<?> subject =
-					objectManager.findObject (
+				Record <?> subject =
+					objectManager.findObjectRequired (
 						transaction,
 						new GlobalId (
 							alertsSubject.getObjectType ().getId (),

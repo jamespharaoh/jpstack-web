@@ -88,11 +88,11 @@ class ConsoleFormActionsAction
 
 			ConsoleFormAction <?, ?> formAction =
 				iterableFindExactlyOneRequired (
+					formActions,
 					candidateFormAction ->
 						stringEqualSafe (
 							candidateFormAction.name (),
-							formName),
-					formActions);
+							formName));
 
 			Object formState =
 				formAction.helper ().constructFormState (

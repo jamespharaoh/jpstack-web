@@ -11,6 +11,8 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
@@ -26,7 +28,10 @@ import wbs.platform.user.model.UserRec;
 import wbs.apn.chat.contact.model.ChatMessageDao;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.contact.model.ChatMessageStats;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
+import wbs.apn.chat.contact.model.ChatMessageUserStats;
+import wbs.apn.chat.contact.model.ChatMessageViewRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
@@ -356,18 +361,35 @@ class ChatMessageDaoHibernate
 					"_toUser")
 
 				.createAlias (
+					"_chat.senderUser",
+					"_senderUser",
+					JoinType.LEFT_OUTER_JOIN)
+
+				.createAlias (
 					"originalText",
 					"_originalText");
 
 			if (
 				isNotNull (
-					search.chatIdIn ())
+					search.chatIds ())
 			) {
 
 				criteria.add (
 					Restrictions.in (
 						"_chat.id",
-						search.chatIdIn ()));
+						search.chatIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.senderUserIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_senderUser.id",
+						search.senderUserIds ()));
 
 			}
 
@@ -398,21 +420,20 @@ class ChatMessageDaoHibernate
 
 			}
 
-			if (search.timestampAfter () != null) {
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
 
 				criteria.add (
 					Restrictions.ge (
-						"timestamp",
-						search.timestampAfter ()));
-
-			}
-
-			if (search.timestampBefore () != null) {
+						"_chatMessage.timestamp",
+						search.timestamp ().start ()));
 
 				criteria.add (
 					Restrictions.lt (
-						"timestamp",
-						search.timestampBefore ()));
+						"_chatMessage.timestamp",
+						search.timestamp ().end ()));
 
 			}
 
@@ -591,6 +612,215 @@ class ChatMessageDaoHibernate
 						maxResults))
 
 			);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <ChatMessageUserStats> searchUserStats (
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatMessageSearch search) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchUserStats");
+
+		) {
+
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ChatMessageViewRec.class,
+					"_chatMessageView")
+
+				.createAlias (
+					"chatMessageView.chat",
+					"_chat")
+
+				.createAlias (
+					"_chatMessageView.senderUser",
+					"_senderUser")
+
+			;
+
+			if (
+				isNotNull (
+					search.chatIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_chat.id",
+						search.chatIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.senderUserIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_senderUser.id",
+						search.senderUserIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_chatMessageView.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_chatMessageView.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			criteria.setProjection (
+				Projections.projectionList ()
+
+				.add (
+					Projections.groupProperty (
+						"_chatMessageView.chat"),
+					"chat")
+
+				.add (
+					Projections.groupProperty (
+						"_chatMessageView.senderUser"),
+					"senderUser")
+
+				.add (
+					Projections.rowCount (),
+					"numMessages")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numCharacters"),
+					"numCharacters")
+
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ChatMessageUserStats.class));
+
+			return findMany (
+				transaction,
+				ChatMessageUserStats.class,
+				criteria);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <ChatMessageStats> searchStats (
+			@NonNull Transaction parentTransaction,
+			@NonNull ChatMessageSearch search) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchStats");
+
+		) {
+
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ChatMessageViewRec.class,
+					"_chatMessageView")
+
+				.createAlias (
+					"chatMessageView.chat",
+					"_chat")
+
+			;
+
+			if (
+				isNotNull (
+					search.chatIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_chat.id",
+						search.chatIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.senderUserIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_senderUser.id",
+						search.senderUserIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_chatMessageView.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_chatMessageView.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			criteria.setProjection (
+				Projections.projectionList ()
+
+				.add (
+					Projections.groupProperty (
+						"_chatMessageView.chat"),
+					"chat")
+
+				.add (
+					Projections.rowCount (),
+					"numMessages")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numCharacters"),
+					"numCharacters")
+
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ChatMessageStats.class));
+
+			return findMany (
+				transaction,
+				ChatMessageStats.class,
+				criteria);
 
 		}
 

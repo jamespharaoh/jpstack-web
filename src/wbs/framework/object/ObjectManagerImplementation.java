@@ -20,7 +20,6 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.PropertyUtils.propertyGetAuto;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
@@ -674,7 +673,7 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Record <?> findObject (
+	Optional <Record <?>> findObject (
 			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId objectGlobalId) {
 
@@ -691,7 +690,7 @@ class ObjectManagerImplementation
 				objectHelpersByTypeId.get (
 					objectGlobalId.typeId ());
 
-			return optionalOrNull (
+			return genericCastUnchecked (
 				objectHelper.find (
 					transaction,
 					objectGlobalId.objectId ()));

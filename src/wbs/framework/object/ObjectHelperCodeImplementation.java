@@ -6,7 +6,9 @@ import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -290,15 +292,52 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 					recordOptional)
 			) {
 
+				if (
+					referenceEqualWithClass (
+						GlobalId.class,
+						GlobalId.root,
+						ancestorGlobalId)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such %s with parent root and code %s",
+							objectModel.objectName (),
+							joinWithFullStop (
+								codes)));
+
+				}
+
+				Optional <Record <?>> ancestorOptional =
+					objectManager.findObject (
+						transaction,
+						ancestorGlobalId);
+
+				if (
+					optionalIsNotPresent (
+						ancestorOptional)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such object with type %s and id %s",
+							integerToDecimalString (
+								ancestorGlobalId.typeId ()),
+							integerToDecimalString (
+								ancestorGlobalId.objectId ())));
+				}
+
+				Record <?> ancestor =
+					optionalGetRequired (
+						ancestorOptional);
+
 				throw new RuntimeException (
 					stringFormat (
 						"No such %s with parent %s and code %s",
 						objectModel.objectName (),
 						objectManager.objectPath (
 							transaction,
-							objectManager.findObject (
-								transaction,
-								ancestorGlobalId)),
+							ancestor),
 						joinWithFullStop (
 							codes)));
 

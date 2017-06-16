@@ -6,6 +6,7 @@ import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.min;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.lessThanOne;
@@ -14,7 +15,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 
 import java.util.ArrayList;
@@ -123,11 +123,19 @@ class ChatDateDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat date";
+	}
+
+	@Override
+	protected
 	String getThreadName () {
 
 		return "Date";
 
 	}
+
+	// implementation
 
 	@Override
 	protected

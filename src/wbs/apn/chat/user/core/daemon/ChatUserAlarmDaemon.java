@@ -64,6 +64,12 @@ class ChatUserAlarmDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat user alarms";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.alarms";
 	}

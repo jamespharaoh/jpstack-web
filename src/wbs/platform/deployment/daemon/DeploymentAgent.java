@@ -58,6 +58,12 @@ class DeploymentAgent
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Deployment agent";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 
 		return stringFormat (

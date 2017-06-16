@@ -77,6 +77,12 @@ class PostgresqlMaintenanceDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "PostgreSQL maintenance";
+	}
+
+	@Override
+	protected
 	String getThreadName () {
 		return "PgMaint";
 	}

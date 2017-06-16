@@ -46,6 +46,12 @@ class ImChatConversationEmailDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Im chat conversation email";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "im-chat-conversation.email";
 	}

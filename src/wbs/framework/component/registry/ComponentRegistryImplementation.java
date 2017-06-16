@@ -436,11 +436,11 @@ class ComponentRegistryImplementation
 
 			singletons =
 				iterableFilterToList (
+					orderedDefinitions,
 					orderedDefinition ->
 						stringEqualSafe (
 							orderedDefinition.scope (),
-							"singleton"),
-					orderedDefinitions);
+							"singleton"));
 
 			// output component definitions
 

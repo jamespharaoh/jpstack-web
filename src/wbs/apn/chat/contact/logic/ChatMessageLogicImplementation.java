@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
@@ -61,6 +62,8 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
+
+import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
@@ -207,11 +210,12 @@ class ChatMessageLogicImplementation
 				.toUserId (
 					toUser.getId ())
 
-				.timestampAfter (
-					oneHourAgo)
+				.timestamp (
+					TextualInterval.after (
+						DateTimeZone.UTC,
+						oneHourAgo))
 
-				.originalTextId (
-					originalText.getId ()));
+			);
 
 			return dupes.size () > 0;
 

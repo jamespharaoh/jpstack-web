@@ -2,13 +2,13 @@ package wbs.console.helper.manager;
 
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -666,7 +666,7 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Record <?> findObject (
+	Optional <Record <?>> findObject (
 			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId objectGlobalId) {
 

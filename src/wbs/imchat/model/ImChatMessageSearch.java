@@ -1,6 +1,7 @@
 package wbs.imchat.model;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -13,7 +14,8 @@ public
 class ImChatMessageSearch
 	implements Serializable {
 
-	Long imChatId;
+	Set <Long> imChatIds;
+	Set <Long> senderUserIds;
 
 	TextualInterval timestamp;
 

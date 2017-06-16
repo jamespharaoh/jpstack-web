@@ -53,10 +53,14 @@ class ChatStatsDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat stats";
+	}
+
+	@Override
+	protected
 	String getThreadName () {
-
 		return "ChatStatsDaemon";
-
 	}
 
 	// implementation

@@ -94,6 +94,11 @@
 			name="deliveryId"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="finalMessage"
+			column="final"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

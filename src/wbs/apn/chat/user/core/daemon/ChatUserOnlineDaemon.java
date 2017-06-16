@@ -71,6 +71,12 @@ class ChatUserOnlineDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Chat user online";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "chat-user.online";
 	}

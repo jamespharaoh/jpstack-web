@@ -28,4 +28,8 @@ interface ImChatMessageDaoMethods {
 			ImChatMessageSearch search,
 			List <Long> ids);
 
+	List <ImChatMessageUserStats> searchMessageUserStats (
+			Transaction parentTransaction,
+			ImChatMessageSearch search);
+
 }

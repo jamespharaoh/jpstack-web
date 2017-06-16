@@ -568,6 +568,7 @@
       <fileset dir="work/console-test/webapps/host-manager"/>
     </copy>
     <exec failonerror="false" executable="work/console-test/bin/catalina.sh">
+      <env key="WBS_CONFIG_XML" value="config/wbs-console-config.xml"/>
       <arg line="run"/>
     </exec>
   </target>

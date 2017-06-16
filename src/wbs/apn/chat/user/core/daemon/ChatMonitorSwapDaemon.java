@@ -3,9 +3,9 @@ package wbs.apn.chat.user.core.daemon;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.EnumUtils.enumName;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.string.StringUtils.keyEqualsEnum;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -71,6 +71,12 @@ class ChatMonitorSwapDaemon
 	RandomLogic randomLogic;
 
 	// details
+
+	@Override
+	protected
+	String friendlyName () {
+		return "Chat monitor swap";
+	}
 
 	@Override
 	protected

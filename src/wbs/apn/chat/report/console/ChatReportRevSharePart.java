@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
@@ -781,11 +782,12 @@ class ChatReportRevSharePart
 				.hasSender (
 					true)
 
-				.timestampAfter (
-					startDate.toDateTimeAtStartOfDay ().toInstant ())
-
-				.timestampBefore (
-					startDate.toDateTimeAtStartOfDay ().toInstant ())
+				.timestamp (
+					TextualInterval.forInterval (
+						DateTimeZone.forID (
+							chat.getTimezone ()),
+						startDate,
+						endDate))
 
 			);
 

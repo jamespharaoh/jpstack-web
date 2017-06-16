@@ -2,9 +2,251 @@
 	name="apn-misc">
 
 	<supervisor-config
+		name="apn-template"
+		label="APN template">
+
+		<!-- aggregators -->
+
+		<sum-stats-aggregator
+			name="sum"/>
+
+		<!-- data sets -->
+
+		<data-set
+			name="queueItemByUser"
+			provider="queueItemUserStatsProvider"/>
+
+		<data-set
+			name="queueItemByQueue"
+			provider="queueItemQueueStatsProvider"/>
+
+		<data-set
+			name="chatMessageUser"
+			provider="chatMessageUserStatsProvider"/>
+
+		<data-set
+			name="manualResponderReplyUser"
+			provider="manualResponderReplyUserStatsProvider"/>
+
+		<data-set
+			name="imChatMessageUser"
+			provider="imChatMessageUserStatsProvider"/>
+
+		<!-- groupers -->
+
+		<queue-stats-grouper
+			name="queue"/>
+
+		<user-stats-grouper
+			name="user"/>
+
+		<!-- formatters -->
+
+		<integer-stats-formatter
+			name="integer"/>
+
+		<integer-stats-formatter
+			name="userQueueItems"
+			target-base="queue.supervisorItems">
+
+			<target-param
+				name="userId"
+				value="{group}"/>
+
+			<target-param
+				name="interval"
+				value="{interval}"/>
+
+		</integer-stats-formatter>
+
+		<!-- queue item resolvers -->
+
+		<simple-stats-resolver
+			name="queueNumProcessed"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			index="queueId"
+			value="numProcessed"/>
+
+		<simple-stats-resolver
+			name="userNumProcessed"
+			aggregator="sum"
+			data-set="queueItemByUser"
+			index="userId"
+			value="numProcessed"/>
+
+		<simple-stats-resolver
+			name="totalCreated"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			value="numCreated"/>
+
+		<simple-stats-resolver
+			name="totalProcessed"
+			aggregator="sum"
+			data-set="queueItemByUser"
+			value="numProcessed"/>
+
+		<addition-stats-resolver
+			name="totalDifference">
+
+			<operand resolver="totalCreated"/>
+			<operand resolver="totalProcessed" coefficient="-1"/>
+
+		</addition-stats-resolver>
+
+		<simple-stats-resolver
+			name="totalPreferred"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			value="numPreferred"/>
+
+		<multiplication-stats-resolver
+			name="totalPreferredPercent">
+
+			<operand value="100"/>
+			<operand resolver="totalPreferred"/>
+			<operand resolver="totalProcessed" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+		<!-- chat message length resolvers -->
+
+		<simple-stats-resolver
+			name="chatMessagesLengthPerUser"
+			aggregator="sum"
+			index="userId"
+			value="charactersSent"
+			data-set="chatMessageUser"/>
+
+		<simple-stats-resolver
+			name="chatMessagesSentPerUser"
+			aggregator="sum"
+			index="userId"
+			value="messagesSent"
+			data-set="chatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="chatMessagesAverageLengthPerUser">
+			<operand resolver="chatMessagesLengthPerUser"/>
+			<operand resolver="chatMessagesSentPerUser" power="-1"/>
+		</multiplication-stats-resolver>
+
+		<simple-stats-resolver
+			name="chatMessagesLength"
+			aggregator="sum"
+			value="charactersSent"
+			data-set="chatMessageUser"/>
+
+		<simple-stats-resolver
+			name="chatMessagesSent"
+			aggregator="sum"
+			value="messagesSent"
+			data-set="chatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="chatMessagesAverageLength">
+
+			<operand resolver="chatMessagesLength"/>
+			<operand resolver="chatMessagesSent" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+		<!-- manual responder reply length resolvers -->
+
+		<simple-stats-resolver
+			name="manualResponderRepliesLengthPerUser"
+			aggregator="sum"
+			index="userId"
+			value="numCharacters"
+			data-set="manualResponderReplyUser"/>
+
+		<simple-stats-resolver
+			name="manualResponderRepliesCountPerUser"
+			aggregator="sum"
+			index="userId"
+			value="numReplies"
+			data-set="manualResponderReplyUser"/>
+
+		<multiplication-stats-resolver
+			name="manualResponderRepliesAverageLengthPerUser">
+
+			<operand resolver="manualResponderRepliesLengthPerUser"/>
+			<operand resolver="manualResponderRepliesCountPerUser" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+		<simple-stats-resolver
+			name="manualResponderRepliesLength"
+			aggregator="sum"
+			value="numCharacters"
+			data-set="manualResponderReplyUser"/>
+
+		<simple-stats-resolver
+			name="manualResponderRepliesCount"
+			aggregator="sum"
+			value="numReplies"
+			data-set="manualResponderReplyUser"/>
+
+		<multiplication-stats-resolver
+			name="manualResponderRepliesAverageLength">
+
+			<operand resolver="manualResponderRepliesLength"/>
+			<operand resolver="manualResponderRepliesCount" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+		<!-- im chat message length resolver -->
+
+		<simple-stats-resolver
+			name="imChatMessagesLengthPerUser"
+			aggregator="sum"
+			index="userId"
+			value="numCharacters"
+			data-set="imChatMessageUser"/>
+
+		<simple-stats-resolver
+			name="imChatMessagesCountPerUser"
+			aggregator="sum"
+			index="userId"
+			value="numMessages"
+			data-set="imChatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="imChatMessagesAverageLengthPerUser">
+
+			<operand resolver="imChatMessagesLengthPerUser"/>
+			<operand resolver="imChatMessagesCountPerUser" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+		<simple-stats-resolver
+			name="imChatMessagesLength"
+			aggregator="sum"
+			value="numCharacters"
+			data-set="imChatMessageUser"/>
+
+		<simple-stats-resolver
+			name="imChatMessagesCount"
+			aggregator="sum"
+			value="numMessages"
+			data-set="imChatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="imChatMessagesAverageLength">
+
+			<operand resolver="imChatMessagesLength"/>
+			<operand resolver="imChatMessagesCount" power="-1"/>
+
+		</multiplication-stats-resolver>
+
+	</supervisor-config>
+
+	<supervisor-config
 		name="apn-default"
 		label="APN default"
-		offset-hours="7">
+		offset-hours="7"
+		template="apn-template">
 
 		<!-- conditions -->
 
@@ -34,143 +276,6 @@
 
 		</value-condition>
 
-		<!-- aggregators -->
-
-		<sum-stats-aggregator
-			name="sum"/>
-
-		<!-- data sets -->
-
-		<data-set
-			name="queueItemByUser"
-			provider="queueItemUserStatsProvider"/>
-
-		<data-set
-			name="queueItemByQueue"
-			provider="queueItemQueueStatsProvider"/>
-
-		<data-set
-			name="chatMessageUser"
-			provider="chatMessageUserStatsProvider"/>
-
-		<!-- groupers -->
-
-		<queue-stats-grouper
-			name="queue"/>
-
-		<user-stats-grouper
-			name="user"/>
-
-		<!-- formatters -->
-
-		<integer-stats-formatter
-			name="integer"/>
-
-		<integer-stats-formatter
-			name="userQueueItems"
-			target-base="queue.supervisorItems">
-
-			<target-param
-				name="userId"
-				value="{group}"/>
-
-			<target-param
-				name="interval"
-				value="{interval}"/>
-
-		</integer-stats-formatter>
-
-		<!-- resolvers -->
-
-		<!-- per queue -->
-
-		<simple-stats-resolver
-			name="queueNumProcessed"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			index="queueId"
-			value="numProcessed"/>
-
-		<!-- per user -->
-
-		<simple-stats-resolver
-			name="userNumProcessed"
-			aggregator="sum"
-			data-set="queueItemByUser"
-			index="userId"
-			value="numProcessed"/>
-
-		<!-- totals -->
-
-		<simple-stats-resolver
-			name="totalCreated"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			value="numCreated"/>
-
-		<simple-stats-resolver
-			name="totalProcessed"
-			aggregator="sum"
-			data-set="queueItemByUser"
-			value="numProcessed"/>
-
-		<addition-stats-resolver
-			name="totalDifference">
-			<operand resolver="totalCreated"/>
-			<operand resolver="totalProcessed" coefficient="-1"/>
-		</addition-stats-resolver>
-
-		<simple-stats-resolver
-			name="totalPreferred"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			value="numPreferred"/>
-
-		<multiplication-stats-resolver
-			name="totalPreferredPercent">
-			<operand value="100"/>
-			<operand resolver="totalPreferred"/>
-			<operand resolver="totalProcessed" power="-1"/>
-		</multiplication-stats-resolver>
-
-		<simple-stats-resolver
-			name="chatMessagesLengthPerUser"
-			aggregator="sum"
-			index="userId"
-			value="charactersSent"
-			data-set="chatMessageUser"/>
-
-		<simple-stats-resolver
-			name="chatMessagesSentPerUser"
-			aggregator="sum"
-			index="userId"
-			value="messagesSent"
-			data-set="chatMessageUser"/>
-
-		<multiplication-stats-resolver
-			name="chatMessagesAverageLengthPerUser">
-			<operand resolver="chatMessagesLengthPerUser"/>
-			<operand resolver="chatMessagesSentPerUser" power="-1"/>
-		</multiplication-stats-resolver>
-
-		<simple-stats-resolver
-			name="chatMessagesLength"
-			aggregator="sum"
-			value="charactersSent"
-			data-set="chatMessageUser"/>
-
-		<simple-stats-resolver
-			name="chatMessagesSent"
-			aggregator="sum"
-			value="messagesSent"
-			data-set="chatMessageUser"/>
-
-		<multiplication-stats-resolver
-			name="chatMessagesAverageLength">
-			<operand resolver="chatMessagesLength"/>
-			<operand resolver="chatMessagesSent" power="-1"/>
-		</multiplication-stats-resolver>
-
 		<!-- content -->
 
 		<table>
@@ -218,6 +323,8 @@
 				resolver="totalPreferredPercent"
 				formatter="integer"/>
 
+			<!-- chat message length -->
+
 			<separator/>
 
 			<heading
@@ -234,6 +341,42 @@
 				resolver="chatMessagesAverageLength"
 				formatter="integer"/>
 
+			<!-- manual responder message length -->
+
+			<separator/>
+
+			<heading
+				label="Manual responder message length (average)"
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="manualResponderRepliesAverageLengthPerUser"
+				formatter="integer"/>
+
+			<stats-total
+				label="Overall"
+				resolver="manualResponderRepliesAverageLength"
+				formatter="integer"/>
+
+			<!-- im chat message length -->
+
+			<separator/>
+
+			<heading
+				label="IM chat message length (average)"
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="imChatMessagesAverageLengthPerUser"
+				formatter="integer"/>
+
+			<stats-total
+				label="Overall"
+				resolver="imChatMessagesAverageLength"
+				formatter="integer"/>
+
 		</table>
 
 	</supervisor-config>
@@ -241,7 +384,8 @@
 	<supervisor-config
 		name="apn-all"
 		label="APN All"
-		offset-hours="7">
+		offset-hours="7"
+		template="apn-template">
 
 		<!-- conditions -->
 
@@ -252,146 +396,11 @@
 
 		</value-condition>
 
-		<!-- aggregators -->
-
-		<sum-stats-aggregator
-			name="sum"/>
-
-		<!-- data sets -->
-
-		<data-set
-			name="queueItemByUser"
-			provider="queueItemUserStatsProvider"/>
-
-		<data-set
-			name="queueItemByQueue"
-			provider="queueItemQueueStatsProvider"/>
-
-		<data-set
-			name="chatMessageUser"
-			provider="chatMessageUserStatsProvider"/>
-
-		<!-- groupers -->
-
-		<queue-stats-grouper
-			name="queue"/>
-
-		<user-stats-grouper
-			name="user"/>
-
-		<!-- formatters -->
-
-		<integer-stats-formatter
-			name="integer"/>
-
-		<integer-stats-formatter
-			name="userQueueItems"
-			target-base="queue.supervisorItems">
-
-			<target-param
-				name="userId"
-				value="{group}"/>
-
-			<target-param
-				name="interval"
-				value="{interval}"/>
-
-		</integer-stats-formatter>
-
-		<!-- resolvers -->
-
-		<!-- per queue -->
-
-		<simple-stats-resolver
-			name="queueNumProcessed"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			index="queueId"
-			value="numProcessed"/>
-
-		<!-- per user -->
-
-		<simple-stats-resolver
-			name="userNumProcessed"
-			aggregator="sum"
-			data-set="queueItemByUser"
-			index="userId"
-			value="numProcessed"/>
-
-		<!-- totals -->
-
-		<simple-stats-resolver
-			name="totalCreated"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			value="numCreated"/>
-
-		<simple-stats-resolver
-			name="totalProcessed"
-			aggregator="sum"
-			data-set="queueItemByUser"
-			value="numProcessed"/>
-
-		<addition-stats-resolver
-			name="totalDifference">
-			<operand resolver="totalCreated"/>
-			<operand resolver="totalProcessed" coefficient="-1"/>
-		</addition-stats-resolver>
-
-		<simple-stats-resolver
-			name="totalPreferred"
-			aggregator="sum"
-			data-set="queueItemByQueue"
-			value="numPreferred"/>
-
-		<multiplication-stats-resolver
-			name="totalPreferredPercent">
-			<operand value="100"/>
-			<operand resolver="totalPreferred"/>
-			<operand resolver="totalProcessed" power="-1"/>
-		</multiplication-stats-resolver>
-
-		<simple-stats-resolver
-			name="chatMessagesLengthPerUser"
-			aggregator="sum"
-			index="userId"
-			value="charactersSent"
-			data-set="chatMessageUser"/>
-
-		<simple-stats-resolver
-			name="chatMessagesSentPerUser"
-			aggregator="sum"
-			index="userId"
-			value="messagesSent"
-			data-set="chatMessageUser"/>
-
-		<multiplication-stats-resolver
-			name="chatMessagesAverageLengthPerUser">
-			<operand resolver="chatMessagesLengthPerUser"/>
-			<operand resolver="chatMessagesSentPerUser" power="-1"/>
-		</multiplication-stats-resolver>
-
-		<simple-stats-resolver
-			name="chatMessagesLength"
-			aggregator="sum"
-			value="charactersSent"
-			data-set="chatMessageUser"/>
-
-		<simple-stats-resolver
-			name="chatMessagesSent"
-			aggregator="sum"
-			value="messagesSent"
-			data-set="chatMessageUser"/>
-
-		<multiplication-stats-resolver
-			name="chatMessagesAverageLength">
-			<operand resolver="chatMessagesLength"/>
-			<operand resolver="chatMessagesSent" power="-1"/>
-		</multiplication-stats-resolver>
-
 		<!-- content -->
 
 		<table>
+
+			<!-- queues -->
 
 			<heading
 				group-label="Queue"/>
@@ -436,6 +445,8 @@
 				resolver="totalPreferredPercent"
 				formatter="integer"/>
 
+			<!-- chat message length -->
+
 			<separator/>
 
 			<heading
@@ -450,6 +461,42 @@
 			<stats-total
 				label="Overall"
 				resolver="chatMessagesAverageLength"
+				formatter="integer"/>
+
+			<!-- manual reponder message length -->
+
+			<separator/>
+
+			<heading
+				label="Manual responder message length (average)"
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="manualResponderRepliesAverageLengthPerUser"
+				formatter="integer"/>
+
+			<stats-total
+				label="Overall"
+				resolver="manualResponderRepliesAverageLength"
+				formatter="integer"/>
+
+			<!-- im chat message length -->
+
+			<separator/>
+
+			<heading
+				label="IM chat message length (average)"
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="imChatMessagesAverageLengthPerUser"
+				formatter="integer"/>
+
+			<stats-total
+				label="Overall"
+				resolver="imChatMessagesAverageLength"
 				formatter="integer"/>
 
 		</table>

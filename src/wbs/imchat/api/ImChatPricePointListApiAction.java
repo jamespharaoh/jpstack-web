@@ -99,11 +99,11 @@ class ImChatPricePointListApiAction
 
 			List <ImChatPricePointRec> pricePoints =
 				iterableFilterToList (
-					pricePoint ->
-						! pricePoint.getDeleted (),
 					imChatPricePointHelper.findByParent (
 						transaction,
-						imChat));
+						imChat),
+					pricePoint ->
+						! pricePoint.getDeleted ());
 
 			Collections.sort (
 				pricePoints,

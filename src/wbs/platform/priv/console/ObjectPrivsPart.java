@@ -109,10 +109,10 @@ class ObjectPrivsPart <
 
 			privCodes =
 				iterableMapToSet (
-					PrivRec::getCode,
 					privHelper.findByParent (
 						transaction,
-						object));
+						object),
+					PrivRec::getCode);
 
 			privDatas =
 				preparePrivDatas (

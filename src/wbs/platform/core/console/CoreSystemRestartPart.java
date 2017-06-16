@@ -121,39 +121,39 @@ class CoreSystemRestartPart
 
 			apiDeployments =
 				iterableFilterToList (
+					apiDeploymentHelper.findAllNotDeletedEntities (
+						transaction),
 					apiDeployment ->
 						userPrivChecker.canRecursive (
 							transaction,
 							apiDeployment,
-							"restart"),
-					apiDeploymentHelper.findAllNotDeletedEntities (
-						transaction));
+							"restart"));
 
 			Collections.sort (
 				apiDeployments);
 
 			consoleDeployments =
 				iterableFilterToList (
+					consoleDeploymentHelper.findAllNotDeletedEntities (
+						transaction),
 					consoleDeployment ->
 						userPrivChecker.canRecursive (
 							transaction,
 							consoleDeployment,
-							"restart"),
-					consoleDeploymentHelper.findAllNotDeletedEntities (
-						transaction));
+							"restart"));
 
 			Collections.sort (
 				consoleDeployments);
 
 			daemonDeployments =
 				iterableFilterToList (
-					daemonDeployment ->
+					daemonDeploymentHelper.findAllNotDeletedEntities (
+						transaction),
+					consoleDeployment ->
 						userPrivChecker.canRecursive (
 							transaction,
-							daemonDeployment,
-							"restart"),
-					daemonDeploymentHelper.findAllNotDeletedEntities (
-						transaction));
+							consoleDeployment,
+							"restart"));
 
 			Collections.sort (
 				daemonDeployments);

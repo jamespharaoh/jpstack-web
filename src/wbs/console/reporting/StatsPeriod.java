@@ -1,9 +1,12 @@
 package wbs.console.reporting;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -14,7 +17,8 @@ import org.joda.time.Interval;
 @Accessors (fluent = true)
 @Data
 public
-class StatsPeriod {
+class StatsPeriod
+	implements Iterable <Interval> {
 
 	StatsGranularity granularity;
 
@@ -107,6 +111,31 @@ class StatsPeriod {
 				timestamp.toString (),
 				startTime.toString (),
 				endTime.toString ()));
+
+	}
+
+	// iterable implementation
+
+	@Override
+	public
+	Iterator <Interval> iterator () {
+
+		return IntStream.range (
+			0,
+			steps.size ())
+
+			.mapToObj (
+				step ->
+					new Interval (
+						steps.get (
+							step),
+						ifThenElse (
+							step < steps.size () - 1,
+							() -> steps.get (
+								step + 1),
+							() -> endTime)))
+
+			.iterator ();
 
 	}
 

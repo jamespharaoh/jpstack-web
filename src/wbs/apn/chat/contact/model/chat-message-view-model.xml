@@ -1,0 +1,39 @@
+<model-meta
+	name="chatMessageView"
+	type="event"
+	create="no">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="chatMessage"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="chatMessage"/>
+
+		<!-- index -->
+
+		<reference-field
+			name="chat"
+			type="chat"/>
+
+		<reference-field
+			name="senderUser"
+			type="user"/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<!-- data -->
+
+		<integer-field
+			name="numCharacters"/>
+
+	</fields>
+
+</model-meta>

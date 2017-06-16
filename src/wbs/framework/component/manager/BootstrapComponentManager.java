@@ -1559,11 +1559,11 @@ class BootstrapComponentManager
 
 				componentDatas =
 					iterableFilterToList (
+						componentDatas,
 						componentData ->
 							optionalIsPresent (
 								findQualifierAnnotation (
-									componentData.implementationClass ())),
-						componentDatas);
+									componentData.implementationClass ())));
 
 			}
 

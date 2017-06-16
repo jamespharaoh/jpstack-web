@@ -89,9 +89,9 @@ class ChatUserInitiationStatsProvider
 
 			Set <Long> chatIds =
 				iterableMapToSet (
-					NumberUtils::parseIntegerRequired,
 					conditions.get (
-						"chatId"));
+						"chatId"),
+					NumberUtils::parseIntegerRequired);
 
 			Set <ChatRec> chats =
 				presentInstancesSet (

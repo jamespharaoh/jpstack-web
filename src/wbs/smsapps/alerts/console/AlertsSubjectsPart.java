@@ -112,7 +112,7 @@ class AlertsSubjectsPart
 			) {
 
 				Record <?> object =
-					objectManager.findObject (
+					objectManager.findObjectRequired (
 						transaction,
 						new GlobalId (
 							alertsSubject.getObjectType ().getId (),

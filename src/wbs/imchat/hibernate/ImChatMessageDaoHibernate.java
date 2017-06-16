@@ -26,6 +26,8 @@ import wbs.framework.logging.LogContext;
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatMessageSearch;
+import wbs.imchat.model.ImChatMessageUserStats;
+import wbs.imchat.model.ImChatMessageViewRec;
 import wbs.imchat.model.ImChatOperatorReport;
 
 public
@@ -83,13 +85,25 @@ class ImChatMessageDaoHibernate
 
 			if (
 				isNotNull (
-					search.imChatId ())
+					search.imChatIds ())
 			) {
 
 				criteria.add (
-					Restrictions.eq (
+					Restrictions.in (
 						"_imChat.id",
-						search.imChatId ()));
+						search.imChatIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.senderUserIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_senderUser.id",
+						search.senderUserIds ()));
 
 			}
 
@@ -274,6 +288,115 @@ class ImChatMessageDaoHibernate
 				ImChatOperatorReport.class,
 				ids,
 				criteria.list ());
+
+		}
+
+	}
+
+	@Override
+	public
+	List <ImChatMessageUserStats> searchMessageUserStats (
+			@NonNull Transaction parentTransaction,
+			@NonNull ImChatMessageSearch search) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchMessageUserStats");
+
+		) {
+
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					ImChatMessageViewRec.class,
+					"_imChatMessageView")
+
+				.createAlias (
+					"_imChatMessageView.imChat",
+					"_imChat")
+
+				.createAlias (
+					"_imChatMessageView.senderUser",
+					"_senderUser")
+
+			;
+
+			if (
+				isNotNull (
+					search.imChatIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_imChat.id",
+						search.imChatIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.senderUserIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_senderUser.id",
+						search.senderUserIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_imChatMessageView.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_imChatMessageView.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			criteria.setProjection (
+				Projections.projectionList ()
+
+				.add (
+					Projections.groupProperty (
+						"_imChatMessageView.imChat"),
+					"imChat")
+
+				.add (
+					Projections.groupProperty (
+						"_imChatMessageView.senderUser"),
+					"senderUser")
+
+				.add (
+					Projections.rowCount (),
+					"numMessages")
+
+				.add (
+					Projections.sum (
+						"_imChatMessageView.numCharacters"),
+					"numCharacters")
+
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					ImChatMessageUserStats.class));
+
+			return findMany (
+				transaction,
+				ImChatMessageUserStats.class,
+				criteria);
 
 		}
 
