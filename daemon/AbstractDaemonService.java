@@ -1,7 +1,5 @@
 package wbs.platform.daemon;
 
-import static wbs.utils.etc.TypeUtils.classNameSimple;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +62,9 @@ class AbstractDaemonService {
 	void serviceTeardown (
 			@NonNull TaskLogger parentTaskLogger) {
 	}
+
+	protected abstract
+	String friendlyName ();
 
 	protected
 	String getThreadName () {
@@ -149,8 +150,7 @@ class AbstractDaemonService {
 
 				taskLogger.noticeFormat (
 					"Not starting %s (disabled)",
-					classNameSimple (
-						getClass ()));
+					friendlyName ());
 
 				return;
 
@@ -161,15 +161,14 @@ class AbstractDaemonService {
 			if (threads != null)
 				return;
 
-			taskLogger.noticeFormat (
-				"Starting %s",
-				classNameSimple (
-					getClass ()));
-
-			// call init
+			// call setup
 
 			setupService (
 				taskLogger);
+
+			taskLogger.noticeFormat (
+				"Starting %s",
+				friendlyName ());
 
 			// start threads
 
@@ -183,8 +182,7 @@ class AbstractDaemonService {
 
 			taskLogger.noticeFormat (
 				"Started %s",
-				classNameSimple (
-					getClass ()));
+				friendlyName ());
 
 		}
 
@@ -216,7 +214,7 @@ class AbstractDaemonService {
 
 			taskLogger.noticeFormat (
 				"Stopping %s",
-				getClass ().getSimpleName ());
+				friendlyName ());
 
 			// interrupt all the threads
 
@@ -258,7 +256,7 @@ class AbstractDaemonService {
 
 			taskLogger.noticeFormat (
 				"Stopped %s",
-				getClass ().getSimpleName ());
+				friendlyName ());
 
 			threads = null;
 

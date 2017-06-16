@@ -45,6 +45,12 @@ class ExceptionLogRemovalDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Exception log removal";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "exception-log.removal";
 	}

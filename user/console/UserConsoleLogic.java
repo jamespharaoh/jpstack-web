@@ -1,5 +1,8 @@
 package wbs.platform.user.console;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.base.Optional;
 
 import wbs.console.misc.ConsoleUserHelper;
@@ -32,6 +35,13 @@ interface UserConsoleLogic
 			Transaction parentTransaction);
 
 	Long sliceIdRequired (
+			Transaction parentTransaction);
+
+	Set <Long> getSupervisorSearchUserIds (
+			Transaction parentTransaction,
+			Map <String, Set <String>> conditions);
+
+	Set <Long> getSupervisorFilterUserIds (
 			Transaction parentTransaction);
 
 }
