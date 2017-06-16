@@ -7,9 +7,12 @@ import org.joda.time.Instant;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 
 public
 interface RemovalDaemon <Type extends Record <Type>> {
+
+	LogContext logContext ();
 
 	String serviceName ();
 	String backgroundProcessName ();

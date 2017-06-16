@@ -38,6 +38,12 @@ class ClockworkSmsInboundLogRemovalDaemon
 
 	@Override
 	public
+	LogContext logContext () {
+		return logContext;
+	}
+
+	@Override
+	public
 	String serviceName () {
 		return "Clockwork SMS inbound log removal";
 	}

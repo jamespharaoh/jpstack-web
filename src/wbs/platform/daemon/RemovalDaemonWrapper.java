@@ -13,12 +13,10 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
@@ -31,9 +29,6 @@ class RemovalDaemonWrapper <Type extends Record <Type>>
 
 	@SingletonDependency
 	Database database;
-
-	@ClassSingletonDependency
-	LogContext logContext;
 
 	// properties
 
@@ -64,7 +59,7 @@ class RemovalDaemonWrapper <Type extends Record <Type>>
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
+				removalDaemon.logContext ().nestTaskLogger (
 					parentTaskLogger,
 					"runOnce");
 
@@ -107,7 +102,7 @@ class RemovalDaemonWrapper <Type extends Record <Type>>
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
-					logContext,
+					removalDaemon.logContext (),
 					"runBatch");
 
 		) {

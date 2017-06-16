@@ -38,6 +38,12 @@ class OxygenateInboundLogRemovalDaemon
 
 	@Override
 	public
+	LogContext logContext () {
+		return logContext;
+	}
+
+	@Override
+	public
 	String serviceName () {
 		return "Oxygenate inbound log removal";
 	}
