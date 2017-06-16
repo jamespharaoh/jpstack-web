@@ -643,7 +643,7 @@ class ChatMessageDaoHibernate
 					"_chat")
 
 				.createAlias (
-					"_chatMessageView.senderUser",
+					"_chatMessageView.sender",
 					"_senderUser")
 
 			;
