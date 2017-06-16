@@ -29,7 +29,7 @@
 	</layer>
 
 	<layer name="daemon">
-		<component class="daemon.ClockworkSmsInboundLogRemovalDaemon"/>
+		<!--<component class="daemon.ClockworkSmsInboundLogRemovalDaemon"/>-->
 		<component class="daemon.ClockworkSmsSenderHelper"/>
 		<component class="daemon.ClockworkSmsSenderService"/>
 	</layer>
