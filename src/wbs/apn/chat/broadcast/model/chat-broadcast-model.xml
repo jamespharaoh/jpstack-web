@@ -1,6 +1,6 @@
 <model-meta
 	name="chatBroadcast"
-	type="event">
+	type="common">
 
 	<fields>
 
