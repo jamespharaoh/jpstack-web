@@ -346,18 +346,19 @@ class ChatMessageDaoHibernate
 			Criteria criteria =
 				createCriteria (
 					transaction,
-					ChatMessageRec.class)
+					ChatMessageRec.class,
+					"_chatMessage")
 
 				.createAlias (
-					"chat",
+					"_chatMessage.chat",
 					"_chat")
 
 				.createAlias (
-					"fromUser",
+					"_chatMessage.fromUser",
 					"_fromUser")
 
 				.createAlias (
-					"toUser",
+					"_chatMessage.toUser",
 					"_toUser")
 
 				.createAlias (
@@ -366,7 +367,7 @@ class ChatMessageDaoHibernate
 					JoinType.LEFT_OUTER_JOIN)
 
 				.createAlias (
-					"originalText",
+					"_chatMessage.originalText",
 					"_originalText");
 
 			if (
