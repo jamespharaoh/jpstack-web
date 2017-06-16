@@ -361,7 +361,7 @@ class ChatMessageDaoHibernate
 					"_toUser")
 
 				.createAlias (
-					"_chat.senderUser",
+					"_chatMessage.sender",
 					"_senderUser",
 					JoinType.LEFT_OUTER_JOIN)
 
