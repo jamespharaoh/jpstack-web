@@ -799,7 +799,7 @@ class Misc {
 
 	public static <Type>
 	boolean contains (
-			@NonNull Collection<Type> collection,
+			@NonNull Collection <Type> collection,
 			@NonNull Type value) {
 
 		return collection.contains (

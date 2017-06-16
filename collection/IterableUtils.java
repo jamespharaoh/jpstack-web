@@ -166,16 +166,25 @@ class IterableUtils {
 
 	public static <InputType, OutputType>
 	Set <OutputType> iterableMapToSet (
+			@NonNull Iterable <InputType> input,
 			@NonNull Function <
 				? super InputType,
 				? extends OutputType
-			> mapFunction,
-			@NonNull Iterable <InputType> input) {
+			> mapFunction) {
 
 		return ImmutableSet.copyOf (
 			iterableMap (
 				input,
 				mapFunction));
+
+	}
+
+	public static <Type>
+	Set <Type> iterableToSet (
+			@NonNull Iterable <Type> input) {
+
+		return ImmutableSet.copyOf (
+			input);
 
 	}
 
@@ -219,8 +228,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	List <ItemType> iterableFilterToList (
-			@NonNull Predicate <? super ItemType> predicate,
-			@NonNull Iterable <ItemType> input) {
+			@NonNull Iterable <ItemType> input,
+			@NonNull Predicate <? super ItemType> predicate) {
 
 		return iterableStream (input)
 
@@ -229,6 +238,21 @@ class IterableUtils {
 
 			.collect (
 				Collectors.toList ());
+
+	}
+
+	public static <ItemType>
+	Set <ItemType> iterableFilterToSet (
+			@NonNull Iterable <ItemType> input,
+			@NonNull Predicate <? super ItemType> predicate) {
+
+		return iterableStream (input)
+
+			.filter (
+				predicate)
+
+			.collect (
+				Collectors.toSet ());
 
 	}
 
@@ -276,6 +300,28 @@ class IterableUtils {
 
 	}
 
+	public static <InputType, OutputType>
+	Set <OutputType> iterableFilterMapToSet (
+			@NonNull Iterable <? extends InputType> iterable,
+			@NonNull Predicate <? super InputType> predicate,
+			@NonNull Function <? super InputType, OutputType> mapping) {
+
+		return Streams.stream (
+			iterable)
+
+			.filter (
+				predicate)
+
+			.map (
+				mapping::apply)
+
+			.collect (
+				Collectors.toSet ())
+
+		;
+
+	}
+
 	public static <ItemType>
 	Stream <ItemType> iterableStream (
 			@NonNull Iterable <ItemType> iterable) {
@@ -314,8 +360,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	ItemType iterableFindExactlyOneRequired (
-			@NonNull Predicate <ItemType> predicate,
-			@NonNull Iterable <ItemType> iterable) {
+			@NonNull Iterable <ItemType> iterable,
+			@NonNull Predicate <ItemType> predicate) {
 
 		Optional <ItemType> value =
 			optionalAbsent ();

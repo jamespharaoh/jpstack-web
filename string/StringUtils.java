@@ -528,6 +528,17 @@ class StringUtils {
 	}
 
 	public static
+	String underscoreToSpaces (
+			@NonNull String string) {
+
+		return replaceAll (
+			string,
+			"_",
+			" ");
+
+	}
+
+	public static
 	String hyphenToUnderscore (
 			@NonNull String string) {
 

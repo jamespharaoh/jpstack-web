@@ -11,6 +11,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
@@ -37,6 +38,51 @@ class LogicUtils {
 		}
 
 		return true;
+
+	}
+
+	public static
+	boolean allOf (
+			@NonNull Iterable <Supplier <Boolean>> conditions) {
+
+		for (
+			Supplier <Boolean> condition
+				: conditions
+		) {
+
+			if (! condition.get ()) {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	}
+
+	public static <Type>
+	Predicate <Type> predicatesCombineAll (
+			@NonNull Iterable <Predicate <Type>> predicates) {
+
+		return value -> {
+
+			for (
+				Predicate <Type> predicate
+					: predicates
+			) {
+
+				if (
+					! predicate.test (
+						value)
+				) {
+					return false;
+				}
+
+			}
+
+			return true;
+
+		};
 
 	}
 
