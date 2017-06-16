@@ -18,7 +18,12 @@ interface RemovalDaemon <Type extends Record <Type>> {
 
 	default
 	Long itemsPerBatch () {
-		return 100l;
+		return 1000l;
+	}
+
+	default
+	Duration sleepTime () {
+		return Duration.standardSeconds (1l);
 	}
 
 	List <Type> findItemsForRemoval (

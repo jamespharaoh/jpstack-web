@@ -73,7 +73,25 @@ class RemovalDaemonWrapper <Type extends Record <Type>>
 			while (
 				runBatch (
 					taskLogger)
-			);
+			) {
+
+				try {
+
+					Thread.sleep (
+						removalDaemon.sleepTime ().getMillis ());
+
+				} catch (InterruptedException interruptedException) {
+
+					taskLogger.warningFormat (
+						"Aborting due to interrupt");
+
+					Thread.currentThread ().interrupt ();
+
+					return;
+
+				}
+
+			}
 
 		}
 
