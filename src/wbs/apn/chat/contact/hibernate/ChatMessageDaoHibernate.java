@@ -426,15 +426,23 @@ class ChatMessageDaoHibernate
 					search.timestamp ())
 			) {
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatMessage.timestamp",
-						search.timestamp ().start ()));
+				if (search.timestamp ().hasStart ()) {
 
-				criteria.add (
-					Restrictions.lt (
-						"_chatMessage.timestamp",
-						search.timestamp ().end ()));
+					criteria.add (
+						Restrictions.ge (
+							"_chatMessage.timestamp",
+							search.timestamp ().start ()));
+
+				}
+
+				if (search.timestamp ().hasEnd ()) {
+
+					criteria.add (
+						Restrictions.lt (
+							"_chatMessage.timestamp",
+							search.timestamp ().end ()));
+
+				}
 
 			}
 
