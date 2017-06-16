@@ -23,7 +23,7 @@ interface RemovalDaemon <Type extends Record <Type>> {
 
 	default
 	Duration sleepTime () {
-		return Duration.standardSeconds (1l);
+		return Duration.millis (100l);
 	}
 
 	List <Type> findItemsForRemoval (
