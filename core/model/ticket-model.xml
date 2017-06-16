@@ -1,6 +1,6 @@
 <model-meta
 	name="ticket"
-	type="event">
+	type="common">
 
 	<fields>
 
