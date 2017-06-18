@@ -1,5 +1,6 @@
 package wbs.console.reporting;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -39,21 +41,18 @@ class SimpleStatsResolver
 
 	@Override
 	public
-	Set<Object> getGroups (
-			Map<String,StatsDataSet> dataSetsByName,
-			StatsGrouper grouper) {
+	Set <Object> getGroups (
+			@NonNull Map <String, StatsDataSet> dataSetsByName,
+			@NonNull StatsGrouper grouper) {
 
 		StatsDataSet dataSet =
-			dataSetsByName.get (dataSetName);
-
-		if (dataSet == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Data set %s not provided",
-					dataSetName));
-
-		}
+			mapItemForKeyOrThrow (
+				dataSetsByName,
+				dataSetName,
+				() -> new RuntimeException (
+					stringFormat (
+						"Data set %s not provided",
+						dataSetName)));
 
 		return grouper.getGroups (
 			dataSet);

@@ -1,7 +1,10 @@
 package wbs.apn.chat.affiliate.console;
 
 import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import javax.inject.Provider;
 
@@ -126,13 +129,16 @@ class ChatAffiliateKeywordsCreateAction
 
 			}
 
-			ChatKeywordJoinType joinType =
+			Optional <ChatKeywordJoinType> joinTypeOptional =
 				toEnum (
 					ChatKeywordJoinType.class,
 					requestContext.parameterRequired (
 						"joinType"));
 
-			if (joinType == null) {
+			if (
+				optionalIsNotPresent (
+					joinTypeOptional)
+			) {
 
 				requestContext.addError (
 					"Please specify a join type");
@@ -141,13 +147,17 @@ class ChatAffiliateKeywordsCreateAction
 
 			}
 
-			Gender gender =
+			ChatKeywordJoinType joinType =
+				optionalGetRequired (
+					joinTypeOptional);
+
+			Optional <Gender> genderOptional =
 				toEnum (
 					Gender.class,
 					requestContext.parameterRequired (
 						"gender"));
 
-			Orient orient =
+			Optional <Orient> orientOptional =
 				toEnum (
 					Orient.class,
 					requestContext.parameterRequired (
@@ -210,10 +220,12 @@ class ChatAffiliateKeywordsCreateAction
 					joinType)
 
 				.setJoinGender (
-					gender)
+					optionalOrNull (
+						genderOptional))
 
 				.setJoinOrient (
-					orient)
+					optionalOrNull (
+						orientOptional))
 
 				.setJoinChatAffiliate (
 					chatAffiliate)

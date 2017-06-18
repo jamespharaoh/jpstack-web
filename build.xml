@@ -633,6 +633,7 @@
       <script name="src/wbs/platform/logging/model/logging-schema.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance.sql"/>
+      <script name="src/wbs/platform/queue/model/queue-item.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
       <script name="src/wbs/sms/network/model/network.sql"/>

@@ -795,7 +795,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType ().isEnum ()) {
 
-				Enum<?> enumValue =
+				Optional <Enum <?>> enumValueOptional =
 					toEnumGeneric (
 						field.getType (),
 						hyphenToCamel (
@@ -804,7 +804,8 @@ class DataFromXmlImplementation
 				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
-					enumValue);
+					optionalOrNull (
+						enumValueOptional));
 
 				return true;
 

@@ -1,6 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -94,7 +94,7 @@ class ChatUserAdminDateAction
 		) {
 
 			ChatUserDateMode dateMode =
-				toEnum (
+				toEnumRequired (
 					ChatUserDateMode.class,
 					requestContext.parameterRequired (
 						"dateMode"));

@@ -1,6 +1,7 @@
 package wbs.apn.chat.affiliate.console;
 
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumOrNull;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -347,19 +348,19 @@ class ChatAffiliateCreateOldAction
 						keyword)
 
 					.setJoinType (
-						toEnum (
+						toEnumRequired (
 							ChatKeywordJoinType.class,
 							requestContext.parameterRequired (
 								"joinType" + index)))
 
 					.setJoinGender (
-						toEnum (
+						toEnumOrNull (
 							Gender.class,
 							requestContext.parameterRequired (
 								"gender" + index)))
 
 					.setJoinOrient (
-						toEnum (
+						toEnumOrNull (
 							Orient.class,
 							requestContext.parameterRequired (
 								"orient" + index)))

@@ -23,7 +23,7 @@ import wbs.platform.user.console.UserConsoleHelper;
 import wbs.utils.collection.CollectionUtils;
 
 import wbs.imchat.model.ImChatMessageRec;
-import wbs.imchat.model.ImChatMessageSearch;
+import wbs.imchat.model.ImChatMessageStatsSearch;
 
 @SingletonComponent ("imChatMessageConsoleHooks")
 public
@@ -64,7 +64,7 @@ class ImChatMessageConsoleHooks
 
 		) {
 
-			ImChatMessageSearch search =
+			ImChatMessageStatsSearch search =
 				genericCastUnchecked (
 					searchObject);
 

@@ -25,7 +25,7 @@ import wbs.framework.logging.LogContext;
 
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
-import wbs.imchat.model.ImChatMessageSearch;
+import wbs.imchat.model.ImChatMessageStatsSearch;
 import wbs.imchat.model.ImChatMessageUserStats;
 import wbs.imchat.model.ImChatMessageViewRec;
 import wbs.imchat.model.ImChatOperatorReport;
@@ -46,7 +46,7 @@ class ImChatMessageDaoHibernate
 	public
 	Criteria searchCriteria (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageSearch search) {
+			@NonNull ImChatMessageStatsSearch search) {
 
 		try (
 
@@ -134,7 +134,7 @@ class ImChatMessageDaoHibernate
 	public
 	Criteria searchOperatorReportCriteria (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageSearch search) {
+			@NonNull ImChatMessageStatsSearch search) {
 
 		try (
 
@@ -204,7 +204,7 @@ class ImChatMessageDaoHibernate
 	public
 	List <Long> searchOperatorReportIds (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageSearch search) {
+			@NonNull ImChatMessageStatsSearch search) {
 
 		try (
 
@@ -261,7 +261,7 @@ class ImChatMessageDaoHibernate
 	public
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageSearch search,
+			@NonNull ImChatMessageStatsSearch search,
 			@NonNull List <Long> ids) {
 
 		try (
@@ -297,7 +297,7 @@ class ImChatMessageDaoHibernate
 	public
 	List <ImChatMessageUserStats> searchMessageUserStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageSearch search) {
+			@NonNull ImChatMessageStatsSearch search) {
 
 		try (
 
@@ -324,46 +324,38 @@ class ImChatMessageDaoHibernate
 
 			;
 
-			if (
-				isNotNull (
-					search.imChatIds ())
-			) {
+			criteria.add (
+				Restrictions.in (
+					"_imChat.id",
+					search.imChatIds ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_imChat.id",
-						search.imChatIds ()));
+			criteria.add (
+				Restrictions.in (
+					"_senderUser.id",
+					search.senderUserIds ()));
 
-			}
+			criteria.add (
+				Restrictions.ge (
+					"_imChatMessageView.timestamp",
+					search.timestamp ().start ()));
 
-			if (
-				isNotNull (
-					search.senderUserIds ())
-			) {
+			criteria.add (
+				Restrictions.lt (
+					"_imChatMessageView.timestamp",
+					search.timestamp ().end ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_senderUser.id",
-						search.senderUserIds ()));
+			criteria.add (
+				Restrictions.or (
 
-			}
+				Restrictions.in (
+					"_imChat.id",
+					search.filterImChatIds ()),
 
-			if (
-				isNotNull (
-					search.timestamp ())
-			) {
+				Restrictions.in (
+					"_senderUser.id",
+					search.filterSenderUserIds ())
 
-				criteria.add (
-					Restrictions.ge (
-						"_imChatMessageView.timestamp",
-						search.timestamp ().start ()));
-
-				criteria.add (
-					Restrictions.lt (
-						"_imChatMessageView.timestamp",
-						search.timestamp ().end ()));
-
-			}
+			));
 
 			criteria.setProjection (
 				Projections.projectionList ()

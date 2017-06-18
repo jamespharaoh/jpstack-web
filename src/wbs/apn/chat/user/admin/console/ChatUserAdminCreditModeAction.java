@@ -1,8 +1,12 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -108,13 +112,16 @@ class ChatUserAdminCreditModeAction
 
 			// get params
 
-			ChatUserCreditMode newCreditMode =
+			Optional <ChatUserCreditMode> newCreditModeOptional =
 				toEnum (
 					ChatUserCreditMode.class,
 					requestContext.parameterRequired (
 						"creditMode"));
 
-			if (newCreditMode == null) {
+			if (
+				optionalIsNotPresent (
+					newCreditModeOptional)
+			) {
 
 				requestContext.addError (
 					"Please select a valid credit mode");
@@ -122,6 +129,10 @@ class ChatUserAdminCreditModeAction
 				return null;
 
 			}
+
+			ChatUserCreditMode newCreditMode =
+				optionalGetRequired (
+					newCreditModeOptional);
 
 			// lookup objects
 

@@ -1,4 +1,4 @@
-package wbs.imchat.model;
+package wbs.apn.chat.contact.model;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -11,12 +11,15 @@ import wbs.utils.time.TextualInterval;
 @Accessors (fluent = true)
 @Data
 public
-class ImChatMessageSearch
+class ChatMessageStatsSearch
 	implements Serializable {
 
-	Set <Long> imChatIds;
+	Set <Long> chatIds;
 	Set <Long> senderUserIds;
 
 	TextualInterval timestamp;
+
+	Set <Long> filterChatIds;
+	Set <Long> filterSenderUserIds;
 
 }

@@ -13,7 +13,6 @@ import org.joda.time.Interval;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
@@ -30,7 +29,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.contact.model.ChatMessageStatsSearch;
 import wbs.apn.chat.contact.model.ChatMessageUserStats;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
@@ -81,10 +80,6 @@ class ChatMessageUserStatsProvider
 
 		) {
 
-			if (period.granularity () != StatsGranularity.hour) {
-				throw new IllegalArgumentException ();
-			}
-
 			// get conditions
 
 			Set <Long> searchChatIds =
@@ -93,7 +88,7 @@ class ChatMessageUserStatsProvider
 					conditions);
 
 			Set <Long> searchUserIds =
-				userConsoleLogic.getSupervisorSearchUserIds (
+				userConsoleLogic.getSupervisorSearchIds (
 					transaction,
 					conditions);
 
@@ -104,7 +99,7 @@ class ChatMessageUserStatsProvider
 					transaction);
 
 			Set <Long> filterUserIds =
-				userConsoleLogic.getSupervisorFilterUserIds (
+				userConsoleLogic.getSupervisorFilterIds (
 					transaction);
 
 			// fetch stats
@@ -126,7 +121,7 @@ class ChatMessageUserStatsProvider
 				List <ChatMessageUserStats> messageUserStatsList =
 					chatMessageHelper.searchUserStats (
 						transaction,
-						new ChatMessageSearch ()
+						new ChatMessageStatsSearch ()
 
 					.chatIds (
 						searchChatIds)
@@ -138,9 +133,6 @@ class ChatMessageUserStatsProvider
 						TextualInterval.forInterval (
 							DateTimeZone.UTC,
 							interval))
-
-					.filter (
-						true)
 
 					.filterChatIds (
 						filterChatIds)

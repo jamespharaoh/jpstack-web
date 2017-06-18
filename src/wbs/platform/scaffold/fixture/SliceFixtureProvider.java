@@ -1,5 +1,7 @@
 package wbs.platform.scaffold.fixture;
 
+import static wbs.utils.string.StringUtils.joinWithComma;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -53,6 +55,11 @@ class SliceFixtureProvider
 
 				.setDescription (
 					"Test")
+
+				.setSupervisorConfigNames (
+					joinWithComma (
+						"apn-default-test",
+						"apn-all-test"))
 
 			);
 

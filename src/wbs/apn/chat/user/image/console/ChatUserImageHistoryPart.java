@@ -2,7 +2,7 @@ package wbs.apn.chat.user.image.console;
 
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
@@ -91,7 +91,7 @@ class ChatUserImageHistoryPart
 		) {
 
 			type =
-				toEnum (
+				toEnumRequired (
 					ChatUserImageType.class,
 					requestContext.stuffString (
 						"chatUserImageType"));

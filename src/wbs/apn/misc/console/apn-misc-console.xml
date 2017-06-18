@@ -116,32 +116,34 @@
 			name="chatMessagesLengthPerUser"
 			aggregator="sum"
 			index="userId"
-			value="charactersSent"
+			value="numCharacters"
 			data-set="chatMessageUser"/>
 
 		<simple-stats-resolver
 			name="chatMessagesSentPerUser"
 			aggregator="sum"
 			index="userId"
-			value="messagesSent"
+			value="numMessages"
 			data-set="chatMessageUser"/>
 
 		<multiplication-stats-resolver
 			name="chatMessagesAverageLengthPerUser">
+
 			<operand resolver="chatMessagesLengthPerUser"/>
 			<operand resolver="chatMessagesSentPerUser" power="-1"/>
+
 		</multiplication-stats-resolver>
 
 		<simple-stats-resolver
 			name="chatMessagesLength"
 			aggregator="sum"
-			value="charactersSent"
+			value="numCharacters"
 			data-set="chatMessageUser"/>
 
 		<simple-stats-resolver
 			name="chatMessagesSent"
 			aggregator="sum"
-			value="messagesSent"
+			value="numMessages"
 			data-set="chatMessageUser"/>
 
 		<multiplication-stats-resolver
@@ -243,22 +245,13 @@
 	</supervisor-config>
 
 	<supervisor-config
-		name="apn-default"
-		label="APN default"
-		offset-hours="7"
+		name="apn-default-template"
+		label="APN default template"
 		template="apn-template">
 
 		<!-- conditions -->
 
-		<value-condition
-			name="sliceCode">
-
-			<item value="apn"/>
-
-		</value-condition>
-
-		<value-condition
-			name="queueTypeCode">
+		<value-condition name="queue-type-code">
 
 			<item value="chat.chat_gay_male"/>
 			<item value="chat.chat_gay_female"/>
@@ -382,19 +375,9 @@
 	</supervisor-config>
 
 	<supervisor-config
-		name="apn-all"
-		label="APN All"
-		offset-hours="7"
+		name="apn-all-template"
+		label="APN All template"
 		template="apn-template">
-
-		<!-- conditions -->
-
-		<value-condition
-			name="sliceCode">
-
-			<item value="apn"/>
-
-		</value-condition>
 
 		<!-- content -->
 
@@ -500,6 +483,61 @@
 				formatter="integer"/>
 
 		</table>
+
+	</supervisor-config>
+
+	<!-- regular config -->
+
+	<supervisor-config
+		name="apn-default"
+		label="APN Default"
+		offset-hours="7"
+		template="apn-default-template">
+
+		<value-condition name="slice-code">
+			<item value="apn"/>
+		</value-condition>
+
+	</supervisor-config>
+
+	<supervisor-config
+		name="apn-all"
+		label="APN All"
+		offset-hours="7"
+		template="apn-all-template">
+
+		<value-condition name="slice-code">
+			<item value="apn"/>
+		</value-condition>
+
+	</supervisor-config>
+
+	<!-- test config -->
+
+	<supervisor-config
+		name="apn-default-test"
+		label="APN Default test"
+		offset-hours="7"
+		template="apn-default-template">
+
+		<value-condition name="slice-code">
+			<item value="test"/>
+		</value-condition>
+
+	</supervisor-config>
+
+	<supervisor-config
+		name="apn-all-test"
+		label="APN All test"
+		offset-hours="7"
+		template="apn-all-template">
+
+		<value-condition
+			name="sliceCode">
+
+			<item value="test"/>
+
+		</value-condition>
 
 	</supervisor-config>
 

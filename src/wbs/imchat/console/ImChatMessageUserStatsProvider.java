@@ -1,16 +1,9 @@
 package wbs.imchat.console;
 
-import static wbs.utils.collection.IterableUtils.iterableMapToSet;
-import static wbs.utils.collection.MapUtils.mapItemForKey;
-import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -20,7 +13,6 @@ import org.joda.time.Interval;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
@@ -31,10 +23,11 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
-import wbs.utils.etc.NumberUtils;
+import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.time.TextualInterval;
 
-import wbs.imchat.model.ImChatMessageSearch;
+import wbs.imchat.model.ImChatMessageStatsSearch;
 import wbs.imchat.model.ImChatMessageUserStats;
 
 @SingletonComponent ("imChatMessageUserStatsProvider")
@@ -48,6 +41,9 @@ class ImChatMessageUserStatsProvider
 	LogContext logContext;
 
 	@SingletonDependency
+	ImChatConsoleLogic imChatConsoleLogic;
+
+	@SingletonDependency
 	ImChatConsoleHelper imChatHelper;
 
 	@SingletonDependency
@@ -55,6 +51,9 @@ class ImChatMessageUserStatsProvider
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
 
 	// implementation
 
@@ -74,31 +73,27 @@ class ImChatMessageUserStatsProvider
 
 		) {
 
-			if (period.granularity () != StatsGranularity.hour) {
-				throw new IllegalArgumentException ();
-			}
-
 			// get conditions
 
-			Optional <Set <Long>> imChatIds =
-				optionalMapRequired (
-					mapItemForKey (
-						conditions,
-						"imChatId"),
-					imChatIdStrings ->
-						iterableMapToSet (
-							imChatIdStrings,
-							NumberUtils::parseIntegerRequired));
+			Set <Long> searchImChatIds =
+				imChatConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
 
-			Optional <Set <Long>> userIds =
-				optionalMapRequired (
-					mapItemForKey (
-						conditions,
-						"userId"),
-					userIdStrings ->
-						iterableMapToSet (
-							userIdStrings,
-							NumberUtils::parseIntegerRequired));
+			Set <Long> searchUserIds =
+				userConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			// get filters
+
+			Set <Long> filterImChatIds =
+				imChatConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+			Set <Long> filterUserIds =
+				userConsoleLogic.getSupervisorFilterIds (
+					transaction);
 
 			// fetch stats
 
@@ -116,25 +111,27 @@ class ImChatMessageUserStatsProvider
 					: period
 			) {
 
-				// TODO permissions
-
 				List <ImChatMessageUserStats> messageUserStatsList =
 					imChatMessageHelper.searchMessageUserStats (
 						transaction,
-						new ImChatMessageSearch ()
+						new ImChatMessageStatsSearch ()
 
 					.imChatIds (
-						optionalOrNull (
-							imChatIds))
+						searchImChatIds)
 
 					.senderUserIds (
-						optionalOrNull (
-							userIds))
+						searchUserIds)
 
 					.timestamp (
 						TextualInterval.forInterval (
 							DateTimeZone.UTC,
 							interval))
+
+					.filterImChatIds (
+						filterImChatIds)
+
+					.filterSenderUserIds (
+						filterUserIds)
 
 				);
 

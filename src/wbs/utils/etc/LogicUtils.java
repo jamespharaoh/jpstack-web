@@ -4,12 +4,14 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -17,6 +19,8 @@ import java.util.function.Supplier;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.joda.time.Duration;
 
 public
 class LogicUtils {
@@ -908,6 +912,146 @@ class LogicUtils {
 	public static
 	Function <Boolean, Boolean> booleanInverseFunction () {
 		return value -> ! value;
+	}
+
+	public static <Type>
+	Type attemptWithRetries (
+			@NonNull Long maxAttempts,
+			@NonNull Duration backoffTime,
+			@NonNull Supplier <Type> task,
+			@NonNull BiConsumer <Long, Exception> retryExceptionHandler,
+			@NonNull BiConsumer <Long, Exception> finalExceptionHandler)
+		throws InterruptedException {
+
+		for (
+			long attempt = 0l;
+			attempt < maxAttempts;
+			attempt ++
+		) {
+
+			if (attempt < maxAttempts - 1) {
+
+				try {
+
+					return task.get ();
+
+				} catch (Exception exception) {
+
+					retryExceptionHandler.accept (
+						attempt,
+						exception);
+				}
+
+				Duration pause =
+					backoffTime.multipliedBy (
+						attempt);
+
+				Thread.sleep (
+					pause.getMillis ());
+
+			} else {
+
+				try {
+
+					return task.get ();
+
+				} catch (RuntimeException exception) {
+
+					finalExceptionHandler.accept (
+						attempt,
+						exception);
+
+					throw exception;
+
+				} catch (Exception exception) {
+
+					finalExceptionHandler.accept (
+						attempt,
+						exception);
+
+					throw new RuntimeException (
+						exception);
+
+				}
+
+			}
+
+		}
+
+		throw shouldNeverHappen ();
+
+	}
+
+	public static
+	void attemptWithRetriesVoid (
+			@NonNull Long maxAttempts,
+			@NonNull Duration backoffTime,
+			@NonNull Runnable task,
+			@NonNull BiConsumer <Long, Exception> retryExceptionHandler,
+			@NonNull BiConsumer <Long, Exception> finalExceptionHandler)
+		throws InterruptedException {
+
+		for (
+			long attempt = 0l;
+			attempt < maxAttempts;
+			attempt ++
+		) {
+
+			if (attempt < maxAttempts - 1) {
+
+				try {
+
+					task.run ();
+
+					return;
+
+				} catch (Exception exception) {
+
+					retryExceptionHandler.accept (
+						attempt,
+						exception);
+				}
+
+				Duration pause =
+					backoffTime.multipliedBy (
+						attempt);
+
+				Thread.sleep (
+					pause.getMillis ());
+
+			} else {
+
+				try {
+
+					task.run ();
+
+					return;
+
+				} catch (RuntimeException exception) {
+
+					finalExceptionHandler.accept (
+						attempt,
+						exception);
+
+					throw exception;
+
+				} catch (Exception exception) {
+
+					finalExceptionHandler.accept (
+						attempt,
+						exception);
+
+					throw new RuntimeException (
+						exception);
+
+				}
+
+			}
+
+		}
+
+		throw shouldNeverHappen ();
+
 	}
 
 }

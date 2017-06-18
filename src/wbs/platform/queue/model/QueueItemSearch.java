@@ -16,19 +16,21 @@ class QueueItemSearch
 
 	Long sliceId;
 
-	Long queueParentTypeId;
-	Long queueTypeId;
 	Long queueId;
-
-	TextualInterval createdTime;
+	Long queueTypeId;
+	Long queueParentTypeId;
 
 	Long claimedUserId;
 	Long processedUserId;
+
+	TextualInterval createdTime;
+	TextualInterval processedTime;
 
 	QueueItemState state;
 
 	boolean filter;
 
 	Collection <Long> filterQueueIds;
+	Collection <Long> filterUserIds;
 
 }

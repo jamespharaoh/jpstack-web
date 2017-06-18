@@ -32,6 +32,10 @@ import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemSearch;
 import wbs.platform.queue.model.QueueItemState;
+import wbs.platform.queue.model.QueueItemStats;
+import wbs.platform.queue.model.QueueItemStatsSearch;
+import wbs.platform.queue.model.QueueItemUserStats;
+import wbs.platform.queue.model.QueueItemViewRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.UserQueueReport;
 import wbs.platform.user.model.UserRec;
@@ -645,6 +649,269 @@ class QueueItemDaoHibernate
 				UserQueueReport.class,
 				objectIds,
 				criteria.list ());
+
+		}
+
+	}
+
+	@Override
+	public
+	List <QueueItemStats> searchStats (
+			@NonNull Transaction parentTransaction,
+			@NonNull QueueItemStatsSearch search) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchStats");
+
+		) {
+
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					QueueItemViewRec.class,
+					"_queueItemView")
+
+				.createAlias (
+					"_queueItemView.queue",
+					"_queue")
+
+				.createAlias (
+					"_queueItemView.processedByUser",
+					"_processedByUser",
+					JoinType.LEFT_OUTER_JOIN)
+
+			;
+
+			// apply criteria
+
+			if (
+				isNotNull (
+					search.queueIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_queue.id",
+						search.queueIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.userIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_processedByUser.id",
+						search.userIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_queueItemView.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_queueItemView.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			// apply filter
+
+			criteria.add (
+				Restrictions.or (
+
+				Restrictions.in (
+					"_queue.id",
+					search.filterQueueIds ()),
+
+				Restrictions.in (
+					"_processedByUser.id",
+					search.filterUserIds ())
+
+			));
+
+			// apply projection
+
+			criteria.setProjection (
+				Projections.projectionList ()
+
+				.add (
+					Projections.groupProperty (
+						"_queueItemView.queue"),
+					"queue")
+
+				.add (
+					Projections.sum (
+						"_queueItemView.numCreated"),
+					"numCreated")
+
+				.add (
+					Projections.sum (
+						"_queueItemView.numProcessed"),
+					"numProcessed")
+
+				.add (
+					Projections.sum (
+						"_queueItemView.numPreferred"),
+					"numPreferred")
+
+				.add (
+					Projections.sum (
+						"_queueItemView.numNotPreferred"),
+					"numNotPreferred")
+
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					QueueItemStats.class));
+
+			// return
+
+			return findMany (
+				transaction,
+				QueueItemStats.class,
+				criteria);
+
+		}
+
+	}
+
+	@Override
+	public
+	List <QueueItemUserStats> searchUserStats (
+			@NonNull Transaction parentTransaction,
+			@NonNull QueueItemStatsSearch search) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"searchUserStats");
+
+		) {
+
+			Criteria criteria =
+				createCriteria (
+					transaction,
+					QueueItemViewRec.class,
+					"_queueItemView")
+
+				.createAlias (
+					"_queueItemView.queue",
+					"_queue")
+
+				.createAlias (
+					"_queueItemView.processedByUser",
+					"_processedByUser")
+
+			;
+
+			// apply criteria
+
+			if (
+				isNotNull (
+					search.queueIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_queue.id",
+						search.queueIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.userIds ())
+			) {
+
+				criteria.add (
+					Restrictions.in (
+						"_processedByUser.id",
+						search.userIds ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.timestamp ())
+			) {
+
+				criteria.add (
+					Restrictions.ge (
+						"_queueItemView.timestamp",
+						search.timestamp ().start ()));
+
+				criteria.add (
+					Restrictions.lt (
+						"_queueItemView.timestamp",
+						search.timestamp ().end ()));
+
+			}
+
+			// apply filter
+
+			criteria.add (
+				Restrictions.or (
+
+				Restrictions.in (
+					"_queue.id",
+					search.filterQueueIds ()),
+
+				Restrictions.in (
+					"_processedByUser.id",
+					search.filterUserIds ())
+
+			));
+
+			// apply projection
+
+			criteria.setProjection (
+				Projections.projectionList ()
+
+				.add (
+					Projections.groupProperty (
+						"_queueItemView.queue"),
+					"queue")
+
+				.add (
+					Projections.groupProperty (
+						"_queueItemView.processedByUser"),
+					"user")
+
+				.add (
+					Projections.sum (
+						"_queueItemView.numProcessed"),
+					"numProcessed")
+
+			);
+
+			criteria.setResultTransformer (
+				Transformers.aliasToBean (
+					QueueItemUserStats.class));
+
+			// return
+
+			return findMany (
+				transaction,
+				QueueItemUserStats.class,
+				criteria);
 
 		}
 

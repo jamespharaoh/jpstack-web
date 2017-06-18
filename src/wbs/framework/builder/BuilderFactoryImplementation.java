@@ -27,6 +27,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -150,6 +152,7 @@ class BuilderFactoryImplementation <Context>
 					: builderClass.getDeclaredMethods ()
 			) {
 
+				@Nullable
 				BuildMethod buildMethodAnnotation =
 					method.getAnnotation (
 						BuildMethod.class);

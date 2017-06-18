@@ -1,10 +1,8 @@
 package wbs.smsapps.manualresponder.hibernate;
 
-import static wbs.utils.etc.NullUtils.isNotNull;
-
 import java.util.List;
 
-import lombok.NonNull;
+import javax.annotation.Nonnull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
@@ -18,7 +16,7 @@ import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.logging.LogContext;
 
 import wbs.smsapps.manualresponder.model.ManualResponderReplyDaoMethods;
-import wbs.smsapps.manualresponder.model.ManualResponderReplySearch;
+import wbs.smsapps.manualresponder.model.ManualResponderReplyStatsSearch;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyUserStats;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyViewRec;
 
@@ -37,8 +35,8 @@ class ManualResponderReplyDaoHibernate
 	@Override
 	public
 	List <ManualResponderReplyUserStats> searchUserStats (
-			@NonNull Transaction parentTransaction,
-			@NonNull ManualResponderReplySearch search) {
+			@Nonnull Transaction parentTransaction,
+			@Nonnull ManualResponderReplyStatsSearch search) {
 
 		try (
 
@@ -65,46 +63,44 @@ class ManualResponderReplyDaoHibernate
 
 			;
 
-			if (
-				isNotNull (
-					search.manualResponderIds ())
-			) {
+			// apply criteria
 
-				criteria.add (
-					Restrictions.in (
-						"_manualResponder.id",
-						search.manualResponderIds ()));
+			criteria.add (
+				Restrictions.in (
+					"_manualResponder.id",
+					search.manualResponderIds ()));
 
-			}
+			criteria.add (
+				Restrictions.in (
+					"_user.id",
+					search.userIds ()));
 
-			if (
-				isNotNull (
-					search.userIds ())
-			) {
+			criteria.add (
+				Restrictions.ge (
+					"_manualResponderReplyView.timestamp",
+					search.timestamp ().start ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_user.id",
-						search.userIds ()));
+			criteria.add (
+				Restrictions.lt (
+					"_manualResponderReplyView.timestamp",
+					search.timestamp ().end ()));
 
-			}
+			// apply filter
 
-			if (
-				isNotNull (
-					search.timestamp ())
-			) {
+			criteria.add (
+				Restrictions.or (
 
-				criteria.add (
-					Restrictions.ge (
-						"_manualResponderReplyView.timestamp",
-						search.timestamp ().start ()));
+				Restrictions.in (
+					"_manualResponder.id",
+					search.filterManualResponderIds ()),
 
-				criteria.add (
-					Restrictions.lt (
-						"_manualResponderReplyView.timestamp",
-						search.timestamp ().end ()));
+				Restrictions.in (
+					"_user.id",
+					search.filterUserIds ())
 
-			}
+			));
+
+			// apply projection
 
 			criteria.setProjection (
 				Projections.projectionList ()
@@ -133,6 +129,8 @@ class ManualResponderReplyDaoHibernate
 			criteria.setResultTransformer (
 				Transformers.aliasToBean (
 					ManualResponderReplyUserStats.class));
+
+			// return
 
 			return findMany (
 				transaction,

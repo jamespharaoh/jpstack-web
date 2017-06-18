@@ -5,8 +5,6 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.module.ConsoleSpec;
-
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
@@ -19,7 +17,7 @@ import wbs.framework.data.annotations.DataParent;
 @PrototypeComponent ("supervisorValueConditionSpec")
 public
 class SupervisorValueConditionSpec
-	implements ConsoleSpec {
+	implements SupervisorConditionSpec {
 
 	@DataParent
 	SupervisorConfigSpec supervisorConfig;

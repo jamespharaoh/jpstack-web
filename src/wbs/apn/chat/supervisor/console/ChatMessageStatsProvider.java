@@ -28,8 +28,8 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
 import wbs.apn.chat.contact.model.ChatMessageStats;
+import wbs.apn.chat.contact.model.ChatMessageStatsSearch;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 
 @SingletonComponent ("chatMessageStatsProvider")
@@ -81,7 +81,7 @@ class ChatMessageStatsProvider
 					conditions);
 
 			Set <Long> searchUserIds =
-				userConsoleLogic.getSupervisorSearchUserIds (
+				userConsoleLogic.getSupervisorSearchIds (
 					transaction,
 					conditions);
 
@@ -92,7 +92,7 @@ class ChatMessageStatsProvider
 					transaction);
 
 			Set <Long> filterUserIds =
-				userConsoleLogic.getSupervisorFilterUserIds (
+				userConsoleLogic.getSupervisorFilterIds (
 					transaction);
 
 			// fetch stats
@@ -111,7 +111,7 @@ class ChatMessageStatsProvider
 				List <ChatMessageStats> messageStatsList =
 					chatMessageHelper.searchStats (
 						transaction,
-						new ChatMessageSearch ()
+						new ChatMessageStatsSearch ()
 
 					.chatIds (
 						searchChatIds)
@@ -123,9 +123,6 @@ class ChatMessageStatsProvider
 						TextualInterval.forInterval (
 							DateTimeZone.UTC,
 							interval))
-
-					.filter (
-						true)
 
 					.filterChatIds (
 						filterChatIds)

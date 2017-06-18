@@ -29,6 +29,7 @@ import wbs.apn.chat.contact.model.ChatMessageDao;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageSearch;
 import wbs.apn.chat.contact.model.ChatMessageStats;
+import wbs.apn.chat.contact.model.ChatMessageStatsSearch;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.contact.model.ChatMessageUserStats;
 import wbs.apn.chat.contact.model.ChatMessageViewRec;
@@ -630,7 +631,7 @@ class ChatMessageDaoHibernate
 	public
 	List <ChatMessageUserStats> searchUserStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull ChatMessageSearch search) {
+			@NonNull ChatMessageStatsSearch search) {
 
 		try (
 
@@ -648,55 +649,47 @@ class ChatMessageDaoHibernate
 					"_chatMessageView")
 
 				.createAlias (
-					"chatMessageView.chat",
+					"_chatMessageView.chat",
 					"_chat")
 
 				.createAlias (
-					"_chatMessageView.sender",
+					"_chatMessageView.senderUser",
 					"_senderUser")
 
 			;
 
-			if (
-				isNotNull (
-					search.chatIds ())
-			) {
+			criteria.add (
+				Restrictions.in (
+					"_chat.id",
+					search.chatIds ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_chat.id",
-						search.chatIds ()));
+			criteria.add (
+				Restrictions.in (
+					"_senderUser.id",
+					search.senderUserIds ()));
 
-			}
+			criteria.add (
+				Restrictions.ge (
+					"_chatMessageView.timestamp",
+					search.timestamp ().start ()));
 
-			if (
-				isNotNull (
-					search.senderUserIds ())
-			) {
+			criteria.add (
+				Restrictions.lt (
+					"_chatMessageView.timestamp",
+					search.timestamp ().end ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_senderUser.id",
-						search.senderUserIds ()));
+			criteria.add (
+				Restrictions.or (
 
-			}
+				Restrictions.in (
+					"_chat.id",
+					search.filterChatIds ()),
 
-			if (
-				isNotNull (
-					search.timestamp ())
-			) {
+				Restrictions.in (
+					"_senderUser.id",
+					search.filterSenderUserIds ())
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatMessageView.timestamp",
-						search.timestamp ().start ()));
-
-				criteria.add (
-					Restrictions.lt (
-						"_chatMessageView.timestamp",
-						search.timestamp ().end ()));
-
-			}
+			));
 
 			criteria.setProjection (
 				Projections.projectionList ()
@@ -709,7 +702,7 @@ class ChatMessageDaoHibernate
 				.add (
 					Projections.groupProperty (
 						"_chatMessageView.senderUser"),
-					"senderUser")
+					"user")
 
 				.add (
 					Projections.rowCount (),
@@ -728,6 +721,7 @@ class ChatMessageDaoHibernate
 
 			return findMany (
 				transaction,
+
 				ChatMessageUserStats.class,
 				criteria);
 
@@ -739,7 +733,7 @@ class ChatMessageDaoHibernate
 	public
 	List <ChatMessageStats> searchStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull ChatMessageSearch search) {
+			@NonNull ChatMessageStatsSearch search) {
 
 		try (
 
@@ -757,51 +751,47 @@ class ChatMessageDaoHibernate
 					"_chatMessageView")
 
 				.createAlias (
-					"chatMessageView.chat",
+					"_chatMessageView.chat",
 					"_chat")
+
+				.createAlias (
+					"_chatMessageView.senderUser",
+					"_senderUser")
 
 			;
 
-			if (
-				isNotNull (
-					search.chatIds ())
-			) {
+			criteria.add (
+				Restrictions.in (
+					"_chat.id",
+					search.chatIds ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_chat.id",
-						search.chatIds ()));
+			criteria.add (
+				Restrictions.in (
+					"_senderUser.id",
+					search.senderUserIds ()));
 
-			}
+			criteria.add (
+				Restrictions.ge (
+					"_chatMessageView.timestamp",
+					search.timestamp ().start ()));
 
-			if (
-				isNotNull (
-					search.senderUserIds ())
-			) {
+			criteria.add (
+				Restrictions.lt (
+					"_chatMessageView.timestamp",
+					search.timestamp ().end ()));
 
-				criteria.add (
-					Restrictions.in (
-						"_senderUser.id",
-						search.senderUserIds ()));
+			criteria.add (
+				Restrictions.or (
 
-			}
+				Restrictions.in (
+					"_chat.id",
+					search.filterChatIds ()),
 
-			if (
-				isNotNull (
-					search.timestamp ())
-			) {
+				Restrictions.in (
+					"_senderUser.id",
+					search.filterSenderUserIds ())
 
-				criteria.add (
-					Restrictions.ge (
-						"_chatMessageView.timestamp",
-						search.timestamp ().start ()));
-
-				criteria.add (
-					Restrictions.lt (
-						"_chatMessageView.timestamp",
-						search.timestamp ().end ()));
-
-			}
+			));
 
 			criteria.setProjection (
 				Projections.projectionList ()

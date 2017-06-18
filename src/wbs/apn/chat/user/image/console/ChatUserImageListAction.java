@@ -4,7 +4,7 @@ import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
@@ -96,7 +96,7 @@ class ChatUserImageListAction
 			@NonNull TaskLogger parentTaskLogger) {
 
 		ChatUserImageType type =
-			toEnum (
+			toEnumRequired (
 				ChatUserImageType.class,
 				(String) requestContext.stuff (
 					"chatUserImageType"));
@@ -146,7 +146,7 @@ class ChatUserImageListAction
 					transaction);
 
 			ChatUserImageType type =
-				toEnum (
+				toEnumRequired (
 					ChatUserImageType.class,
 					requestContext.stuffString (
 						"chatUserImageType"));

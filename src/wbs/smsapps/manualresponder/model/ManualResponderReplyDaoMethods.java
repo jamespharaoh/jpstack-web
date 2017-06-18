@@ -9,6 +9,6 @@ interface ManualResponderReplyDaoMethods {
 
 	List <ManualResponderReplyUserStats> searchUserStats (
 			Transaction parentTransaction,
-			ManualResponderReplySearch search);
+			ManualResponderReplyStatsSearch search);
 
 }

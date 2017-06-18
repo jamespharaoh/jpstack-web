@@ -28,6 +28,7 @@
 	</layer>
 
 	<layer name="console">
+		<component class="console.ManualResponderConsoleLogicImplementation"/>
 		<component class="console.ManualResponderNumThisHourCache"/>
 		<component class="console.ManualResponderNumTodayCache"/>
 		<component class="console.ManualResponderNumberConsoleHooks"/>

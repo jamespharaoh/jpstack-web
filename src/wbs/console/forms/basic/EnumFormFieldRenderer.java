@@ -2,7 +2,7 @@ package wbs.console.forms.basic;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
@@ -279,7 +279,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 				return successResult (
 					optionalOf (
-						toEnum (
+						toEnumRequired (
 							enumConsoleHelper.enumClass (),
 							hyphenToCamel (
 								submission.parameter (

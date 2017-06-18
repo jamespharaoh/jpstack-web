@@ -339,7 +339,7 @@ class SupervisorPart
 					.toDateTime (
 						localTime (
 							ifNull (
-								supervisorConfig.get ().spec ().offsetHours (),
+								supervisorConfig.get ().offsetHours (),
 								0l)),
 						consoleUserHelper.timezone (
 							transaction));
@@ -352,7 +352,7 @@ class SupervisorPart
 					.toDateTime (
 						localTime (
 							ifNull (
-								supervisorConfig.get ().spec ().offsetHours (),
+								supervisorConfig.get ().offsetHours (),
 								0l)),
 						consoleUserHelper.timezone (
 							transaction));
@@ -401,7 +401,7 @@ class SupervisorPart
 					startTime,
 					endTime,
 					ifNull (
-						supervisorConfig.get ().spec ().offsetHours (),
+						supervisorConfig.get ().offsetHours (),
 						0l));
 
 		}
@@ -424,15 +424,15 @@ class SupervisorPart
 				ImmutableMap.builder ();
 
 			for (
-				Object object
-					: supervisorConfig.get ().spec ().builders ()
+				Object condition
+					: supervisorConfig.get ().conditionSpecs ()
 			) {
 
-				if (object instanceof SupervisorContextConditionSpec) {
+				if (condition instanceof SupervisorContextConditionSpec) {
 
 					SupervisorContextConditionSpec contextCondition =
 						(SupervisorContextConditionSpec)
-						object;
+						condition;
 
 					conditionsBuilder.put (
 						contextCondition.name (),
@@ -443,10 +443,10 @@ class SupervisorPart
 
 				}
 
-				if (object instanceof SupervisorValueConditionSpec) {
+				if (condition instanceof SupervisorValueConditionSpec) {
 
 					SupervisorValueConditionSpec valueCondition =
-						(SupervisorValueConditionSpec) object;
+						(SupervisorValueConditionSpec) condition;
 
 					conditionsBuilder.put (
 						valueCondition.name (),
@@ -482,7 +482,7 @@ class SupervisorPart
 
 			for (
 				Object object
-					: supervisorConfig.get ().spec ().builders ()
+					: supervisorConfig.get ().dataSetSpecs ()
 			) {
 
 				if (! (object instanceof SupervisorDataSetSpec))

@@ -5,7 +5,7 @@ import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
@@ -106,7 +106,7 @@ class ChatUserImageListPart
 		) {
 
 			type =
-				toEnum (
+				toEnumRequired (
 					ChatUserImageType.class,
 					requestContext.stuffString (
 						"chatUserImageType"));

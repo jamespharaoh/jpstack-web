@@ -1,7 +1,7 @@
 package wbs.apn.chat.user.image.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import lombok.NonNull;
@@ -63,7 +63,7 @@ class ChatUserImageUploadPart
 		) {
 
 			chatUserImageType =
-				toEnum (
+				toEnumRequired (
 					ChatUserImageType.class,
 					requestContext.stuffString (
 						"chatUserImageType"));

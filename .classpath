@@ -15,6 +15,7 @@
   <classpathentry kind="lib" path="binaries/libraries/ant-launcher-jar-1.9.6.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/antlr-jar-2.7.7.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/antlr4-runtime-jar-4.5.2-1.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/checker-jar-2.1.12.jar" sourcepath="/root/projects/wbs-platform/wbs-binaries/libraries/checker-source-2.1.12.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/checkstyle-jar-6.17.jar" sourcepath="/root/projects/wbs-platform/wbs-binaries/libraries/checkstyle-source-6.17.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/classmate-bundle-1.1.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-beanutils-jar-1.9.2.jar"/>
@@ -124,7 +125,7 @@
   <classpathentry kind="lib" path="binaries/libraries/txw2-jar-2.2.11.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.jodatime-jar-2.0.1.jar" sourcepath="/root/projects/wbs-platform/wbs-binaries/libraries/usertype.jodatime-source-2.0.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.spi-jar-2.0.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/validation-api-jar-1.1.0.Final.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/validation-api-jar-2.0.0.Beta2.jar" sourcepath="/root/projects/wbs-platform/wbs-binaries/libraries/validation-api-source-2.0.0.Beta2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/woodstox-core-asl-jar-4.3.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/xalan-jar-2.7.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/xercesImpl-jar-2.10.0.jar"/>

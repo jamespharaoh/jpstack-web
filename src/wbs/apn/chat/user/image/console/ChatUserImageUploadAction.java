@@ -1,7 +1,7 @@
 package wbs.apn.chat.user.image.console;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.Misc.toEnumRequired;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -134,7 +134,7 @@ class ChatUserImageUploadAction
 		) {
 
 			chatUserImageType =
-				toEnum (
+				toEnumRequired (
 					ChatUserImageType.class,
 					(String)
 					requestContext.stuff (

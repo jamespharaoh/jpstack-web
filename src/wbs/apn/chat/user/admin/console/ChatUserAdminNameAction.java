@@ -2,10 +2,14 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -107,13 +111,16 @@ class ChatUserAdminNameAction
 
 			}
 
-			ChatUserEditReason editReason =
+			Optional <ChatUserEditReason> editReasonOptional =
 				toEnum (
 					ChatUserEditReason.class,
 					requestContext.parameterRequired (
 						"editReason"));
 
-			if (editReason == null) {
+			if (
+				optionalIsNotPresent (
+					editReasonOptional)
+			) {
 
 				requestContext.addError (
 					"Please select a valid reason");
@@ -121,6 +128,10 @@ class ChatUserAdminNameAction
 				return null;
 
 			}
+
+			ChatUserEditReason editReason =
+				optionalGetRequired (
+					editReasonOptional);
 
 			String name =
 				nullIfEmptyString (

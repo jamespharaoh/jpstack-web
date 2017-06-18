@@ -72,10 +72,10 @@ interface ChatMessageDaoMethods {
 
 	List <ChatMessageStats> searchStats (
 			Transaction parentTransaction,
-			ChatMessageSearch search);
+			ChatMessageStatsSearch search);
 
 	List <ChatMessageUserStats> searchUserStats (
 			Transaction parentTransaction,
-			ChatMessageSearch search);
+			ChatMessageStatsSearch search);
 
 }

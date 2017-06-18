@@ -55,12 +55,13 @@ elif test "$basebackup_enabled" = "yes" -a \! -e "$basebackup_yesterday"; then
 				--warning=no-file-ignored \
 				--warning=file-changed \
 				--directory "/mnt/zuri-platform-database-data/8.3/main" \
+				--exclude "./pg_xlog" \
 				"." \
 			|| test "$?" -eq "1"
 
 		} | {
 
-			sudo -u ubuntu -- \
+			sudo -H -u ubuntu -- \
 			zbackup \
 				--password-file "/backup/password" \
 				--silent \
@@ -95,7 +96,7 @@ elif test "$dump_enabled" = "yes" -a \! -e "$dump_yesterday"; then
 
 		} | {
 
-			sudo -u ubuntu -- \
+			sudo -H -u ubuntu -- \
 			zbackup \
 				--password-file "/backup/password" \
 				--silent \
