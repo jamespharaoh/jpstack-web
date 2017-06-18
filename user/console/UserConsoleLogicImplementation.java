@@ -1,19 +1,21 @@
 package wbs.platform.user.console;
 
 import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
-import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.collection.IterableUtils.iterableToSet;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
-import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.LogicUtils.predicatesCombineAll;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.presentInstancesSet;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.google.common.base.Optional;
 
@@ -34,7 +36,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.feature.console.FeatureConsoleHelper;
@@ -381,7 +382,7 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Set <Long> getSupervisorSearchUserIds (
+	Set <Long> getSupervisorSearchIds (
 			@NonNull Transaction parentTransaction,
 			@NonNull Map <String, Set <String>> conditions) {
 
@@ -394,34 +395,88 @@ class UserConsoleLogicImplementation
 
 		) {
 
-			Optional <Set <String>> userIdStringsOptional =
+			List <Predicate <UserRec>> predicates =
+				new ArrayList<> ();
+
+			// handle slice code condition
+
+			Optional <Set <String>> sliceCodes =
 				mapItemForKey (
 					conditions,
-					"user-id");
+					"slice-code");
 
-			Set <UserRec> users =
-				ifThenElse (
-					optionalIsPresent (
-						userIdStringsOptional),
-					() -> presentInstancesSet (
-						userHelper.findMany (
-							transaction,
-							iterableMapToList (
-								optionalGetRequired (
-									userIdStringsOptional),
-								NumberUtils::parseIntegerRequired))),
-					() -> iterableToSet (
-						userHelper.findAll (
-							transaction)));
+			if (
+				optionalIsPresent (
+					sliceCodes)
+			) {
+
+				predicates.add (
+					user ->
+						contains (
+							optionalGetRequired (
+								sliceCodes),
+							user.getSlice ().getCode ()));
+
+			}
+
+			// handle user slice code condition
+
+			Optional <Set <String>> userSliceCodesOptional =
+				mapItemForKey (
+					conditions,
+					"user-slice-code");
+
+			if (
+				optionalIsPresent (
+					userSliceCodesOptional)
+			) {
+
+				Set <String> userSliceCodes =
+					optionalGetRequired (
+						userSliceCodesOptional);
+
+				predicates.add (
+					user ->
+						contains (
+							userSliceCodes,
+							user.getSlice ().getCode ()));
+
+			}
+
+			// handle user code condition
+
+			Optional <Set <String>> userCodesOptional =
+				mapItemForKey (
+					conditions,
+					"user-code");
+
+			if (
+				optionalIsPresent (
+					userCodesOptional)
+			) {
+
+				Set <String> userCodes =
+					optionalGetRequired (
+						userCodesOptional);
+
+				predicates.add (
+					user ->
+						contains (
+							userCodes,
+							joinWithFullStop (
+								user.getSlice ().getCode (),
+								user.getUsername ())));
+
+			}
+
+			// return
 
 			return iterableFilterMapToSet (
-				users,
-				user ->
-					privChecker.canRecursive (
-						transaction,
-						user,
-						"supervisor"),
-				IdObject::getId);
+				userHelper.findAll (
+					transaction),
+				predicatesCombineAll (
+					predicates),
+				UserRec::getId);
 
 		}
 
@@ -429,7 +484,7 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Set <Long> getSupervisorFilterUserIds (
+	Set <Long> getSupervisorFilterIds (
 			@NonNull Transaction parentTransaction) {
 
 		try (

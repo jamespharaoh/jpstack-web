@@ -57,4 +57,12 @@ interface QueueItemDaoMethods {
 			UserRec user,
 			Interval processedTimeInterval);
 
+	List <QueueItemStats> searchStats (
+			Transaction parentTransaction,
+			QueueItemStatsSearch search);
+
+	List <QueueItemUserStats> searchUserStats (
+			Transaction parentTransaction,
+			QueueItemStatsSearch search);
+
 }

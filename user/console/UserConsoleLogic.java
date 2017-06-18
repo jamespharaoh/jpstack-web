@@ -37,11 +37,11 @@ interface UserConsoleLogic
 	Long sliceIdRequired (
 			Transaction parentTransaction);
 
-	Set <Long> getSupervisorSearchUserIds (
+	Set <Long> getSupervisorSearchIds (
 			Transaction parentTransaction,
 			Map <String, Set <String>> conditions);
 
-	Set <Long> getSupervisorFilterUserIds (
+	Set <Long> getSupervisorFilterIds (
 			Transaction parentTransaction);
 
 }
