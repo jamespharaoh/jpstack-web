@@ -129,9 +129,11 @@ class ClockworkSmsRouteInApiLoggingAction
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					ClockworkSmsRouteInRequest.class)
 
-				.build ();
+				.build (
+					taskLogger);
 
 
 		}

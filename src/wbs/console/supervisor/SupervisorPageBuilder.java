@@ -31,6 +31,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -60,16 +61,16 @@ class SupervisorPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFile;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTab;
 
 	@PrototypeDependency
-	Provider <SupervisorPart> supervisorPart;
+	ComponentProvider <SupervisorPart> supervisorPart;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponder;
 
 	// builder
 
@@ -157,10 +158,18 @@ class SupervisorPageBuilder <
 			consoleModule.addContextTab (
 				taskLogger,
 				container.tabLocation (),
-				contextTab.get ()
-					.name (tabName)
-					.defaultLabel (tabLabel)
-					.localFile (fileName),
+				contextTab.provide (
+					taskLogger)
+
+					.name (
+						tabName)
+
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						fileName),
+
 				extensionPoint.contextTypeNames ());
 
 		}
@@ -182,7 +191,8 @@ class SupervisorPageBuilder <
 
 			consoleModule.addContextFile (
 				fileName,
-				consoleFile.get ()
+				consoleFile.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider),
@@ -207,7 +217,8 @@ class SupervisorPageBuilder <
 
 			) {
 
-				return supervisorPart.get ()
+				return supervisorPart.provide (
+					transaction)
 
 					.fileName (
 						fileName)

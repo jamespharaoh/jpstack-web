@@ -62,8 +62,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -163,12 +161,12 @@ class ComponentManagerImplementation
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponent");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponent");
 
 			HeldLock heldLock =
 				lock.read ();
@@ -211,12 +209,12 @@ class ComponentManagerImplementation
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponentRequired");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentRequired");
 
 			HeldLock heldLock =
 				lock.read ();
@@ -262,12 +260,12 @@ class ComponentManagerImplementation
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponentOrElse");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentOrElse");
 
 			HeldLock heldLock =
 				lock.read ();
@@ -302,18 +300,18 @@ class ComponentManagerImplementation
 
 	@Override
 	public <ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponentProviderRequired");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentProvider");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -366,18 +364,18 @@ class ComponentManagerImplementation
 
 	@Override
 	public <ComponentType>
-	Provider <ComponentType> getComponentProviderRequired (
+	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"getComponentProviderRequired");
-
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentProviderRequired");
 
 			HeldLock heldlock =
 				lock.read ();
@@ -1253,7 +1251,7 @@ class ComponentManagerImplementation
 						"prototype")
 				) {
 
-					Provider <?> targetProvider =
+					ComponentProvider <?> targetProvider =
 						getComponentProviderRequired (
 							taskLogger,
 							targetName,
@@ -1340,7 +1338,7 @@ class ComponentManagerImplementation
 						"prototype")
 				) {
 
-					List <Provider <?>> targetProviders =
+					List <ComponentProvider <?>> targetProviders =
 						iterableMapToList (
 							targetNames,
 							targetName ->
@@ -1432,7 +1430,7 @@ class ComponentManagerImplementation
 						"prototype")
 				) {
 
-					Map <Object, Provider <Object>> targetProviders =
+					Map <Object, ComponentProvider <Object>> targetProviders =
 						mapTransformToMap (
 							targetMap,
 							(key, targetName) ->
@@ -1502,7 +1500,7 @@ class ComponentManagerImplementation
 		InjectedProperty injectedProperty;
 		List <ComponentDefinition> targetComponents;
 
-		Function <Provider <?>, Object> transformer;
+		Function <ComponentProvider <?>, Object> transformer;
 		Function <List <Pair <ComponentDefinition, Object>>, Object> aggregator;
 
 		Set <String> missingComponents;
@@ -1725,21 +1723,22 @@ class ComponentManagerImplementation
 
 		) {
 
-			List <Pair <ComponentDefinition, Provider <?>>> targetProviders =
-				iterableMapToList (
-					injection.targetComponents,
-					targetDefinition ->
-						Pair.of (
-							targetDefinition,
-							getComponentProvider (
-								taskLogger,
+			List <Pair <ComponentDefinition, ComponentProvider <?>>>
+				targetProviders =
+					iterableMapToList (
+						injection.targetComponents,
+						targetDefinition ->
+							Pair.of (
 								targetDefinition,
-								injection
-									.injectedProperty
-									.initialized (),
-								injection
-									.injectedProperty
-									.weak ())));
+								getComponentProvider (
+									taskLogger,
+									targetDefinition,
+									injection
+										.injectedProperty
+										.initialized (),
+									injection
+										.injectedProperty
+										.weak ())));
 
 			List <String> missingRawValueNames =
 				iterableMapToList (
@@ -2170,8 +2169,8 @@ class ComponentManagerImplementation
 
 	}
 
-	public
-	Provider <?> getComponentProvider (
+	private
+	ComponentProvider <?> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialise,
@@ -2184,21 +2183,37 @@ class ComponentManagerImplementation
 
 		) {
 
-			return () -> {
+			return new ComponentProvider <Object> () {
 
-				try (
-
-					OwnedTaskLogger taskLogger =
-						logContext.createTaskLogger (
-							"getComponentProvider.get");
-
-				) {
+				@Override
+				public
+				Object provide (
+						TaskLogger parentTaskLogger) {
 
 					return getComponentReal (
-						taskLogger,
+						parentTaskLogger,
 						componentDefinition,
 						initialise,
 						weak);
+
+				}
+
+				@Override
+				public
+				Object get () {
+
+					try (
+
+						OwnedTaskLogger taskLogger =
+							logContext.createTaskLogger (
+								"ComponentProvider.get");
+
+					) {
+
+						return provide (
+							taskLogger);
+
+					}
 
 				}
 

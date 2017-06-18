@@ -48,10 +48,12 @@ class ClockworkSmsRouteReportRequestReader
 			return dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					ClockworkSmsRouteReportRequest.class,
 					ClockworkSmsRouteReportRequest.Item.class)
 
-				.build ()
+				.build (
+					taskLogger)
 
 			;
 

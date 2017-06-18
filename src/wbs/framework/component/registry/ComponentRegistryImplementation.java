@@ -22,6 +22,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.classInSafe;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
@@ -84,6 +85,7 @@ import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.manager.ComponentManagerImplementation;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.registry.InjectedProperty.CollectionType;
 import wbs.framework.component.tools.ComponentWrapper;
 import wbs.framework.component.tools.EasyReadWriteLock;
@@ -127,7 +129,7 @@ class ComponentRegistryImplementation
 	// prototype depdendencies
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// properties
 
@@ -319,17 +321,22 @@ class ComponentRegistryImplementation
 		) {
 
 			dataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
-			.registerBuilderClasses (
-				ComponentsSpec.class,
-				ComponentsComponentSpec.class,
-				ComponentsValuePropertySpec.class,
-				ComponentsReferencePropertySpec.class,
-				ComponentsPropertiesPropertySpec.class,
-				ComponentPropertyValueSpec.class)
+				.registerBuilderClasses (
+					taskLogger,
+					ComponentsSpec.class,
+					ComponentsComponentSpec.class,
+					ComponentsValuePropertySpec.class,
+					ComponentsReferencePropertySpec.class,
+					ComponentsPropertiesPropertySpec.class,
+					ComponentPropertyValueSpec.class)
 
-			.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 
@@ -1913,7 +1920,12 @@ class ComponentRegistryImplementation
 
 			boolean isProvider;
 
-			if (injectClass == Provider.class) {
+			if (
+				classInSafe (
+					injectClass,
+					ComponentProvider.class,
+					Provider.class)
+			) {
 
 				if (parameterizedInjectType == null) {
 

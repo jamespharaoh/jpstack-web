@@ -12,28 +12,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.data.tools.DataFromXmlImplementation.DataClassInfo;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("dataFromXmlBuilder")
 @Accessors (fluent = true)
 public
 class DataFromXmlBuilder {
 
+	// singeton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <DataFromXmlImplementation> dataFromXmlImplementationProvider;
+	ComponentProvider <DataFromXmlImplementation>
+		dataFromXmlImplementationProvider;
 
 	// state
 
@@ -69,27 +78,42 @@ class DataFromXmlBuilder {
 
 	public
 	DataFromXmlBuilder registerBuilderClasses (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <Class <?>> builderClasses) {
 
-		for (
-			Class <?> builderClass
-				: builderClasses
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerBuilderClasses");
+
 		) {
 
-			registerBuilderClass (
-				builderClass);
+			for (
+				Class <?> builderClass
+					: builderClasses
+			) {
+
+				registerBuilderClass (
+					taskLogger,
+					builderClass);
+
+			}
+
+			return this;
 
 		}
-
-		return this;
 
 	}
 
 	public
 	DataFromXmlBuilder registerBuilderClasses (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?>... builderClasses) {
 
 		return registerBuilderClasses (
+			parentTaskLogger,
 			Arrays.asList (
 				builderClasses));
 
@@ -97,121 +121,167 @@ class DataFromXmlBuilder {
 
 	public
 	DataFromXmlBuilder registerBuilderClass (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?> builderClass) {
 
-		Provider <?> builderProvider =
-			new Provider <Object> () {
+		try (
 
-			@Override
-			public
-			Object get () {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerBuilderClass");
 
-				try {
+		) {
 
-					return builderClass.newInstance ();
+			ComponentProvider <?> builderProvider =
+				new ComponentProvider <Object> () {
 
-				} catch (Exception exception) {
+				@Override
+				public
+				Object provide (
+						@NonNull TaskLogger parentTaskLogger) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Unable to instantiate builder class %s",
-							builderClass.getName ()),
-						exception);
+					try (
+
+						OwnedTaskLogger taskLogger =
+							logContext.nestTaskLogger (
+								parentTaskLogger,
+								"provide");
+
+					) {
+
+						return builderClass.newInstance ();
+
+					} catch (Exception exception) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Unable to instantiate builder class %s",
+								builderClass.getName ()),
+							exception);
+
+					}
 
 				}
 
-			}
+			};
 
-		};
+			registerBuilder (
+				taskLogger,
+				builderClass,
+				builderProvider);
 
-		registerBuilder (
-			builderClass,
-			builderProvider);
+			return this;
 
-		return this;
+		}
 
 	}
 
 	public <Type>
 	DataFromXmlBuilder registerBuilders (
-			@NonNull Map <Class <?>, Provider <Type>> builders) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Map <Class <?>, ComponentProvider <Type>> builders) {
 
-		builders.entrySet ().forEach (
-			builder ->
-				registerBuilder (
-					builder.getKey (),
-					builder.getValue ()));
+		try (
 
-		return this;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerBuilders");
+
+		) {
+
+			builders.entrySet ().forEach (
+				builder ->
+					registerBuilder (
+						taskLogger,
+						builder.getKey (),
+						builder.getValue ()));
+
+			return this;
+
+		}
 
 	}
 
 	public
 	DataFromXmlBuilder registerBuilder (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?> dataClass,
-			@NonNull Provider <?> builderProvider) {
+			@NonNull ComponentProvider <?> builderProvider) {
 
-		DataClass dataClassAnnotation =
-			dataClass.getAnnotation (
-				DataClass.class);
+		try (
 
-		if (dataClassAnnotation == null) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerBuilder");
 
-			throw new RuntimeException (
-				stringFormat (
-					"Builder class %s has no @DataClass annotation",
-					dataClass.getName ()));
+		) {
+
+			DataClass dataClassAnnotation =
+				dataClass.getAnnotation (
+					DataClass.class);
+
+			if (dataClassAnnotation == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Builder class %s has no @DataClass annotation",
+						dataClass.getName ()));
+
+			}
+
+			String elementName =
+				ifNull (
+					nullIfEmptyString (
+						dataClassAnnotation.value ()),
+					camelToHyphen (
+						dataClass.getSimpleName ()));
+
+			Field parentField =
+				findParentField (
+					dataClass);
+
+			Class <?> parentClass =
+				parentField != null
+					? parentField.getType ()
+					: Object.class;
+
+			// add to map
+
+			List <DataClassInfo> dataClassInfos =
+				dataClassesMap.get (
+					elementName);
+
+			if (dataClassInfos == null) {
+
+				dataClassInfos =
+					new ArrayList <DataClassInfo> ();
+
+				dataClassesMap.put (
+					elementName,
+					dataClassInfos);
+
+			}
+
+			dataClassInfos.add (
+				new DataClassInfo ()
+
+				.parentClass (
+					parentClass)
+
+				.dataClass (
+					dataClass)
+
+				.provider (
+					builderProvider)
+
+			);
+
+			return this;
 
 		}
-
-		String elementName =
-			ifNull (
-				nullIfEmptyString (
-					dataClassAnnotation.value ()),
-				camelToHyphen (
-					dataClass.getSimpleName ()));
-
-		Field parentField =
-			findParentField (
-				dataClass);
-
-		Class <?> parentClass =
-			parentField != null
-				? parentField.getType ()
-				: Object.class;
-
-		// add to map
-
-		List <DataClassInfo> dataClassInfos =
-			dataClassesMap.get (
-				elementName);
-
-		if (dataClassInfos == null) {
-
-			dataClassInfos =
-				new ArrayList <DataClassInfo> ();
-
-			dataClassesMap.put (
-				elementName,
-				dataClassInfos);
-
-		}
-
-		dataClassInfos.add (
-			new DataClassInfo ()
-
-			.parentClass (
-				parentClass)
-
-			.dataClass (
-				dataClass)
-
-			.provider (
-				builderProvider)
-
-		);
-
-		return this;
 
 	}
 
@@ -245,16 +315,31 @@ class DataFromXmlBuilder {
 	}
 
 	public
-	DataFromXml build () {
+	DataFromXml build (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return dataFromXmlImplementationProvider.get ()
+		try (
 
-			.dataClassesMap (
-				ImmutableMap.copyOf (
-					dataClassesMap))
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.namedObjectCollections (
-				namedObjectCollections);
+		) {
+
+			return dataFromXmlImplementationProvider.provide (
+				taskLogger)
+
+				.dataClassesMap (
+					ImmutableMap.copyOf (
+						dataClassesMap))
+
+				.namedObjectCollections (
+					namedObjectCollections)
+
+			;
+
+		}
 
 	}
 

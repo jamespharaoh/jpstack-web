@@ -1,12 +1,11 @@
 package wbs.framework.component.scaffold;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -27,7 +26,7 @@ class BuildSpecFactory
 	// prototype components
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// public implementation
 
@@ -46,15 +45,18 @@ class BuildSpecFactory
 		) {
 
 			DataFromXml buildDataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
 				.registerBuilderClasses (
+					taskLogger,
 					BuildSpec.class,
 					BuildLayerPluginSpec.class,
 					BuildLayerSpec.class,
 					BuildPluginSpec.class)
 
-				.build ();
+				.build (
+					taskLogger);
 
 			BuildSpec build =
 				(BuildSpec)

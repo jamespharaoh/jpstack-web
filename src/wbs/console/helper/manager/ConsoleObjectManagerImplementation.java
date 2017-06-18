@@ -25,7 +25,6 @@ import lombok.NonNull;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCellWriter;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.tab.Tab;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.TaskLogger;
 
 public
@@ -23,7 +24,7 @@ interface BuilderFactory <
 	<Type>
 	Factory addBuilders (
 			TaskLogger parentTaskLogger,
-			Map <Class <?>, Provider <Type>> builders);
+			Map <Class <?>, ComponentProvider <Type>> builders);
 
 	Builder <Context> create (
 			TaskLogger parentTaskLogger);

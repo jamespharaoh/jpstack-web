@@ -104,6 +104,7 @@ class PluginManagerFactory
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					PluginApiModuleSpec.class,
 					PluginBootstrapComponentSpec.class,
 					PluginComponentSpec.class,
@@ -118,7 +119,10 @@ class PluginManagerFactory
 					PluginDependencySpec.class,
 					PluginSpec.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 			Set <String> pluginNames =
 				new HashSet<> ();

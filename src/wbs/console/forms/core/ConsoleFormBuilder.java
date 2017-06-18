@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -35,7 +36,8 @@ class ConsoleFormBuilder {
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Map <Class <?>, Provider <ConsoleFormBuilderComponent>> builderProviders;
+	Map <Class <?>, ComponentProvider <ConsoleFormBuilderComponent>>
+		builderProviders;
 
 	@StrongPrototypeDependency
 	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;

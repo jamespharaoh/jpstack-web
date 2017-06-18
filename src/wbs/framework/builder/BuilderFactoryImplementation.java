@@ -36,6 +36,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -257,7 +258,7 @@ class BuilderFactoryImplementation <Context>
 	public <Type>
 	BuilderFactoryImplementation <Context> addBuilders (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Map <Class <?>, Provider <Type>> buildersMap) {
+			@NonNull Map <Class <?>, ComponentProvider <Type>> buildersMap) {
 
 		try (
 
@@ -271,7 +272,7 @@ class BuilderFactoryImplementation <Context>
 			checkContextClassIsNotNull ();
 
 			for (
-				Map.Entry <Class <?>, Provider <Type>> builderEntry
+				Map.Entry <Class <?>, ComponentProvider <Type>> builderEntry
 					: buildersMap.entrySet ()
 			) {
 

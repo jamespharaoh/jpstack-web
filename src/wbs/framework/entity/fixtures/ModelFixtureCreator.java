@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
@@ -49,7 +50,7 @@ class ModelFixtureCreator {
 
 	@PrototypeDependency
 	@ModelMetaBuilderHandler
-	Map <Class <?>, Provider <Object>> modelMetaBuilderProviders;
+	Map <Class <?>, ComponentProvider <Object>> modelMetaBuilderProviders;
 
 	// state
 

@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.logging.LogContext;
@@ -34,7 +35,7 @@ class ModelWriterManager {
 
 	@PrototypeDependency
 	@ModelWriter
-	Map <Class <?>, Provider <Object>> modelWriterProviders;
+	Map <Class <?>, ComponentProvider <Object>> modelWriterProviders;
 
 	// state
 

@@ -32,6 +32,7 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.classInSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -388,6 +389,7 @@ class BootstrapComponentManager
 				.forEach (
 					componentData ->
 						getComponentReal (
+							taskLogger,
 							componentData))
 
 			;
@@ -552,7 +554,7 @@ class BootstrapComponentManager
 
 	@Override
 	public <ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
@@ -596,10 +598,10 @@ class BootstrapComponentManager
 			}
 
 			return optionalOf (
-				() ->
-					componentClass.cast (
-						getComponentReal (
-							componentData)));
+				genericCastUnchecked (
+					getComponentProviderReal (
+						taskLogger,
+						componentData)));
 
 		}
 
@@ -635,6 +637,7 @@ class BootstrapComponentManager
 							Pair.of (
 								componentData.interfaceClass (),
 								getComponentReal (
+									taskLogger,
 									componentData))))
 
 			;
@@ -970,13 +973,71 @@ class BootstrapComponentManager
 	}
 
 	private synchronized
-	Object getComponentReal (
+	ComponentProvider <?> getComponentProviderReal (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentData componentData) {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
-				logContext.createTaskLogger (
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getComponentProviderReal");
+
+		) {
+
+			return new ComponentProvider <Object> () {
+
+				@Override
+				public
+				Object provide (
+						TaskLogger parentTaskLogger) {
+
+					return getComponentReal (
+						parentTaskLogger,
+						componentData);
+
+
+				}
+
+				@Override
+				public
+				Object get () {
+
+					try (
+
+						OwnedTaskLogger taskLogger =
+							logContext.createTaskLogger (
+								"ComponentProvider.get",
+								keyEqualsString (
+									"componentDefinition.name",
+									componentData.name));
+
+					) {
+
+						return provide (
+							taskLogger);
+
+					}
+
+				}
+
+			};
+
+		}
+
+	}
+
+	private synchronized
+	Object getComponentReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentData componentData) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
 					"getComponentReal");
 
 		) {
@@ -1288,9 +1349,9 @@ class BootstrapComponentManager
 						valueComponentData ->
 							Pair.of (
 								valueComponentData,
-								(Provider <?>)
-									() -> getComponentReal (
-										valueComponentData)));
+								getComponentProviderReal (
+									taskLogger,
+									valueComponentData)));
 
 			} else {
 
@@ -1301,6 +1362,7 @@ class BootstrapComponentManager
 							Pair.of (
 								valueComponentData,
 								getComponentReal (
+									taskLogger,
 									valueComponentData)));
 
 			}
@@ -1495,9 +1557,10 @@ class BootstrapComponentManager
 			// check for provider
 
 			if (
-				classEqualSafe (
+				classInSafe (
 					rawType (
 						valueInjectionType),
+					ComponentProvider.class,
 					Provider.class)
 			) {
 

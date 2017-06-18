@@ -24,8 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -45,6 +43,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
 import wbs.framework.component.scaffold.BuildLayerPluginSpec;
@@ -90,11 +89,11 @@ class ComponentManagerBuilder {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ComponentRegistryImplementation>
+	ComponentProvider <ComponentRegistryImplementation>
 		componentRegistryImplementationProvider;
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// properties
 
@@ -745,10 +744,13 @@ class ComponentManagerBuilder {
 		) {
 
 			componentRegistry =
-				componentRegistryImplementationProvider.get ()
+				componentRegistryImplementationProvider.provide (
+					taskLogger)
 
 				.outputPath (
-					outputPath);
+					outputPath)
+
+			;
 
 		}
 

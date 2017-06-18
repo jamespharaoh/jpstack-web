@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -30,14 +28,14 @@ interface ComponentManager
 			TaskLogger parentTaskLogger);
 
 	<ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			TaskLogger parentTaskLogger,
 			String componentName,
 			Class <ComponentType> componentClass,
 			Boolean initialized);
 
 	default <ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
@@ -57,7 +55,7 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialized) {
 
-		Optional <Provider <ComponentType>> componentProvider =
+		Optional <ComponentProvider <ComponentType>> componentProvider =
 			getComponentProvider (
 				taskLogger,
 				componentName,
@@ -97,7 +95,7 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		Optional <Provider <ComponentType>> componentProvider =
+		Optional <ComponentProvider <ComponentType>> componentProvider =
 			getComponentProvider (
 				parentTaskLogger,
 				componentName,
@@ -143,7 +141,7 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
 
-		Optional <Provider <ComponentType>> componentProvider =
+		Optional <ComponentProvider <ComponentType>> componentProvider =
 			getComponentProvider (
 				taskLogger,
 				componentName,
@@ -161,13 +159,13 @@ interface ComponentManager
 	}
 
 	default <ComponentType>
-	Provider <ComponentType> getComponentProviderRequired (
+	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		Optional <Provider <ComponentType>> componentProvider =
+		Optional <ComponentProvider <ComponentType>> componentProvider =
 			getComponentProvider (
 				parentTaskLogger,
 				componentName,
@@ -185,7 +183,7 @@ interface ComponentManager
 	}
 
 	default <ComponentType>
-	Provider <ComponentType> getComponentProviderRequired (
+	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {

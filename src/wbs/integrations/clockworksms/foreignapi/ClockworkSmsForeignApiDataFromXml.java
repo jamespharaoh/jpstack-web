@@ -48,10 +48,14 @@ class ClockworkSmsForeignApiDataFromXml
 			return dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					ClockworkSmsMessageResponse.class,
 					ClockworkSmsMessageResponse.SmsResp.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 

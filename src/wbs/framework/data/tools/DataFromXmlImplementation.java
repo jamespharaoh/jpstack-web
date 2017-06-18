@@ -44,8 +44,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -67,6 +65,7 @@ import org.dom4j.io.SAXReader;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
@@ -399,13 +398,14 @@ class DataFromXmlImplementation
 
 				}
 
-				Provider <?> builder =
+				ComponentProvider <?> builder =
 					matchingDataClassInfos.get (0).provider ();
 
 				// build it
 
 				object =
-					builder.get ();
+					builder.provide (
+						taskLogger);
 
 				for (
 					Field field
@@ -413,7 +413,7 @@ class DataFromXmlImplementation
 				) {
 
 					buildField (
-						parentTaskLogger,
+						taskLogger,
 						field);
 
 				}
@@ -538,93 +538,104 @@ class DataFromXmlImplementation
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Field field) {
 
-			for (
-				Annotation annotation
-					: field.getAnnotations ()
+			try (
+
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildField");
+
 			) {
 
-				if (annotation instanceof DataAttribute) {
+				for (
+					Annotation annotation
+						: field.getAnnotations ()
+				) {
 
-					buildAttributeField (
-						parentTaskLogger,
-						field,
-						(DataAttribute) annotation);
+					if (annotation instanceof DataAttribute) {
 
-				}
+						buildAttributeField (
+							taskLogger,
+							field,
+							(DataAttribute) annotation);
 
-				if (annotation instanceof DataContent) {
+					}
 
-					buildContentField (
-						parentTaskLogger,
-						field,
-						(DataContent) annotation);
+					if (annotation instanceof DataContent) {
 
-				}
+						buildContentField (
+							taskLogger,
+							field,
+							(DataContent) annotation);
 
-				if (annotation instanceof DataChild) {
+					}
 
-					buildChildField (
-						parentTaskLogger,
-						field,
-						(DataChild) annotation);
+					if (annotation instanceof DataChild) {
 
-				}
+						buildChildField (
+							taskLogger,
+							field,
+							(DataChild) annotation);
 
-				if (annotation instanceof DataChildren) {
+					}
 
-					buildChildrenField (
-						parentTaskLogger,
-						field,
-						(DataChildren) annotation);
+					if (annotation instanceof DataChildren) {
 
-				}
+						buildChildrenField (
+							taskLogger,
+							field,
+							(DataChildren) annotation);
 
-				if (annotation instanceof DataChildrenIndex) {
+					}
 
-					buildChildrenIndexField (
-						field,
-						(DataChildrenIndex) annotation);
+					if (annotation instanceof DataChildrenIndex) {
 
-				}
+						buildChildrenIndexField (
+							field,
+							(DataChildrenIndex) annotation);
 
-				if (annotation instanceof DataParent) {
+					}
 
-					if (! parents.iterator ().hasNext ())
-						throw new RuntimeException ();
+					if (annotation instanceof DataParent) {
 
-					PropertyUtils.propertySetSimple (
-						object,
-						field.getName (),
-						parents.iterator ().next ());
-
-				}
-
-				if (annotation instanceof DataAncestor) {
-
-					for (
-						Object ancestor
-							: parents
-					) {
-
-						if (! field.getType ().isInstance (ancestor))
-							continue;
+						if (! parents.iterator ().hasNext ())
+							throw new RuntimeException ();
 
 						PropertyUtils.propertySetSimple (
 							object,
 							field.getName (),
-							ancestor);
-
-						break;
+							parents.iterator ().next ());
 
 					}
 
-				}
+					if (annotation instanceof DataAncestor) {
 
-				if (annotation instanceof DataIgnore) {
+						for (
+							Object ancestor
+								: parents
+						) {
 
-					matchedElementNames.add (
-						camelToHyphen (
-							field.getName ()));
+							if (! field.getType ().isInstance (ancestor))
+								continue;
+
+							PropertyUtils.propertySetSimple (
+								object,
+								field.getName (),
+								ancestor);
+
+							break;
+
+						}
+
+					}
+
+					if (annotation instanceof DataIgnore) {
+
+						matchedElementNames.add (
+							camelToHyphen (
+								field.getName ()));
+
+					}
 
 				}
 
@@ -637,86 +648,97 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull DataAttribute dataAttributeAnnotation) {
 
-			String attributeName =
-				ifNull (
-					nullIfEmptyString (
-						dataAttributeAnnotation.name ()),
-					camelToHyphen (
-						field.getName ()));
+			try (
 
-			String attributeValue =
-				element.attributeValue (
-					attributeName);
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildAttributeField");
 
-			if (attributeValue == null) {
+			) {
 
-				if (dataAttributeAnnotation.required ()) {
+				String attributeName =
+					ifNull (
+						nullIfEmptyString (
+							dataAttributeAnnotation.name ()),
+						camelToHyphen (
+							field.getName ()));
 
-					parentTaskLogger.errorFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Missing required attribute '%s' of <%s>",
-						attributeName,
-						element.getName ());
+				String attributeValue =
+					element.attributeValue (
+						attributeName);
 
-				}
+				if (attributeValue == null) {
 
-				return;
+					if (dataAttributeAnnotation.required ()) {
 
-			}
+						taskLogger.errorFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Missing required attribute '%s' of <%s>",
+							attributeName,
+							element.getName ());
 
-			matchedAttributes.add (
-				attributeName);
-
-			if (! dataAttributeAnnotation.collection ().isEmpty ()) {
-
-				Map <String, ?> collection =
-					namedObjectCollections.get (
-						dataAttributeAnnotation.collection ());
-
-				if (collection == null) {
-
-					parentTaskLogger.errorFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Named collection %s doesn't exist for %s.%s",
-						dataAttributeAnnotation.collection (),
-						object.getClass ().getSimpleName (),
-						field.getName ());
-
-				}
-
-				Object namedObject =
-					collection.get (attributeValue);
-
-				if (namedObject == null) {
-
-					parentTaskLogger.errorFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Named object %s not found in collection %s",
-						attributeValue,
-						dataAttributeAnnotation.collection ());
+					}
 
 					return;
 
 				}
 
-				PropertyUtils.propertySetSimple (
-					object,
-					field.getName (),
-					namedObject);
+				matchedAttributes.add (
+					attributeName);
 
-			} else {
+				if (! dataAttributeAnnotation.collection ().isEmpty ()) {
 
-				setScalarFieldRequired (
-					parentTaskLogger,
-					object,
-					field,
-					attributeValue);
+					Map <String, ?> collection =
+						namedObjectCollections.get (
+							dataAttributeAnnotation.collection ());
+
+					if (collection == null) {
+
+						taskLogger.errorFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Named collection %s doesn't exist for %s.%s",
+							dataAttributeAnnotation.collection (),
+							object.getClass ().getSimpleName (),
+							field.getName ());
+
+					}
+
+					Object namedObject =
+						collection.get (attributeValue);
+
+					if (namedObject == null) {
+
+						taskLogger.errorFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Named object %s not found in collection %s",
+							attributeValue,
+							dataAttributeAnnotation.collection ());
+
+						return;
+
+					}
+
+					PropertyUtils.propertySetSimple (
+						object,
+						field.getName (),
+						namedObject);
+
+				} else {
+
+					setScalarFieldRequired (
+						taskLogger,
+						object,
+						field,
+						attributeValue);
+
+				}
 
 			}
 
@@ -823,22 +845,33 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull String stringValue) {
 
-			if (
-				! tryToSetScalarField (
-					object,
-					field,
-					stringValue)
+			try (
+
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"setScalarFieldRequired");
+
 			) {
 
-				parentTaskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't know how to map attribute to %s ",
-					field.getType ().getName (),
-					"at %s.%s",
-					object.getClass ().getSimpleName (),
-					field.getName ());
+				if (
+					! tryToSetScalarField (
+						object,
+						field,
+						stringValue)
+				) {
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't know how to map attribute to %s ",
+						field.getType ().getName (),
+						"at %s.%s",
+						object.getClass ().getSimpleName (),
+						field.getName ());
+
+				}
 
 			}
 
@@ -849,75 +882,86 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull DataContent dataContentAnnotation) {
 
-			String stringValue;
+			try (
 
-			if (
-				stringIsNotEmpty (
-					dataContentAnnotation.name ())
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildContentField");
+
 			) {
 
-				Element contentElement =
-					element.element (
-						dataContentAnnotation.name ());
+				String stringValue;
 
 				if (
-					isNotNull (
-						contentElement)
+					stringIsNotEmpty (
+						dataContentAnnotation.name ())
 				) {
 
-					matchedElementNames.add (
-						dataContentAnnotation.name ());
+					Element contentElement =
+						element.element (
+							dataContentAnnotation.name ());
+
+					if (
+						isNotNull (
+							contentElement)
+					) {
+
+						matchedElementNames.add (
+							dataContentAnnotation.name ());
+
+						stringValue =
+							contentElement.getTextTrim ();
+
+					} else if (
+						dataContentAnnotation.required ()
+					) {
+
+						taskLogger.errorFormat (
+							"%s: ",
+							joinWithFullStop (
+								context),
+							"Missing required content element <%s> ",
+							dataContentAnnotation.name (),
+							"at %s.%s",
+							object.getClass ().getSimpleName (),
+							field.getName ());
+
+						return;
+
+					} else {
+
+						stringValue = null;
+
+					}
+
+				} else {
 
 					stringValue =
-						contentElement.getTextTrim ();
+						element.getTextTrim ();
 
-				} else if (
-					dataContentAnnotation.required ()
-				) {
+				}
 
-					parentTaskLogger.errorFormat (
+				if (field.getType () == String.class) {
+
+					PropertyUtils.propertySetSimple (
+						object,
+						field.getName (),
+						stringValue);
+
+				} else {
+
+					taskLogger.errorFormat (
 						"%s: ",
 						joinWithFullStop (
 							context),
-						"Missing required content element <%s> ",
-						dataContentAnnotation.name (),
+						"Don't know how to map content to %s ",
+						field.getType ().getName (),
 						"at %s.%s",
 						object.getClass ().getSimpleName (),
 						field.getName ());
 
-					return;
-
-				} else {
-
-					stringValue = null;
-
 				}
-
-			} else {
-
-				stringValue =
-					element.getTextTrim ();
-
-			}
-
-			if (field.getType () == String.class) {
-
-				PropertyUtils.propertySetSimple (
-					object,
-					field.getName (),
-					stringValue);
-
-			} else {
-
-				parentTaskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't know how to map content to %s ",
-					field.getType ().getName (),
-					"at %s.%s",
-					object.getClass ().getSimpleName (),
-					field.getName ());
 
 			}
 
@@ -928,72 +972,83 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull DataChild dataChildAnnotation) {
 
-			String childElementName =
-				ifNull (
-					nullIfEmptyString (
-						dataChildAnnotation.name ()),
-					camelToHyphen (
-						field.getName ()));
+			try (
 
-			Element childElement =
-				element.element (
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildChildField");
+
+			) {
+
+				String childElementName =
+					ifNull (
+						nullIfEmptyString (
+							dataChildAnnotation.name ()),
+						camelToHyphen (
+							field.getName ()));
+
+				Element childElement =
+					element.element (
+						childElementName);
+
+				if (
+					isNull (
+						childElement)
+				) {
+					return;
+				}
+
+				matchedElementNames.add (
 					childElementName);
 
-			if (
-				isNull (
-					childElement)
-			) {
-				return;
-			}
+				if (
 
-			matchedElementNames.add (
-				childElementName);
+					collectionIsNotEmpty (
+						childElement.attributes ())
 
-			if (
+					|| collectionIsNotEmpty (
+						childElement.elements ())
 
-				collectionIsNotEmpty (
-					childElement.attributes ())
-
-				|| collectionIsNotEmpty (
-					childElement.elements ())
-
-				|| ! tryToSetScalarField (
-					object,
-					field,
-					childElement.getText ())
-
-			) {
-
-				Object nextParent =
-					object;
-
-				Object child =
-					new ElementBuilder ()
-
-					.element (
-						childElement)
-
-					.parents (
-						Iterables.concat (
-							Collections.singletonList (
-								nextParent),
-							parents))
-
-					.context (
-						Iterables.concat (
-							context,
-							Collections.singletonList (
-								childElement.getName ())))
-
-					.build (
-						parentTaskLogger);
-
-				if (child != null) {
-
-					PropertyUtils.propertySetSimple (
+					|| ! tryToSetScalarField (
 						object,
-						field.getName (),
-						child);
+						field,
+						childElement.getText ())
+
+				) {
+
+					Object nextParent =
+						object;
+
+					Object child =
+						new ElementBuilder ()
+
+						.element (
+							childElement)
+
+						.parents (
+							Iterables.concat (
+								Collections.singletonList (
+									nextParent),
+								parents))
+
+						.context (
+							Iterables.concat (
+								context,
+								Collections.singletonList (
+									childElement.getName ())))
+
+						.build (
+							taskLogger);
+
+					if (child != null) {
+
+						PropertyUtils.propertySetSimple (
+							object,
+							field.getName (),
+							child);
+
+					}
 
 				}
 
@@ -1006,334 +1061,347 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull DataChildren dataChildrenAnnotation) {
 
-			if (
+			try (
 
-				! dataChildrenAnnotation.direct ()
-
-				&& ! dataChildrenAnnotation.childElement ().isEmpty ()
-
-				&& (
-
-					field.getType () != Map.class
-
-					&& field.getType () != List.class
-
-				)
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildChildrenField");
 
 			) {
 
-				parentTaskLogger.errorFormat (
-					"%s: ",
-					joinWithFullStop (
-						context),
-					"Don't specify childElement for indirect children, at ",
-					"%s.%s",
-					field.getDeclaringClass ().getSimpleName (),
-					field.getName ());
+				if (
 
-				return;
+					! dataChildrenAnnotation.direct ()
 
-			}
+					&& ! dataChildrenAnnotation.childElement ().isEmpty ()
 
-			// find the element which contains the children
+					&& (
 
-			Element childrenElement;
+						field.getType () != Map.class
 
-			if (dataChildrenAnnotation.direct ()) {
+						&& field.getType () != List.class
 
-				childrenElement =
-					element;
+					)
 
-				if (childrenElement == null)
+				) {
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't specify childElement for indirect children, at ",
+						"%s.%s",
+						field.getDeclaringClass ().getSimpleName (),
+						field.getName ());
+
 					return;
 
-			} else {
+				}
 
-				String childrenElementName =
-					! dataChildrenAnnotation.childrenElement ().isEmpty ()
-						? dataChildrenAnnotation.childrenElement ()
-						: camelToHyphen (
-							field.getName ());
+				// find the element which contains the children
 
-				List <?> childrenElementObjects =
-					element.elements (
-						childrenElementName);
-
-				if (childrenElementObjects.isEmpty ())
-					return;
-
-				if (childrenElementObjects.size () > 1)
-					throw new RuntimeException ();
-
-				matchedElementNames.add (
-					childrenElementName);
-
-				childrenElement =
-					(Element)
-					childrenElementObjects.get (0);
-
-			}
-
-			// work out parents for recursive call
-
-			Iterable <Object> nextParents;
-
-			if (! dataChildrenAnnotation.surrogateParent ().isEmpty ()) {
-
-				nextParents =
-					Iterables.concat (
-						ImmutableList.<Object> of (
-							PropertyUtils.propertyGetSimple (
-								object,
-								dataChildrenAnnotation.surrogateParent ()),
-							object),
-						parents);
-
-			} else {
-
-				nextParents =
-					Iterables.concat (
-						Collections.singletonList (
-							object),
-						parents);
-
-			}
-
-			// collect children
-
-			List <Object> children =
-				new ArrayList<> ();
-
-			List <?> childElementObjects =
-				! dataChildrenAnnotation.childElement ().isEmpty ()
-					? childrenElement.elements (
-						dataChildrenAnnotation.childElement ())
-					: childrenElement.elements ();
-
-			Set <String> newlyMatchedElementNames =
-				new HashSet<> ();
-
-			for (
-				Object childElementObject
-					: childElementObjects
-			) {
-
-				Element childElement =
-					(Element)
-					childElementObject;
+				Element childrenElement;
 
 				if (dataChildrenAnnotation.direct ()) {
 
-					if (
-						contains (
-							matchedElementNames,
-							childElement.getName ())
-					) {
-						continue;
-					}
+					childrenElement =
+						element;
 
-					newlyMatchedElementNames.add (
-						childElement.getName ());
-
-				}
-
-				if (field.getType () == Map.class) {
-
-					String entryKey =
-						childElement.attributeValue (
-							dataChildrenAnnotation.keyAttribute ());
-
-					String entryValue =
-						childElement.attributeValue (
-							dataChildrenAnnotation.valueAttribute ());
-
-					if (entryKey == null) {
-
-						parentTaskLogger.errorFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"Must specify 'keyAttribute' on @DataChildren ",
-							"when field type is Map, at %s.%s",
-							object.getClass ().getSimpleName (),
-							field.getName ());
-
-					}
-
-					if (entryValue == null) {
-
-						parentTaskLogger.errorFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"Must specify 'entryValue' on @DataChildren ",
-							"when f	ield type is Map, at %s.%s",
-							object.getClass ().getSimpleName (),
-							field.getName ());
-
-					}
-
-					if (
-
-						isNull (
-							entryKey)
-
-						|| isNull (
-							entryValue)
-
-					) {
+					if (childrenElement == null)
 						return;
-					}
-
-					children.add (
-						Pair.of (
-							entryKey,
-							entryValue));
-
-				} else if (
-					field.getType () == List.class
-					&& ! dataChildrenAnnotation.valueAttribute ().isEmpty ()
-				) {
-
-					Type genericType =
-						field.getGenericType ();
-
-					Class <?> itemClass;
-
-					if (genericType instanceof ParameterizedType) {
-
-						ParameterizedType parameterizedType =
-							(ParameterizedType)
-							genericType;
-
-						itemClass =
-							(Class <?>)
-							parameterizedType.getActualTypeArguments () [0];
-
-					} else {
-
-						itemClass = null;
-
-					}
-
-					String stringValue =
-						childElement.attributeValue (
-							dataChildrenAnnotation.valueAttribute ());
-
-					if (stringValue == null) {
-
-						parentTaskLogger.errorFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"No attribute '%s' on <%s> ",
-							dataChildrenAnnotation.valueAttribute (),
-							childElement.getName (),
-							"at %s.%s",
-							object.getClass ().getSimpleName (),
-							field.getName ());
-
-						return;
-
-					}
-
-					Object value;
-
-					if (itemClass == Integer.class) {
-
-						value =
-							Integer.parseInt (
-								stringValue);
-
-					} else if (itemClass == Long.class) {
-
-						value =
-							parseIntegerRequired (
-								stringValue);
-
-					} else if (itemClass == String.class) {
-
-						value =
-							stringValue;
-
-					} else {
-
-						parentTaskLogger.errorFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"Unable to map attribute type %s ",
-							itemClass.getName (),
-							"at %s.%s",
-							object.getClass ().getSimpleName (),
-							field.getName ());
-
-						return;
-
-					}
-
-					children.add (
-						value);
 
 				} else {
 
-					children.add (
-						new ElementBuilder ()
+					String childrenElementName =
+						! dataChildrenAnnotation.childrenElement ().isEmpty ()
+							? dataChildrenAnnotation.childrenElement ()
+							: camelToHyphen (
+								field.getName ());
 
-						.element (
-							childElement)
+					List <?> childrenElementObjects =
+						element.elements (
+							childrenElementName);
 
-						.parents (
-							nextParents)
+					if (childrenElementObjects.isEmpty ())
+						return;
 
-						.context (
-							Iterables.concat (
-								context,
-								Collections.singletonList (
-									childElement.getName ())))
+					if (childrenElementObjects.size () > 1)
+						throw new RuntimeException ();
 
-						.build (
-							parentTaskLogger));
+					matchedElementNames.add (
+						childrenElementName);
+
+					childrenElement =
+						(Element)
+						childrenElementObjects.get (0);
 
 				}
 
-			}
+				// work out parents for recursive call
 
-			matchedElementNames.addAll (
-				newlyMatchedElementNames);
+				Iterable <Object> nextParents;
 
-			// set them
+				if (! dataChildrenAnnotation.surrogateParent ().isEmpty ()) {
 
-			if (field.getType () == Map.class) {
+					nextParents =
+						Iterables.concat (
+							ImmutableList.<Object> of (
+								PropertyUtils.propertyGetSimple (
+									object,
+									dataChildrenAnnotation.surrogateParent ()),
+								object),
+							parents);
 
-				ImmutableMap.Builder<Object,Object> mapBuilder =
-					ImmutableMap.builder ();
+				} else {
+
+					nextParents =
+						Iterables.concat (
+							Collections.singletonList (
+								object),
+							parents);
+
+				}
+
+				// collect children
+
+				List <Object> children =
+					new ArrayList<> ();
+
+				List <?> childElementObjects =
+					! dataChildrenAnnotation.childElement ().isEmpty ()
+						? childrenElement.elements (
+							dataChildrenAnnotation.childElement ())
+						: childrenElement.elements ();
+
+				Set <String> newlyMatchedElementNames =
+					new HashSet<> ();
 
 				for (
-					Object pairObject
-						: children
+					Object childElementObject
+						: childElementObjects
 				) {
 
-					Pair<?,?> pair =
-						(Pair<?,?>) pairObject;
+					Element childElement =
+						(Element)
+						childElementObject;
 
-					mapBuilder.put (
-						pair.getLeft (),
-						pair.getRight());
+					if (dataChildrenAnnotation.direct ()) {
+
+						if (
+							contains (
+								matchedElementNames,
+								childElement.getName ())
+						) {
+							continue;
+						}
+
+						newlyMatchedElementNames.add (
+							childElement.getName ());
+
+					}
+
+					if (field.getType () == Map.class) {
+
+						String entryKey =
+							childElement.attributeValue (
+								dataChildrenAnnotation.keyAttribute ());
+
+						String entryValue =
+							childElement.attributeValue (
+								dataChildrenAnnotation.valueAttribute ());
+
+						if (entryKey == null) {
+
+							taskLogger.errorFormat (
+								"%s: ",
+								joinWithFullStop (
+									context),
+								"Must specify 'keyAttribute' on @DataChildren ",
+								"when field type is Map, at %s.%s",
+								object.getClass ().getSimpleName (),
+								field.getName ());
+
+						}
+
+						if (entryValue == null) {
+
+							taskLogger.errorFormat (
+								"%s: ",
+								joinWithFullStop (
+									context),
+								"Must specify 'entryValue' on @DataChildren ",
+								"when f	ield type is Map, at %s.%s",
+								object.getClass ().getSimpleName (),
+								field.getName ());
+
+						}
+
+						if (
+
+							isNull (
+								entryKey)
+
+							|| isNull (
+								entryValue)
+
+						) {
+							return;
+						}
+
+						children.add (
+							Pair.of (
+								entryKey,
+								entryValue));
+
+					} else if (
+						field.getType () == List.class
+						&& ! dataChildrenAnnotation.valueAttribute ().isEmpty ()
+					) {
+
+						Type genericType =
+							field.getGenericType ();
+
+						Class <?> itemClass;
+
+						if (genericType instanceof ParameterizedType) {
+
+							ParameterizedType parameterizedType =
+								(ParameterizedType)
+								genericType;
+
+							itemClass =
+								(Class <?>)
+								parameterizedType.getActualTypeArguments () [0];
+
+						} else {
+
+							itemClass = null;
+
+						}
+
+						String stringValue =
+							childElement.attributeValue (
+								dataChildrenAnnotation.valueAttribute ());
+
+						if (stringValue == null) {
+
+							taskLogger.errorFormat (
+								"%s: ",
+								joinWithFullStop (
+									context),
+								"No attribute '%s' on <%s> ",
+								dataChildrenAnnotation.valueAttribute (),
+								childElement.getName (),
+								"at %s.%s",
+								object.getClass ().getSimpleName (),
+								field.getName ());
+
+							return;
+
+						}
+
+						Object value;
+
+						if (itemClass == Integer.class) {
+
+							value =
+								Integer.parseInt (
+									stringValue);
+
+						} else if (itemClass == Long.class) {
+
+							value =
+								parseIntegerRequired (
+									stringValue);
+
+						} else if (itemClass == String.class) {
+
+							value =
+								stringValue;
+
+						} else {
+
+							taskLogger.errorFormat (
+								"%s: ",
+								joinWithFullStop (
+									context),
+								"Unable to map attribute type %s ",
+								itemClass.getName (),
+								"at %s.%s",
+								object.getClass ().getSimpleName (),
+								field.getName ());
+
+							return;
+
+						}
+
+						children.add (
+							value);
+
+					} else {
+
+						children.add (
+							new ElementBuilder ()
+
+							.element (
+								childElement)
+
+							.parents (
+								nextParents)
+
+							.context (
+								Iterables.concat (
+									context,
+									Collections.singletonList (
+										childElement.getName ())))
+
+							.build (
+								taskLogger)
+
+						);
+
+					}
 
 				}
 
-				PropertyUtils.propertySetSimple (
-					object,
-					field.getName (),
-					mapBuilder.build ());
+				matchedElementNames.addAll (
+					newlyMatchedElementNames);
 
-			} else {
+				// set them
 
-				PropertyUtils.propertySetSimple (
-					object,
-					field.getName (),
-					children);
+				if (field.getType () == Map.class) {
+
+					ImmutableMap.Builder<Object,Object> mapBuilder =
+						ImmutableMap.builder ();
+
+					for (
+						Object pairObject
+							: children
+					) {
+
+						Pair<?,?> pair =
+							(Pair<?,?>) pairObject;
+
+						mapBuilder.put (
+							pair.getLeft (),
+							pair.getRight());
+
+					}
+
+					PropertyUtils.propertySetSimple (
+						object,
+						field.getName (),
+						mapBuilder.build ());
+
+				} else {
+
+					PropertyUtils.propertySetSimple (
+						object,
+						field.getName (),
+						children);
+
+				}
 
 			}
 
@@ -1403,9 +1471,9 @@ class DataFromXmlImplementation
 	static
 	class DataClassInfo {
 
-		Class<?> parentClass;
-		Class<?> dataClass;
-		Provider<?> provider;
+		Class <?> parentClass;
+		Class <?> dataClass;
+		ComponentProvider <?> provider;
 
 	}
 

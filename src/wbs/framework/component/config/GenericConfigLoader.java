@@ -52,10 +52,14 @@ class GenericConfigLoader {
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					GenericConfigSpec.class,
 					GenericConfigItemSpec.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 

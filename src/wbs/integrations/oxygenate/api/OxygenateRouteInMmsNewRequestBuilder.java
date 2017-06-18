@@ -58,10 +58,14 @@ class OxygenateRouteInMmsNewRequestBuilder {
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					OxygenateRouteInMmsNewRequest.class,
 					OxygenateRouteInMmsNewRequest.Attachment.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 
