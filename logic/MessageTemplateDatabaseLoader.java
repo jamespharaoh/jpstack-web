@@ -59,12 +59,16 @@ class MessageTemplateDatabaseLoader {
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					MessageTemplateDatabaseSpec.class,
 					MessageTemplateEntryTypeSpec.class,
 					MessageTemplateFieldTypeSpec.class,
 					MessageTemplateParameterSpec.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 
