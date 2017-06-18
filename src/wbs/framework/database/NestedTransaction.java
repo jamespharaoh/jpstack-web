@@ -73,7 +73,7 @@ class NestedTransaction
 			ownedTransaction (),
 			logContext.nestTaskLogger (
 				optionalOf (
-					ownedTransaction ()),
+					taskLoggerImplementation ()),
 				dynamicContextName,
 				dynamicContextParameters,
 				debugEnabled

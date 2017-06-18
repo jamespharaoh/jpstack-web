@@ -197,7 +197,7 @@ class IntegerStatsFormatter
 				value)
 		) {
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<td></td>");
 
 		} else {
