@@ -2,10 +2,11 @@ package wbs.console.reporting;
 
 import static wbs.utils.etc.Misc.mapEntry;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -94,8 +95,8 @@ class IntegerStatsFormatter
 				value)
 		) {
 
-			formatWriter.writeFormat (
-				"<td></td>\n");
+			formatWriter.writeLineFormat (
+				"<td></td>");
 
 			return;
 
@@ -108,8 +109,8 @@ class IntegerStatsFormatter
 				targetBase)
 		) {
 
-			formatWriter.writeFormat (
-				"<td style=\"text-align: right\">%h</td>\n",
+			formatWriter.writeLineFormat (
+				"<td style=\"text-align: right\">%h</td>",
 				integerToDecimalString (
 					value));
 
@@ -169,10 +170,13 @@ class IntegerStatsFormatter
 			.write (
 				formatWriter);
 
-		formatWriter.writeFormat (
-			"%h</td>\n",
+		formatWriter.writeLineFormat (
+			"%h\n",
 			integerToDecimalString (
 				value));
+
+		htmlTableCellClose (
+			formatWriter);
 
 	}
 
@@ -194,14 +198,14 @@ class IntegerStatsFormatter
 		) {
 
 			formatWriter.writeFormat (
-				"<td></td>\n");
+				"<td></td>");
 
 		} else {
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<td",
 				" style=\"text-align: right\"",
-				">%h</td>\n",
+				">%h</td>",
 				integerToDecimalString (
 					value));
 

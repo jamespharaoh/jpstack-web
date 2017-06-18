@@ -42,6 +42,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -672,9 +673,9 @@ class QueueConsoleLogicImplementation
 				queue ->
 					privChecker.canRecursive (
 						transaction,
-						objectManager.getParentRequired (
-							transaction,
-							queue),
+						new GlobalId (
+							queue.getParentType ().getId (),
+							queue.getParentId ()),
 						"supervisor"),
 				QueueRec::getId);
 
