@@ -63,6 +63,7 @@ class PrivHooks
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
+					parentTaskLogger,
 					"setup");
 
 		) {

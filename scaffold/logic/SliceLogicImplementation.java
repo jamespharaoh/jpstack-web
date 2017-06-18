@@ -153,15 +153,35 @@ class SliceLogicImplementation
 	// implementation
 
 	@Override
-	public synchronized
+	public
 	void runOnce () {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"runOnce");
+
+		) {
+
+			runOnceReal (
+				taskLogger);
+
+		}
+
+	}
+
+	private synchronized
+	void runOnceReal (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadWrite (
 					logContext,
-					"runOnce");
+					parentTaskLogger,
+					"runOnceReal");
 
 		) {
 

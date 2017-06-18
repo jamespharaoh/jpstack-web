@@ -103,6 +103,7 @@ class RemovalDaemonWrapper <Type extends Record <Type>>
 			OwnedTransaction transaction =
 				database.beginReadWrite (
 					removalDaemon.logContext (),
+					parentTaskLogger,
 					"runBatch");
 
 		) {
