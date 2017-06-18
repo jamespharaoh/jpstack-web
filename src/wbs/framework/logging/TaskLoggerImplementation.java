@@ -1,5 +1,6 @@
 package wbs.framework.logging;
 
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -12,10 +13,12 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringFormatLazy;
 import static wbs.utils.string.StringUtils.stringFormatLazyArray;
+import static wbs.utils.time.TimeUtils.longerThan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.utils.string.LazyString;
@@ -151,9 +155,7 @@ class TaskLoggerImplementation
 		}
 
 		if (this.debugEnabled) {
-
 			addToParent ();
-
 		}
 
 		this.startTime =
@@ -211,6 +213,16 @@ class TaskLoggerImplementation
 
 		this.endTime =
 			endTime;
+
+		if (
+			longerThan (
+				new Duration (
+					this.startTime,
+					this.endTime),
+				Duration.millis (10))
+		) {
+			addToParent ();
+		}
 
 	}
 
@@ -292,6 +304,8 @@ class TaskLoggerImplementation
 					toString ()));
 
 		}
+
+		addToParent ();
 
 		events.add (
 			child);
@@ -896,6 +910,7 @@ class TaskLoggerImplementation
 
 			parentOptional.get ().addChild (
 				this);
+
 		}
 
 		addedToParent = true;
@@ -935,12 +950,24 @@ class TaskLoggerImplementation
 	public
 	String eventText () {
 
+		Instant endTime =
+			ifNull (
+				this.endTime,
+				Instant.now ());
+
 		return stringFormat (
-			"%s.%s (%s)",
+			"%s.%s (%s) — %s (%s)",
 			staticContextName,
 			dynamicContextName,
 			joinWithCommaAndSpace (
-				dynamicContextParameters));
+				dynamicContextParameters),
+			objectToString (
+				new Duration (
+					startTime,
+					endTime)),
+			this.endTime != null
+				? "complete"
+				: "ongoing");
 
 	}
 
