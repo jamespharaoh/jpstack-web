@@ -1,6 +1,7 @@
 package wbs.web.mvc;
 
-import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.etc.LogicUtils.attemptWithRetries;
+import static wbs.utils.etc.LogicUtils.attemptWithRetriesVoid;
 
 import javax.inject.Provider;
 
@@ -89,51 +90,17 @@ class WebActionRequestHandler
 
 		) {
 
-			for (
-				long attempt = 0l;
-				attempt < maxAttempts;
-				attempt ++
-			) {
+			WebResponder responder =
+				runAction (
+					taskLogger);
 
-				if (attempt < maxAttempts - 1) {
+			runResponder (
+				taskLogger,
+				responder);
 
-					try {
+		} catch (InterruptedException interrupedException) {
 
-						handleOnce (
-							taskLogger,
-							attempt);
-
-						return;
-
-					} catch (Exception exception) {
-
-						webExceptionHandler.handleExceptionRetry (
-							taskLogger,
-							attempt,
-							exception);
-
-					}
-
-				} else {
-
-					try {
-
-						handleOnce (
-							taskLogger,
-							attempt);
-
-					} catch (Exception exception) {
-
-						webExceptionHandler.handleExceptionFinal (
-							taskLogger,
-							attempt,
-							exception);
-
-					}
-
-				}
-
-			}
+			Thread.currentThread ().interrupt ();
 
 		}
 
@@ -142,31 +109,87 @@ class WebActionRequestHandler
 	// private implementation
 
 	private
-	void handleOnce (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Long attempt) {
+	WebResponder runAction (
+			@NonNull TaskLogger parentTaskLogger)
+		throws InterruptedException {
 
 		try (
 
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"handleOnce",
-					keyEqualsDecimalInteger (
-						"attempt",
-						attempt));
+					"runAction");
 
 		) {
 
-			WebAction action =
-				actionProvider.get ();
+			return attemptWithRetries (
+				maxAttempts,
+				backoffDuration,
 
-			WebResponder responder =
-				action.handle (
-					taskLogger);
+				() -> {
 
-			responder.execute (
-				taskLogger);
+					WebAction action =
+						actionProvider.get ();
+
+					return action.handle (
+						taskLogger);
+
+				},
+
+				(attempt, exception) ->
+					webExceptionHandler.handleExceptionRetry (
+						taskLogger,
+						attempt,
+						exception),
+
+				(attempt, exception) ->
+					webExceptionHandler.handleExceptionFinal (
+						taskLogger,
+						attempt,
+						exception)
+
+			);
+
+		}
+
+	}
+
+	private
+	void runResponder (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull WebResponder responder)
+		throws InterruptedException {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runResponder");
+
+		) {
+
+			attemptWithRetriesVoid (
+				maxAttempts,
+				backoffDuration,
+
+				() ->
+					responder.execute (
+						taskLogger),
+
+				(attempt, exception) ->
+					webExceptionHandler.handleExceptionRetry (
+						taskLogger,
+						attempt,
+						exception),
+
+				(attempt, exception) ->
+					webExceptionHandler.handleExceptionFinal (
+						taskLogger,
+						attempt,
+						exception)
+
+			);
 
 		}
 
