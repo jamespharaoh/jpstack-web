@@ -25,6 +25,7 @@ import wbs.framework.logging.LogContext;
 
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
+import wbs.imchat.model.ImChatMessageSearch;
 import wbs.imchat.model.ImChatMessageStatsSearch;
 import wbs.imchat.model.ImChatMessageUserStats;
 import wbs.imchat.model.ImChatMessageViewRec;
@@ -46,7 +47,7 @@ class ImChatMessageDaoHibernate
 	public
 	Criteria searchCriteria (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageStatsSearch search) {
+			@NonNull ImChatMessageSearch search) {
 
 		try (
 
@@ -85,25 +86,25 @@ class ImChatMessageDaoHibernate
 
 			if (
 				isNotNull (
-					search.imChatIds ())
+					search.imChatId ())
 			) {
 
 				criteria.add (
-					Restrictions.in (
+					Restrictions.eq (
 						"_imChat.id",
-						search.imChatIds ()));
+						search.imChatId ()));
 
 			}
 
 			if (
 				isNotNull (
-					search.senderUserIds ())
+					search.senderUserId ())
 			) {
 
 				criteria.add (
-					Restrictions.in (
+					Restrictions.eq (
 						"_senderUser.id",
-						search.senderUserIds ()));
+						search.senderUserId ()));
 
 			}
 
@@ -134,7 +135,7 @@ class ImChatMessageDaoHibernate
 	public
 	Criteria searchOperatorReportCriteria (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageStatsSearch search) {
+			@NonNull ImChatMessageSearch search) {
 
 		try (
 
@@ -204,7 +205,7 @@ class ImChatMessageDaoHibernate
 	public
 	List <Long> searchOperatorReportIds (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageStatsSearch search) {
+			@NonNull ImChatMessageSearch search) {
 
 		try (
 
@@ -261,7 +262,7 @@ class ImChatMessageDaoHibernate
 	public
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
 			@NonNull Transaction parentTransaction,
-			@NonNull ImChatMessageStatsSearch search,
+			@NonNull ImChatMessageSearch search,
 			@NonNull List <Long> ids) {
 
 		try (

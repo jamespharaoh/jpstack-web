@@ -43,7 +43,6 @@
 		<component class="console.QueueItemsStatusLine"/>
 		<component class="console.QueueListActivePart"/>
 		<component class="console.QueueManager"/>
-		<component class="console.QueueStatsFilter"/>
 		<component class="console.QueueStatsGrouper"/>
 		<component class="console.QueueSubjectActionsAction"/>
 		<component class="console.QueueSubjectActionsPart"/>

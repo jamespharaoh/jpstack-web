@@ -13,19 +13,19 @@ interface ImChatMessageDaoMethods {
 
 	Criteria searchCriteria (
 			Transaction parentTransaction,
-			ImChatMessageStatsSearch search);
+			ImChatMessageSearch search);
 
 	Criteria searchOperatorReportCriteria (
 			Transaction parentTransaction,
-			ImChatMessageStatsSearch search);
+			ImChatMessageSearch search);
 
 	List <Long> searchOperatorReportIds (
 			Transaction parentTransaction,
-			ImChatMessageStatsSearch search);
+			ImChatMessageSearch search);
 
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
 			Transaction parentTransaction,
-			ImChatMessageStatsSearch search,
+			ImChatMessageSearch search,
 			List <Long> ids);
 
 	List <ImChatMessageUserStats> searchMessageUserStats (
