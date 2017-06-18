@@ -1,6 +1,13 @@
 package wbs.utils.etc;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -18,7 +25,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -35,7 +41,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -68,13 +73,14 @@ class Misc {
 
 	}
 
-	public static <Type extends Enum<Type>>
-	Type toEnum (
-			Class<Type> enumType,
+	public static <Type extends Enum <Type>>
+	Optional <Type> toEnum (
+			Class <Type> enumType,
 			String name) {
 
-		if (name == null || name.length () == 0)
-			return null;
+		if (name.length () == 0) {
+			return optionalAbsent ();
+		}
 
 		if (
 			stringEqualSafe (
@@ -84,20 +90,48 @@ class Misc {
 			return null;
 		}
 
-		return Enum.valueOf (enumType, name);
+		return optionalOf (
+			Enum.valueOf (
+				enumType,
+				name));
+
+	}
+
+	public static <Type extends Enum <Type>>
+	Type toEnumRequired (
+			Class <Type> enumType,
+			String name) {
+
+		return optionalGetRequired (
+			toEnum (
+				enumType,
+				name));
+
+	}
+
+	public static <Type extends Enum <Type>>
+	Type toEnumOrNull (
+			Class <Type> enumType,
+			String name) {
+
+		return optionalOrNull (
+			toEnum (
+				enumType,
+				name));
 
 	}
 
 	public static
-	Enum<?> toEnumGeneric (
-			@NonNull Class<?> enumType,
-			@NonNull String name) {
+	Optional <Enum <?>> toEnumGeneric (
+			Class <?> uncastEnumType,
+			String name) {
 
-		return (Enum<?>)
-			Arrays.stream (enumType.getEnumConstants ())
-			.filter (value -> ((Enum<?>) value).name ().equals (name))
-			.findFirst ()
-			.orElseThrow (() -> new IllegalArgumentException ());
+		return optionalFromNullable (
+			genericCastUncheckedNullSafe (
+				Enum.valueOf (
+					genericCastUnchecked (
+						uncastEnumType),
+					name)));
 
 	}
 
@@ -607,19 +641,28 @@ class Misc {
 
 	}
 
-	@SneakyThrows (NoSuchAlgorithmException.class)
 	public static
 	String hashSha1Base64 (
 			String string) {
 
-		MessageDigest messageDigest =
-			MessageDigest.getInstance ("SHA-1");
+		try {
 
-		messageDigest.update (
-			string.getBytes ());
+			MessageDigest messageDigest =
+				MessageDigest.getInstance (
+					"SHA-1");
 
-		return Base64.encodeBase64String (
-			messageDigest.digest ());
+			messageDigest.update (
+				string.getBytes ());
+
+			return Base64.encodeBase64String (
+				messageDigest.digest ());
+
+		} catch (NoSuchAlgorithmException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
 
 	}
 
