@@ -18,6 +18,12 @@
 			counter="numMessages"
 			cacheable="yes"/>
 
+		<!-- identity help -->
+
+		<reference-field
+			name="imChat"
+			type="imChat"/>
+
 		<!-- state -->
 
 		<reference-field

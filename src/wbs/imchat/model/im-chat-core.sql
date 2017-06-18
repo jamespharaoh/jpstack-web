@@ -17,28 +17,12 @@ CREATE OR REPLACE VIEW im_chat_message_view
 AS SELECT
 
 	im_chat_message.id as id,
-	im_chat.id AS im_chat_id,
-	sender_user.id AS sender_user_id,
+	im_chat_message.im_chat_id AS im_chat_id,
+	im_chat_message.sender_user_id AS sender_user_id,
 	timestamp AS timestamp,
 
 	length (im_chat_message.message_text) as num_characters
 
 FROM im_chat_message
-
-INNER JOIN im_chat_conversation
-	ON im_chat_message.im_chat_conversation_id
-		= im_chat_conversation.id
-
-INNER JOIN im_chat_customer
-	ON im_chat_conversation.im_chat_customer_id
-		= im_chat_customer.id
-
-INNER JOIN im_chat
-	ON im_chat_customer.im_chat_id
-		= im_chat.id
-
-INNER JOIN "user" AS sender_user
-	ON im_chat_message.sender_user_id
-		= sender_user.id
 
 ;
