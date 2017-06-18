@@ -557,16 +557,6 @@
     <copy todir="work/console-test/apps/console/host-manager">
       <fileset dir="work/console-test/webapps/host-manager"/>
     </copy>
-    <delete dir="work/console-test/apps/api/ROOT"/>
-    <copy todir="work/console-test/apps/api/ROOT">
-      <fileset dir="work/api/root"/>
-    </copy>
-    <copy todir="work/console-test/apps/api/manager">
-      <fileset dir="work/console-test/webapps/manager"/>
-    </copy>
-    <copy todir="work/console-test/apps/api/host-manager">
-      <fileset dir="work/console-test/webapps/host-manager"/>
-    </copy>
     <exec failonerror="false" executable="work/console-test/bin/catalina.sh">
       <env key="WBS_CONFIG_XML" value="config/wbs-console-config.xml"/>
       <arg line="run"/>

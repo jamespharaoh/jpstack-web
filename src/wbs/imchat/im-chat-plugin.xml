@@ -70,6 +70,7 @@
 	</layer>
 
 	<layer name="console">
+		<component class="console.ImChatConsoleLogicImplementation"/>
 		<component class="console.ImChatCustomerCreditAction"/>
 		<component class="console.ImChatCustomerCreditPart"/>
 		<component class="console.ImChatCustomerSearchOrderConsoleHelper"/>

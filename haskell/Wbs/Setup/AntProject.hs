@@ -798,21 +798,7 @@ writeBuildFile world = do
 				(tomcatDir ++ "/webapps/host-manager")
 				(tomcatDir ++ "/apps/console/host-manager"),
 
-			-- deploy api
-
-			makeDeleteDir $ tomcatDir ++ "/apps/api/ROOT",
-
-			makeCopyDirToDir
-				("work/api/root")
-				(tomcatDir ++ "/apps/api/ROOT"),
-
-			makeCopyDirToDir
-				(tomcatDir ++ "/webapps/manager")
-				(tomcatDir ++ "/apps/api/manager"),
-
-			makeCopyDirToDir
-				(tomcatDir ++ "/webapps/host-manager")
-				(tomcatDir ++ "/apps/api/host-manager"),
+			-- start tomcat
 
 			makeExec (tomcatDir ++ "/bin/catalina.sh") [
 				makeEnvKeyValue "WBS_CONFIG_XML" "config/wbs-console-config.xml",
