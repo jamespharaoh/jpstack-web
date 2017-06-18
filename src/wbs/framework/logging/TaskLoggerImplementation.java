@@ -628,6 +628,10 @@ class TaskLoggerImplementation
 	void debugFormat (
 			@NonNull CharSequence ... arguments) {
 
+		if (! debugEnabled ()) {
+			return;
+		}
+
 		LazyString message =
 			stringFormatLazyArray (
 				arguments);
@@ -653,6 +657,10 @@ class TaskLoggerImplementation
 	void debugFormatException (
 			@NonNull Throwable throwable,
 			@NonNull CharSequence ... arguments) {
+
+		if (! debugEnabled ()) {
+			return;
+		}
 
 		LazyString message =
 			stringFormatLazyArray (

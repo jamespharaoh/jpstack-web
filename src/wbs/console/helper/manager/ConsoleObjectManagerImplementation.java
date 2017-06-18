@@ -10,6 +10,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,7 @@ import lombok.NonNull;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCellWriter;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.console.tab.Tab;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
@@ -223,9 +225,12 @@ class ConsoleObjectManagerImplementation
 					.write (
 						formatWriter);
 
-				formatWriter.writeFormat (
-					"%h</td>",
+				formatWriter.writeLineFormat (
+					"%h",
 					path);
+
+				htmlTableCellClose (
+					formatWriter);
 
 			} else {
 
