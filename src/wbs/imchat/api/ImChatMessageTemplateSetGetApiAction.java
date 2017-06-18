@@ -79,6 +79,7 @@ class ImChatMessageTemplateSetGetApiAction
 			OwnedTransaction transaction =
 				database.beginReadWrite (
 					logContext,
+					parentTaskLogger,
 					"handle");
 
 		) {

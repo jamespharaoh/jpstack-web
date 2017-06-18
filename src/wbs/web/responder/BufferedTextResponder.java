@@ -65,6 +65,7 @@ class BufferedTextResponder
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
+					parentTaskLogger,
 					"execute");
 
 		) {

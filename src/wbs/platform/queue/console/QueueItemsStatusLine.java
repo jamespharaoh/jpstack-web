@@ -273,10 +273,30 @@ class QueueItemsStatusLine
 
 		try (
 
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"updateAllUsers");
+
+		) {
+
+			updateAllUsersReal (
+				taskLogger);
+
+		}
+
+	}
+
+	private
+	void updateAllUsersReal (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
-					"updateAllUsers");
+					parentTaskLogger,
+					"updateAllUsersReal");
 
 			HeldLock heldLock =
 				lock.write ();

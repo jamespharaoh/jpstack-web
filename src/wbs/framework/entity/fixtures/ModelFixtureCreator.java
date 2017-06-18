@@ -121,6 +121,7 @@ class ModelFixtureCreator {
 			OwnedTransaction transaction =
 				database.beginReadWrite (
 					logContext,
+					parentTaskLogger,
 					"runModelFixtureCreators");
 
 		) {

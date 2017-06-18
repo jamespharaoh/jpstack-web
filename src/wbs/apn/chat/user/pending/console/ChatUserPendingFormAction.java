@@ -153,6 +153,7 @@ class ChatUserPendingFormAction
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
+					parentTaskLogger,
 					"backupResponder");
 
 		) {

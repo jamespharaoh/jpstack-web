@@ -1,6 +1,5 @@
 package wbs.framework.database;
 
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.Arrays;
@@ -42,22 +41,6 @@ interface Database {
 	}
 
 	default
-	OwnedTransaction beginReadWrite (
-			@NonNull LogContext parentLogContext,
-			@NonNull String dynamicContextName,
-			@NonNull CharSequence ... dynamicContextParameters) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
-			dynamicContextName,
-			Arrays.asList (
-				dynamicContextParameters),
-			true);
-
-	}
-
-	default
 	OwnedTransaction beginReadOnly (
 			@NonNull LogContext parentLogContext,
 			@NonNull TaskLogger parentTaskLogger,
@@ -68,22 +51,6 @@ interface Database {
 			parentLogContext,
 			optionalOf (
 				parentTaskLogger),
-			dynamicContextName,
-			Arrays.asList (
-				dynamicContextParameters),
-			false);
-
-	}
-
-	default
-	OwnedTransaction beginReadOnly (
-			@NonNull LogContext parentLogContext,
-			@NonNull String dynamicContextName,
-			@NonNull CharSequence ... dynamicContextParameters) {
-
-		return beginTransaction (
-			parentLogContext,
-			optionalAbsent (),
 			dynamicContextName,
 			Arrays.asList (
 				dynamicContextParameters),
