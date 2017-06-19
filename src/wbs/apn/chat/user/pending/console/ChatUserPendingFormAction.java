@@ -20,8 +20,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -35,6 +33,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
@@ -135,11 +134,11 @@ class ChatUserPendingFormAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserPendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("queueHomeResponder")
-	Provider <WebResponder> queueHomeResponderProvider;
+	ComponentProvider <WebResponder> queueHomeResponderProvider;
 
 	// details
 
@@ -1343,7 +1342,10 @@ class ChatUserPendingFormAction
 					transaction,
 					chatUser)
 			) {
-				return pendingFormResponderProvider.get ();
+
+				return pendingFormResponderProvider.provide (
+					transaction);
+
 			}
 
 			queueLogic.processQueueItem (
@@ -1356,7 +1358,8 @@ class ChatUserPendingFormAction
 				.setQueueItem (
 					null);
 
-			return queueHomeResponderProvider.get ();
+			return queueHomeResponderProvider.provide (
+				transaction);
 
 		}
 
@@ -1427,8 +1430,10 @@ class ChatUserPendingFormAction
 				moreToApprove (
 					transaction,
 					chatUser),
-				() -> pendingFormResponderProvider.get (),
-				() -> queueHomeResponderProvider.get ());
+				() -> pendingFormResponderProvider.provide (
+					transaction),
+				() -> queueHomeResponderProvider.provide (
+					transaction));
 
 		}
 

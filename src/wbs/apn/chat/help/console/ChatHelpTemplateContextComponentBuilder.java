@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.component.ConsoleComponentBuilderComponent;
@@ -29,6 +27,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.registry.ComponentRegistryBuilder;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -53,28 +52,14 @@ class ChatHelpTemplateContextComponentBuilder
 
 	// prototype dependences
 
-/*
 	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
+	ComponentProvider <ObjectCreatePageSpec> objectCreatePageSpecProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ObjectListPageSpec> objectListPageSpecProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextType> contextTypeProvider;
-
-	@PrototypeDependency
-	Provider <ObjectContext> objectContextProvider;
-*/
-
-	@PrototypeDependency
-	Provider <ObjectCreatePageSpec> objectCreatePageSpecProvider;
-
-	@PrototypeDependency
-	Provider <ObjectListPageSpec> objectListPageSpecProvider;
-
-	@PrototypeDependency
-	Provider <ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
+	ComponentProvider <ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
 
 	// builder
 
@@ -215,7 +200,8 @@ class ChatHelpTemplateContextComponentBuilder
 		) {
 
 			listChildren.add (
-				objectListPageSpecProvider.get ()
+				objectListPageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())
@@ -263,7 +249,8 @@ class ChatHelpTemplateContextComponentBuilder
 		) {
 
 			listChildren.add (
-				objectCreatePageSpecProvider.get ()
+				objectCreatePageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())
@@ -298,7 +285,8 @@ class ChatHelpTemplateContextComponentBuilder
 		) {
 
 			objectChildren.add (
-				objectSettingsPageSpecProvider.get ()
+				objectSettingsPageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())

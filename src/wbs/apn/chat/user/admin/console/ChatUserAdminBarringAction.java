@@ -4,8 +4,6 @@ import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -16,9 +14,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -65,7 +65,7 @@ class ChatUserAdminBarringAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserAdminBarringResponder")
-	Provider <WebResponder> barringResponderProvider;
+	ComponentProvider <WebResponder> barringResponderProvider;
 
 	// details
 
@@ -74,7 +74,19 @@ class ChatUserAdminBarringAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return barringResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return barringResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

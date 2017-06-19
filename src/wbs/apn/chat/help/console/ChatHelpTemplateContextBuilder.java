@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -35,6 +33,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -64,25 +63,25 @@ class ChatHelpTemplateContextBuilder
 	// prototype dependences
 
 	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
+	ComponentProvider <SimpleConsoleContext> simpleConsoleContextProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextType> contextTypeProvider;
+	ComponentProvider <ConsoleContextType> contextTypeProvider;
 
 	@PrototypeDependency
-	Provider <ObjectContext> objectContextProvider;
+	ComponentProvider <ObjectContext> objectContextProvider;
 
 	@PrototypeDependency
-	Provider <ObjectCreatePageSpec> objectCreatePageSpecProvider;
+	ComponentProvider <ObjectCreatePageSpec> objectCreatePageSpecProvider;
 
 	@PrototypeDependency
-	Provider <ObjectListPageSpec> objectListPageSpecProvider;
+	ComponentProvider <ObjectListPageSpec> objectListPageSpecProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
+	ComponentProvider <ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
 
 	// builder
 
@@ -265,7 +264,8 @@ class ChatHelpTemplateContextBuilder
 		) {
 
 			consoleModule.addContextType (
-				contextTypeProvider.get ()
+				contextTypeProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeNamePlural)
@@ -273,7 +273,8 @@ class ChatHelpTemplateContextBuilder
 			);
 
 			consoleModule.addContextType (
-				contextTypeProvider.get ()
+				contextTypeProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeNameCombined)
@@ -281,7 +282,8 @@ class ChatHelpTemplateContextBuilder
 			);
 
 			consoleModule.addContextType (
-				contextTypeProvider.get ()
+				contextTypeProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeName)
@@ -306,7 +308,8 @@ class ChatHelpTemplateContextBuilder
 		) {
 
 			consoleModule.addContext (
-				simpleConsoleContextProvider.get ()
+				simpleConsoleContextProvider.provide (
+					taskLogger)
 
 				.name (
 					contextNamePlural)
@@ -336,7 +339,8 @@ class ChatHelpTemplateContextBuilder
 						typeCamel)));
 
 			consoleModule.addContext (
-				objectContextProvider.get ()
+				objectContextProvider.provide (
+					taskLogger)
 
 				.name (
 					contextName)
@@ -394,7 +398,8 @@ class ChatHelpTemplateContextBuilder
 				taskLogger,
 				parentContextTabLocation,
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						parentContextTabName)
@@ -428,7 +433,8 @@ class ChatHelpTemplateContextBuilder
 		) {
 
 			listChildren.add (
-				objectListPageSpecProvider.get ()
+				objectListPageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())
@@ -464,7 +470,8 @@ class ChatHelpTemplateContextBuilder
 		) {
 
 			listChildren.add (
-				objectCreatePageSpecProvider.get ()
+				objectCreatePageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())
@@ -499,7 +506,8 @@ class ChatHelpTemplateContextBuilder
 		) {
 
 			objectChildren.add (
-				objectSettingsPageSpecProvider.get ()
+				objectSettingsPageSpecProvider.provide (
+					taskLogger)
 
 				.consoleSpec (
 					spec.consoleSpec ())

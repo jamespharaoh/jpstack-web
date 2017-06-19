@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -98,7 +97,7 @@ class ChatSendLogicImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	/**
 	 * Sends a message to a user using the "free" reverse bill route.
@@ -161,7 +160,8 @@ class ChatSendLogicImplementation
 					transaction,
 					chatUser);
 
-			return messageSenderProvider.get ()
+			return messageSenderProvider.provide (
+				transaction)
 
 				.threadId (
 					threadId.orNull ())
@@ -294,7 +294,8 @@ class ChatSendLogicImplementation
 			// send the message
 
 			MessageRec message =
-				messageSenderProvider.get ()
+				messageSenderProvider.provide (
+					transaction)
 
 				.threadId (
 					threadId.orNull ())
@@ -477,7 +478,8 @@ class ChatSendLogicImplementation
 					chatUser);
 
 			MessageRec ret =
-				messageSenderProvider.get ()
+				messageSenderProvider.provide (
+					transaction)
 
 				.threadId (
 					threadId.orNull ())

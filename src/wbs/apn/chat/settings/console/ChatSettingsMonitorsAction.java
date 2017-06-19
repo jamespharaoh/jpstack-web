@@ -1,7 +1,5 @@
 package wbs.apn.chat.settings.console;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -12,9 +10,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -50,7 +50,7 @@ class ChatSettingsMonitorsAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatSettingsMonitorsResponder")
-	Provider <WebResponder> monitorsResponderProvider;
+	ComponentProvider <WebResponder> monitorsResponderProvider;
 
 	// details
 
@@ -59,7 +59,19 @@ class ChatSettingsMonitorsAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return monitorsResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return monitorsResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

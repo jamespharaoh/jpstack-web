@@ -11,8 +11,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -25,6 +23,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -72,13 +71,16 @@ class ChatUserImageUploadPostApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatUserImageUploadErrorPage> uploadErrorResponderProvider;
+	ComponentProvider <ChatUserImageUploadErrorPage>
+		uploadErrorResponderProvider;
 
 	@PrototypeDependency
-	Provider <ChatUserImageUploadExpiredPage> uploadExpiredPageProvider;
+	ComponentProvider <ChatUserImageUploadExpiredPage>
+		uploadExpiredPageProvider;
 
 	@PrototypeDependency
-	Provider <ChatUserImageUploadSuccessPage> uploadSuccessPageProvider;
+	ComponentProvider <ChatUserImageUploadSuccessPage>
+		uploadSuccessPageProvider;
 
 	// implementation
 
@@ -131,7 +133,8 @@ class ChatUserImageUploadPostApiAction
 				transaction.commit ();
 
 				return optionalOf (
-					uploadExpiredPageProvider.get ());
+					uploadExpiredPageProvider.provide (
+						transaction));
 
 			}
 
@@ -232,7 +235,8 @@ class ChatUserImageUploadPostApiAction
 				transaction.commit ();
 
 				return optionalOf (
-					uploadSuccessPageProvider.get ());
+					uploadSuccessPageProvider.provide (
+						transaction));
 
 			} catch (Exception exception) {
 
@@ -300,7 +304,8 @@ class ChatUserImageUploadPostApiAction
 
 			transaction.commit ();
 
-			return uploadErrorResponderProvider.get ();
+			return uploadErrorResponderProvider.provide (
+				transaction);
 
 		}
 

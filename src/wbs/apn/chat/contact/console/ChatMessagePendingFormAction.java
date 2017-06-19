@@ -1,13 +1,12 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-
-import javax.inject.Provider;
 
 import lombok.NonNull;
 
@@ -19,6 +18,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -97,11 +97,11 @@ class ChatMessagePendingFormAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatMessagePendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("queueHomeResponder")
-	Provider <WebResponder> queueHomeResponderProvider;
+	ComponentProvider <WebResponder> queueHomeResponderProvider;
 
 	// details
 
@@ -110,7 +110,19 @@ class ChatMessagePendingFormAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return pendingFormResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return pendingFormResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -236,13 +248,17 @@ class ChatMessagePendingFormAction
 
 			// confirm message status
 
-			if (chatMessage.getStatus ()
-					!= ChatMessageStatus.moderatorPending) {
+			if (
+				enumNotEqualSafe (
+					chatMessage.getStatus (),
+					ChatMessageStatus.moderatorPending)
+			) {
 
 				requestContext.addError (
 					"Message is already approved");
 
-				return queueHomeResponderProvider.get ();
+				return queueHomeResponderProvider.provide (
+					transaction);
 
 			}
 
@@ -386,7 +402,8 @@ class ChatMessagePendingFormAction
 			requestContext.addNotice (
 				"Message approved");
 
-			return queueHomeResponderProvider.get ();
+			return queueHomeResponderProvider.provide (
+				transaction);
 
 		}
 
@@ -444,7 +461,8 @@ class ChatMessagePendingFormAction
 				requestContext.addError (
 					"Message is already approved");
 
-				return queueHomeResponderProvider.get ();
+				return queueHomeResponderProvider.provide (
+					transaction);
 
 			}
 
@@ -496,7 +514,8 @@ class ChatMessagePendingFormAction
 			requestContext.addNotice (
 				"Rejection sent");
 
-			return queueHomeResponderProvider.get ();
+			return queueHomeResponderProvider.provide (
+				transaction);
 
 		}
 

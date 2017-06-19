@@ -4,8 +4,6 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -18,6 +16,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -64,7 +63,7 @@ class ChatJoinCommand
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatJoiner> chatJoinerProvider;
+	ComponentProvider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -166,7 +165,8 @@ class ChatJoinCommand
 					commandCodeToOrient.get (
 						command.getCode ());
 
-				return chatJoinerProvider.get ()
+				return chatJoinerProvider.provide (
+					transaction)
 
 					.chatId (
 						chat.getId ())
@@ -206,7 +206,8 @@ class ChatJoinCommand
 				if (joinType == null)
 					throw new RuntimeException ();
 
-				return chatJoinerProvider.get ()
+				return chatJoinerProvider.provide (
+					transaction)
 
 					.chatId (
 						chat.getId ())
@@ -246,7 +247,8 @@ class ChatJoinCommand
 				if (joinType == null)
 					throw new RuntimeException ();
 
-				return chatJoinerProvider.get ()
+				return chatJoinerProvider.provide (
+					transaction)
 
 					.chatId (
 						chat.getId ())

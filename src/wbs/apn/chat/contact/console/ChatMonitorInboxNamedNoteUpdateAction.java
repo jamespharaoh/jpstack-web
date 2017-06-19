@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -17,6 +15,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -82,7 +81,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponder;
+	ComponentProvider <TextResponder> textResponder;
 
 	// misc
 
@@ -200,11 +199,14 @@ class ChatMonitorInboxNamedNoteUpdateAction
 					oldValue)
 			) {
 
-				return textResponder.get ()
+				return textResponder.provide (
+					transaction)
 
 					.text (
 						HtmlUtils.htmlEncode (
-							newValue));
+							newValue))
+
+				;
 
 			}
 
@@ -282,11 +284,14 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 			transaction.commit ();
 
-			return textResponder.get ()
+			return textResponder.provide (
+				transaction)
 
 				.text (
 					HtmlUtils.htmlEncode (
-						newValue));
+						newValue))
+
+			;
 
 		}
 

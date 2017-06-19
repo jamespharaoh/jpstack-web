@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -31,9 +29,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -78,15 +78,15 @@ class ChatUserImageListAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserAudioListResponder")
-	Provider <WebResponder> audioListResponderProvider;
+	ComponentProvider <WebResponder> audioListResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserImageListResponder")
-	Provider <WebResponder> imageListResponderProvider;
+	ComponentProvider <WebResponder> imageListResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserVideoListResponder")
-	Provider <WebResponder> videoListResponderProvider;
+	ComponentProvider <WebResponder> videoListResponderProvider;
 
 	// details
 
@@ -95,29 +95,43 @@ class ChatUserImageListAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		ChatUserImageType type =
-			toEnumRequired (
-				ChatUserImageType.class,
-				(String) requestContext.stuff (
-					"chatUserImageType"));
+		try (
 
-		switch (type) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
 
-		case audio:
+		) {
 
-			return audioListResponderProvider.get ();
+			ChatUserImageType type =
+				toEnumRequired (
+					ChatUserImageType.class,
+					(String) requestContext.stuff (
+						"chatUserImageType"));
 
-		case image:
+			switch (type) {
 
-			return imageListResponderProvider.get ();
+			case audio:
 
-		case video:
+				return audioListResponderProvider.provide (
+					taskLogger);
 
-			return videoListResponderProvider.get ();
+			case image:
 
-		default:
+				return imageListResponderProvider.provide (
+					taskLogger);
 
-			throw shouldNeverHappen ();
+			case video:
+
+				return videoListResponderProvider.provide (
+					taskLogger);
+
+			default:
+
+				throw shouldNeverHappen ();
+
+			}
 
 		}
 

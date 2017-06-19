@@ -2,8 +2,6 @@ package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -14,9 +12,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -56,7 +56,7 @@ class ChatUserHelpFormAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserHelpFormResponder")
-	Provider <WebResponder> helpFormResponderProvider;
+	ComponentProvider <WebResponder> helpFormResponderProvider;
 
 	// details
 
@@ -65,7 +65,19 @@ class ChatUserHelpFormAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return helpFormResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return helpFormResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

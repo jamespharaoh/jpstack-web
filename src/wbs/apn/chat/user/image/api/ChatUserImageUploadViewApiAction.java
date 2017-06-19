@@ -2,8 +2,6 @@ package wbs.apn.chat.user.image.api;
 
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -14,6 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -46,10 +45,10 @@ class ChatUserImageUploadViewApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatUserImageUploadExpiredPage> expiredPageProvider;
+	ComponentProvider <ChatUserImageUploadExpiredPage> expiredPageProvider;
 
 	@PrototypeDependency
-	Provider <ChatUserImageUploadFormPage> formPageProvider;
+	ComponentProvider <ChatUserImageUploadFormPage> formPageProvider;
 
 	// implementation
 
@@ -102,7 +101,8 @@ class ChatUserImageUploadViewApiAction
 				transaction.commit ();
 
 				return optionalOf (
-					expiredPageProvider.get ());
+					expiredPageProvider.provide (
+						transaction));
 
 			} else {
 
@@ -124,7 +124,8 @@ class ChatUserImageUploadViewApiAction
 				transaction.commit ();
 
 				return optionalOf (
-					formPageProvider.get ());
+					formPageProvider.provide (
+						transaction));
 
 			}
 

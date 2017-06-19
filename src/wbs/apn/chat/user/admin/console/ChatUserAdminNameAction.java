@@ -7,8 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -21,9 +19,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -69,7 +69,7 @@ class ChatUserAdminNameAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserAdminNameResponder")
-	Provider <WebResponder> nameResponderProvider;
+	ComponentProvider <WebResponder> nameResponderProvider;
 
 	// details
 
@@ -78,7 +78,19 @@ class ChatUserAdminNameAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return nameResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return nameResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

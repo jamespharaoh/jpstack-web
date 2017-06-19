@@ -12,8 +12,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -28,9 +26,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -93,11 +93,11 @@ class ChatUserImageUploadAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserImageListResponder")
-	Provider <WebResponder> imageListResponderProvider;
+	ComponentProvider <WebResponder> imageListResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserImageUploadResponder")
-	Provider <WebResponder> imageUploadResponderProvider;
+	ComponentProvider <WebResponder> imageUploadResponderProvider;
 
 	// state
 
@@ -112,7 +112,19 @@ class ChatUserImageUploadAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return imageUploadResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return imageUploadResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -315,7 +327,8 @@ class ChatUserImageUploadAction
 				capitalise (
 					chatUserImageType.name ()));
 
-			return imageListResponderProvider.get ();
+			return imageListResponderProvider.provide (
+				transaction);
 
 		}
 

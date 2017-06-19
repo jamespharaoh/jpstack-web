@@ -3,8 +3,6 @@ package wbs.apn.chat.contact.logic;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -16,6 +14,7 @@ import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.CloseableTransaction;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -54,7 +53,7 @@ class ChatContactObjectHelperMethodsImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <
+	ComponentProvider <IdCacheBuilder <
 		CloseableTransaction,
 		Pair <Long, Long>,
 		Long,
@@ -85,7 +84,8 @@ class ChatContactObjectHelperMethodsImplementation
 			// from and to user id
 
 			fromAndToUserCache =
-				idCacheBuilderProvider.get ()
+				idCacheBuilderProvider.provide (
+					taskLogger)
 
 				.lookupByIdFunction (
 					chatContactHelper::find)

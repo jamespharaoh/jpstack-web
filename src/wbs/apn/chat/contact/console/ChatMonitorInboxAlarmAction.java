@@ -3,8 +3,6 @@ package wbs.apn.chat.contact.console;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
@@ -20,9 +18,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
@@ -79,7 +79,7 @@ class ChatMonitorInboxAlarmAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatMonitorInboxSummaryResponder")
-	Provider <WebResponder> summaryResponderProvider;
+	ComponentProvider <WebResponder> summaryResponderProvider;
 
 	// state
 
@@ -92,7 +92,19 @@ class ChatMonitorInboxAlarmAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return summaryResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return summaryResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

@@ -11,8 +11,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -27,6 +25,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
@@ -127,7 +126,7 @@ class ChatMainCommand
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatJoiner> chatJoinerProvider;
+	ComponentProvider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -329,7 +328,8 @@ class ChatMainCommand
 							inbox.getId ()),
 						"no keyword found, new user, joining");
 
-					return chatJoinerProvider.get ()
+					return chatJoinerProvider.provide (
+						transaction)
 
 						.chatId (
 							chat.getId ())
@@ -579,8 +579,9 @@ class ChatMainCommand
 						? chatSchemeKeyword.getJoinChatAffiliate ().getId ()
 						: null;
 
-				return Optional.of (
-					chatJoinerProvider.get ()
+				return optionalOf (
+					chatJoinerProvider.provide (
+						transaction)
 
 					.chatId (
 						chat.getId ())
@@ -731,8 +732,9 @@ class ChatMainCommand
 
 				}
 
-				return Optional.of (
-					chatJoinerProvider.get ()
+				return optionalOf (
+					chatJoinerProvider.provide (
+						transaction)
 
 					.chatId (
 						chat.getId ())
@@ -883,8 +885,9 @@ class ChatMainCommand
 				return optionalAbsent ();
 			}
 
-			return Optional.of (
-				chatJoinerProvider.get ()
+			return optionalOf (
+				chatJoinerProvider.provide (
+					transaction)
 
 				.chatId (
 					chat.getId ())

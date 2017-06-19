@@ -5,8 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -19,9 +17,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -62,7 +62,7 @@ class ChatUserAdminPrefsAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatUserAdminPrefsResponder")
-	Provider <WebResponder> prefsResponderProvider;
+	ComponentProvider <WebResponder> prefsResponderProvider;
 
 	// details
 
@@ -71,7 +71,19 @@ class ChatUserAdminPrefsAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return prefsResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return prefsResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

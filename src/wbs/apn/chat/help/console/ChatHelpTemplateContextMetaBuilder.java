@@ -2,8 +2,6 @@ package wbs.apn.chat.help.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -21,6 +19,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -38,7 +37,8 @@ class ChatHelpTemplateContextMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	ComponentProvider <ConsoleContextRootExtensionPoint>
+		rootExtensionPointProvider;
 
 	// builder
 
@@ -79,58 +79,87 @@ class ChatHelpTemplateContextMetaBuilder
 
 			setDefaults ();
 
-			buildListExtensionPoint ();
-			buildObjectExtensionPoint ();
+			buildListExtensionPoint (
+				taskLogger);
+
+			buildObjectExtensionPoint (
+				taskLogger);
 
 		}
 
 	}
 
-	void buildListExtensionPoint () {
+	void buildListExtensionPoint (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		metaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+		try (
 
-			.name (
-				contextTypeName + ":list")
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildListExtensionPoint");
 
-			.contextTypeNames (
-				ImmutableList.<String>of (
-					contextTypeNamePlural,
-					contextTypeNameCombo))
+		) {
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+			metaModule.addExtensionPoint (
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
-			.parentContextNames (
-				ImmutableList.<String>of ())
+				.name (
+					contextTypeName + ":list")
 
-		);
+				.contextTypeNames (
+					ImmutableList.<String>of (
+						contextTypeNamePlural,
+						contextTypeNameCombo))
+
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						contextTypeName))
+
+				.parentContextNames (
+					ImmutableList.<String>of ())
+
+			);
+
+		}
 
 	}
 
-	void buildObjectExtensionPoint () {
+	void buildObjectExtensionPoint (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		metaModule.addExtensionPoint (
-			rootExtensionPointProvider.get ()
+		try (
 
-			.name (
-				contextTypeName + ":object")
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildObjectExtensionPoint");
 
-			.contextTypeNames (
-				ImmutableList.<String>of (
-					contextTypeNameCombo,
-					contextTypeName))
+		) {
 
-			.contextLinkNames (
-				ImmutableList.<String>of (
-					contextTypeName))
+			metaModule.addExtensionPoint (
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
-			.parentContextNames (
-				ImmutableList.<String>of ())
+				.name (
+					contextTypeName + ":object")
 
-		);
+				.contextTypeNames (
+					ImmutableList.<String>of (
+						contextTypeNameCombo,
+						contextTypeName))
+
+				.contextLinkNames (
+					ImmutableList.<String>of (
+						contextTypeName))
+
+				.parentContextNames (
+					ImmutableList.<String>of ())
+
+			);
+
+		}
 
 	}
 

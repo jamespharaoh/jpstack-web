@@ -9,14 +9,11 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -36,7 +33,6 @@ import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.lookup.logic.NumberLookupManager;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
@@ -106,11 +102,6 @@ class ChatBroadcastSendHelper
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 

@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -16,6 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -48,10 +47,10 @@ class ChatInfoSiteViewApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatInfoSiteExpiredResponder> expiredResponderProvider;
+	ComponentProvider <ChatInfoSiteExpiredResponder> expiredResponderProvider;
 
 	@PrototypeDependency
-	Provider <ChatInfoSiteViewResponder> viewResponderProvider;
+	ComponentProvider <ChatInfoSiteViewResponder> viewResponderProvider;
 
 	// implementation
 
@@ -120,7 +119,8 @@ class ChatInfoSiteViewApiAction
 				// and show expired page
 
 				return optionalOf (
-					expiredResponderProvider.get ());
+					expiredResponderProvider.provide (
+						transaction));
 
 			}
 
@@ -141,7 +141,8 @@ class ChatInfoSiteViewApiAction
 			// and show info site
 
 			return optionalOf (
-				viewResponderProvider.get ());
+				viewResponderProvider.provide (
+					transaction));
 
 		}
 

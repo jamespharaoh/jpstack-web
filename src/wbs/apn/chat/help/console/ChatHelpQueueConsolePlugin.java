@@ -1,7 +1,5 @@
 package wbs.apn.chat.help.console;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContext;
@@ -14,6 +12,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -43,7 +42,7 @@ class ChatHelpQueueConsolePlugin
 
 	@PrototypeDependency
 	@NamedDependency ("chatHelpLogPendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	// details
 
@@ -76,7 +75,8 @@ class ChatHelpQueueConsolePlugin
 				targetContext,
 				"/" + queueItem.getRefObjectId ());
 
-			return pendingFormResponderProvider.get ();
+			return pendingFormResponderProvider.provide (
+				taskLogger);
 
 		}
 

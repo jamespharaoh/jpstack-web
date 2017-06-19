@@ -3,8 +3,6 @@ package wbs.apn.chat.help.console;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -15,9 +13,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -66,11 +66,11 @@ class ChatHelpLogPendingFormAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatHelpLogPendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("queueHomeResponder")
-	Provider <WebResponder> queueHomeResponderProvider;
+	ComponentProvider <WebResponder> queueHomeResponderProvider;
 
 	// details
 
@@ -79,7 +79,19 @@ class ChatHelpLogPendingFormAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return pendingFormResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return pendingFormResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -183,7 +195,8 @@ class ChatHelpLogPendingFormAction
 					? "Request ignored"
 					: "Reply sent");
 
-			return queueHomeResponderProvider.get ();
+			return queueHomeResponderProvider.provide (
+				transaction);
 
 		}
 
