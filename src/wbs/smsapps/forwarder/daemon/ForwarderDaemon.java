@@ -77,7 +77,7 @@ class ForwarderDaemon
 
 	// state
 
-	QueueBuffer<Long,Long> buffer =
+	QueueBuffer <Long, Long> buffer =
 		new QueueBuffer<> (
 			bufferSize);
 
@@ -117,26 +117,6 @@ class ForwarderDaemon
 						transaction,
 						transaction.now (),
 						buffer.getFullSize ());
-
-				// initialise any proxies
-
-				for (
-					ForwarderMessageInRec forwarderMessageIn
-						: forwarderMessageIns
-				) {
-
-					forwarderMessageIn
-						.getMessage ()
-						.getText ()
-						.getText ();
-
-					forwarderMessageIn
-						.getForwarder ()
-						.getUrl ();
-
-				}
-
-				transaction.close ();
 
 				int numRetrieved = 0;
 
@@ -583,6 +563,17 @@ class ForwarderDaemon
 					return optionalAbsent ();
 
 				} else {
+
+					// get lazy data
+
+					forwarderMessageIn
+						.getMessage ()
+						.getText ()
+						.getText ();
+
+					forwarderMessageIn
+						.getForwarder ()
+						.getUrl ();
 
 					transaction.commit ();
 
