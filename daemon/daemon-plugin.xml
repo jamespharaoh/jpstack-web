@@ -3,8 +3,12 @@
 	package="wbs.platform.daemon">
 
 	<layer name="daemon">
+
+		<bootstrap-component class="RemovalDaemonComponentWrapper"/>
+
 		<component class="DaemonSpecialConfig"/>
 		<component class="DaemonThreadManager"/>
+
 	</layer>
 
 </plugin>

@@ -6,6 +6,10 @@
 		<plugin-dependency name="platform-common"/>
 	</plugin-dependencies>
 
+	<sql-scripts>
+		<sql-schema name="queue-item"/>
+	</sql-scripts>
+
 	<models>
 
 		<custom-type name="queueItemState"/>
@@ -13,6 +17,7 @@
 
 		<model name="queue"/>
 		<model name="queueItem"/>
+		<model name="queueItemView"/>
 		<model name="queueItemClaim"/>
 		<model name="queueSubject"/>
 		<model name="queueType"/>
@@ -38,7 +43,6 @@
 		<component class="console.QueueItemsStatusLine"/>
 		<component class="console.QueueListActivePart"/>
 		<component class="console.QueueManager"/>
-		<component class="console.QueueStatsFilter"/>
 		<component class="console.QueueStatsGrouper"/>
 		<component class="console.QueueSubjectActionsAction"/>
 		<component class="console.QueueSubjectActionsPart"/>
@@ -75,6 +79,7 @@
 		<console-module name="queue"/>
 		<console-module name="queue-item"/>
 		<console-module name="queue-item-claim"/>
+		<console-module name="queue-item-view"/>
 		<console-module name="queue-subject"/>
 		<console-module name="queue-type"/>
 	</console-modules>

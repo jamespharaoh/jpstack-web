@@ -183,6 +183,7 @@ class ObjectEventsPageBuilder <
 						responderName)
 
 					.privName (
+						taskLogger,
 						privKey),
 
 				extensionPoint.contextTypeNames ()

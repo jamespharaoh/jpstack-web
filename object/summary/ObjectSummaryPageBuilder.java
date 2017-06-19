@@ -246,6 +246,7 @@ class ObjectSummaryPageBuilder <
 							container.newBeanNamePrefix ()))
 
 					.privKeys (
+						taskLogger,
 						privKey != null
 							? Collections.singletonList (privKey)
 							: Collections.<String>emptyList ()),

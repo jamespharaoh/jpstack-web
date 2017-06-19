@@ -32,24 +32,31 @@ class SleepingDaemonService
 	// singleton dependencies
 
 	@SingletonDependency
+	private
 	BackgroundLogic backgroundLogic;
 
 	@SingletonDependency
+	private
 	Database database;
 
 	@SingletonDependency
+	private
 	ExceptionLogger exceptionLogger;
 
 	@ClassSingletonDependency
+	private
 	LogContext logContext;
 
 	@SingletonDependency
+	private
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	private
 	ObjectTypeObjectHelper objectTypeHelper;
 
 	@SingletonDependency
+	private
 	RandomLogic randomLogic;
 
 	// state

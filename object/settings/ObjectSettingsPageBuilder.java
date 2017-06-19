@@ -11,8 +11,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -41,6 +39,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -82,24 +81,24 @@ class ObjectSettingsPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFile;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTab;
 
 	@PrototypeDependency
-	Provider <ObjectRemoveAction> objectRemoveAction;
+	ComponentProvider <ObjectRemoveAction> objectRemoveAction;
 
 	@PrototypeDependency
-	Provider <ObjectSettingsAction <ObjectType, ParentType>>
-	objectSettingsActionProvider;
+	ComponentProvider <ObjectSettingsAction <ObjectType, ParentType>>
+		objectSettingsActionProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSettingsPart <ObjectType, ParentType>>
-	objectSettingsPartProvider;
+	ComponentProvider <ObjectSettingsPart <ObjectType, ParentType>>
+		objectSettingsPartProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponder;
 
 	// builder
 
@@ -128,8 +127,8 @@ class ObjectSettingsPageBuilder <
 	String tabName;
 	String tabLocation;
 
-	Provider <WebResponder> responderProvider;
-	Provider <WebAction> settingsActionProvider;
+	ComponentProvider <WebResponder> responderProvider;
+	ComponentProvider <WebAction> settingsActionProvider;
 
 	// build
 
@@ -191,7 +190,8 @@ class ObjectSettingsPageBuilder <
 			consoleModule.addContextTab (
 				taskLogger,
 				"end",
-				contextTab.get ()
+				contextTab.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -227,7 +227,9 @@ class ObjectSettingsPageBuilder <
 			if (consoleHelper.ephemeral ()) {
 
 				settingsActionProvider =
-					() -> objectSettingsActionProvider.get ()
+					taskLoggerNested ->
+						objectSettingsActionProvider.provide (
+							taskLoggerNested)
 
 					.detailsResponderProvider (
 						responderProvider)
@@ -253,12 +255,16 @@ class ObjectSettingsPageBuilder <
 							: "id")
 
 					.objectType (
-						consoleHelper.objectTypeCode ());
+						consoleHelper.objectTypeCode ())
+
+				;
 
 			} else {
 
 				settingsActionProvider =
-					() -> objectSettingsActionProvider.get ()
+					taskLoggerNested ->
+						objectSettingsActionProvider.provide (
+							taskLoggerNested)
 
 					.detailsResponderProvider (
 						responderProvider)
@@ -301,7 +307,8 @@ class ObjectSettingsPageBuilder <
 
 			consoleModule.addContextFile (
 				fileName,
-				consoleFile.get ()
+				consoleFile.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
@@ -310,6 +317,7 @@ class ObjectSettingsPageBuilder <
 						settingsActionProvider)
 
 					.privName (
+						taskLogger,
 						privKey),
 
 				extensionPoint.contextTypeNames ()
@@ -317,8 +325,10 @@ class ObjectSettingsPageBuilder <
 
 			if (consoleHelper.ephemeral ()) {
 
-				Provider <WebAction> removeActionProvider =
-					() -> objectRemoveAction.get ()
+				ComponentProvider <WebAction> removeActionProvider =
+					taskLoggerNested ->
+						objectRemoveAction.provide (
+							taskLoggerNested)
 
 					.objectHelper (
 						consoleHelper)
@@ -348,12 +358,14 @@ class ObjectSettingsPageBuilder <
 						"%s.remove",
 						container.structuralName ()),
 
-					consoleFile.get ()
+					consoleFile.provide (
+						taskLogger)
 
 						.postActionProvider (
 							removeActionProvider)
 
 						.privName (
+							taskLogger,
 							privKey),
 
 					extensionPoint.contextTypeNames ());

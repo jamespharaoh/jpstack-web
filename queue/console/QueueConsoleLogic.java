@@ -1,5 +1,8 @@
 package wbs.platform.queue.console;
 
+import java.util.Map;
+import java.util.Set;
+
 import wbs.framework.database.Transaction;
 
 import wbs.platform.queue.metamodel.QueueTypeSpec;
@@ -34,5 +37,12 @@ interface QueueConsoleLogic {
 	boolean canSupervise (
 			Transaction parentTransaction,
 			QueueRec queue);
+
+	Set <Long> getSupervisorSearchIds (
+			Transaction parentTransaction,
+			Map <String, Set <String>> conditions);
+
+	Set <Long> getSupervisorFilterIds (
+			Transaction parentTransaction);
 
 }

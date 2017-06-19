@@ -4,8 +4,6 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
@@ -65,19 +64,20 @@ class ObjectLinksPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ObjectLinksPart <ObjectType, TargetType>> objectLinksPart;
+	ComponentProvider <ObjectLinksPart <ObjectType, TargetType>>
+		objectLinksPartProvider;
 
 	@PrototypeDependency
-	Provider <ObjectLinksAction> objectLinksAction;
+	ComponentProvider <ObjectLinksAction> objectLinksActionProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -100,7 +100,7 @@ class ObjectLinksPageBuilder <
 	String localFile;
 	String privKey;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	String pageTitle;
 	ModelField linksField;
@@ -173,12 +173,23 @@ class ObjectLinksPageBuilder <
 			consoleModule.addContextTab (
 				taskLogger,
 				container.tabLocation (),
-				contextTab.get ()
-					.name (tabName)
-					.defaultLabel (tabLabel)
-					.localFile (localFile)
-					.privKeys (privKey),
-				extensionPoint.contextTypeNames ());
+				contextTabProvider.provide (
+					taskLogger)
+
+					.name (
+						tabName)
+
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						localFile)
+
+					.privKeys (
+						privKey),
+
+				extensionPoint.contextTypeNames ()
+			);
 
 		}
 
@@ -197,8 +208,10 @@ class ObjectLinksPageBuilder <
 
 		) {
 
-			Provider <WebAction> actionProvider =
-				() -> objectLinksAction.get ()
+			ComponentProvider <WebAction> actionProvider =
+				taskLoggerNested ->
+					objectLinksActionProvider.provide (
+						taskLoggerNested)
 
 				.responderProvider (
 					responderProvider)
@@ -235,7 +248,8 @@ class ObjectLinksPageBuilder <
 
 			consoleModule.addContextFile (
 				localFile,
-				consoleFile.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
@@ -244,6 +258,7 @@ class ObjectLinksPageBuilder <
 						actionProvider)
 
 					.privName (
+						taskLogger,
 						privKey),
 
 				extensionPoint.contextTypeNames ()
@@ -267,7 +282,8 @@ class ObjectLinksPageBuilder <
 
 			) {
 
-				return objectLinksPart.get ()
+				return objectLinksPartProvider.provide (
+					transaction)
 
 					.consoleHelper (
 						container.consoleHelper ())
@@ -291,7 +307,9 @@ class ObjectLinksPageBuilder <
 		};
 
 		responderProvider =
-			() -> tabContextResponder.get ()
+			taskLogger ->
+				tabContextResponderProvider.provide (
+					taskLogger)
 
 			.tab (
 				tabName)

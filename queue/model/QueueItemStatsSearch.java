@@ -11,24 +11,13 @@ import wbs.utils.time.TextualInterval;
 @Accessors (fluent = true)
 @Data
 public
-class QueueItemSearch
+class QueueItemStatsSearch
 	implements Serializable {
 
-	Long sliceId;
+	Collection <Long> queueIds;
+	Collection <Long> userIds;
 
-	Long queueId;
-	Long queueTypeId;
-	Long queueParentTypeId;
-
-	Long claimedUserId;
-	Long processedUserId;
-
-	TextualInterval createdTime;
-	TextualInterval processedTime;
-
-	QueueItemState state;
-
-	boolean filter;
+	TextualInterval timestamp;
 
 	Collection <Long> filterQueueIds;
 	Collection <Long> filterUserIds;

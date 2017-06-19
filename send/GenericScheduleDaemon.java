@@ -48,6 +48,16 @@ class GenericScheduleDaemon <
 
 	@Override
 	protected
+	String friendlyName () {
+
+		return stringFormat (
+			"%s schedule",
+			helper ().name ());
+
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 
 		return stringFormat (

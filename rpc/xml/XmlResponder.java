@@ -79,20 +79,22 @@ class XmlResponder
 
 			try (
 
-				BorrowedOutputStream out =
+				BorrowedOutputStream outputStream =
 					requestContext.outputStream ();
 
 			) {
 
 				Element node =
-					toNode (data);
+					toNode (
+						data);
 
 				Document doc =
-					new Document (node);
+					new Document (
+						node);
 
 				Serializer serializer =
 					new Serializer (
-						out,
+						outputStream,
 						"utf-8");
 
 				serializer.setIndent (

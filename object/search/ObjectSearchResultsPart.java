@@ -89,8 +89,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
@@ -329,7 +327,7 @@ class ObjectSearchResultsPart <
 						consoleHelper.getClass (),
 						resultsDaoMethodName,
 						ImmutableList.<Class <?>> of (
-							TaskLogger.class,
+							Transaction.class,
 							searchObject.getClass (),
 							List.class));
 
@@ -364,14 +362,15 @@ class ObjectSearchResultsPart <
 
 	}
 
+	private
 	void prepareTargetContext (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
 					"prepareTargetContext");
 
 		) {
@@ -383,7 +382,7 @@ class ObjectSearchResultsPart <
 
 			targetContext =
 				consoleManager.relatedContext (
-					taskLogger,
+					transaction,
 					requestContext.consoleContextRequired (),
 					targetContextType);
 
@@ -434,162 +433,210 @@ class ObjectSearchResultsPart <
 
 	}
 
+	private
 	void renderNewSearch (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter) {
 
-		htmlFormOpenPost (
-			formatWriter);
+		try (
 
-		htmlParagraphOpen (
-			formatWriter);
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderNewSearch");
 
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"new-search\"",
-			" value=\"new search\"",
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"repeat-search\"",
-			" value=\"repeat search\"",
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" name=\"download-csv\"",
-			" value=\"download csv\"",
-			">");
-
-		htmlParagraphClose (
-			formatWriter);
-
-		htmlFormClose (
-			formatWriter);
-
-	}
-
-	void renderTotalObjects (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter formatWriter) {
-
-		htmlParagraphWriteFormat (
-			formatWriter,
-			"Search returned %h items",
-			integerToDecimalString (
-				totalObjects));
-
-	}
-
-	void renderPageNumbers (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter formatWriter) {
-
-		if (pageCount == 1)
-			return;
-
-		htmlParagraphOpen (
-			formatWriter,
-			htmlClassAttribute (
-				"links"));
-
-		formatWriter.writeLineFormat (
-			"Select page");
-
-		htmlLinkWrite (
-			formatWriter,
-			stringFormat (
-				"?page=all&mode=%u",
-				requestContext.parameterOrDefault (
-					"mode",
-					resultsModes.keySet ().iterator ().next ())),
-			"All",
-			presentInstances (
-				optionalIf (
-					singlePage,
-					() -> htmlClassAttribute (
-						"selected"))));
-
-		for (
-			long page = 0;
-			page < pageCount;
-			page ++
 		) {
+
+			htmlFormOpenPost (
+				formatWriter);
+
+			htmlParagraphOpen (
+				formatWriter);
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"new-search\"",
+				" value=\"new search\"",
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"repeat-search\"",
+				" value=\"repeat search\"",
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"download-csv\"",
+				" value=\"download csv\"",
+				">");
+
+			htmlParagraphClose (
+				formatWriter);
+
+			htmlFormClose (
+				formatWriter);
+
+		}
+
+	}
+
+	private
+	void renderTotalObjects (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderTotalObjects");
+
+		) {
+
+			htmlParagraphWriteFormat (
+				formatWriter,
+				"Search returned %h items",
+				integerToDecimalString (
+					totalObjects));
+
+		}
+
+	}
+
+	private
+	void renderPageNumbers (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderPageNumbers");
+
+		) {
+
+			if (pageCount == 1)
+				return;
+
+			htmlParagraphOpen (
+				formatWriter,
+				htmlClassAttribute (
+					"links"));
+
+			formatWriter.writeLineFormat (
+				"Select page");
 
 			htmlLinkWrite (
 				formatWriter,
 				stringFormat (
-					"?page=%h&mode=%u",
-					integerToDecimalString (
-						page),
+					"?page=all&mode=%u",
 					requestContext.parameterOrDefault (
 						"mode",
 						resultsModes.keySet ().iterator ().next ())),
-				integerToDecimalString (
-					page + 1),
+				"All",
 				presentInstances (
 					optionalIf (
-						! singlePage && page == pageNumber,
+						singlePage,
 						() -> htmlClassAttribute (
 							"selected"))));
 
-		}
+			for (
+				long page = 0;
+				page < pageCount;
+				page ++
+			) {
 
-		htmlParagraphClose (
-			formatWriter);
+				htmlLinkWrite (
+					formatWriter,
+					stringFormat (
+						"?page=%h&mode=%u",
+						integerToDecimalString (
+							page),
+						requestContext.parameterOrDefault (
+							"mode",
+							resultsModes.keySet ().iterator ().next ())),
+					integerToDecimalString (
+						page + 1),
+					presentInstances (
+						optionalIf (
+							! singlePage && page == pageNumber,
+							() -> htmlClassAttribute (
+								"selected"))));
+
+			}
+
+			htmlParagraphClose (
+				formatWriter);
+
+		}
 
 	}
 
+	private
 	void renderModeTabs (
-			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction parentTransaction,
 			@NonNull FormatWriter formatWriter) {
 
-		if (
-			collectionHasOneItem (
-				resultsModes.entrySet ())
-		) {
-			return;
-		}
+		try (
 
-		htmlParagraphOpen (
-			formatWriter,
-			htmlClassAttribute (
-				"links"));
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderModeTabs");
 
-		for (
-			ObjectSearchResultsMode <ResultType> resultsMode
-				: resultsModes.values ()
 		) {
 
-			htmlLinkWrite (
+			if (
+				collectionHasOneItem (
+					resultsModes.entrySet ())
+			) {
+				return;
+			}
+
+			htmlParagraphOpen (
 				formatWriter,
-				stringFormat (
-					"?page=%u&mode=%u",
-					requestContext.parameterOrDefault (
-						"page",
-						"0"),
-					resultsMode.name ()),
-				capitalise (
-					hyphenToSpaces (
-						resultsMode.name ())),
-				presentInstances (
-					optionalIf (
-						stringEqualSafe (
-							resultsMode.name (),
-							requestContext.parameterOrDefault (
-								"mode",
-								resultsModes.keySet ().iterator ().next ())),
-						() -> htmlClassAttribute (
-							"selected"))));
+				htmlClassAttribute (
+					"links"));
+
+			for (
+				ObjectSearchResultsMode <ResultType> resultsMode
+					: resultsModes.values ()
+			) {
+
+				htmlLinkWrite (
+					formatWriter,
+					stringFormat (
+						"?page=%u&mode=%u",
+						requestContext.parameterOrDefault (
+							"page",
+							"0"),
+						resultsMode.name ()),
+					capitalise (
+						hyphenToSpaces (
+							resultsMode.name ())),
+					presentInstances (
+						optionalIf (
+							stringEqualSafe (
+								resultsMode.name (),
+								requestContext.parameterOrDefault (
+									"mode",
+									resultsModes.keySet ().iterator ().next ())),
+							() -> htmlClassAttribute (
+								"selected"))));
+
+			}
+
+			htmlParagraphClose (
+				formatWriter);
 
 		}
-
-		htmlParagraphClose (
-			formatWriter);
 
 	}
 
