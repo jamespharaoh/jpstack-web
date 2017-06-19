@@ -1,9 +1,11 @@
 package wbs.apn.chat.ad.daemon;
 
 import static wbs.utils.collection.CollectionUtils.iterableFirstElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -24,6 +26,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -111,50 +114,68 @@ class ChatAdultAdDaemon
 
 		try (
 
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			List <Long> chatUserIds =
+				getChatUsersIdsForAd (
+					taskLogger);
+
+			chatUserIds.forEach (
+				chatUserId ->  {
+
+				try {
+
+					doAdultAd (
+						taskLogger,
+						chatUserId);
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"ChatAdDaemon",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
+
+			});
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	List <Long> getChatUsersIdsForAd (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
-					"ChatAdultAdDaemon.runOnce");
+					"getChatUserIdsForAd");
 
 		) {
 
 			transaction.debugFormat (
 				"Looking for users to send an adult ad to");
 
-			List <ChatUserRec> chatUsers =
+			return iterableMapToList (
 				chatUserHelper.findWantingAdultAd (
 					transaction,
-					transaction.now ());
-
-			transaction.close ();
-
-			// then call doAdultAd for each one
-
-			for (
-				ChatUserRec chatUser
-					: chatUsers
-			) {
-
-				try {
-
-					doAdultAd (
-						transaction,
-						chatUser.getId ());
-
-				} catch (Exception exception) {
-
-					exceptionLogger.logThrowable (
-						transaction,
-						"daemon",
-						"ChatAdDaemon",
-						exception,
-						Optional.absent (),
-						GenericExceptionResolution.tryAgainLater);
-
-				}
-
-			}
+					transaction.now ()),
+				ChatUserRec::getId);
 
 		}
 
