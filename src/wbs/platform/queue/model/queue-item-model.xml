@@ -21,6 +21,11 @@
 			name="createdTime"
 			column-type="postgresql"/>
 
+		<!-- identity cache -->
+
+		<reference-field
+			type="queue"/>
+
 		<!-- data -->
 
 		<string-field
@@ -69,11 +74,6 @@
 		<reference-field
 			type="queueItemClaim"
 			nullable="yes"/>
-
-		<!-- TODO legacy, remove when possible -->
-
-		<reference-field
-			type="queue"/>
 
 	</fields>
 

@@ -23,22 +23,14 @@ CREATE OR REPLACE VIEW chat_message_view
 AS SELECT
 
 	chat_message.id as id,
-	chat.id AS chat_id,
-	sender_user.id AS sender_user_id,
+	chat_message.chat_id AS chat_id,
+	chat_message.sender_user_id AS sender_user_id,
 	timestamp AS timestamp,
 
 	length (edited_text.text) as num_characters,
 	chat_message.final as final
 
 FROM chat_message
-
-INNER JOIN chat
-	ON chat_message.chat_id
-		= chat.id
-
-INNER JOIN "user" AS sender_user
-	ON chat_message.sender_user_id
-		= sender_user.id
 
 INNER JOIN text AS edited_text
 	ON chat_message.edited_text_id

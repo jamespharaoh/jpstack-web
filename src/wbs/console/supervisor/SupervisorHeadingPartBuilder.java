@@ -80,7 +80,7 @@ class SupervisorHeadingPartBuilder
 			supervisorConfigBuilder.pagePartFactories ().add (
 				(transaction, statsPeriod, statsData) ->
 					textPartProvider.provide (
-						taskLogger)
+						transaction)
 
 				.text (
 					text)
