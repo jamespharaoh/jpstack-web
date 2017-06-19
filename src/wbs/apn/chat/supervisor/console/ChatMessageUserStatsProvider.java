@@ -170,8 +170,8 @@ class ChatMessageUserStatsProvider
 							messageUserStats.getNumCharacters ())
 
 						.addValue (
-							"numFinal",
-							messageUserStats.getNumFinalMessages ())
+							"numMessagesFinal",
+							messageUserStats.getNumMessagesFinal ())
 
 					);
 

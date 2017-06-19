@@ -32,7 +32,31 @@
 		<!-- data -->
 
 		<integer-field
+			name="numMessages"/>
+
+		<integer-field
+			name="numMessagesIn"/>
+
+		<integer-field
+			name="numMessagesOut"/>
+
+		<integer-field
 			name="numCharacters"/>
+
+		<integer-field
+			name="numCharactersIn"/>
+
+		<integer-field
+			name="numCharactersOut"/>
+
+		<integer-field
+			name="numMessagesFinal"/>
+
+		<integer-field
+			name="numMessagesFinalIn"/>
+
+		<integer-field
+			name="numMessagesFinalOut"/>
 
 	</fields>
 

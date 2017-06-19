@@ -112,6 +112,9 @@ class SupervisorSimpleStatsResolverBuilder
 				simpleStatsResolverProvider.provide (
 					taskLogger)
 
+				.name (
+					name)
+
 				.indexName (
 					indexName)
 

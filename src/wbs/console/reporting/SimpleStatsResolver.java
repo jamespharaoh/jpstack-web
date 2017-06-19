@@ -1,6 +1,7 @@
 package wbs.console.reporting;
 
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import org.joda.time.Instant;
@@ -26,6 +26,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 public
 class SimpleStatsResolver
 	implements StatsResolver {
+
+	// properties
+
+	@Getter @Setter
+	String name;
 
 	@Getter @Setter
 	String dataSetName;
@@ -39,6 +44,8 @@ class SimpleStatsResolver
 	@Getter @Setter
 	StatsAggregator aggregator;
 
+	// public implementation
+
 	@Override
 	public
 	Set <Object> getGroups (
@@ -51,8 +58,10 @@ class SimpleStatsResolver
 				dataSetName,
 				() -> new RuntimeException (
 					stringFormat (
-						"Data set %s not provided",
-						dataSetName)));
+						"Data set \"%s\" not provided ",
+						dataSetName,
+						"in simple stats resolver \"%s\"",
+						name)));
 
 		return grouper.getGroups (
 			dataSet);
@@ -67,32 +76,31 @@ class SimpleStatsResolver
 			Set <Object> groups) {
 
 		StatsDataSet dataSet =
-			dataSetsByName.get (dataSetName);
+			mapItemForKeyRequired (
+				dataSetsByName,
+				dataSetName);
 
-		if (dataSet == null)
-			throw new RuntimeException ();
+		Map <Pair <Object, Instant>, List <Object>> unaggregatedSteps =
+			new HashMap<> ();
 
-		Map<Pair<Object,Instant>,List<Object>> unaggregatedSteps =
-			new HashMap<Pair<Object,Instant>,List<Object>> ();
-
-		Map<Object,List<Object>> unaggregatedTotals =
-			new HashMap<Object,List<Object>> ();
+		Map <Object, List <Object>> unaggregatedTotals =
+			new HashMap<> ();
 
 		for (Object group : groups) {
 
 			for (Instant step : period.steps ()) {
 
 				unaggregatedSteps.put (
-					new ImmutablePair <Object, Instant> (
+					Pair.of (
 						group,
 						step),
-					new ArrayList<Object> ());
+					new ArrayList<> ());
 
 			}
 
 			unaggregatedTotals.put (
 				group,
-				new ArrayList<Object> ());
+				new ArrayList<> ());
 
 		}
 
@@ -118,9 +126,12 @@ class SimpleStatsResolver
 
 				throw new RuntimeException (
 					stringFormat (
-						"Unexpected data for %s/%s",
+						"Unexpected data for index \"%s\" ",
 						indexValue.toString (),
-						datum.startTime ().toString ()));
+						"start time \"%s\" ",
+						datum.startTime ().toString (),
+						"in simple stats resolver \"%s\"",
+						name));
 
 			}
 
@@ -132,8 +143,10 @@ class SimpleStatsResolver
 
 				throw new RuntimeException (
 					stringFormat (
-						"Unexpected data for %s",
-						indexValue.toString ()));
+						"Unexpected data for index \"%s\" ",
+						indexValue.toString (),
+						"in simple stats resolver \"%s\"",
+						name));
 
 			}
 
@@ -144,8 +157,10 @@ class SimpleStatsResolver
 
 				throw new RuntimeException (
 					stringFormat (
-						"Value %s not found",
-						valueName));
+						"Value \"%s\" not found ",
+						valueName,
+						"in simple stats resolver \"%s\"",
+						name));
 
 			}
 
@@ -163,24 +178,26 @@ class SimpleStatsResolver
 			new ResolvedStats ();
 
 		for (
-			Map.Entry<Pair<Object,Instant>,List<Object>> entry
+			Map.Entry <Pair <Object, Instant>, List <Object>> entry
 				: unaggregatedSteps.entrySet ()
 		) {
 
 			ret.steps ().put (
 				entry.getKey (),
-				aggregator.aggregate (entry.getValue ()));
+				aggregator.aggregate (
+					entry.getValue ()));
 
 		}
 
 		for (
-			Map.Entry<Object,List<Object>> entry
+			Map.Entry <Object, List <Object>> entry
 				: unaggregatedTotals.entrySet ()
 		) {
 
 			ret.totals ().put (
 				entry.getKey (),
-				aggregator.aggregate (entry.getValue ()));
+				aggregator.aggregate (
+					entry.getValue ()));
 
 		}
 

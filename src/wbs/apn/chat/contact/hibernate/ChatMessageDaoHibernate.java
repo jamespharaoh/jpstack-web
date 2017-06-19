@@ -705,13 +705,19 @@ class ChatMessageDaoHibernate
 					"user")
 
 				.add (
-					Projections.rowCount (),
+					Projections.sum (
+						"_chatMessageView.numMessagesOut"),
 					"numMessages")
 
 				.add (
 					Projections.sum (
-						"_chatMessageView.numCharacters"),
+						"_chatMessageView.numCharactersOut"),
 					"numCharacters")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesFinalOut"),
+					"numMessagesFinal")
 
 			);
 
@@ -721,7 +727,6 @@ class ChatMessageDaoHibernate
 
 			return findMany (
 				transaction,
-
 				ChatMessageUserStats.class,
 				criteria);
 
@@ -802,13 +807,49 @@ class ChatMessageDaoHibernate
 					"chat")
 
 				.add (
-					Projections.rowCount (),
+					Projections.sum (
+						"_chatMessageView.numMessages"),
 					"numMessages")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesIn"),
+					"numMessagesIn")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesOut"),
+					"numMessagesOut")
 
 				.add (
 					Projections.sum (
 						"_chatMessageView.numCharacters"),
 					"numCharacters")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numCharactersIn"),
+					"numCharactersIn")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numCharactersOut"),
+					"numCharactersOut")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesFinal"),
+					"numMessagesFinal")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesFinalIn"),
+					"numMessagesFinalIn")
+
+				.add (
+					Projections.sum (
+						"_chatMessageView.numMessagesFinalOut"),
+					"numMessagesFinalOut")
 
 			);
 

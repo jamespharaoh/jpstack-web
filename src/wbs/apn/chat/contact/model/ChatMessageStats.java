@@ -11,7 +11,15 @@ class ChatMessageStats {
 	ChatRec chat;
 
 	Long numMessages;
-	Long numFinalMessages;
+	Long numMessagesIn;
+	Long numMessagesOut;
+
 	Long numCharacters;
+	Long numCharactersIn;
+	Long numCharactersOut;
+
+	Long numMessagesFinal;
+	Long numMessagesFinalIn;
+	Long numMessagesFinalOut;
 
 }

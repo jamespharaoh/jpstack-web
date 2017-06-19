@@ -14,7 +14,7 @@ class ChatMessageUserStats {
 	UserRec user;
 
 	Long numMessages;
-	Long numFinalMessages;
+	Long numMessagesFinal;
 	Long numCharacters;
 
 }

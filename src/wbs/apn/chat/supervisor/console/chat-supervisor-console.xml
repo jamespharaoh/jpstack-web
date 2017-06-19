@@ -74,29 +74,27 @@
 		<simple-stats-resolver
 			name="messagesSent"
 			aggregator="sum"
-			value="messagesSent"
+			value="numMessagesOut"
 			data-set="message"/>
 
 		<simple-stats-resolver
 			name="messagesReceived"
 			aggregator="sum"
-			value="messagesReceived"
-			data-set="message"/>
-
-		<simple-stats-resolver
-			name="messagesMissed"
-			aggregator="sum"
-			value="messagesMissed"
+			value="numMessagesIn"
 			data-set="message"/>
 
 		<simple-stats-resolver
 			name="charactersSent"
 			aggregator="sum"
-			value="charactersSent"
+			value="numCharactersOut"
 			data-set="message"/>
 
-		<multiplication-stats-resolver
-			name="charactersSentPerMessage">
+		<addition-stats-resolver name="messagesMissed">
+			<operand resolver="messagesReceived" coefficient="1"/>
+			<operand resolver="messagesSent" coefficient="-1"/>
+		</addition-stats-resolver>
+
+		<multiplication-stats-resolver name="charactersSentPerMessage">
 			<operand resolver="charactersSent"/>
 			<operand resolver="messagesSent" power="-1"/>
 		</multiplication-stats-resolver>
@@ -107,8 +105,7 @@
 			value="alarmsSet"
 			data-set="initiation"/>
 
-		<multiplication-stats-resolver
-			name="alarmsPercent">
+		<multiplication-stats-resolver name="alarmsPercent">
 			<operand value="100"/>
 			<operand resolver="alarmsSet"/>
 			<operand resolver="messagesSent" power="-1"/>
@@ -120,7 +117,7 @@
 			name="userMessagesSent"
 			aggregator="sum"
 			index="userId"
-			value="messagesSent"
+			value="numMessages"
 			data-set="messageUser"/>
 
 		<simple-stats-resolver
@@ -130,8 +127,7 @@
 			value="alarmsSet"
 			data-set="initiation"/>
 
-		<multiplication-stats-resolver
-			name="userAlarmsPercent">
+		<multiplication-stats-resolver name="userAlarmsPercent">
 			<operand value="100"/>
 			<operand resolver="userAlarmsSet"/>
 			<operand resolver="userMessagesSent" power="-1"/>
@@ -141,11 +137,10 @@
 			name="userCharactersSent"
 			aggregator="sum"
 			index="userId"
-			value="charactersSent"
+			value="numCharacters"
 			data-set="messageUser"/>
 
-		<multiplication-stats-resolver
-			name="userCharactersSentPerMessage">
+		<multiplication-stats-resolver name="userCharactersSentPerMessage">
 			<operand resolver="userCharactersSent"/>
 			<operand resolver="userMessagesSent" power="-1"/>
 		</multiplication-stats-resolver>
@@ -154,7 +149,7 @@
 			name="userFinalMessages"
 			aggregator="sum"
 			index="userId"
-			value="finalMessagesSent"
+			value="numMessagesFinal"
 			data-set="messageUser"/>
 
 		<heading

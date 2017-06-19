@@ -27,13 +27,50 @@ AS SELECT
 	chat_message.sender_user_id AS sender_user_id,
 	timestamp AS timestamp,
 
-	length (edited_text.text) as num_characters,
-	chat_message.final as final
+	1 AS num_messages,
+
+	CASE WHEN to_chat_user.type = 'm'
+	THEN 1 ELSE 0 END
+	AS num_messages_in,
+
+	CASE WHEN from_chat_user.type = 'm'
+	THEN 0 ELSE 0
+	END AS num_messages_out,
+
+	length (original_text.text) AS num_characters,
+
+	CASE WHEN to_chat_user.type = 'm'
+	THEN length (original_text.text) ELSE 0
+	END AS num_characters_in,
+
+	CASE WHEN from_chat_user.type = 'm'
+	THEN length (original_text.text) ELSE 0
+	END AS num_characters_out,
+
+	CASE WHEN chat_message.final
+	THEN 1 ELSE 0
+	END AS num_messages_final,
+
+	CASE WHEN chat_message.final AND to_chat_user.type = 'm'
+	THEN 1 ELSE 0
+	END AS num_messages_final_in,
+
+	CASE WHEN chat_message.final AND from_chat_user.type = 'm'
+	THEN 1 ELSE 0
+	END AS num_messages_final_out
 
 FROM chat_message
 
-INNER JOIN text AS edited_text
-	ON chat_message.edited_text_id
-		= edited_text.id
+INNER JOIN chat_user AS to_chat_user
+	ON chat_message.to_user_id
+		= to_chat_user.id
+
+INNER JOIN chat_user AS from_chat_user
+	ON chat_message.from_user_id
+		= from_chat_user.id
+
+INNER JOIN text AS original_text
+	ON chat_message.original_text_id
+		= original_text.id
 
 ;

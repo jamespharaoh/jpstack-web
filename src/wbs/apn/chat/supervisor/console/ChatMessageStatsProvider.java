@@ -152,12 +152,36 @@ class ChatMessageStatsProvider
 							messageStats.getNumMessages ())
 
 						.addValue (
+							"numMessagesIn",
+							messageStats.getNumMessagesIn ())
+
+						.addValue (
+							"numMessagesOut",
+							messageStats.getNumMessagesOut ())
+
+						.addValue (
 							"numCharacters",
 							messageStats.getNumCharacters ())
 
 						.addValue (
-							"numFinal",
-							messageStats.getNumFinalMessages ())
+							"numCharactersIn",
+							messageStats.getNumCharactersIn ())
+
+						.addValue (
+							"numCharactersOut",
+							messageStats.getNumCharactersOut ())
+
+						.addValue (
+							"numMessagesFinal",
+							messageStats.getNumMessagesFinal ())
+
+						.addValue (
+							"numMessagesFinalIn",
+							messageStats.getNumMessagesFinalIn ())
+
+						.addValue (
+							"numMessagesFinalOut",
+							messageStats.getNumMessagesFinalOut ())
 
 					);
 
