@@ -97,7 +97,7 @@
 		<yes-no-field
 			name="finalMessage"
 			column="final"
-			nullable="yes"/>
+			default="yes"/>
 
 	</fields>
 
