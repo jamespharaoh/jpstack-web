@@ -197,7 +197,8 @@ interface ComponentManager
 			throw new NoSuchElementException ();
 		}
 
-		return componentProvider.get ();
+		return optionalGetRequired (
+			componentProvider);
 
 	}
 

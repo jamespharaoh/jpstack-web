@@ -497,7 +497,7 @@ class ChatApiServletModule
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"files");
+					"webModuleFiles");
 
 		) {
 

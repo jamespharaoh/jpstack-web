@@ -60,7 +60,7 @@ class ChatInfoSiteApiModule
 
 	@NormalLifecycleSetup
 	public
-	void init (
+	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
@@ -68,7 +68,7 @@ class ChatInfoSiteApiModule
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"init");
+					"setup");
 
 		) {
 

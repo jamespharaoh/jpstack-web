@@ -380,4 +380,13 @@ class ForwarderApiModule
 
 	}
 
+	@Override
+	public
+	Map <String, WebFile> webModuleFiles (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return files;
+
+	}
+
 }
