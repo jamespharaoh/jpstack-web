@@ -8,7 +8,7 @@
 		<!-- conditions -->
 
 		<value-condition
-			name="slice-code">
+			name="queue-slice-code">
 
 			<item value="psychic"/>
 

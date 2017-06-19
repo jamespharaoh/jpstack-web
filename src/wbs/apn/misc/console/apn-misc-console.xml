@@ -494,7 +494,7 @@
 		offset-hours="7"
 		template="apn-default-template">
 
-		<value-condition name="slice-code">
+		<value-condition name="queue-slice-code">
 			<item value="apn"/>
 		</value-condition>
 
@@ -506,7 +506,7 @@
 		offset-hours="7"
 		template="apn-all-template">
 
-		<value-condition name="slice-code">
+		<value-condition name="queue-slice-code">
 			<item value="apn"/>
 		</value-condition>
 
@@ -520,7 +520,7 @@
 		offset-hours="7"
 		template="apn-default-template">
 
-		<value-condition name="slice-code">
+		<value-condition name="queue-slice-code">
 			<item value="test"/>
 		</value-condition>
 
@@ -533,7 +533,7 @@
 		template="apn-all-template">
 
 		<value-condition
-			name="sliceCode">
+			name="queue-slice-code">
 
 			<item value="test"/>
 
