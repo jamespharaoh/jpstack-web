@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -27,6 +25,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -108,7 +107,7 @@ class ForwarderLogicImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	// implementation
 
@@ -1156,7 +1155,8 @@ class ForwarderLogicImplementation
 			if (url == null) {
 
 				messageOut =
-					messageSenderProvider.get ()
+					messageSenderProvider.provide (
+						transaction)
 
 					.threadId (
 						threadId)

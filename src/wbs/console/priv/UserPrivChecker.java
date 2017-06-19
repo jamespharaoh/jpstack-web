@@ -2,6 +2,7 @@ package wbs.console.priv;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -49,6 +50,15 @@ interface UserPrivChecker {
 	boolean canGrant (
 			TaskLogger parentTaskLogger,
 			Long privId);
+
+	Set <Long> getObjectIds (
+			TaskLogger parentTaskLogger,
+			Long parentTypeId);
+
+	Set <Long> getCanRecursiveObjectIds (
+			TaskLogger parentTaskLogger,
+			Long parentTypeId,
+			String ... privCodes);
 
 	void refresh (
 			TaskLogger taskLogger);

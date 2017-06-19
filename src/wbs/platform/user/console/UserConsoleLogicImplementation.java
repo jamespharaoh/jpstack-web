@@ -400,21 +400,24 @@ class UserConsoleLogicImplementation
 
 			// handle slice code condition
 
-			Optional <Set <String>> sliceCodes =
+			Optional <Set <String>> sliceCodesOptional =
 				mapItemForKey (
 					conditions,
 					"slice-code");
 
 			if (
 				optionalIsPresent (
-					sliceCodes)
+					sliceCodesOptional)
 			) {
+
+				Set <String> sliceCodes =
+					optionalGetRequired (
+						sliceCodesOptional);
 
 				predicates.add (
 					user ->
 						contains (
-							optionalGetRequired (
-								sliceCodes),
+							sliceCodes,
 							user.getSlice ().getCode ()));
 
 			}

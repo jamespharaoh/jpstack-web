@@ -5,6 +5,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -215,6 +216,32 @@ class UserPrivCheckerImplementation
 		return target.canGrant (
 			parentTaskLogger,
 			privId);
+
+	}
+
+	@Override
+	public
+	Set <Long> getObjectIds (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long parentTypeId) {
+
+		return target.getObjectIds (
+			parentTaskLogger,
+			parentTypeId);
+
+	}
+
+	@Override
+	public
+	Set <Long> getCanRecursiveObjectIds (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long parentTypeId,
+			@NonNull String ... privCodes) {
+
+		return target.getCanRecursiveObjectIds (
+			parentTaskLogger,
+			parentTypeId,
+			privCodes);
 
 	}
 

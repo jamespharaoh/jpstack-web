@@ -1,9 +1,11 @@
 package wbs.console.priv;
 
+import static wbs.utils.collection.SetUtils.emptySet;
 import static wbs.utils.etc.Misc.doNothing;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.NonNull;
 
@@ -113,6 +115,27 @@ class NullUserPrivChecker
 			@NonNull TaskLogger parentTaskLogger) {
 
 		doNothing ();
+
+	}
+
+	@Override
+	public
+	Set <Long> getObjectIds (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long parentTypeId) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	Set <Long> getCanRecursiveObjectIds (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long parentTypeId,
+			@NonNull String ... privCodes) {
+
+		return emptySet ();
 
 	}
 
