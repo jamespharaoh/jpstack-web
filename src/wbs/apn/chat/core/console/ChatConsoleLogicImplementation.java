@@ -1,6 +1,7 @@
 package wbs.apn.chat.core.console;
 
 import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.IterableUtils.iterableMapToSet;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.LogicUtils.predicatesCombineAll;
 import static wbs.utils.etc.Misc.contains;
@@ -35,6 +36,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.etc.NumberUtils;
 import wbs.utils.string.FormatWriter;
 
 import wbs.apn.chat.core.model.ChatRec;
@@ -383,6 +385,35 @@ class ChatConsoleLogicImplementation
 							optionalGetRequired (
 								sliceCodes),
 							chat.getSlice ().getCode ()));
+
+			}
+
+			// handle chat slice code condition
+
+			Optional <Set <String>> chatIdStringsOptional =
+				mapItemForKey (
+					conditions,
+					"chat-id");
+
+			if (
+				optionalIsPresent (
+					chatIdStringsOptional)
+			) {
+
+				Set <String> chatIdStrings =
+					optionalGetRequired (
+						chatIdStringsOptional);
+
+				Set <Long> chatIds =
+					iterableMapToSet (
+						chatIdStrings,
+						NumberUtils::parseIntegerRequired);
+
+				predicates.add (
+					chat ->
+						contains (
+							chatIds,
+							chat.getId ()));
 
 			}
 

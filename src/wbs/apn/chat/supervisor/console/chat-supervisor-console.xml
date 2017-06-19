@@ -31,7 +31,7 @@
 		offset-hours="7">
 
 		<context-condition
-			name="chatId"
+			name="chat-id"
 			stuff-key="chatId"/>
 
 		<sum-stats-aggregator
