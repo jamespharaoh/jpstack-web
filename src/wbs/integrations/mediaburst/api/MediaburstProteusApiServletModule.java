@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -24,9 +22,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.message.core.model.MessageStatus;
@@ -70,7 +70,7 @@ class MediaburstProteusApiServletModule
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// ============================================================ inFile
 
@@ -293,29 +293,36 @@ class MediaburstProteusApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/mediaburst/proteus",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					routeEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/mediaburst/proteus",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						routeEntry)
 
-	}
+				)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
-		return null;
+				.build ()
+
+			;
+
+		}
+
 	}
 
 }

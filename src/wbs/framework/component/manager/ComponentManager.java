@@ -1,6 +1,7 @@
 package wbs.framework.component.manager;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -55,22 +56,28 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialized) {
 
-		Optional <ComponentProvider <ComponentType>> componentProvider =
-			getComponentProvider (
-				taskLogger,
-				componentName,
-				componentClass,
-				initialized);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					taskLogger,
+					componentName,
+					componentClass,
+					initialized);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 			return optionalAbsent ();
 		}
 
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
 		return optionalOf (
-			componentProvider.get ().get ());
+			componentProvider.provide (
+				taskLogger));
 
 	}
 
@@ -95,16 +102,17 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		Optional <ComponentProvider <ComponentType>> componentProvider =
-			getComponentProvider (
-				parentTaskLogger,
-				componentName,
-				componentClass,
-				initialise);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					parentTaskLogger,
+					componentName,
+					componentClass,
+					initialise);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 
 			throw new NoSuchElementException (
@@ -116,7 +124,12 @@ interface ComponentManager
 
 		}
 
-		return componentProvider.get ().get ();
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
+		return componentProvider.provide (
+			parentTaskLogger);
 
 	}
 
@@ -136,25 +149,31 @@ interface ComponentManager
 
 	default <ComponentType>
 	ComponentType getComponentOrElse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
 
-		Optional <ComponentProvider <ComponentType>> componentProvider =
-			getComponentProvider (
-				taskLogger,
-				componentName,
-				componentClass);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					parentTaskLogger,
+					componentName,
+					componentClass);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 			return orElse.get ();
 		}
 
-		return componentProvider.get ().get ();
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
+		return componentProvider.provide (
+			parentTaskLogger);
 
 	}
 

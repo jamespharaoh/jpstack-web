@@ -5,8 +5,6 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -19,6 +17,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -45,10 +44,10 @@ class ChatInfoSiteApiModule
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <ApiFile> apiFile;
+	ComponentProvider <ApiFile> apiFile;
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// state
 
@@ -74,7 +73,8 @@ class ChatInfoSiteApiModule
 		) {
 
 			infoSiteFile =
-				apiFile.get ()
+				apiFile.provide (
+					taskLogger)
 
 				.getActionName (
 					taskLogger,
@@ -85,7 +85,8 @@ class ChatInfoSiteApiModule
 					"chatInfoSiteRespondAction");
 
 			infoSiteImageFile =
-				apiFile.get ()
+				apiFile.provide (
+					taskLogger)
 
 				.getResponderName (
 					taskLogger,
@@ -141,29 +142,36 @@ class ChatInfoSiteApiModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/chat/infoSite",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					infoSiteEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/chat/infoSite",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						infoSiteEntry)
 
-	}
+				)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
-		return null;
+				.build ()
+
+			;
+
+		}
+
 	}
 
 }

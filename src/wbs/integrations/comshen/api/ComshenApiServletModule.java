@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -17,9 +15,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -72,12 +72,12 @@ class ComshenApiServletModule
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// ================================= report file
 
 	public final static
-	Map<String,MessageStatus> statToResult =
+	Map <String, MessageStatus> statToResult =
 		ImmutableMap.<String,MessageStatus>builder ()
 			.put ("DELIBRD", MessageStatus.delivered) // TODO sp?
 			.put ("EXPIRED", MessageStatus.undelivered)
@@ -191,31 +191,35 @@ class ComshenApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/comshen",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					routeEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/comshen",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						routeEntry)
 
-	}
+				)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
+				.build ()
 
-		return ImmutableMap.<String,WebFile>builder ()
-			.build ();
+			;
+
+		}
 
 	}
 

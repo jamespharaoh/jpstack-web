@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -49,6 +47,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -86,31 +85,33 @@ class ObjectSearchPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSearchGetAction> objectSearchGetAction;
+	ComponentProvider <ObjectSearchGetAction>
+		objectSearchGetActionProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSearchPart <ObjectType, SearchType>> objectSearchPart;
+	ComponentProvider <ObjectSearchPart <ObjectType, SearchType>>
+		objectSearchPartProvider;
 
 	@PrototypeDependency
-	Provider <
+	ComponentProvider <
 		ObjectSearchPostAction <
 			ObjectType,
 			SearchType,
 			ResultType
 		>
-	> objectSearchPostAction;
+	> objectSearchPostActionProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSearchResultsPart <ObjectType, ResultType>>
+	ComponentProvider <ObjectSearchResultsPart <ObjectType, ResultType>>
 		objectSearchResultsPartProvider;
 
 	// builder
@@ -144,11 +145,11 @@ class ObjectSearchPageBuilder <
 	String tabLabel;
 	String fileName;
 
-	Provider <WebResponder> searchResponderProvider;
-	Provider <WebResponder> resultsResponderProvider;
+	ComponentProvider <WebResponder> searchResponderProvider;
+	ComponentProvider <WebResponder> resultsResponderProvider;
 
-	Provider <WebAction> searchGetActionProvider;
-	Provider <WebAction> searchPostActionProvider;
+	ComponentProvider <WebAction> searchGetActionProvider;
+	ComponentProvider <WebAction> searchPostActionProvider;
 
 	// build
 
@@ -188,6 +189,7 @@ class ObjectSearchPageBuilder <
 					resolvedExtensionPoint);
 
 				buildContextFile (
+					taskLogger,
 					resolvedExtensionPoint);
 
 			}
@@ -213,7 +215,8 @@ class ObjectSearchPageBuilder <
 				taskLogger,
 				"end",
 
-				contextTab.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -249,7 +252,9 @@ class ObjectSearchPageBuilder <
 		) {
 
 			searchGetActionProvider =
-				() -> objectSearchGetAction.get ()
+				taskLoggerNested ->
+					objectSearchGetActionProvider.provide (
+						taskLoggerNested)
 
 				.searchResponderProvider (
 					searchResponderProvider)
@@ -278,7 +283,9 @@ class ObjectSearchPageBuilder <
 		) {
 
 			searchPostActionProvider =
-				() -> objectSearchPostAction.get ()
+				taskLoggerNested ->
+					objectSearchPostActionProvider.provide (
+						taskLoggerNested)
 
 				.consoleHelper (
 					consoleHelper)
@@ -320,27 +327,39 @@ class ObjectSearchPageBuilder <
 	}
 
 	void buildContextFile (
-			@NonNull ResolvedConsoleContextExtensionPoint
-				resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		consoleModule.addContextFile (
+		try (
 
-			fileName,
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextFile");
 
-			consoleFile.get ()
+		) {
 
-				.getActionProvider (
-					searchGetActionProvider)
+			consoleModule.addContextFile (
+				fileName,
+				consoleFileProvider.provide (
+					taskLogger)
 
-				.postActionProvider (
-					searchPostActionProvider)
+					.getActionProvider (
+						searchGetActionProvider)
 
-				.privKeys (
-					privKey != null
-						? Collections.singletonList (privKey)
-						: Collections.<String>emptyList ()),
+					.postActionProvider (
+						searchPostActionProvider)
 
-			resolvedExtensionPoint.contextTypeNames ());
+					.privKeys (
+						taskLogger,
+						privKey != null
+							? Collections.singletonList (privKey)
+							: Collections.<String>emptyList ()),
+
+				extensionPoint.contextTypeNames ()
+			);
+
+		}
 
 	}
 

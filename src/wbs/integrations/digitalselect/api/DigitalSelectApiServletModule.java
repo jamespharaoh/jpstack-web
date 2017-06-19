@@ -2,15 +2,19 @@ package wbs.integrations.digitalselect.api;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
-import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.responder.WebModule;
@@ -25,38 +29,47 @@ class DigitalSelectApiServletModule
 	@SingletonDependency
 	DigitalSelectRoutePathHandlerEntry digitalSelectRoutePathHandlerEntry;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// implementation
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		try (
 
-			.put (
-				"/digitalselect",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					digitalSelectRoutePathHandlerEntry)
+		) {
 
-			)
+			return ImmutableMap.<String,PathHandler>builder ()
 
-			.build ();
+				.put (
+					"/digitalselect",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-	}
+					.add (
+						digitalSelectRoutePathHandlerEntry)
 
-	@Override
-	public
-	Map <String, WebFile> files () {
+				)
 
-		return ImmutableMap.<String,WebFile>builder ()
-			.build ();
+				.build ()
+
+			;
+
+		}
 
 	}
 

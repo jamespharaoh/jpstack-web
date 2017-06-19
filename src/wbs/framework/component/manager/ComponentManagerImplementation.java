@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -1500,7 +1501,7 @@ class ComponentManagerImplementation
 		InjectedProperty injectedProperty;
 		List <ComponentDefinition> targetComponents;
 
-		Function <ComponentProvider <?>, Object> transformer;
+		BiFunction <TaskLogger, ComponentProvider <?>, Object> transformer;
 		Function <List <Pair <ComponentDefinition, Object>>, Object> aggregator;
 
 		Set <String> missingComponents;
@@ -1547,14 +1548,15 @@ class ComponentManagerImplementation
 			if (injectedProperty.prototype ()) {
 
 				injection.transformer =
-					provider ->
+					(taskLoggerNested, provider) ->
 						provider;
 
 			} else {
 
 				injection.transformer =
-					provider ->
-						provider.get ();
+					(taskLoggerNested, provider) ->
+						provider.provide (
+							taskLoggerNested);
 
 			}
 
@@ -1771,6 +1773,7 @@ class ComponentManagerImplementation
 						Pair.of (
 							targetDefinition,
 							injection.transformer.apply (
+								taskLogger,
 								targetProvider)));
 
 			/*

@@ -2,8 +2,6 @@ package wbs.smsapps.forwarder.api;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
@@ -19,6 +17,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -84,28 +83,29 @@ class ForwarderApiModule
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <ApiFile> apiFile;
+	ComponentProvider <ApiFile> apiFile;
 
 	@PrototypeDependency
-	Provider <ForwarderPeekExRpcHandler> peekExRpcHandlerProvider;
+	ComponentProvider <ForwarderPeekExRpcHandler> peekExRpcHandlerProvider;
 
 	@PrototypeDependency
-	Provider <PhpRpcAction> phpRpcAction;
+	ComponentProvider <PhpRpcAction> phpRpcAction;
 
 	@PrototypeDependency
-	Provider <ForwarderQueryExRpcHandler> queryExRpcHandlerProvider;
+	ComponentProvider <ForwarderQueryExRpcHandler> queryExRpcHandlerProvider;
 
 	@PrototypeDependency
-	Provider <ForwarderSendExRpcHandler> sendExRpcHandlerProvider;
+	ComponentProvider <ForwarderSendExRpcHandler> sendExRpcHandlerProvider;
 
 	@PrototypeDependency
-	Provider <ForwarderSendRpcHandler> sendRpcHandlerProvider;
+	ComponentProvider <ForwarderSendRpcHandler> sendRpcHandlerProvider;
 
 	@PrototypeDependency
-	Provider <ForwarderUnqueueExRpcHandler> unqueueExRpcHandlerProvider;
+	ComponentProvider <ForwarderUnqueueExRpcHandler>
+		unqueueExRpcHandlerProvider;
 
 	@PrototypeDependency
-	Provider <XmlRpcAction> xmlRpcAction;
+	ComponentProvider <XmlRpcAction> xmlRpcAction;
 
 	// properties
 
@@ -157,7 +157,8 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/control",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.getActionName (
 						taskLogger,
@@ -171,7 +172,8 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/in",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.getActionName (
 						taskLogger,
@@ -185,7 +187,8 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/out",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.getActionName (
 						taskLogger,
@@ -201,10 +204,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/php/send",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> phpRpcAction.get ()
+						taskLoggerNested ->
+							phpRpcAction.provide (
+							taskLoggerNested)
 
 						.rpcHandlerProvider (
 							sendRpcHandlerProvider)
@@ -215,10 +221,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/php/sendEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> phpRpcAction.get ()
+						taskLoggerNested ->
+							phpRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							sendExRpcHandlerProvider)
@@ -229,10 +238,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/php/queryEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> phpRpcAction.get ()
+						taskLoggerNested ->
+							phpRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							queryExRpcHandlerProvider)
@@ -243,10 +255,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/php/peekEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> phpRpcAction.get ()
+						taskLoggerNested ->
+							phpRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							peekExRpcHandlerProvider)
@@ -257,10 +272,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/php/unqueueEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> phpRpcAction.get ()
+						taskLoggerNested ->
+							phpRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							unqueueExRpcHandlerProvider)
@@ -273,10 +291,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/xml/send",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> xmlRpcAction.get ()
+						taskLoggerNested ->
+							xmlRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							sendRpcHandlerProvider)
@@ -287,10 +308,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/xml/sendEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> xmlRpcAction.get ()
+						taskLoggerNested ->
+							xmlRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							sendExRpcHandlerProvider)
@@ -301,10 +325,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/xml/queryEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> xmlRpcAction.get ()
+						taskLoggerNested ->
+							xmlRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							queryExRpcHandlerProvider)
@@ -315,10 +342,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/xml/peekEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> xmlRpcAction.get ()
+						taskLoggerNested ->
+							xmlRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							peekExRpcHandlerProvider)
@@ -329,10 +359,13 @@ class ForwarderApiModule
 
 				.put (
 					"/forwarder/xml/unqueueEx",
-					apiFile.get ()
+					apiFile.provide (
+						taskLogger)
 
 					.postActionProvider (
-						() -> xmlRpcAction.get ()
+						taskLoggerNested ->
+							xmlRpcAction.provide (
+								taskLoggerNested)
 
 						.rpcHandlerProvider (
 							unqueueExRpcHandlerProvider)

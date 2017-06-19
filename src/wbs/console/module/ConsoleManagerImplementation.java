@@ -1,6 +1,7 @@
 package wbs.console.module;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
@@ -104,7 +105,7 @@ class ConsoleManagerImplementation
 
 	@Getter
 	Map <String, WebFile> files =
-		ImmutableMap.of ();
+		emptyMap ();
 
 	@Getter
 	Map <String, PathHandler> paths;
@@ -1938,6 +1939,15 @@ class ConsoleManagerImplementation
 
 		return supervisorConfigs.get (
 			name);
+
+	}
+
+	@Override
+	public
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return paths;
 
 	}
 

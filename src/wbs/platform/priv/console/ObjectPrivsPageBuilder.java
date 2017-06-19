@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -30,6 +28,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -51,19 +50,19 @@ class ObjectPrivsPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponder;
 
 	@PrototypeDependency
-	Provider <ObjectPrivsPart <ObjectType>> objectPrivsPartProvider;
+	ComponentProvider <ObjectPrivsPart <ObjectType>> objectPrivsPartProvider;
 
 	// builder
 
@@ -85,7 +84,7 @@ class ObjectPrivsPageBuilder <
 	String tabLabel;
 	String fileName;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	// build
 
@@ -148,7 +147,8 @@ class ObjectPrivsPageBuilder <
 				taskLogger,
 				"end",
 
-				contextTab.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -186,12 +186,14 @@ class ObjectPrivsPageBuilder <
 
 			consoleModule.addContextFile (
 				fileName,
-				consoleFile.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
 
 					.privKeys (
+						taskLogger,
 						ImmutableList.of (
 							stringFormat (
 								"%s.manage",
@@ -208,8 +210,9 @@ class ObjectPrivsPageBuilder <
 			@NonNull TaskLogger parentTaskLogger) {
 
 		PagePartFactory privsPartFactory =
-			nestedTaskLogger ->
-				objectPrivsPartProvider.get ()
+			taskLoggerNested ->
+				objectPrivsPartProvider.provide (
+					taskLoggerNested)
 
 			.consoleHelper (
 				consoleHelper)
@@ -217,7 +220,9 @@ class ObjectPrivsPageBuilder <
 		;
 
 		responderProvider =
-			() -> tabContextResponder.get ()
+			taskLoggerNested ->
+				tabContextResponder.provide (
+					taskLoggerNested)
 
 			.tab (
 				tabName)

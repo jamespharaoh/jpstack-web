@@ -22,8 +22,6 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -36,9 +34,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -107,7 +107,7 @@ class DialogueMmsApiServletModule
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// TODO should be in the database
 	Map <String, Integer> networks =
@@ -480,30 +480,35 @@ class DialogueMmsApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/dialogueMMS",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					routeEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/dialogueMMS",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						routeEntry)
 
-	}
+				)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
+				.build ()
 
-		return null;
+			;
+
+		}
 
 	}
 

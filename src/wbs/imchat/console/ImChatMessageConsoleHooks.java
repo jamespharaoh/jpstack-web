@@ -1,6 +1,5 @@
 package wbs.imchat.console;
 
-import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
@@ -20,10 +19,8 @@ import wbs.framework.object.ObjectManager;
 
 import wbs.platform.user.console.UserConsoleHelper;
 
-import wbs.utils.collection.CollectionUtils;
-
 import wbs.imchat.model.ImChatMessageRec;
-import wbs.imchat.model.ImChatMessageStatsSearch;
+import wbs.imchat.model.ImChatMessageSearch;
 
 @SingletonComponent ("imChatMessageConsoleHooks")
 public
@@ -64,18 +61,16 @@ class ImChatMessageConsoleHooks
 
 		) {
 
-			ImChatMessageStatsSearch search =
+			ImChatMessageSearch search =
 				genericCastUnchecked (
 					searchObject);
 
 			search
 
-				.imChatIds (
+				.imChatId (
 					optionalOrNull (
-						optionalMapRequired (
-							requestContext.stuffInteger (
-								"imChatId"),
-							CollectionUtils::singletonSet)))
+						requestContext.stuffInteger (
+							"imChatId")))
 
 			;
 

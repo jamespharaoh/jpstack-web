@@ -3,8 +3,6 @@ package wbs.apn.chat.user.image.api;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -17,6 +15,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -43,10 +42,10 @@ class ChatUserImageApiModule
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <ApiFile> apiFileProvider;
+	ComponentProvider <ApiFile> apiFileProvider;
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// state
 
@@ -70,7 +69,8 @@ class ChatUserImageApiModule
 		) {
 
 			imageUploadFile =
-				apiFileProvider.get ()
+				apiFileProvider.provide (
+					taskLogger)
 
 				.getActionName (
 					taskLogger,
@@ -105,32 +105,35 @@ class ChatUserImageApiModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/chat/imageUpload",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					imageUploadEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/chat/imageUpload",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						imageUploadEntry)
 
-	}
+				)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
+				.build ()
 
-		return ImmutableMap.<String,WebFile>builder ()
+			;
 
-			.build ();
+		}
 
 	}
 

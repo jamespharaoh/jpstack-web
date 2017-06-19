@@ -196,6 +196,7 @@ class ContextTabActionPageBuilder <
 						actionName)
 
 					.privKeys (
+						taskLogger,
 						privKeys),
 
 				resolvedExtensionPoint.contextTypeNames ());

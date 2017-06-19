@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -36,6 +34,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -72,33 +71,37 @@ class ObjectTicketCreatePageBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpecProvider;
+	ComponentProvider <ObjectTicketCreateSetFieldSpec>
+		ticketCreateSetFieldSpecProvider;
 
 	@PrototypeDependency
-	Provider <ObjectTicketCreatePart <TicketRec, TicketManagerRec>>
+	ComponentProvider <ObjectTicketCreatePart <TicketRec, TicketManagerRec>>
 	objectTicketCreatePartProvider;
 
 	@PrototypeDependency
-	Provider <ObjectTicketCreateAction <TicketRec, TicketManagerRec>>
+	ComponentProvider <ObjectTicketCreateAction <TicketRec, TicketManagerRec>>
 	objectTicketCreateActionProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponderProvider;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	@PrototypeDependency
-	Provider <WhereDeletedCriteriaSpec> whereDeletedCriteriaSpecProvider;
+	ComponentProvider <WhereDeletedCriteriaSpec>
+		whereDeletedCriteriaSpecProvider;
 
 	@PrototypeDependency
-	Provider <WhereICanManageCriteriaSpec> whereICanManageCriteriaSpecProvider;
+	ComponentProvider <WhereICanManageCriteriaSpec>
+		whereICanManageCriteriaSpecProvider;
 
 	@PrototypeDependency
-	Provider <WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpecProvider;
+	ComponentProvider <WhereNotDeletedCriteriaSpec>
+		whereNotDeletedCriteriaSpecProvider;
 
 	// builder
 
@@ -132,8 +135,8 @@ class ObjectTicketCreatePageBuilder
 	String privKey;
 	String ticketManagerPath;
 
-	Provider <WebResponder> responderProvider;
-	Provider <WebResponder> targetResponderProvider;
+	ComponentProvider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> targetResponderProvider;
 
 	// build
 
@@ -194,10 +197,18 @@ class ObjectTicketCreatePageBuilder
 			consoleModule.addContextTab (
 				taskLogger,
 				container.tabLocation (),
-				contextTabProvider.get ()
-					.name (tabName)
-					.defaultLabel (tabLabel)
-					.localFile (localFile),
+				contextTabProvider.provide (
+					taskLogger)
+
+					.name (
+						tabName)
+
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						localFile),
+
 				hideTab
 					? Collections.<String>emptyList ()
 					: extensionPoint.contextTypeNames ());
@@ -219,8 +230,10 @@ class ObjectTicketCreatePageBuilder
 
 		) {
 
-			Provider <WebAction> createActionProvider =
-				() -> objectTicketCreateActionProvider.get ()
+			ComponentProvider <WebAction> createActionProvider =
+				taskLoggerNested ->
+					objectTicketCreateActionProvider.provide (
+						taskLoggerNested)
 
 				.consoleHelper (
 					consoleHelper)
@@ -256,11 +269,14 @@ class ObjectTicketCreatePageBuilder
 					createTimeFieldName)
 
 				.createUserFieldName (
-					createUserFieldName);
+					createUserFieldName)
+
+			;
 
 			consoleModule.addContextFile (
 				localFile,
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
@@ -292,7 +308,8 @@ class ObjectTicketCreatePageBuilder
 
 			) {
 
-				return objectTicketCreatePartProvider.get ()
+				return objectTicketCreatePartProvider.provide (
+					transaction)
 
 					.consoleHelper (
 						consoleHelper)
@@ -304,14 +321,18 @@ class ObjectTicketCreatePageBuilder
 						formContextBuilder)
 
 					.ticketManagerPath (
-						ticketManagerPath);
+						ticketManagerPath)
+
+				;
 
 			}
 
 		};
 
 		responderProvider =
-			() -> tabContextResponderProvider.get ()
+			taskLoggerNested ->
+				tabContextResponderProvider.provide (
+					taskLoggerNested)
 
 			.tab (
 				tabName)

@@ -58,6 +58,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
@@ -231,19 +232,19 @@ class ChatApiServletModule
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <ApiFile> apiFile;
+	ComponentProvider <ApiFile> apiFile;
 
 	@PrototypeDependency
-	Provider <PhpRpcAction> phpRpcAction;
+	ComponentProvider <PhpRpcAction> phpRpcAction;
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	@StrongPrototypeDependency
-	Provider <WebActionRequestHandler> webActionRequestHandlerProvider;
+	ComponentProvider <WebActionRequestHandler> webActionRequestHandlerProvider;
 
 	@PrototypeDependency
-	Provider <XmlRpcAction> xmlRpcAction;
+	ComponentProvider <XmlRpcAction> xmlRpcAction;
 
 	// life cycle
 
@@ -273,7 +274,9 @@ class ChatApiServletModule
 				ProfileDeleteRpcHandler.class);
 
 			initRpcHandlers ();
-			initActions ();
+
+			initActions (
+				taskLogger);
 
 		}
 
@@ -452,73 +455,108 @@ class ChatApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/chat/media",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					mediaEntry)
+		) {
 
-			)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			.build ()
+				.put (
+					"/chat/media",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-		;
+					.add (
+						mediaEntry)
+
+				)
+
+				.build ()
+
+			;
+
+		}
 
 	}
 
 	@Override
 	public
-	Map <String, WebFile> files () {
+	Map <String, WebFile> webModuleFiles (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		Map <String, WebFile> ret =
-			new HashMap<> ();
+		try (
 
-		for (
-			Class <? extends RpcHandler> handlerClass
-				: handlerClasses
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"files");
+
 		) {
 
-			String name =
-				handlerClass
-					.getAnnotation (RpcExport.class)
-					.value ();
+			Map <String, WebFile> ret =
+				new HashMap<> ();
 
-			ret.put (
-				"/chat/php/" + name,
-				apiFile.get ()
+			for (
+				Class <? extends RpcHandler> handlerClass
+					: handlerClasses
+			) {
 
-				.postHandlerProvider (
-					() -> webActionRequestHandlerProvider.get ()
+				String name =
+					handlerClass
+						.getAnnotation (RpcExport.class)
+						.value ();
 
-					.actionProvider (
-						() -> actions.get (
-							"php_" + name))
+				ret.put (
+					"/chat/php/" + name,
+					apiFile.provide (
+						taskLogger)
 
-				)
+					.postHandlerProvider (
+						taskLoggerNested ->
+							webActionRequestHandlerProvider.provide (
+								taskLoggerNested)
 
-			);
+						.actionProvider (
+							taskLoggerNestedAgain ->
+								actions.get (
+									"php_" + name))
 
-			ret.put (
-				"/chat/xml/" + name,
-				apiFile.get ()
+					)
 
-				.postHandlerProvider (
-					() -> webActionRequestHandlerProvider.get ()
+				);
 
-					.actionProvider (
-						() -> actions.get (
-							"xml_" + name)))
+				ret.put (
+					"/chat/xml/" + name,
+					apiFile.provide (
+						taskLogger)
 
-			);
+					.postHandlerProvider (
+						taskLoggerNested ->
+							webActionRequestHandlerProvider.provide (
+								taskLoggerNested)
+
+						.actionProvider (
+							taskLoggerNestedAagain
+								-> actions.get (
+									"xml_" + name))
+
+					)
+
+				);
+
+			}
+
+			return ret;
 
 		}
-
-		return ret;
 
 	}
 
@@ -607,35 +645,49 @@ class ChatApiServletModule
 		new HashMap<> ();
 
 	private
-	void initActions () {
+	void initActions (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		for (
-			Class<? extends RpcHandler> handlerClass
-				: handlerClasses
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initActions");
+
 		) {
 
-			String name =
-				handlerClass.getAnnotation (RpcExport.class).value ();
+			for (
+				Class<? extends RpcHandler> handlerClass
+					: handlerClasses
+			) {
 
-			actions.put (
-				"php_" + name,
-				phpRpcAction.get ()
+				String name =
+					handlerClass.getAnnotation (RpcExport.class).value ();
 
-				.rpcHandlerProvider (
-					handlers.get (
-						name))
+				actions.put (
+					"php_" + name,
+					phpRpcAction.provide (
+						taskLogger)
 
-			);
+					.rpcHandlerProvider (
+						handlers.get (
+							name))
 
-			actions.put (
-				"xml_" + name,
-				xmlRpcAction.get ()
+				);
 
-				.rpcHandlerProvider (
-					handlers.get (
-						name))
+				actions.put (
+					"xml_" + name,
+					xmlRpcAction.provide (
+						taskLogger)
 
-			);
+					.rpcHandlerProvider (
+						handlers.get (
+							name))
+
+				);
+
+			}
 
 		}
 

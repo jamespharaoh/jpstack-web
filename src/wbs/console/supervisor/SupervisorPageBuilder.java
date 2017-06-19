@@ -5,8 +5,6 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
@@ -94,7 +92,7 @@ class SupervisorPageBuilder <
 	String fileName;
 	String title;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	PagePartFactory pagePartFactory;
 
@@ -235,7 +233,9 @@ class SupervisorPageBuilder <
 	void buildResponder () {
 
 		responderProvider =
-			() -> tabContextResponder.get ()
+			taskLoggerNested ->
+				tabContextResponder.provide (
+					taskLoggerNested)
 
 			.tab (
 				tabName)

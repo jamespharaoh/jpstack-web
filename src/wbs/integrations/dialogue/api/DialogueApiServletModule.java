@@ -12,12 +12,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
@@ -37,6 +35,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -111,14 +110,14 @@ class DialogueApiServletModule
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <ApiFile> apiFileProvider;
+	ComponentProvider <ApiFile> apiFileProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("dialogueResponder")
-	Provider <WebResponder> dialogueResponderProvider;
+	ComponentProvider <WebResponder> dialogueResponderProvider;
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// =============================================================== networks
 
@@ -481,8 +480,9 @@ class DialogueApiServletModule
 	};
 
 	private final
-	Provider <WebAction> reportActionProvider =
-		() -> new WebAction () {
+	ComponentProvider <WebAction> reportActionProvider =
+		taskLogger ->
+			new WebAction () {
 
 		@Override
 		public
@@ -550,8 +550,8 @@ class DialogueApiServletModule
 						"Ignoring dialogue report with no user key, X-E3-ID=%s",
 						idParam);
 
-					return dialogueResponderProvider
-						.get ();
+					return dialogueResponderProvider.provide (
+						transaction);
 
 				}
 
@@ -609,8 +609,8 @@ class DialogueApiServletModule
 						integerToDecimalString (
 							messageId));
 
-					return dialogueResponderProvider
-						.get ();
+					return dialogueResponderProvider.provide (
+						transaction);
 
 				}
 
@@ -626,8 +626,8 @@ class DialogueApiServletModule
 
 				transaction.commit ();
 
-				return dialogueResponderProvider
-					.get ();
+				return dialogueResponderProvider.provide (
+					transaction);
 
 			}
 
@@ -654,7 +654,8 @@ class DialogueApiServletModule
 		) {
 
 			reportFile =
-				apiFileProvider.get ()
+				apiFileProvider.provide (
+					taskLogger)
 
 				.postActionProvider (
 					reportActionProvider);
@@ -712,30 +713,39 @@ class DialogueApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return ImmutableMap.<String, PathHandler> builder ()
+		try (
 
-			.put (
-				"/dialogue",
-				regexpPathHandlerProvider.get ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"paths");
 
-				.add (
-					inEntry)
+		) {
 
-				.add (
-					routeEntry)
+			return ImmutableMap.<String, PathHandler> builder ()
 
-			)
+				.put (
+					"/dialogue",
+					regexpPathHandlerProvider.provide (
+						taskLogger)
 
-			.build ();
+					.add (
+						inEntry)
 
-	}
+					.add (
+						routeEntry)
 
-	@Override
-	public
-	Map<String,WebFile> files () {
-		return Collections.emptyMap ();
+				)
+
+				.build ()
+
+			;
+
+		}
+
 	}
 
 }

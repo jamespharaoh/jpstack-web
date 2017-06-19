@@ -2,8 +2,6 @@ package wbs.integrations.txtnation.api;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -13,11 +11,11 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.responder.WebModule;
@@ -38,7 +36,7 @@ class TxtNationApiServletModule
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <RegexpPathHandler> regexpPathHandlerProvider;
+	ComponentProvider <RegexpPathHandler> regexpPathHandlerProvider;
 
 	// state
 
@@ -61,7 +59,8 @@ class TxtNationApiServletModule
 		) {
 
 			pathHandler =
-				regexpPathHandlerProvider.get ()
+				regexpPathHandlerProvider.provide (
+					taskLogger)
 
 				.add (
 					txtNationRoutePathHandlerEntry)
@@ -76,7 +75,8 @@ class TxtNationApiServletModule
 
 	@Override
 	public
-	Map <String, PathHandler> paths () {
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return ImmutableMap.<String, PathHandler> builder ()
 
@@ -84,15 +84,6 @@ class TxtNationApiServletModule
 				"/txtnation",
 				pathHandler)
 
-			.build ();
-
-	}
-
-	@Override
-	public
-	Map<String,WebFile> files () {
-
-		return ImmutableMap.<String,WebFile>builder ()
 			.build ();
 
 	}
