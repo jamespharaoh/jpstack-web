@@ -3,8 +3,6 @@ package wbs.console.supervisor;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -21,6 +19,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -39,7 +38,7 @@ class SupervisorTablePartBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SupervisorTablePart> supervisorTablePartProvider;
+	ComponentProvider <SupervisorTablePart> supervisorTablePartProvider;
 
 	// builder
 
@@ -85,7 +84,8 @@ class SupervisorTablePartBuilder
 
 			supervisorConfigBuilder.pagePartFactories ().add (
 				(transaction, statsPeriod, statsData) ->
-					supervisorTablePartProvider.get ()
+					supervisorTablePartProvider.provide (
+						transaction)
 
 				.pagePartFactories (
 					pagePartFactories)

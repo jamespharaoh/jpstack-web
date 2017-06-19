@@ -1,9 +1,19 @@
 package wbs.console.supervisor;
 
+import static wbs.utils.collection.IterableUtils.iterableChainToList;
+import static wbs.utils.collection.IterableUtils.iterableFilterByClass;
+import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,24 +66,24 @@ class SupervisorConfigBuilder
 	// properties
 
 	@Getter @Setter
-	Map<String,StatsProvider> statsProvidersByName =
-		new LinkedHashMap<String,StatsProvider> ();
+	Map <String, StatsProvider> statsProvidersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsAggregator> statsAggregatorsByName =
-		new LinkedHashMap<String,StatsAggregator> ();
+	Map <String, StatsAggregator> statsAggregatorsByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsFormatter> statsFormattersByName =
-		new LinkedHashMap<String,StatsFormatter> ();
+	Map <String, StatsFormatter> statsFormattersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsGrouper> statsGroupersByName =
-		new LinkedHashMap<String,StatsGrouper> ();
+	Map <String, StatsGrouper> statsGroupersByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Map<String,StatsResolver> statsResolversByName =
-		new LinkedHashMap<String,StatsResolver> ();
+	Map <String, StatsResolver> statsResolversByName =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
 	List <StatsPagePartFactory> pagePartFactories =
@@ -97,12 +107,31 @@ class SupervisorConfigBuilder
 
 		) {
 
-			builder.descend (
-				taskLogger,
-				spec,
-				spec.builders (),
-				this,
-				MissingBuilderBehaviour.ignore);
+			List <Object> children =
+				resolveTemplates (
+					taskLogger);
+
+			try {
+
+				builder.descend (
+					taskLogger,
+					spec,
+					children,
+					this,
+					MissingBuilderBehaviour.ignore);
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormatException (
+					exception,
+					"Error building supervisor config \"%s\" ",
+					spec.name (),
+					"from console module \"%s\"",
+					container.consoleModule ().name ());
+
+				return;
+
+			}
 
 			consoleModule.addSupervisorConfig (
 				new SupervisorConfig ()
@@ -113,13 +142,86 @@ class SupervisorConfigBuilder
 				.label (
 					spec.label ())
 
-				.spec (
-					spec)
+				.offsetHours (
+					spec.offsetHours ())
+
+				.conditionSpecs (
+					ImmutableList.copyOf (
+						iterableFilterByClass (
+							children,
+							SupervisorConditionSpec.class)))
+
+				.dataSetSpecs (
+					ImmutableList.copyOf (
+						iterableFilterByClass (
+							children,
+							SupervisorDataSetSpec.class)))
 
 				.pagePartFactories (
 					pagePartFactories)
 
 			);
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	List <Object> resolveTemplates (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveTemplates");
+
+		) {
+
+			List <SupervisorConfigSpec> allSpecs =
+				new ArrayList<> ();
+
+			SupervisorConfigSpec currentSpec =
+				spec;
+
+			for (;;) {
+
+				allSpecs.add (
+					currentSpec);
+
+				if (
+					isNull (
+						currentSpec.templateName ())
+				) {
+					break;
+				}
+
+				SupervisorConfigSpec previousSpec =
+					currentSpec;
+
+				currentSpec =
+					iterableFindExactlyOneRequired (
+						iterableFilterByClass (
+							container.consoleModule ().builders (),
+							SupervisorConfigSpec.class),
+						someSpec ->
+							stringEqualSafe (
+								previousSpec.templateName (),
+								someSpec.name ()));
+
+			}
+
+			Collections.reverse (
+				allSpecs);
+
+			return iterableChainToList (
+				iterableMap (
+					allSpecs,
+					someSpec ->
+						someSpec.builders ()));
 
 		}
 

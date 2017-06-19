@@ -81,6 +81,10 @@ class MediaTestImagesFixtureProvider
 			testMediaIdsByName =
 				testMediaIdsByNameBuilder.build ();
 
+			testMediaIds =
+				ImmutableList.copyOf (
+					testMediaIdsByName.values ());
+
 		}
 
 	}
@@ -95,5 +99,8 @@ class MediaTestImagesFixtureProvider
 
 	public static
 	Map <String, Long> testMediaIdsByName;
+
+	public static
+	List <Long> testMediaIds;
 
 }

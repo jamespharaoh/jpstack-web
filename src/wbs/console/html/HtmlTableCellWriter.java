@@ -203,6 +203,8 @@ class HtmlTableCellWriter {
 		formatWriter.writeFormat (
 			">");
 
+		formatWriter.writeNewline ();
+
 		formatWriter.increaseIndent ();
 
 	}

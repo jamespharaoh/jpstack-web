@@ -253,7 +253,12 @@ class TimestampFormFieldBuilder
 					name)
 
 				.format (
-					format);
+					format)
+
+				.timezonePath (
+					spec.timezonePath ())
+
+			;
 
 			// renderer
 
@@ -267,7 +272,9 @@ class TimestampFormFieldBuilder
 					label)
 
 				.nullable (
-					nullable);
+					nullable)
+
+			;
 
 			// update hook
 

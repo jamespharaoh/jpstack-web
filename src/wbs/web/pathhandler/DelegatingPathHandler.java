@@ -88,7 +88,8 @@ class DelegatingPathHandler
 				// import all its paths
 
 				Map <String, ? extends PathHandler> modulePaths =
-					servletModule.paths ();
+					servletModule.webModulePaths (
+						taskLogger);
 
 				if (modulePaths != null) {
 
@@ -137,7 +138,8 @@ class DelegatingPathHandler
 				// import all its files
 
 				Map <String, ? extends WebFile> moduleFiles =
-					servletModule.files ();
+					servletModule.webModuleFiles (
+						taskLogger);
 
 				if (moduleFiles != null) {
 

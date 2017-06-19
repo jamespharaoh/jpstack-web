@@ -1,6 +1,5 @@
 package wbs.platform.queue.console;
 
-import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.joinWithNewline;
 
@@ -14,20 +13,21 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.OwnedTransaction;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
 
+import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TimeFormatter;
 
-import wbs.web.responder.WebResponder;
+import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("queueFilterResponder")
 public
 class QueueFilterResponder
-	implements WebResponder {
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -46,26 +46,75 @@ class QueueFilterResponder
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	// state
+
+	String content;
+
 	// implementation
 
 	@Override
-	public
-	void execute (
-			@NonNull TaskLogger parentTaskLogger) {
+	protected
+	void prepare (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
-			OwnedTransaction transaction =
-				database.beginReadOnly (
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
 					logContext,
-					parentTaskLogger,
-					"execute");
+					"prepare");
+
+		) {
+
+			content =
+				ifNull (
+					userConsoleLogic.sliceRequired (
+						transaction
+					).getFilter (),
+					defaultFilter);
+
+		}
+
+	}
+
+	@Override
+	protected
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+
+		) {
+
+			formatWriter.writeString (
+				content);
+
+		}
+
+	}
+
+	@Override
+	public
+	void headers (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"headers");
 
 		) {
 
 			requestContext.contentType (
-				"text/plain",
-				"utf-8");
+				"text/plain");
 
 			requestContext.setHeader (
 				"Cache-Control",
@@ -76,20 +125,11 @@ class QueueFilterResponder
 				timeFormatter.httpTimestampString (
 					Instant.now ()));
 
-			String filter =
-				ifNull (
-					userConsoleLogic.sliceRequired (
-						transaction
-					).getFilter (),
-					defaultFilter);
-
-			writeBytes (
-				requestContext.outputStream (),
-				filter.getBytes ());
-
 		}
 
 	}
+
+	// data
 
 	final static
 	String defaultFilter =

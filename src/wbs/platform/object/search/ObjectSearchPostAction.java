@@ -445,8 +445,8 @@ class ObjectSearchPostAction <
 						sessionKey),
 					joinWithComma (
 						iterableMap (
-							NumberUtils::integerToDecimalString,
-							objectIds)));
+							objectIds,
+							NumberUtils::integerToDecimalString)));
 
 				transaction.commit ();
 

@@ -1,5 +1,7 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.IterableUtils.iterableMap;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -76,6 +78,17 @@ class NumberUtils {
 			@NonNull Long integerValue) {
 
 		return integerValue.toString ();
+
+	}
+
+	public static
+	Iterable <String> integerToDecimalString (
+			@NonNull Iterable <Long> integerValues) {
+
+		return iterableMap (
+			integerValues,
+			integerValue ->
+				integerValue.toString ());
 
 	}
 

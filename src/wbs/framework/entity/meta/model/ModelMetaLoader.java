@@ -1,7 +1,7 @@
 package wbs.framework.entity.meta.model;
 
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -9,8 +9,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
-import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -24,6 +22,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
@@ -50,11 +49,11 @@ class ModelMetaLoader {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	@PrototypeDependency
 	@ModelMetaData
-	Map <Class <?>, Provider <Object>> modelMetaDataProviders;
+	Map <Class <?>, ComponentProvider <Object>> modelMetaDataProviders;
 
 	// properties
 
@@ -110,12 +109,17 @@ class ModelMetaLoader {
 		) {
 
 			dataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
 				.registerBuilders (
+					taskLogger,
 					modelMetaDataProviders)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 		}
 

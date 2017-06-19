@@ -2,6 +2,7 @@ package wbs.platform.send;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -43,6 +44,17 @@ class GenericSendDaemon <
 	GenericSendHelper <Service, Job, Item> helper ();
 
 	// details
+
+	@Override
+	protected
+	String friendlyName () {
+
+		return stringFormat (
+			"%s send",
+			capitalise (
+				helper ().name ()));
+
+	}
 
 	@Override
 	protected

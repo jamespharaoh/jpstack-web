@@ -1,6 +1,7 @@
 package wbs.console.module;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
@@ -23,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -52,6 +51,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -99,13 +99,13 @@ class ConsoleManagerImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextStuff> contextStuffProvider;
+	ComponentProvider <ConsoleContextStuff> contextStuffProvider;
 
 	// properties
 
 	@Getter
 	Map <String, WebFile> files =
-		ImmutableMap.of ();
+		emptyMap ();
 
 	@Getter
 	Map <String, PathHandler> paths;
@@ -1324,11 +1324,22 @@ class ConsoleManagerImplementation
 							pathParts.used ());
 
 					contextStuff =
-						contextStuffProvider.get ()
-							.foreignPath (contextStuffPath)
-							.consoleContext (consoleContext)
-							.parentContextStuff (contextStuff)
-							.embeddedParentContextTab (parentContextTab);
+						contextStuffProvider.provide (
+							transaction)
+
+						.foreignPath (
+							contextStuffPath)
+
+						.consoleContext (
+							consoleContext)
+
+						.parentContextStuff (
+							contextStuff)
+
+						.embeddedParentContextTab (
+							parentContextTab)
+
+					;
 
 					consoleContext.initContext (
 						transaction,
@@ -1928,6 +1939,15 @@ class ConsoleManagerImplementation
 
 		return supervisorConfigs.get (
 			name);
+
+	}
+
+	@Override
+	public
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return paths;
 
 	}
 

@@ -1,7 +1,5 @@
 package wbs.console.supervisor;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -14,6 +12,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -31,7 +30,8 @@ class SupervisorTableHeadingBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SupervisorTableHeadingPart> supervisorTableHeadingPartProvider;
+	ComponentProvider <SupervisorTableHeadingPart>
+		supervisorTableHeadingPartProvider;
 
 	// builder
 
@@ -64,7 +64,8 @@ class SupervisorTableHeadingBuilder
 
 			supervisorTablePartBuilder.pagePartFactories ().add (
 				(transaction, statsPeriod, statsData) ->
-					supervisorTableHeadingPartProvider.get ()
+					supervisorTableHeadingPartProvider.provide (
+						transaction)
 
 				.supervisorTableHeadingSpec (
 					supervisorTableHeadingSpec)

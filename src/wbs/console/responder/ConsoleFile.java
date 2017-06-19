@@ -10,8 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -70,23 +69,24 @@ class ConsoleFile
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <WebActionRequestHandler> actionRequestHandlerProvider;
+	ComponentProvider <WebActionRequestHandler> actionRequestHandlerProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextPrivLookup> contextPrivLookupProvider;
+	ComponentProvider <ConsoleContextPrivLookup> contextPrivLookupProvider;
 
 	@StrongPrototypeDependency
-	Provider <WebResponderRequestHandler> responderRequestHandlerProvider;
+	ComponentProvider <WebResponderRequestHandler>
+		responderRequestHandlerProvider;
 
 	// properties
 
 	@DataAttribute
 	@Getter @Setter
-	Provider <? extends WebRequestHandler> getHandlerProvider;
+	ComponentProvider <? extends WebRequestHandler> getHandlerProvider;
 
 	@DataAttribute
 	@Getter @Setter
-	Provider <? extends WebRequestHandler> postHandlerProvider;
+	ComponentProvider <? extends WebRequestHandler> postHandlerProvider;
 
 	@DataAttribute
 	@Getter @Setter
@@ -125,10 +125,12 @@ class ConsoleFile
 
 	public
 	ConsoleFile getResponderProvider (
-			@NonNull Provider <WebResponder> responder) {
+			@NonNull ComponentProvider <WebResponder> responder) {
 
 		return getHandlerProvider (
-			() -> responderRequestHandlerProvider.get ()
+			taskLogger ->
+				responderRequestHandlerProvider.provide (
+					taskLogger)
 
 			.responderProvider (
 				responder)
@@ -182,10 +184,12 @@ class ConsoleFile
 
 	public
 	ConsoleFile getActionProvider (
-			@NonNull Provider <WebAction> actionProvider) {
+			@NonNull ComponentProvider <WebAction> actionProvider) {
 
 		return getHandlerProvider (
-			() -> actionRequestHandlerProvider.get ()
+			taskLogger ->
+				actionRequestHandlerProvider.provide (
+					taskLogger)
 
 			.actionProvider (
 				actionProvider)
@@ -263,10 +267,12 @@ class ConsoleFile
 
 	public
 	ConsoleFile postActionProvider (
-			@NonNull Provider <WebAction> actionProvider) {
+			@NonNull ComponentProvider <WebAction> actionProvider) {
 
 		return postHandlerProvider (
-			() -> actionRequestHandlerProvider.get ()
+			taskLogger ->
+				actionRequestHandlerProvider.provide (
+					taskLogger)
 
 			.actionProvider (
 				actionProvider)
@@ -320,21 +326,55 @@ class ConsoleFile
 
 	public
 	ConsoleFile privKeys (
-			List <String> privKeys) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> privKeys) {
 
-		return privLookup (
-			contextPrivLookupProvider.get ()
-				.privKeys (privKeys));
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"privKeys");
+
+		) {
+
+			return privLookup (
+				contextPrivLookupProvider.provide (
+					taskLogger)
+
+				.privKeys (
+					privKeys)
+
+			);
+
+		}
 
 	}
 
 	public
 	ConsoleFile privName (
-			String privName) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String privName) {
 
-		return privLookup (
-			contextPrivLookupProvider.get ()
-				.addPrivKey (privName));
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"privName");
+
+		) {
+
+			return privLookup (
+				contextPrivLookupProvider.provide (
+					taskLogger)
+
+				.addPrivKey (
+					privName)
+
+			);
+
+		}
 
 	}
 

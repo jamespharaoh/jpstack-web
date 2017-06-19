@@ -104,6 +104,7 @@ class PluginManagerFactory
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
+					taskLogger,
 					PluginApiModuleSpec.class,
 					PluginBootstrapComponentSpec.class,
 					PluginComponentSpec.class,
@@ -118,7 +119,10 @@ class PluginManagerFactory
 					PluginDependencySpec.class,
 					PluginSpec.class)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 			Set <String> pluginNames =
 				new HashSet<> ();
@@ -363,8 +367,8 @@ class PluginManagerFactory
 			Set <String> allPluginNames =
 				ImmutableSet.copyOf (
 					iterableMap (
-						PluginSpec::name,
-						plugins));
+						plugins,
+						PluginSpec::name));
 
 			for (
 				PluginSpec plugin
@@ -373,13 +377,13 @@ class PluginManagerFactory
 
 				List <String> missingDependencies =
 					iterableFilterToList (
+						iterableMap (
+							plugin.pluginDependencies (),
+							PluginDependencySpec::name),
 						dependencyName ->
 							doesNotContain (
 								allPluginNames,
-								dependencyName),
-						iterableMap (
-							PluginDependencySpec::name,
-							plugin.pluginDependencies ()));
+								dependencyName));
 
 				if (
 					collectionIsNotEmpty (

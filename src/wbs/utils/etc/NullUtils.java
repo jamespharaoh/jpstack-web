@@ -8,7 +8,8 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.NonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import wbs.framework.logging.TaskLogger;
 
@@ -16,9 +17,9 @@ public
 class NullUtils {
 
 	@SafeVarargs
-	public static <Type>
+	public static <@Nullable Type>
 	Type ifNull (
-			@NonNull Type... values) {
+			Type... values) {
 
 		for (Type value : values) {
 
@@ -32,9 +33,9 @@ class NullUtils {
 	}
 
 	@SafeVarargs
-	public static <Type>
+	public static <@Nullable Type>
 	Type ifNull (
-			@NonNull Supplier <Type> ... valueSuppliers) {
+			Supplier <Type> ... valueSuppliers) {
 
 		for (
 			Supplier <Type> valueSupplier
@@ -67,7 +68,7 @@ class NullUtils {
 	@SafeVarargs
 	public static <Type>
 	Type ifNullThenRequired (
-			@NonNull Supplier <? extends Type> ... valueSuppliers) {
+			Supplier <? extends Type> ... valueSuppliers) {
 
 		for (
 			Supplier <? extends Type> valueSupplier
@@ -87,8 +88,8 @@ class NullUtils {
 
 	}
 
-	public static
-	<Type> Type nullIf (
+	public static <@Nullable Type>
+	Type nullIf (
 			Type input,
 			Type nullIf) {
 
@@ -139,8 +140,8 @@ class NullUtils {
 
 	@SafeVarargs
 	public static <OutType, InType extends OutType>
-	Iterable <OutType> filterNotNull (
-			@NonNull InType ... array) {
+	Iterable <@NonNull OutType> filterNotNull (
+			InType ... array) {
 
 		return () ->
 			arrayStream (
@@ -179,20 +180,27 @@ class NullUtils {
 
 	@SuppressWarnings ("unchecked")
 	public static <OutType, InType extends OutType>
-	List <OutType> filterNotNullToList (
-			@NonNull InType ... array) {
+	List <@NonNull OutType> filterNotNullToList (
+			InType ... array) {
 
-		return ImmutableList.<OutType> copyOf (
-			arrayStream (
-				array)
+		ImmutableList.Builder <@NonNull OutType> builder =
+			ImmutableList.builder ();
 
-			.filter (
-				item ->
-					item != null)
+		for (
+			InType item
+				: array
+		) {
 
-			.iterator ()
+			if (item != null) {
 
-		);
+				builder.add (
+					item);
+
+			}
+
+		}
+
+		return builder.build ();
 
 	}
 

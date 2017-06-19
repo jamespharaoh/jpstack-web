@@ -528,6 +528,17 @@ class StringUtils {
 	}
 
 	public static
+	String underscoreToSpaces (
+			@NonNull String string) {
+
+		return replaceAll (
+			string,
+			"_",
+			" ");
+
+	}
+
+	public static
 	String hyphenToUnderscore (
 			@NonNull String string) {
 
@@ -1217,8 +1228,8 @@ class StringUtils {
 
 		return StringFormatter.standard (
 			iterableMap (
-				CharSequence::toString,
-				arguments));
+				arguments,
+				CharSequence::toString));
 
 	}
 
@@ -1228,9 +1239,9 @@ class StringUtils {
 
 		return StringFormatter.standard (
 			iterableMap (
-				CharSequence::toString,
 				Arrays.asList (
-					arguments)));
+					arguments),
+				CharSequence::toString));
 
 	}
 
@@ -1240,9 +1251,9 @@ class StringUtils {
 
 		return StringFormatter.standard (
 			iterableMap (
-				CharSequence::toString,
 				Arrays.asList (
-					arguments)));
+					arguments),
+				CharSequence::toString));
 
 	}
 
@@ -1253,8 +1264,8 @@ class StringUtils {
 		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
-					CharSequence::toString,
-					arguments)));
+					arguments,
+					CharSequence::toString)));
 
 	}
 
@@ -1265,9 +1276,9 @@ class StringUtils {
 		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
-					CharSequence::toString,
 					Arrays.asList (
-						arguments))));
+						arguments),
+					CharSequence::toString)));
 
 	}
 
@@ -1278,9 +1289,9 @@ class StringUtils {
 		return LazyString.singleton (
 			() -> StringFormatter.standard (
 				iterableMap (
-					CharSequence::toString,
 					Arrays.asList (
-						arguments))));
+						arguments),
+					CharSequence::toString)));
 
 	}
 

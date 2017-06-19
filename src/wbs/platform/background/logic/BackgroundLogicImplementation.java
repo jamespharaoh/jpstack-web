@@ -211,7 +211,7 @@ class BackgroundLogicImplementation
 			;
 
 			transaction.noticeFormat (
-				"Found background process %s with id %s",
+				"Found background process \"%s\" with id %s",
 				backgroundProcess.getName (),
 				integerToDecimalString (
 					backgroundProcess.getId ()));

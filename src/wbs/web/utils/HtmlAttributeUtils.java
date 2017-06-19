@@ -259,13 +259,15 @@ class HtmlAttributeUtils {
 			.value (
 				joinWithSemicolonAndSpace (
 					iterableMap (
+						styles,
 						entry ->
 							stringFormat (
 								"%s: %s",
 								entry.name (),
 								joinWithSpace (
-									entry.values ())),
-						styles)));
+									entry.values ())))))
+
+		;
 
 	}
 

@@ -40,7 +40,7 @@ class UnaryStatsGrouper
 
 	@Override
 	public
-	Set<Object> getGroups (
+	Set <Object> getGroups (
 			StatsDataSet dataSet) {
 
 		return Collections.singleton (

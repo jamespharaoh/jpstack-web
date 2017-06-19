@@ -156,10 +156,10 @@ class AnnotatedClassComponentTools {
 					"has multiple component annotations: %s",
 					joinWithCommaAndSpace (
 						iterableMap (
+							presentAnnotations,
 							annotation ->
 								classNameSimple (
-									annotation.getClass ()),
-							presentAnnotations)));
+									annotation.getClass ()))));
 
 				return emptyList ();
 

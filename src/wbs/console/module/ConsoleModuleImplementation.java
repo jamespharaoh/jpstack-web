@@ -200,10 +200,12 @@ class ConsoleModuleImplementation
 	void addContextFile (
 			@NonNull String name,
 			@NonNull WebFile file,
-			@NonNull List<String> contextTypeNames) {
+			@NonNull List <String> contextTypeNames) {
 
-		if (contextFiles.containsKey (
-				name)) {
+		if (
+			contextFiles.containsKey (
+				name)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -262,8 +264,10 @@ class ConsoleModuleImplementation
 			@NonNull String path,
 			@NonNull WebFile file) {
 
-		if (files.containsKey (
-			path)) {
+		if (
+			files.containsKey (
+			path)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -293,10 +297,12 @@ class ConsoleModuleImplementation
 	void addTabLocation (
 			@NonNull String insertLocationName,
 			@NonNull String newLocationName,
-			@NonNull List<String> contextTypeNames) {
+			@NonNull List <String> contextTypeNames) {
 
-		for (String contextTypeName
-				: contextTypeNames) {
+		for (
+			String contextTypeName
+				: contextTypeNames
+		) {
 
 			List<ContextTabPlacement> tabPlacementsForContextType =
 				tabPlacementsByContextType.get (
@@ -361,6 +367,24 @@ class ConsoleModuleImplementation
 		supervisorConfigs.put (
 			supervisorConfig.name (),
 			supervisorConfig);
+
+	}
+
+	@Override
+	public
+	Map <String, PathHandler> webModulePaths (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return paths;
+
+	}
+
+	@Override
+	public
+	Map <String, WebFile> webModuleFiles (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return files;
 
 	}
 

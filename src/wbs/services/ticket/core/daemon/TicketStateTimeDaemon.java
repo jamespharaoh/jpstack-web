@@ -73,6 +73,12 @@ class TicketStateTimeDaemon
 
 	@Override
 	protected
+	String friendlyName () {
+		return "Ticket state time";
+	}
+
+	@Override
+	protected
 	String backgroundProcessName () {
 		return "ticket.state-time";
 	}

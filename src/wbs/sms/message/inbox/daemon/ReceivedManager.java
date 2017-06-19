@@ -6,6 +6,7 @@ import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.keyEqualsClassSimple;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
@@ -13,8 +14,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -107,6 +106,14 @@ class ReceivedManager
 		new QueueBuffer<> (
 			bufferSize);
 
+	// details
+
+	@Override
+	protected
+	String friendlyName () {
+		return "Received manager";
+	}
+
 	/**
 	 * Runnable class for a worker thread. Loops until the exit flag is set in
 	 * the buffer, Processing messages and updating the database with the
@@ -189,7 +196,7 @@ class ReceivedManager
 							transaction,
 							inbox,
 							route.getCommand (),
-							Optional.fromNullable (
+							optionalFromNullable (
 								message.getRef ()),
 							message.getText ().getText ());
 
@@ -334,14 +341,35 @@ class ReceivedManager
 
 	}
 
+	private
 	boolean doQuery () {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"doQuery");
+
+		) {
+
+			return doQueryReal (
+				taskLogger);
+
+		}
+
+	}
+
+	private
+	boolean doQueryReal (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
-					"doQuery");
+					parentTaskLogger,
+					"doQueryReal");
 
 		) {
 

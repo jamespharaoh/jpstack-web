@@ -543,12 +543,12 @@ class TypeUtils {
 				typeVariable.getName (),
 				joinWithCommaAndSpace (
 					iterableMap (
+						bounds,
 						bound ->
 							typeSourceName (
 								imports,
 								typeParameterMappings,
-								bound),
-						bounds)));
+								bound))));
 
 		}
 

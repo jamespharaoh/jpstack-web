@@ -26,6 +26,7 @@ import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.WbsConnection;
@@ -46,6 +47,9 @@ class HibernateTransaction
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	UnsavedRecordDetector unsavedRecordDetector;
 
 	// properties
 
@@ -164,7 +168,7 @@ class HibernateTransaction
 
 			// create unsaved record detector frame
 
-			UnsavedRecordDetector.instance.createFrame (
+			unsavedRecordDetector.createFrame (
 				this);
 
 			unsavedRecordFrameCreated = true;
@@ -236,7 +240,8 @@ class HibernateTransaction
 					realTransaction)
 			) {
 
-				UnsavedRecordDetector.instance.verifyFrame (
+				unsavedRecordDetector.verifyFrame (
+					taskLogger,
 					this);
 
 			}
@@ -340,7 +345,7 @@ class HibernateTransaction
 
 					try {
 
-						UnsavedRecordDetector.instance.destroyFrame (
+						unsavedRecordDetector.destroyFrame (
 							this);
 
 					} catch (Exception exception) {

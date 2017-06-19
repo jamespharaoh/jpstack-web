@@ -13,8 +13,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -38,6 +36,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -68,19 +67,20 @@ class ContextTabFormActionsPageBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleFormActionsAction> consoleFormActionsActionProvider;
+	ComponentProvider <ConsoleFormActionsAction>
+		consoleFormActionsActionProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleFormActionsPart> consoleFormActionsPartProvider;
+	ComponentProvider <ConsoleFormActionsPart> consoleFormActionsPartProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> consoleContextTabProvider;
+	ComponentProvider <ConsoleContextTab> consoleContextTabProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponderProvider;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -102,11 +102,11 @@ class ContextTabFormActionsPageBuilder
 	String actionName;
 	String title;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 	List <ConsoleFormAction> formActions;
 
 	PagePartFactory pagePartFactory;
-	Provider <WebAction> actionProvider;
+	ComponentProvider <WebAction> actionProvider;
 
 	// build
 
@@ -134,7 +134,8 @@ class ContextTabFormActionsPageBuilder
 			buildPagePartFactory (
 				taskLogger);
 
-			buildAction ();
+			buildAction (
+				taskLogger);
 
 			buildResponder (
 				taskLogger);
@@ -289,11 +290,20 @@ class ContextTabFormActionsPageBuilder
 			consoleModule.addContextTab (
 				taskLogger,
 				container.tabLocation (),
-				consoleContextTabProvider.get ()
-					.name (tabName)
-					.defaultLabel (tabLabel)
-					.localFile (localFile),
-				extensionPoint.contextTypeNames ());
+				consoleContextTabProvider.provide (
+					taskLogger)
+
+					.name (
+						tabName)
+
+					.defaultLabel (
+						tabLabel)
+
+					.localFile (
+						localFile),
+
+				extensionPoint.contextTypeNames ()
+			);
 
 		}
 
@@ -302,30 +312,60 @@ class ContextTabFormActionsPageBuilder
 	void buildPagePartFactory (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		pagePartFactory =
-			nextTaskLogger ->
-				consoleFormActionsPartProvider.get ()
+		try (
 
-			.formActions (
-				genericCastUnchecked (
-					formActions))
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildPagePartFactory");
 
-			.localFile (
-				"/" + localFile);
+		) {
+
+			pagePartFactory =
+				taskLoggerNested ->
+					consoleFormActionsPartProvider.provide (
+						taskLoggerNested)
+
+				.formActions (
+					genericCastUnchecked (
+						formActions))
+
+				.localFile (
+					"/" + localFile)
+
+			;
+
+		}
 
 	}
 
-	void buildAction () {
+	void buildAction (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		actionProvider =
-			() -> consoleFormActionsActionProvider.get ()
+		try (
 
-			.formActions (
-				genericCastUnchecked (
-					formActions))
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildAction");
 
-			.responderProvider (
-				responderProvider);
+		) {
+
+			actionProvider =
+				taskLoggerNested ->
+					consoleFormActionsActionProvider.provide (
+						taskLoggerNested)
+
+				.formActions (
+					genericCastUnchecked (
+						formActions))
+
+				.responderProvider (
+					responderProvider)
+
+			;
+
+		}
 
 	}
 
@@ -344,7 +384,8 @@ class ContextTabFormActionsPageBuilder
 
 			consoleModule.addContextFile (
 				localFile,
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
@@ -362,19 +403,32 @@ class ContextTabFormActionsPageBuilder
 	void buildResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		responderProvider =
-			() -> tabContextResponderProvider.get ()
+		try (
 
-			.tab (
-				tabName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResponder");
 
-			.title (
-				title)
+		) {
 
-			.pagePartFactory (
-				pagePartFactory)
+			responderProvider =
+				taskLoggerNested ->
+					tabContextResponderProvider.provide (
+						taskLoggerNested)
 
-		;
+				.tab (
+					tabName)
+
+				.title (
+					title)
+
+				.pagePartFactory (
+					pagePartFactory)
+
+			;
+
+		}
 
 	}
 

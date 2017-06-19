@@ -214,7 +214,7 @@ class AbstractMediaImageResponder
 		) {
 
 			writeBytes (
-				requestContext.outputStream (),
+				outputStream,
 				data);
 
 		}

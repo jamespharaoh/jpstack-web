@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -29,6 +27,7 @@ import wbs.framework.component.annotations.ComponentInterface;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -57,10 +56,10 @@ class ConsoleModuleSpecManagerFactory
 	// prototype dependencies
 
 	@PrototypeDependency
-	Map <Class <?>, Provider <ConsoleSpec>> consoleModuleSpecProviders;
+	Map <Class <?>, ComponentProvider <ConsoleSpec>> consoleModuleSpecProviders;
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// state
 
@@ -89,12 +88,17 @@ class ConsoleModuleSpecManagerFactory
 		) {
 
 			dataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
 				.registerBuilders (
+					taskLogger,
 					consoleModuleSpecProviders)
 
-				.build ();
+				.build (
+					taskLogger)
+
+			;
 
 			pluginManager.plugins ().forEach (
 				pluginSpec ->

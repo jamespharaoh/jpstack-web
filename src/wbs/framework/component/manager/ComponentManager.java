@@ -1,6 +1,7 @@
 package wbs.framework.component.manager;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -11,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
-
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -30,14 +29,14 @@ interface ComponentManager
 			TaskLogger parentTaskLogger);
 
 	<ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			TaskLogger parentTaskLogger,
 			String componentName,
 			Class <ComponentType> componentClass,
 			Boolean initialized);
 
 	default <ComponentType>
-	Optional <Provider <ComponentType>> getComponentProvider (
+	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
@@ -57,22 +56,28 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialized) {
 
-		Optional <Provider <ComponentType>> componentProvider =
-			getComponentProvider (
-				taskLogger,
-				componentName,
-				componentClass,
-				initialized);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					taskLogger,
+					componentName,
+					componentClass,
+					initialized);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 			return optionalAbsent ();
 		}
 
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
 		return optionalOf (
-			componentProvider.get ().get ());
+			componentProvider.provide (
+				taskLogger));
 
 	}
 
@@ -97,16 +102,17 @@ interface ComponentManager
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		Optional <Provider <ComponentType>> componentProvider =
-			getComponentProvider (
-				parentTaskLogger,
-				componentName,
-				componentClass,
-				initialise);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					parentTaskLogger,
+					componentName,
+					componentClass,
+					initialise);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 
 			throw new NoSuchElementException (
@@ -118,7 +124,12 @@ interface ComponentManager
 
 		}
 
-		return componentProvider.get ().get ();
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
+		return componentProvider.provide (
+			parentTaskLogger);
 
 	}
 
@@ -138,36 +149,42 @@ interface ComponentManager
 
 	default <ComponentType>
 	ComponentType getComponentOrElse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
 
-		Optional <Provider <ComponentType>> componentProvider =
-			getComponentProvider (
-				taskLogger,
-				componentName,
-				componentClass);
+		Optional <ComponentProvider <ComponentType>>
+			componentProviderOptional =
+				getComponentProvider (
+					parentTaskLogger,
+					componentName,
+					componentClass);
 
 		if (
 			optionalIsNotPresent (
-				componentProvider)
+				componentProviderOptional)
 		) {
 			return orElse.get ();
 		}
 
-		return componentProvider.get ().get ();
+		ComponentProvider <ComponentType> componentProvider =
+			optionalGetRequired (
+				componentProviderOptional);
+
+		return componentProvider.provide (
+			parentTaskLogger);
 
 	}
 
 	default <ComponentType>
-	Provider <ComponentType> getComponentProviderRequired (
+	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Boolean initialise) {
 
-		Optional <Provider <ComponentType>> componentProvider =
+		Optional <ComponentProvider <ComponentType>> componentProvider =
 			getComponentProvider (
 				parentTaskLogger,
 				componentName,
@@ -180,12 +197,13 @@ interface ComponentManager
 			throw new NoSuchElementException ();
 		}
 
-		return componentProvider.get ();
+		return optionalGetRequired (
+			componentProvider);
 
 	}
 
 	default <ComponentType>
-	Provider <ComponentType> getComponentProviderRequired (
+	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {

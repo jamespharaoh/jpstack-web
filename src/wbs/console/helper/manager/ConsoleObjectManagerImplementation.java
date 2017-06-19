@@ -2,14 +2,15 @@ package wbs.console.helper.manager;
 
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 
 import java.util.Collection;
 import java.util.List;
@@ -223,9 +224,12 @@ class ConsoleObjectManagerImplementation
 					.write (
 						formatWriter);
 
-				formatWriter.writeFormat (
-					"%h</td>",
+				formatWriter.writeLineFormat (
+					"%h",
 					path);
+
+				htmlTableCellClose (
+					formatWriter);
 
 			} else {
 
@@ -666,7 +670,7 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Record <?> findObject (
+	Optional <Record <?>> findObject (
 			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId objectGlobalId) {
 
@@ -776,12 +780,12 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	boolean isParent (
+	boolean isAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Record <?> parent) {
 
-		return objectManager.isParent (
+		return objectManager.isAncestor (
 			parentTransaction,
 			object,
 			parent);
@@ -790,12 +794,12 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public <ObjectType extends Record <?>>
-	ObjectType firstParent (
+	Optional <ObjectType> firstAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Set <ObjectType> parents) {
 
-		return objectManager.firstParent (
+		return objectManager.firstAncestor (
 			parentTransaction,
 			object,
 			parents);

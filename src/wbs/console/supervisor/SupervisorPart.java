@@ -17,6 +17,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseOptional;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localTime;
@@ -31,6 +32,7 @@ import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -123,7 +125,7 @@ class SupervisorPart
 
 	StatsPeriod statsPeriod;
 
-	Map <String, Object> statsConditions;
+	Map <String, Set <String>> statsConditions;
 	Map <String, StatsDataSet> statsDataSets;
 
 	List <PagePart> pageParts =
@@ -337,7 +339,7 @@ class SupervisorPart
 					.toDateTime (
 						localTime (
 							ifNull (
-								supervisorConfig.get ().spec ().offsetHours (),
+								supervisorConfig.get ().offsetHours (),
 								0l)),
 						consoleUserHelper.timezone (
 							transaction));
@@ -350,7 +352,7 @@ class SupervisorPart
 					.toDateTime (
 						localTime (
 							ifNull (
-								supervisorConfig.get ().spec ().offsetHours (),
+								supervisorConfig.get ().offsetHours (),
 								0l)),
 						consoleUserHelper.timezone (
 							transaction));
@@ -399,7 +401,7 @@ class SupervisorPart
 					startTime,
 					endTime,
 					ifNull (
-						supervisorConfig.get ().spec ().offsetHours (),
+						supervisorConfig.get ().offsetHours (),
 						0l));
 
 		}
@@ -418,48 +420,38 @@ class SupervisorPart
 
 		) {
 
-			ImmutableMap.Builder <String, Object> conditionsBuilder =
+			ImmutableMap.Builder <String, Set <String>> conditionsBuilder =
 				ImmutableMap.builder ();
 
 			for (
-				Object object
-					: supervisorConfig.get ().spec ().builders ()
+				Object condition
+					: supervisorConfig.get ().conditionSpecs ()
 			) {
 
-				if (object instanceof SupervisorConditionSpec) {
+				if (condition instanceof SupervisorContextConditionSpec) {
 
-					SupervisorConditionSpec supervisorConditionSpec =
-						(SupervisorConditionSpec)
-						object;
+					SupervisorContextConditionSpec contextCondition =
+						(SupervisorContextConditionSpec)
+						condition;
 
 					conditionsBuilder.put (
-						supervisorConditionSpec.name (),
-						requestContext.stuff (
-							supervisorConditionSpec.stuffKey ()));
+						contextCondition.name (),
+						ImmutableSet.of (
+							objectToString (
+								requestContext.stuff (
+									contextCondition.stuffKey ()))));
 
 				}
 
-				if (object instanceof SupervisorIntegerConditionSpec) {
+				if (condition instanceof SupervisorValueConditionSpec) {
 
-					SupervisorIntegerConditionSpec integerConditionSpec =
-						(SupervisorIntegerConditionSpec)
-						object;
-
-					conditionsBuilder.put (
-						integerConditionSpec.name (),
-						integerConditionSpec.value ());
-
-				}
-
-				if (object instanceof SupervisorIntegerInConditionSpec) {
-
-					SupervisorIntegerInConditionSpec integerInConditionSpec =
-						(SupervisorIntegerInConditionSpec) object;
+					SupervisorValueConditionSpec valueCondition =
+						(SupervisorValueConditionSpec) condition;
 
 					conditionsBuilder.put (
-						integerInConditionSpec.name (),
+						valueCondition.name (),
 						ImmutableSet.copyOf (
-							integerInConditionSpec.values ()));
+							valueCondition.values ()));
 
 				}
 
@@ -490,7 +482,7 @@ class SupervisorPart
 
 			for (
 				Object object
-					: supervisorConfig.get ().spec ().builders ()
+					: supervisorConfig.get ().dataSetSpecs ()
 			) {
 
 				if (! (object instanceof SupervisorDataSetSpec))

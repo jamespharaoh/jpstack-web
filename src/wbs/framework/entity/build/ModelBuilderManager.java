@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -34,7 +35,7 @@ class ModelBuilderManager {
 
 	@PrototypeDependency
 	@ModelBuilder
-	Map <Class <?>, Provider <Object>> modelBuilderProviders;
+	Map <Class <?>, ComponentProvider <Object>> modelBuilderProviders;
 
 	// state
 

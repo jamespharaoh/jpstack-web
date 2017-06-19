@@ -2,8 +2,6 @@ package wbs.console.supervisor;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -17,6 +15,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -34,7 +33,7 @@ class SupervisorIntegerStatsFormatterBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IntegerStatsFormatter> integerStatsFormatterProvider;
+	ComponentProvider <IntegerStatsFormatter> integerStatsFormatterProvider;
 
 	// builder
 
@@ -76,7 +75,8 @@ class SupervisorIntegerStatsFormatterBuilder
 
 			supervisorConfigBuilder.statsFormattersByName.put (
 				name,
-				integerStatsFormatterProvider.get ()
+				integerStatsFormatterProvider.provide (
+					taskLogger)
 
 				.targetBase (
 					targetBase)

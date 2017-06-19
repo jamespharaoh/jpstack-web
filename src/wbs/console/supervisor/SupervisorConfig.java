@@ -13,7 +13,10 @@ class SupervisorConfig {
 	String name;
 	String label;
 
-	SupervisorConfigSpec spec;
+	Long offsetHours;
+
+	List <SupervisorConditionSpec> conditionSpecs;
+	List <SupervisorDataSetSpec> dataSetSpecs;
 
 	List <StatsPagePartFactory> pagePartFactories;
 

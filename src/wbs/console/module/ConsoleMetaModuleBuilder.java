@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -38,7 +39,7 @@ class ConsoleMetaModuleBuilder
 	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
-	Map <Class <?>, Provider <ConsoleMetaModuleBuilderComponent>>
+	Map <Class <?>, ComponentProvider <ConsoleMetaModuleBuilderComponent>>
 		consoleMetaModuleBuilders;
 
 	// state

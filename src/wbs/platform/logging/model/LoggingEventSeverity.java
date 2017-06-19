@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -55,7 +54,8 @@ enum LoggingEventSeverity {
 				loggingEventSeverity ->
 					LogSeverity.valueOf (
 						loggingEventSeverity.name ()),
-				Functions.identity ()))
+				loggingEventSeverity ->
+					loggingEventSeverity))
 
 	);
 
@@ -67,7 +67,8 @@ enum LoggingEventSeverity {
 
 		.collect (
 			Collectors.toMap (
-				Functions.identity (),
+				loggingEventSeverity ->
+					loggingEventSeverity,
 				loggingEventSeverity ->
 					LogSeverity.valueOf (
 						loggingEventSeverity.name ())))

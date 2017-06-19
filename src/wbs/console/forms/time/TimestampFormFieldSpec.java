@@ -33,6 +33,10 @@ class TimestampFormFieldSpec
 	@DataAttribute
 	Boolean readOnly;
 
+	@DataAttribute (
+		name = "timezone")
+	String timezonePath;
+
 	@DataAttribute
 	Format format;
 

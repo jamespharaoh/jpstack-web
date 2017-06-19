@@ -4,8 +4,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
-import com.google.common.collect.ImmutableList;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -92,14 +90,15 @@ class WbsConfigFactory
 				dataFromXmlBuilderProvider.get ()
 
 				.registerBuilderClasses (
-					ImmutableList.of (
-						WbsConfig.class,
-						WbsConfigConsoleServer.class,
-						WbsConfigDatabase.class,
-						WbsConfigEmail.class,
-						WbsConfigProcessApi.class))
+					taskLogger,
+					WbsConfig.class,
+					WbsConfigConsoleServer.class,
+					WbsConfigDatabase.class,
+					WbsConfigEmail.class,
+					WbsConfigProcessApi.class)
 
-				.build ();
+				.build (
+					taskLogger);
 
 			WbsConfig wbsConfig =
 				(WbsConfig)

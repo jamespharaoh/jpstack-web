@@ -110,7 +110,8 @@ class BackgroundProcessBuilder
 						"Error creating background process %s.%s",
 						spec.objectTypeCode (),
 						simplifyToCodeRequired (
-							spec.name ())));
+							spec.name ())),
+					exception);
 
 			}
 

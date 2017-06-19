@@ -1,19 +1,30 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.EnumUtils.enumName;
+import static wbs.utils.etc.LogicUtils.predicatesCombineAll;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -31,6 +42,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -88,6 +100,9 @@ class QueueConsoleLogicImplementation
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	QueueConsoleHelper queueHelper;
 
 	// prototype dependencies
 
@@ -528,6 +543,141 @@ class QueueConsoleLogicImplementation
 				transaction,
 				supervisorDelegate,
 				supervisorParts [1]);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorSearchIds (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorSearchIds");
+
+		) {
+
+			List <Predicate <QueueRec>> predicates =
+				new ArrayList<> ();
+
+			// handle slice code condition
+
+			Optional <Set <String>> sliceCodesOptional =
+				mapItemForKey (
+					conditions,
+					"slice-code");
+
+			if (
+				optionalIsPresent (
+					sliceCodesOptional)
+			) {
+
+				Set <String> sliceCodes =
+					optionalGetRequired (
+						sliceCodesOptional);
+
+				predicates.add (
+					queue ->
+						contains (
+							sliceCodes,
+							queue.getSlice ().getCode ()));
+
+			}
+
+			// handle manual responder slice code condition
+
+			Optional <Set <String>> queueSliceCodesOptional =
+				mapItemForKey (
+					conditions,
+					"queue-slice-code");
+
+			if (
+				optionalIsPresent (
+					queueSliceCodesOptional)
+			) {
+
+				Set <String> queueSliceCodes =
+					optionalGetRequired (
+						queueSliceCodesOptional);
+
+				predicates.add (
+					queue ->
+						contains (
+							queueSliceCodes,
+							queue.getSlice ().getCode ()));
+
+			}
+
+			// handle chat code condition
+
+			Optional <Set <String>> queueTypeCodesOptional =
+				mapItemForKey (
+					conditions,
+					"queue-type-code");
+
+			if (
+				optionalIsPresent (
+					queueTypeCodesOptional)
+			) {
+
+				Set <String> queueTypeCodes =
+					optionalGetRequired (
+						queueTypeCodesOptional);
+
+				predicates.add (
+					queue ->
+						contains (
+							queueTypeCodes,
+							joinWithFullStop (
+								queue.getQueueType ().getParentType ().getCode (),
+								queue.getQueueType ().getCode ())));
+
+			}
+
+			// return
+
+			return iterableFilterMapToSet (
+				queueHelper.findAll (
+					transaction),
+				predicatesCombineAll (
+					predicates),
+				QueueRec::getId);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorFilterIds (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorFilterUserIds");
+
+		) {
+
+			return iterableFilterMapToSet (
+				queueHelper.findAll (
+					transaction),
+				queue ->
+					privChecker.canRecursive (
+						transaction,
+						new GlobalId (
+							queue.getParentType ().getId (),
+							queue.getParentId ()),
+						"supervisor"),
+				QueueRec::getId);
 
 		}
 

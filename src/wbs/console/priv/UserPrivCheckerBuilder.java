@@ -2,11 +2,14 @@ package wbs.console.priv;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -284,6 +287,72 @@ class UserPrivCheckerBuilder {
 					managePrivId)
 
 			);
+
+		}
+
+		@Override
+		public
+		Set <Long> getObjectIds (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Long parentTypeId) {
+
+			return userPrivData
+				.sharedData
+				.objectDatasByObjectId
+				.keySet ()
+				.stream ()
+
+				.filter (
+					objectGlobalId ->
+						integerEqualSafe (
+							parentTypeId,
+							objectGlobalId.typeId ()))
+
+				.map (
+					objectGlobalId ->
+						objectGlobalId.objectId ())
+
+				.collect (
+					Collectors.toSet ())
+
+			;
+
+		}
+
+		@Override
+		public
+		Set <Long> getCanRecursiveObjectIds (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Long parentTypeId,
+				@NonNull String ... privCodes) {
+
+			return userPrivData
+				.sharedData
+				.objectDatasByObjectId
+				.keySet ()
+				.stream ()
+
+				.filter (
+					objectGlobalId ->
+						integerEqualSafe (
+							parentTypeId,
+							objectGlobalId.typeId ()))
+
+				.filter (
+					objectGlobalId ->
+						canRecursive (
+							parentTaskLogger,
+							objectGlobalId,
+							privCodes))
+
+				.map (
+					objectGlobalId ->
+						objectGlobalId.objectId ())
+
+				.collect (
+					Collectors.toSet ())
+
+			;
 
 		}
 

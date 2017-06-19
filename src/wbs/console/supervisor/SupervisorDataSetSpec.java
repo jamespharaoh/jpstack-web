@@ -31,7 +31,7 @@ class SupervisorDataSetSpec
 	String providerBeanName;
 
 	@DataChildren
-	List <SupervisorDataSetConditionSpec> conditions =
+	List <SupervisorConditionSpec> conditions =
 		new ArrayList<> ();
 
 }

@@ -32,6 +32,10 @@ class SupervisorConfigSpec
 	@DataAttribute
 	Long offsetHours;
 
+	@DataAttribute (
+		name = "template")
+	String templateName;
+
 	@DataChildren (
 		direct = true)
 	List <Object> builders =

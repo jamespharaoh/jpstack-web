@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -25,6 +23,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -53,7 +52,7 @@ class ContextActionPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
@@ -73,7 +72,7 @@ class ContextActionPageBuilder <
 	String actionName;
 	String responderName;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	// build
 
@@ -109,7 +108,8 @@ class ContextActionPageBuilder <
 
 				consoleModule.addContextFile (
 					fileName,
-					consoleFile.get ()
+					consoleFileProvider.provide (
+						taskLogger)
 
 						.getResponderProvider (
 							responderProvider)
@@ -118,7 +118,8 @@ class ContextActionPageBuilder <
 							taskLogger,
 							actionName),
 
-					resolvedExtensionPoint.contextTypeNames ());
+					resolvedExtensionPoint.contextTypeNames ()
+				);
 
 			}
 

@@ -39,6 +39,10 @@
 		<component class="logic.RawMediaLogicImplementation"/>
 	</layer>
 
+	<layer name="fixture">
+		<component class="fixture.MediaFixtureLogicImplementation"/>
+	</layer>
+
 	<fixtures>
 		<fixture name="media"/>
 		<fixture name="mediaTestImages"/>

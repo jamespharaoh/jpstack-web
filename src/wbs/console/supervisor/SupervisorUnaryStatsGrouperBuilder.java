@@ -1,7 +1,5 @@
 package wbs.console.supervisor;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -15,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -32,7 +31,7 @@ class SupervisorUnaryStatsGrouperBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <UnaryStatsGrouper> unaryStatsGrouperProvider;
+	ComponentProvider <UnaryStatsGrouper> unaryStatsGrouperProvider;
 
 	// builder
 
@@ -71,10 +70,13 @@ class SupervisorUnaryStatsGrouperBuilder
 
 			supervisorConfigBuilder.statsGroupersByName ().put (
 				name,
-				unaryStatsGrouperProvider.get ()
+				unaryStatsGrouperProvider.provide (
+					taskLogger)
 
-					.label (
-						label));
+				.label (
+					label)
+
+			);
 
 		}
 

@@ -4,8 +4,8 @@ import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doesNotContain;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Set;
@@ -13,19 +13,29 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
-@Log4j
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
+
+@SingletonComponent ("unsavedRecordDetector")
 public
 class UnsavedRecordDetector {
 
-	public final static
-	UnsavedRecordDetector instance =
-		 new UnsavedRecordDetector ();
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// state
 
 	private
 	ThreadLocal <Frame> frameThreadLocal =
 		new ThreadLocal<> ();
+
+	// public implementation
 
 	public
 	void createFrame (
@@ -47,44 +57,55 @@ class UnsavedRecordDetector {
 
 	public
 	void verifyFrame (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object reference) {
 
-		Frame currentFrame =
-			frameThreadLocal.get ();
+		try (
 
-		if (
-			referenceNotEqualWithClass (
-				Object.class,
-				currentFrame.reference,
-				reference)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"verifyFrame");
+
 		) {
 
-			throw new IllegalStateException ();
+			Frame currentFrame =
+				frameThreadLocal.get ();
 
-		}
-
-		if (
-			collectionIsNotEmpty (
-				currentFrame.unsavedRecords)
-		) {
-
-			for (
-				Record<?> unsavedRecord
-					: currentFrame.unsavedRecords
+			if (
+				referenceNotEqualWithClass (
+					Object.class,
+					currentFrame.reference,
+					reference)
 			) {
 
-				log.error (
-					stringFormat (
-						"Unsaved record %s",
-						unsavedRecord.toString ()));
+				throw new IllegalStateException ();
 
 			}
 
-			throw new IllegalStateException (
-				stringFormat (
-					"%s unsaved records",
-					integerToDecimalString (
-						currentFrame.unsavedRecords.size ())));
+			if (
+				collectionIsNotEmpty (
+					currentFrame.unsavedRecords)
+			) {
+
+				for (
+					Record<?> unsavedRecord
+						: currentFrame.unsavedRecords
+				) {
+
+					taskLogger.errorFormat (
+						"Unsaved record %s",
+						unsavedRecord.toString ());
+
+				}
+
+				throw new IllegalStateException (
+					stringFormat (
+						"%s unsaved records",
+						integerToDecimalString (
+							currentFrame.unsavedRecords.size ())));
+
+			}
 
 		}
 

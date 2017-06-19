@@ -20,6 +20,13 @@
 			name="checkstyle"
 			rev="6.17" />
 
+		<!-- checker framework -->
+
+		<dependency
+			org="org.checkerframework"
+			name="checker"
+			rev="2.1.12"/>
+
 		<!-- commons -->
 
 		<dependency
@@ -239,6 +246,13 @@
 			org="org.jadira.usertype"
 			name="usertype.jodatime"
 			rev="2.0.1"/>
+
+		<!-- validation -->
+
+		<dependency
+			org="javax.validation"
+			name="validation-api"
+			rev="2.0.0.Beta2"/>
 
 		<!-- xom -->
 

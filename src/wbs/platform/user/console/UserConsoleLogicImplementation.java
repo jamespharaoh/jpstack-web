@@ -1,9 +1,21 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.LogicUtils.predicatesCombineAll;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import com.google.common.base.Optional;
 
@@ -15,6 +27,7 @@ import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
 
 import wbs.console.misc.ConsoleUserHelper;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -59,6 +72,9 @@ class UserConsoleLogicImplementation
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -359,6 +375,139 @@ class UserConsoleLogicImplementation
 				timezone (
 					transaction),
 				timestamp);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorSearchIds (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorSearchUserIds");
+
+		) {
+
+			List <Predicate <UserRec>> predicates =
+				new ArrayList<> ();
+
+			// handle slice code condition
+
+			Optional <Set <String>> sliceCodesOptional =
+				mapItemForKey (
+					conditions,
+					"slice-code");
+
+			if (
+				optionalIsPresent (
+					sliceCodesOptional)
+			) {
+
+				Set <String> sliceCodes =
+					optionalGetRequired (
+						sliceCodesOptional);
+
+				predicates.add (
+					user ->
+						contains (
+							sliceCodes,
+							user.getSlice ().getCode ()));
+
+			}
+
+			// handle user slice code condition
+
+			Optional <Set <String>> userSliceCodesOptional =
+				mapItemForKey (
+					conditions,
+					"user-slice-code");
+
+			if (
+				optionalIsPresent (
+					userSliceCodesOptional)
+			) {
+
+				Set <String> userSliceCodes =
+					optionalGetRequired (
+						userSliceCodesOptional);
+
+				predicates.add (
+					user ->
+						contains (
+							userSliceCodes,
+							user.getSlice ().getCode ()));
+
+			}
+
+			// handle user code condition
+
+			Optional <Set <String>> userCodesOptional =
+				mapItemForKey (
+					conditions,
+					"user-code");
+
+			if (
+				optionalIsPresent (
+					userCodesOptional)
+			) {
+
+				Set <String> userCodes =
+					optionalGetRequired (
+						userCodesOptional);
+
+				predicates.add (
+					user ->
+						contains (
+							userCodes,
+							joinWithFullStop (
+								user.getSlice ().getCode (),
+								user.getUsername ())));
+
+			}
+
+			// return
+
+			return iterableFilterMapToSet (
+				userHelper.findAll (
+					transaction),
+				predicatesCombineAll (
+					predicates),
+				UserRec::getId);
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <Long> getSupervisorFilterIds (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getSupervisorFilterUserIds");
+
+		) {
+
+			return iterableFilterMapToSet (
+				userHelper.findAll (
+					transaction),
+				user ->
+					privChecker.canRecursive (
+						transaction,
+						user,
+						"supervisor"),
+				UserRec::getId);
 
 		}
 

@@ -4,8 +4,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -20,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,7 +36,7 @@ class SupervisorAdditionStatsResolverBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <AdditionStatsResolver> additionStatsResolverProvider;
+	ComponentProvider <AdditionStatsResolver> additionStatsResolverProvider;
 
 	// builder
 
@@ -75,7 +74,8 @@ class SupervisorAdditionStatsResolverBuilder
 				spec.operandSpecs ();
 
 			AdditionStatsResolver additionStatsResolver =
-				this.additionStatsResolverProvider.get ();
+				this.additionStatsResolverProvider.provide (
+					taskLogger);
 
 			for (
 				SupervisorAdditionOperandSpec operandSpec

@@ -1,10 +1,10 @@
 package wbs.console.priv;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -345,8 +345,8 @@ class UserPrivData {
 	class ObjectData {
 
 		public
-		Map<String,Long> privIdsByCode =
-			new HashMap<String,Long> ();
+		Map <String, Long> privIdsByCode =
+			new HashMap <String, Long> ();
 
 		public
 		Long managePrivId;

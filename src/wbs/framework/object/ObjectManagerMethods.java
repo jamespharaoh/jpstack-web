@@ -3,15 +3,19 @@ package wbs.framework.object;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.ResultUtils.mapSuccess;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -120,18 +124,50 @@ interface ObjectManagerMethods {
 			Transaction parentTransaction,
 			Record <?> object);
 
-	public
-	abstract <ObjectType extends Record <ObjectType>>
+	<ObjectType extends Record <ObjectType>>
 	Optional <ObjectType> getAncestor (
 			Transaction parentTransaction,
 			Class <ObjectType> ancestorClass,
 			Record <?> object);
 
+	default <ObjectType extends Record <ObjectType>>
+	ObjectType getAncestorRequired (
+			@NonNull Transaction parentTransaction,
+			@NonNull Class <ObjectType> ancestorClass,
+			@NonNull Record <?> object) {
+
+		return optionalGetRequired (
+			getAncestor (
+				parentTransaction,
+				ancestorClass,
+				object));
+
+	}
+
 	// data access
 
-	Record <?> findObject (
+	Optional <Record <?>> findObject (
 			Transaction parentTransaction,
 			GlobalId objectGlobalId);
+
+	default
+	Record <?> findObjectRequired (
+			@NonNull Transaction parentTransaction,
+			@NonNull GlobalId objectGlobalId) {
+
+		return optionalOrThrow (
+			findObject (
+				parentTransaction,
+				objectGlobalId),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No such object with type %s and id %s",
+					integerToDecimalString (
+						objectGlobalId.typeId ()),
+					integerToDecimalString (
+						objectGlobalId.objectId ()))));
+
+	}
 
 	<ObjectType extends Record <?>>
 	ObjectType update (
@@ -167,13 +203,13 @@ interface ObjectManagerMethods {
 	Long objectClassToTypeId (
 			Class <?> objectClass);
 
-	boolean isParent (
+	boolean isAncestor (
 			Transaction parentTransaction,
 			Record <?> object,
 			Record <?> parent);
 
 	<ObjectType extends Record <?>>
-	ObjectType firstParent (
+	Optional <ObjectType> firstAncestor (
 			Transaction parentTransaction,
 			Record <?> object,
 			Set <ObjectType> parents);

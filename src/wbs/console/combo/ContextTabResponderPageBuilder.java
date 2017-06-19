@@ -8,7 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Collections;
 
 import javax.annotation.Nonnull;
-import javax.inject.Provider;
 
 import lombok.NonNull;
 
@@ -31,6 +30,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -58,13 +58,13 @@ class ContextTabResponderPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -87,7 +87,7 @@ class ContextTabResponderPageBuilder <
 	String pagePartName;
 	Boolean hideTab;
 
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	// build
 
@@ -150,7 +150,8 @@ class ContextTabResponderPageBuilder <
 				taskLogger,
 				container.tabLocation (),
 
-				contextTab.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -163,7 +164,8 @@ class ContextTabResponderPageBuilder <
 
 				hideTab
 					? Collections.emptyList ()
-					: extensionPoint.contextTypeNames ());
+					: extensionPoint.contextTypeNames ()
+			);
 
 		}
 
@@ -184,7 +186,8 @@ class ContextTabResponderPageBuilder <
 
 			consoleModule.addContextFile (
 				fileName,
-				consoleFile.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider),
@@ -196,21 +199,35 @@ class ContextTabResponderPageBuilder <
 
 	}
 
-	void buildResponder () {
+	void buildResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		responderProvider =
-			() -> tabContextResponder.get ()
+		try (
 
-			.tab (
-				tabName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResponder");
 
-			.title (
-				pageTitle)
+		) {
 
-			.pagePartName (
-				pagePartName)
+			responderProvider =
+				taskLoggerNested ->
+					tabContextResponderProvider.provide (
+						taskLoggerNested)
 
-		;
+				.tab (
+					tabName)
+
+				.title (
+					pageTitle)
+
+				.pagePartName (
+					pagePartName)
+
+			;
+
+		}
 
 	}
 

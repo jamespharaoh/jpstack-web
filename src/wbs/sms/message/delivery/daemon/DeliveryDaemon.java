@@ -72,6 +72,14 @@ class DeliveryDaemon
 	QueueBuffer<Long,DeliveryRec> buffer;
 	Map<Long,DeliveryHandler> handlersById;
 
+	// details
+
+	@Override
+	protected
+	String friendlyName () {
+		return "SMS message delivery";
+	}
+
 	// implementation
 
 	@Override
@@ -170,9 +178,10 @@ class DeliveryDaemon
 		void run () {
 
 			try {
+
 				while (true) {
 
-					Set<Long> activeIds =
+					Set <Long> activeIds =
 						buffer.getKeys ();
 
 					int numFound =
@@ -205,9 +214,30 @@ class DeliveryDaemon
 
 			try (
 
+				OwnedTaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"pollDatabase");
+
+			) {
+
+				return pollDatabaseReal (
+					taskLogger,
+					activeIds);
+
+			}
+
+		}
+
+		int pollDatabaseReal (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Set <Long> activeIds) {
+
+			try (
+
 				OwnedTransaction transaction =
 					database.beginReadOnly (
 						logContext,
+						parentTaskLogger,
 						"QueryThread.pollDatabase");
 
 			) {

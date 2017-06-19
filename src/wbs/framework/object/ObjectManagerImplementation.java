@@ -11,6 +11,7 @@ import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notMoreThan;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -19,7 +20,6 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.PropertyUtils.propertyGetAuto;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
@@ -29,7 +29,6 @@ import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -674,7 +673,7 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Record <?> findObject (
+	Optional <Record <?>> findObject (
 			@NonNull Transaction parentTransaction,
 			@NonNull GlobalId objectGlobalId) {
 
@@ -691,7 +690,7 @@ class ObjectManagerImplementation
 				objectHelpersByTypeId.get (
 					objectGlobalId.typeId ());
 
-			return optionalOrNull (
+			return genericCastUnchecked (
 				objectHelper.find (
 					transaction,
 					objectGlobalId.objectId ()));
@@ -855,7 +854,7 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	boolean isParent (
+	boolean isAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Record <?> parent) {
@@ -869,14 +868,12 @@ class ObjectManagerImplementation
 
 		) {
 
-			Record <?> foundParent =
-				firstParent (
+			return optionalIsPresent (
+				firstAncestor (
 					transaction,
 					object,
 					Collections.singleton (
-						parent));
-
-			return foundParent != null;
+						parent)));
 
 		}
 
@@ -884,7 +881,7 @@ class ObjectManagerImplementation
 
 	@Override
 	public <ParentType extends Record <?>>
-	ParentType firstParent (
+	Optional <ParentType> firstAncestor (
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Set <ParentType> parents) {
@@ -913,12 +910,14 @@ class ObjectManagerImplementation
 						genericCastUnchecked (
 							current);
 
-					return temp;
+					return optionalOf (
+						temp);
 
 				}
 
-				if (currentHelper.isRoot ())
-					return null;
+				if (currentHelper.isRoot ()) {
+					return optionalAbsent ();
+				}
 
 				current =
 					currentHelper.getParentRequired (

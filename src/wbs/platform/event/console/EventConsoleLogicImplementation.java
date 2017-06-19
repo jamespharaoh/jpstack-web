@@ -232,7 +232,7 @@ class EventConsoleLogicImplementation
 					// locate referenced object
 
 					Record <?> object =
-						objectManager.findObject (
+						objectManager.findObjectRequired (
 							transaction,
 							new GlobalId (
 								eventLink.getTypeId (),

@@ -27,6 +27,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -34,6 +36,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -150,6 +153,7 @@ class BuilderFactoryImplementation <Context>
 					: builderClass.getDeclaredMethods ()
 			) {
 
+				@Nullable
 				BuildMethod buildMethodAnnotation =
 					method.getAnnotation (
 						BuildMethod.class);
@@ -189,10 +193,10 @@ class BuilderFactoryImplementation <Context>
 						"has invalid type signature (%s)",
 						joinWithCommaAndSpace (
 							iterableMap (
+								buildMethodParameters,
 								parameterType ->
 									classNameSimple (
-										parameterType),
-								buildMethodParameters)));
+										parameterType))));
 
 					return this;
 
@@ -254,7 +258,7 @@ class BuilderFactoryImplementation <Context>
 	public <Type>
 	BuilderFactoryImplementation <Context> addBuilders (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Map <Class <?>, Provider <Type>> buildersMap) {
+			@NonNull Map <Class <?>, ComponentProvider <Type>> buildersMap) {
 
 		try (
 
@@ -268,7 +272,7 @@ class BuilderFactoryImplementation <Context>
 			checkContextClassIsNotNull ();
 
 			for (
-				Map.Entry <Class <?>, Provider <Type>> builderEntry
+				Map.Entry <Class <?>, ComponentProvider <Type>> builderEntry
 					: buildersMap.entrySet ()
 			) {
 

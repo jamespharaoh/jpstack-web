@@ -1,39 +1,36 @@
 package wbs.platform.queue.console;
 
-import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import javax.inject.Provider;
 
 import lombok.NonNull;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.queue.model.QueueItemObjectHelper;
-import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueRec;
-import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.queue.model.QueueItemStatsSearch;
+import wbs.platform.queue.model.QueueItemUserStats;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.time.TextualInterval;
 
 @SingletonComponent ("queueItemUserStatsProvider")
 public
@@ -52,15 +49,16 @@ class QueueItemUserStatsProvider
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
+	QueueConsoleLogic queueConsoleLogic;
+
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <QueueStatsFilter> queueStatsFilterProvider;
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
 
 	// implementation
 
@@ -68,8 +66,8 @@ class QueueItemUserStatsProvider
 	public
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull StatsPeriod statsPeriod,
-			@NonNull Map <String, Object> conditions) {
+			@NonNull StatsPeriod period,
+			@NonNull Map <String, Set <String>> conditions) {
 
 		try (
 
@@ -80,132 +78,110 @@ class QueueItemUserStatsProvider
 
 		) {
 
-			if (statsPeriod.granularity () != StatsGranularity.hour)
-				throw new IllegalArgumentException ();
+			// get conditions
 
-			// setup data structures
-
-			Map <Long, long[]> numProcessedPerUser =
-				new TreeMap<> ();
-
-			Set <Object> userIdObjects =
-				new HashSet<> ();
-
-			// retrieve queue items
-
-			QueueStatsFilter queueStatsFilter =
-				queueStatsFilterProvider.get ();
-
-			queueStatsFilter.conditions (
-				transaction,
-				conditions);
-
-			List <QueueItemRec> queueItems =
-				queueStatsFilter.filterQueueItems (
+			Set <Long> searchQueueIds =
+				queueConsoleLogic.getSupervisorSearchIds (
 					transaction,
-					queueItemHelper.findByProcessedTime (
-						transaction,
-						statsPeriod.toInterval ()));
+					conditions);
 
-			// aggregate stats
+			Set <Long> searchUserIds =
+				userConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
 
-			for (
-				QueueItemRec queueItem
-					: queueItems
-			) {
+			// get filters
 
-				QueueSubjectRec queueSubject =
-					queueItem.getQueueSubject ();
+			Set <Long> filterQueueIds =
+				queueConsoleLogic.getSupervisorFilterIds (
+					transaction);
 
-				// TODO fix data!
-				QueueRec queue =
-					queueSubject != null
-						? queueSubject.getQueue ()
-						: queueItem.getQueue ();
+			Set <Long> filterUserIds =
+				userConsoleLogic.getSupervisorFilterIds (
+					transaction);
 
-				Record <?> parent =
-					objectManager.getParentRequired (
-						transaction,
-						queue);
-
-				if (
-					! privChecker.canRecursive (
-						transaction,
-						parent,
-						"supervisor")
-				) {
-					continue;
-				}
-
-				int hour =
-					statsPeriod.assign (
-						queueItem.getProcessedTime ());
-
-
-				if (! userIdObjects.contains (
-						queueItem.getProcessedUser ().getId ())) {
-
-					userIdObjects.add (
-						queueItem.getProcessedUser ().getId ());
-
-					numProcessedPerUser.put (
-						queueItem.getProcessedUser ().getId (),
-						new long [
-							toJavaIntegerRequired (
-								statsPeriod.size ())]);
-
-				}
-
-				long[] numProcessedForUser =
-					numProcessedPerUser.get (
-						queueItem.getProcessedUser ().getId ());
-
-				numProcessedForUser [hour] ++;
-
-			}
-
-			// create return value
+			// fetch stats
 
 			StatsDataSet statsDataSet =
 				new StatsDataSet ();
 
-			statsDataSet.indexValues ().put (
-				"userId",
-				userIdObjects);
+			Set <Object> indexQueueIds =
+				new HashSet<> ();
+
+			Set <Object> indexUserIds =
+				new HashSet<> ();
 
 			for (
-				int hour = 0;
-				hour < statsPeriod.size ();
-				hour ++
+				Interval interval
+					: period
 			) {
 
-				for (
-					Object userIdObject
-						: userIdObjects
-				) {
+				List <QueueItemUserStats> queueItemUserStatsList =
+					queueItemHelper.searchUserStats (
+						transaction,
+						new QueueItemStatsSearch ()
 
-					Long userId =
-						(Long)
-						userIdObject;
+					.queueIds (
+						searchQueueIds)
+
+					.userIds (
+						searchUserIds)
+
+					.timestamp (
+						TextualInterval.forInterval (
+							DateTimeZone.UTC,
+							interval))
+
+					.filterQueueIds (
+						filterQueueIds)
+
+					.filterUserIds (
+						filterUserIds)
+
+				);
+
+				for (
+					QueueItemUserStats queueItemUserStats
+						: queueItemUserStatsList
+				) {
 
 					statsDataSet.data ().add (
 						new StatsDatum ()
 
 						.startTime (
-							statsPeriod.step (
-								hour))
+							interval.getStart ().toInstant ())
+
+						.addIndex (
+							"queueId",
+							queueItemUserStats.getQueue ().getId ())
 
 						.addIndex (
 							"userId",
-							userId)
+							queueItemUserStats.getUser ().getId ())
 
 						.addValue (
 							"numProcessed",
-							numProcessedPerUser.get (userId) [hour]));
+							queueItemUserStats.getNumProcessed ())
+
+					);
+
+					indexQueueIds.add (
+						queueItemUserStats.getQueue ().getId ());
+
+					indexUserIds.add (
+						queueItemUserStats.getUser ().getId ());
 
 				}
 
 			}
+
+			statsDataSet.indexValues ().put (
+				"queueId",
+				indexQueueIds);
+
+			statsDataSet.indexValues ().put (
+				"userId",
+				indexUserIds);
 
 			return statsDataSet;
 
