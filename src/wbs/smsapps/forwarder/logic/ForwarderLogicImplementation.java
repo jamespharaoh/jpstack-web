@@ -4,7 +4,6 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -1020,9 +1019,12 @@ class ForwarderLogicImplementation
 					forwarderMessaeOut.getForwarderRoute (),
 					route)
 
-				|| integerNotEqualSafe (
-					message.getPri (),
-					priority)
+				|| optionalNotEqualOrNotPresentWithClass (
+					Long.class,
+					optionalFromNullable (
+						message.getPri ()),
+					optionalFromNullable (
+						priority))
 
 				|| (
 
@@ -1087,7 +1089,7 @@ class ForwarderLogicImplementation
 			String url,
 			String numfrom,
 			String numto,
-			Long threadId,
+			Long threadIdArgument,
 			ForwarderRouteRec forwarderRoute,
 			ServiceRec service,
 			String myId,
@@ -1114,10 +1116,17 @@ class ForwarderLogicImplementation
 					transaction,
 					numto);
 
-			if (threadId == null && fmIn != null) {
+			Long threadId;
+
+			if (threadIdArgument == null && fmIn != null) {
 
 				threadId =
 					fmIn.getMessage ().getThreadId ();
+
+			} else {
+
+				threadId =
+					threadIdArgument;
 
 			}
 
