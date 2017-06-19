@@ -1137,6 +1137,9 @@ class ForwarderLogicImplementation
 				.setNumber (
 					number)
 
+				.setCreatedTime (
+					transaction.now ())
+
 				.setOtherId (
 					myId)
 
