@@ -8,9 +8,6 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.extern.log4j.Log4j;
-
-@Log4j
 public
 class PhpArray
 	extends AbstractPhpEntity {
@@ -89,9 +86,6 @@ class PhpArray
 
 			Object key =
 				entry.getKey ();
-
-			log.debug (
-				"Key is " + key + ", " + key.getClass ());
 
 			if (! (key instanceof Integer)) {
 				return false;
