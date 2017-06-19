@@ -8,6 +8,7 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.shorterThan;
 
@@ -38,6 +39,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -140,11 +142,67 @@ class AlertsDaemon
 
 		try (
 
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"runOnce");
+
+		) {
+
+			List <Long> alertsSettingsIds =
+				getAlertsSettingsIds (
+					taskLogger);
+
+			// process alerts settings
+
+			for (
+				Long alertsSettingsId
+					: alertsSettingsIds
+			) {
+
+				try {
+
+					processAlertsSettings (
+						taskLogger,
+						alertsSettingsId);
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
+						"Error checking alerts for %s",
+						integerToDecimalString (
+							alertsSettingsId));
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"alerts daemon " + alertsSettingsId,
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.ignoreWithNoWarning);
+
+				}
+
+			}
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	List <Long> getAlertsSettingsIds (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
 			OwnedTransaction transaction =
 				database.beginReadOnly (
 					logContext,
 					parentTaskLogger,
-					"runOnce");
+					"getAlertsSettingsIds");
 
 		) {
 
@@ -159,9 +217,8 @@ class AlertsDaemon
 
 			// find alerts settings pending
 
-			List <Long> alertsSettingsIds =
-				alertsSettingsHelper.findAll (
-					transaction)
+			return alertsSettingsHelper.findAll (
+				transaction)
 
 				.stream ()
 
@@ -190,49 +247,16 @@ class AlertsDaemon
 						alertsSettings.getId ())
 
 				.collect (
-					Collectors.toList ());
+					Collectors.toList ())
 
-			transaction.close ();
-
-			// process alerts settings
-
-			for (
-				Long alertsSettingsId
-					: alertsSettingsIds
-			) {
-
-				try {
-
-					runOnce (
-						transaction,
-						alertsSettingsId);
-
-				} catch (Exception exception) {
-
-					transaction.errorFormatException (
-						exception,
-						"Error checking alerts for %s",
-						integerToDecimalString (
-							alertsSettingsId));
-
-					exceptionLogger.logThrowable (
-						transaction,
-						"daemon",
-						"alerts daemon " + alertsSettingsId,
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.ignoreWithNoWarning);
-
-				}
-
-			}
+			;
 
 		}
 
 	}
 
 	protected
-	void runOnce (
+	void processAlertsSettings (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long alertsSettingsId) {
 
@@ -242,7 +266,10 @@ class AlertsDaemon
 				database.beginReadWrite (
 					logContext,
 					parentTaskLogger,
-					"runOnce");
+					"processAlertsSettings",
+					keyEqualsDecimalInteger (
+						"alertsSettingsId",
+						alertsSettingsId));
 
 		) {
 
