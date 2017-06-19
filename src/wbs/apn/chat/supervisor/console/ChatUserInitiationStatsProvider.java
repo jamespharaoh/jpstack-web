@@ -3,6 +3,7 @@ package wbs.apn.chat.supervisor.console;
 import static wbs.utils.collection.IterableUtils.iterableChainToList;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToSet;
+import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstancesSet;
 
@@ -74,8 +75,16 @@ class ChatUserInitiationStatsProvider
 			if (period.granularity () != StatsGranularity.hour)
 				throw new IllegalArgumentException ();
 
-			if (! conditions.containsKey ("chatId"))
-				throw new IllegalArgumentException ();
+			if (
+				mapDoesNotContainKey (
+					conditions,
+					"chat-id")
+			) {
+
+				throw new IllegalArgumentException (
+					"Must provide \"chat-id\" condition");
+
+			}
 
 			// setup data structures
 
@@ -90,7 +99,7 @@ class ChatUserInitiationStatsProvider
 			Set <Long> chatIds =
 				iterableMapToSet (
 					conditions.get (
-						"chatId"),
+						"chat-id"),
 					NumberUtils::parseIntegerRequired);
 
 			Set <ChatRec> chats =
