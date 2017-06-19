@@ -1,6 +1,5 @@
 package wbs.platform.object.browse;
 
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -37,7 +35,6 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.NestedTransaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -210,6 +207,7 @@ class ObjectBrowsePageBuilder <
 
 	void buildResponder () {
 
+/*
 		PagePartFactory partFactory =
 			parentTransaction -> {
 
@@ -245,7 +243,6 @@ class ObjectBrowsePageBuilder <
 
 		};
 
-/*
 		consoleModule.addResponder (
 			container.newBeanNamePrefix () + "BrowseResponder",
 			tabContextResponder.get ()

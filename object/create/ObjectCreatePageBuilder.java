@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.hyphenToCamelCapitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -34,6 +32,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -70,21 +69,21 @@ class ObjectCreatePageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ObjectCreateAction <ObjectType, ParentType>>
-	objectCreateActionProvider;
+	ComponentProvider <ObjectCreateAction <ObjectType, ParentType>>
+		objectCreateActionProvider;
 
 	@PrototypeDependency
-	Provider <ObjectCreatePart <ObjectType, ParentType>>
-	objectCreatePartProvider;
+	ComponentProvider <ObjectCreatePart <ObjectType, ParentType>>
+		objectCreatePartProvider;
 
 	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponderProvider;
+	ComponentProvider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -115,8 +114,8 @@ class ObjectCreatePageBuilder <
 	String createPrivCode;
 	String privKey;
 
-	Provider <WebResponder> responderProvider;
-	Provider <WebResponder> targetResponderProvider;
+	ComponentProvider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> targetResponderProvider;
 
 	// build
 
@@ -176,7 +175,8 @@ class ObjectCreatePageBuilder <
 				taskLogger,
 				"end",
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -190,7 +190,8 @@ class ObjectCreatePageBuilder <
 					/*.privKeys (
 					 * 	Collections.singletonList (privKey))*/,
 
-				extensionPoint.contextTypeNames ());
+				extensionPoint.contextTypeNames ()
+			);
 
 		}
 
@@ -209,8 +210,10 @@ class ObjectCreatePageBuilder <
 
 		) {
 
-			Provider <WebAction> createActionProvider =
-				() -> objectCreateActionProvider.get ()
+			ComponentProvider <WebAction> createActionProvider =
+				taskLoggerNested ->
+					objectCreateActionProvider.provide (
+						taskLoggerNested)
 
 				.consoleHelper (
 					consoleHelper)
@@ -243,10 +246,9 @@ class ObjectCreatePageBuilder <
 					createUserFieldName);
 
 			consoleModule.addContextFile (
-
 				localFile,
-
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderProvider (
 						responderProvider)
@@ -257,7 +259,8 @@ class ObjectCreatePageBuilder <
 					/*.privKeys (
 						Collections.singletonList (privKey)*/,
 
-				extensionPoint.contextTypeNames ());
+				extensionPoint.contextTypeNames ()
+			);
 
 		}
 
