@@ -10,8 +10,6 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -117,7 +116,7 @@ class ChatPromoCommand
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatJoiner> chatJoinerProvider;
+	ComponentProvider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -441,7 +440,8 @@ class ChatPromoCommand
 					chatUser.getFirstJoin ())
 			) {
 
-				return chatJoinerProvider.get ()
+				return chatJoinerProvider.provide (
+					transaction)
 
 					.chatId (
 						chat.getId ())

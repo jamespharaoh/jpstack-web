@@ -7,8 +7,6 @@ import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -27,9 +25,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.keyword.logic.KeywordLogic;
@@ -99,11 +99,11 @@ class ChatAffiliateCreateOldAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatAffiliateCreateOldResponder")
-	Provider <WebResponder> createOldResponderProvider;
+	ComponentProvider <WebResponder> createOldResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("chatAffiliateSettingsResponder")
-	Provider <WebResponder> settingsResponderProvider;
+	ComponentProvider <WebResponder> settingsResponderProvider;
 
 	// details
 
@@ -112,7 +112,19 @@ class ChatAffiliateCreateOldAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return createOldResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return createOldResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -394,7 +406,8 @@ class ChatAffiliateCreateOldAction
 				targetContext,
 				"/" + chatAffiliateId);
 
-			return settingsResponderProvider.get ();
+			return settingsResponderProvider.provide (
+				transaction);
 
 		}
 

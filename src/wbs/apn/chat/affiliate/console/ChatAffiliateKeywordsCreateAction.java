@@ -6,8 +6,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -21,9 +19,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.keyword.logic.KeywordLogic;
@@ -74,11 +74,11 @@ class ChatAffiliateKeywordsCreateAction
 
 	@PrototypeDependency
 	@NamedDependency ("chatAffiliateKeywordsCreateResponder")
-	Provider <WebResponder> createResponderProvider;
+	ComponentProvider <WebResponder> createResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("chatAffiliateKeywordsListResponder")
-	Provider <WebResponder> listResponderProvider;
+	ComponentProvider <WebResponder> listResponderProvider;
 
 	// details
 
@@ -87,7 +87,19 @@ class ChatAffiliateKeywordsCreateAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return createResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return createResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -239,7 +251,8 @@ class ChatAffiliateKeywordsCreateAction
 
 			requestContext.setEmptyFormData ();
 
-			return listResponderProvider.get ();
+			return listResponderProvider.provide (
+				transaction);
 
 		}
 

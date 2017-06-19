@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.Collection;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -17,6 +15,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -64,7 +63,7 @@ class ChatAdultDeliveryHandler
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChatJoiner> joinerProvider;
+	ComponentProvider <ChatJoiner> joinerProvider;
 
 	// implementation
 
@@ -201,7 +200,8 @@ class ChatAdultDeliveryHandler
 				ChatJoiner.convertJoinType (
 					chatUser.getNextJoinType ());
 
-			joinerProvider.get ()
+			joinerProvider.provide (
+				transaction)
 
 				.chatId (
 					chatUser.getChat ().getId ())

@@ -37,8 +37,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -562,7 +560,7 @@ class ChatApiServletModule
 
 	// ================================= rpc handlers
 
-	Map <String, Provider <RpcHandler>> handlers =
+	Map <String, ComponentProvider <RpcHandler>> handlers =
 		new HashMap<> ();
 
 	private
@@ -583,9 +581,10 @@ class ChatApiServletModule
 
 			handlers.put (
 				name,
-				() -> new RpcHandlerFactory (
-					handlerClass,
-					this));
+				taskLoggerNested ->
+					new RpcHandlerFactory (
+						handlerClass,
+						this));
 
 		}
 

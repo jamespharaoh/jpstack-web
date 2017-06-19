@@ -11,8 +11,6 @@ import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -21,6 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -89,7 +88,7 @@ class ChatAdultAdDaemon
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSender;
+	ComponentProvider <SmsMessageSender> messageSender;
 
 	// details
 
@@ -373,7 +372,8 @@ class ChatAdultAdDaemon
 					chat,
 					"system");
 
-			messageSender.get ()
+			messageSender.provide (
+				transaction)
 
 				.number (
 					chatUser.getNumber ())

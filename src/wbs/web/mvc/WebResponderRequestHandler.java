@@ -2,8 +2,6 @@ package wbs.web.mvc;
 
 import static wbs.utils.etc.LogicUtils.attemptWithRetriesVoid;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -14,6 +12,7 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,7 +36,7 @@ class WebResponderRequestHandler
 	// properties
 
 	@Getter @Setter
-	Provider <? extends WebResponder> responderProvider;
+	ComponentProvider <? extends WebResponder> responderProvider;
 
 	// details
 
@@ -71,7 +70,8 @@ class WebResponderRequestHandler
 				() -> {
 
 					WebResponder responder =
-						responderProvider.get ();
+						responderProvider.provide (
+							taskLogger);
 
 					responder.execute (
 						taskLogger);
