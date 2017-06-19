@@ -75,7 +75,7 @@ class ExtendContextComponentBuilder
 					spec.baseName ())
 
 				.pathPrefix (
-					spec.name ())
+					spec.baseName ())
 
 				.newComponentNamePrefix (
 					spec.componentName ())

@@ -9,7 +9,7 @@ import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.web.utils.HtmlTableUtils.htmlTableOpenLayout;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
@@ -223,7 +223,7 @@ class AutoResponderVotesPart
 				formatWriter,
 				"Vote summary");
 
-			htmlTableOpenLayout (
+			htmlTableOpenList (
 				formatWriter);
 
 			htmlTableHeaderRowWrite (
