@@ -28,14 +28,8 @@ AS SELECT
 	timestamp AS timestamp,
 
 	1 AS num_messages,
-
-	CASE WHEN to_chat_user.type = 'm'
-	THEN 1 ELSE 0 END
-	AS num_messages_in,
-
-	CASE WHEN from_chat_user.type = 'm'
-	THEN 0 ELSE 0
-	END AS num_messages_out,
+	(to_chat_user.type = 'm')::int AS num_messages_in,
+	(from_chat_user.type = 'm')::int AS num_messages_out,
 
 	length (original_text.text) AS num_characters,
 

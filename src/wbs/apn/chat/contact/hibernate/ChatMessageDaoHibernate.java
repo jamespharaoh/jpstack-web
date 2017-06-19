@@ -646,26 +646,16 @@ class ChatMessageDaoHibernate
 				createCriteria (
 					transaction,
 					ChatMessageViewRec.class,
-					"_chatMessageView")
-
-				.createAlias (
-					"_chatMessageView.chat",
-					"_chat")
-
-				.createAlias (
-					"_chatMessageView.senderUser",
-					"_senderUser")
-
-			;
+					"_chatMessageView");
 
 			criteria.add (
 				Restrictions.in (
-					"_chat.id",
+					"_chatMessageView.chat.id",
 					search.chatIds ()));
 
 			criteria.add (
 				Restrictions.in (
-					"_senderUser.id",
+					"_chatMessageView.senderUser.id",
 					search.senderUserIds ()));
 
 			criteria.add (
@@ -682,11 +672,11 @@ class ChatMessageDaoHibernate
 				Restrictions.or (
 
 				Restrictions.in (
-					"_chat.id",
+					"_chatMessageView.chat.id",
 					search.filterChatIds ()),
 
 				Restrictions.in (
-					"_senderUser.id",
+					"_chatMessageView.senderUser.id",
 					search.filterSenderUserIds ())
 
 			));
@@ -753,27 +743,20 @@ class ChatMessageDaoHibernate
 				createCriteria (
 					transaction,
 					ChatMessageViewRec.class,
-					"_chatMessageView")
-
-				.createAlias (
-					"_chatMessageView.chat",
-					"_chat")
-
-				.createAlias (
-					"_chatMessageView.senderUser",
-					"_senderUser")
-
-			;
+					"_chatMessageView");
 
 			criteria.add (
 				Restrictions.in (
-					"_chat.id",
+					"_chatMessageView.chat.id",
 					search.chatIds ()));
 
 			criteria.add (
-				Restrictions.in (
-					"_senderUser.id",
-					search.senderUserIds ()));
+				Restrictions.or (
+					Restrictions.isNull (
+						"_chatMessageView.senderUser.id"),
+					Restrictions.in (
+						"_chatMessageView.senderUser.id",
+						search.senderUserIds ())));
 
 			criteria.add (
 				Restrictions.ge (
@@ -789,11 +772,11 @@ class ChatMessageDaoHibernate
 				Restrictions.or (
 
 				Restrictions.in (
-					"_chat.id",
+					"_chatMessageView.chat.id",
 					search.filterChatIds ()),
 
 				Restrictions.in (
-					"_senderUser.id",
+					"_chatMessageView.senderUser.id",
 					search.filterSenderUserIds ())
 
 			));
