@@ -3,8 +3,6 @@ package wbs.web.mvc;
 import static wbs.utils.etc.LogicUtils.attemptWithRetries;
 import static wbs.utils.etc.LogicUtils.attemptWithRetriesVoid;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Duration;
@@ -13,6 +11,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,7 +36,7 @@ class WebActionRequestHandler
 
 	// properties
 
-	Provider <WebAction> actionProvider;
+	ComponentProvider <WebAction> actionProvider;
 
 	// details
 
@@ -52,7 +51,7 @@ class WebActionRequestHandler
 
 	public
 	WebActionRequestHandler actionProvider (
-			@NonNull Provider <WebAction> actionProvider) {
+			@NonNull ComponentProvider <WebAction> actionProvider) {
 
 		this.actionProvider =
 			actionProvider;
@@ -129,7 +128,8 @@ class WebActionRequestHandler
 				() -> {
 
 					WebAction action =
-						actionProvider.get ();
+						actionProvider.provide (
+							taskLogger);
 
 					return action.handle (
 						taskLogger);

@@ -5,15 +5,15 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.context.RequestContext;
@@ -46,18 +46,19 @@ class AbstractFile
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <WebActionRequestHandler> actionRequestHandlerProvider;
+	ComponentProvider <WebActionRequestHandler> actionRequestHandlerProvider;
 
 	@StrongPrototypeDependency
-	Provider <WebResponderRequestHandler> responderRequestHandlerProvider;
+	ComponentProvider <WebResponderRequestHandler>
+		responderRequestHandlerProvider;
 
 	// extension points
 
 	public abstract
-	Provider <? extends WebRequestHandler> getHandlerProvider ();
+	ComponentProvider <? extends WebRequestHandler> getHandlerProvider ();
 
 	public abstract
-	Provider <? extends WebRequestHandler> postHandlerProvider ();
+	ComponentProvider <? extends WebRequestHandler> postHandlerProvider ();
 
 	public abstract
 	Map <String, Object> requestParams ();
@@ -83,18 +84,33 @@ class AbstractFile
 	void doGet (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (getHandlerProvider () != null) {
+		try (
 
-			setRequestParams ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doGet");
 
-			getHandlerProvider ().get ().handle (
-				parentTaskLogger);
+		) {
 
-		} else {
+			if (getHandlerProvider () != null) {
 
-			throw new HttpMethodNotAllowedException (
-				optionalAbsent (),
-				emptyList ());
+				setRequestParams ();
+
+				WebRequestHandler requestHandler =
+					getHandlerProvider ().provide (
+						taskLogger);
+
+				requestHandler.handle (
+					taskLogger);
+
+			} else {
+
+				throw new HttpMethodNotAllowedException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
 
 		}
 
@@ -105,18 +121,33 @@ class AbstractFile
 	void doPost (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (postHandlerProvider () != null) {
+		try (
 
-			setRequestParams ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doPost");
 
-			postHandlerProvider ().get ().handle (
-				parentTaskLogger);
+		) {
 
-		} else {
+			if (postHandlerProvider () != null) {
 
-			throw new HttpMethodNotAllowedException (
-				optionalAbsent (),
-				emptyList ());
+				setRequestParams ();
+
+				WebRequestHandler requestHandler =
+					postHandlerProvider ().provide (
+						taskLogger);
+
+				requestHandler.handle (
+					taskLogger);
+
+			} else {
+
+				throw new HttpMethodNotAllowedException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
 
 		}
 
