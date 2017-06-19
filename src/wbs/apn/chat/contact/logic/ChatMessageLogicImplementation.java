@@ -215,6 +215,9 @@ class ChatMessageLogicImplementation
 						DateTimeZone.UTC,
 						oneHourAgo))
 
+				.originalTextId (
+					originalText.getId ())
+
 			);
 
 			return dupes.size () > 0;
