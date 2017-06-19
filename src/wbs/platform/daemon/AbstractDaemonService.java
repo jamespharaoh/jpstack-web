@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
@@ -130,7 +130,7 @@ class AbstractDaemonService {
 	 * Sets up some stuff and calls createThreads (). Will simply return if
 	 * startService () has already been called since the last stopService ().
 	 */
-	@NormalLifecycleSetup
+	@LateLifecycleSetup
 	public synchronized
 	void startService (
 			@NonNull TaskLogger parentTaskLogger) {
