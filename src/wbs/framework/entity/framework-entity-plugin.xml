@@ -2,6 +2,12 @@
 	name="framework-entity"
 	package="wbs.framework.entity">
 
+	<layer name="data">
+
+		<component class="record.UnsavedRecordDetector"/>
+
+	</layer>
+
 	<layer name="model-meta">
 
 		<component class="meta.collections.AssociativeCollectionSpec"/>
@@ -54,8 +60,10 @@
 	</layer>
 
 	<layer name="generate">
+
 		<component class="generate.ModelGenerateExceptionLogger"/>
 		<component class="generate.ModelGenerateSpecialConfig"/>
+
 	</layer>
 
 	<layer name="model-generate">
@@ -105,10 +113,13 @@
 	</layer>
 
 	<layer name="object-generate">
+
 		<component class="generate.ObjectHelperGenerator"/>
+
 	</layer>
 
 	<layer name="entity">
+
 		<component class="build.AssignedIdModelFieldBuilder"/>
 		<component class="build.AssociativeCollectionModelFieldBuilder"/>
 		<component class="build.AssociativeListModelFieldBuilder"/>
@@ -148,6 +159,7 @@
 		<component class="build.YesNoModelFieldBuilder"/>
 		<component class="helper.EntityHelperImplementation"/>
 		<component class="model.ModelBuilder"/>
+
 	</layer>
 
 </plugin>
