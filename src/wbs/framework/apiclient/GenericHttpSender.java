@@ -1,7 +1,9 @@
 package wbs.framework.apiclient;
 
+import static wbs.utils.collection.ArrayUtils.arrayStream;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
@@ -29,57 +31,60 @@ import lombok.experimental.Accessors;
 import org.apache.commons.compress.utils.IOUtils;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 
+import wbs.web.misc.UrlParams;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("genericHttpSender")
-public abstract
-class GenericHttpSender <
-	SenderType extends GenericHttpSender <
-		SenderType,
-		RequestType,
-		ResponseType,
-		HelperType
-	>,
-	RequestType,
-	ResponseType,
-	HelperType extends GenericHttpSenderHelper <
-		RequestType,
-		ResponseType
-	>
-> {
+public
+class GenericHttpSender <Request, Response> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// properties
 
-	@Setter
-	HelperType helper;
+	@Getter @Setter
+	ComponentProvider <GenericHttpSenderHelper <Request, Response>>
+		helperProvider;
 
 	// state
+
+	GenericHttpSenderHelper <Request, Response> helper;
 
 	State state =
 		State.init;
 
 	CloseableHttpClient httpClient;
 
-	HttpPost httpPost;
+	HttpRequestBase httpRequest;
 
 	HttpResponse httpResponse;
 	String responseBody;
@@ -94,26 +99,45 @@ class GenericHttpSender <
 	Optional <String> errorMessage =
 		optionalAbsent ();
 
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"setup");
+
+		) {
+
+			helper =
+				helperProvider.provide (
+					taskLogger);
+
+		}
+
+	}
+
 	// property accessors
 
 	public
-	SenderType request (
-			@NonNull RequestType request) {
+	GenericHttpSender <Request, Response> request (
+			@NonNull Request request) {
 
 		helper.request (
 			request);
 
-		@SuppressWarnings ("unchecked")
-		SenderType senderThis =
-			(SenderType)
-			this;
-
-		return senderThis;
+		return this;
 
 	}
 
 	public
-	ResponseType response () {
+	Response response () {
 
 		return helper.response ();
 
@@ -122,266 +146,341 @@ class GenericHttpSender <
 	// public implementation
 
 	public
-	SenderType encode () {
+	GenericHttpSender <Request, Response> encode (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// check and set temporary state
+		try (
 
-		if (
-			enumNotEqualSafe (
-				state,
-				State.init)
-		) {
-			throw new IllegalStateException ();
-		}
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"encode");
 
-		// ask helper to verify
-
-		state =
-			State.verifyError;
-
-		helper.verify ();
-
-		// delegate to helper
-
-		state =
-			State.encodeError;
-
-		helper.encode ();
-
-		// create post
-
-		httpPost =
-			new HttpPost (
-				helper.url ());
-
-		// configure request
-
-		httpPost.setConfig (
-			RequestConfig.custom ()
-
-			.setConnectionRequestTimeout (
-				toJavaIntegerRequired (
-					helper.connectionRequestTimeout ().getMillis ()))
-
-			.setConnectTimeout (
-				toJavaIntegerRequired (
-					helper.connectTimeout ().getMillis ()))
-
-			.setSocketTimeout (
-				toJavaIntegerRequired (
-					helper.socketTimeout ().getMillis ()))
-
-			.build ()
-
-		);
-
-		// convert to binary representation
-
-		byte[] requestData =
-			stringToUtf8 (
-				helper.requestBody ());
-
-		// set default headers
-
-		httpPost.setHeader (
-			"User-Agent",
-			wbsConfig.httpUserAgent ());
-
-		// set headers from helper
-
-		for (
-			Map.Entry <String, String> requestHeaderEntry
-				: helper.requestHeaders ().entrySet ()
 		) {
 
-			httpPost.setHeader (
-				requestHeaderEntry.getKey (),
-				requestHeaderEntry.getValue ());
+			// check and set temporary state
+
+			if (
+				enumNotEqualSafe (
+					state,
+					State.init)
+			) {
+				throw new IllegalStateException ();
+			}
+
+			// ask helper to verify
+
+			state =
+				State.verifyError;
+
+			helper.verify ();
+
+			// delegate to helper
+
+			state =
+				State.encodeError;
+
+			helper.encode ();
+
+			// work out url
+
+			UrlParams urlParams =
+				new UrlParams ();
+
+			helper.requestParameters ().forEach (
+				(key, values) ->
+
+				values.forEach (
+					value ->
+
+					urlParams.add (
+						key,
+						value)
+				)
+
+			);
+
+			String urlWithParams =
+				urlParams.toUrl (
+					helper.url ());
+
+			// create post
+
+			switch (helper.method ()) {
+
+			case get:
+
+				httpRequest =
+					new HttpGet (
+						urlWithParams);
+
+				break;
+
+			case post:
+
+				httpRequest =
+					new HttpPost (
+						urlWithParams);
+
+				break;
+
+			}
+
+			// configure request
+
+			httpRequest.setConfig (
+				RequestConfig.custom ()
+
+				.setConnectionRequestTimeout (
+					toJavaIntegerRequired (
+						helper.connectionRequestTimeout ().getMillis ()))
+
+				.setConnectTimeout (
+					toJavaIntegerRequired (
+						helper.connectTimeout ().getMillis ()))
+
+				.setSocketTimeout (
+					toJavaIntegerRequired (
+						helper.socketTimeout ().getMillis ()))
+
+				.build ()
+
+			);
+
+			// convert to binary representation
+
+			byte[] requestData =
+				stringToUtf8 (
+					helper.requestBody ());
+
+			// set default headers
+
+			httpRequest.setHeader (
+				"User-Agent",
+				wbsConfig.httpUserAgent ());
+
+			// set headers from helper
+
+			for (
+				Map.Entry <String, String> requestHeaderEntry
+					: helper.requestHeaders ().entrySet ()
+			) {
+
+				httpRequest.setHeader (
+					requestHeaderEntry.getKey (),
+					requestHeaderEntry.getValue ());
+
+			}
+
+			// set body
+
+			switch (helper.method ()) {
+
+			case get:
+
+				doNothing ();
+
+				break;
+
+			case post:
+
+				HttpEntityEnclosingRequest httpEntityRequest =
+					(HttpEntityEnclosingRequest)
+					httpRequest;
+
+				httpEntityRequest.setEntity (
+					new ByteArrayEntity (
+						requestData));
+
+			}
+
+			// create debug trace
+
+			requestTrace =
+				new JSONObject (
+					ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"url",
+					httpRequest.getURI ().toString ())
+
+				.put (
+					"method",
+					httpRequest.getMethod ())
+
+				.put (
+					"headers",
+					Arrays.asList (
+						httpRequest.getAllHeaders ()
+					).stream ().collect (
+						Collectors.toMap (
+							Header::getName,
+							Header::getValue)))
+
+				.put (
+					"body",
+					helper.requestBody ())
+
+				.build ()
+
+			);
+
+			// update state and return
+
+			state =
+				State.encoded;
+
+			return this;
 
 		}
-
-		// set body
-
-		httpPost.setEntity (
-			new ByteArrayEntity (
-				requestData));
-
-		// create debug trace
-
-		requestTrace =
-			new JSONObject (
-				ImmutableMap.<String, Object> builder ()
-
-			.put (
-				"url",
-				httpPost.getURI ().toString ())
-
-			.put (
-				"method",
-				httpPost.getMethod ())
-
-			.put (
-				"headers",
-				Arrays.asList (
-					httpPost.getAllHeaders ()
-				).stream ().collect (
-					Collectors.toMap (
-						Header::getName,
-						Header::getValue)))
-
-			.put (
-				"body",
-				helper.requestBody ())
-
-			.build ()
-
-		);
-
-		// update state and return
-
-		state =
-			State.encoded;
-
-		@SuppressWarnings ("unchecked")
-		SenderType senderThis =
-			(SenderType)
-			this;
-
-		return senderThis;
 
 	}
 
 	public
-	SenderType send () {
+	GenericHttpSender <Request, Response> send (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// check and set temporary state
+		try (
 
-		if (
-			enumNotEqualSafe (
-				state,
-				State.encoded)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"send");
+
 		) {
-			throw new IllegalStateException ();
+
+			// check and set temporary state
+
+			if (
+				enumNotEqualSafe (
+					state,
+					State.encoded)
+			) {
+				throw new IllegalStateException ();
+			}
+
+			state =
+				State.sendError;
+
+			// perform api call
+
+			httpClient =
+				HttpClientBuilder.create ()
+					.build ();
+
+			try {
+
+				httpResponse =
+					httpClient.execute (
+						httpRequest);
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
+			state =
+				State.sent;
+
+			return this;
+
 		}
-
-		state =
-			State.sendError;
-
-		// perform api call
-
-		httpClient =
-			HttpClientBuilder.create ()
-				.build ();
-
-		try {
-
-			httpResponse =
-				httpClient.execute (
-					httpPost);
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
-		}
-
-		state =
-			State.sent;
-
-		@SuppressWarnings ("unchecked")
-		SenderType senderThis =
-			(SenderType)
-			this;
-
-		return senderThis;
 
 	}
 
 	public
-	GenericHttpSender <
-		SenderType,
-		RequestType,
-		ResponseType,
-		HelperType
-	> receive () {
+	GenericHttpSender <Request, Response> receive (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		// check and set temporary state
+		try (
 
-		if (
-			enumNotEqualSafe (
-				state,
-				State.sent)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"receive");
+
 		) {
-			throw new IllegalStateException ();
+
+			// check and set temporary state
+
+			if (
+				enumNotEqualSafe (
+					state,
+					State.sent)
+			) {
+				throw new IllegalStateException ();
+			}
+
+			state =
+				State.receiveError;
+
+			// receive responsea
+
+			try {
+
+				responseBody =
+					utf8ToString (
+						IOUtils.toByteArray (
+							httpResponse.getEntity ().getContent ()));
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
+
+			// store raw response
+
+			responseTrace =
+				new JSONObject (
+					ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"statusCode",
+					httpResponse.getStatusLine ().getStatusCode ())
+
+				.put (
+					"statusMessage",
+					httpResponse.getStatusLine ().getReasonPhrase ())
+
+				.put (
+					"headers",
+					arrayStream (
+						httpResponse.getAllHeaders ())
+
+					.collect (
+						Collectors.groupingBy (
+							Header::getName,
+							Collectors.mapping (
+								Header::getValue,
+								Collectors.toList ())))
+
+				)
+
+				.put (
+					"body",
+					responseBody)
+
+				.build ()
+
+			);
+
+			// update state and return
+
+			state =
+				State.received;
+
+			return this;
+
 		}
-
-		state =
-			State.receiveError;
-
-		// receive responsea
-
-		try {
-
-			responseBody =
-				utf8ToString (
-					IOUtils.toByteArray (
-						httpResponse.getEntity ().getContent ()));
-
-		} catch (IOException ioException) {
-
-			throw new RuntimeIoException (
-				ioException);
-
-		}
-
-		// store raw response
-
-		responseTrace =
-			new JSONObject (
-				ImmutableMap.<String, Object> builder ()
-
-			.put (
-				"statusCode",
-				httpResponse.getStatusLine ().getStatusCode ())
-
-			.put (
-				"statusMessage",
-				httpResponse.getStatusLine ().getReasonPhrase ())
-
-			.put (
-				"headers",
-				Arrays.asList (
-					httpResponse.getAllHeaders ()
-				).stream ().collect (
-					Collectors.toMap (
-						Header::getName,
-						Header::getValue)))
-
-			.put (
-				"body",
-				responseBody)
-
-			.build ()
-
-		);
-
-		// update state and return
-
-		state =
-			State.received;
-
-		return this;
 
 	}
 
 	public
-	GenericHttpSender <
-		SenderType,
-		RequestType,
-		ResponseType,
-		HelperType
-	> decode (
+	GenericHttpSender <Request, Response> decode (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		// check and set temporary state
@@ -430,16 +529,18 @@ class GenericHttpSender <
 					httpResponse.getStatusLine ().getReasonPhrase ())
 
 				.responseHeaders (
-					ImmutableMap.copyOf (
-						Arrays.stream (
-							httpResponse.getAllHeaders ())
+
+					arrayStream (
+						httpResponse.getAllHeaders ())
 
 					.collect (
-						Collectors.toMap (
+						Collectors.groupingBy (
 							Header::getName,
-							Header::getValue))
+							Collectors.mapping (
+								Header::getValue,
+								Collectors.toList ())))
 
-				))
+				)
 
 				.responseBody (
 					responseBody)
@@ -491,6 +592,41 @@ class GenericHttpSender <
 
 	}
 
+	public
+	Response allInOne (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Request request) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"allInOne");
+
+		) {
+
+			request (
+				request);
+
+			encode (
+				taskLogger);
+
+			send (
+				taskLogger);
+
+			receive (
+				taskLogger);
+
+			decode (
+				taskLogger);
+
+			return response ();
+
+		}
+
+	}
+
 	// inner classes
 
 	public static
@@ -506,6 +642,12 @@ class GenericHttpSender <
 		decoded,
 		error,
 		closed;
+	}
+
+	public static
+	enum Method {
+		get,
+		post
 	}
 
 }

@@ -37,8 +37,7 @@ class ContextTabFormActionPageSpec
 	@DataAttribute
 	String helpText;
 
-	@DataAttribute (
-		required = true)
+	@DataAttribute
 	String submitLabel;
 
 	@DataAttribute (

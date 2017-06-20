@@ -12,6 +12,15 @@
 		<model name="shnShopifyStore"/>
 	</models>
 
+	<layer name="console">
+		<component class="console.ShnShopifyConnectionSynchroniseFormActionHelper"/>
+	</layer>
+
+	<layer name="logic">
+		<component class="apiclient.ShopifyApiClientImplementation"/>
+		<component class="apiclient.ShopifyProductListHttpSenderHelper"/>
+	</layer>
+
 	<fixtures>
 		<fixture name="shnShopifyStore"/>
 	</fixtures>

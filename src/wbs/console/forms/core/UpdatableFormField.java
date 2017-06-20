@@ -2,7 +2,6 @@ package wbs.console.forms.core;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.isRight;
@@ -665,10 +664,6 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						transaction,
 						container,
 						nativeValue));
-
-if (csvMapping == null) {
-	debugFormat ("CSV MAPPING NULL IN %s", name);
-}
 
 			String csvValue =
 				optionalOr (

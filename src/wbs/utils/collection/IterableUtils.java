@@ -278,6 +278,34 @@ class IterableUtils {
 
 	}
 
+	public static <InLeft, InRight, Out>
+	Iterable <Out> iterableFilterMap (
+			@NonNull Iterable <Pair <? extends InLeft, ? extends InRight>> iterable,
+			@NonNull BiPredicate <? super InLeft, ? super InRight> predicate,
+			@NonNull BiFunction <? super InLeft, ? super InRight, Out> mapping) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.filter (
+				pair ->
+					predicate.test (
+						pair.getLeft (),
+						pair.getRight ()))
+
+			.map (
+				pair ->
+					mapping.apply (
+						pair.getLeft (),
+						pair.getRight ()))
+
+			.iterator ()
+
+		;
+
+	}
+
 	public static <InputType, OutputType>
 	List <OutputType> iterableFilterMapToList (
 			@NonNull Iterable <? extends InputType> iterable,

@@ -1,5 +1,6 @@
 package wbs.framework.data.tools;
 
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -7,6 +8,7 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -44,14 +46,6 @@ class DataFromJson {
 
 			field.setAccessible (true);
 
-			Object fieldValue =
-				jsonValue.get (
-					field.getName ());
-
-			if (fieldValue == null) {
-				continue;
-			}
-
 			// handle data attribute
 
 			DataAttribute dataAttribute =
@@ -62,6 +56,17 @@ class DataFromJson {
 				isNotNull (
 					dataAttribute)
 			) {
+
+				Object fieldValue =
+					jsonValue.get (
+						ifNull (
+							nullIfEmptyString (
+								dataAttribute.name ()),
+							field.getName ()));
+
+				if (fieldValue == null) {
+					continue;
+				}
 
 				doDataAttribute (
 					dataClass,
@@ -83,6 +88,17 @@ class DataFromJson {
 					dataChild)
 			) {
 
+				Object fieldValue =
+					jsonValue.get (
+						ifNull (
+							nullIfEmptyString (
+								dataChild.name ()),
+							field.getName ()));
+
+				if (fieldValue == null) {
+					continue;
+				}
+
 				doDataChild (
 					dataClass,
 					dataValue,
@@ -103,6 +119,21 @@ class DataFromJson {
 				isNotNull (
 					dataChildren)
 			) {
+
+System.out.println ("DO CHILDREN");
+System.out.println (ifNull (dataChildren.childrenElement (), field.getName ()));
+
+				Object fieldValue =
+					jsonValue.get (
+						ifNull (
+							dataChildren.childrenElement (),
+							field.getName ()));
+
+System.out.println (fieldValue);
+
+				if (fieldValue == null) {
+					continue;
+				}
 
 				doDataChildren (
 					dataClass,

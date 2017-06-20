@@ -36,6 +36,9 @@
 			<object-settings-page
 				form="settings"/>
 
+			<context-tab-form-action-page
+				name="synchronise"/>
+
 			<object-events-page/>
 
 		</object>
@@ -119,6 +122,23 @@
 				<object-field
 					name="store"
 					object-type="shnShopifyStore"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="synchronise-action"
+			class="shn.shopify.console.ShnShopifyConnectionSynchroniseForm"
+			type="perform">
+
+			<columns>
+
+				<yes-no-field
+					name="updateProducts"/>
+
+				<yes-no-field
+					name="removeProducts"/>
 
 			</columns>
 

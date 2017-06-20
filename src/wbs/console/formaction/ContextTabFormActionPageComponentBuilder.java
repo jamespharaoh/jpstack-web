@@ -138,8 +138,11 @@ class ContextTabFormActionPageComponentBuilder
 
 				.addValueProperty (
 					"submitLabel",
-					optionalFromNullable (
-						spec.submitLabel ()))
+					optionalOf (
+						ifNull (
+							spec.submitLabel (),
+							camelToSpaces (
+								spec.name ()))))
 
 				.addValuePropertyFormat (
 					"localFile",
