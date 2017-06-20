@@ -8,7 +8,9 @@ import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.anyIsNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -616,62 +618,71 @@ class ConsoleComponentPlugin
 			if (! gotSections) {
 
 				String fieldsProviderName =
-					stringFormat (
-						"%s%sFormFieldsProvider",
-						hyphenToCamel (
-							moduleSpec.name ()),
-						hyphenToCamelCapitalise (
-							formSpec.name ()));
+					ifNull (
+						formSpec.fieldsProviderName (),
+						stringFormat (
+							"%s%sFormFieldsProvider",
+							hyphenToCamel (
+								moduleSpec.name ()),
+							hyphenToCamelCapitalise (
+								formSpec.name ())));
 
 				if (
 					isNotNull (
 						formSpec.objectTypeName ())
 				) {
 
-					componentRegistry.registerDefinition (
-						taskLogger,
-						new ComponentDefinition ()
+					if (
+						isNull (
+							formSpec.fieldsProviderName ())
+					) {
 
-						.name (
-							fieldsProviderName)
+						componentRegistry.registerDefinition (
+							taskLogger,
+							new ComponentDefinition ()
 
-						.componentClass (
-							StaticFieldsProvider.class)
+							.name (
+								fieldsProviderName)
 
-						.factoryClass (
-							genericCastUnchecked (
-								StaticObjectFieldsProviderFactory.class))
+							.componentClass (
+								StaticFieldsProvider.class)
 
-						.scope (
-							"singleton")
+							.factoryClass (
+								genericCastUnchecked (
+									StaticObjectFieldsProviderFactory.class))
 
-						.hide (
-							true)
+							.scope (
+								"singleton")
 
-						.addValuePropertyFormat (
-							"name",
-							"%s.%s",
-							moduleSpec.name (),
-							formSpec.name ())
+							.hide (
+								true)
 
-						.addReferencePropertyFormat (
-							"consoleHelper",
-							"singleton",
-							"%sConsoleHelper",
-							hyphenToCamel (
-								formSpec.objectTypeName ()))
+							.addValuePropertyFormat (
+								"name",
+								"%s.%s",
+								moduleSpec.name (),
+								formSpec.name ())
 
-						.addValueProperty (
-							"columnFieldSpecs",
-							optionalFromNullable (
-								formSpec.columnFields ()))
+							.addReferencePropertyFormat (
+								"consoleHelper",
+								"singleton",
+								"%sConsoleHelper",
+								hyphenToCamel (
+									formSpec.objectTypeName ()))
 
-						.addValueProperty (
-							"rowFieldSpecs",
-							optionalFromNullable (
-								formSpec.rowFields ()))
+							.addValueProperty (
+								"columnFieldSpecs",
+								optionalFromNullable (
+									formSpec.columnFields ()))
 
-					);
+							.addValueProperty (
+								"rowFieldSpecs",
+								optionalFromNullable (
+									formSpec.rowFields ()))
+
+						);
+
+					}
 
 				} else {
 
