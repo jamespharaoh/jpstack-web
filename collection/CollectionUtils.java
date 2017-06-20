@@ -217,6 +217,26 @@ class CollectionUtils {
 	}
 
 	public static <Type>
+	Type listItemAtIndexRequired (
+			@NonNull List <Type> list,
+			@NonNull Integer index) {
+
+		Type value =
+			list.get (
+				index);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return value;
+
+	}
+
+	public static <Type>
 	Optional <Type> listFirstElement (
 			@NonNull List <Type> list) {
 
