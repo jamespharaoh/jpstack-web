@@ -18,6 +18,7 @@
 
 	<layer name="logic">
 		<component class="apiclient.ShopifyApiClientImplementation"/>
+		<component class="apiclient.ShopifyProductCreateHttpSenderHelper"/>
 		<component class="apiclient.ShopifyProductListHttpSenderHelper"/>
 	</layer>
 

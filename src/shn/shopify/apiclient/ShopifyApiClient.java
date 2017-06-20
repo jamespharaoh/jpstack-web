@@ -16,4 +16,9 @@ interface ShopifyApiClient {
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials);
 
+	ShopifyProductResponse createProduct (
+			TaskLogger parentTaskLogger,
+			ShopifyApiClientCredentials credentials,
+			ShopifyProductRequest product);
+
 }

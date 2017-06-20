@@ -10,6 +10,8 @@ import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
@@ -612,11 +614,32 @@ class GenericHttpSender <Request, Response> {
 			encode (
 				taskLogger);
 
+System.out.println (helper.requestBody ());
+
 			send (
 				taskLogger);
 
+System.out.println (requestTrace);
+
 			receive (
 				taskLogger);
+
+			if (
+				optionalIsPresent (
+					errorMessage)
+			) {
+
+				throw new RuntimeException (
+					optionalGetRequired (
+						errorMessage));
+
+			}
+
+System.out.println (httpResponse.getStatusLine ());
+
+System.out.println (responseTrace);
+
+System.out.println (responseBody);
 
 			decode (
 				taskLogger);

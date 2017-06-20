@@ -31,6 +31,15 @@ class ShopifyApiClientImplementation
 	@ClassSingletonDependency
 	LogContext logContext;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	@NamedDependency ("shopifyProductCreateHttpSender")
+	ComponentProvider <GenericHttpSender <
+		ShopifyProductCreateRequest,
+		ShopifyProductCreateResponse
+	>> productCreateHttpSenderProvider;
+
 	@PrototypeDependency
 	@NamedDependency ("shopifyProductListHttpSender")
 	ComponentProvider <GenericHttpSender <
@@ -87,7 +96,7 @@ class ShopifyApiClientImplementation
 
 		) {
 
-			ImmutableList.Builder <ShopifyProductListEntryResponse> builder =
+			ImmutableList.Builder <ShopifyProductResponse> builder =
 				ImmutableList.builder ();
 
 			for (
@@ -135,6 +144,44 @@ class ShopifyApiClientImplementation
 					builder.build ())
 
 			;
+
+		}
+
+	}
+
+	@Override
+	public
+	ShopifyProductResponse createProduct (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ShopifyApiClientCredentials credentials,
+			@NonNull ShopifyProductRequest product) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createProduct");
+
+		) {
+
+			ShopifyProductCreateResponse response =
+				productCreateHttpSenderProvider.provide (
+					taskLogger)
+
+				.allInOne (
+					taskLogger,
+					new ShopifyProductCreateRequest ()
+
+				.credentials (
+					credentials)
+
+				.product (
+					product)
+
+			);
+
+			return response.product ();
 
 		}
 

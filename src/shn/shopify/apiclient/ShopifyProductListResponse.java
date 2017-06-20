@@ -16,7 +16,7 @@ class ShopifyProductListResponse {
 
 	@DataChildren (
 		childrenElement = "products")
-	List <ShopifyProductListEntryResponse> products =
+	List <ShopifyProductResponse> products =
 		emptyList ();
 
 }

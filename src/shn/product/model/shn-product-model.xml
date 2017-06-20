@@ -94,6 +94,27 @@
 			column-type="postgresql"
 			nullable="yes"/>
 
+		<!-- shopify data -->
+
+		<integer-field
+			name="shopifyId"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifyCreateTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifyUpdateTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifyRemoveTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
 	</fields>
 
 </model-meta>

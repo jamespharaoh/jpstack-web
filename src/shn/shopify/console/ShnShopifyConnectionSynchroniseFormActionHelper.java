@@ -1,7 +1,10 @@
 package shn.shopify.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
@@ -26,8 +29,11 @@ import wbs.utils.string.FormatWriter;
 
 import shn.product.console.ShnProductConsoleHelper;
 import shn.product.model.ShnProductRec;
-import shn.shopify.apiclient.ShopifyProductListResponse;
 import shn.shopify.apiclient.ShopifyApiClient;
+import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.ShopifyProductListResponse;
+import shn.shopify.apiclient.ShopifyProductRequest;
+import shn.shopify.apiclient.ShopifyProductResponse;
 import shn.shopify.model.ShnShopifyConnectionRec;
 import wbs.web.responder.WebResponder;
 
@@ -171,24 +177,18 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 				shopifyConnectionHelper.findFromContextRequired (
 					transaction);
 
-			// get all products from shopify
-
-			ShopifyProductListResponse response =
-				shopifyApiClient.listAllProducts (
-					transaction,
-					shopifyApiClient.getCredentials (
-						transaction,
-						shopifyConnection.getStore ()));
-
-			requestContext.addNoticeFormat (
-				"Got %s products",
-				integerToDecimalString (
-					collectionSize (
-						response.products ())));
-
 			long productsCreated = 0l;
 			long productsUpdated = 0l;
 			long productsRemoved = 0l;
+
+			long operations = 0;
+
+			ShopifyApiClientCredentials credentials =
+				shopifyApiClient.getCredentials (
+					transaction,
+					shopifyConnection.getStore ());
+
+			// create or update products
 
 			List <ShnProductRec> allProducts =
 				productHelper.findAll (
@@ -198,6 +198,124 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 				ShnProductRec product
 					: allProducts
 			) {
+
+				if (
+					isNull (
+						product.getShopifyId ())
+				) {
+
+					operations ++;
+
+					if (operations > maxOperations) {
+						continue;
+					}
+
+					ShopifyProductResponse shopifyProduct =
+						shopifyApiClient.createProduct (
+							transaction,
+							credentials,
+							new ShopifyProductRequest ()
+
+						.title (
+							product.getPublicTitle ())
+
+						.bodyHtml (
+							product.getPublicDescription ().getText ())
+
+						.vendor (
+							product.getSupplier ().getPublicName ())
+
+						.productType (
+							product.getSubCategory ().getPublicName ())
+
+					);
+
+					product
+
+						.setShopifyId (
+							shopifyProduct.id ())
+
+						.setShopifyCreateTime (
+							transaction.now ())
+
+					;
+
+					productsCreated ++;
+
+				}
+
+			}
+
+			// remove products
+
+			if (formState.removeProducts ()) {
+
+				ShopifyProductListResponse response =
+					shopifyApiClient.listAllProducts (
+						transaction,
+						credentials);
+
+				requestContext.addNoticeFormat (
+					"Got %s products",
+					integerToDecimalString (
+						collectionSize (
+							response.products ())));
+
+			}
+
+			// commit and return
+
+			transaction.commit ();
+
+			if (
+				moreThanZero (
+					productsCreated)
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s products created",
+					integerToDecimalString (
+						productsCreated));
+
+			}
+
+			if (
+				moreThanZero (
+					productsUpdated)
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s products updated",
+					integerToDecimalString (
+						productsUpdated));
+
+			}
+
+			if (
+				moreThanZero (
+					productsRemoved)
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s products removed",
+					integerToDecimalString (
+						productsRemoved));
+
+			}
+
+			if (
+				moreThan (
+					operations,
+					maxOperations)
+			) {
+
+				requestContext.addWarningFormat (
+					"Only performed %s out of %s operations, please repeat",
+					integerToDecimalString (
+						maxOperations),
+					integerToDecimalString (
+						operations));
+
 			}
 
 			return optionalAbsent ();
@@ -205,5 +323,10 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 		}
 
 	}
+
+	// data
+
+	public final static
+	long maxOperations = 20;
 
 }

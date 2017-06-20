@@ -13,7 +13,7 @@ import wbs.framework.data.annotations.DataChildren;
 @Accessors (fluent = true)
 @Data
 public
-class ShopifyProductListEntryResponse {
+class ShopifyProductResponse {
 
 	@DataAttribute (
 		name = "id")

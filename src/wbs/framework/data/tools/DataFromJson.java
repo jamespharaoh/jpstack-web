@@ -120,16 +120,11 @@ class DataFromJson {
 					dataChildren)
 			) {
 
-System.out.println ("DO CHILDREN");
-System.out.println (ifNull (dataChildren.childrenElement (), field.getName ()));
-
 				Object fieldValue =
 					jsonValue.get (
 						ifNull (
 							dataChildren.childrenElement (),
 							field.getName ()));
-
-System.out.println (fieldValue);
 
 				if (fieldValue == null) {
 					continue;

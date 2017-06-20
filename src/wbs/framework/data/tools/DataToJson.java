@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataClass;
 
 public
@@ -107,14 +108,8 @@ class DataToJson {
 					: dataClass.getDeclaredFields ()
 			) {
 
-				DataAttribute dataAttribute =
-					field.getAnnotation (
-						DataAttribute.class);
-
-				if (dataAttribute == null)
-					continue;
-
-				field.setAccessible (true);
+				field.setAccessible (
+					true);
 
 				Object fieldValue =
 					fieldGet (
@@ -124,12 +119,37 @@ class DataToJson {
 				if (fieldValue == null)
 					continue;
 
-				jsonValueBuilder.put (
-					ifNull (
-						nullIfEmptyString (
-							dataAttribute.name ()),
-						field.getName ()),
-					toJson (fieldValue));
+				DataAttribute dataAttribute =
+					field.getAnnotation (
+						DataAttribute.class);
+
+				if (dataAttribute != null) {
+
+					jsonValueBuilder.put (
+						ifNull (
+							nullIfEmptyString (
+								dataAttribute.name ()),
+							field.getName ()),
+						toJson (
+							fieldValue));
+
+				}
+
+				DataChild dataChild =
+					field.getAnnotation (
+						DataChild.class);
+
+				if (dataChild != null) {
+
+					jsonValueBuilder.put (
+						ifNull (
+							nullIfEmptyString (
+								dataChild.name ()),
+							field.getName ()),
+						toJson (
+							fieldValue));
+
+				}
 
 			}
 

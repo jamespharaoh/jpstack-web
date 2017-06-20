@@ -10,6 +10,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.web.utils.HtmlUtils.htmlEncode;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ import wbs.platform.event.logic.EventFixtureLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
 
 import wbs.utils.csv.CsvReader;
 import wbs.utils.io.SafeBufferedReader;
@@ -85,6 +88,9 @@ class ShnProductFixtureProvider
 
 	@SingletonDependency
 	ShnSupplierObjectHelper supplierHelper;
+
+	@SingletonDependency
+	TextObjectHelper textHelper;
 
 	// public implementation
 
@@ -429,6 +435,12 @@ class ShnProductFixtureProvider
 							line,
 							13l));
 
+				TextRec publicDescription =
+					textHelper.findOrCreate (
+						transaction,
+						htmlEncode (
+							name));
+
 				ShnProductRec product =
 					productHelper.insert (
 						transaction,
@@ -445,6 +457,9 @@ class ShnProductFixtureProvider
 
 					.setPublicTitle (
 						name)
+
+					.setPublicDescription (
+						publicDescription)
 
 					.setSupplier (
 						supplier)
@@ -493,6 +508,10 @@ class ShnProductFixtureProvider
 					.put (
 						"publicTitle",
 						name)
+
+					.put (
+						"publicDescription",
+						publicDescription)
 
 					.put (
 						"supplier",
