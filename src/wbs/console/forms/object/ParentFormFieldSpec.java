@@ -28,6 +28,10 @@ class ParentFormFieldSpec
 	@DataAttribute
 	Boolean readOnly;
 
+	@DataAttribute (
+		name = "root")
+	String rootPath;
+
 	@DataAttribute
 	String createPrivDelegate;
 

@@ -488,6 +488,14 @@
 			name="shn-product"
 			package="shn.product"/>
 
+		<plugin
+			name="shn-shopify"
+			package="shn.shopify"/>
+
+		<plugin
+			name="shn-supplier"
+			package="shn.supplier"/>
+
 		<!-- test -->
 
 		<plugin

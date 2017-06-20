@@ -254,6 +254,8 @@
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/shn/core/api/files"/>
       <fileset dir="src/shn/product/api/files"/>
+      <fileset dir="src/shn/shopify/api/files"/>
+      <fileset dir="src/shn/supplier/api/files"/>
       <fileset dir="src/wbs/test/simulator/api/files"/>
       <fileset dir="src/wbs/test/common/api/files"/>
       <fileset dir="src/wbs/web/api/files"/>
@@ -391,6 +393,8 @@
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/shn/core/console/files"/>
       <fileset dir="src/shn/product/console/files"/>
+      <fileset dir="src/shn/shopify/console/files"/>
+      <fileset dir="src/shn/supplier/console/files"/>
       <fileset dir="src/wbs/test/simulator/console/files"/>
       <fileset dir="src/wbs/test/common/console/files"/>
       <fileset dir="src/wbs/web/console/files"/>

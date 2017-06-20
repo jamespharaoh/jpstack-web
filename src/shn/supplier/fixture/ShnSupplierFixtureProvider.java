@@ -1,4 +1,11 @@
-package shn.core.fixture;
+package shn.supplier.fixture;
+
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.etc.Misc.iterable;
+import static wbs.utils.io.FileUtils.fileReaderBuffered;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+
+import java.util.List;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -12,25 +19,23 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 
-import wbs.platform.currency.model.CurrencyObjectHelper;
-import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.event.logic.EventFixtureLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
+
+import wbs.utils.csv.CsvReader;
+import wbs.utils.io.SafeBufferedReader;
 
 import shn.core.model.ShnDatabaseObjectHelper;
 import shn.core.model.ShnDatabaseRec;
+import shn.supplier.model.ShnSupplierObjectHelper;
+import shn.supplier.model.ShnSupplierRec;
 
 public
-class ShnCoreFixtureProvider
+class ShnSupplierFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	CurrencyObjectHelper currencyHelper;
 
 	@SingletonDependency
 	EventFixtureLogic eventFixtureLogic;
@@ -48,7 +53,7 @@ class ShnCoreFixtureProvider
 	ShnDatabaseObjectHelper shnDatabaseHelper;
 
 	@SingletonDependency
-	SliceObjectHelper sliceHelper;
+	ShnSupplierObjectHelper shnSupplierHelper;
 
 	// public implementation
 
@@ -66,13 +71,10 @@ class ShnCoreFixtureProvider
 
 		) {
 
-			createMenuGroups (
-				transaction);
-
 			createMenuItems (
 				transaction);
 
-			createDatabase (
+			createSuppliers (
 				transaction);
 
 		}
@@ -80,52 +82,6 @@ class ShnCoreFixtureProvider
 	}
 
 	// private implementation
-
-	private
-	void createMenuGroups (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"createMenuItems");
-
-		) {
-
-			menuGroupHelper.insert (
-				transaction,
-				menuGroupHelper.createInstance ()
-
-				.setSlice (
-					sliceHelper.findByCodeRequired (
-						transaction,
-						GlobalId.root,
-						"test"))
-
-				.setOrder (
-					5l)
-
-				.setCode (
-					"shopping_nation")
-
-				.setName (
-					"Shopping Nation")
-
-				.setDescription (
-					"Shopping Nation")
-
-				.setLabel (
-					"Shopping Nation")
-
-			);
-
-			transaction.flush ();
-
-		}
-
-	}
 
 	private
 	void createMenuItems (
@@ -152,33 +108,31 @@ class ShnCoreFixtureProvider
 						"shopping_nation"))
 
 				.setCode (
-					"database")
+					"supplier")
 
 				.setName (
-					"Database")
+					"Supplier")
 
 				.setDescription (
-					"Shopping Nation databases")
+					"Suppliers")
 
 				.setLabel (
-					"Databases")
+					"Suppliers")
 
 				.setTargetPath (
-					"/shnDatabases")
+					"/shnSuppliers")
 
 				.setTargetFrame (
 					"main")
 
 			);
 
-			transaction.flush ();
-
 		}
 
 	}
 
 	private
-	void createDatabase (
+	void createSuppliers (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -186,67 +140,84 @@ class ShnCoreFixtureProvider
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"createDatabase");
+					"importTestData");
+
+			SafeBufferedReader reader =
+				fileReaderBuffered (
+					"config/test-data/shn-suppliers.csv");
 
 		) {
 
-			SliceRec slice =
-				sliceHelper.findByCodeRequired (
-					transaction,
-					GlobalId.root,
-					"test");
+			CsvReader csvReader =
+				new CsvReader ()
 
-			CurrencyRec currency =
-				currencyHelper.findByCodeRequired (
+				.skipHeader (
+					true);
+
+			ShnDatabaseRec shnDatabase =
+				shnDatabaseHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
 					"test",
-					"gbp");
+					"test");
 
-			ShnDatabaseRec productDatabase =
-				shnDatabaseHelper.insert (
+			for (
+				List <String> line
+					: iterable (
+						csvReader.readAsList (
+							reader))
+			) {
+
+				String name =
+					listItemAtIndexRequired (
+						line,
+						0l);
+
+				String code =
+					simplifyToCodeRequired (
+						name);
+
+				ShnSupplierRec supplier =
+					shnSupplierHelper.insert (
+						transaction,
+						shnSupplierHelper.createInstance ()
+
+					.setDatabase (
+						shnDatabase)
+
+					.setCode (
+						code)
+
+					.setName (
+						name)
+
+					.setDescription (
+						name)
+
+					.setPublicName (
+						name)
+
+				);
+
+				eventFixtureLogic.createEvents (
 					transaction,
-					shnDatabaseHelper.createInstance ()
+					"SHN Supplier",
+					shnDatabase,
+					supplier,
+					ImmutableMap.<String, Object> builder ()
 
-				.setSlice (
-					slice)
+					.put (
+						"description",
+						name)
 
-				.setCode (
-					"test")
+					.put (
+						"publicName",
+						name)
 
-				.setName (
-					"Test")
+					.build ()
+				);
 
-				.setDescription (
-					"Test Shopping Nation database")
-
-				.setCurrency (
-					currency)
-
-			);
-
-			eventFixtureLogic.createEvents (
-				transaction,
-				"SHN Product",
-				slice,
-				productDatabase,
-				ImmutableMap.<String, Object> builder ()
-
-				.put (
-					"name",
-					"Test")
-
-				.put (
-					"description",
-					"Test product database")
-
-				.put (
-					"currency",
-					currency)
-
-				.build ()
-
-			);
+			}
 
 			transaction.flush ();
 

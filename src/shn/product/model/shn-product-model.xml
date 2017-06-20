@@ -1,6 +1,6 @@
 <model-meta
 	name="shnProduct"
-	type="major">
+	type="common">
 
 	<fields>
 
@@ -11,13 +11,13 @@
 		<!-- identity -->
 
 		<parent-field
-			type="slice"/>
+			name="subCategory"
+			type="shnProductSubCategory"/>
 
-		<code-field/>
+		<code-field
+			name="itemNumber"/>
 
 		<!-- details -->
-
-		<name-field/>
 
 		<description-field/>
 
@@ -35,29 +35,65 @@
 			nullable="yes"/>
 
 		<reference-field
-			name="productType"
-			type="shnProductType"
-			nullable="yes"/>
-
-		<!--
-		<reference-field
-			name="vendor"
-			type="vendor"/>
-		-->
+			name="supplier"
+			type="shnSupplier"/>
 
 		<string-field
-			name="sku"
+			name="supplierReference"
+			nullable="yes"/>
+
+		<integer-field
+			name="recommendedRetailPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="shoppingNationPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="promotionalPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="costPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="postageAndPackaging"
+			nullable="yes"/>
+
+		<integer-field
+			name="stockQuantity"
+			default="0"/>
+
+		<yes-no-field
+			name="active"
+			default="no"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="soldQuantity"
+			default="0"/>
+
+		<integer-field
+			name="salesRetail"
+			default="0"/>
+
+		<integer-field
+			name="salesCost"
+			default="0"/>
+
+		<timestamp-field
+			name="dateFirstAired"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="dateLastAired"
+			column-type="postgresql"
 			nullable="yes"/>
 
 	</fields>
-
-	<priv-types>
-
-		<priv-type
-			name="Manage"
-			description="Full control of a product"
-			template="yes"/>
-
-	</priv-types>
 
 </model-meta>

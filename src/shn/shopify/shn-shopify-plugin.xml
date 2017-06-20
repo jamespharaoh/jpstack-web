@@ -1,0 +1,25 @@
+<plugin
+	name="shn-shopify"
+	package="shn.shopify">
+
+	<plugin-dependencies>
+		<plugin-dependency name="platform-scaffold"/>
+		<plugin-dependency name="shn-core"/>
+	</plugin-dependencies>
+
+	<models>
+		<model name="shnShopifyConnection"/>
+		<model name="shnShopifyStore"/>
+	</models>
+
+	<fixtures>
+		<fixture name="shnShopifyStore"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="shn-shopify"/>
+		<console-module name="shn-shopify-connection"/>
+		<console-module name="shn-shopify-store"/>
+	</console-modules>
+
+</plugin>

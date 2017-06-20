@@ -1,22 +1,22 @@
 <console-module
-	name="shn-product-type">
+	name="shn-shopify-store">
 
 	<console-helper-provider
-		object-name="shnProductType">
+		object-name="shnShopifyStore">
 
 		<priv-key
-			name="shnProductType.manage"
+			name="shnShopifyStore.manage"
 			priv="manage"/>
 
 		<context-stuff
-			name="shnProductTypeName"
+			name="shnShopifyStoreName"
 			field="name"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="shnProductType"
-		object-name="shnProductType">
+		name="shnShopifyStore"
+		object-name="shnShopifyStore">
 
 		<list>
 
@@ -46,7 +46,7 @@
 
 		<form
 			name="list"
-			object-type="shn-product-type"
+			object-type="shn-shopify-store"
 			type="read-only">
 
 			<columns>
@@ -55,16 +55,13 @@
 				<name-field/>
 				<description-field/>
 
-				<text-field
-					name="publicName"/>
-
 			</columns>
 
 		</form>
 
 		<form
 			name="create"
-			object-type="shn-product-type"
+			object-type="shn-shopify-store"
 			type="create">
 
 			<columns>
@@ -73,16 +70,13 @@
 				<name-field/>
 				<description-field/>
 
-				<text-field
-					name="publicName"/>
-
 			</columns>
 
 		</form>
 
 		<form
 			name="summary"
-			object-type="shn-product-type"
+			object-type="shn-shopify-store"
 			type="read-only">
 
 			<columns>
@@ -95,7 +89,19 @@
 				<deleted-field/>
 
 				<text-field
-					name="publicName"/>
+					name="storeName"/>
+
+				<text-field
+					name="privateAppName"/>
+
+				<text-field
+					name="apiKey"/>
+
+				<text-field
+					name="password"/>
+
+				<text-field
+					name="sharedSecret"/>
 
 			</columns>
 
@@ -103,7 +109,7 @@
 
 		<form
 			name="settings"
-			object-type="shn-product-type"
+			object-type="shn-shopify-store"
 			type="update">
 
 			<columns>
@@ -114,7 +120,24 @@
 				<deleted-field/>
 
 				<text-field
-					name="publicName"/>
+					name="storeName"
+					nullable="yes"/>
+
+				<text-field
+					name="privateAppName"
+					nullable="yes"/>
+
+				<text-field
+					name="apiKey"
+					nullable="yes"/>
+
+				<text-field
+					name="password"
+					nullable="yes"/>
+
+				<text-field
+					name="sharedSecret"
+					nullable="yes"/>
 
 			</columns>
 

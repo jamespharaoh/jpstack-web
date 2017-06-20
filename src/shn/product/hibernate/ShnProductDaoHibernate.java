@@ -56,6 +56,18 @@ class ShnProductDaoHibernate
 					"_product")
 
 				.createAlias (
+					"_product.subCategory",
+					"_productSubCategory")
+
+				.createAlias (
+					"_productSubCategory.category",
+					"_productCategory")
+
+				.createAlias (
+					"_productCategory.database",
+					"_shnDatabase")
+
+				.createAlias (
 					"_product.publicDescription",
 					"_publicDescription",
 					JoinType.LEFT_OUTER_JOIN)
@@ -64,30 +76,51 @@ class ShnProductDaoHibernate
 
 			if (
 				isNotNull (
-					search.sliceId ())
+					search.shnDatabaseId ())
 			) {
 
 				criteria.add (
 					Restrictions.eq (
-						"_product.slice.id",
-						search.sliceId ()));
+						"_shnDatabase.id",
+						search.shnDatabaseId ()));
 
 			}
 
 			if (
 				isNotNull (
-					search.name ())
+					search.productCategoryId ())
 			) {
 
 				criteria.add (
-					Restrictions.ilike (
-						"_product.name",
-						stringFormat (
-							"%%%s%%",
-							search.name ())));
+					Restrictions.eq (
+						"_productCategory.id",
+						search.productCategoryId ()));
 
 			}
 
+			if (
+				isNotNull (
+					search.productSubCategoryId ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_productSubCategory.id",
+						search.productSubCategoryId ()));
+
+			}
+
+			if (
+				isNotNull (
+					search.itemNumber ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_product.itemNumber",
+						search.itemNumber ()));
+
+			}
 
 			if (
 				isNotNull (
@@ -117,6 +150,18 @@ class ShnProductDaoHibernate
 
 			if (
 				isNotNull (
+					search.active ())
+			) {
+
+				criteria.add (
+					Restrictions.eq (
+						"_product.active",
+						search.active ()));
+
+			}
+
+			if (
+				isNotNull (
 					search.publicTitle ())
 			) {
 
@@ -140,30 +185,6 @@ class ShnProductDaoHibernate
 						stringFormat (
 							"%%%s%%",
 							search.publicDescription ())));
-
-			}
-
-			if (
-				isNotNull (
-					search.productTypeId ())
-			) {
-
-				criteria.add (
-					Restrictions.ilike (
-						"_product.productType.id",
-						search.productTypeId ()));
-
-			}
-
-			if (
-				isNotNull (
-					search.sku ())
-			) {
-
-				criteria.add (
-					Restrictions.eq (
-						"_product.sku",
-						search.sku ()));
 
 			}
 

@@ -1,11 +1,15 @@
 package wbs.utils.io;
 
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import lombok.NonNull;
 
@@ -148,6 +152,32 @@ class FileUtils {
 
 			throw new RuntimeIoException (
 				ioException);
+
+		}
+
+	}
+
+	@SuppressWarnings ("resource")
+	public static
+	SafeBufferedReader fileReaderBuffered (
+			@NonNull String filename) {
+
+		try {
+
+			return new SafeBufferedReader (
+				new InputStreamReader (
+					new FileInputStream (
+						filename),
+					"utf-8"));
+
+		} catch (UnsupportedEncodingException unsupportedEncodingException) {
+
+			throw shouldNeverHappen ();
+
+		} catch (FileNotFoundException fileNotFoundException) {
+
+			throw new RuntimeFileNotFoundException (
+				fileNotFoundException);
 
 		}
 

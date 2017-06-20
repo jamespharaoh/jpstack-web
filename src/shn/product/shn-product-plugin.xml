@@ -5,11 +5,13 @@
 	<plugin-dependencies>
 		<plugin-dependency name="platform-scaffold"/>
 		<plugin-dependency name="shn-core"/>
+		<plugin-dependency name="shn-supplier"/>
 	</plugin-dependencies>
 
 	<models>
 		<model name="shnProduct"/>
-		<model name="shnProductType"/>
+		<model name="shnProductCategory"/>
+		<model name="shnProductSubCategory"/>
 	</models>
 
 	<fixtures>
@@ -18,7 +20,8 @@
 
 	<console-modules>
 		<console-module name="shn-product"/>
-		<console-module name="shn-product-type"/>
+		<console-module name="shn-product-category"/>
+		<console-module name="shn-product-sub-category"/>
 	</console-modules>
 
 </plugin>

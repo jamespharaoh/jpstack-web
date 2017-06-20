@@ -6,8 +6,16 @@
 		<plugin-dependency name="platform-scaffold"/>
 	</plugin-dependencies>
 
+	<models>
+		<model name="shnDatabase"/>
+	</models>
+
 	<fixtures>
 		<fixture name="shnCore"/>
 	</fixtures>
+
+	<console-modules>
+		<console-module name="shn-database"/>
+	</console-modules>
 
 </plugin>

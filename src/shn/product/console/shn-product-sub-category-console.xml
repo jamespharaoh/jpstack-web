@@ -1,0 +1,133 @@
+<console-module
+	name="shn-product-sub-category">
+
+	<console-helper-provider
+		object-name="shnProductSubCategory"
+		view-priv="category.database:view">
+
+		<priv-key
+			name="shnProductSubCategory.manage"
+			priv="category.database:manage"/>
+
+		<context-stuff
+			name="shnProductSubCategoryName"
+			field="name"/>
+
+		<context-stuff
+			name="shnProductCategoryId"
+			field="category.id"/>
+
+		<run-post-processor
+			name="shnProductCategory"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="shnProductSubCategory"
+		object-name="shnProductSubCategory">
+
+		<list>
+
+			<object-list-page
+				form="list"/>
+
+			<object-create-page
+				form="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				form="summary"/>
+
+			<object-settings-page
+				form="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<forms>
+
+		<form
+			name="list"
+			object-type="shn-product-sub-category"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="shn-product-sub-category"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="shn-product-sub-category"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="shn-product-sub-category"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
+
+</console-module>

@@ -1,0 +1,138 @@
+<console-module
+	name="shn-product-category">
+
+	<console-helper-provider
+		object-name="shnProductCategory"
+		view-priv="database:view">
+
+		<priv-key
+			name="shnProductSubCategory.manage"
+			priv="database:manage"/>
+
+		<context-stuff
+			name="shnProductCategoryName"
+			field="name"/>
+
+		<context-stuff
+			name="shnDatabaseId"
+			field="database.id"/>
+
+		<run-post-processor
+			name="shnDatabase"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="shnProductCategory"
+		object-name="shnProductCategory">
+
+		<list>
+
+			<object-list-page
+				form="list"/>
+
+			<object-create-page
+				form="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				form="summary"/>
+
+			<object-settings-page
+				form="settings"/>
+
+			<context-link
+				name="subCategory"
+				link="shnProductSubCategory"
+				label="Sub categories"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<forms>
+
+		<form
+			name="list"
+			object-type="shn-product-category"
+			type="read-only">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="create"
+			object-type="shn-product-category"
+			type="create">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="shn-product-category"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="settings"
+			object-type="shn-product-category"
+			type="update">
+
+			<columns>
+
+				<parent-field/>
+				<name-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<text-field
+					name="publicName"/>
+
+			</columns>
+
+		</form>
+
+	</forms>
+
+</console-module>

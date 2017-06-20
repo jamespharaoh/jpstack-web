@@ -11,18 +11,18 @@ public
 class ShnProductSearch
 	implements Serializable {
 
-	Long sliceId;
+	Long shnDatabaseId;
 
-	String name;
+	Long productCategoryId;
+	Long productSubCategoryId;
+
+	String itemNumber;
 	String description;
 
 	Boolean deleted;
+	Boolean active;
 
 	String publicTitle;
 	String publicDescription;
-
-	Long productTypeId;
-
-	String sku;
 
 }

@@ -128,16 +128,19 @@ class DeploymentFixtureProvider
 				consoleDeploymentHelper.createInstance ()
 
 				.setCode (
-					"test")
+					"dev")
 
 				.setName (
-					"Test")
+					"dev")
 
 				.setDescription (
-					"Console test deployment")
+					"Console dev deployment")
 
 				.setHost (
 					runHostname ())
+
+				.setStatusLabel (
+					"Local dev")
 
 			);
 

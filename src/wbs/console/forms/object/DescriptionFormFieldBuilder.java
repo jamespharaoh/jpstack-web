@@ -289,6 +289,9 @@ class DescriptionFormFieldBuilder
 					.interfaceMapping (
 						interfaceMapping)
 
+					.csvMapping (
+						interfaceMapping)
+
 					.renderer (
 						renderer)
 
@@ -318,6 +321,9 @@ class DescriptionFormFieldBuilder
 						constraintValidator)
 
 					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
 						interfaceMapping)
 
 					.renderer (

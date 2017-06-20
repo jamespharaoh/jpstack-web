@@ -23,6 +23,7 @@
 	</layer>
 
 	<layer name="logic">
+		<component class="logic.EventFixtureLogicImplementation"/>
 		<component class="logic.EventLogicImplementation"/>
 	</layer>
 

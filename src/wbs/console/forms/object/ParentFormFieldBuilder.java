@@ -190,7 +190,9 @@ class ParentFormFieldBuilder
 						consoleHelper.parentFieldName ())
 
 					.nativeClass (
-						consoleHelper.parentClassRequired ()),
+						consoleHelper.parentClassRequired ())
+
+				,
 
 				() -> parentFormFieldAccessorProvider.get ()
 
@@ -243,11 +245,16 @@ class ParentFormFieldBuilder
 				.entityFinder (
 					parentHelper)
 
+				.rootFieldName (
+					spec.rootPath ())
+
 				.mini (
 					consoleHelper.parentTypeIsFixed ())
 
 				.nullable (
-					false);
+					false)
+
+			;
 
 			// update hook
 
