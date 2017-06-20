@@ -153,13 +153,6 @@ class MessageTemplateEntryValueFieldsProvider
 						formName),
 					scriptRefFieldSpecs);
 
-			// get static felds
-
-			FormFieldSet <MessageTemplateEntryValueRec> staticFields =
-				consoleModule.formFieldSetRequired (
-					mode,
-					MessageTemplateEntryValueRec.class);
-
 			// build dynamic form fields
 
 			MessageTemplateEntryTypeRec entryType =
@@ -219,7 +212,6 @@ class MessageTemplateEntryValueFieldsProvider
 						MessageTemplateEntryValueRec.class,
 						ImmutableList.of (
 							scriptRefFields,
-							staticFields,
 							dynamicFields)))
 
 			;
