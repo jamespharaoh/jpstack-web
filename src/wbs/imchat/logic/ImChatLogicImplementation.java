@@ -216,7 +216,7 @@ class ImChatLogicImplementation
 							.put (
 								"amount",
 								currencyLogic.formatText (
-									imChat.getBillingCurrency (),
+									imChat.getCreditCurrency (),
 									message.getPrice ()))
 
 							.build ();
