@@ -539,6 +539,18 @@ class StringUtils {
 	}
 
 	public static
+	String underscoreToSpacesCapitalise (
+			@NonNull String string) {
+
+		return capitalise (
+			replaceAll (
+				string,
+				"_",
+				" "));
+
+	}
+
+	public static
 	String hyphenToUnderscore (
 			@NonNull String string) {
 

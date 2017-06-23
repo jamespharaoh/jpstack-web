@@ -179,6 +179,78 @@ class IterableUtils {
 
 	}
 
+	public static <In, Out>
+	Iterable <Pair <Long, Out>> iterableMapWithIndex (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, Out> mapFunction) {
+
+		return () ->
+			new Iterator <Pair <Long, Out>> () {
+
+			Iterator <? extends In> iterator =
+				iterable.iterator ();
+
+			long index = 0;
+
+			@Override
+			public
+			boolean hasNext () {
+				return iterator.hasNext ();
+			}
+
+			@Override
+			public
+			Pair <Long, Out> next () {
+
+				Pair <Long, Out> value =
+					Pair.of (
+						index,
+						mapFunction.apply (
+							index,
+							iterator.next ()));
+
+				index ++;
+
+				return value;
+
+			}
+
+		};
+
+	}
+
+	public static <In, OutKey, OutValue>
+	Map <OutKey, OutValue> iterableMapWithIndexToMap (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, OutKey> keyFunction,
+			@NonNull BiFunction <Long, ? super In, OutValue> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> builder =
+			ImmutableMap.builder ();
+
+		long index = 0;
+
+		for (
+			In item
+				: iterable
+		) {
+
+			builder.put (
+				keyFunction.apply (
+					index,
+					item),
+				valueFunction.apply (
+					index,
+					item));
+
+			index ++;
+
+		}
+
+		return builder.build ();
+
+	}
+
 	public static <Type>
 	Set <Type> iterableToSet (
 			@NonNull Iterable <Type> input) {
@@ -190,8 +262,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	Iterable <ItemType> iterableFilter (
-			@NonNull Predicate <? super ItemType> predicate,
-			@NonNull Iterable <ItemType> input) {
+			@NonNull Iterable <ItemType> input,
+			@NonNull Predicate <? super ItemType> predicate) {
 
 		return () ->
 			iterableStream (
