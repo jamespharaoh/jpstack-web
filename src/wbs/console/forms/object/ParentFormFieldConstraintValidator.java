@@ -1,6 +1,7 @@
 package wbs.console.forms.object;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,6 +13,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.types.FormFieldConstraintValidator;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 
@@ -27,8 +29,8 @@ import wbs.framework.logging.LogContext;
 @PrototypeComponent ("parentFormFieldConstraintValidator")
 public
 class ParentFormFieldConstraintValidator <
-	Container extends Record <?>,
-	Native extends Record <?>
+	Container extends Record <Container>,
+	Native extends Record <Native>
 >
 	implements FormFieldConstraintValidator <Container, Native> {
 
@@ -46,10 +48,7 @@ class ParentFormFieldConstraintValidator <
 	// properties
 
 	@Getter @Setter
-	String createPrivDelegate;
-
-	@Getter @Setter
-	String createPrivCode;
+	ConsoleHelper <Container> consoleHelper;
 
 	// implementation
 
@@ -69,20 +68,11 @@ class ParentFormFieldConstraintValidator <
 
 		) {
 
-			Record <?> privDelegate =
-				createPrivDelegate != null
-					? (Record <?>)
-						objectManager.dereferenceObsolete (
-							transaction,
-							nativeValue.get (),
-							createPrivDelegate)
-					: nativeValue.get ();
-
 			if (
-				! privChecker.canRecursive (
+				! consoleHelper.canCreateIn (
 					transaction,
-					privDelegate,
-					createPrivCode)
+					optionalGetRequired (
+						nativeValue))
 			) {
 
 				return optionalOf (

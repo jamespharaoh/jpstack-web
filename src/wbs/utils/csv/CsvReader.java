@@ -1,11 +1,14 @@
 package wbs.utils.csv;
 
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableMapWithIndexToMap;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.io.BufferedReader;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -29,10 +32,11 @@ class CsvReader {
 	// public implementation
 
 	public
-	Iterator <List <String>> readAsList (
+	Iterable <List <String>> readAsList (
 			@NonNull BufferedReader reader) {
 
-		return reader.lines ()
+		return () ->
+			reader.lines ()
 
 			.skip (
 				skipHeader ? 1 : 0)
@@ -48,6 +52,26 @@ class CsvReader {
 						line))
 
 			.iterator ();
+
+	}
+
+	public
+	Iterable <Map <String, String>> readAsMap (
+			@NonNull List <String> columnNames,
+			@NonNull BufferedReader reader) {
+
+		return iterableMap (
+			readAsList (
+				reader),
+			lineList ->
+				iterableMapWithIndexToMap (
+					lineList,
+					(index, value) ->
+						listItemAtIndexRequired (
+							columnNames,
+							index),
+					(index, value) ->
+						value));
 
 	}
 

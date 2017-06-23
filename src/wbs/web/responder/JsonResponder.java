@@ -16,7 +16,7 @@ import org.json.simple.JSONValue;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataToJson;
+import wbs.framework.data.tools.DataToSimple;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -79,8 +79,8 @@ class JsonResponder
 
 		) {
 
-			DataToJson dataToJson =
-				new DataToJson ();
+			DataToSimple dataToJson =
+				new DataToSimple ();
 
 			Object jsonValue =
 				dataToJson.toJson (

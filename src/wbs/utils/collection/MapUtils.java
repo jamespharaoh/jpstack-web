@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
@@ -311,6 +312,56 @@ class MapUtils {
 	}
 
 	public static <KeyType, ValueType>
+	Map <KeyType, Optional <ValueType>> mapItemsForKeys (
+			@NonNull Map <KeyType, ValueType> map,
+			@NonNull Iterable <KeyType> keys) {
+
+		ImmutableMap.Builder <KeyType, Optional <ValueType>> builder =
+			ImmutableMap.builder ();
+
+		for (
+			KeyType key
+				: keys
+		) {
+
+			builder.put (
+				key,
+				mapItemForKey (
+					map,
+					key));
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <Key, Value>
+	Map <Key, Value> mapItemsForKeysRequired (
+			@NonNull Map <Key, Value> map,
+			@NonNull Iterable <Key> keys) {
+
+		ImmutableMap.Builder <Key, Value> builder =
+			ImmutableMap.builder ();
+
+		for (
+			Key key
+				: keys
+		) {
+
+			builder.put (
+				key,
+				mapItemForKeyRequired (
+					map,
+					key));
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <KeyType, ValueType>
 	Map <KeyType, ValueType> mapWithDerivedKey (
 			@NonNull Iterable <ValueType> values,
 			@NonNull Function <
@@ -400,6 +451,35 @@ class MapUtils {
 		map.put (
 			key,
 			value);
+
+	}
+
+	public static <Key, Value>
+	Map <Key, Value> mapFilterByKeyToMap (
+			@NonNull Map <Key, Value> input,
+			@NonNull Predicate <Key> predicate) {
+
+		ImmutableMap.Builder <Key, Value> builder =
+			ImmutableMap.builder ();
+
+		for (
+			Map.Entry <Key, Value> entry
+				: input.entrySet ()
+		) {
+
+			if (
+				! predicate.test (
+					entry.getKey ())
+			) {
+				continue;
+			}
+
+			builder.put (
+				entry);
+
+		}
+
+		return builder.build ();
 
 	}
 

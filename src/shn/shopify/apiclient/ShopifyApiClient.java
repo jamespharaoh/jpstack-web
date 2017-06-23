@@ -21,4 +21,9 @@ interface ShopifyApiClient {
 			ShopifyApiClientCredentials credentials,
 			ShopifyProductRequest product);
 
+	void removeProduct (
+			TaskLogger parentTaskLogger,
+			ShopifyApiClientCredentials credentials,
+			Long id);
+
 }

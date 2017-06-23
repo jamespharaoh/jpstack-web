@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import wbs.framework.apiclient.GenericHttpSender.Method;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
@@ -122,13 +120,12 @@ class ShopifyProductCreateHttpSenderHelper
 		DataToJson dataToJson =
 			new DataToJson ();
 
-		Object jsonValue =
+		JsonElement jsonValue =
 			dataToJson.toJson (
 				request);
 
 		requestBody =
-			JSONValue.toJSONString (
-				jsonValue);
+			jsonValue.toString ();
 
 	}
 
@@ -136,18 +133,13 @@ class ShopifyProductCreateHttpSenderHelper
 	public
 	void decode () {
 
-		JSONObject jsonObject =
-			(JSONObject)
-			JSONValue.parse (
-				responseBody);
-
 		DataFromJson dataFromJson =
 			new DataFromJson ();
 
 		response =
 			dataFromJson.fromJson (
 				ShopifyProductCreateResponse.class,
-				jsonObject);
+				responseBody);
 
 	}
 

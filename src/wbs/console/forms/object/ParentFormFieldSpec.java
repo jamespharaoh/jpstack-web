@@ -32,10 +32,4 @@ class ParentFormFieldSpec
 		name = "root")
 	String rootPath;
 
-	@DataAttribute
-	String createPrivDelegate;
-
-	@DataAttribute
-	String createPrivCode;
-
 }

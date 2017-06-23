@@ -11,6 +11,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.ids.GeneratedIdFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -72,10 +73,15 @@ class GeneratedIdFieldWriter
 				.propertyNameFormat (
 					"id")
 
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
+
 				.writeBlock (
 					taskLogger,
 					target.imports (),
-					target.formatWriter ());
+					target.formatWriter ())
+
+			;
 
 		}
 

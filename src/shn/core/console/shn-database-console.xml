@@ -35,17 +35,18 @@
 				form="summary"/>
 
 			<section
-				name="settings"
-				label="Settings">
-
-				<object-settings-page
-					short-name="general"
-					form="settings"/>
+				name="product"
+				label="Products">
 
 				<context-link
-					name="productCategory"
+					name="product"
+					link="shnProduct"
+					label="Products"/>
+
+				<context-link
+					name="category"
 					link="shnProductCategory"
-					label="Product categories"/>
+					label="Categories"/>
 
 				<context-link
 					name="supplier"
@@ -54,12 +55,60 @@
 
 			</section>
 
-			<context-link
-				name="product"
-				link="shnProduct"
-				label="Products"/>
+			<section
+				name="show"
+				label="Shows">
 
-			<object-events-page/>
+				<context-link
+					name="show"
+					link="shnShow"
+					label="Shows"/>
+
+				<context-link
+					name="type"
+					link="shnShowType"
+					label="Show types"/>
+
+				<context-link
+					name="presenter"
+					link="shnShowPresenter"
+					label="Presenters"/>
+
+				<context-link
+					name="guest"
+					link="shnShowGuest"
+					label="Guests"/>
+
+			</section>
+
+			<section
+				name="promo"
+				label="Promos">
+
+				<context-link
+					name="promo"
+					link="shnPromo"
+					label="Promos"/>
+
+				<context-link
+					name="type"
+					link="shnPromoType"
+					label="Promo types"/>
+
+			</section>
+
+			<section
+				name="settings"
+				label="Settings"
+				priv-key="shnDatabase.manage">
+
+				<object-settings-page
+					short-name="general"
+					form="settings"/>
+
+				<object-events-page/>
+
+			</section>
 
 		</object>
 

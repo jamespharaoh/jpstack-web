@@ -1,0 +1,34 @@
+<model-meta
+	name="shnPromoItem"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			name="promo"
+			type="shnPromo"/>
+
+		<index-field/>
+
+		<!-- details -->
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="productVariant"
+			type="shnProductVariant"/>
+
+		<integer-field
+			name="promoPrice"/>
+
+	</fields>
+
+</model-meta>

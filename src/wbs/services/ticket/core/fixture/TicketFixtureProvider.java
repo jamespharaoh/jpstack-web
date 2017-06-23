@@ -5,6 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -76,10 +77,13 @@ class TicketFixtureProvider
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	RandomLogic randomLogic;
+
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	@SingletonDependency
-	RandomLogic randomLogic;
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -128,7 +132,7 @@ class TicketFixtureProvider
 					menuGroupHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test",
+						wbsConfig.defaultSlice (),
 						"facility"))
 
 				.setCode (
@@ -180,7 +184,7 @@ class TicketFixtureProvider
 					sliceHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test"))
+						wbsConfig.defaultSlice ()))
 
 				.setCode (
 					"ticket_manager")

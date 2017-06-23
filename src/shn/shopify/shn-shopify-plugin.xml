@@ -20,10 +20,11 @@
 		<component class="apiclient.ShopifyApiClientImplementation"/>
 		<component class="apiclient.ShopifyProductCreateHttpSenderHelper"/>
 		<component class="apiclient.ShopifyProductListHttpSenderHelper"/>
+		<component class="apiclient.ShopifyProductRemoveHttpSenderHelper"/>
 	</layer>
 
 	<fixtures>
-		<fixture name="shnShopifyStore"/>
+		<fixture name="shnShopify"/>
 	</fixtures>
 
 	<console-modules>

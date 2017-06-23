@@ -40,4 +40,8 @@ interface ConsoleHelperProvider <
 			Transaction parentTransaction,
 			ConsoleContextStuff contextStuff);
 
+	boolean canCreateIn (
+			Transaction parentTransaction,
+			Record <?> parent);
+
 }

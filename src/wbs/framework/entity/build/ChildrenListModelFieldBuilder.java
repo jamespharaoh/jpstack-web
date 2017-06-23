@@ -140,6 +140,9 @@ class ChildrenListModelFieldBuilder
 				.collectionValueType (
 					fieldTypeClass)
 
+				.joinColumnName (
+					spec.joinColumnName ())
+
 				.whereSql (
 					spec.whereSql ())
 

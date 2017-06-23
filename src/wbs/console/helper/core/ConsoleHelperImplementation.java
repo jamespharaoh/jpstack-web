@@ -137,6 +137,18 @@ class ConsoleHelperImplementation <
 
 	@Override
 	public
+	boolean canCreateIn (
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parent) {
+
+		return consoleHelperProvider.canCreateIn (
+			parentTransaction,
+			parent);
+
+	}
+
+	@Override
+	public
 	Optional <RecordType> findFromContext (
 			@NonNull Transaction parentTransaction) {
 

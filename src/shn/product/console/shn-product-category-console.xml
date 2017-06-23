@@ -6,12 +6,12 @@
 		view-priv="database:view">
 
 		<priv-key
-			name="shnProductSubCategory.manage"
-			priv="database:manage"/>
+			name="shnProductCategory.manage"
+			priv="database:admin"/>
 
 		<context-stuff
 			name="shnProductCategoryName"
-			field="name"/>
+			field="code"/>
 
 		<context-stuff
 			name="shnDatabaseId"
@@ -41,13 +41,13 @@
 			<object-summary-page
 				form="summary"/>
 
-			<object-settings-page
-				form="settings"/>
-
 			<context-link
 				name="subCategory"
 				link="shnProductSubCategory"
 				label="Sub categories"/>
+
+			<object-settings-page
+				form="settings"/>
 
 			<object-events-page/>
 
@@ -64,8 +64,7 @@
 
 			<columns>
 
-				<parent-field/>
-				<name-field/>
+				<code-field/>
 				<description-field/>
 
 				<text-field
@@ -82,8 +81,7 @@
 
 			<columns>
 
-				<parent-field/>
-				<name-field/>
+				<code-field pattern="[A-Z]+"/>
 				<description-field/>
 
 				<text-field
@@ -103,7 +101,6 @@
 				<id-field/>
 				<parent-field/>
 				<code-field/>
-				<name-field/>
 				<description-field/>
 				<deleted-field/>
 
@@ -121,8 +118,7 @@
 
 			<columns>
 
-				<parent-field/>
-				<name-field/>
+				<code-field pattern="[A-Z]+"/>
 				<description-field/>
 				<deleted-field/>
 

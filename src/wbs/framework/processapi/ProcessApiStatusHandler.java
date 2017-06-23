@@ -20,7 +20,7 @@ import org.glassfish.grizzly.http.server.Response;
 import org.json.simple.JSONValue;
 
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.data.tools.DataToJson;
+import wbs.framework.data.tools.DataToSimple;
 
 import wbs.web.misc.HttpStatus;
 
@@ -74,8 +74,8 @@ class ProcessApiStatusHandler
 
 		// send response
 
-		DataToJson dataToJson =
-			new DataToJson ();
+		DataToSimple dataToJson =
+			new DataToSimple ();
 
 		Object jsonResponseObject =
 			dataToJson.toJson (

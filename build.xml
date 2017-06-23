@@ -138,6 +138,7 @@
     <mkdir dir="work/api/root/WEB-INF/lib"/>
     <copy todir="work/api/root" failonerror="false">
       <fileset dir="src/wbs/utils/api/files"/>
+      <fileset dir="src/wbs/framework/apiclient/api/files"/>
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/codegen/api/files"/>
       <fileset dir="src/wbs/framework/component/api/files"/>
@@ -254,7 +255,9 @@
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/shn/core/api/files"/>
       <fileset dir="src/shn/product/api/files"/>
+      <fileset dir="src/shn/promo/api/files"/>
       <fileset dir="src/shn/shopify/api/files"/>
+      <fileset dir="src/shn/show/api/files"/>
       <fileset dir="src/shn/supplier/api/files"/>
       <fileset dir="src/wbs/test/simulator/api/files"/>
       <fileset dir="src/wbs/test/common/api/files"/>
@@ -277,6 +280,7 @@
     <mkdir dir="work/console/root/WEB-INF/lib"/>
     <copy todir="work/console/root" failonerror="false">
       <fileset dir="src/wbs/utils/console/files"/>
+      <fileset dir="src/wbs/framework/apiclient/console/files"/>
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/codegen/console/files"/>
       <fileset dir="src/wbs/framework/component/console/files"/>
@@ -393,7 +397,9 @@
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/shn/core/console/files"/>
       <fileset dir="src/shn/product/console/files"/>
+      <fileset dir="src/shn/promo/console/files"/>
       <fileset dir="src/shn/shopify/console/files"/>
+      <fileset dir="src/shn/show/console/files"/>
       <fileset dir="src/shn/supplier/console/files"/>
       <fileset dir="src/wbs/test/simulator/console/files"/>
       <fileset dir="src/wbs/test/common/console/files"/>

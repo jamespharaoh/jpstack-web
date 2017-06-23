@@ -1,5 +1,7 @@
 package wbs.console.forms.object;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.regex.Matcher;
@@ -20,7 +22,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 @PrototypeComponent ("codeFormFieldValueValidator")
 public
 class CodeFormFieldValueValidator
-	implements FormFieldValueValidator<String> {
+	implements FormFieldValueValidator <String> {
 
 	// dependencies
 
@@ -31,8 +33,8 @@ class CodeFormFieldValueValidator
 
 	@Override
 	public
-	Optional<String> validate (
-			@NonNull Optional<String> genericValue) {
+	Optional <String> validate (
+			@NonNull Optional <String> genericValue) {
 
 		Matcher matcher =
 			pattern.matcher (
@@ -40,13 +42,13 @@ class CodeFormFieldValueValidator
 
 		if (! matcher.matches ()) {
 
-			return Optional.of (
+			return optionalOfFormat (
 				stringFormat (
 					"Invalid code"));
 
 		}
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 

@@ -15,13 +15,11 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.entity.record.UnsavedRecordDetector;
 import wbs.framework.logging.LogContext;
 
 @Accessors (fluent = true)
@@ -41,9 +39,6 @@ class ObjectHelperUpdateImplementation <
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
-
-	@SingletonDependency
-	UnsavedRecordDetector unsavedRecordDetector;
 
 	// properties
 
@@ -92,9 +87,6 @@ class ObjectHelperUpdateImplementation <
 
 			objectDatabaseHelper.insert (
 				transaction,
-				object);
-
-			unsavedRecordDetector.removeRecord (
 				object);
 
 			for (
@@ -149,9 +141,6 @@ class ObjectHelperUpdateImplementation <
 
 			objectDatabaseHelper.insertSpecial (
 				transaction,
-				object);
-
-			unsavedRecordDetector.removeRecord (
 				object);
 
 			for (
@@ -276,9 +265,6 @@ class ObjectHelperUpdateImplementation <
 			RecordType object =
 				(RecordType)
 				constructor.newInstance ();
-
-			unsavedRecordDetector.addRecord (
-				object);
 
 			return object;
 

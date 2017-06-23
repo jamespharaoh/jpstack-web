@@ -36,35 +36,8 @@
 
 		<reference-field
 			name="supplier"
-			type="shnSupplier"/>
-
-		<string-field
-			name="supplierReference"
+			type="shnSupplier"
 			nullable="yes"/>
-
-		<integer-field
-			name="recommendedRetailPrice"
-			nullable="yes"/>
-
-		<integer-field
-			name="shoppingNationPrice"
-			nullable="yes"/>
-
-		<integer-field
-			name="promotionalPrice"
-			nullable="yes"/>
-
-		<integer-field
-			name="costPrice"
-			nullable="yes"/>
-
-		<integer-field
-			name="postageAndPackaging"
-			nullable="yes"/>
-
-		<integer-field
-			name="stockQuantity"
-			default="0"/>
 
 		<yes-no-field
 			name="active"
@@ -101,17 +74,7 @@
 			nullable="yes"/>
 
 		<timestamp-field
-			name="shopifyCreateTime"
-			column-type="postgresql"
-			nullable="yes"/>
-
-		<timestamp-field
-			name="shopifyUpdateTime"
-			column-type="postgresql"
-			nullable="yes"/>
-
-		<timestamp-field
-			name="shopifyRemoveTime"
+			name="shopifyUpdatedAt"
 			column-type="postgresql"
 			nullable="yes"/>
 

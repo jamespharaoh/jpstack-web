@@ -5,6 +5,7 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -36,6 +37,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -210,6 +212,14 @@ class GenericHttpSender <Request, Response> {
 
 			switch (helper.method ()) {
 
+			case delete:
+
+				httpRequest =
+					new HttpDelete (
+						urlWithParams);
+
+				break;
+
 			case get:
 
 				httpRequest =
@@ -225,6 +235,10 @@ class GenericHttpSender <Request, Response> {
 						urlWithParams);
 
 				break;
+
+			default:
+
+				throw shouldNeverHappen ();
 
 			}
 
@@ -278,6 +292,7 @@ class GenericHttpSender <Request, Response> {
 
 			switch (helper.method ()) {
 
+			case delete:
 			case get:
 
 				doNothing ();
@@ -293,6 +308,12 @@ class GenericHttpSender <Request, Response> {
 				httpEntityRequest.setEntity (
 					new ByteArrayEntity (
 						requestData));
+
+				break;
+
+			default:
+
+				throw shouldNeverHappen ();
 
 			}
 
@@ -614,12 +635,8 @@ class GenericHttpSender <Request, Response> {
 			encode (
 				taskLogger);
 
-System.out.println (helper.requestBody ());
-
 			send (
 				taskLogger);
-
-System.out.println (requestTrace);
 
 			receive (
 				taskLogger);
@@ -634,12 +651,6 @@ System.out.println (requestTrace);
 						errorMessage));
 
 			}
-
-System.out.println (httpResponse.getStatusLine ());
-
-System.out.println (responseTrace);
-
-System.out.println (responseBody);
 
 			decode (
 				taskLogger);
@@ -669,6 +680,7 @@ System.out.println (responseBody);
 
 	public static
 	enum Method {
+		delete,
 		get,
 		post
 	}

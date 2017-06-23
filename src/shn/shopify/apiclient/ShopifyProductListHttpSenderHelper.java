@@ -22,9 +22,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import wbs.framework.apiclient.GenericHttpSender.Method;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -112,7 +109,17 @@ class ShopifyProductListHttpSenderHelper
 					page ->
 						singletonList (
 							integerToDecimalString (
-								page + 1))))
+								page + 1)))),
+
+			Pair.of (
+				"fields",
+				optionalMapRequired (
+					optionalFromNullable (
+						request.fields ()),
+					fields ->
+						singletonList (
+							joinWithComma (
+								fields))))
 
 		);
 
@@ -167,18 +174,13 @@ class ShopifyProductListHttpSenderHelper
 	public
 	void decode () {
 
-		JSONObject jsonObject =
-			(JSONObject)
-			JSONValue.parse (
-				responseBody);
-
 		DataFromJson dataFromJson =
 			new DataFromJson ();
 
 		response =
 			dataFromJson.fromJson (
 				ShopifyProductListResponse.class,
-				jsonObject);
+				responseBody);
 
 	}
 

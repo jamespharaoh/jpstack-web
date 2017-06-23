@@ -1,14 +1,20 @@
 package shn.shopify.fixture;
 
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
-import static wbs.utils.string.CodeUtils.simplifyToCodeRelaxed;
+import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -16,17 +22,23 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.logging.LogContext;
 
+import wbs.platform.event.logic.EventFixtureLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
 
+import shn.shopify.model.ShnShopifyConnectionObjectHelper;
 import shn.shopify.model.ShnShopifyStoreObjectHelper;
 
 public
-class ShnShopifyStoreFixtureProvider
+class ShnShopifyFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	EventFixtureLogic eventFixtureLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -38,6 +50,9 @@ class ShnShopifyStoreFixtureProvider
 	MenuItemObjectHelper menuItemHelper;
 
 	@SingletonDependency
+	ShnShopifyConnectionObjectHelper shopifyConnectionHelper;
+
+	@SingletonDependency
 	ShnShopifyStoreObjectHelper shopifyStoreHelper;
 
 	@SingletonDependency
@@ -45,6 +60,9 @@ class ShnShopifyStoreFixtureProvider
 
 	@SingletonDependency
 	TestAccounts testAccounts;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// public implementation
 
@@ -66,6 +84,9 @@ class ShnShopifyStoreFixtureProvider
 				transaction);
 
 			createStores (
+				transaction);
+
+			createConnections (
 				transaction);
 
 		}
@@ -95,7 +116,7 @@ class ShnShopifyStoreFixtureProvider
 					menuGroupHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test",
+						wbsConfig.defaultSlice (),
 						"shopping_nation"))
 
 				.setCode (
@@ -139,81 +160,102 @@ class ShnShopifyStoreFixtureProvider
 
 			testAccounts.forEach (
 				"shopify-store",
-				testAccount ->
-					createStore (
+				suppliedParams -> {
+
+				SliceRec slice =
+					sliceHelper.findByCodeRequired (
 						transaction,
-						testAccount));
+						GlobalId.root,
+						mapItemForKeyRequired (
+							suppliedParams,
+							"slice"));
+
+				Map <String, String> allParams =
+					ImmutableMap.<String, String> builder ()
+
+					.putAll (
+						suppliedParams)
+
+					.put (
+						"code",
+						simplifyToCodeRequired (
+							mapItemForKeyRequired (
+								suppliedParams,
+								"name")))
+
+					.build ();
+
+				eventFixtureLogic.createRecordAndEvents (
+					transaction,
+					"SHN Shopify",
+					shopifyStoreHelper,
+					slice,
+					allParams,
+					emptySet ());
+
+			});
+
+			transaction.flush ();
 
 		}
 
 	}
 
 	private
-	void createStore (
-			@NonNull Transaction parentTransaction,
-			@NonNull Map <String, String> params) {
+	void createConnections (
+			@NonNull Transaction parentTransaction) {
 
 		try (
 
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"createStore");
+					"createConnections");
 
 		) {
 
-			shopifyStoreHelper.insert (
-				transaction,
-				shopifyStoreHelper.createInstance ()
+			Set <String> ignoreParams =
+				ImmutableSet.of (
+					"slice");
 
-				.setSlice (
+			testAccounts.forEach (
+				"shopify-connection",
+				suppliedParams -> {
+
+				SliceRec slice =
 					sliceHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test"))
-
-				.setCode (
-					simplifyToCodeRelaxed (
 						mapItemForKeyRequired (
-							params,
-							"name")))
+							suppliedParams,
+							"slice"));
 
-				.setName (
-					mapItemForKeyRequired (
-						params,
-						"name"))
+				Map <String, String> allParams =
+					ImmutableMap.<String, String> builder ()
 
-				.setDescription (
-					mapItemForKeyRequired (
-						params,
-						"name"))
+					.putAll (
+						suppliedParams)
 
-				.setStoreName (
-					mapItemForKeyRequired (
-						params,
-						"store-name"))
+					.put (
+						"code",
+						simplifyToCodeRequired (
+							mapItemForKeyRequired (
+								suppliedParams,
+								"name")))
 
-				.setPrivateAppName (
-					mapItemForKeyRequired (
-						params,
-						"private-app-name"))
+					.build ();
 
-				.setApiKey (
-					mapItemForKeyRequired (
-						params,
-						"api-key"))
+				eventFixtureLogic.createRecordAndEvents (
+					transaction,
+					"SHN Shopify",
+					shopifyConnectionHelper,
+					slice,
+					allParams,
+					ignoreParams);
 
-				.setPassword (
-					mapItemForKeyRequired (
-						params,
-						"password"))
+			});
 
-				.setSharedSecret (
-					mapItemForKeyRequired (
-						params,
-						"shared-secret"))
-
-			);
+			transaction.flush ();
 
 		}
 

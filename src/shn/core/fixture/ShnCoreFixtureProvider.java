@@ -6,6 +6,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -49,6 +50,9 @@ class ShnCoreFixtureProvider
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// public implementation
 
@@ -102,7 +106,7 @@ class ShnCoreFixtureProvider
 					sliceHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test"))
+						wbsConfig.defaultSlice ()))
 
 				.setOrder (
 					5l)
@@ -148,7 +152,7 @@ class ShnCoreFixtureProvider
 					menuGroupHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test",
+						wbsConfig.defaultSlice (),
 						"shopping_nation"))
 
 				.setCode (
@@ -194,13 +198,13 @@ class ShnCoreFixtureProvider
 				sliceHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test");
+					wbsConfig.defaultSlice ());
 
 			CurrencyRec currency =
 				currencyHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"gbp");
 
 			ShnDatabaseRec productDatabase =
@@ -231,6 +235,10 @@ class ShnCoreFixtureProvider
 				slice,
 				productDatabase,
 				ImmutableMap.<String, Object> builder ()
+
+				.put (
+					"code",
+					"test")
 
 				.put (
 					"name",

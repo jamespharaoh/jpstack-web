@@ -135,10 +135,16 @@
 			<columns>
 
 				<yes-no-field
+					name="createProducts"/>
+
+				<yes-no-field
 					name="updateProducts"/>
 
 				<yes-no-field
 					name="removeProducts"/>
+
+				<integer-field
+					name="maxOperations"/>
 
 			</columns>
 

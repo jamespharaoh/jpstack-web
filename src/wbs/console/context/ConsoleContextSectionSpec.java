@@ -37,6 +37,9 @@ class ConsoleContextSectionSpec
 	@DataAttribute
 	String label;
 
+	@DataAttribute
+	String privKey;
+
 	// children
 
 	@DataChildren (

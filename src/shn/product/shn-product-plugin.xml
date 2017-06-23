@@ -12,6 +12,7 @@
 		<model name="shnProduct"/>
 		<model name="shnProductCategory"/>
 		<model name="shnProductSubCategory"/>
+		<model name="shnProductVariant"/>
 	</models>
 
 	<fixtures>
@@ -22,6 +23,7 @@
 		<console-module name="shn-product"/>
 		<console-module name="shn-product-category"/>
 		<console-module name="shn-product-sub-category"/>
+		<console-module name="shn-product-variant"/>
 	</console-modules>
 
 </plugin>

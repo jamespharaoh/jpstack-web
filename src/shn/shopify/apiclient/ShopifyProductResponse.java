@@ -23,6 +23,10 @@ class ShopifyProductResponse {
 		name = "title")
 	String title;
 
+	@DataAttribute (
+		name = "updated_at")
+	String updatedAt;
+
 	@DataChildren (
 		childElement = "images")
 	List <ShopifyProductImageResponse> images =

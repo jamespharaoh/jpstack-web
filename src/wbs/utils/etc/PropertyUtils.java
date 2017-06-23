@@ -3,6 +3,8 @@ package wbs.utils.etc;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
@@ -142,13 +144,41 @@ class PropertyUtils {
 
 		try {
 
-			Class<?> objectClass =
+			Class <?> objectClass =
 				object.getClass ();
 
 			Method setter =
 				propertySetMethodAuto (
 					objectClass,
 					propertyName);
+
+			Class <?> propertyClass =
+				setter.getParameterTypes () [0];
+
+			Class <?> valueClass =
+				newValue.getClass ();
+
+			if (
+				isNotSubclassOf (
+					propertyClass,
+					valueClass)
+			) {
+
+				throw new ClassCastException (
+					stringFormat (
+						"Cannot set property %s.%s ",
+						classNameFull (
+							objectClass),
+						propertyName,
+						"of type %s ",
+						classNameFull (
+							propertyClass),
+						"to %s",
+						classNameFull (
+							valueClass)));
+
+
+			}
 
 			setter.invoke (
 				object,

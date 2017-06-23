@@ -1,6 +1,9 @@
 package wbs.framework.data.tools;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.collection.IterableUtils.iterableOnlyItemRequired;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrElse;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoEmpty;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.toEnumGeneric;
@@ -12,8 +15,12 @@ import static wbs.utils.etc.NumberUtils.notEqualToOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.ReflectionUtils.fieldParameterizedType;
+import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
@@ -21,7 +28,6 @@ import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
@@ -72,6 +78,8 @@ import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataContent;
+import wbs.framework.data.annotations.DataElementAttributes;
+import wbs.framework.data.annotations.DataElementName;
 import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.data.annotations.DataSetupMethod;
@@ -103,6 +111,9 @@ class DataFromXmlImplementation
 
 	@Getter @Setter
 	Map <String, List <DataClassInfo>> dataClassesMap;
+
+	@Getter @Setter
+	List <DataClassInfo> elementDataClasses;
 
 	@Getter @Setter
 	Map <String, Map <String, ?>> namedObjectCollections;
@@ -314,92 +325,37 @@ class DataFromXmlImplementation
 
 			) {
 
-				Iterator <Object> parentsIterator =
-					parents.iterator ();
+				// find builder
 
-				Class <?> parentClass =
-					parentsIterator.hasNext ()
-						? parentsIterator.next ().getClass ()
-						: Object.class;
+				Optional <ComponentProvider <?>> builderOptional =
+					findBuilder (
+						taskLogger);
 
-				// find the appropriate builder
-
-				List <DataClassInfo> dataClassInfosForElementName =
-					dataClassesMap.get (
-						element.getName ());
-
-				if (dataClassInfosForElementName == null) {
-
-					taskLogger.errorFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Don't know how to map <%s>",
-						element.getName ());
-
-					return null;
-
-				}
-
-				List <DataClassInfo> matchingDataClassInfos =
-					new ArrayList<> ();
-
-				for (
-					DataClassInfo dataClassInfo :
-						dataClassInfosForElementName
+				if (
+					optionalIsNotPresent (
+						builderOptional)
 				) {
-
-					if (! dataClassInfo.parentClass.isAssignableFrom (
-							parentClass))
-						continue;
-
-					matchingDataClassInfos.add (
-						dataClassInfo);
-
-				}
-
-				if (matchingDataClassInfos.isEmpty ()) {
-
-					taskLogger.errorFormat (
-						"%s: ",
-						joinWithFullStop (
-							context),
-						"Don't know how to map <%s> with parent %s",
-						element.getName (),
-						parentClass.getName ());
-
 					return null;
-
-				}
-
-				if (matchingDataClassInfos.size () > 1) {
-
-					List <String> matchingDataClassNames =
-						new ArrayList<> ();
-
-					for (DataClassInfo matchingDataClassInfo
-							: matchingDataClassInfos) {
-
-						matchingDataClassNames.add (
-							matchingDataClassInfo.dataClass ().getName ());
-
-					}
-
-					throw new RuntimeException (
-						stringFormat (
-							"%s: ",
-							joinWithFullStop (
-								context),
-							"Multiple mappings for <%s> with parent %s: %s",
-							element.getName (),
-							parentClass.getName (),
-							joinWithCommaAndSpace (
-								matchingDataClassNames)));
-
 				}
 
 				ComponentProvider <?> builder =
-					matchingDataClassInfos.get (0).provider ();
+					optionalGetRequired (
+						builderOptional);
+
+				// check for text
+
+				if (
+					stringIsNotEmpty (
+						element.getTextTrim ())
+				) {
+
+					taskLogger.errorFormat (
+						"Element <%s> contains text",
+						element.getName ());
+
+					return null;
+
+				}
 
 				// build it
 
@@ -534,6 +490,130 @@ class DataFromXmlImplementation
 
 		}
 
+		private
+		Optional <ComponentProvider <?>> findBuilder (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			try (
+
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"findBuilder");
+
+			) {
+
+				Iterator <Object> parentsIterator =
+					parents.iterator ();
+
+				Class <?> parentClass =
+					parentsIterator.hasNext ()
+						? parentsIterator.next ().getClass ()
+						: Object.class;
+
+				// find the appropriate builder
+
+				List <DataClassInfo> dataClassInfosForElementName =
+					ImmutableList.<DataClassInfo> builder ()
+
+					.addAll (
+						mapItemForKeyOrElse (
+							dataClassesMap,
+							element.getName (),
+							() -> emptyList ()))
+
+					.addAll (
+						elementDataClasses)
+
+					.build ();
+
+				if (dataClassInfosForElementName == null) {
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't know how to map <%s>",
+						element.getName ());
+
+					return optionalAbsent ();
+
+				}
+
+				List <DataClassInfo> matchingDataClassInfos =
+					new ArrayList<> ();
+
+				for (
+					DataClassInfo dataClassInfo :
+						dataClassInfosForElementName
+				) {
+
+					if (
+						! dataClassInfo.parentClass.isAssignableFrom (
+							parentClass)
+					) {
+						continue;
+					}
+
+					matchingDataClassInfos.add (
+						dataClassInfo);
+
+				}
+
+				if (matchingDataClassInfos.isEmpty ()) {
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Don't know how to map <%s> with parent %s",
+						element.getName (),
+						parentClass.getName ());
+
+					return optionalAbsent ();
+
+				}
+
+				if (matchingDataClassInfos.size () > 1) {
+
+					List <String> matchingDataClassNames =
+						new ArrayList<> ();
+
+					for (
+						DataClassInfo matchingDataClassInfo
+							: matchingDataClassInfos
+					) {
+
+						matchingDataClassNames.add (
+							matchingDataClassInfo.dataClass ().getName ());
+
+					}
+
+					taskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Multiple mappings for <%s> with parent %s: %s",
+						element.getName (),
+						parentClass.getName (),
+						joinWithCommaAndSpace (
+							matchingDataClassNames));
+
+					return optionalAbsent ();
+
+				}
+
+				DataClassInfo dataClassInfo =
+					iterableOnlyItemRequired (
+						matchingDataClassInfos);
+
+				return optionalOf (
+					dataClassInfo.provider);
+
+			}
+
+		}
+
 		void buildField (
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Field field) {
@@ -551,6 +631,24 @@ class DataFromXmlImplementation
 					Annotation annotation
 						: field.getAnnotations ()
 				) {
+
+					if (annotation instanceof DataElementName) {
+
+						buildElementNameField (
+							taskLogger,
+							field,
+							(DataElementName) annotation);
+
+					}
+
+					if (annotation instanceof DataElementAttributes) {
+
+						buildElementAttributesField (
+							taskLogger,
+							field,
+							(DataElementAttributes) annotation);
+
+					}
 
 					if (annotation instanceof DataAttribute) {
 
@@ -739,6 +837,78 @@ class DataFromXmlImplementation
 						attributeValue);
 
 				}
+
+			}
+
+		}
+
+		void buildElementNameField (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Field field,
+				@NonNull DataElementName dataElementNameAnnotation) {
+
+			try (
+
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildElementNameField");
+
+			) {
+
+				setScalarFieldRequired (
+					taskLogger,
+					object,
+					field,
+					element.getName ());
+
+			}
+
+		}
+
+		void buildElementAttributesField (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Field field,
+				@NonNull DataElementAttributes dataElementNameAnnotation) {
+
+			try (
+
+				OwnedTaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildElementAttributesField");
+
+			) {
+
+				ImmutableMap.Builder <String, String> builder =
+					ImmutableMap.builder ();
+
+				for (
+					Object attributeObject
+						: element.attributes ()
+				) {
+
+					Attribute attribute =
+						(Attribute)
+						attributeObject;
+
+					builder.put (
+						attribute.getName (),
+						attribute.getValue ());
+
+					matchedAttributes.add (
+						attribute.getName ());
+
+				}
+
+				field.setAccessible (
+					true);
+
+				fieldSet (
+					field,
+					object,
+					optionalOf (
+						builder.build ()));
 
 			}
 

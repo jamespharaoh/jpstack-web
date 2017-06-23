@@ -1,0 +1,86 @@
+<model-meta
+	name="shnProductVariant"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			name="product"
+			type="shnProduct"/>
+
+		<code-field
+			name="itemNumber"/>
+
+		<!-- details -->
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="publicTitle"
+			nullable="yes"/>
+
+		<string-field
+			name="supplierReference"
+			nullable="yes"/>
+
+		<integer-field
+			name="recommendedRetailPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="shoppingNationPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="promotionalPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="costPrice"
+			nullable="yes"/>
+
+		<integer-field
+			name="postageAndPackaging"
+			nullable="yes"/>
+
+		<integer-field
+			name="stockQuantity"
+			default="0"/>
+
+		<yes-no-field
+			name="active"
+			default="no"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="soldQuantity"
+			default="0"/>
+
+		<integer-field
+			name="salesRetail"
+			default="0"/>
+
+		<integer-field
+			name="salesCost"
+			default="0"/>
+
+		<!-- shopify data -->
+
+		<integer-field
+			name="shopifyId"
+			nullable="yes"/>
+
+	</fields>
+
+</model-meta>

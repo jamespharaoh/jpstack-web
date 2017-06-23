@@ -1155,12 +1155,12 @@ class BootstrapComponentManager
 			for (
 				Method method
 					: iterableFilter (
+						Arrays.asList (
+							component.getClass ().getMethods ()),
 						method ->
 							isNotNull (
 								method.getAnnotation (
-									NormalLifecycleSetup.class)),
-						Arrays.asList (
-							component.getClass ().getMethods ()))
+									NormalLifecycleSetup.class)))
 			) {
 
 				methodInvoke (

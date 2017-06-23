@@ -1,7 +1,5 @@
 package shn.shopify.apiclient;
 
-import static wbs.utils.collection.CollectionUtils.emptyList;
-
 import java.util.List;
 
 import lombok.Data;
@@ -39,7 +37,6 @@ class ShopifyProductRequest {
 
 	@DataChildren (
 		childElement = "images")
-	List <ShopifyProductImageResponse> images =
-		emptyList ();
+	List <ShopifyProductImageResponse> images;
 
 }

@@ -96,7 +96,7 @@ class ConsoleHelperProviderFactory <
 
 			return genericConsoleHelperProviderProvider.get ()
 
-				.consoleHelperProviderSpec (
+				.spec (
 					spec)
 
 				.objectHelper (

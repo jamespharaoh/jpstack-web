@@ -493,8 +493,16 @@
 			package="shn.product"/>
 
 		<plugin
+			name="shn-promo"
+			package="shn.promo"/>
+
+		<plugin
 			name="shn-shopify"
 			package="shn.shopify"/>
+
+		<plugin
+			name="shn-show"
+			package="shn.show"/>
 
 		<plugin
 			name="shn-supplier"

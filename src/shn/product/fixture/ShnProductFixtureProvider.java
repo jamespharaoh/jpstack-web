@@ -1,40 +1,35 @@
 package shn.product.fixture;
 
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
-import static wbs.utils.etc.Misc.iterable;
-import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.optionalOr;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.collection.SetUtils.emptySet;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
-import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
-import static wbs.utils.string.StringUtils.nullIfEmptyString;
-import static wbs.web.utils.HtmlUtils.htmlEncode;
+import static wbs.utils.string.PlaceholderUtils.placeholderMapCurlyBraces;
 
 import java.util.List;
+import java.util.Map;
 
-import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.fixtures.FixturesLogic;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.event.logic.EventFixtureLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
 
 import wbs.utils.csv.CsvReader;
 import wbs.utils.io.SafeBufferedReader;
@@ -47,8 +42,8 @@ import shn.product.model.ShnProductObjectHelper;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryObjectHelper;
 import shn.product.model.ShnProductSubCategoryRec;
+import shn.product.model.ShnProductVariantObjectHelper;
 import shn.supplier.model.ShnSupplierObjectHelper;
-import shn.supplier.model.ShnSupplierRec;
 
 public
 class ShnProductFixtureProvider
@@ -61,6 +56,9 @@ class ShnProductFixtureProvider
 
 	@SingletonDependency
 	EventFixtureLogic eventFixtureLogic;
+
+	@SingletonDependency
+	FixturesLogic fixturesLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -81,6 +79,9 @@ class ShnProductFixtureProvider
 	ShnProductSubCategoryObjectHelper productSubCategoryHelper;
 
 	@SingletonDependency
+	ShnProductVariantObjectHelper productVariantHelper;
+
+	@SingletonDependency
 	ShnDatabaseObjectHelper shnDatabaseHelper;
 
 	@SingletonDependency
@@ -91,6 +92,9 @@ class ShnProductFixtureProvider
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// public implementation
 
@@ -150,24 +154,19 @@ class ShnProductFixtureProvider
 				shnDatabaseHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"test");
 
 			for (
 				List <String> line
-					: iterable (
-						csvReader.readAsList (
-							reader))
+					: csvReader.readAsList (
+						reader)
 			) {
 
-				String name =
+				String code =
 					listItemAtIndexRequired (
 						line,
 						0l);
-
-				String code =
-					simplifyToCodeRequired (
-						name);
 
 				ShnProductCategoryRec productCategory =
 					productCategoryHelper.insert (
@@ -180,11 +179,11 @@ class ShnProductFixtureProvider
 					.setCode (
 						code)
 
-					.setName (
-						name)
-
 					.setDescription (
-						name)
+						code)
+
+					.setPublicName (
+						code)
 
 				);
 
@@ -196,8 +195,16 @@ class ShnProductFixtureProvider
 					ImmutableMap.<String, Object> builder ()
 
 					.put (
+						"code",
+						code)
+
+					.put (
 						"description",
-						name)
+						code)
+
+					.put (
+						"publicName",
+						code)
 
 					.build ()
 
@@ -238,33 +245,27 @@ class ShnProductFixtureProvider
 				shnDatabaseHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"test");
 
 			for (
 				List <String> line
-					: iterable (
-						csvReader.readAsList (
-							reader))
+					: csvReader.readAsList (
+						reader)
 			) {
 
 				ShnProductCategoryRec category =
 					productCategoryHelper.findByCodeRequired (
 						transaction,
 						shnDatabase,
-						simplifyToCodeRequired (
-							listItemAtIndexRequired (
-								line,
-								0l)));
+						listItemAtIndexRequired (
+							line,
+							0l));
 
-				String name =
+				String code =
 					listItemAtIndexRequired (
 						line,
 						1l);
-
-				String code =
-					simplifyToCodeRequired (
-						name);
 
 				ShnProductSubCategoryRec subCategory =
 					productSubCategoryHelper.insert (
@@ -277,11 +278,11 @@ class ShnProductFixtureProvider
 					.setCode (
 						code)
 
-					.setName (
-						name)
-
 					.setDescription (
-						name)
+						code)
+
+					.setPublicName (
+						code)
 
 				);
 
@@ -293,8 +294,16 @@ class ShnProductFixtureProvider
 					ImmutableMap.<String, Object> builder ()
 
 					.put (
+						"code",
+						code)
+
+					.put (
 						"description",
-						name)
+						code)
+
+					.put (
+						"publicName",
+						code)
 
 					.build ()
 
@@ -335,219 +344,72 @@ class ShnProductFixtureProvider
 				shnDatabaseHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"test");
 
 			for (
-				List <String> line
-					: iterable (
-						csvReader.readAsList (
-							reader))
+				Map <String, String> lineMap
+					: csvReader.readAsMap (
+						productColumnNames,
+						reader)
 			) {
-
-				String itemNumber =
-					listItemAtIndexRequired (
-						line,
-						0l);
-
-				ShnSupplierRec supplier =
-					supplierHelper.findByCodeRequired (
-						transaction,
-						shnDatabase,
-						simplifyToCodeRequired (
-							listItemAtIndexRequired (
-								line,
-								1l)));
-
-				String supplierReference =
-					listItemAtIndexRequired (
-						line,
-						2l);
 
 				ShnProductSubCategoryRec subCategory =
 					productSubCategoryHelper.findByCodeRequired (
 						transaction,
 						shnDatabase,
-						simplifyToCodeRequired (
-							listItemAtIndexRequired (
-								line,
-								3l)),
-						simplifyToCodeRequired (
-							listItemAtIndexRequired (
-								line,
-								4l)));
+						mapItemForKeyRequired (
+							lineMap,
+							"category-code"),
+						mapItemForKeyRequired (
+							lineMap,
+							"sub-category-code"));
 
-				String name =
-					listItemAtIndexRequired (
-						line,
-						5l);
-
-				@SuppressWarnings ("unused")
-				String promoCode =
-					listItemAtIndexRequired (
-						line,
-						6l);
-
-				Optional <Long> recommendedRetailPrice =
-					parseCurrencyOrEmptyString (
-						shnDatabase.getCurrency (),
-						listItemAtIndexRequired (
-							line,
-							7l));
-
-				Optional <Long> shoppingNationPrice =
-					parseCurrencyOrEmptyString (
-						shnDatabase.getCurrency (),
-						listItemAtIndexRequired (
-							line,
-							8l));
-
-				Optional <Long> promotionalPrice =
-					parseCurrencyOrEmptyString (
-						shnDatabase.getCurrency (),
-						listItemAtIndexRequired (
-							line,
-							9l));
-
-				Optional <Long> costPrice =
-					parseCurrencyOrEmptyString (
-						shnDatabase.getCurrency (),
-						listItemAtIndexRequired (
-							line,
-							10l));
-
-				@SuppressWarnings ("unused")
-				String margin =
-					listItemAtIndexRequired (
-						line,
-						11l);
-
-				Optional <Long> postageAndPackaging =
-					parseCurrencyOrEmptyString (
-						shnDatabase.getCurrency (),
-						listItemAtIndexRequired (
-							line,
-							12l));
-
-				Optional <Long> stockQuatity =
-					parseIntegerOrEmptyString (
-						listItemAtIndexRequired (
-							line,
-							13l));
-
-				TextRec publicDescription =
-					textHelper.findOrCreate (
-						transaction,
-						htmlEncode (
-							name));
-
-				ShnProductRec product =
-					productHelper.insert (
-						transaction,
-						productHelper.createInstance ()
-
-					.setSubCategory (
-						subCategory)
-
-					.setItemNumber (
-						itemNumber)
-
-					.setDescription (
-						name)
-
-					.setPublicTitle (
-						name)
-
-					.setPublicDescription (
-						publicDescription)
-
-					.setSupplier (
-						supplier)
-
-					.setSupplierReference (
-						supplierReference)
-
-					.setRecommendedRetailPrice (
-						optionalOrNull (
-							recommendedRetailPrice))
-
-					.setShoppingNationPrice (
-						optionalOrNull (
-							shoppingNationPrice))
-
-					.setPromotionalPrice (
-						optionalOrNull (
-							promotionalPrice))
-
-					.setCostPrice (
-						optionalOrNull (
-							costPrice))
-
-					.setPostageAndPackaging (
-						optionalOrNull (
-							postageAndPackaging))
-
-					.setStockQuantity (
-						optionalOr (
-							stockQuatity,
-							0l))
-
-				);
-
-				eventFixtureLogic.createEvents (
-					transaction,
-					"SHN Product",
-					subCategory,
-					product,
+				Map <String, Object> mappingHints =
 					ImmutableMap.<String, Object> builder ()
 
 					.put (
-						"description",
-						name)
-
-					.put (
-						"publicTitle",
-						name)
-
-					.put (
-						"publicDescription",
-						publicDescription)
-
-					.put (
-						"supplier",
-						supplier)
-
-					.put (
-						"supplierReference",
-						supplierReference)
-
-					.put (
-						"reommendedRetailPrice",
-						recommendedRetailPrice)
-
-					.put (
-						"shoppingNationPrice",
-						shoppingNationPrice)
-
-					.put (
-						"promotionalPrice",
-						promotionalPrice)
-
-					.put (
-						"costPrice",
-						costPrice)
-
-					.put (
-						"postageAndPackaging",
-						postageAndPackaging)
-
-					.put (
-						"stockQuatity",
-						stockQuatity)
+						"currency",
+						shnDatabase.getCurrency ())
 
 					.build ()
 
-				);
+				;
+
+				// create product
+
+				Map <String, String> productParams =
+					placeholderMapCurlyBraces (
+						productColumnMap,
+						fixturesLogic.placeholderFunction (
+							mappingHints,
+							lineMap));
+
+				ShnProductRec product =
+					eventFixtureLogic.createRecordAndEvents (
+						transaction,
+						"SHN Product",
+						productHelper,
+						subCategory,
+						productParams,
+						emptySet ());
+
+				// create product variant
+
+				Map <String, String> productVariantParams =
+					placeholderMapCurlyBraces (
+						productVariantColumnMap,
+						fixturesLogic.placeholderFunction (
+							mappingHints,
+							lineMap));
+
+				eventFixtureLogic.createRecordAndEvents (
+					transaction,
+					"SHN Product",
+					productVariantHelper,
+					product,
+					productVariantParams,
+					emptySet ());
 
 			}
 
@@ -557,34 +419,116 @@ class ShnProductFixtureProvider
 
 	}
 
-	private
-	Optional <Long> parseCurrencyOrEmptyString (
-			@NonNull CurrencyRec currency,
-			@NonNull String text) {
+	// data
 
-		return optionalMapRequired (
-			optionalFromNullable (
-				nullIfEmptyString (
-					text)),
-			textAgain ->
-				currencyLogic.parseTextRequired (
-					currency,
-					textAgain));
+	private final static
+	List <String> productColumnNames =
+		ImmutableList.of (
+			"item-number",
+			"supplier-name",
+			"supplier-reference",
+			"category-code",
+			"sub-category-code",
+			"description",
+			"promo-code",
+			"recommended-retail-price",
+			"shopping-nation-price",
+			"promo-price",
+			"cost-price",
+			"margin",
+			"postage-and-packaging",
+			"stock-quantity",
+			"stock-value",
+			"sold-quantity",
+			"sales-retail",
+			"sales-cost",
+			"sales-rate",
+			"last-date-aired",
+			"first-date-aired",
+			"active");
 
-	}
+	private final static
+	Map <String, String> productColumnMap =
+		ImmutableMap.<String, String> builder ()
 
-	private
-	Optional <Long> parseIntegerOrEmptyString (
-			@NonNull String text) {
+		.put (
+			"item-number",
+			"{item-number}")
 
-		return optionalMapRequired (
-			optionalFromNullable (
-				nullIfEmptyString (
-					text)),
-			textAgain ->
-				parseIntegerRequired (
-					textAgain));
+		.put (
+			"description",
+			"{description}")
 
-	}
+		.put (
+			"public-title",
+			"{description}")
+
+		.put (
+			"public-description",
+			"{description}")
+
+		.put (
+			"supplier",
+			"shn.test.{codify:supplier-name}")
+
+		.put (
+			"active",
+			"yes")
+
+		.build ()
+
+	;
+
+	private final static
+	Map <String, String> productVariantColumnMap =
+		ImmutableMap.<String, String> builder ()
+
+		.put (
+			"item-number",
+			"{item-number}")
+
+		.put (
+			"description",
+			"{description}")
+
+		.put (
+			"publicTitle",
+			"{description}")
+
+		.put (
+			"supplierReference",
+			"{supplier-reference}")
+
+		.put (
+			"recommendedRetailPrice",
+			"{currency:recommended-retail-price}")
+
+		.put (
+			"shoppingNationPrice",
+			"{currency:shopping-nation-price}")
+
+		.put (
+			"promotionalPrice",
+			"{currency:promo-price}")
+
+		.put (
+			"costPrice",
+			"{currency:cost-price}")
+
+		.put (
+			"postageAndPackaging",
+			"{currency:postage-and-packaging}")
+
+		.put (
+			"stockQuantity",
+			"{stock-quantity}")
+
+		.put (
+			"active",
+			"yes")
+
+		.build ()
+
+	;
 
 }

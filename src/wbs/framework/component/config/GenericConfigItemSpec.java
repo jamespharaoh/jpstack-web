@@ -6,31 +6,24 @@ import java.util.Map;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.framework.data.annotations.DataAttribute;
-import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.data.annotations.DataElementAttributes;
+import wbs.framework.data.annotations.DataElementName;
 import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("item")
+@DataClass (element = true)
 public
 class GenericConfigItemSpec {
 
 	@DataParent
 	GenericConfigSpec testAccounts;
 
-	@DataAttribute
+	@DataElementName
 	String type;
 
-	@DataAttribute
-	String name;
-
-	@DataChildren (
-		direct = true,
-		childElement = "param",
-		keyAttribute = "name",
-		valueAttribute = "value")
+	@DataElementAttributes
 	Map <String, String> params =
 		new LinkedHashMap <String, String> ();
 

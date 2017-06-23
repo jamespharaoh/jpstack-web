@@ -68,6 +68,7 @@
 		<component class="basic.YesNoFormFieldRenderer"/>
 
 		<component class="core.ConsoleFormBuilder"/>
+		<component class="core.ConsoleFormHintsLogicImplementation"/>
 		<component class="core.ConsoleFormImplementation"/>
 		<component class="core.ConsoleFormManagerImplementation"/>
 		<component class="core.ConsoleFormPluginManagerImplementation"/>

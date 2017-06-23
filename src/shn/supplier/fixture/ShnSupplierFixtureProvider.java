@@ -1,7 +1,6 @@
 package shn.supplier.fixture;
 
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
-import static wbs.utils.etc.Misc.iterable;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 
@@ -13,6 +12,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -55,6 +55,9 @@ class ShnSupplierFixtureProvider
 	@SingletonDependency
 	ShnSupplierObjectHelper shnSupplierHelper;
 
+	@SingletonDependency
+	WbsConfig wbsConfig;
+
 	// public implementation
 
 	@Override
@@ -71,61 +74,8 @@ class ShnSupplierFixtureProvider
 
 		) {
 
-			createMenuItems (
-				transaction);
-
 			createSuppliers (
 				transaction);
-
-		}
-
-	}
-
-	// private implementation
-
-	private
-	void createMenuItems (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"createMenuItems");
-
-		) {
-
-			menuItemHelper.insert (
-				transaction,
-				menuItemHelper.createInstance ()
-
-				.setMenuGroup (
-					menuGroupHelper.findByCodeRequired (
-						transaction,
-						GlobalId.root,
-						"test",
-						"shopping_nation"))
-
-				.setCode (
-					"supplier")
-
-				.setName (
-					"Supplier")
-
-				.setDescription (
-					"Suppliers")
-
-				.setLabel (
-					"Suppliers")
-
-				.setTargetPath (
-					"/shnSuppliers")
-
-				.setTargetFrame (
-					"main")
-
-			);
 
 		}
 
@@ -158,14 +108,13 @@ class ShnSupplierFixtureProvider
 				shnDatabaseHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"test");
 
 			for (
 				List <String> line
-					: iterable (
-						csvReader.readAsList (
-							reader))
+					: csvReader.readAsList (
+						reader)
 			) {
 
 				String name =

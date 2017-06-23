@@ -1,0 +1,29 @@
+<model-meta
+	name="shnShowGuest"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			name="database"
+			type="shnDatabase"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+	</fields>
+
+</model-meta>

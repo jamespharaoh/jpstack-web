@@ -47,6 +47,13 @@ class ShopifyApiClientImplementation
 		ShopifyProductListResponse
 	>> productListHttpSenderProvider;
 
+	@PrototypeDependency
+	@NamedDependency ("shopifyProductRemoveHttpSender")
+	ComponentProvider <GenericHttpSender <
+		ShopifyProductRemoveRequest,
+		ShopifyProductRemoveResponse
+	>> productRemoveHttpSenderProvider;
+
 	// public implementation
 
 	@Override
@@ -122,6 +129,11 @@ class ShopifyApiClientImplementation
 					.page (
 						page)
 
+					.fields (
+						ImmutableList.of (
+							"id",
+							"updated_at"))
+
 				);
 
 				builder.addAll (
@@ -182,6 +194,41 @@ class ShopifyApiClientImplementation
 			);
 
 			return response.product ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void removeProduct (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ShopifyApiClientCredentials credentials,
+			@NonNull Long id) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"removeProduct");
+
+		) {
+
+			productRemoveHttpSenderProvider.provide (
+				taskLogger)
+
+				.allInOne (
+					taskLogger,
+					new ShopifyProductRemoveRequest ()
+
+				.credentials (
+					credentials)
+
+				.id (
+					id)
+
+			);
 
 		}
 

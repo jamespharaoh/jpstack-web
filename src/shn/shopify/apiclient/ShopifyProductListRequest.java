@@ -16,4 +16,6 @@ class ShopifyProductListRequest {
 	Long limit;
 	Long page;
 
+	List <String> fields;
+
 }

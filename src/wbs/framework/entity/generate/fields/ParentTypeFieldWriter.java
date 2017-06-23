@@ -13,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.ParentTypeFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -77,6 +78,9 @@ class ParentTypeFieldWriter
 					ifNull (
 						spec.name (),
 						"parentType"))
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
 
 				.writeBlock (
 					taskLogger,

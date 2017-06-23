@@ -32,6 +32,10 @@ class ChildrenListSpec
 	String typeName;
 
 	@DataAttribute (
+		name = "join-column")
+	String joinColumnName;
+
+	@DataAttribute (
 		name = "list-index-column")
 	String listIndexColumnName;
 

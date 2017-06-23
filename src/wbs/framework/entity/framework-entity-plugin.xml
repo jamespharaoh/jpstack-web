@@ -2,12 +2,6 @@
 	name="framework-entity"
 	package="wbs.framework.entity">
 
-	<layer name="data">
-
-		<component class="record.UnsavedRecordDetector"/>
-
-	</layer>
-
 	<layer name="model-meta">
 
 		<component class="meta.collections.AssociativeCollectionSpec"/>

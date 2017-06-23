@@ -19,6 +19,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.IdentityReferenceFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -98,6 +99,9 @@ class IdentityReferenceFieldWriter
 					ifNull (
 						spec.name (),
 						spec.typeName ()))
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
 
 				.writeBlock (
 					taskLogger,
