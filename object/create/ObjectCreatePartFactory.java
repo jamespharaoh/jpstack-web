@@ -43,9 +43,6 @@ class ObjectCreatePartFactory <RecordType extends Record <RecordType>>
 	ConsoleFormType <RecordType> formType;
 
 	@Getter @Setter
-	String createPrivCode;
-
-	@Getter @Setter
 	String localFile;
 
 	// implementation
@@ -71,9 +68,6 @@ class ObjectCreatePartFactory <RecordType extends Record <RecordType>>
 
 				.formType (
 					formType)
-
-				.parentPrivCode (
-					createPrivCode)
 
 				.localFile (
 					localFile);

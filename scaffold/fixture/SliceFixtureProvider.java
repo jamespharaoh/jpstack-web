@@ -1,12 +1,14 @@
 package wbs.platform.scaffold.fixture;
 
 import static wbs.utils.string.StringUtils.joinWithComma;
+import static wbs.utils.string.StringUtils.underscoreToSpacesCapitalise;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
@@ -26,6 +28,9 @@ class SliceFixtureProvider
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -48,13 +53,15 @@ class SliceFixtureProvider
 				sliceHelper.createInstance ()
 
 				.setCode (
-					"test")
+					wbsConfig.defaultSlice ())
 
 				.setName (
-					"Test")
+					underscoreToSpacesCapitalise (
+						wbsConfig.defaultSlice ()))
 
 				.setDescription (
-					"Test")
+					underscoreToSpacesCapitalise (
+						wbsConfig.defaultSlice ()))
 
 				.setSupervisorConfigNames (
 					joinWithComma (

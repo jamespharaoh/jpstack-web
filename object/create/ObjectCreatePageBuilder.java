@@ -336,16 +336,6 @@ class ObjectCreatePageBuilder <
 							consoleHelper.objectName ())),
 					WebResponder.class);
 
-			createPrivDelegate =
-				spec.createPrivDelegate ();
-
-			createPrivCode =
-				ifNull (
-					spec.createPrivCode (),
-					stringFormat (
-						"%s_create",
-						consoleHelper.objectTypeCode ()));
-
 			createTimeFieldName =
 				spec.createTimeFieldName ();
 
