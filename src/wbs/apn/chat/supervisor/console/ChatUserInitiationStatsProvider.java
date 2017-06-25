@@ -4,7 +4,6 @@ import static wbs.utils.collection.IterableUtils.iterableChainToList;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToSet;
 import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
-import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.presentInstancesSet;
 
 import java.util.HashSet;
@@ -15,16 +14,14 @@ import java.util.TreeMap;
 
 import lombok.NonNull;
 
-import org.joda.time.Instant;
+import org.joda.time.Interval;
 
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsGranularity;
-import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -38,7 +35,7 @@ import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 
-@SingletonComponent ("chatUserInitiationStatsProvider")
+@PrototypeComponent ("chatUserInitiationStatsProvider")
 public
 class ChatUserInitiationStatsProvider
 	implements StatsProvider {
@@ -54,14 +51,39 @@ class ChatUserInitiationStatsProvider
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// implementation
+	// state
+
+	Map <String, Set <String>> conditions;
+
+	// public implementation
+
+	@Override
+	public
+	void prepare (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		if (
+			mapDoesNotContainKey (
+				conditions,
+				"chat-id")
+		) {
+
+			throw new IllegalArgumentException (
+				"Must provide \"chat-id\" condition");
+
+		}
+
+		this.conditions =
+			conditions;
+
+	}
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull StatsPeriod period,
-			@NonNull Map <String, Set <String>> conditions) {
+			@NonNull Interval interval) {
 
 		try (
 
@@ -72,23 +94,9 @@ class ChatUserInitiationStatsProvider
 
 		) {
 
-			if (period.granularity () != StatsGranularity.hour)
-				throw new IllegalArgumentException ();
-
-			if (
-				mapDoesNotContainKey (
-					conditions,
-					"chat-id")
-			) {
-
-				throw new IllegalArgumentException (
-					"Must provide \"chat-id\" condition");
-
-			}
-
 			// setup data structures
 
-			Map <Long, long[]> alarmsPerUser =
+			Map <Long, Long> alarmsPerUser =
 				new TreeMap<> ();
 
 			Set <Object> userIdObjects =
@@ -119,7 +127,7 @@ class ChatUserInitiationStatsProvider
 							chatUserInitiationLogHelper.findByTimestamp (
 								transaction,
 								chat,
-								period.toInterval ())));
+								interval)));
 
 			// aggregate stats
 
@@ -134,15 +142,6 @@ class ChatUserInitiationStatsProvider
 				if (log.getMonitorUser () == null)
 					continue;
 
-				// work out which hour
-
-				Instant timestamp =
-					log.getTimestamp ();
-
-				int hour =
-					period.assign (
-						timestamp);
-
 				// count alarms per user
 
 				if (! userIdObjects.contains (
@@ -153,17 +152,13 @@ class ChatUserInitiationStatsProvider
 
 					alarmsPerUser.put (
 						log.getMonitorUser ().getId (),
-						new long [
-							toJavaIntegerRequired (
-								period.size ())]);
+						0l);
 
 				}
 
-				long[] userAlarms =
-					alarmsPerUser.get (
-						log.getMonitorUser ().getId ());
-
-				userAlarms [hour] ++;
+				alarmsPerUser.compute (
+					log.getMonitorUser ().getId (),
+					(key, value) -> value + 1);
 
 			}
 
@@ -177,38 +172,32 @@ class ChatUserInitiationStatsProvider
 				userIdObjects);
 
 			for (
-				int hour = 0;
-				hour < period.size ();
-				hour ++
+				Object userIdObject
+					: userIdObjects
 			) {
 
-				for (
-					Object userIdObject
-						: userIdObjects
-				) {
+				Long userId =
+					(Long) userIdObject;
 
-					Long userId =
-						(Long) userIdObject;
+				statsDataSet.data ().add (
+					new StatsDatum ()
 
-					statsDataSet.data ().add (
-						new StatsDatum ()
+					.startTime (
+						interval.getStart ().toInstant ())
 
-						.startTime (
-							period.step (hour))
+					.addIndex (
+						"chatId",
+						conditions.get (
+							"chatId"))
 
-						.addIndex (
-							"chatId",
-							conditions.get ("chatId"))
+					.addIndex (
+						"userId",
+						userId)
 
-						.addIndex (
-							"userId",
-							userId)
-
-						.addValue (
-							"alarmsSet",
-							alarmsPerUser.get (userId) [hour]));
-
-				}
+					.addValue (
+						"alarmsSet",
+						alarmsPerUser.get (
+							userId)));
 
 			}
 

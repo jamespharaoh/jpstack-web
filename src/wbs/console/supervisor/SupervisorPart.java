@@ -3,6 +3,7 @@ package wbs.console.supervisor;
 import static wbs.utils.collection.CollectionUtils.collectionHasLessThanTwoElements;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -29,10 +30,13 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
 import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +50,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Interval;
 
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
@@ -64,9 +69,12 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -83,6 +91,9 @@ class SupervisorPart
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
+
+	@SingletonDependency
+	Database database;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -477,8 +488,13 @@ class SupervisorPart
 
 		) {
 
-			ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
-				ImmutableMap.builder ();
+			// prepare stats providers
+
+			ImmutableList.Builder <StatsProvider> statsProvidersBuilder =
+				ImmutableList.builder ();
+
+			ImmutableList.Builder <String> statsProviderNamesBuilder =
+				ImmutableList.builder ();
 
 			for (
 				Object object
@@ -492,26 +508,177 @@ class SupervisorPart
 					(SupervisorDataSetSpec)
 					object;
 
+				statsProviderNamesBuilder.add (
+					supervisorDataSetSpec.name ());
+
 				StatsProvider statsProvider =
 					componentManager.getComponentRequired (
 						transaction,
 						supervisorDataSetSpec.providerBeanName (),
 						StatsProvider.class);
 
-				StatsDataSet statsDataSet =
-					statsProvider.getStats (
-						transaction,
-						statsPeriod,
-						statsConditions);
+				statsProvider.prepare (
+					transaction,
+					statsConditions);
+
+				statsProvidersBuilder.add (
+					statsProvider);
+
+			}
+
+			List <String> statsProviderNames =
+				statsProviderNamesBuilder.build ();
+
+			List <StatsProvider> statsProviders =
+				statsProvidersBuilder.build ();
+
+			// execute stats providers
+
+			ImmutableList.Builder <Future <List <StatsDataSet>>>
+				dataSetFuturesBuilder =
+					ImmutableList.builder ();
+
+			for (
+				Interval interval
+					: statsPeriod
+			) {
+
+				CompletableFuture <List <StatsDataSet>> intervalFuture =
+					new CompletableFuture<> ();
+
+				Thread thread =
+					new Thread (
+						() -> {
+
+					intervalFuture.complete (
+						getDataSetsForInterval (
+							statsProviders,
+							interval));
+
+				});
+
+				thread.start ();
+
+				dataSetFuturesBuilder.add (
+					intervalFuture);
+
+			}
+
+			List <Future <List <StatsDataSet>>> dataSetsFutures =
+				dataSetFuturesBuilder.build ();
+
+			// collect results
+
+			ImmutableList.Builder <List <StatsDataSet>> rawDataSetsBuilder =
+				ImmutableList.builder ();
+
+			for (
+				Future <List <StatsDataSet>> dataSetFuture
+					: dataSetsFutures
+			) {
+
+				try {
+
+					rawDataSetsBuilder.add (
+						dataSetFuture.get ());
+
+				} catch (Exception exception) {
+
+					throw new RuntimeException (
+						exception);
+
+
+				}
+
+			}
+
+			List <List <StatsDataSet>> rawDataSets =
+				rawDataSetsBuilder.build ();
+
+			// aggregate results
+
+			ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
+				ImmutableMap.builder ();
+
+			for (
+				long statsProviderIndex = 0;
+				statsProviderIndex < statsProviders.size ();
+				statsProviderIndex ++
+			) {
+
+				List <StatsDataSet> providerDataSets =
+					new ArrayList<> ();
+
+				for (
+					long intervalIndex = 0;
+					intervalIndex < statsPeriod.size ();
+					intervalIndex ++
+				) {
+
+					List <StatsDataSet> intervalDataSets =
+						listItemAtIndexRequired (
+							rawDataSets,
+							intervalIndex);
+
+					providerDataSets.add (
+						listItemAtIndexRequired (
+							intervalDataSets,
+							statsProviderIndex));
+
+					intervalIndex ++;
+
+				}
 
 				dataSetsBuilder.put (
-					supervisorDataSetSpec.name (),
-					statsDataSet);
+					listItemAtIndexRequired (
+						statsProviderNames,
+						statsProviderIndex),
+					StatsDataSet.combine (
+						providerDataSets));
 
 			}
 
 			statsDataSets =
 				dataSetsBuilder.build ();
+
+		}
+
+	}
+
+	private
+	List <StatsDataSet> getDataSetsForInterval (
+			@NonNull List <StatsProvider> statsProviders,
+			@NonNull Interval interval) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"getDataSetsForInterval");
+
+			OwnedTransaction transaction =
+				database.beginReadOnly (
+					logContext,
+					taskLogger,
+					"getDataSetsForInterval");
+		) {
+
+			ImmutableList.Builder <StatsDataSet> builder =
+				ImmutableList.builder ();
+
+			for (
+				StatsProvider statsProvider
+					: statsProviders
+			) {
+
+				builder.add (
+					statsProvider.getStats (
+						transaction,
+						interval));
+
+			}
+
+			return builder.build ();
 
 		}
 

@@ -13,11 +13,10 @@ import org.joda.time.Interval;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -34,7 +33,7 @@ import wbs.apn.chat.contact.model.ChatMessageUserStats;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 
-@SingletonComponent ("chatMessageUserStatsProvider")
+@PrototypeComponent ("chatMessageUserStatsProvider")
 public
 class ChatMessageUserStatsProvider
 	implements StatsProvider {
@@ -62,14 +61,62 @@ class ChatMessageUserStatsProvider
 	@SingletonDependency
 	UserConsoleHelper userHelper;
 
+	// state
+
+	Set <Long> searchChatIds;
+	Set <Long> searchUserIds;
+
+	Set <Long> filterChatIds;
+	Set <Long> filterUserIds;
+
 	// implementation
+
+	@Override
+	public
+	void prepare (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			// get conditions
+
+			searchChatIds =
+				chatConsoleLogic.getSupervisorSearchChatIds (
+					transaction,
+					conditions);
+
+			searchUserIds =
+				userConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			// get filters
+
+			filterChatIds =
+				chatConsoleLogic.getSupervisorFilterChatIds (
+					transaction);
+
+			filterUserIds =
+				userConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+		}
+
+	}
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull StatsPeriod period,
-			@NonNull Map <String, Set <String>> conditions) {
+			@NonNull Interval interval) {
 
 		try (
 
@@ -79,28 +126,6 @@ class ChatMessageUserStatsProvider
 					"getStats");
 
 		) {
-
-			// get conditions
-
-			Set <Long> searchChatIds =
-				chatConsoleLogic.getSupervisorSearchChatIds (
-					transaction,
-					conditions);
-
-			Set <Long> searchUserIds =
-				userConsoleLogic.getSupervisorSearchIds (
-					transaction,
-					conditions);
-
-			// get filters
-
-			Set <Long> filterChatIds =
-				chatConsoleLogic.getSupervisorFilterChatIds (
-					transaction);
-
-			Set <Long> filterUserIds =
-				userConsoleLogic.getSupervisorFilterIds (
-					transaction);
 
 			// fetch stats
 
@@ -113,75 +138,68 @@ class ChatMessageUserStatsProvider
 			Set <Object> indexChatIds =
 				new HashSet<> ();
 
+			List <ChatMessageUserStats> messageUserStatsList =
+				chatMessageHelper.searchUserStats (
+					transaction,
+					new ChatMessageStatsSearch ()
+
+				.chatIds (
+					searchChatIds)
+
+				.senderUserIds (
+					searchUserIds)
+
+				.timestamp (
+					TextualInterval.forInterval (
+						DateTimeZone.UTC,
+						interval))
+
+				.filterChatIds (
+					filterChatIds)
+
+				.filterSenderUserIds (
+					filterUserIds)
+
+			);
+
 			for (
-				Interval interval
-					: period
+				ChatMessageUserStats messageUserStats
+					: messageUserStatsList
 			) {
 
-				List <ChatMessageUserStats> messageUserStatsList =
-					chatMessageHelper.searchUserStats (
-						transaction,
-						new ChatMessageStatsSearch ()
+				statsDataSet.data ().add (
+					new StatsDatum ()
 
-					.chatIds (
-						searchChatIds)
+					.startTime (
+						interval.getStart ().toInstant ())
 
-					.senderUserIds (
-						searchUserIds)
+					.addIndex (
+						"userId",
+						messageUserStats.getUser ().getId ())
 
-					.timestamp (
-						TextualInterval.forInterval (
-							DateTimeZone.UTC,
-							interval))
+					.addIndex (
+						"chatId",
+						messageUserStats.getChat ().getId ())
 
-					.filterChatIds (
-						filterChatIds)
+					.addValue (
+						"numMessages",
+						messageUserStats.getNumMessages ())
 
-					.filterSenderUserIds (
-						filterUserIds)
+					.addValue (
+						"numCharacters",
+						messageUserStats.getNumCharacters ())
+
+					.addValue (
+						"numMessagesFinal",
+						messageUserStats.getNumMessagesFinal ())
 
 				);
 
-				for (
-					ChatMessageUserStats messageUserStats
-						: messageUserStatsList
-				) {
+				indexUserIds.add (
+					messageUserStats.getUser ().getId ());
 
-					statsDataSet.data ().add (
-						new StatsDatum ()
-
-						.startTime (
-							interval.getStart ().toInstant ())
-
-						.addIndex (
-							"userId",
-							messageUserStats.getUser ().getId ())
-
-						.addIndex (
-							"chatId",
-							messageUserStats.getChat ().getId ())
-
-						.addValue (
-							"numMessages",
-							messageUserStats.getNumMessages ())
-
-						.addValue (
-							"numCharacters",
-							messageUserStats.getNumCharacters ())
-
-						.addValue (
-							"numMessagesFinal",
-							messageUserStats.getNumMessagesFinal ())
-
-					);
-
-					indexUserIds.add (
-						messageUserStats.getUser ().getId ());
-
-					indexChatIds.add (
-						messageUserStats.getChat ().getId ());
-
-				}
+				indexChatIds.add (
+					messageUserStats.getChat ().getId ());
 
 			}
 

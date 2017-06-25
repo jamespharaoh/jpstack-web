@@ -13,11 +13,10 @@ import org.joda.time.Interval;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -30,7 +29,7 @@ import wbs.utils.time.TextualInterval;
 import wbs.imchat.model.ImChatMessageStatsSearch;
 import wbs.imchat.model.ImChatMessageUserStats;
 
-@SingletonComponent ("imChatMessageUserStatsProvider")
+@PrototypeComponent ("imChatMessageUserStatsProvider")
 public
 class ImChatMessageUserStatsProvider
 	implements StatsProvider {
@@ -55,14 +54,62 @@ class ImChatMessageUserStatsProvider
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
+	// state
+
+	Set <Long> searchImChatIds;
+	Set <Long> searchUserIds;
+
+	Set <Long> filterImChatIds;
+	Set <Long> filterUserIds;
+
 	// implementation
+
+	@Override
+	public
+	void prepare (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			// get conditions
+
+			searchImChatIds =
+				imChatConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			searchUserIds =
+				userConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			// get filters
+
+			filterImChatIds =
+				imChatConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+			filterUserIds =
+				userConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+		}
+
+	}
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull StatsPeriod period,
-			@NonNull Map <String, Set <String>> conditions) {
+			@NonNull Interval interval) {
 
 		try (
 
@@ -72,28 +119,6 @@ class ImChatMessageUserStatsProvider
 					"getStats");
 
 		) {
-
-			// get conditions
-
-			Set <Long> searchImChatIds =
-				imChatConsoleLogic.getSupervisorSearchIds (
-					transaction,
-					conditions);
-
-			Set <Long> searchUserIds =
-				userConsoleLogic.getSupervisorSearchIds (
-					transaction,
-					conditions);
-
-			// get filters
-
-			Set <Long> filterImChatIds =
-				imChatConsoleLogic.getSupervisorFilterIds (
-					transaction);
-
-			Set <Long> filterUserIds =
-				userConsoleLogic.getSupervisorFilterIds (
-					transaction);
 
 			// fetch stats
 
@@ -106,71 +131,64 @@ class ImChatMessageUserStatsProvider
 			Set <Object> indexUserIds =
 				new HashSet<> ();
 
+			List <ImChatMessageUserStats> messageUserStatsList =
+				imChatMessageHelper.searchMessageUserStats (
+					transaction,
+					new ImChatMessageStatsSearch ()
+
+				.imChatIds (
+					searchImChatIds)
+
+				.senderUserIds (
+					searchUserIds)
+
+				.timestamp (
+					TextualInterval.forInterval (
+						DateTimeZone.UTC,
+						interval))
+
+				.filterImChatIds (
+					filterImChatIds)
+
+				.filterSenderUserIds (
+					filterUserIds)
+
+			);
+
 			for (
-				Interval interval
-					: period
+				ImChatMessageUserStats messageUserStats
+					: messageUserStatsList
 			) {
 
-				List <ImChatMessageUserStats> messageUserStatsList =
-					imChatMessageHelper.searchMessageUserStats (
-						transaction,
-						new ImChatMessageStatsSearch ()
+				statsDataSet.data ().add (
+					new StatsDatum ()
 
-					.imChatIds (
-						searchImChatIds)
+					.startTime (
+						interval.getStart ().toInstant ())
 
-					.senderUserIds (
-						searchUserIds)
+					.addIndex (
+						"userId",
+						messageUserStats.getSenderUser ().getId ())
 
-					.timestamp (
-						TextualInterval.forInterval (
-							DateTimeZone.UTC,
-							interval))
+					.addIndex (
+						"manualResponderId",
+						messageUserStats.getImChat ().getId ())
 
-					.filterImChatIds (
-						filterImChatIds)
+					.addValue (
+						"numMessages",
+						messageUserStats.getNumMessages ())
 
-					.filterSenderUserIds (
-						filterUserIds)
+					.addValue (
+						"numCharacters",
+						messageUserStats.getNumCharacters ())
 
 				);
 
-				for (
-					ImChatMessageUserStats messageUserStats
-						: messageUserStatsList
-				) {
+				indexUserIds.add (
+					messageUserStats.getSenderUser ().getId ());
 
-					statsDataSet.data ().add (
-						new StatsDatum ()
-
-						.startTime (
-							interval.getStart ().toInstant ())
-
-						.addIndex (
-							"userId",
-							messageUserStats.getSenderUser ().getId ())
-
-						.addIndex (
-							"manualResponderId",
-							messageUserStats.getImChat ().getId ())
-
-						.addValue (
-							"numMessages",
-							messageUserStats.getNumMessages ())
-
-						.addValue (
-							"numCharacters",
-							messageUserStats.getNumCharacters ())
-
-					);
-
-					indexUserIds.add (
-						messageUserStats.getSenderUser ().getId ());
-
-					indexImChatIds.add (
-						messageUserStats.getImChat ().getId ());
-
-				}
+				indexImChatIds.add (
+					messageUserStats.getImChat ().getId ());
 
 			}
 
