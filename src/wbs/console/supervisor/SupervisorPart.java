@@ -625,8 +625,6 @@ class SupervisorPart
 							intervalDataSets,
 							statsProviderIndex));
 
-					intervalIndex ++;
-
 				}
 
 				dataSetsBuilder.put (
