@@ -15,6 +15,7 @@
 	</models>
 
 	<layer name="console">
+		<component class="console.BroadcastConsoleHooks"/>
 		<component class="console.BroadcastNumbersAction"/>
 		<component class="console.BroadcastNumbersPart"/>
 		<component class="console.BroadcastSendAction"/>

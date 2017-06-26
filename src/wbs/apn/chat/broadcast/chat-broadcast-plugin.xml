@@ -19,6 +19,7 @@
 	</layer>
 
 	<layer name="console">
+		<component class="console.ChatBroadcastConsoleHooks"/>
 		<component class="console.ChatBroadcastListPart"/>
 		<component class="console.ChatBroadcastSendAction"/>
 		<component class="console.ChatBroadcastSendPart"/>
