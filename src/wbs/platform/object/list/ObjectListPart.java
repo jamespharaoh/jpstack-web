@@ -707,14 +707,9 @@ class ObjectListPart <
 
 			// TODO i hate generics
 
-			@SuppressWarnings ("unchecked")
-			List <Comparable <Comparable <?>>> temp =
-				(List <Comparable <Comparable <?>>>)
-				(List <?>)
-				selectedObjects;
-
 			Collections.sort (
-				temp);
+				selectedObjects,
+				consoleHelper.defaultOrdering ());
 
 		}
 

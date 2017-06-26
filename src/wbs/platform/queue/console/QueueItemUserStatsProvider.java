@@ -14,11 +14,10 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
-import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -32,7 +31,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.time.TextualInterval;
 
-@SingletonComponent ("queueItemUserStatsProvider")
+@PrototypeComponent ("queueItemUserStatsProvider")
 public
 class QueueItemUserStatsProvider
 	implements StatsProvider {
@@ -60,14 +59,62 @@ class QueueItemUserStatsProvider
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	// implementation
+	// state
+
+	Set <Long> searchQueueIds;
+	Set <Long> searchUserIds;
+
+	Set <Long> filterQueueIds;
+	Set <Long> filterUserIds;
+
+	// public implementation
+
+	@Override
+	public
+	void prepare (
+			@NonNull Transaction parentTransaction,
+			@NonNull Map <String, Set <String>> conditions) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"prepare");
+
+		) {
+
+			// get conditions
+
+			searchQueueIds =
+				queueConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			searchUserIds =
+				userConsoleLogic.getSupervisorSearchIds (
+					transaction,
+					conditions);
+
+			// get filters
+
+			filterQueueIds =
+				queueConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+			filterUserIds =
+				userConsoleLogic.getSupervisorFilterIds (
+					transaction);
+
+		}
+
+	}
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull Transaction parentTransaction,
-			@NonNull StatsPeriod period,
-			@NonNull Map <String, Set <String>> conditions) {
+			@NonNull Interval interval) {
 
 		try (
 
@@ -77,28 +124,6 @@ class QueueItemUserStatsProvider
 					"getStats");
 
 		) {
-
-			// get conditions
-
-			Set <Long> searchQueueIds =
-				queueConsoleLogic.getSupervisorSearchIds (
-					transaction,
-					conditions);
-
-			Set <Long> searchUserIds =
-				userConsoleLogic.getSupervisorSearchIds (
-					transaction,
-					conditions);
-
-			// get filters
-
-			Set <Long> filterQueueIds =
-				queueConsoleLogic.getSupervisorFilterIds (
-					transaction);
-
-			Set <Long> filterUserIds =
-				userConsoleLogic.getSupervisorFilterIds (
-					transaction);
 
 			// fetch stats
 
@@ -111,67 +136,60 @@ class QueueItemUserStatsProvider
 			Set <Object> indexUserIds =
 				new HashSet<> ();
 
+			List <QueueItemUserStats> queueItemUserStatsList =
+				queueItemHelper.searchUserStats (
+					transaction,
+					new QueueItemStatsSearch ()
+
+				.queueIds (
+					searchQueueIds)
+
+				.userIds (
+					searchUserIds)
+
+				.timestamp (
+					TextualInterval.forInterval (
+						DateTimeZone.UTC,
+						interval))
+
+				.filterQueueIds (
+					filterQueueIds)
+
+				.filterUserIds (
+					filterUserIds)
+
+			);
+
 			for (
-				Interval interval
-					: period
+				QueueItemUserStats queueItemUserStats
+					: queueItemUserStatsList
 			) {
 
-				List <QueueItemUserStats> queueItemUserStatsList =
-					queueItemHelper.searchUserStats (
-						transaction,
-						new QueueItemStatsSearch ()
+				statsDataSet.data ().add (
+					new StatsDatum ()
 
-					.queueIds (
-						searchQueueIds)
+					.startTime (
+						interval.getStart ().toInstant ())
 
-					.userIds (
-						searchUserIds)
+					.addIndex (
+						"queueId",
+						queueItemUserStats.getQueue ().getId ())
 
-					.timestamp (
-						TextualInterval.forInterval (
-							DateTimeZone.UTC,
-							interval))
+					.addIndex (
+						"userId",
+						queueItemUserStats.getUser ().getId ())
 
-					.filterQueueIds (
-						filterQueueIds)
-
-					.filterUserIds (
-						filterUserIds)
+					.addValue (
+						"numProcessed",
+						queueItemUserStats.getNumProcessed ())
 
 				);
 
-				for (
-					QueueItemUserStats queueItemUserStats
-						: queueItemUserStatsList
-				) {
+				indexQueueIds.add (
+					queueItemUserStats.getQueue ().getId ());
 
-					statsDataSet.data ().add (
-						new StatsDatum ()
-
-						.startTime (
-							interval.getStart ().toInstant ())
-
-						.addIndex (
-							"queueId",
-							queueItemUserStats.getQueue ().getId ())
-
-						.addIndex (
-							"userId",
-							queueItemUserStats.getUser ().getId ())
-
-						.addValue (
-							"numProcessed",
-							queueItemUserStats.getNumProcessed ())
-
-					);
-
-					indexQueueIds.add (
-						queueItemUserStats.getQueue ().getId ());
-
-					indexUserIds.add (
-						queueItemUserStats.getUser ().getId ());
-
-				}
+				indexUserIds.add (
+					queueItemUserStats.getUser ().getId ());
 
 			}
 

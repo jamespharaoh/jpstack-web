@@ -7,6 +7,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 
@@ -69,6 +70,11 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 		doNothing ();
 
+	}
+
+	default
+	Ordering <RecordType> defaultOrdering () {
+		return Ordering.natural ();
 	}
 
 	public static

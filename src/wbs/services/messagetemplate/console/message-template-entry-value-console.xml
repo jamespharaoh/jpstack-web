@@ -46,14 +46,6 @@
 			<object-settings-page
 				form="settings"/>
 
-			<!--
-			<context-link
-				name="fieldValue"
-				link="messageTemplateFieldValue"
-				label="Fields"
-				priv-key="messageTemplateDatabase.manage"/>
-			-->
-
 			<object-events-page/>
 
 		</object>

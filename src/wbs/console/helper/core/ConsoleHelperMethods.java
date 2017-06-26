@@ -3,6 +3,7 @@ package wbs.console.helper.core;
 import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 
@@ -118,6 +119,11 @@ interface ConsoleHelperMethods <
 			assumedRoot,
 			mini);
 
+	}
+
+	default
+	Ordering <RecordType> defaultOrdering () {
+		return consoleHooks ().defaultOrdering ();
 	}
 
 	ConsoleHooks <RecordType> consoleHooks ();

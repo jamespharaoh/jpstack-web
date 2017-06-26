@@ -13,7 +13,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-@PrototypeComponent ("ticketFieldsProviderConfig")
+@PrototypeComponent ("ticketListFieldsProvider")
 @HiddenComponent
 public
 class TicketListFieldsProvider

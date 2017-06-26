@@ -208,6 +208,12 @@
 
 			<columns>
 
+				<object-field
+					name="queueParentTypeId"
+					object-type="objectType"
+					label="Queue service type"
+					nullable="yes"/>
+
 				<interval-field
 					name="createdTime"
 					label="Time"/>
