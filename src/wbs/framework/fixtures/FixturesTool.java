@@ -1,9 +1,11 @@
 package wbs.framework.fixtures;
 
+import static wbs.framework.logging.TaskLogUtils.writeTaskLogToStandardError;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -113,7 +115,13 @@ class FixturesTool {
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runFixtureProvider (pluginFixtureSpec)");
+					"runFixtureProvider",
+					keyEqualsString (
+						"pluginName",
+						plugin.name ()),
+					keyEqualsString (
+						"fixtureName",
+						fixture.name ()));
 
 		) {
 
@@ -174,6 +182,9 @@ class FixturesTool {
 					"Error creating fixture %s from %s",
 					fixture.name (),
 					plugin.name ());
+
+				writeTaskLogToStandardError (
+					taskLogger);
 
 			}
 

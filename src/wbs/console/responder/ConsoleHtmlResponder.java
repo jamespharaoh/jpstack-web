@@ -1,5 +1,6 @@
 package wbs.console.responder;
 
+import static wbs.framework.logging.TaskLogUtils.writeTaskLog;
 import static wbs.utils.collection.CollectionUtils.listSorted;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
@@ -540,27 +541,6 @@ class ConsoleHtmlResponder
 				"-->");
 
 		}
-
-	}
-
-	private
-	void writeTaskLog (
-			@NonNull FormatWriter formatWriter,
-			@NonNull TaskLogEvent taskLogEvent) {
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"%s %s",
-			enumName (
-				taskLogEvent.eventSeverity ()),
-			taskLogEvent.eventText ());
-
-		taskLogEvent.eventChildren ().forEach (
-			childEvent ->
-				writeTaskLog (
-					formatWriter,
-					childEvent));
-
-		formatWriter.decreaseIndent ();
 
 	}
 

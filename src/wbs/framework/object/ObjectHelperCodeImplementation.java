@@ -12,10 +12,13 @@ import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.integerToDecimalStringLazy;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpaceLazy;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -177,7 +180,18 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"findByCode");
+					"findByCode",
+					keyEqualsString (
+						"ancestorGlobalId",
+						joinWithCommaAndSpaceLazy (
+							integerToDecimalStringLazy (
+								ancestorGlobalId.typeId ()),
+							integerToDecimalStringLazy (
+								ancestorGlobalId.objectId ()))),
+					keyEqualsString (
+						"codes",
+						joinWithCommaAndSpaceLazy (
+							codes)));
 
 		) {
 
