@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 
@@ -57,6 +58,11 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 		doNothing ();
 
+	}
+
+	default
+	Ordering <RecordType> defaultOrdering () {
+		return Ordering.natural ();
 	}
 
 	public static
