@@ -3,6 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listSlice;
+import static wbs.utils.collection.IterableUtils.iterableIsNotEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
@@ -787,8 +788,8 @@ class ObjectSearchResultsPart <
 				// output separator if there are row fields
 
 				if (
-					isNotNull (
-						form.rowFields ())
+					iterableIsNotEmpty (
+						form.rowFields ().formFields ())
 				) {
 
 					htmlTableRowSeparatorWrite (
