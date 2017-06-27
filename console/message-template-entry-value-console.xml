@@ -93,7 +93,16 @@
 			name="summary"
 			object-type="message-template-entry-value"
 			type="read-only"
-			fields-provider="messageTemplateEntryValueSummaryFieldsProvider"/>
+			fields-provider="messageTemplateEntryValueSummaryFieldsProvider">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+
+			</columns>
+
+		</form>
 
 		<form
 			name="settings"
