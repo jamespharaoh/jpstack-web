@@ -1,6 +1,8 @@
 package wbs.console.forms.basic;
 
-import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
+import java.nio.channels.UnsupportedAddressTypeException;
 
 import com.google.common.base.Optional;
 
@@ -40,28 +42,19 @@ class IdentityFormFieldAccessor <Container>
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container) {
 
-		return Optional.of (
+		return optionalOf (
 			container);
 
 	}
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Container> nativeValue) {
 
-		if (
-			referenceNotEqualWithClass (
-				containerClass,
-				container,
-				nativeValue.get ())
-		) {
-
-			throw new RuntimeException ();
-
-		}
+		throw new UnsupportedAddressTypeException ();
 
 	}
 

@@ -1,5 +1,6 @@
 package wbs.console.forms.object;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -124,7 +125,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional<Native> nativeValue) {
@@ -181,6 +182,10 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 				container,
 				name,
 				nativeValue.orNull ());
+
+			// return
+
+			return optionalAbsent ();
 
 		}
 

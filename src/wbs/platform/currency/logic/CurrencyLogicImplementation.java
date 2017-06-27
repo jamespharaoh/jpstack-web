@@ -372,4 +372,15 @@ class CurrencyLogicImplementation
 
 	}
 
+	@Override
+	public
+	Double toFloat (
+			@NonNull CurrencyRec currency,
+			@NonNull Long amount) {
+
+		return (double) amount
+			/ (double) currency.getDivisions ();
+
+	}
+
 }

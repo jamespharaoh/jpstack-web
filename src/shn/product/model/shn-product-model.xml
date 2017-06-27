@@ -80,4 +80,20 @@
 
 	</fields>
 
+	<collections>
+
+		<associative-list
+			name="variantTypes"
+			type="shnProductVariantType"
+			table="shn_product_variant_type_link"
+			join-column="product_id"
+			value-column="variant_type_id"/>
+
+		<children-collection
+			name="variants"
+			type="shnProductVariant"
+			join-column="product_id"/>
+
+	</collections>
+
 </model-meta>

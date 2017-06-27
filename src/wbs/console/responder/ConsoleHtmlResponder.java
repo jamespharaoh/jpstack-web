@@ -2,7 +2,6 @@ package wbs.console.responder;
 
 import static wbs.framework.logging.TaskLogUtils.writeTaskLog;
 import static wbs.utils.collection.CollectionUtils.listSorted;
-import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -27,7 +26,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogEvent;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -42,15 +40,19 @@ class ConsoleHtmlResponder
 	// singleton dependencies
 
 	@ClassSingletonDependency
+	private
 	LogContext logContext;
 
 	@SingletonDependency
+	private
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
+	private
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
+	private
 	TimeFormatter timeFormatter;
 
 	// details

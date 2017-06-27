@@ -1,6 +1,7 @@
 package wbs.console.component;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableFilterByClass;
 import static wbs.utils.collection.IterableUtils.iterableOnlyItemByClass;
 import static wbs.utils.collection.MapUtils.iterableTransformToMap;
@@ -10,7 +11,6 @@ import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.anyIsNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -36,6 +36,7 @@ import wbs.console.forms.core.ConsoleFormTypeFactory;
 import wbs.console.forms.core.ConsoleFormsSpec;
 import wbs.console.forms.core.ConsoleMultiFormType;
 import wbs.console.forms.core.ConsoleMultiFormTypeFactory;
+import wbs.console.forms.core.DynamicFieldsProvider;
 import wbs.console.forms.core.StaticFieldsProvider;
 import wbs.console.forms.core.StaticFieldsProviderFactory;
 import wbs.console.forms.core.StaticObjectFieldsProviderFactory;
@@ -603,7 +604,11 @@ class ConsoleComponentPlugin
 				collectionIsNotEmpty (
 					formSpec.sections ());
 
-			if (gotFields && gotSections) {
+			boolean gotProvider =
+				isNotNull (
+					formSpec.fieldsProviderName ());
+
+			if ((gotFields && gotProvider) && gotSections) {
 				throw todo ();
 			}
 
@@ -615,143 +620,110 @@ class ConsoleComponentPlugin
 					() -> classForNameRequired (
 						formSpec.className ()));
 
-			if (! gotSections) {
+			if (gotSections) {
 
-				String fieldsProviderName =
-					ifNull (
-						formSpec.fieldsProviderName (),
-						stringFormat (
-							"%s%sFormFieldsProvider",
-							hyphenToCamel (
-								moduleSpec.name ()),
-							hyphenToCamelCapitalise (
-								formSpec.name ())));
+				registerConsoleMultiFormType (
+					taskLogger,
+					componentRegistry,
+					moduleSpec,
+					formSpec);
 
-				if (
-					isNotNull (
-						formSpec.objectTypeName ())
-				) {
+				return;
 
-					if (
-						isNull (
-							formSpec.fieldsProviderName ())
-					) {
+			}
 
-						componentRegistry.registerDefinition (
-							taskLogger,
-							new ComponentDefinition ()
+			// static fields provider
 
-							.name (
-								fieldsProviderName)
+			String staticFieldsProviderName =
+				stringFormat (
+					"%s%sStaticFormFieldsProvider",
+					hyphenToCamel (
+						moduleSpec.name ()),
+					hyphenToCamelCapitalise (
+						formSpec.name ()));
 
-							.componentClass (
-								StaticFieldsProvider.class)
+			if (
+				isNotNull (
+					formSpec.objectTypeName ())
+			) {
 
-							.factoryClass (
-								genericCastUnchecked (
-									StaticObjectFieldsProviderFactory.class))
-
-							.scope (
-								"singleton")
-
-							.hide (
-								true)
-
-							.addValuePropertyFormat (
-								"name",
-								"%s.%s",
-								moduleSpec.name (),
-								formSpec.name ())
-
-							.addReferencePropertyFormat (
-								"consoleHelper",
-								"singleton",
-								"%sConsoleHelper",
-								hyphenToCamel (
-									formSpec.objectTypeName ()))
-
-							.addValueProperty (
-								"columnFieldSpecs",
-								optionalFromNullable (
-									formSpec.columnFields ()))
-
-							.addValueProperty (
-								"rowFieldSpecs",
-								optionalFromNullable (
-									formSpec.rowFields ()))
-
-						);
-
-					}
-
-				} else {
-
-					componentRegistry.registerDefinition (
-						taskLogger,
-						new ComponentDefinition ()
-
-						.name (
-							fieldsProviderName)
-
-						.componentClass (
-							StaticFieldsProvider.class)
-
-						.factoryClass (
-							genericCastUnchecked (
-								StaticFieldsProviderFactory.class))
-
-						.scope (
-							"singleton")
-
-						.hide (
-							true)
-
-						.addValueProperty (
-							"name",
-							optionalOfFormat (
-								"%s.%s",
-								moduleSpec.name (),
-								formSpec.name ()))
-
-						.addValueProperty (
-							"containerClass",
-							optionalOf (
-								formClass))
-
-						.addValueProperty (
-							"columnFieldSpecs",
-							optionalFromNullable (
-								formSpec.columnFields ()))
-
-						.addValueProperty (
-							"rowFieldSpecs",
-							optionalFromNullable (
-								formSpec.rowFields ()))
-
-					);
-
-				}
-
-				ComponentDefinition componentDefinition =
+				componentRegistry.registerDefinition (
+					taskLogger,
 					new ComponentDefinition ()
 
 					.name (
-						stringFormat (
-							"%s%sFormType",
-							hyphenToCamel (
-								moduleSpec.name ()),
-							hyphenToCamelCapitalise (
-								formSpec.name ())))
+						staticFieldsProviderName)
 
 					.componentClass (
-						ConsoleFormType.class)
+						StaticFieldsProvider.class)
 
 					.factoryClass (
 						genericCastUnchecked (
-							ConsoleFormTypeFactory.class))
+							StaticObjectFieldsProviderFactory.class))
 
 					.scope (
 						"singleton")
+
+					.hide (
+						true)
+
+					.addValuePropertyFormat (
+						"name",
+						"%s.%s",
+						moduleSpec.name (),
+						formSpec.name ())
+
+					.addReferencePropertyFormat (
+						"consoleHelper",
+						"singleton",
+						"%sConsoleHelper",
+						hyphenToCamel (
+							formSpec.objectTypeName ()))
+
+					.addValueProperty (
+						"columnFieldSpecs",
+						optionalOf (
+							ifNull (
+								formSpec.columnFields (),
+								emptyList ())))
+
+					.addValueProperty (
+						"rowFieldSpecs",
+						optionalOf (
+							ifNull (
+								formSpec.rowFields (),
+								emptyList ())))
+
+				);
+
+			} else {
+
+				componentRegistry.registerDefinition (
+					taskLogger,
+					new ComponentDefinition ()
+
+					.name (
+						staticFieldsProviderName)
+
+					.componentClass (
+						StaticFieldsProvider.class)
+
+					.factoryClass (
+						genericCastUnchecked (
+							StaticFieldsProviderFactory.class))
+
+					.scope (
+						"singleton")
+
+					.hide (
+						true)
+
+					.addValueProperty (
+						"name",
+						optionalOfFormat (
+							"%s.%s",
+							moduleSpec.name (),
+							formSpec.name ()))
 
 					.addValueProperty (
 						"containerClass",
@@ -759,125 +731,241 @@ class ConsoleComponentPlugin
 							formClass))
 
 					.addValueProperty (
-						"formName",
-						optionalOf (
-							formSpec.name ()))
+						"columnFieldSpecs",
+						optionalFromNullable (
+							formSpec.columnFields ()))
 
 					.addValueProperty (
-						"formType",
-						optionalOf (
-							formSpec.formType ()))
+						"rowFieldSpecs",
+						optionalFromNullable (
+							formSpec.rowFields ()))
 
-					.addReferenceProperty (
-						"fieldsProvider",
-						"singleton",
-						fieldsProviderName)
+				);
 
-				;
+			}
 
-				if (
-					isNotNull (
-						formSpec.objectTypeName ())
-				) {
+			// dynamic fields provider
 
-					componentDefinition.addReferencePropertyFormat (
-						"consoleHelper",
-						"singleton",
-						"%sConsoleHelper",
+			String fieldsProviderName;
+
+			if (gotProvider) {
+
+				fieldsProviderName =
+					stringFormat (
+						"%s%sDynamicFormFieldsProvider",
 						hyphenToCamel (
-							formSpec.objectTypeName ()));
-
-				} else {
-
-					componentDefinition.addValueProperty (
-						"containerClass",
-						optionalOf (
-							classForNameRequired (
-								formSpec.className ())));
-
-				}
+							moduleSpec.name ()),
+						hyphenToCamelCapitalise (
+							formSpec.name ()));
 
 				componentRegistry.registerDefinition (
 					taskLogger,
-					componentDefinition);
-
-			} else {
-
-				ComponentDefinition componentDefinition =
 					new ComponentDefinition ()
 
 					.name (
-						stringFormat (
-							"%s%sFormType",
-							hyphenToCamel (
-								moduleSpec.name ()),
-							hyphenToCamelCapitalise (
-								formSpec.name ())))
-
-					.componentClass (
-						ConsoleMultiFormType.class)
-
-					.factoryClass (
-						genericCastUnchecked (
-							ConsoleMultiFormTypeFactory.class))
+						fieldsProviderName)
 
 					.scope (
 						"singleton")
 
-					.addValueProperty (
-						"consoleModuleName",
-						optionalOf (
-							moduleSpec.name ()))
+					.componentClass (
+						DynamicFieldsProvider.class)
 
 					.addValueProperty (
-						"formName",
-						optionalOf (
+						"name",
+						optionalOfFormat (
+							"%s.%s",
+							moduleSpec.name (),
 							formSpec.name ()))
 
 					.addValueProperty (
-						"formType",
-						optionalOf (
-							formSpec.formType ()))
-
-					.addValueProperty (
-						"sectionFields",
-						optionalOf (
-							iterableTransformToMap (
-								formSpec.sections (),
-								section ->
-									section.name (),
-								section ->
-									section.fields ())))
-
-				;
-
-				if (
-					isNotNull (
-						formSpec.objectTypeName ())
-				) {
-
-					componentDefinition.addReferencePropertyFormat (
-						"consoleHelper",
-						"singleton",
-						"%sConsoleHelper",
-						hyphenToCamel (
-							formSpec.objectTypeName ()));
-
-				} else {
-
-					componentDefinition.addValueProperty (
 						"containerClass",
 						optionalOf (
-							classForNameRequired (
-								formSpec.className ())));
+							formClass))
 
-				}
+					.addReferenceProperty (
+						"staticFieldsProvider",
+						"singleton",
+						staticFieldsProviderName)
 
-				componentRegistry.registerDefinition (
-					taskLogger,
-					componentDefinition);
+					.addReferenceProperty (
+						"dynamicFieldsProvider",
+						"singleton",
+						formSpec.fieldsProviderName ())
+
+				);
+
+			} else {
+
+				fieldsProviderName =
+					staticFieldsProviderName;
 
 			}
+
+			// form type
+
+			ComponentDefinition componentDefinition =
+				new ComponentDefinition ()
+
+				.name (
+					stringFormat (
+						"%s%sFormType",
+						hyphenToCamel (
+							moduleSpec.name ()),
+						hyphenToCamelCapitalise (
+							formSpec.name ())))
+
+				.componentClass (
+					ConsoleFormType.class)
+
+				.factoryClass (
+					genericCastUnchecked (
+						ConsoleFormTypeFactory.class))
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"containerClass",
+					optionalOf (
+						formClass))
+
+				.addValueProperty (
+					"formName",
+					optionalOf (
+						formSpec.name ()))
+
+				.addValueProperty (
+					"formType",
+					optionalOf (
+						formSpec.formType ()))
+
+				.addReferenceProperty (
+					"fieldsProvider",
+					"singleton",
+					fieldsProviderName)
+
+			;
+
+			if (
+				isNotNull (
+					formSpec.objectTypeName ())
+			) {
+
+				componentDefinition.addReferencePropertyFormat (
+					"consoleHelper",
+					"singleton",
+					"%sConsoleHelper",
+					hyphenToCamel (
+						formSpec.objectTypeName ()));
+
+			} else {
+
+				componentDefinition.addValueProperty (
+					"containerClass",
+					optionalOf (
+						classForNameRequired (
+							formSpec.className ())));
+
+			}
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				componentDefinition);
+
+		}
+
+	}
+
+	private
+	void registerConsoleMultiFormType (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentRegistryBuilder componentRegistry,
+			@NonNull ConsoleModuleSpec moduleSpec,
+			@NonNull ConsoleFormSpec formSpec) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"registerConsoleMultiFormType");
+
+		) {
+
+			ComponentDefinition componentDefinition =
+				new ComponentDefinition ()
+
+				.name (
+					stringFormat (
+						"%s%sFormType",
+						hyphenToCamel (
+							moduleSpec.name ()),
+						hyphenToCamelCapitalise (
+							formSpec.name ())))
+
+				.componentClass (
+					ConsoleMultiFormType.class)
+
+				.factoryClass (
+					genericCastUnchecked (
+						ConsoleMultiFormTypeFactory.class))
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"consoleModuleName",
+					optionalOf (
+						moduleSpec.name ()))
+
+				.addValueProperty (
+					"formName",
+					optionalOf (
+						formSpec.name ()))
+
+				.addValueProperty (
+					"formType",
+					optionalOf (
+						formSpec.formType ()))
+
+				.addValueProperty (
+					"sectionFields",
+					optionalOf (
+						iterableTransformToMap (
+							formSpec.sections (),
+							section ->
+								section.name (),
+							section ->
+								section.fields ())))
+
+			;
+
+			if (
+				isNotNull (
+					formSpec.objectTypeName ())
+			) {
+
+				componentDefinition.addReferencePropertyFormat (
+					"consoleHelper",
+					"singleton",
+					"%sConsoleHelper",
+					hyphenToCamel (
+						formSpec.objectTypeName ()));
+
+			} else {
+
+				componentDefinition.addValueProperty (
+					"containerClass",
+					optionalOf (
+						classForNameRequired (
+							formSpec.className ())));
+
+			}
+
+			componentRegistry.registerDefinition (
+				taskLogger,
+				componentDefinition);
 
 		}
 

@@ -25,7 +25,7 @@
 		<!-- settings -->
 
 		<string-field
-			name="publicName"
+			name="publicTitle"
 			nullable="yes"/>
 
 	</fields>

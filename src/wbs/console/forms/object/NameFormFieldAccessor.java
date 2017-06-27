@@ -1,6 +1,8 @@
 package wbs.console.forms.object;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.PropertyUtils.propertySetAuto;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRelaxed;
 
 import com.google.common.base.Optional;
@@ -47,7 +49,7 @@ class NameFormFieldAccessor <Container>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
@@ -63,12 +65,14 @@ class NameFormFieldAccessor <Container>
 				simplifyToCodeRelaxed (
 					nativeValue.get ());
 
-			PropertyUtils.propertySetAuto (
+			propertySetAuto (
 				container,
 				consoleHelper.codeFieldName (),
 				codeValue);
 
 		}
+
+		return optionalAbsent ();
 
 	}
 

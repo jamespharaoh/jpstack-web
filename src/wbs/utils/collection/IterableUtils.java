@@ -693,4 +693,41 @@ class IterableUtils {
 
 	}
 
+	public static
+	long iterableSize (
+			@NonNull Iterable <?> iterable) {
+
+		long size = 0;
+
+		Iterator <?> iterator =
+			iterable.iterator ();
+
+		while (iterator.hasNext ()) {
+
+			size ++;
+
+			iterator.next ();
+
+		}
+
+		return size;
+
+	}
+
+	public static
+	boolean iterableIsEmpty (
+			@NonNull Iterable <?> iterable) {
+
+		return ! iterable.iterator ().hasNext ();
+
+	}
+
+	public static
+	boolean iterableIsNotEmpty (
+			@NonNull Iterable <?> iterable) {
+
+		return iterable.iterator ().hasNext ();
+
+	}
+
 }

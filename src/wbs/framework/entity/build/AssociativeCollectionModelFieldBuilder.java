@@ -159,6 +159,12 @@ class AssociativeCollectionModelFieldBuilder
 				.associationTableName (
 					spec.tableName ())
 
+				.joinColumnName (
+					spec.joinColumnName ())
+
+				.foreignColumnName (
+					spec.foreignColumnName ())
+
 				.valueColumnName (
 					spec.valueColumnName ())
 

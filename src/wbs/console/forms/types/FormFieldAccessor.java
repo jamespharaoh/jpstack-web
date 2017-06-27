@@ -11,7 +11,7 @@ interface FormFieldAccessor <Container, Native> {
 			Transaction parentTransaction,
 			Container container);
 
-	void write (
+	Optional <String> write (
 			Transaction parentTransaction,
 			Container container,
 			Optional <Native> nativeValue);

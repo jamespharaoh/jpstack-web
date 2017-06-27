@@ -18,6 +18,8 @@ class FormUpdateResult <Generic, Native> {
 	Optional <Native> oldNativeValue;
 	Optional <Native> newNativeValue;
 
+	Optional <String> updatedFieldName;
+
 	Optional <String> error;
 
 }

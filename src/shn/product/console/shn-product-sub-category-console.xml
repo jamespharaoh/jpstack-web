@@ -64,7 +64,7 @@
 				<description-field/>
 
 				<text-field
-					name="publicName"/>
+					name="publicTitle"/>
 
 			</columns>
 
@@ -81,7 +81,7 @@
 				<description-field/>
 
 				<text-field
-					name="publicName"/>
+					name="publicTitle"/>
 
 			</columns>
 
@@ -101,7 +101,7 @@
 				<deleted-field/>
 
 				<text-field
-					name="publicName"/>
+					name="publicTitle"/>
 
 			</columns>
 
@@ -119,7 +119,7 @@
 				<deleted-field/>
 
 				<text-field
-					name="publicName"/>
+					name="publicTitle"/>
 
 			</columns>
 

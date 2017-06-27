@@ -3,14 +3,18 @@ package shn.shopify.console;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.PropertyUtils.propertySetSimple;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
 import java.util.List;
@@ -33,15 +37,22 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.utils.string.FormatWriter;
 
+import shn.core.model.ShnDatabaseRec;
 import shn.product.console.ShnProductConsoleHelper;
 import shn.product.model.ShnProductRec;
+import shn.product.model.ShnProductVariantRec;
+import shn.product.model.ShnProductVariantTypeRec;
+import shn.product.model.ShnProductVariantValueRec;
 import shn.shopify.apiclient.ShopifyApiClient;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
 import shn.shopify.apiclient.ShopifyProductListResponse;
 import shn.shopify.apiclient.ShopifyProductRequest;
 import shn.shopify.apiclient.ShopifyProductResponse;
+import shn.shopify.apiclient.ShopifyProductVariantRequest;
 import shn.shopify.model.ShnShopifyConnectionRec;
 import wbs.web.responder.WebResponder;
 
@@ -54,6 +65,9 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	> {
 
 	// singleton depdendencies
+
+	@SingletonDependency
+	CurrencyLogic currencyLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -72,6 +86,27 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 	@SingletonDependency
 	ShnShopifyConnectionConsoleHelper shopifyConnectionHelper;
+
+	// state
+
+	ShnShopifyConnectionRec shopifyConnection;
+	ShopifyApiClientCredentials shopifyCredentials;
+
+	ShnDatabaseRec shnDatabase;
+
+	List <ShnProductRec> localProducts;
+	Map <Long, ShnProductRec> localProductsByShopifyId;
+	List <ShnProductRec> localProductsWithoutShopifyId;
+
+	List <ShopifyProductResponse> shopifyProducts;
+	Map <Long, ShopifyProductResponse> shopifyProductsById;
+
+	long productsCreated = 0l;
+	long productsUpdated = 0l;
+	long productsRemoved = 0l;
+
+	long operations = 0;
+	long maxOperations = 0;
 
 	// public implementation
 
@@ -187,203 +222,38 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 		) {
 
-			ShnShopifyConnectionRec shopifyConnection =
+			shopifyConnection =
 				shopifyConnectionHelper.findFromContextRequired (
 					transaction);
 
-			long productsCreated = 0l;
-			long productsUpdated = 0l;
-			long productsRemoved = 0l;
-
-			long operations = 0;
-
-			ShopifyApiClientCredentials credentials =
+			shopifyCredentials =
 				shopifyApiClient.getCredentials (
 					transaction,
 					shopifyConnection.getStore ());
 
-			// find and index local products
+			shnDatabase =
+				shopifyConnection.getDatabase ();
 
-			transaction.noticeFormat (
-				"Fetching all products from database");
+			maxOperations =
+				formState.maxOperations ();
 
-			List <ShnProductRec> localProducts =
-				productHelper.findAllNotDeletedEntities (
-					transaction);
+			findLocalProducts (
+				transaction);
 
-			Map <Long, ShnProductRec> localProductsByShopifyId =
-				mapWithDerivedKey (
-					iterableFilter (
-						localProducts,
-						localProduct ->
-							isNotNull (
-								localProduct.getShopifyId ())),
-					ShnProductRec::getShopifyId);
-
-			List <ShnProductRec> localProductsWithoutShopifyId =
-				iterableFilterToList (
-					localProducts,
-					localProduct ->
-						isNull (
-							localProduct.getShopifyId ()));
-
-			transaction.noticeFormat (
-				"Found %s products total, ",
-				integerToDecimalString (
-					collectionSize (
-						localProducts)),
-				"%s previously synchronised with shopify, ",
-				integerToDecimalString (
-					collectionSize (
-						localProductsByShopifyId)),
-				"%s never synchronised with shopify",
-				integerToDecimalString (
-					collectionSize (
-						localProductsWithoutShopifyId)));
-
-			// find and index shopify products
-
-			transaction.noticeFormat (
-				"Retrieving list of products from shopify");
-
-			ShopifyProductListResponse shopifyProductListResponse =
-				shopifyApiClient.listAllProducts (
-					transaction,
-					credentials);
-
-			List <ShopifyProductResponse> shopifyProducts =
-				shopifyProductListResponse.products ();
-
-			Map <Long, ShopifyProductResponse> shopifyProductsById =
-				mapWithDerivedKey (
-					shopifyProducts,
-					ShopifyProductResponse::id);
-
-			transaction.noticeFormat (
-				"Retrieved %s products from shopify",
-				integerToDecimalString (
-					collectionSize (
-						shopifyProducts)));
-
-			// remove products
+			findShopifyProducts (
+				transaction);
 
 			if (formState.removeProducts ()) {
 
-				transaction.noticeFormat (
-					"About to remove products from shopify");
-
-				for (
-					ShopifyProductResponse shopifyProduct
-						: shopifyProducts
-				) {
-
-					if (
-						mapContainsKey (
-							localProductsByShopifyId,
-							shopifyProduct.id ())
-					) {
-						continue;
-					}
-
-					operations ++;
-
-					if (operations > formState.maxOperations ()) {
-						continue;
-					}
-
-					transaction.noticeFormat (
-						"Removing product %s from shopify",
-						integerToDecimalString (
-							shopifyProduct.id ()));
-
-					shopifyApiClient.removeProduct (
-						transaction,
-						credentials,
-						shopifyProduct.id ());
-
-					productsRemoved ++;
-
-				}
-
-				transaction.noticeFormat (
-					"Removed %s products from shopify",
-					integerToDecimalString (
-						productsRemoved));
+				removeProducts (
+					transaction);
 
 			}
 
-			// create products
-
 			if (formState.createProducts ()) {
 
-				transaction.noticeFormat (
-					"About to create products in shopify");
-
-				for (
-					ShnProductRec localProduct
-						: localProductsWithoutShopifyId
-				) {
-
-					operations ++;
-
-					if (operations > formState.maxOperations ()) {
-						continue;
-					}
-
-					transaction.noticeFormat (
-						"Creating product %s (%s) in shopify",
-						integerToDecimalString (
-							localProduct.getId ()),
-						localProduct.getItemNumber ());
-
-					ShopifyProductResponse shopifyProduct =
-						shopifyApiClient.createProduct (
-							transaction,
-							credentials,
-							new ShopifyProductRequest ()
-
-						.title (
-							localProduct.getPublicTitle ())
-
-						.bodyHtml (
-							localProduct.getPublicDescription ().getText ())
-
-						.vendor (
-							localProduct.getSupplier ().getPublicName ())
-
-						.productType (
-							localProduct.getSubCategory ().getPublicName ())
-
-						);
-
-						localProduct
-
-							.setShopifyId (
-								shopifyProduct.id ())
-
-							.setShopifyUpdatedAt (
-								Instant.parse (
-									shopifyProduct.updatedAt ()))
-
-						;
-
-					productsCreated ++;
-
-					transaction.noticeFormat (
-						"Created product %s (%s) in shopify ",
-						integerToDecimalString (
-							localProduct.getId ()),
-						localProduct.getItemNumber (),
-						"with shopify id %s",
-						integerToDecimalString (
-							shopifyProduct.id ()));
-
-				}
-
-				transaction.noticeFormat (
-					"Created %s products in shopify",
-					integerToDecimalString (
-						productsCreated));
+				createProducts (
+					transaction);
 
 			}
 
@@ -447,6 +317,324 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			}
 
 			return optionalAbsent ();
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void findLocalProducts (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findLocalProducts");
+
+		) {
+
+			transaction.noticeFormat (
+				"Fetching all products from database");
+
+			localProducts =
+				productHelper.findAllNotDeletedEntities (
+					transaction);
+
+			localProductsByShopifyId =
+				mapWithDerivedKey (
+					iterableFilter (
+						localProducts,
+						localProduct ->
+							isNotNull (
+								localProduct.getShopifyId ())),
+					ShnProductRec::getShopifyId);
+
+			localProductsWithoutShopifyId =
+				iterableFilterToList (
+					localProducts,
+					localProduct ->
+						isNull (
+							localProduct.getShopifyId ()));
+
+			transaction.noticeFormat (
+				"Found %s products total, ",
+				integerToDecimalString (
+					collectionSize (
+						localProducts)),
+				"%s previously synchronised with shopify, ",
+				integerToDecimalString (
+					collectionSize (
+						localProductsByShopifyId)),
+				"%s never synchronised with shopify",
+				integerToDecimalString (
+					collectionSize (
+						localProductsWithoutShopifyId)));
+
+		}
+
+	}
+
+	private
+	void findShopifyProducts (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findShopifyProducts");
+
+		) {
+
+			transaction.noticeFormat (
+				"Retrieving list of products from shopify");
+
+			ShopifyProductListResponse shopifyProductListResponse =
+				shopifyApiClient.listAllProducts (
+					transaction,
+					shopifyCredentials);
+
+			shopifyProducts =
+				shopifyProductListResponse.products ();
+
+			shopifyProductsById =
+				mapWithDerivedKey (
+					shopifyProducts,
+					ShopifyProductResponse::id);
+
+			transaction.noticeFormat (
+				"Retrieved %s products from shopify",
+				integerToDecimalString (
+					collectionSize (
+						shopifyProducts)));
+
+		}
+
+	}
+
+	private
+	void removeProducts (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"removeProducts");
+
+		) {
+
+			transaction.noticeFormat (
+				"About to remove products from shopify");
+
+			for (
+				ShopifyProductResponse shopifyProduct
+					: shopifyProducts
+			) {
+
+				if (
+					mapContainsKey (
+						localProductsByShopifyId,
+						shopifyProduct.id ())
+				) {
+					continue;
+				}
+
+				operations ++;
+
+				if (operations > maxOperations) {
+					continue;
+				}
+
+				transaction.noticeFormat (
+					"Removing product %s from shopify",
+					integerToDecimalString (
+						shopifyProduct.id ()));
+
+				shopifyApiClient.removeProduct (
+					transaction,
+					shopifyCredentials,
+					shopifyProduct.id ());
+
+				productsRemoved ++;
+
+			}
+
+			transaction.noticeFormat (
+				"Removed %s products from shopify",
+				integerToDecimalString (
+					productsRemoved));
+
+		}
+
+	}
+
+	private
+	void createProducts (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createProducts");
+
+		) {
+
+			transaction.noticeFormat (
+				"About to create products in shopify");
+
+			for (
+				ShnProductRec localProduct
+					: localProductsWithoutShopifyId
+			) {
+
+				operations ++;
+
+				if (operations > maxOperations) {
+					continue;
+				}
+
+				transaction.noticeFormat (
+					"Creating product %s (%s) in shopify",
+					integerToDecimalString (
+						localProduct.getId ()),
+					localProduct.getItemNumber ());
+
+				ShopifyProductRequest shopifyProductRequest =
+					new ShopifyProductRequest ()
+
+					.title (
+						localProduct.getPublicTitle ())
+
+					.bodyHtml (
+						localProduct.getPublicDescription ().getText ())
+
+					.vendor (
+						localProduct.getSupplier ().getPublicName ())
+
+					.productType (
+						localProduct.getSubCategory ().getPublicTitle ());
+
+				for (
+					ShnProductVariantRec localVariant
+						: localProduct.getVariants ()
+				) {
+
+					ShopifyProductVariantRequest shopifyVariantRequest =
+						new ShopifyProductVariantRequest ()
+
+						.title (
+							localVariant.getPublicTitle ())
+
+					;
+
+					if (
+						isNotNull (
+							localVariant.getPromotionalPrice ())
+					) {
+
+						shopifyVariantRequest
+
+							.compareAtPrice (
+								currencyLogic.toFloat (
+									shnDatabase.getCurrency (),
+									localVariant.getShoppingNationPrice ()))
+
+							.price (
+								currencyLogic.toFloat (
+									shnDatabase.getCurrency (),
+									localVariant.getPromotionalPrice ()))
+
+						;
+
+					} else {
+
+						shopifyVariantRequest
+
+							.compareAtPrice (
+								null)
+
+							.price (
+								currencyLogic.toFloat (
+									shnDatabase.getCurrency (),
+									localVariant.getShoppingNationPrice ()))
+
+						;
+
+					}
+
+					long variantTypeIndex = 0;
+
+					for (
+						ShnProductVariantTypeRec localVariantType
+							: localProduct.getVariantTypes ()
+					) {
+
+						ShnProductVariantValueRec localVariantValue =
+							iterableFindExactlyOneRequired (
+								localVariant.getVariantValues (),
+								localVariantValueNested ->
+									referenceEqualSafe (
+										localVariantType,
+										localVariantValueNested.getType ()));
+
+						propertySetSimple (
+							shopifyVariantRequest,
+							stringFormat (
+								"option%s",
+								integerToDecimalString (
+									variantTypeIndex + 1)),
+							localVariantValue.getPublicTitle ());
+
+					}
+
+					shopifyProductRequest.variants ().add (
+						shopifyVariantRequest);
+
+				}
+
+				ShopifyProductResponse shopifyProductResponse =
+					shopifyApiClient.createProduct (
+						transaction,
+						shopifyCredentials,
+						shopifyProductRequest);
+
+				localProduct
+
+					.setShopifyId (
+						shopifyProductResponse.id ())
+
+					.setShopifyUpdatedAt (
+						Instant.parse (
+							shopifyProductResponse.updatedAt ()))
+
+				;
+
+				productsCreated ++;
+
+				transaction.noticeFormat (
+					"Created product %s (%s) in shopify ",
+					integerToDecimalString (
+						localProduct.getId ()),
+					localProduct.getItemNumber (),
+					"with shopify id %s",
+					integerToDecimalString (
+						shopifyProductResponse.id ()));
+
+			}
+
+			transaction.noticeFormat (
+				"Created %s products in shopify",
+				integerToDecimalString (
+					productsCreated));
 
 		}
 

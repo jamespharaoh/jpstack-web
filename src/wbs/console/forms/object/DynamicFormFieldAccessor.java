@@ -113,7 +113,7 @@ class DynamicFormFieldAccessor <
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValueOptional) {
@@ -154,7 +154,7 @@ class DynamicFormFieldAccessor <
 				consoleObjectManager.findConsoleHelperRequired (
 					container);
 
-			consoleHelper.setDynamic (
+			return consoleHelper.setDynamic (
 				transaction,
 				genericCastUnchecked (
 					container),

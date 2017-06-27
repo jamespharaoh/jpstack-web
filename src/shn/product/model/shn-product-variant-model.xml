@@ -83,4 +83,16 @@
 
 	</fields>
 
+	<collections>
+
+		<associative-collection
+			name="variantValues"
+			type="shnProductVariantValue"
+			table="shn_product_variant_has_variant_value"
+			join-column="product_variant_id"
+			foreign-column="variant_value_id"
+			owned="yes"/>
+
+	</collections>
+
 </model-meta>

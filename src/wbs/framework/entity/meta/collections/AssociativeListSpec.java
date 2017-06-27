@@ -37,8 +37,16 @@ class AssociativeListSpec
 	String tableName;
 
 	@DataAttribute (
-		name = "list-column")
-	String listColumnName;
+		name = "join-column")
+	String joinColumnName;
+
+	@DataAttribute (
+		name = "index-column")
+	String indexColumnName;
+
+	@DataAttribute (
+		name = "value-column")
+	String valueColumnName;
 
 	@DataAttribute
 	String whereSql;

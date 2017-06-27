@@ -1,6 +1,5 @@
 package shn.product.fixture;
 
-import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.SetUtils.emptySet;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
@@ -37,7 +36,6 @@ import wbs.utils.io.SafeBufferedReader;
 import shn.core.model.ShnDatabaseObjectHelper;
 import shn.core.model.ShnDatabaseRec;
 import shn.product.model.ShnProductCategoryObjectHelper;
-import shn.product.model.ShnProductCategoryRec;
 import shn.product.model.ShnProductObjectHelper;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryObjectHelper;
@@ -112,12 +110,6 @@ class ShnProductFixtureProvider
 
 		) {
 
-			createProductCategories (
-				transaction);
-
-			createProductSubCategories (
-				transaction);
-
 			createProducts (
 				transaction);
 
@@ -126,196 +118,6 @@ class ShnProductFixtureProvider
 	}
 
 	// private implementation
-
-	private
-	void createProductCategories (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"createProductCategories");
-
-			SafeBufferedReader reader =
-				fileReaderBuffered (
-					"config/test-data/shn-product-categories.csv");
-
-		) {
-
-			CsvReader csvReader =
-				new CsvReader ()
-
-				.skipHeader (
-					true);
-
-			ShnDatabaseRec shnDatabase =
-				shnDatabaseHelper.findByCodeRequired (
-					transaction,
-					GlobalId.root,
-					wbsConfig.defaultSlice (),
-					"test");
-
-			for (
-				List <String> line
-					: csvReader.readAsList (
-						reader)
-			) {
-
-				String code =
-					listItemAtIndexRequired (
-						line,
-						0l);
-
-				ShnProductCategoryRec productCategory =
-					productCategoryHelper.insert (
-						transaction,
-						productCategoryHelper.createInstance ()
-
-					.setDatabase (
-						shnDatabase)
-
-					.setCode (
-						code)
-
-					.setDescription (
-						code)
-
-					.setPublicName (
-						code)
-
-				);
-
-				eventFixtureLogic.createEvents (
-					transaction,
-					"SHN Product",
-					shnDatabase,
-					productCategory,
-					ImmutableMap.<String, Object> builder ()
-
-					.put (
-						"code",
-						code)
-
-					.put (
-						"description",
-						code)
-
-					.put (
-						"publicName",
-						code)
-
-					.build ()
-
-				);
-
-			}
-
-			transaction.flush ();
-
-		}
-
-	}
-
-	private
-	void createProductSubCategories (
-			@NonNull Transaction parentTransaction) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"createProductSubCategories");
-
-			SafeBufferedReader reader =
-				fileReaderBuffered (
-					"config/test-data/shn-product-sub-categories.csv");
-
-		) {
-
-			CsvReader csvReader =
-				new CsvReader ()
-
-				.skipHeader (
-					true);
-
-			ShnDatabaseRec shnDatabase =
-				shnDatabaseHelper.findByCodeRequired (
-					transaction,
-					GlobalId.root,
-					wbsConfig.defaultSlice (),
-					"test");
-
-			for (
-				List <String> line
-					: csvReader.readAsList (
-						reader)
-			) {
-
-				ShnProductCategoryRec category =
-					productCategoryHelper.findByCodeRequired (
-						transaction,
-						shnDatabase,
-						listItemAtIndexRequired (
-							line,
-							0l));
-
-				String code =
-					listItemAtIndexRequired (
-						line,
-						1l);
-
-				ShnProductSubCategoryRec subCategory =
-					productSubCategoryHelper.insert (
-						transaction,
-						productSubCategoryHelper.createInstance ()
-
-					.setCategory (
-						category)
-
-					.setCode (
-						code)
-
-					.setDescription (
-						code)
-
-					.setPublicName (
-						code)
-
-				);
-
-				eventFixtureLogic.createEvents (
-					transaction,
-					"SHN Product",
-					category,
-					subCategory,
-					ImmutableMap.<String, Object> builder ()
-
-					.put (
-						"code",
-						code)
-
-					.put (
-						"description",
-						code)
-
-					.put (
-						"publicName",
-						code)
-
-					.build ()
-
-				);
-
-			}
-
-			transaction.flush ();
-
-		}
-
-	}
 
 	private
 	void createProducts (

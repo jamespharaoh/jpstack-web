@@ -53,6 +53,11 @@
 					link="shnSupplier"
 					label="Suppliers"/>
 
+				<context-link
+					name="variantType"
+					link="shnProductVariantType"
+					label="Variant types"/>
+
 			</section>
 
 			<section

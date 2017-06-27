@@ -1,6 +1,7 @@
 package wbs.console.forms.object;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
@@ -64,7 +65,7 @@ class DereferenceFormFieldAccessor <Container, Native>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
@@ -128,6 +129,10 @@ class DereferenceFormFieldAccessor <Container, Native>
 				container,
 				path,
 				nativeValue.orNull ());
+
+			// return
+
+			return optionalAbsent ();
 
 		}
 

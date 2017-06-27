@@ -184,18 +184,7 @@ class TextAreaFormFieldBuilder
 
 			Class<?> propertyClass = null;
 
-			if (spec.dataProvider () != null) {
-
-				propertyClass =
-					String.class;
-
-				dataProvider =
-					componentManager.getComponentRequired (
-						taskLogger,
-						spec.dataProvider (),
-						FormFieldDataProvider.class);
-
-			} else if (! dynamic) {
+			if (! dynamic) {
 
 				propertyClass =
 					PropertyUtils.propertyClassForClass (

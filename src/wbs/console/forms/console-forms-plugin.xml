@@ -21,6 +21,7 @@
 		<bootstrap-component class="object.IndexFormFieldSpec"/>
 		<bootstrap-component class="object.NameFormFieldSpec"/>
 		<bootstrap-component class="object.ObjectFormFieldSpec"/>
+		<bootstrap-component class="object.ObjectFieldsProviderComponentWrapper"/>
 		<bootstrap-component class="object.ParentFormFieldSpec"/>
 
 		<bootstrap-component class="scriptref.JqueryScriptRefFormFieldSpec"/>

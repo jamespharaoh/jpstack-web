@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -15,7 +16,6 @@ import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
@@ -513,13 +513,13 @@ class ObjectHelperPropertyImplementation <
 
 	@Override
 	public
-	void setDynamic (
+	Optional <String> setDynamic (
 			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
-		objectModel.hooks ().setDynamic (
+		return objectModel.hooks ().setDynamic (
 			parentTransaction,
 			object,
 			name,

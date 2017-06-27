@@ -196,9 +196,39 @@ class CollectionUtils {
 	}
 
 	public static <Type>
+	Optional <Type> listItemAtIndex (
+			@NonNull List <Type> list,
+			@NonNull Long index) {
+
+		if (list.size () <= index) {
+			return optionalAbsent ();
+		}
+
+		Type value =
+			list.get (
+				toJavaIntegerRequired (
+					index));
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return optionalOf (
+			value);
+
+	}
+
+	public static <Type>
 	Type listItemAtIndexRequired (
 			@NonNull List <Type> list,
 			@NonNull Long index) {
+
+		if (list.size () <= index) {
+			throw new IndexOutOfBoundsException ();
+		}
 
 		Type value =
 			list.get (
@@ -220,6 +250,10 @@ class CollectionUtils {
 	Type listItemAtIndexRequired (
 			@NonNull List <Type> list,
 			@NonNull Integer index) {
+
+		if (list.size () <= index) {
+			throw new IndexOutOfBoundsException ();
+		}
 
 		Type value =
 			list.get (

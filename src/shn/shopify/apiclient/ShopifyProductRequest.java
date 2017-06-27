@@ -37,6 +37,10 @@ class ShopifyProductRequest {
 
 	@DataChildren (
 		childElement = "images")
-	List <ShopifyProductImageResponse> images;
+	List <ShopifyProductImageRequest> images;
+
+	@DataChildren (
+		childElement = "variants")
+	List <ShopifyProductVariantRequest> variants;
 
 }

@@ -15,12 +15,14 @@ import lombok.experimental.Accessors;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.logging.LogContext;
 
 import wbs.utils.string.FormatWriter;
 
@@ -33,12 +35,19 @@ class ErrorResponder
 	// singleton dependencies
 
 	@SingletonDependency
+	private
 	ExceptionUtils exceptionLogic;
 
+	@ClassSingletonDependency
+	private
+	LogContext logContext;
+
 	@SingletonDependency
+	private
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
+	private
 	ConsoleRequestContext requestContext;
 
 	// properties

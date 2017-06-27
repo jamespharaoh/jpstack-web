@@ -555,6 +555,7 @@
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
       <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
       <script name="src/wbs/sms/spendlimit/model/sms-spend-limit.sql"/>
+      <script name="src/shn/product/model/shn-product.sql"/>
     </database-init>
   </target>
   <target name="just-sql-data">

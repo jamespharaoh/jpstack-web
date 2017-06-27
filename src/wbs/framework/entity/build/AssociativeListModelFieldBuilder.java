@@ -149,10 +149,16 @@ class AssociativeListModelFieldBuilder
 				.associationTableName (
 					spec.tableName ())
 
+				.joinColumnName (
+					spec.joinColumnName ())
+
 				.listIndexColumnName (
 					ifNull (
-						spec.listColumnName (),
+						spec.indexColumnName (),
 						"index"))
+
+				.valueColumnName (
+					spec.valueColumnName ())
 
 				.owned (
 					ifNull (

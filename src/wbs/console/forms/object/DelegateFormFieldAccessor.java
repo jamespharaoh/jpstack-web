@@ -1,5 +1,7 @@
 package wbs.console.forms.object;
 
+import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -89,7 +91,7 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull PrincipalContainer principalContainer,
 			@NonNull Optional <Native> nativeValue) {
@@ -110,10 +112,20 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 						principalContainer,
 						path));
 
+			if (
+				referenceNotEqualSafe (
+					principalContainer,
+					delegateContainer)
+			) {
+				throw todo ();
+			}
+
 			delegateFormFieldAccessor.write (
 				transaction,
 				delegateContainer,
 				nativeValue);
+
+			return optionalAbsent ();
 
 		}
 

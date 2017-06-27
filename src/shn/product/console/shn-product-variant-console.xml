@@ -60,7 +60,7 @@
 
 			<columns>
 
-				<code-field/>
+				<code-field pattern="[1-9][0-9]{5}[A-Z]*"/>
 				<description-field/>
 
 				<text-field
@@ -80,7 +80,7 @@
 
 			<columns>
 
-				<code-field pattern="[1-9][0-9]*"/>
+				<code-field pattern="[1-9][0-9]{5}[A-Z]*"/>
 				<description-field/>
 
 				<text-field
@@ -96,13 +96,14 @@
 		<form
 			name="summary"
 			object-type="shn-product-variant"
-			type="read-only">
+			type="read-only"
+			fields-provider="shnProductVariantSummaryFieldsProvider">
 
 			<columns>
 
 				<id-field/>
 				<parent-field root="product.subCategory.category.database"/>
-				<code-field/>
+				<code-field pattern="[1-9][0-9]{5}[A-Z]*"/>
 				<description-field/>
 				<deleted-field/>
 
@@ -154,11 +155,12 @@
 		<form
 			name="settings"
 			object-type="shn-product-variant"
-			type="update">
+			type="update"
+			fields-provider="shnProductVariantSettingsFieldsProvider">
 
 			<columns>
 
-				<code-field/>
+				<code-field pattern="[1-9][0-9]{5}[A-Z]*"/>
 				<description-field/>
 				<deleted-field/>
 
