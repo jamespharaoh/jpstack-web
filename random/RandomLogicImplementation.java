@@ -94,6 +94,16 @@ class RandomLogicImplementation
 
 	@Override
 	public
+	boolean randomBoolean (
+			long numerator,
+			long denominator) {
+
+		return randomInteger (denominator) < numerator;
+
+	}
+
+	@Override
+	public
 	String generateString (
 			String chars,
 			int length) {
