@@ -30,4 +30,13 @@
 
 	</fields>
 
+	<collections>
+
+		<children-collection
+			name="values"
+			type="shnProductVariantValue"
+			join-column="type_id"/>
+
+	</collections>
+
 </model-meta>

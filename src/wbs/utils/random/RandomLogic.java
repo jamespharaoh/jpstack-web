@@ -11,6 +11,10 @@ interface RandomLogic {
 	long randomInteger (
 			long limit);
 
+	boolean randomBoolean (
+			long numerator,
+			long denominator);
+
 	String generateString (
 			String chars,
 			int length);

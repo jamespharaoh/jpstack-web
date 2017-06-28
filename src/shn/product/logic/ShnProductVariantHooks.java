@@ -28,11 +28,11 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectHooks;
 
 import shn.core.model.ShnDatabaseRec;
-import shn.product.console.ShnProductVariantTypeConsoleHelper;
 import shn.product.model.ShnProductCategoryRec;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryRec;
 import shn.product.model.ShnProductVariantRec;
+import shn.product.model.ShnProductVariantTypeObjectHelper;
 import shn.product.model.ShnProductVariantTypeRec;
 import shn.product.model.ShnProductVariantValueRec;
 
@@ -46,7 +46,7 @@ class ShnProductVariantHooks
 	LogContext logContext;
 
 	@WeakSingletonDependency
-	ShnProductVariantTypeConsoleHelper variantTypeHelper;
+	ShnProductVariantTypeObjectHelper variantTypeHelper;
 
 	// public implementation
 

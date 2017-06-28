@@ -1,15 +1,26 @@
 package shn.product.fixture;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneElement;
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.IterableUtils.iterableFilterToSet;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.mapFilterByKeyToMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.SetUtils.emptySet;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
 import static wbs.utils.string.PlaceholderUtils.placeholderMapCurlyBraces;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringNotInSafe;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 import lombok.NonNull;
 
@@ -32,6 +43,7 @@ import wbs.platform.text.model.TextObjectHelper;
 
 import wbs.utils.csv.CsvReader;
 import wbs.utils.io.SafeBufferedReader;
+import wbs.utils.random.RandomLogic;
 
 import shn.core.model.ShnDatabaseObjectHelper;
 import shn.core.model.ShnDatabaseRec;
@@ -41,6 +53,10 @@ import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryObjectHelper;
 import shn.product.model.ShnProductSubCategoryRec;
 import shn.product.model.ShnProductVariantObjectHelper;
+import shn.product.model.ShnProductVariantRec;
+import shn.product.model.ShnProductVariantTypeObjectHelper;
+import shn.product.model.ShnProductVariantTypeRec;
+import shn.product.model.ShnProductVariantValueRec;
 import shn.supplier.model.ShnSupplierObjectHelper;
 
 public
@@ -78,6 +94,12 @@ class ShnProductFixtureProvider
 
 	@SingletonDependency
 	ShnProductVariantObjectHelper productVariantHelper;
+
+	@SingletonDependency
+	ShnProductVariantTypeObjectHelper productVariantTypeHelper;
+
+	@SingletonDependency
+	RandomLogic randomLogic;
 
 	@SingletonDependency
 	ShnDatabaseObjectHelper shnDatabaseHelper;
@@ -196,7 +218,7 @@ class ShnProductFixtureProvider
 						productParams,
 						emptySet ());
 
-				// create product variant
+				// create product variants
 
 				Map <String, String> productVariantParams =
 					placeholderMapCurlyBraces (
@@ -205,13 +227,105 @@ class ShnProductFixtureProvider
 							mappingHints,
 							lineMap));
 
-				eventFixtureLogic.createRecordAndEvents (
-					transaction,
-					"SHN Product",
-					productVariantHelper,
-					product,
-					productVariantParams,
-					emptySet ());
+				List <ShnProductVariantTypeRec> variantTypeSample =
+					iterableFilterToList (
+						productVariantTypeHelper.findAll (
+							transaction),
+						variantType ->
+							randomLogic.randomBoolean (1l, 2l));
+
+				List <Set <ShnProductVariantValueRec>> variantValueSample =
+					iterableMapToList (
+						variantTypeSample,
+						variantType -> {
+
+					for (;;) {
+
+						Set <ShnProductVariantValueRec> variantValues =
+							iterableFilterToSet (
+								variantType.getValues (),
+								variantValue ->
+									randomLogic.randomBoolean (1l, 2l));
+
+						if (
+							collectionHasMoreThanOneElement (
+								variantValues)
+						) {
+							return variantValues;
+						}
+					}
+
+				});
+
+				for (
+					List <ShnProductVariantValueRec> variantValueCombination
+						: Sets.cartesianProduct (
+							variantValueSample)
+				) {
+
+					Map <String, String> productVariantCombinationParams =
+						ImmutableMap.<String, String> builder ()
+
+						.putAll (
+							mapFilterByKeyToMap (
+								productVariantParams,
+								name ->
+									stringNotInSafe (
+										name,
+										"itemNumber",
+										"description",
+										"publicTitle")))
+
+						.put (
+							"itemNumber",
+							joinWithoutSeparator (
+								mapItemForKeyRequired (
+									productVariantParams,
+									"itemNumber"),
+								joinWithoutSeparator (
+									iterableMap (
+										variantValueCombination,
+										ShnProductVariantValueRec::getCode))))
+
+						.put (
+							"description",
+							joinWithSpace (
+								mapItemForKeyRequired (
+									productVariantParams,
+									"description"),
+								joinWithSpace (
+									iterableMap (
+										variantValueCombination,
+										ShnProductVariantValueRec::getPublicTitle))))
+
+						.put (
+							"publicTitle",
+							joinWithSpace (
+								mapItemForKeyRequired (
+									productVariantParams,
+									"publicTitle"),
+								joinWithSpace (
+									iterableMap (
+										variantValueCombination,
+										ShnProductVariantValueRec::getPublicTitle))))
+
+						.build ()
+
+					;
+
+					ShnProductVariantRec productVariant =
+						eventFixtureLogic.createRecordAndEvents (
+							transaction,
+							"SHN Product",
+							productVariantHelper,
+							product,
+							productVariantCombinationParams,
+							emptySet ());
+
+					productVariant.getVariantValues ().addAll (
+						variantValueCombination);
+
+				}
 
 			}
 
@@ -286,7 +400,7 @@ class ShnProductFixtureProvider
 		ImmutableMap.<String, String> builder ()
 
 		.put (
-			"item-number",
+			"itemNumber",
 			"{item-number}")
 
 		.put (

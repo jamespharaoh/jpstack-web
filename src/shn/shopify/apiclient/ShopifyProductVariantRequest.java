@@ -17,6 +17,10 @@ class ShopifyProductVariantRequest {
 	Long id;
 
 	@DataAttribute (
+		name = "sku")
+	String sku;
+
+	@DataAttribute (
 		name = "title")
 	String title;
 
@@ -29,6 +33,28 @@ class ShopifyProductVariantRequest {
 	@DataAttribute (
 		name = "compare_at_price")
 	Double compareAtPrice;
+
+	// inventory
+
+	@DataAttribute (
+		name = "inventory_management")
+	String inventoryManagement;
+
+	@DataAttribute (
+		name = "inventory_policy")
+	String inventoryPolicy;
+
+	@DataAttribute (
+		name = "inventory_quantity")
+	Long inventoryQuantity;
+
+	@DataAttribute (
+		name = "old_inventory_quantity")
+	Long oldInventoryQuantity;
+
+	@DataAttribute (
+		name = "inventory_quantity_adjustment")
+	Long inventoryQuantityAdjustment;
 
 	// options
 

@@ -3,6 +3,7 @@ package wbs.framework.data.tools;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.ReflectionUtils.fieldGet;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -22,6 +23,7 @@ import lombok.NonNull;
 
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 public
@@ -174,6 +176,25 @@ class DataToJson {
 						ifNull (
 							nullIfEmptyString (
 								dataChild.name ()),
+							field.getName ()),
+						toJson (
+							fieldValue));
+
+				}
+
+				DataChildren dataChildren =
+					field.getAnnotation (
+						DataChildren.class);
+
+				if (
+					isNotNull (
+						dataChildren)
+				) {
+
+					jsonObject.add (
+						ifNull (
+							nullIfEmptyString (
+								dataChildren.childElement ()),
 							field.getName ()),
 						toJson (
 							fieldValue));

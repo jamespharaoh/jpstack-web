@@ -31,6 +31,10 @@
 		<component class="console.ShnProductVariantObjectFieldsProvider"/>
 	</layer>
 
+	<layer name="logic">
+		<component class="logic.ShnProductLogicImplementation"/>
+	</layer>
+
 	<console-modules>
 		<console-module name="shn-product"/>
 		<console-module name="shn-product-category"/>

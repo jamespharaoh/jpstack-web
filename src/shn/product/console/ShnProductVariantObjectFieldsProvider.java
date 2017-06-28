@@ -8,12 +8,9 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -31,6 +28,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import shn.product.logic.ShnProductLogic;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantValueRec;
@@ -48,6 +46,9 @@ class ShnProductVariantObjectFieldsProvider
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ShnProductLogic productLogic;
 
 	@SingletonDependency
 	ShnProductVariantConsoleHelper productVariantHelper;
@@ -210,23 +211,8 @@ class ShnProductVariantObjectFieldsProvider
 		) {
 
 			List <ShnProductVariantValueRec> variantValues =
-				new ArrayList<> (
+				productLogic.sortVariantValues (
 					productVariant.getVariantValues ());
-
-			Collections.sort (
-				variantValues,
-				Ordering.compound (
-					ImmutableList.of (
-
-				Ordering.natural ().onResultOf (
-					variantValue ->
-						variantValue.getType ().getCode ()),
-
-				Ordering.natural ().onResultOf (
-					variantValue ->
-						variantValue.getCode ())
-
-			)));
 
 			for (
 				long index = 0;

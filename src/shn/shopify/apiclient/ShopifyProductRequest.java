@@ -36,11 +36,15 @@ class ShopifyProductRequest {
 	String productType;
 
 	@DataChildren (
-		childElement = "images")
+		childrenElement = "images")
 	List <ShopifyProductImageRequest> images;
 
 	@DataChildren (
-		childElement = "variants")
+		childrenElement = "options")
+	List <ShopifyProductOptionRequest> options;
+
+	@DataChildren (
+		childrenElement = "variants")
 	List <ShopifyProductVariantRequest> variants;
 
 }

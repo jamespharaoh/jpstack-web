@@ -33,11 +33,11 @@
 			<object-summary-page
 				form="summary"/>
 
-			<object-settings-page
-				form="settings"/>
-
 			<context-tab-form-action-page
 				name="synchronise"/>
+
+			<object-settings-page
+				form="settings"/>
 
 			<object-events-page/>
 

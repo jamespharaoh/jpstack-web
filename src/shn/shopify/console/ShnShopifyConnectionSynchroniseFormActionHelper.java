@@ -1,12 +1,14 @@
 package shn.shopify.console;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
-import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
-import static wbs.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.utils.etc.Misc.iterable;
+import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -21,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
 
@@ -43,6 +47,7 @@ import wbs.utils.string.FormatWriter;
 
 import shn.core.model.ShnDatabaseRec;
 import shn.product.console.ShnProductConsoleHelper;
+import shn.product.logic.ShnProductLogic;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantTypeRec;
@@ -50,6 +55,7 @@ import shn.product.model.ShnProductVariantValueRec;
 import shn.shopify.apiclient.ShopifyApiClient;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
 import shn.shopify.apiclient.ShopifyProductListResponse;
+import shn.shopify.apiclient.ShopifyProductOptionRequest;
 import shn.shopify.apiclient.ShopifyProductRequest;
 import shn.shopify.apiclient.ShopifyProductResponse;
 import shn.shopify.apiclient.ShopifyProductVariantRequest;
@@ -77,6 +83,9 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 	@SingletonDependency
 	ShnProductConsoleHelper productHelper;
+
+	@SingletonDependency
+	ShnProductLogic productLogic;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -199,7 +208,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 					true)
 
 				.maxOperations (
-					50l)
+					10l)
 
 			;
 
@@ -521,7 +530,69 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 						localProduct.getSupplier ().getPublicName ())
 
 					.productType (
-						localProduct.getSubCategory ().getPublicTitle ());
+						localProduct.getSubCategory ().getPublicTitle ())
+
+				;
+
+				// add options
+
+				List <ShnProductVariantTypeRec> localVariantTypes =
+					ImmutableList.copyOf (
+						iterable (
+							localProduct.getVariants ().stream ()
+
+					.flatMap (
+						localProductVariant ->
+							localProductVariant.getVariantValues ().stream ())
+
+					.map (
+						localVariantValue ->
+							localVariantValue.getType ())
+
+					.distinct ()
+
+					.sorted (
+						Ordering.natural ().onResultOf (
+							ShnProductVariantTypeRec::getCode))
+
+					.iterator ()
+
+				));
+
+				if (
+					collectionIsNotEmpty (
+						localVariantTypes)
+				) {
+
+					ImmutableList.Builder <ShopifyProductOptionRequest>
+						shopifyOptionsBuilder =
+							ImmutableList.builder ();
+
+					for (
+						ShnProductVariantTypeRec localVariantType
+							: localVariantTypes
+					) {
+
+						shopifyOptionsBuilder.add (
+							new ShopifyProductOptionRequest ()
+
+							.name (
+								localVariantType.getPublicTitle ())
+
+						);
+
+					}
+
+					shopifyProductRequest.options (
+						shopifyOptionsBuilder.build ());
+
+				}
+
+				// add variants
+
+				ImmutableList.Builder <ShopifyProductVariantRequest>
+					shopifyVariantsBuilder =
+						ImmutableList.builder ();
 
 				for (
 					ShnProductVariantRec localVariant
@@ -531,8 +602,20 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 					ShopifyProductVariantRequest shopifyVariantRequest =
 						new ShopifyProductVariantRequest ()
 
+						.sku (
+							localVariant.getItemNumber ())
+
 						.title (
 							localVariant.getPublicTitle ())
+
+						.inventoryManagement (
+							"shopify")
+
+						.inventoryPolicy (
+							"deny")
+
+						.inventoryQuantity (
+							localVariant.getStockQuantity ())
 
 					;
 
@@ -543,15 +626,19 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 						shopifyVariantRequest
 
-							.compareAtPrice (
-								currencyLogic.toFloat (
-									shnDatabase.getCurrency (),
-									localVariant.getShoppingNationPrice ()))
-
 							.price (
 								currencyLogic.toFloat (
 									shnDatabase.getCurrency (),
-									localVariant.getPromotionalPrice ()))
+									sum (
+										localVariant.getPromotionalPrice (),
+										localVariant.getPostageAndPackaging ())))
+
+							.compareAtPrice (
+								currencyLogic.toFloat (
+									shnDatabase.getCurrency (),
+									sum (
+										localVariant.getShoppingNationPrice (),
+										localVariant.getPostageAndPackaging ())))
 
 						;
 
@@ -559,47 +646,51 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 						shopifyVariantRequest
 
-							.compareAtPrice (
-								null)
-
 							.price (
 								currencyLogic.toFloat (
 									shnDatabase.getCurrency (),
-									localVariant.getShoppingNationPrice ()))
+									sum (
+										localVariant.getShoppingNationPrice (),
+										localVariant.getPostageAndPackaging ())))
+
+							.compareAtPrice (
+								null)
 
 						;
 
 					}
 
-					long variantTypeIndex = 0;
-
 					for (
-						ShnProductVariantTypeRec localVariantType
-							: localProduct.getVariantTypes ()
+						ShnProductVariantValueRec localVariantValue
+							: productLogic.sortVariantValues (
+								localVariant.getVariantValues ())
 					) {
 
-						ShnProductVariantValueRec localVariantValue =
-							iterableFindExactlyOneRequired (
-								localVariant.getVariantValues (),
-								localVariantValueNested ->
-									referenceEqualSafe (
-										localVariantType,
-										localVariantValueNested.getType ()));
+						long optionIndex =
+							listIndexOfRequired (
+								localVariantTypes,
+								localVariantValue.getType ());
 
 						propertySetSimple (
 							shopifyVariantRequest,
 							stringFormat (
 								"option%s",
 								integerToDecimalString (
-									variantTypeIndex + 1)),
+									optionIndex + 1)),
 							localVariantValue.getPublicTitle ());
 
 					}
 
-					shopifyProductRequest.variants ().add (
+					shopifyVariantsBuilder.add (
 						shopifyVariantRequest);
 
 				}
+
+				shopifyProductRequest.variants (
+					shopifyVariantsBuilder.build ());
+
+System.out.println (
+	"VARIANTS: " + shopifyProductRequest.variants ().size ());
 
 				ShopifyProductResponse shopifyProductResponse =
 					shopifyApiClient.createProduct (
