@@ -766,16 +766,6 @@ class GenericConsoleHelperProvider <
 					viewPrivDelegate)
 			) {
 
-				// special keyword 'public'
-
-				if (
-					stringEqualSafe (
-						viewPrivDelegate,
-						"public")
-				) {
-					return true;
-				}
-
 				// lookup delegate
 
 				Optional <Record <?>> delegateOptional =
@@ -842,12 +832,22 @@ class GenericConsoleHelperProvider <
 
 			}
 
-			// view direct
+			// check view priv
 
 			if (
 				isNotNull (
 					viewPrivCode)
 			) {
+
+				// special keyword 'public'
+
+				if (
+					stringEqualSafe (
+						viewPrivCode,
+						"public")
+				) {
+					return true;
+				}
 
 				transaction.debugFormat (
 					"Checking view priv: %s",
