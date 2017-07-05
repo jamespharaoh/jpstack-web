@@ -822,8 +822,9 @@ class GenericConsoleHelperProvider <
 				} else {
 
 					ConsoleHelper <?> delegateHelper =
-						consoleObjectManager.findConsoleHelperRequired (
-							delegate);
+						consoleObjectManager.consoleHelperForObjectRequired (
+							genericCastUnchecked (
+								delegate));
 
 					transaction.debugFormat (
 						"Delegating to %s",

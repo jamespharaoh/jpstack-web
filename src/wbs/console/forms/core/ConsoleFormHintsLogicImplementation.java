@@ -60,7 +60,7 @@ class ConsoleFormHintsLogicImplementation
 			}
 
 			ConsoleHelper <?> parentHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForClassRequired (
 					objectHelper.parentClassRequired ());
 
 			Optional <Long> parentIdOptional =
@@ -120,7 +120,7 @@ class ConsoleFormHintsLogicImplementation
 			}
 
 			ConsoleHelper <?> grandparentHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForClassRequired (
 					parentHelper.parentClassRequired ());
 
 			Optional <Long> grandparentIdOptional =
@@ -200,7 +200,7 @@ class ConsoleFormHintsLogicImplementation
 			}
 
 			ConsoleHelper <?> greatGrandparentHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForClassRequired (
 					grandparentHelper.parentClassRequired ());
 
 			Optional <Long> greatGrandparentIdOptional =

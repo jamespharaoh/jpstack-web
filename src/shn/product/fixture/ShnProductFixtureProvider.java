@@ -1,17 +1,21 @@
 package shn.product.fixture;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasMoreThanOneElement;
+import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.collection.IterableUtils.iterableFilterToSet;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.IterableUtils.iterableMapWithIndexToList;
 import static wbs.utils.collection.MapUtils.mapFilterByKeyToMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.io.FileUtils.fileReaderBuffered;
 import static wbs.utils.string.PlaceholderUtils.placeholderMapCurlyBraces;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotInSafe;
 
 import java.util.List;
@@ -36,6 +40,7 @@ import wbs.framework.logging.LogContext;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventFixtureLogic;
+import wbs.platform.media.fixture.MediaFixtureLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -48,10 +53,10 @@ import wbs.utils.random.RandomLogic;
 import shn.core.model.ShnDatabaseObjectHelper;
 import shn.core.model.ShnDatabaseRec;
 import shn.product.model.ShnProductCategoryObjectHelper;
+import shn.product.model.ShnProductImageObjectHelper;
 import shn.product.model.ShnProductObjectHelper;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryObjectHelper;
-import shn.product.model.ShnProductSubCategoryRec;
 import shn.product.model.ShnProductVariantObjectHelper;
 import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantTypeObjectHelper;
@@ -78,6 +83,9 @@ class ShnProductFixtureProvider
 	LogContext logContext;
 
 	@SingletonDependency
+	MediaFixtureLogic mediaFixtureLogic;
+
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@SingletonDependency
@@ -88,6 +96,9 @@ class ShnProductFixtureProvider
 
 	@SingletonDependency
 	ShnProductObjectHelper productHelper;
+
+	@SingletonDependency
+	ShnProductImageObjectHelper productImageHelper;
 
 	@SingletonDependency
 	ShnProductSubCategoryObjectHelper productSubCategoryHelper;
@@ -178,17 +189,6 @@ class ShnProductFixtureProvider
 						reader)
 			) {
 
-				ShnProductSubCategoryRec subCategory =
-					productSubCategoryHelper.findByCodeRequired (
-						transaction,
-						shnDatabase,
-						mapItemForKeyRequired (
-							lineMap,
-							"category-code"),
-						mapItemForKeyRequired (
-							lineMap,
-							"sub-category-code"));
-
 				Map <String, Object> mappingHints =
 					ImmutableMap.<String, Object> builder ()
 
@@ -214,9 +214,45 @@ class ShnProductFixtureProvider
 						transaction,
 						"SHN Product",
 						productHelper,
-						subCategory,
+						shnDatabase,
 						productParams,
 						emptySet ());
+
+				// create product images
+
+				product.setImages (
+					iterableMapWithIndexToList (
+						iterableFilter (
+							randomLogic.shuffleToList (
+								mediaFixtureLogic.testImages (
+									transaction)),
+							media ->
+								randomLogic.randomBoolean (
+									1l, 4l)),
+						(index, media) ->
+							productImageHelper.insert (
+								transaction,
+								productImageHelper.createInstance ()
+
+					.setProduct (
+						product)
+
+					.setIndex (
+						index)
+
+					.setDescription (
+						stringFormat (
+							"Image %s",
+							integerToDecimalString (
+								index + 1)))
+
+					.setOriginalMedia (
+						media)
+
+					.setActive (
+						true)
+
+				)));
 
 				// create product variants
 
@@ -374,6 +410,10 @@ class ShnProductFixtureProvider
 		.put (
 			"description",
 			"{description}")
+
+		.put (
+			"subCategory",
+			"shn.test.{category-code}.{sub-category-code}")
 
 		.put (
 			"public-title",

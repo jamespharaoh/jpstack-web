@@ -153,7 +153,7 @@ class DescriptionFormFieldBuilder
 								spec.delegate ())));
 
 				thatConsoleHelper =
-					objectManager.findConsoleHelperRequired (
+					objectManager.consoleHelperForClassRequired (
 						thatClass);
 
 			} else {

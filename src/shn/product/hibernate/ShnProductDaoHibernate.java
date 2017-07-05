@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -187,6 +188,14 @@ class ShnProductDaoHibernate
 							search.publicDescription ())));
 
 			}
+
+			criteria.addOrder (
+				Order.asc (
+					"_product.database"));
+
+			criteria.addOrder (
+				Order.asc (
+					"_product.itemNumber"));
 
 			criteria.setProjection (
 				Projections.id ());

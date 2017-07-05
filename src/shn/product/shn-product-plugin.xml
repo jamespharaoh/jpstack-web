@@ -3,6 +3,7 @@
 	package="shn.product">
 
 	<plugin-dependencies>
+		<plugin-dependency name="media"/>
 		<plugin-dependency name="platform-scaffold"/>
 		<plugin-dependency name="shn-core"/>
 		<plugin-dependency name="shn-supplier"/>
@@ -11,6 +12,7 @@
 	<models>
 		<model name="shnProduct"/>
 		<model name="shnProductCategory"/>
+		<model name="shnProductImage"/>
 		<model name="shnProductSubCategory"/>
 		<model name="shnProductVariant"/>
 		<model name="shnProductVariantType"/>
@@ -27,6 +29,10 @@
 		<fixture name="shnProduct"/>
 	</fixtures>
 
+	<layer name="api">
+		<component class="api.ShnProductImageOriginalGetApiAction"/>
+	</layer>
+
 	<layer name="console">
 		<component class="console.ShnProductVariantObjectFieldsProvider"/>
 	</layer>
@@ -35,9 +41,14 @@
 		<component class="logic.ShnProductLogicImplementation"/>
 	</layer>
 
+	<api-modules>
+		<api-module name="shn-product"/>
+	</api-modules>
+
 	<console-modules>
 		<console-module name="shn-product"/>
 		<console-module name="shn-product-category"/>
+		<console-module name="shn-product-image"/>
 		<console-module name="shn-product-sub-category"/>
 		<console-module name="shn-product-variant"/>
 		<console-module name="shn-product-variant-type"/>

@@ -29,7 +29,7 @@ import wbs.utils.etc.PropertyUtils;
 @Accessors (fluent = true)
 @PrototypeComponent ("specialFormFieldAccessor")
 public
-class SpecialFormFieldAccessor <Container extends Record <?>, Native>
+class SpecialFormFieldAccessor <Container extends Record <Container>, Native>
 	implements FormFieldAccessor <Container, Native> {
 
 	// singleton dependencies
@@ -68,7 +68,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 			// get field name
 
 			ConsoleHelper <?> consoleHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForObjectRequired (
 					container);
 
 			ModelField modelField =
@@ -142,7 +142,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 			// get field name
 
 			ConsoleHelper <?> consoleHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForObjectRequired (
 					container);
 
 			ModelField modelField =

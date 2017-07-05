@@ -11,8 +11,8 @@
 		<!-- identity -->
 
 		<parent-field
-			name="subCategory"
-			type="shnProductSubCategory"/>
+			name="database"
+			type="shnDatabase"/>
 
 		<code-field
 			name="itemNumber"/>
@@ -24,6 +24,10 @@
 		<deleted-field/>
 
 		<!-- settings -->
+
+		<reference-field
+			name="subCategory"
+			type="shnProductSubCategory"/>
 
 		<string-field
 			name="publicTitle"
@@ -44,6 +48,14 @@
 			default="no"/>
 
 		<!-- statistics -->
+
+		<timestamp-field
+			name="createTime"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="updateTime"
+			column-type="postgresql"/>
 
 		<integer-field
 			name="soldQuantity"
@@ -67,7 +79,23 @@
 			column-type="postgresql"
 			nullable="yes"/>
 
+		<integer-field
+			name="numImages"
+			default="0"/>
+
+		<integer-field
+			name="numImagesNotDeleted"
+			default="0"/>
+
+		<reference-field
+			name="primaryImage"
+			type="shnProductImage"
+			nullable="yes"/>
+
 		<!-- shopify data -->
+
+		<yes-no-field
+			name="shopifyNeedsSync"/>
 
 		<integer-field
 			name="shopifyId"
@@ -85,6 +113,11 @@
 		<children-collection
 			name="variants"
 			type="shnProductVariant"
+			join-column="product_id"/>
+
+		<children-list
+			name="images"
+			type="shnProductImage"
 			join-column="product_id"/>
 
 	</collections>

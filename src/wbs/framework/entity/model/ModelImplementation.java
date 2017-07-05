@@ -1,11 +1,14 @@
 package wbs.framework.entity.model;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -97,12 +100,12 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 	ModelField typeField;
 
 	@DataChildren
-	List<ModelField> fields =
-		new ArrayList<ModelField> ();
+	List <ModelField> fields =
+		new ArrayList<> ();
 
 	@DataChildrenIndex
-	Map<String,ModelField> fieldsByName =
-		new LinkedHashMap<String,ModelField> ();
+	Map <String, ModelField> fieldsByName =
+		new LinkedHashMap<> ();
 
 	// helper
 
@@ -318,6 +321,27 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 			String name) {
 
 		return fieldsByName.get (name);
+
+	}
+
+	@Override
+	public
+	List <ModelField> identityFields () {
+
+		return iterableFilterToList (
+			fields,
+			ModelField::identity);
+
+	}
+
+	@Override
+	public
+	Set <ModelFieldType> identityFieldTypes () {
+
+		return iterableFilterMapToSet (
+			fields,
+			ModelField::identity,
+			ModelField::type);
 
 	}
 

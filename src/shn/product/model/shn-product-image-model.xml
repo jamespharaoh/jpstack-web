@@ -1,0 +1,57 @@
+<model-meta
+	name="shnProductImage"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			name="product"
+			type="shnProduct"/>
+
+		<index-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="originalMedia"
+			type="media"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<!-- statistics -->
+
+		<timestamp-field
+			name="createTime"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="updateTime"
+			column-type="postgresql"/>
+
+		<!-- shopify data -->
+
+		<integer-field
+			name="shopifyId"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifyUpdatedAt"
+			column-type="postgresql"
+			nullable="yes"/>
+
+	</fields>
+
+</model-meta>

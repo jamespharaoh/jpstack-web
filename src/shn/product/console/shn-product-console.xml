@@ -3,23 +3,23 @@
 
 	<console-helper-provider
 		object-name="shnProduct"
-		view-priv="subCategory.category.database:view"
-		create-priv="category.database:admin">
+		view-priv="database:view"
+		create-priv="admin">
 
 		<priv-key
 			name="shnProduct.manage"
-			priv="subCategory.category.database:admin"/>
+			priv="database:admin"/>
 
 		<context-stuff
 			name="shnProductName"
 			field="itemNumber"/>
 
 		<context-stuff
-			name="shnProductSubCategoryId"
-			field="subCategory.id"/>
+			name="shnDatabaseId"
+			field="database.id"/>
 
 		<run-post-processor
-			name="shnProductSubCategory"/>
+			name="shnDatabase"/>
 
 	</console-helper-provider>
 
@@ -49,6 +49,11 @@
 				link="shnProductVariant"
 				label="Variants"/>
 
+			<context-link
+				name="image"
+				link="shnProductImage"
+				label="Images"/>
+
 			<object-settings-page
 				form="settings"/>
 
@@ -70,13 +75,13 @@
 				<object-field
 					name="productCategoryId"
 					object-type="shnProductCategory"
-					root-field="subCategory.category.database"
+					root-field="database"
 					nullable="yes"/>
 
 				<object-field
 					name="productSubCategoryId"
 					object-type="shnProductSubCategory"
-					root-field="subCategory.category.database"
+					root-field="database"
 					nullable="yes"/>
 
 				<text-field
@@ -138,6 +143,11 @@
 				<yes-no-field
 					name="active"/>
 
+				<image-field
+					name="primaryImage"
+					field="primaryImage.originalMedia"
+					show-filename="no"/>
+
 			</columns>
 
 		</form>
@@ -149,28 +159,12 @@
 
 			<columns>
 
-				<parent-field root="subCategory.category.database"/>
 				<code-field pattern="[1-9][0-9]{5}"/>
 				<description-field/>
 
-			</columns>
-
-		</form>
-
-		<form
-			name="summary"
-			object-type="shn-product"
-			type="read-only">
-
-			<columns>
-
-				<id-field/>
-				<parent-field root="subCategory.category.database"/>
-				<code-field/>
-				<description-field/>
-				<deleted-field/>
-
-				<!-- settings -->
+				<object-field
+					name="subCategory"
+					object-type="shnProductSubCategory"/>
 
 				<text-field
 					name="publicTitle"/>
@@ -184,6 +178,45 @@
 
 				<yes-no-field
 					name="active"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="summary"
+			object-type="shn-product"
+			type="read-only">
+
+			<columns>
+
+				<id-field/>
+				<parent-field/>
+				<code-field/>
+				<description-field/>
+				<deleted-field/>
+
+				<!-- settings -->
+
+				<object-field
+					name="subCategory"
+					object-type="shnProductSubCategory"/>
+
+				<text-field
+					name="publicTitle"/>
+
+				<text-area-field
+					name="publicDescription"/>
+
+				<object-field
+					name="supplier"
+					object-type="shnSupplier"/>
+
+				<yes-no-field
+					name="active"/>
+
+				<image-field
+					name="primaryImage"/>
 
 				<!-- statistics -->
 
@@ -215,12 +248,16 @@
 
 			<columns>
 
-				<parent-field root="subCategory.category.database"/>
-				<code-field/>
+				<parent-field/>
+				<code-field pattern="[1-9][0-9]{5}"/>
 				<description-field/>
 				<deleted-field/>
 
 				<!-- settings -->
+
+				<object-field
+					name="subCategory"
+					object-type="shnProductSubCategory"/>
 
 				<text-field
 					name="publicTitle"

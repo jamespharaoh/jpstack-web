@@ -563,7 +563,7 @@ class ObjectContextBuilder <
 
 			consoleHelper =
 				genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
+					objectManager.consoleHelperForNameRequired (
 						spec.objectName ()));
 
 			name =

@@ -2,6 +2,7 @@ package wbs.framework.entity.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
@@ -34,6 +35,9 @@ interface ModelMethods <RecordType extends Record <RecordType>> {
 
 	List <ModelField> fields ();
 	Map <String, ModelField> fieldsByName ();
+
+	List <ModelField> identityFields ();
+	Set <ModelFieldType> identityFieldTypes ();
 
 	ModelField field (
 			String name);

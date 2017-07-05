@@ -13,6 +13,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
+import static wbs.utils.string.StringUtils.stringDoesNotStartWith;
 import static wbs.utils.string.StringUtils.stringExtractRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -28,9 +29,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectHooks;
 
 import shn.core.model.ShnDatabaseRec;
-import shn.product.model.ShnProductCategoryRec;
 import shn.product.model.ShnProductRec;
-import shn.product.model.ShnProductSubCategoryRec;
 import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantTypeObjectHelper;
 import shn.product.model.ShnProductVariantTypeRec;
@@ -52,6 +51,85 @@ class ShnProductVariantHooks
 
 	@Override
 	public
+	void beforeInsert (
+			@NonNull Transaction parentTransaction,
+			@NonNull ShnProductVariantRec productVariant) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"beforeInsert");
+
+		) {
+
+			ShnProductRec product =
+				productVariant.getProduct ();
+
+			if (
+				stringDoesNotStartWith (
+					product.getItemNumber (),
+					productVariant.getItemNumber ())
+			) {
+				throw todo ();
+			}
+
+			productVariant
+
+				.setDatabase (
+					product.getDatabase ())
+
+			;
+
+			product
+
+				.setUpdateTime (
+					transaction.now ())
+
+				.setShopifyNeedsSync (
+					true)
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
+	void beforeUpdate (
+			@NonNull Transaction parentTransaction,
+			@NonNull ShnProductVariantRec productVariant) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"beforeUpdate");
+
+		) {
+
+			ShnProductRec product =
+				productVariant.getProduct ();
+
+			product
+
+				.setUpdateTime (
+					transaction.now ())
+
+				.setShopifyNeedsSync (
+					true)
+
+			;
+
+		}
+
+	}
+
+	@Override
+	public
 	Object getDynamic (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnProductVariantRec productVariant,
@@ -69,14 +147,8 @@ class ShnProductVariantHooks
 			ShnProductRec product =
 				productVariant.getProduct ();
 
-			ShnProductSubCategoryRec subCategory =
-				product.getSubCategory ();
-
-			ShnProductCategoryRec category =
-				subCategory.getCategory ();
-
 			ShnDatabaseRec shnDatabase =
-				category.getDatabase ();
+				product.getDatabase ();
 
 			String variantIndexString =
 				stringExtractRequired (
@@ -134,14 +206,8 @@ class ShnProductVariantHooks
 			ShnProductRec product =
 				productVariant.getProduct ();
 
-			ShnProductSubCategoryRec subCategory =
-				product.getSubCategory ();
-
-			ShnProductCategoryRec category =
-				subCategory.getCategory ();
-
 			ShnDatabaseRec shnDatabase =
-				category.getDatabase ();
+				product.getDatabase ();
 
 			String variantIndexString =
 				stringExtractRequired (

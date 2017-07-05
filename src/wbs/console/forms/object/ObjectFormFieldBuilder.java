@@ -193,7 +193,7 @@ class ObjectFormFieldBuilder
 
 				consoleHelperOptional =
 					optionalOf (
-						objectManager.findConsoleHelperRequired (
+						objectManager.consoleHelperForNameRequired (
 							spec.objectTypeName ()));
 
 				if (

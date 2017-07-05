@@ -157,7 +157,7 @@ class ParentFormFieldBuilder
 
 			ConsoleHelper <?> parentHelper =
 				consoleHelper.parentTypeIsFixed ()
-					? objectManager.findConsoleHelperRequired (
+					? objectManager.consoleHelperForClassRequired (
 						consoleHelper.parentClassRequired ())
 					: null;
 

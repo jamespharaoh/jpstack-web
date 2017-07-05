@@ -183,7 +183,7 @@ class ExtendContextBuilder <
 			ifNotNullThenElse (
 				spec.objectName (),
 				() -> genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
+					objectManager.consoleHelperForNameRequired (
 						spec.objectName ())),
 				() -> null);
 

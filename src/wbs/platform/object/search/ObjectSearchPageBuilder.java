@@ -388,7 +388,7 @@ class ObjectSearchPageBuilder <
 
 				consoleHelper =
 					genericCastUnchecked (
-						objectManager.findConsoleHelperRequired (
+						objectManager.consoleHelperForNameRequired (
 							spec.objectTypeName ()));
 
 			} else {

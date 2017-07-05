@@ -23,6 +23,12 @@
 
 		<deleted-field/>
 
+		<!-- cached data -->
+
+		<reference-field
+			name="database"
+			type="shnDatabase"/>
+
 		<!-- settings -->
 
 		<string-field

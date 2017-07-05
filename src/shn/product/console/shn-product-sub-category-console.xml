@@ -3,12 +3,12 @@
 
 	<console-helper-provider
 		object-name="shnProductSubCategory"
-		view-priv="category.database:view"
+		view-priv="database:view"
 		create-priv="database:admin">
 
 		<priv-key
 			name="shnProductSubCategory.manage"
-			priv="category.database:admin"/>
+			priv="database:admin"/>
 
 		<context-stuff
 			name="shnProductSubCategoryName"
@@ -95,7 +95,7 @@
 			<columns>
 
 				<id-field/>
-				<parent-field root="category.database"/>
+				<parent-field root="database"/>
 				<code-field/>
 				<description-field/>
 				<deleted-field/>

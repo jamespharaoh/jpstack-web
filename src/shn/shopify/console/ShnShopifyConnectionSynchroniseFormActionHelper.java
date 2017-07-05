@@ -689,8 +689,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 				shopifyProductRequest.variants (
 					shopifyVariantsBuilder.build ());
 
-System.out.println (
-	"VARIANTS: " + shopifyProductRequest.variants ().size ());
+				// call shopify api
 
 				ShopifyProductResponse shopifyProductResponse =
 					shopifyApiClient.createProduct (
@@ -699,6 +698,9 @@ System.out.println (
 						shopifyProductRequest);
 
 				localProduct
+
+					.setShopifyNeedsSync (
+						false)
 
 					.setShopifyId (
 						shopifyProductResponse.id ())

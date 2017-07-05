@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.requiredValue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,6 +13,7 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
+import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
@@ -280,6 +282,18 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	public
 	Class <? extends ObjectHelper <?>> helperClass () {
 		return model.helperClass ();
+	}
+
+	@Override
+	public
+	List <ModelField> identityFields () {
+		return model.identityFields ();
+	}
+
+	@Override
+	public
+	Set <ModelFieldType> identityFieldTypes () {
+		return model.identityFieldTypes ();
 	}
 
 }

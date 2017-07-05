@@ -251,6 +251,34 @@ class IterableUtils {
 
 	}
 
+	public static <In, Out>
+	List <Out> iterableMapWithIndexToList (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, Out> mapFunction) {
+
+		ImmutableList.Builder <Out> builder =
+			ImmutableList.builder ();
+
+		long index = 0;
+
+		for (
+			In item
+				: iterable
+		) {
+
+			builder.add (
+				mapFunction.apply (
+					index,
+					item));
+
+			index ++;
+
+		}
+
+		return builder.build ();
+
+	}
+
 	public static <Type>
 	Set <Type> iterableToSet (
 			@NonNull Iterable <Type> input) {
@@ -434,8 +462,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	Optional <ItemType> iterableFindFirst (
-			@NonNull Predicate <ItemType> predicate,
-			@NonNull Iterable <ItemType> iterable) {
+			@NonNull Iterable <ItemType> iterable,
+			@NonNull Predicate <ItemType> predicate) {
 
 		for (
 			ItemType item

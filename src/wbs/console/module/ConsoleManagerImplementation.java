@@ -1209,7 +1209,7 @@ class ConsoleManagerImplementation
 		) {
 
 			ConsoleHelper <?> consoleHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForNameRequired (
 					name);
 
 			ConsoleHelperProvider <?> consoleHelperProvider =
