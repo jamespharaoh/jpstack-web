@@ -392,7 +392,7 @@ class ObjectSettingsPageBuilder <
 				genericCastUnchecked (
 					ifNotNullThenElse (
 						spec.objectName (),
-						() -> objectManager.findConsoleHelperRequired (
+						() -> objectManager.consoleHelperForNameRequired (
 							spec.objectName ()),
 						() -> container.consoleHelper ()));
 

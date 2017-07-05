@@ -214,6 +214,12 @@ class ObjectSettingsAction <
 
 			}
 
+			// call object hooks
+
+			consoleHelper.hooks ().beforeUpdate (
+				transaction,
+				object);
+
 			// commit
 
 			transaction.commit ();
@@ -240,7 +246,7 @@ class ObjectSettingsAction <
 		) {
 
 			ConsoleHelper <ParentType> parentHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForClassRequired (
 					consoleHelper.parentClassRequired ());
 
 			if (parentHelper.isRoot ()) {
