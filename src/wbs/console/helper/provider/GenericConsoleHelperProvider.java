@@ -17,6 +17,7 @@ import static wbs.utils.etc.ResultUtils.resultValue;
 import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.naivePluralise;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -195,16 +196,18 @@ class GenericConsoleHelperProvider <
 
 				if (viewPrivParts.size () == 1) {
 
-					viewPrivDelegate (
+					viewPrivCode (
 						viewPrivParts.get (0));
 
 				} else if (viewPrivParts.size () == 2) {
 
 					viewPrivDelegate (
-						viewPrivParts.get (0));
+						nullIfEmptyString (
+							viewPrivParts.get (0)));
 
 					viewPrivCode (
-						viewPrivParts.get (1));
+						nullIfEmptyString (
+							viewPrivParts.get (1)));
 
 				} else {
 
