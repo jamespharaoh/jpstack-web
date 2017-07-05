@@ -187,6 +187,25 @@ writeBuildFile world = do
 
 			],
 
+			makeComboTarget "model-fixtures" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-object-helpers",
+				"generate-console-helpers",
+				"build-rest",
+
+				"db-drop",
+				"db-create",
+				"schema-create",
+				"sql-schema",
+				"sql-data",
+				"model-fixtures"
+
+			],
+
 			makeComboTarget "fixtures" [
 
 				"build-framework",
@@ -202,7 +221,8 @@ writeBuildFile world = do
 				"schema-create",
 				"sql-schema",
 				"sql-data",
-				"fixtures"
+				"model-fixtures",
+				"fixture-providers"
 
 			],
 
@@ -995,7 +1015,7 @@ writeBuildFile world = do
 	let makeFixtureTargets =
 		[
 
-			makeSimpleTarget "fixtures" [
+			makeSimpleTarget "model-fixtures" [
 
 				mkelem "java" [
 					sattr "classname"
@@ -1011,7 +1031,11 @@ writeBuildFile world = do
 					makeArgValue (
 						"wbs.framework.entity.fixtures.ModelFixtureCreator"),
 					makeArgValue "runModelFixtureCreators"
-				],
+				]
+
+			],
+
+			makeSimpleTarget "fixture-providers" [
 
 				mkelem "java" [
 					sattr "classname"
@@ -1029,6 +1053,7 @@ writeBuildFile world = do
 				]
 
 			]
+
 		]
 
 	let makeCodeStyleTargets =

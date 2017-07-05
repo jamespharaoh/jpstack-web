@@ -17,8 +17,8 @@
   <target name="daemon-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-restart"/>
   <target name="all-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-api-restart, just-console-restart, just-daemon-restart"/>
   <target name="javadoc" depends="just-javadoc"/>
-  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
-  <target name="schema" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data"/>
+  <target name="model-fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-model-fixtures"/>
+  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-model-fixtures, just-fixture-providers"/>
   <target name="api-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-api-test"/>
   <target name="console-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-console-deploy, just-console-test"/>
   <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
@@ -606,7 +606,7 @@
       <arg value="schemaCreate"/>
     </java>
   </target>
-  <target name="just-fixtures">
+  <target name="just-model-fixtures">
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
@@ -615,6 +615,8 @@
       <arg value="wbs.framework.entity.fixtures.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
+  </target>
+  <target name="just-fixture-providers">
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
