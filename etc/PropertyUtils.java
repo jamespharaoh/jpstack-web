@@ -2,6 +2,7 @@ package wbs.utils.etc;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
@@ -155,28 +156,35 @@ class PropertyUtils {
 			Class <?> propertyClass =
 				setter.getParameterTypes () [0];
 
-			Class <?> valueClass =
-				newValue.getClass ();
-
 			if (
-				isNotSubclassOf (
-					propertyClass,
-					valueClass)
+				isNotNull (
+					newValue)
 			) {
 
-				throw new ClassCastException (
-					stringFormat (
-						"Cannot set property %s.%s ",
-						classNameFull (
-							objectClass),
-						propertyName,
-						"of type %s ",
-						classNameFull (
-							propertyClass),
-						"to %s",
-						classNameFull (
-							valueClass)));
-
+				Class <?> valueClass =
+					newValue.getClass ();
+	
+				if (
+					isNotSubclassOf (
+						propertyClass,
+						valueClass)
+				) {
+	
+					throw new ClassCastException (
+						stringFormat (
+							"Cannot set property %s.%s ",
+							classNameFull (
+								objectClass),
+							propertyName,
+							"of type %s ",
+							classNameFull (
+								propertyClass),
+							"to %s",
+							classNameFull (
+								valueClass)));
+	
+	
+				}
 
 			}
 
