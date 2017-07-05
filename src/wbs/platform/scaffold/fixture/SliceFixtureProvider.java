@@ -1,7 +1,12 @@
 package wbs.platform.scaffold.fixture;
 
-import static wbs.utils.string.StringUtils.joinWithComma;
-import static wbs.utils.string.StringUtils.underscoreToSpacesCapitalise;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.collection.SetUtils.emptySet;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -12,8 +17,11 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.logging.LogContext;
 
+import wbs.platform.event.logic.EventFixtureLogic;
+import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("sliceFixtureProvider")
@@ -23,11 +31,20 @@ class SliceFixtureProvider
 
 	// singleton dependencies
 
+	@SingletonDependency
+	EventFixtureLogic eventFixtureLogic;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
+	RootObjectHelper rootHelper;
+
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
+
+	@SingletonDependency
+	TestAccounts testAccounts;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -48,27 +65,38 @@ class SliceFixtureProvider
 
 		) {
 
-			sliceHelper.insert (
-				transaction,
-				sliceHelper.createInstance ()
+			testAccounts.forEach (
+				"slice",
+				suppliedParams -> {
 
-				.setCode (
-					wbsConfig.defaultSlice ())
+				Map <String, String> allParams =
+					ImmutableMap.<String, String> builder ()
 
-				.setName (
-					underscoreToSpacesCapitalise (
-						wbsConfig.defaultSlice ()))
+					.putAll (
+						suppliedParams)
 
-				.setDescription (
-					underscoreToSpacesCapitalise (
-						wbsConfig.defaultSlice ()))
+					.put (
+						"code",
+						simplifyToCodeRequired (
+							mapItemForKeyRequired (
+								suppliedParams,
+								"name")))
 
-				.setSupervisorConfigNames (
-					joinWithComma (
-						"apn-default-test",
-						"apn-all-test"))
+					.build ()
 
-			);
+				;
+
+				eventFixtureLogic.createRecordAndEvents (
+					transaction,
+					"Slice",
+					sliceHelper,
+					rootHelper.findRequired (
+						transaction,
+						0l),
+					allParams,
+					emptySet ());
+
+			});
 
 		}
 
