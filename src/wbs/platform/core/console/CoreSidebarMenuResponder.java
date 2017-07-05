@@ -1,7 +1,6 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
@@ -33,6 +32,7 @@ import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -45,7 +45,6 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 import wbs.utils.string.FormatWriter;
 
@@ -78,6 +77,9 @@ class CoreSidebarMenuResponder
 
 	@SingletonDependency
 	UserObjectHelper userHelper;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// state
 
@@ -120,43 +122,17 @@ class CoreSidebarMenuResponder
 
 		) {
 
-			UserRec currentUser =
-				userConsoleLogic.userRequired (
-					transaction);
-
-			SliceRec apnSlice =
+			SliceRec defaultSlice =
 				optionalOrNull (
 					sliceHelper.findByCode (
 						transaction,
 						GlobalId.root,
-						"apn"));
+						wbsConfig.defaultSlice ()));
 
-			if (
-
-				apnSlice != null
-
-				&& stringNotEqualSafe (
-					currentUser.getUsername (),
-					"stuart_test")
-
-			) {
-
-				menuGroups =
-					menuGroupHelper.findByParent (
-						transaction,
-						sliceHelper.findByCodeRequired (
-							transaction,
-							GlobalId.root,
-							"apn"));
-
-			} else {
-
-				menuGroups =
-					menuGroupHelper.findByParent (
-						transaction,
-						currentUser.getSlice ());
-
-			}
+			menuGroups =
+				menuGroupHelper.findByParent (
+					transaction,
+					defaultSlice);
 
 			Collections.sort (
 				menuGroups,
