@@ -839,6 +839,24 @@ class GenericConsoleHelperProvider <
 
 			}
 
+			// view direct
+
+			if (
+				isNotNull (
+					viewPrivCode)
+			) {
+
+				transaction.debugFormat (
+					"Checking view priv: %s",
+					viewPrivCode);
+	
+				return privChecker.canRecursive (
+					transaction,
+					object,
+					viewPrivCode);
+
+			}
+
 			// default
 
 			transaction.debugFormat (
