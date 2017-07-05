@@ -1,6 +1,5 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
@@ -123,11 +122,10 @@ class CoreSidebarMenuResponder
 		) {
 
 			SliceRec defaultSlice =
-				optionalOrNull (
-					sliceHelper.findByCode (
-						transaction,
-						GlobalId.root,
-						wbsConfig.defaultSlice ()));
+				sliceHelper.findByCodeRequired (
+					transaction,
+					GlobalId.root,
+					wbsConfig.defaultSlice ());
 
 			menuGroups =
 				menuGroupHelper.findByParent (
