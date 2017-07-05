@@ -261,7 +261,7 @@ class ChatUserSummaryPart
 
 			}
 
-			htmlTableDetailsRowWriteRaw (
+			htmlTableDetailsRowWrite (
 				formatWriter,
 				"Location",
 				ifNotNullThenElseEmDash (
