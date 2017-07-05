@@ -3,7 +3,8 @@
 
 	<console-helper-provider
 		object-name="menuItem"
-		create-priv="parent:manage">
+		create-priv="parent:manage"
+		view-priv="view">
 
 		<context-stuff
 			name="menuItemName"
