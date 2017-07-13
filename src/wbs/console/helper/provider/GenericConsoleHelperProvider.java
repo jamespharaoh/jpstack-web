@@ -852,7 +852,7 @@ class GenericConsoleHelperProvider <
 				transaction.debugFormat (
 					"Checking view priv: %s",
 					viewPrivCode);
-	
+
 				return privChecker.canRecursive (
 					transaction,
 					object,
