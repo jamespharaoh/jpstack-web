@@ -163,13 +163,13 @@ class PropertyUtils {
 
 				Class <?> valueClass =
 					newValue.getClass ();
-	
+
 				if (
 					isNotSubclassOf (
 						propertyClass,
 						valueClass)
 				) {
-	
+
 					throw new ClassCastException (
 						stringFormat (
 							"Cannot set property %s.%s ",
@@ -182,8 +182,8 @@ class PropertyUtils {
 							"to %s",
 							classNameFull (
 								valueClass)));
-	
-	
+
+
 				}
 
 			}
