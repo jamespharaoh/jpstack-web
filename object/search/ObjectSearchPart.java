@@ -157,6 +157,9 @@ class ObjectSearchPart <
 					formHints,
 					currentSearch);
 
+			searchForm.setDefaults (
+				transaction);
+
 			cleanSearch =
 				classInstantiate (
 					searchClass);
