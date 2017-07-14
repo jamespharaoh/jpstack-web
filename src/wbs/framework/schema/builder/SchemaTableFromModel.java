@@ -8,7 +8,6 @@ import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,10 +18,13 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
@@ -41,6 +43,9 @@ class SchemaTableFromModel {
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	SchemaNamesHelper schemaNamesHelper;
 
@@ -51,9 +56,6 @@ class SchemaTableFromModel {
 	SqlLogicImplementation sqlLogic;
 
 	// properties
-
-	@Getter @Setter
-	TaskLogger taskLog;
 
 	@Getter @Setter
 	Map <Class <?>, Model <?>> modelsByClass;
@@ -81,175 +83,207 @@ class SchemaTableFromModel {
 	// implementation
 
 	public
-	SchemaTable build () {
+	SchemaTable build (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		if (! model.create ())
-			return null;
+		try (
 
-		schemaTable =
-			new SchemaTable ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-			.name (
-				model.tableName ());
-
-		for (
-			ModelField modelField
-				: model.fields ()
 		) {
 
-			forModelField (
-				modelField);
+			if (! model.create ())
+				return null;
 
-		}
-
-		if (! identityColumnNames.isEmpty ()) {
-
-			List <String> treeColumnNames =
-				ImmutableList.<String>builder ()
-
-				.addAll (
-					parentColumnNames)
-
-				.addAll (
-					identityColumnNames)
-
-				.build ();
-
-			String treeIndexName =
-				stringFormat (
-					"%s_tree_key",
-					model.tableName ());
-
-			schemaTable.addIndex (
-				new SchemaIndex ()
+			schemaTable =
+				new SchemaTable ()
 
 				.name (
-					treeIndexName)
+					model.tableName ());
 
-				.unique (
-					true)
+			for (
+				ModelField modelField
+					: model.fields ()
+			) {
 
-				.columns (
-					treeColumnNames)
+				forModelField (
+					taskLogger,
+					modelField);
 
-			);
+			}
+
+			if (! identityColumnNames.isEmpty ()) {
+
+				List <String> treeColumnNames =
+					ImmutableList.<String>builder ()
+
+					.addAll (
+						parentColumnNames)
+
+					.addAll (
+						identityColumnNames)
+
+					.build ();
+
+				String treeIndexName =
+					stringFormat (
+						"%s_tree_key",
+						model.tableName ());
+
+				schemaTable.addIndex (
+					new SchemaIndex ()
+
+					.name (
+						treeIndexName)
+
+					.unique (
+						true)
+
+					.columns (
+						treeColumnNames)
+
+				);
+
+			}
+
+			if (
+				schemaTable.primaryKey () == null
+				|| schemaTable.primaryKey ().columns ().isEmpty ()
+			) {
+
+				taskLogger.errorFormat (
+					"No primary key for %s",
+					model.objectName ());
+
+				return null;
+
+			}
+
+			return schemaTable;
 
 		}
-
-		if (schemaTable.primaryKey () == null
-				|| schemaTable.primaryKey ().columns ().isEmpty ()) {
-
-			taskLog.errorFormat (
-				"No primary key for %s",
-				model.objectName ());
-
-			return null;
-
-		}
-
-		return schemaTable;
 
 	}
 
 	public
 	void forModelField (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
 
-		switch (modelField.type ()) {
+		try (
 
-		case generatedId:
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forModelField");
 
-			forGeneratedId (
-				modelField);
+		) {
 
-			break;
+			switch (modelField.type ()) {
 
-		case assignedId:
+			case generatedId:
 
-			forAssignedId (
-				modelField);
+				forGeneratedId (
+					modelField);
 
-			break;
+				break;
 
-		case foreignId:
+			case assignedId:
 
-			forForeignId (
-				modelField);
+				forAssignedId (
+					modelField);
 
-			break;
+				break;
 
-		case simple:
-		case name:
-		case description:
-		case deleted:
-		case typeCode:
-		case code:
-		case index:
-		case parentId:
-		case identitySimple:
+			case foreignId:
 
-			forField (
-				modelField);
+				forForeignId (
+					taskLogger,
+					modelField);
 
-			break;
+				break;
 
-		case reference:
-		case parent:
-		case grandParent:
-		case greatGrandParent:
-		case parentType:
-		case type:
-		case identityReference:
+			case simple:
+			case name:
+			case description:
+			case deleted:
+			case typeCode:
+			case code:
+			case index:
+			case parentId:
+			case identitySimple:
 
-			forReference (
-				modelField);
+				forField (
+					taskLogger,
+					modelField);
 
-			break;
+				break;
 
-		case compositeId:
+			case reference:
+			case parent:
+			case grandParent:
+			case greatGrandParent:
+			case parentType:
+			case type:
+			case identityReference:
 
-			forCompositeId (
-				modelField);
+				forReference (
+					taskLogger,
+					modelField);
 
-			break;
+				break;
 
-		case component:
+			case compositeId:
 
-			forComponent (
-				modelField);
+				forCompositeId (
+					taskLogger,
+					modelField);
 
-			break;
+				break;
 
-		case collection:
-		case associative:
-		case master:
-		case slave:
+			case component:
 
-			doNothing ();
+				forComponent (
+					taskLogger,
+					modelField);
 
-			break;
+				break;
 
-		default:
+			case collection:
+			case associative:
+			case master:
+			case slave:
 
-			throw new RuntimeException (
-				stringFormat (
-					"Unrecognised type %s for model field %s",
-					modelField.type ().name (),
-					modelField.fullName ()));
+				doNothing ();
 
-		}
+				break;
 
-		if (modelField.parent ()) {
+			default:
 
-			parentColumnNames.addAll (
-				modelField.columnNames ());
+				throw new RuntimeException (
+					stringFormat (
+						"Unrecognised type %s for model field %s",
+						modelField.type ().name (),
+						modelField.fullName ()));
 
-		}
+			}
 
-		if (modelField.identity ()) {
+			if (modelField.parent ()) {
 
-			identityColumnNames.addAll (
-				modelField.columnNames ());
+				parentColumnNames.addAll (
+					modelField.columnNames ());
+
+			}
+
+			if (modelField.identity ()) {
+
+				identityColumnNames.addAll (
+					modelField.columnNames ());
+
+			}
 
 		}
 
@@ -317,132 +351,47 @@ class SchemaTableFromModel {
 	}
 
 	void forForeignId (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
 
-		ModelField foreignModelField =
-			model.fieldsByName ().get (
-				modelField.foreignFieldName ());
+		try (
 
-		if (foreignModelField == null) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forForeignId");
 
-			taskLog.errorFormat (
-				"Foreign model field %s doesn't exist",
-				modelField.fullName ());
+		) {
 
-			return;
+			ModelField foreignModelField =
+				model.fieldsByName ().get (
+					modelField.foreignFieldName ());
 
-		}
+			if (foreignModelField == null) {
 
-		Model <?> targetModel =
-			modelsByClass.get (
-				foreignModelField.valueType ());
-
-		if (targetModel == null) {
-
-			taskLog.errorFormat (
-				"Can't find model for type %s specified by %s",
-				classNameSimple (
-					modelField.valueType ()),
-				modelField.fullName ());
-
-			return;
-
-		}
-
-		schemaTable
-
-			.addColumn (
-				new SchemaColumn ()
-
-				.name (
-					modelField.columnName ())
-
-				.type (
-					"integer")
-
-				.nullable (
-					false))
-
-			.primaryKey (
-				new SchemaPrimaryKey ()
-
-				.addColumn (
-					modelField.columnName ()))
-
-			.addForeignKey (
-				new SchemaForeignKey ()
-
-				.addSourceColumn (
-					modelField.columnName ())
-
-				.targetTable (
-					targetModel.tableName ()));
-
-	}
-
-	void forField (
-			@NonNull ModelField modelField) {
-
-		List<String> typeNames;
-
-		if (modelField.sqlType () != null) {
-
-			typeNames =
-				Collections.singletonList (
-					modelField.sqlType ());
-
-		} else {
-
-			typeNames =
-				schemaTypesHelper.fieldTypeNames ().get (
-					modelField.valueType ());
-
-			if (typeNames == null) {
-
-				taskLog.errorFormat (
-					"Can't map type %s for %s",
-					modelField.valueType ().getSimpleName (),
+				taskLogger.errorFormat (
+					"Foreign model field %s doesn't exist",
 					modelField.fullName ());
 
 				return;
 
 			}
 
-		}
+			Model <?> targetModel =
+				modelsByClass.get (
+					foreignModelField.valueType ());
 
-		if (
-			integerNotEqualSafe (
-				collectionSize (
-					modelField.columnNames ()),
-				collectionSize (
-					typeNames))
-		) {
+			if (targetModel == null) {
 
-			taskLog.errorFormat (
-				"Expected %s columns for %s at %s, not %s",
-				integerToDecimalString (
-					typeNames.size ()),
-				classNameSimple (
-					modelField.valueType ()),
-				modelField.fullName (),
-				integerToDecimalString (
-					modelField.columnNames ().size ()));
+				taskLogger.errorFormat (
+					"Can't find model for type %s specified by %s",
+					classNameSimple (
+						modelField.valueType ()),
+					modelField.fullName ());
 
-			return;
+				return;
 
-		}
-
-		for (
-			int column = 0;
-			column < modelField.columnNames ().size ();
-			column ++
-		) {
-
-			String columnName =
-				modelField.columnNames ().get (column);
-
-			String typeName =
-				typeNames.get (column);
+			}
 
 			schemaTable
 
@@ -450,165 +399,323 @@ class SchemaTableFromModel {
 					new SchemaColumn ()
 
 					.name (
-						columnName)
+						modelField.columnName ())
 
 					.type (
-						typeName)
+						"integer")
 
 					.nullable (
-						modelField.nullable ()));
+						false))
+
+				.primaryKey (
+					new SchemaPrimaryKey ()
+
+					.addColumn (
+						modelField.columnName ()))
+
+				.addForeignKey (
+					new SchemaForeignKey ()
+
+					.addSourceColumn (
+						modelField.columnName ())
+
+					.targetTable (
+						targetModel.tableName ()));
+
+		}
+
+	}
+
+	void forField (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ModelField modelField) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forField");
+
+		) {
+
+			List <String> typeNames;
+
+			if (modelField.columnSqlTypes () != null) {
+
+				typeNames =
+					modelField.columnSqlTypes ();
+
+			} else {
+
+				typeNames =
+					schemaTypesHelper.fieldTypeNames ().get (
+						modelField.valueType ());
+
+				if (typeNames == null) {
+
+					taskLogger.errorFormat (
+						"Can't map type %s for %s",
+						modelField.valueType ().getSimpleName (),
+						modelField.fullName ());
+
+					return;
+
+				}
+
+			}
+
+			if (
+				integerNotEqualSafe (
+					collectionSize (
+						modelField.columnNames ()),
+					collectionSize (
+						typeNames))
+			) {
+
+				taskLogger.errorFormat (
+					"Expected %s columns for %s at %s, not %s",
+					integerToDecimalString (
+						typeNames.size ()),
+					classNameSimple (
+						modelField.valueType ()),
+					modelField.fullName (),
+					integerToDecimalString (
+						modelField.columnNames ().size ()));
+
+				return;
+
+			}
+
+			for (
+				int column = 0;
+				column < modelField.columnNames ().size ();
+				column ++
+			) {
+
+				String columnName =
+					modelField.columnNames ().get (column);
+
+				String typeName =
+					typeNames.get (column);
+
+				schemaTable
+
+					.addColumn (
+						new SchemaColumn ()
+
+						.name (
+							columnName)
+
+						.type (
+							typeName)
+
+						.nullable (
+							modelField.nullable ()));
+
+			}
 
 		}
 
 	}
 
 	void forReference (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
 
-		Model <?> targetModel =
-			modelsByClass.get (
-				modelField.valueType ());
+		try (
 
-		if (targetModel == null) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forReference");
 
-			taskLog.errorFormat (
-				"Can't find model for type %s specified by %s",
-				classNameSimple (
-					modelField.valueType ()),
-				modelField.fullName ());
+		) {
 
-			return;
+			Model <?> targetModel =
+				modelsByClass.get (
+					modelField.valueType ());
+
+			if (targetModel == null) {
+
+				taskLogger.errorFormat (
+					"Can't find model for type %s specified by %s",
+					classNameSimple (
+						modelField.valueType ()),
+					modelField.fullName ());
+
+				return;
+
+			}
+
+			schemaTable
+
+				.addColumn (
+					new SchemaColumn ()
+
+					.name (
+						modelField.columnName ())
+
+					.type (
+						"integer")
+
+					.nullable (
+						modelField.nullable ()))
+
+				.addForeignKey (
+					new SchemaForeignKey ()
+
+					.addSourceColumn (
+						modelField.columnName ())
+
+					.targetTable (
+						targetModel.tableName ()));
 
 		}
-
-		schemaTable
-
-			.addColumn (
-				new SchemaColumn ()
-
-				.name (
-					modelField.columnName ())
-
-				.type (
-					"integer")
-
-				.nullable (
-					modelField.nullable ()))
-
-			.addForeignKey (
-				new SchemaForeignKey ()
-
-				.addSourceColumn (
-					modelField.columnName ())
-
-				.targetTable (
-					targetModel.tableName ()));
 
 	}
 
 	void forCompositeId (
-			ModelField modelField) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ModelField modelField) {
 
-		if (schemaTable.primaryKey () != null) {
+		try (
 
-			taskLog.errorFormat (
-				"More than one primary key for %s",
-				model.objectName ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forCompositeId");
 
-			return;
-
-		}
-
-		schemaTable.primaryKey (
-			new SchemaPrimaryKey ());
-
-		for (
-			ModelField compositeIdModelField
-				: modelField.fields ()
 		) {
 
-			forCompositeIdField (
-				modelField,
-				compositeIdModelField);
+			if (schemaTable.primaryKey () != null) {
+
+				taskLogger.errorFormat (
+					"More than one primary key for %s",
+					model.objectName ());
+
+				return;
+
+			}
+
+			schemaTable.primaryKey (
+				new SchemaPrimaryKey ());
+
+			for (
+				ModelField compositeIdModelField
+					: modelField.fields ()
+			) {
+
+				forCompositeIdField (
+					taskLogger,
+					modelField,
+					compositeIdModelField);
+
+			}
 
 		}
 
 	}
 
 	void forCompositeIdField (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
 			@NonNull ModelField compositeIdModelField) {
 
-		if (compositeIdModelField.reference ()) {
+		try (
 
-			forCompositeIdReference (
-				modelField,
-				compositeIdModelField);
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forCompositeIdField");
 
-		} else if (compositeIdModelField.value ()) {
+		) {
 
-			forCompositeIdValue (
-				modelField,
-				compositeIdModelField);
+			if (compositeIdModelField.reference ()) {
 
-		} else {
+				forCompositeIdReference (
+					taskLogger,
+					modelField,
+					compositeIdModelField);
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map field of type %s at %s",
-					compositeIdModelField.type ().name (),
-					compositeIdModelField.fullName ()));
+			} else if (compositeIdModelField.value ()) {
+
+				forCompositeIdValue (
+					modelField,
+					compositeIdModelField);
+
+			} else {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to map field of type %s at %s",
+						compositeIdModelField.type ().name (),
+						compositeIdModelField.fullName ()));
+
+			}
 
 		}
 
 	}
 
 	void forCompositeIdReference (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
 			@NonNull ModelField compositeIdModelField) {
 
-		Model <?> targetModel =
-			modelsByClass.get (
-				compositeIdModelField.valueType ());
+		try (
 
-		if (targetModel == null) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forCompositeIdReference");
 
-			taskLog.errorFormat (
-				"Can't find model for type %s specified by %s",
-				compositeIdModelField.valueType ().getSimpleName (),
-				compositeIdModelField.fullName ());
+		) {
 
-			return;
+			Model <?> targetModel =
+				modelsByClass.get (
+					compositeIdModelField.valueType ());
+
+			if (targetModel == null) {
+
+				taskLogger.errorFormat (
+					"Can't find model for type %s specified by %s",
+					compositeIdModelField.valueType ().getSimpleName (),
+					compositeIdModelField.fullName ());
+
+				return;
+
+			}
+
+			schemaTable
+
+				.addColumn (
+					new SchemaColumn ()
+
+					.name (
+						compositeIdModelField.columnName ())
+
+					.type (
+						"integer")
+
+					.nullable (
+						false))
+
+				.addForeignKey (
+					new SchemaForeignKey ()
+
+					.addSourceColumn (
+						compositeIdModelField.columnName ())
+
+					.targetTable (
+						targetModel.tableName ()));
+
+			schemaTable.primaryKey ()
+
+				.addColumn (
+					compositeIdModelField.columnName ());
 
 		}
-
-		schemaTable
-
-			.addColumn (
-				new SchemaColumn ()
-
-				.name (
-					compositeIdModelField.columnName ())
-
-				.type (
-					"integer")
-
-				.nullable (
-					false))
-
-			.addForeignKey (
-				new SchemaForeignKey ()
-
-				.addSourceColumn (
-					compositeIdModelField.columnName ())
-
-				.targetTable (
-					targetModel.tableName ()));
-
-		schemaTable.primaryKey ()
-
-			.addColumn (
-				compositeIdModelField.columnName ());
 
 	}
 
@@ -642,32 +749,45 @@ class SchemaTableFromModel {
 	}
 
 	void forComponent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
 
-		for (
-			ModelField componentModelField
-				: modelField.fields ()
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forComponent");
+
 		) {
 
-			if (componentModelField.value ()) {
+			for (
+				ModelField componentModelField
+					: modelField.fields ()
+			) {
 
-				forComponentField (
-					modelField,
-					componentModelField);
+				if (componentModelField.value ()) {
 
-			} else if (componentModelField.reference ()) {
+					forComponentField (
+						modelField,
+						componentModelField);
 
-				forComponentReference (
-					modelField,
-					componentModelField);
+				} else if (componentModelField.reference ()) {
 
-			} else {
+					forComponentReference (
+						taskLogger,
+						modelField,
+						componentModelField);
 
-				throw new RuntimeException (
-					stringFormat (
-						"Don't know how to map field of type %s at %s",
-						componentModelField.type ().name (),
-						componentModelField.fullName ()));
+				} else {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Don't know how to map field of type %s at %s",
+							componentModelField.type ().name (),
+							componentModelField.fullName ()));
+
+				}
 
 			}
 
@@ -720,47 +840,59 @@ class SchemaTableFromModel {
 	}
 
 	void forComponentReference (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
 			@NonNull ModelField componentModelField) {
 
-		Model <?> targetModel =
-			modelsByClass.get (
-				componentModelField.valueType ());
+		try (
 
-		if (targetModel == null) {
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"forComponentReference");
 
-			taskLog.errorFormat (
-				"Can't find model for type %s specified by %s",
-				classNameSimple (
-					componentModelField.valueType ()),
-				componentModelField.fullName ());
+		) {
 
-			return;
+			Model <?> targetModel =
+				modelsByClass.get (
+					componentModelField.valueType ());
+
+			if (targetModel == null) {
+
+				taskLogger.errorFormat (
+					"Can't find model for type %s specified by %s",
+					classNameSimple (
+						componentModelField.valueType ()),
+					componentModelField.fullName ());
+
+				return;
+
+			}
+
+			schemaTable
+
+				.addColumn (
+					new SchemaColumn ()
+
+					.name (
+						componentModelField.columnName ())
+
+					.type (
+						"integer")
+
+					.nullable (
+						false))
+
+				.addForeignKey (
+					new SchemaForeignKey ()
+
+					.addSourceColumn (
+						componentModelField.columnName ())
+
+					.targetTable (
+						targetModel.tableName ()));
 
 		}
-
-		schemaTable
-
-			.addColumn (
-				new SchemaColumn ()
-
-				.name (
-					componentModelField.columnName ())
-
-				.type (
-					"integer")
-
-				.nullable (
-					false))
-
-			.addForeignKey (
-				new SchemaForeignKey ()
-
-				.addSourceColumn (
-					componentModelField.columnName ())
-
-				.targetTable (
-					targetModel.tableName ()));
 
 	}
 

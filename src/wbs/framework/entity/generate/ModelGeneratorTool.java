@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import com.google.common.collect.Iterables;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -58,16 +56,14 @@ class ModelGeneratorTool {
 			taskLogger.noticeFormat (
 				"About to generate %s models",
 				integerToDecimalString (
-					modelMetaLoader.modelMetas ().size ()));
+					modelMetaLoader.allModelMetas ().size ()));
 
 			StatusCounters statusCounters =
 				new StatusCounters ();
 
 			for (
 				ModelMetaSpec modelMeta
-					: Iterables.concat (
-						modelMetaLoader.modelMetas ().values (),
-						modelMetaLoader.componentMetas ().values ())
+					: modelMetaLoader.allModelMetas ().values ()
 			) {
 
 				PluginSpec plugin =

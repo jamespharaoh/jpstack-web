@@ -14,13 +14,13 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("implements-interfaces")
 @PrototypeComponent ("modelImplementsInterfacesSpec")
-@ModelMetaData
 public
-class ModelImplementsInterfacesSpec {
+class ModelImplementsInterfacesSpec
+	implements ModelDataSpec {
 
 	@DataChildren (
 		direct = true)
-	List<ModelImplementsInterfaceSpec> implementsInterfaces =
-		new ArrayList<ModelImplementsInterfaceSpec> ();
+	List <ModelImplementsInterfaceSpec> implementsInterfaces =
+		new ArrayList<> ();
 
 }

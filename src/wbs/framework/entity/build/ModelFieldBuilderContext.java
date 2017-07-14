@@ -13,7 +13,7 @@ class ModelFieldBuilderContext {
 
 	ModelMetaSpec modelMeta;
 
-	Class<?> recordClass;
+	Class <?> modelClass;
 
 	ModelField parentModelField;
 

@@ -17,7 +17,7 @@ import wbs.framework.codegen.JavaInterfaceWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.logging.LogContext;
@@ -50,7 +50,7 @@ class ModelInterfacesGenerator {
 	PluginSpec plugin;
 
 	@Getter @Setter
-	PluginModelSpec pluginModel;
+	PluginRecordModelSpec pluginModel;
 
 	@Getter @Setter
 	ModelMetaSpec modelMeta;

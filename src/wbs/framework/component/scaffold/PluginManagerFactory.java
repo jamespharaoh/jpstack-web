@@ -108,13 +108,13 @@ class PluginManagerFactory
 					PluginApiModuleSpec.class,
 					PluginBootstrapComponentSpec.class,
 					PluginComponentSpec.class,
-					PluginComponentTypeSpec.class,
+					PluginComponentModelSpec.class,
 					PluginConsoleModuleSpec.class,
 					PluginCustomTypeSpec.class,
 					PluginEnumTypeSpec.class,
 					PluginFixtureSpec.class,
 					PluginLayerSpec.class,
-					PluginModelSpec.class,
+					PluginRecordModelSpec.class,
 					PluginModelsSpec.class,
 					PluginDependencySpec.class,
 					PluginSpec.class)
@@ -187,6 +187,8 @@ class PluginManagerFactory
 
 			}
 
+			taskLogger.makeException ();
+
 			return pluginsBuilder.build ();
 
 		}
@@ -214,7 +216,7 @@ class PluginManagerFactory
 			ImmutableList.Builder <PluginSpec> pluginsBuilder =
 				ImmutableList.builder ();
 
-			ImmutableMap.Builder <String, PluginModelSpec>
+			ImmutableMap.Builder <String, PluginRecordModelSpec>
 			pluginModelsByNameBuilder =
 				ImmutableMap.builder ();
 
@@ -260,7 +262,7 @@ class PluginManagerFactory
 
 
 					for (
-						PluginModelSpec pluginModel
+						PluginRecordModelSpec pluginModel
 							: plugin.models ().models ()
 					) {
 

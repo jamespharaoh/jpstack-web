@@ -27,7 +27,7 @@ class PluginManager {
 	List <PluginSpec> plugins;
 
 	@Getter @Setter
-	Map <String, PluginModelSpec> pluginModelsByName;
+	Map <String, PluginRecordModelSpec> pluginModelsByName;
 
 	@Getter @Setter
 	Map <String, PluginEnumTypeSpec> pluginEnumTypesByName;
@@ -41,7 +41,7 @@ class PluginManager {
 	Class <? extends Record <?>> modelClass (
 			@NonNull String modelName) {
 
-		PluginModelSpec modelSpec =
+		PluginRecordModelSpec modelSpec =
 			mapItemForKeyRequired (
 				pluginModelsByName,
 				hyphenToCamel (

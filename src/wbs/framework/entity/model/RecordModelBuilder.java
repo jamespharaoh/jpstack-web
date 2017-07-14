@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.build.ModelBuilderManager;
 import wbs.framework.entity.build.ModelFieldBuilderContext;
@@ -33,9 +33,9 @@ import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("modelBuilder")
+@PrototypeComponent ("recordModelBuilder")
 public
-class ModelBuilder <RecordType extends Record <RecordType>> {
+class RecordModelBuilder <RecordType extends Record <RecordType>> {
 
 	// singleton dependencies
 
@@ -58,14 +58,14 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 
 	// state
 
-	PluginModelSpec pluginModel;
+	PluginRecordModelSpec pluginModel;
 	PluginSpec plugin;
 
-	ModelImplementation <?> model;
+	RecordModelImplementation <?> model;
 
-	String recordClassName;
+	String modelClassName;
 	String recordClassNameFull;
-	Class <RecordType> recordClass;
+	Class <RecordType> modelClass;
 
 	String objectHelperClassName;
 	String objectHelperClassNameFull;
@@ -86,40 +86,12 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 
 		) {
 
-			return buildReal (
-				taskLogger);
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Error creating model %s",
-					modelMeta.name ()),
-				exception);
-
-		}
-
-	}
-
-	private
-	Model <?> buildReal (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"buildReal");
-
-		) {
-
 			plugin =
 				modelMeta.plugin ();
 
 			// record class
 
-			recordClassName =
+			modelClassName =
 				stringFormat (
 					"%sRec",
 					capitalise (
@@ -129,15 +101,12 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				stringFormat (
 					"%s.model.%s",
 					plugin.packageName (),
-					recordClassName);
+					modelClassName);
 
-			Class <RecordType> recordClassTemp =
+			modelClass =
 				genericCastUnchecked (
 					classForNameRequired (
 						recordClassNameFull));
-
-			recordClass =
-				recordClassTemp;
 
 			// object helper class
 
@@ -164,10 +133,10 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 			// model
 
 			model =
-				new ModelImplementation <RecordType> ()
+				new RecordModelImplementation <RecordType> ()
 
 				.objectClass (
-					recordClass)
+					modelClass)
 
 				.objectName (
 					modelMeta.name ())
@@ -185,7 +154,7 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 					ifNull (
 						modelMeta.tableName (),
 						schemaNamesHelper.tableName (
-							recordClass)))
+							modelClass)))
 
 				.create (
 					ifNull (
@@ -198,7 +167,12 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 						true))
 
 				.helperClass (
-					objectHelperClass);
+					objectHelperClass)
+
+				.cachedView (
+					modelMeta.cachedView ())
+
+			;
 
 			// model fields
 
@@ -208,8 +182,8 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				.modelMeta (
 					modelMeta)
 
-				.recordClass (
-					recordClass);
+				.modelClass (
+					modelClass);
 
 			ModelFieldBuilderTarget target =
 				new ModelFieldBuilderTarget ()

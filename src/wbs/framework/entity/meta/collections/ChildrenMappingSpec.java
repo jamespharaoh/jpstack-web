@@ -8,14 +8,12 @@ import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.meta.model.ModelCollectionSpec;
-import wbs.framework.entity.meta.model.ModelMetaData;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 
 @Accessors (fluent = true)
 @Data
 @DataClass ("children-mapping")
 @PrototypeComponent ("childrenMappingSpec")
-@ModelMetaData
 public
 class ChildrenMappingSpec
 	implements ModelCollectionSpec {

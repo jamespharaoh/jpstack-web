@@ -131,11 +131,11 @@ class ModelFixtureCreator {
 
 			for (
 				ModelMetaSpec spec
-					: modelMetaLoader.modelMetas ().values ()
+					: modelMetaLoader.recordModelMetas ().values ()
 			) {
 
 				Model <?> model =
-					entityHelper.modelsByName ().get (
+					entityHelper.recordModelsByName ().get (
 						spec.name ());
 
 				fixtureBuilder.descend (

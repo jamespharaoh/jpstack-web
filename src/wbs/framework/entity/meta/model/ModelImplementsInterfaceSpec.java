@@ -12,9 +12,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("implements-interface")
 @PrototypeComponent ("modelImplementsInterfaceSpec")
-@ModelMetaData
 public
-class ModelImplementsInterfaceSpec {
+class ModelImplementsInterfaceSpec
+	implements ModelDataSpec {
 
 	@DataAncestor
 	ModelMetaSpec modelMeta;

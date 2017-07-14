@@ -542,7 +542,7 @@ class IterableUtils {
 	@SafeVarargs
 	public static <Type>
 	Iterable <Type> iterableChainArguments (
-			@NonNull Iterable <Type> ... iterables) {
+			@NonNull Iterable <? extends Type> ... iterables) {
 
 		return () ->
 			arrayStream (
@@ -552,6 +552,10 @@ class IterableUtils {
 				iterable ->
 					iterableStream (
 						iterable))
+
+			.map (
+				item ->
+					(Type) item)
 
 			.iterator ();
 

@@ -11,9 +11,11 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
+import wbs.framework.entity.meta.cachedview.CachedViewSpec;
 
 @Accessors (fluent = true)
 @Data
@@ -21,9 +23,9 @@ import wbs.framework.data.annotations.DataParent;
 @ToString (of = "name")
 @DataClass ("model-meta")
 @PrototypeComponent ("modelMetaSpec")
-@ModelMetaData
 public
-class ModelMetaSpec {
+class ModelMetaSpec
+	implements ModelDataSpec {
 
 	@DataParent
 	PluginSpec plugin;
@@ -68,9 +70,12 @@ class ModelMetaSpec {
 	List <ModelCollectionSpec> collections =
 		new ArrayList<> ();
 
+	@DataChild
+	CachedViewSpec cachedView;
+
 	@DataChildren (
 		direct = true,
-		excludeChildren = { "fields", "collections" })
+		excludeChildren = { "fields", "collections", "cached-view" })
 	List <Object> children =
 		new ArrayList<> ();
 

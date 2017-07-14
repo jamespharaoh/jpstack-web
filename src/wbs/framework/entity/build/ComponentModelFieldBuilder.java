@@ -1,8 +1,8 @@
 package wbs.framework.entity.build;
 
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -133,8 +133,8 @@ class ComponentModelFieldBuilder
 				.modelMeta (
 					context.modelMeta ())
 
-				.recordClass (
-					context.recordClass ())
+				.modelClass (
+					context.modelClass ())
 
 				.parentModelField (
 					modelField);

@@ -1,5 +1,6 @@
 package wbs.framework.schema.tool;
 
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -12,13 +13,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.LoggingDataSource;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
@@ -35,6 +35,9 @@ public
 class SchemaTool {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	CachedViewToSql cachedViewToSql;
 
 	@SingletonDependency
 	LoggingDataSource dataSource;
@@ -54,7 +57,7 @@ class SchemaTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SchemaFromModel> schemaFromModel;
+	ComponentProvider <SchemaFromModel> schemaFromModelProvider;
 
 	// state
 
@@ -80,7 +83,8 @@ class SchemaTool {
 			defineTables (
 				taskLogger);
 
-			createSchemaSqlScript ();
+			writeSchemaSqlScript (
+				taskLogger);
 
 			executeSchemaSqlScript (
 				taskLogger);
@@ -105,18 +109,17 @@ class SchemaTool {
 		) {
 
 			schema =
-				schemaFromModel.get ()
-
-				.taskLog (
+				schemaFromModelProvider.provide (
 					taskLogger)
 
 				.enumTypes (
 					schemaTypesHelper.enumTypes ())
 
 				.modelsByClass (
-					entityHelper.modelsByClass ())
+					entityHelper.recordModelsByClass ())
 
-				.build ();
+				.build (
+					taskLogger);
 
 			if (taskLogger.errors ()) {
 
@@ -132,39 +135,71 @@ class SchemaTool {
 
 	}
 
-	void createSchemaSqlScript () {
-
-		sqlStatements =
-			new ArrayList <String> ();
-
-		schemaToSql.forSchema (
-			sqlStatements,
-			schema);
-
-		// write sql
+	private
+	void writeSchemaSqlScript (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
 
-			AtomicFileWriter fileWriter =
-				new AtomicFileWriter (
-					"work/schema.sql");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeSchemaSqlScript");
 
 		) {
 
+			sqlStatements =
+				new ArrayList <String> ();
+
+			schemaToSql.forSchema (
+				sqlStatements,
+				schema);
+
 			for (
-				String sqlStatement
-					: sqlStatements
+				Model <?> model
+					: entityHelper.recordModels ()
 			) {
 
-				fileWriter.writeString (
-					sqlStatement);
+				if (
+					isNull (
+						model.cachedView ())
+				) {
+					continue;
+				}
 
-				fileWriter.writeString (
-					";\n");
+				cachedViewToSql.forModel (
+					taskLogger,
+					sqlStatements,
+					model);
 
 			}
 
-			fileWriter.close ();
+			// write sql
+
+			try (
+
+				AtomicFileWriter fileWriter =
+					new AtomicFileWriter (
+						"work/schema.sql");
+
+			) {
+
+				for (
+					String sqlStatement
+						: sqlStatements
+				) {
+
+					fileWriter.writeString (
+						sqlStatement);
+
+					fileWriter.writeString (
+						";\n");
+
+				}
+
+				fileWriter.close ();
+
+			}
 
 		}
 
@@ -315,7 +350,7 @@ class SchemaTool {
 
 				for (
 					Model <?> model
-						: entityHelper.models ()
+						: entityHelper.recordModels ()
 				) {
 
 					int objectTypeId;

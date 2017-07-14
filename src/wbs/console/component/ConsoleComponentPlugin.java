@@ -61,7 +61,7 @@ import wbs.framework.component.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
-import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.ComponentPlugin;
 import wbs.framework.logging.LogContext;
@@ -143,7 +143,7 @@ class ConsoleComponentPlugin
 	void registerConsoleHelper (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentRegistryBuilder componentRegistry,
-			@NonNull PluginModelSpec model) {
+			@NonNull PluginRecordModelSpec model) {
 
 		try (
 

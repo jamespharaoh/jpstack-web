@@ -1,7 +1,13 @@
 package wbs.framework.entity.meta.model;
 
+import static wbs.utils.collection.IterableUtils.iterableChainArguments;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -10,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -24,6 +31,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginManager;
+import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -52,13 +60,15 @@ class ModelMetaLoader {
 	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	@PrototypeDependency
-	@ModelMetaData
-	Map <Class <?>, ComponentProvider <Object>> modelMetaDataProviders;
+	Map <Class <?>, ComponentProvider <ModelDataSpec>> modelMetaDataProviders;
 
 	// properties
 
 	@Getter
-	Map <String, ModelMetaSpec> modelMetas;
+	Map <String, ModelMetaSpec> allModelMetas;
+
+	@Getter
+	Map <String, ModelMetaSpec> recordModelMetas;
 
 	@Getter
 	Map <String, ModelMetaSpec> componentMetas;
@@ -138,7 +148,10 @@ class ModelMetaLoader {
 
 		) {
 
-			ImmutableMap.Builder <String, ModelMetaSpec> modelBuilder =
+			ImmutableMap.Builder <String, ModelMetaSpec> allBuilder =
+				ImmutableMap.builder ();
+
+			ImmutableMap.Builder <String, ModelMetaSpec> recordBuilder =
 				ImmutableMap.builder ();
 
 			ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
@@ -154,21 +167,53 @@ class ModelMetaLoader {
 					return;
 				}
 
-				pluginSpec.models ().models ().forEach (
-					pluginModelSpec ->
-						loadModelMeta (
-							taskLogger,
-							modelBuilder,
-							pluginSpec,
-							pluginModelSpec.name ()));
+				for (
+					PluginModelSpec pluginModelSpec
+						: iterableChainArguments (
+							pluginSpec.models ().models (),
+							pluginSpec.models ().componentTypes ())
+				) {
 
-				pluginSpec.models ().componentTypes ().forEach (
-					pluginComponentTypeSpec ->
+					Optional <ModelMetaSpec> modelMetaOptional =
 						loadModelMeta (
 							taskLogger,
-							componentBuilder,
 							pluginSpec,
-							pluginComponentTypeSpec.name ()));
+							pluginModelSpec.name ());
+
+					if (
+						optionalIsNotPresent (
+							modelMetaOptional)
+					) {
+						continue;
+					}
+
+					ModelMetaSpec modelMeta =
+						optionalGetRequired (
+							modelMetaOptional);
+
+					allBuilder.put (
+						modelMeta.name (),
+						modelMeta);
+
+					if (modelMeta.type ().record ()) {
+
+						recordBuilder.put (
+							modelMeta.name (),
+							modelMeta);
+
+					} else if (modelMeta.type.component ()) {
+
+						componentBuilder.put (
+							modelMeta.name (),
+							modelMeta);
+
+					} else {
+
+						throw shouldNeverHappen ();
+
+					}
+
+				}
 
 			});
 
@@ -182,8 +227,11 @@ class ModelMetaLoader {
 
 			}
 
-			modelMetas =
-				modelBuilder.build ();
+			allModelMetas =
+				allBuilder.build ();
+
+			recordModelMetas =
+				recordBuilder.build ();
 
 			componentMetas =
 				componentBuilder.build ();
@@ -193,9 +241,8 @@ class ModelMetaLoader {
 	}
 
 	private
-	void loadModelMeta (
+	Optional <ModelMetaSpec> loadModelMeta (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ImmutableMap.Builder <String, ModelMetaSpec> builder,
 			@NonNull PluginSpec plugin,
 			@NonNull String modelName) {
 
@@ -231,7 +278,7 @@ class ModelMetaLoader {
 						modelName,
 						resourceName);
 
-					return;
+					return optionalAbsent ();
 
 				}
 
@@ -257,7 +304,7 @@ class ModelMetaLoader {
 						modelName,
 						resourceName);
 
-					return;
+					return optionalAbsent ();
 
 				}
 
@@ -273,12 +320,11 @@ class ModelMetaLoader {
 						modelName,
 						resourceName);
 
-					return;
+					return optionalAbsent ();
 
 				}
 
-				builder.put (
-					modelName,
+				return optionalOf (
 					spec);
 
 			} catch (IOException ioException) {

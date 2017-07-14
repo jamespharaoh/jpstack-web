@@ -11,7 +11,7 @@ import wbs.apn.chat.user.core.model.Gender;
 
 public
 class GenderType
-	extends EnumUserType<String,Gender> {
+	extends EnumUserType <String, Gender> {
 
 	{
 

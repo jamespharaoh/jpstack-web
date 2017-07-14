@@ -22,9 +22,9 @@ class PluginModelsSpec {
 
 	@DataChildren (
 		direct = true,
-		childElement = "component-type")
+		childElement = "component")
 	@Getter @Setter
-	List <PluginComponentTypeSpec> componentTypes =
+	List <PluginComponentModelSpec> componentTypes =
 		new ArrayList <> ();
 
 	@DataChildren (
@@ -45,7 +45,7 @@ class PluginModelsSpec {
 		direct = true,
 		childElement = "model")
 	@Getter @Setter
-	List <PluginModelSpec> models =
+	List <PluginRecordModelSpec> models =
 		new ArrayList<> ();
 
 }

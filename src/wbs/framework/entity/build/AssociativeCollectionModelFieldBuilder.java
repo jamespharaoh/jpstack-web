@@ -24,7 +24,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
-import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.collections.AssociativeCollectionSpec;
 import wbs.framework.entity.model.ModelField;
@@ -95,7 +95,7 @@ class AssociativeCollectionModelFieldBuilder
 
 			} else {
 
-				PluginModelSpec fieldTypePluginModel =
+				PluginRecordModelSpec fieldTypePluginModel =
 					pluginManager.pluginModelsByName ().get (
 						spec.typeName ());
 

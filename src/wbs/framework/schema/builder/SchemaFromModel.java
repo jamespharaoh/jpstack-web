@@ -3,15 +3,18 @@ package wbs.framework.schema.builder;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.model.Schema;
 import wbs.framework.schema.model.SchemaTable;
@@ -21,50 +24,70 @@ import wbs.framework.schema.model.SchemaTable;
 public
 class SchemaFromModel {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SchemaTableFromModel> schemaTableFromModel;
+	ComponentProvider <SchemaTableFromModel> schemaTableFromModelProvider;
 
 	// properties
 
 	@Getter @Setter
-	TaskLogger taskLog;
-
-	@Getter @Setter
-	Map<String,List<String>> enumTypes;
+	Map <String, List <String>> enumTypes;
 
 	@Getter @Setter
 	Map <Class <?>, Model <?>> modelsByClass;
 
 	public
-	Schema build () {
+	Schema build (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		Schema schema =
-			new Schema ()
-				.enumTypes (enumTypes);
+		try (
 
-		for (
-			Model <?> model
-				: modelsByClass.values ()
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
+
 		) {
 
-			SchemaTable schemaTable =
-				schemaTableFromModel.get ()
-					.taskLog (taskLog)
-					.modelsByClass (modelsByClass)
-					.model (model)
-					.build ();
+			Schema schema =
+				new Schema ()
+					.enumTypes (enumTypes);
 
-			if (schemaTable == null)
-				continue;
+			for (
+				Model <?> model
+					: modelsByClass.values ()
+			) {
 
-			schema.addTable (
-				schemaTable);
+				SchemaTable schemaTable =
+					schemaTableFromModelProvider.provide (
+						taskLogger)
+
+					.modelsByClass (
+						modelsByClass)
+
+					.model (
+						model)
+
+					.build (
+						taskLogger);
+
+				if (schemaTable == null)
+					continue;
+
+				schema.addTable (
+					schemaTable);
+
+			}
+
+			return schema;
 
 		}
-
-		return schema;
 
 	}
 

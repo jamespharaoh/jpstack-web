@@ -1,6 +1,5 @@
 package wbs.apn.chat.broadcast.console;
 
-import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
@@ -8,6 +7,7 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -394,7 +394,7 @@ class ChatBroadcastSendAction
 						// TODO block all? done later...
 
 						.lastAction (
-							orNull (
+							optionalOrNull (
 								TextualInterval.forInterval (
 									userConsoleLogic.timezone (
 										transaction),

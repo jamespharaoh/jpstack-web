@@ -7,12 +7,11 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.meta.model.ModelFieldSpec;
-import wbs.framework.entity.meta.model.ModelMetaData;
+import wbs.framework.entity.meta.model.ModelDataSpec;
 
 @Accessors (fluent = true)
 @Data
 @DataClass ("floating-point-field")
-@ModelMetaData
 @PrototypeComponent ("floatingPointFieldSpec")
 public
 class FloatingPointFieldSpec

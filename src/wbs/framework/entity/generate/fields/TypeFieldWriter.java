@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
-import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.TypeFieldSpec;
@@ -80,7 +80,7 @@ class TypeFieldWriter
 					spec.name (),
 					fieldTypeName);
 
-			PluginModelSpec fieldTypePluginModel =
+			PluginRecordModelSpec fieldTypePluginModel =
 				pluginManager.pluginModelsByName ().get (
 					fieldTypeName);
 

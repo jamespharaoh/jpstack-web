@@ -10,6 +10,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.entity.meta.cachedview.CachedViewSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
@@ -108,6 +109,12 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
+	ModelField masterField () {
+		return model.masterField ();
+	}
+
+	@Override
+	public
 	ModelField nameField () {
 		return model.nameField ();
 	}
@@ -140,6 +147,12 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	public
 	ModelField typeCodeField () {
 		return model.typeCodeField ();
+	}
+
+	@Override
+	public
+	ModelField typeField () {
+		return model.typeField ();
 	}
 
 	@Override
@@ -280,6 +293,12 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	public
 	Class <? extends ObjectHelper <?>> helperClass () {
 		return model.helperClass ();
+	}
+
+	@Override
+	public
+	CachedViewSpec cachedView () {
+		return model.cachedView ();
 	}
 
 }

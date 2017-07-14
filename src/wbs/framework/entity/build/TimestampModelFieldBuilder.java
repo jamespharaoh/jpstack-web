@@ -1,7 +1,7 @@
 package wbs.framework.entity.build;
 
-import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 
@@ -121,15 +121,17 @@ class TimestampModelFieldBuilder
 							camelToUnderscore (
 								fieldName))))
 
+				.columnSqlTypes (
+					ImmutableList.of (
+						sqlTypeByColumnType.get (
+							spec.columnType ())))
+
 				.hibernateTypeHelper (
-					orNull (
+					optionalOrNull (
 						hibernateTypeHelperByColumnType.get (
 							spec.columnType ())))
 
-				.sqlType (
-					orNull (
-						sqlTypeByColumnType.get (
-							spec.columnType ())));
+			;
 
 			// store field
 
@@ -173,21 +175,24 @@ class TimestampModelFieldBuilder
 		.build ();
 
 	public final static
-	Map<ColumnType,Optional<String>> sqlTypeByColumnType =
-		ImmutableMap.<ColumnType,Optional<String>>builder ()
+	Map <ColumnType, String> sqlTypeByColumnType =
+		ImmutableMap.<ColumnType, String> builder ()
 
 		.put (
 			ColumnType.sql,
-			Optional.absent ())
+			"timestamp")
 
 		.put (
 			ColumnType.postgresql,
-			Optional.of (
-				"timestamp with time zone"))
+			"timestamp with time zone")
 
 		.put (
 			ColumnType.iso,
-			Optional.absent ())
+			"text")
+
+		.put (
+			ColumnType.unix,
+			"bigint")
 
 		.build ();
 

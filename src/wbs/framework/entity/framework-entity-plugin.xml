@@ -10,6 +10,10 @@
 
 	<layer name="model-meta">
 
+		<component class="meta.cachedview.CachedCountFieldSpec"/>
+		<component class="meta.cachedview.CachedGroupFieldSpec"/>
+		<component class="meta.cachedview.CachedViewSpec"/>
+
 		<component class="meta.collections.AssociativeCollectionSpec"/>
 		<component class="meta.collections.AssociativeListSpec"/>
 		<component class="meta.collections.ChildrenCollectionSpec"/>
@@ -158,7 +162,8 @@
 		<component class="build.TypeModelFieldBuilder"/>
 		<component class="build.YesNoModelFieldBuilder"/>
 		<component class="helper.EntityHelperImplementation"/>
-		<component class="model.ModelBuilder"/>
+		<component class="model.CompositeModelBuilder"/>
+		<component class="model.RecordModelBuilder"/>
 
 	</layer>
 

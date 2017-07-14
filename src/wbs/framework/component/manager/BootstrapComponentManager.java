@@ -1170,6 +1170,8 @@ class BootstrapComponentManager
 
 			}
 
+			taskLogger.makeException ();
+
 		}
 
 	}
