@@ -39,6 +39,11 @@
 			nullable="yes"/>
 
 		<reference-field
+			name="publicContents"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
 			name="supplier"
 			type="shnSupplier"
 			nullable="yes"/>

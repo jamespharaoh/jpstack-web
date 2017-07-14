@@ -172,6 +172,9 @@
 				<text-area-field
 					name="publicDescription"/>
 
+				<text-area-field
+					name="publicContents"/>
+
 				<object-field
 					name="supplier"
 					object-type="shnSupplier"/>
@@ -207,6 +210,9 @@
 
 				<text-area-field
 					name="publicDescription"/>
+
+				<text-area-field
+					name="publicContents"/>
 
 				<object-field
 					name="supplier"
@@ -265,6 +271,10 @@
 
 				<text-area-field
 					name="publicDescription"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicContents"
 					nullable="yes"/>
 
 				<object-field

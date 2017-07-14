@@ -99,6 +99,9 @@
 					name="store"
 					object-type="shnShopifyStore"/>
 
+				<text-area-field
+					name="productDescriptionTemplate"/>
+
 			</columns>
 
 		</form>
@@ -122,6 +125,9 @@
 				<object-field
 					name="store"
 					object-type="shnShopifyStore"/>
+
+				<text-area-field
+					name="productDescriptionTemplate"/>
 
 			</columns>
 

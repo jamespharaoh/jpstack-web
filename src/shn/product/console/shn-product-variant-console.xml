@@ -113,6 +113,9 @@
 				<yes-no-field
 					name="active"/>
 
+				<text-field
+					name="supplierReference"/>
+
 				<!-- pricing -->
 
 				<currency-field
@@ -172,6 +175,10 @@
 
 				<yes-no-field
 					name="active"/>
+
+				<text-field
+					name="supplierReference"
+					nullable="yes"/>
 
 				<!-- pricing -->
 

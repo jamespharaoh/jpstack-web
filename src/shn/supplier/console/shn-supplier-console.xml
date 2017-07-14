@@ -98,6 +98,18 @@
 				<text-field
 					name="publicName"/>
 
+				<text-field
+					name="contactName"/>
+
+				<text-field
+					name="contactAddress"/>
+
+				<text-field
+					name="contactPhone"/>
+
+				<text-field
+					name="contactNotes"/>
+
 			</columns>
 
 		</form>
@@ -116,6 +128,22 @@
 
 				<text-field
 					name="publicName"
+					nullable="yes"/>
+
+				<text-field
+					name="contactName"
+					nullable="yes"/>
+
+				<text-field
+					name="contactAddress"
+					nullable="yes"/>
+
+				<text-field
+					name="contactPhone"
+					nullable="yes"/>
+
+				<text-field
+					name="contactNotes"
 					nullable="yes"/>
 
 			</columns>
