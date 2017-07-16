@@ -11,9 +11,8 @@ import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringLength;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -26,7 +25,7 @@ class LazyStringList
 	// state
 
 	private
-	Provider <List <String>> provider;
+	Supplier <List <String>> valuesSupplier;
 
 	private
 	Optional <List <String>> values =
@@ -44,10 +43,10 @@ class LazyStringList
 
 	public
 	LazyStringList (
-			@NonNull Provider <List <String>> provider) {
+			@NonNull Supplier <List <String>> valuesSupplier) {
 
-		this.provider =
-			provider;
+		this.valuesSupplier =
+			valuesSupplier;
 
 	}
 
@@ -83,9 +82,9 @@ class LazyStringList
 
 			values =
 				optionalOf (
-					provider.get ());
+					valuesSupplier.get ());
 
-			provider = null;
+			valuesSupplier = null;
 
 		}
 
