@@ -389,6 +389,7 @@ class ObjectFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);

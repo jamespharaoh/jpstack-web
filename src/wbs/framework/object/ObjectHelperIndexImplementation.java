@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.CloseableTransaction;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -56,7 +55,7 @@ class ObjectHelperIndexImplementation <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <
+	ComponentProvider <IdCacheBuilder <
 		CloseableTransaction,
 		Pair <Long, Long>,
 		Long,
@@ -64,7 +63,7 @@ class ObjectHelperIndexImplementation <
 	>> parentIdAndIndexCacheBuilderProvider;
 
 	@PrototypeDependency
-	Provider <IdCacheBuilder <
+	ComponentProvider <IdCacheBuilder <
 		CloseableTransaction,
 		Pair <GlobalId, Long>,
 		Long,
@@ -119,7 +118,8 @@ class ObjectHelperIndexImplementation <
 			) {
 
 				parentIdAndIndexCache =
-					parentIdAndIndexCacheBuilderProvider.get ()
+					parentIdAndIndexCacheBuilderProvider.provide (
+						taskLogger)
 
 					.dummy (
 						! objectModel.parentField ().cacheable ()
@@ -173,7 +173,8 @@ class ObjectHelperIndexImplementation <
 			) {
 
 				parentGlobalIdAndIndexCache =
-					parentGlobalIdAndIndexCacheBuilderProvider.get ()
+					parentGlobalIdAndIndexCacheBuilderProvider.provide (
+						taskLogger)
 
 					.dummy (
 						! objectModel.parentTypeField ().cacheable ()

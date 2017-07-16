@@ -3,34 +3,51 @@
 	package="shn.shopify">
 
 	<plugin-dependencies>
+
 		<plugin-dependency name="platform-scaffold"/>
 		<plugin-dependency name="shn-core"/>
+
 	</plugin-dependencies>
 
 	<models>
+
 		<model name="shnShopifyConnection"/>
 		<model name="shnShopifyStore"/>
+
 	</models>
 
 	<layer name="console">
+
 		<component class="console.ShnShopifyConnectionSynchroniseFormActionHelper"/>
+
 	</layer>
 
 	<layer name="logic">
-		<component class="apiclient.ShopifyApiClientImplementation"/>
-		<component class="apiclient.ShopifyProductCreateHttpSenderHelper"/>
-		<component class="apiclient.ShopifyProductListHttpSenderHelper"/>
-		<component class="apiclient.ShopifyProductRemoveHttpSenderHelper"/>
+
+		<bootstrap-component class="logic.ShnShopifySynchronisationComponentWrapper"/>
+
+		<component class="apiclient.product.ShopifyProductApiClientImplementation"/>
+		<component class="apiclient.product.ShopifyProductCreateHttpSenderHelper"/>
+		<component class="apiclient.product.ShopifyProductListHttpSenderHelper"/>
+		<component class="apiclient.product.ShopifyProductRemoveHttpSenderHelper"/>
+
+		<component class="logic.ShnShopifyLogicImplementation"/>
+		<component class="logic.ShnShopifyProductSynchronisationHelper"/>
+
 	</layer>
 
 	<fixtures>
+
 		<fixture name="shnShopify"/>
+
 	</fixtures>
 
 	<console-modules>
+
 		<console-module name="shn-shopify"/>
 		<console-module name="shn-shopify-connection"/>
 		<console-module name="shn-shopify-store"/>
+
 	</console-modules>
 
 </plugin>

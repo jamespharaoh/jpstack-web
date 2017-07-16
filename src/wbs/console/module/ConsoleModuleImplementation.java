@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -26,7 +24,6 @@ import wbs.console.tab.ContextTabPlacement;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
@@ -53,11 +50,6 @@ class ConsoleModuleImplementation
 
 	@ClassSingletonDependency
 	LogContext logContext;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
 
 	// properties
 

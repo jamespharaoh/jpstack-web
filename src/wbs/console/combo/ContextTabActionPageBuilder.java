@@ -9,8 +9,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -23,7 +21,6 @@ import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
-import wbs.console.tab.TabContextResponder;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -34,6 +31,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -57,13 +55,10 @@ class ContextTabActionPageBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
-
-	@PrototypeDependency
-	Provider <TabContextResponder> tabContextResponder;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	// builder
 
@@ -112,6 +107,7 @@ class ContextTabActionPageBuilder <
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 
@@ -147,7 +143,8 @@ class ContextTabActionPageBuilder <
 				taskLogger,
 				container.tabLocation (),
 
-				contextTab.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)
@@ -185,7 +182,8 @@ class ContextTabActionPageBuilder <
 
 			consoleModule.addContextFile (
 				localFile,
-				consoleFile.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getResponderName (
 						taskLogger,

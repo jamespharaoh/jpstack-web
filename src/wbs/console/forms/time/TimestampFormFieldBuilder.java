@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -46,6 +44,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -69,44 +68,40 @@ class TimestampFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DateFormFieldNativeMapping>
-	dateFormFieldNativeMappingProvider;
+	ComponentProvider <DateFormFieldNativeMapping>
+		dateFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <DereferenceFormFieldAccessor>
-	dereferenceFormFieldAccessorProvider;
+	ComponentProvider <DereferenceFormFieldAccessor>
+		dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <TimestampFormFieldInterfaceMapping>
-	timestampFormFieldInterfaceMappingProvider;
+	ComponentProvider <TimestampFormFieldInterfaceMapping>
+		timestampFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -182,7 +177,8 @@ class TimestampFormFieldBuilder
 			) {
 
 				accessor =
-					dereferenceFormFieldAccessorProvider.get ()
+					dereferenceFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.path (
 						fieldName);
@@ -190,7 +186,8 @@ class TimestampFormFieldBuilder
 			} else {
 
 				accessor =
-					simpleFormFieldAccessorProvider.get ()
+					simpleFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.name (
 						fieldName)
@@ -207,12 +204,14 @@ class TimestampFormFieldBuilder
 			if (propertyClass == Instant.class) {
 
 				nativeMapping =
-					identityFormFieldNativeMappingProvider.get ();
+					identityFormFieldNativeMappingProvider.provide (
+						taskLogger);
 
 			} else if (propertyClass == Date.class) {
 
 				nativeMapping =
-					dateFormFieldNativeMappingProvider.get ();
+					dateFormFieldNativeMappingProvider.provide (
+						taskLogger);
 
 			} else {
 
@@ -235,19 +234,22 @@ class TimestampFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldValueConstraintValidatorProvider.get ();
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				timestampFormFieldInterfaceMappingProvider.get ()
+				timestampFormFieldInterfaceMappingProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -263,7 +265,8 @@ class TimestampFormFieldBuilder
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -280,6 +283,7 @@ class TimestampFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -290,7 +294,8 @@ class TimestampFormFieldBuilder
 
 				formFieldSet.addFormItem (
 
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -319,7 +324,8 @@ class TimestampFormFieldBuilder
 
 				formFieldSet.addFormItem (
 
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

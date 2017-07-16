@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -34,9 +32,13 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -50,46 +52,45 @@ class YesNoFormFieldBuilder
 	@SingletonDependency
 	ConsoleFormPluginManager formFieldPluginManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <HiddenFormField> hiddenFormFieldProvider;
+	ComponentProvider <HiddenFormField> hiddenFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <YesNoFormFieldRenderer>
-	yesNoFormFieldRendererProvider;
+	ComponentProvider <YesNoFormFieldRenderer> yesNoFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <YesNoCsvFormFieldInterfaceMapping>
-	yesNoCsvFormFieldInterfaceMappingProvider;
+	ComponentProvider <YesNoCsvFormFieldInterfaceMapping>
+		yesNoCsvFormFieldInterfaceMappingProvider;
 
 	// builder
 
@@ -111,152 +112,107 @@ class YesNoFormFieldBuilder
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		String name =
-			spec.name ();
+		try (
 
-		String label =
-			ifNull (
-				spec.label (),
-				capitalise (
-					camelToSpaces (
-						name)));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"build");
 
-		Boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+		) {
 
-		Boolean readOnly =
-			ifNull (
-				spec.readOnly (),
-				false);
+			String name =
+				spec.name ();
 
-		Boolean hidden =
-			ifNull (
-				spec.hidden (),
-				false);
+			String label =
+				ifNull (
+					spec.label (),
+					capitalise (
+						camelToSpaces (
+							name)));
 
-		String yesLabel =
-			ifNull (
-				spec.yesLabel (),
-				"yes");
+			Boolean nullable =
+				ifNull (
+					spec.nullable (),
+					false);
 
-		String noLabel =
-			ifNull (
-				spec.noLabel (),
-				"no");
+			Boolean readOnly =
+				ifNull (
+					spec.readOnly (),
+					false);
 
-		/*
-		Boolean dynamic =
-			ifNull (
-				spec.dynamic (),
-				false);
-		*/
+			Boolean hidden =
+				ifNull (
+					spec.hidden (),
+					false);
 
-		// field components
+			String yesLabel =
+				ifNull (
+					spec.yesLabel (),
+					"yes");
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			String noLabel =
+				ifNull (
+					spec.noLabel (),
+					"no");
 
-			.name (
-				name)
+			/*
+			Boolean dynamic =
+				ifNull (
+					spec.dynamic (),
+					false);
+			*/
 
-			.nativeClass (
-				Boolean.class);
+			// field components
 
-		// TODO dynamic
-
-		// native mapping
-
-		ConsoleFormNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
-
-		// value validators
-
-		List <FormFieldValueValidator> valueValidators =
-			new ArrayList<> ();
-
-		if (! nullable) {
-
-			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
-
-		}
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
-
-		// interface mapping
-
-		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
-
-		// renderer
-
-		FormFieldRenderer renderer =
-			yesNoFormFieldRendererProvider.get ()
-
-			.name (
-				name)
-
-			.label (
-				label)
-
-			.nullable (
-				nullable)
-
-			.yesLabel (
-				yesLabel)
-
-			.noLabel (
-				noLabel);
-
-		// update hook
-
-		FormFieldUpdateHook updateHook =
-			formFieldPluginManager.getUpdateHook (
-				context,
-				context.containerClass (),
-				name);
-
-		// csv mapping
-
-		FormFieldInterfaceMapping csvMapping =
-			yesNoCsvFormFieldInterfaceMappingProvider.get ()
-
-			.nullable (
-				nullable);
-
-		// field
-
-		if (hidden) {
-
-			formFieldSet.addFormItem (
-				hiddenFormFieldProvider.get ()
+			FormFieldAccessor accessor =
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
 
-				.accessor (
-					accessor)
+				.nativeClass (
+					Boolean.class);
 
-				.nativeMapping (
-					nativeMapping)
+			// TODO dynamic
 
-				.csvMapping (
-					csvMapping)
+			// native mapping
 
-				.implicitValue (
-					Optional.absent ())
+			ConsoleFormNativeMapping nativeMapping =
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
-			);
+			// value validators
 
-		} else if (! readOnly) {
+			List <FormFieldValueValidator> valueValidators =
+				new ArrayList<> ();
 
-			formFieldSet.addFormItem (
-				updatableFormFieldProvider.get ()
+			if (! nullable) {
+
+				valueValidators.add (
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
+
+			}
+
+			// constraint validator
+
+			FormFieldConstraintValidator constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
+
+			// interface mapping
+
+			FormFieldInterfaceMapping interfaceMapping =
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
+
+			// renderer
+
+			FormFieldRenderer renderer =
+				yesNoFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -264,71 +220,138 @@ class YesNoFormFieldBuilder
 				.label (
 					label)
 
-				.defaultValueSupplier (
-					ifNotNullThenElse (
-						spec.defaultValue (),
-						() -> spec::defaultValue,
-						() -> null))
+				.nullable (
+					nullable)
 
-				.viewPriv (
-					spec.viewPriv ())
+				.yesLabel (
+					yesLabel)
 
-				.accessor (
-					accessor)
+				.noLabel (
+					noLabel);
 
-				.nativeMapping (
-					nativeMapping)
+			// update hook
 
-				.valueValidators (
-					valueValidators)
+			FormFieldUpdateHook updateHook =
+				formFieldPluginManager.getUpdateHook (
+					taskLogger,
+					context,
+					context.containerClass (),
+					name);
 
-				.constraintValidator (
-					constraintValidator)
+			// csv mapping
 
-				.interfaceMapping (
-					interfaceMapping)
+			FormFieldInterfaceMapping csvMapping =
+				yesNoCsvFormFieldInterfaceMappingProvider.provide (
+					taskLogger)
 
-				.csvMapping (
-					csvMapping)
+				.nullable (
+					nullable);
 
-				.renderer (
-					renderer)
+			// field
 
-				.updateHook (
-					updateHook)
+			if (hidden) {
 
-			);
+				formFieldSet.addFormItem (
+					hiddenFormFieldProvider.provide (
+						taskLogger)
 
-		} else {
+					.name (
+						name)
 
-			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+					.accessor (
+						accessor)
 
-				.name (
-					name)
+					.nativeMapping (
+						nativeMapping)
 
-				.label (
-					label)
+					.csvMapping (
+						csvMapping)
 
-				.viewPriv (
-					spec.viewPriv ())
+					.implicitValue (
+						Optional.absent ())
 
-				.accessor (
-					accessor)
+				);
 
-				.nativeMapping (
-					nativeMapping)
+			} else if (! readOnly) {
 
-				.interfaceMapping (
-					interfaceMapping)
+				formFieldSet.addFormItem (
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
-				.csvMapping (
-					csvMapping)
+					.name (
+						name)
 
-				.renderer (
-					renderer)
+					.label (
+						label)
 
-			);
+					.defaultValueSupplier (
+						ifNotNullThenElse (
+							spec.defaultValue (),
+							() -> spec::defaultValue,
+							() -> null))
+
+					.viewPriv (
+						spec.viewPriv ())
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.valueValidators (
+						valueValidators)
+
+					.constraintValidator (
+						constraintValidator)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+					.updateHook (
+						updateHook)
+
+				);
+
+			} else {
+
+				formFieldSet.addFormItem (
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
+
+					.name (
+						name)
+
+					.label (
+						label)
+
+					.viewPriv (
+						spec.viewPriv ())
+
+					.accessor (
+						accessor)
+
+					.nativeMapping (
+						nativeMapping)
+
+					.interfaceMapping (
+						interfaceMapping)
+
+					.csvMapping (
+						csvMapping)
+
+					.renderer (
+						renderer)
+
+				);
+
+			}
 
 		}
 

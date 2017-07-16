@@ -3,8 +3,6 @@ package wbs.framework.entity.build;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -31,7 +29,7 @@ class ModelBuilderManager {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ModelBuilder
@@ -58,7 +56,8 @@ class ModelBuilderManager {
 		) {
 
 			modelBuilder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					TaskLogger.class)

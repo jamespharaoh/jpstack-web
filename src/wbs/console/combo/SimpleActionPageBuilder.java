@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -23,11 +21,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("simpleActionPageBuilder")
 public
@@ -45,7 +42,7 @@ class SimpleActionPageBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
@@ -64,8 +61,6 @@ class SimpleActionPageBuilder
 	String path;
 	String actionName;
 	String responderName;
-
-	Provider <WebResponder> responderProvider;
 
 	// build
 
@@ -90,9 +85,6 @@ class SimpleActionPageBuilder
 			buildFile (
 				taskLogger);
 
-			buildResponder (
-				taskLogger);
-
 		}
 
 	}
@@ -111,7 +103,8 @@ class SimpleActionPageBuilder
 
 			consoleModule.addFile (
 				path,
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 				.getResponderName (
 					taskLogger,
@@ -122,28 +115,6 @@ class SimpleActionPageBuilder
 					actionName)
 
 			);
-
-		}
-
-	}
-
-	void buildResponder (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"buildResponder");
-
-		) {
-
-			responderProvider =
-				componentManager.getComponentProviderRequired (
-					taskLogger,
-					responderName,
-					WebResponder.class);
 
 		}
 

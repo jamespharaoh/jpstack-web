@@ -80,8 +80,24 @@
 				<code-field pattern="[A-Z]+"/>
 				<description-field/>
 
+				<yes-no-field
+					name="active"/>
+
 				<text-field
-					name="publicTitle"/>
+					name="publicHandle"
+					nullable="yes"/>
+
+				<text-field
+					name="publicTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicDescription"
+					nullable="yes"/>
+
+				<image-field
+					name="publicImage"
+					nullable="yes"/>
 
 			</columns>
 
@@ -100,8 +116,20 @@
 				<description-field/>
 				<deleted-field/>
 
+				<yes-no-field
+					name="active"/>
+
+				<text-field
+					name="publicHandle"/>
+
 				<text-field
 					name="publicTitle"/>
+
+				<text-area-field
+					name="publicDescription"/>
+
+				<image-field
+					name="publicImage"/>
 
 			</columns>
 
@@ -118,8 +146,24 @@
 				<description-field/>
 				<deleted-field/>
 
+				<yes-no-field
+					name="active"/>
+
 				<text-field
-					name="publicTitle"/>
+					name="publicHandle"
+					nullable="yes"/>
+
+				<text-field
+					name="publicTitle"
+					nullable="yes"/>
+
+				<text-area-field
+					name="publicDescription"
+					nullable="yes"/>
+
+				<image-field
+					name="publicImage"
+					nullable="yes"/>
 
 			</columns>
 

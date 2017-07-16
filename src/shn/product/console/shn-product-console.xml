@@ -44,6 +44,9 @@
 			<object-summary-page
 				form="summary"/>
 
+			<object-settings-page
+				form="settings"/>
+
 			<context-link
 				name="variant"
 				link="shnProductVariant"
@@ -53,9 +56,6 @@
 				name="image"
 				link="shnProductImage"
 				label="Images"/>
-
-			<object-settings-page
-				form="settings"/>
 
 			<object-events-page/>
 

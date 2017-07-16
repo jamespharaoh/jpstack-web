@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -20,7 +18,8 @@ import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -41,9 +40,9 @@ class ConsoleMultiFormTypeFactory <Container>
 
 	// uninitalized components
 
-	@UninitializedDependency
-	Provider <ConsoleMultiFormTypeImplementation <Container>>
-		multiFormContextTypeImplementationProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <ConsoleMultiFormTypeImplementation <Container>>
+		multiFormContextTypeProvider;
 
 	// properties
 
@@ -81,7 +80,10 @@ class ConsoleMultiFormTypeFactory <Container>
 
 		) {
 
-			return multiFormContextTypeImplementationProvider.get ()
+			return multiFormContextTypeProvider.provide (
+				taskLogger,
+				multiFormContextType ->
+					multiFormContextType
 
 				.containerClass (
 					containerClass)
@@ -103,7 +105,7 @@ class ConsoleMultiFormTypeFactory <Container>
 								sectionName,
 								sectionFields)))
 
-			;
+			);
 
 		}
 

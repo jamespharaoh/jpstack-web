@@ -5,8 +5,6 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 
 import java.util.Properties;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -18,6 +16,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -39,7 +38,7 @@ class HibernateSessionFactory
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <HibernateSessionFactoryBuilder>
+	ComponentProvider <HibernateSessionFactoryBuilder>
 		hibernateSessionFactoryBuilderProvider;
 
 	// implementation
@@ -84,7 +83,8 @@ class HibernateSessionFactory
 
 			);
 
-			return hibernateSessionFactoryBuilderProvider.get ()
+			return hibernateSessionFactoryBuilderProvider.provide (
+				taskLogger)
 
 				.configProperties (
 					configProperties)

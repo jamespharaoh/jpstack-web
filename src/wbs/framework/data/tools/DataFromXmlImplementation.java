@@ -13,12 +13,13 @@ import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.notEqualToOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.PropertyUtils.propertySetSimple;
 import static wbs.utils.etc.ReflectionUtils.fieldParameterizedType;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
@@ -699,10 +700,12 @@ class DataFromXmlImplementation
 						if (! parents.iterator ().hasNext ())
 							throw new RuntimeException ();
 
-						PropertyUtils.propertySetSimple (
+						propertySetSimple (
 							object,
 							field.getName (),
-							parents.iterator ().next ());
+							Object.class,
+							optionalOf (
+								parents.iterator ().next ()));
 
 					}
 
@@ -716,10 +719,12 @@ class DataFromXmlImplementation
 							if (! field.getType ().isInstance (ancestor))
 								continue;
 
-							PropertyUtils.propertySetSimple (
+							propertySetSimple (
 								object,
 								field.getName (),
-								ancestor);
+								Object.class,
+								optionalOf (
+									ancestor));
 
 							break;
 
@@ -807,7 +812,8 @@ class DataFromXmlImplementation
 					}
 
 					Object namedObject =
-						collection.get (attributeValue);
+						collection.get (
+							attributeValue);
 
 					if (namedObject == null) {
 
@@ -823,10 +829,12 @@ class DataFromXmlImplementation
 
 					}
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						object,
 						field.getName (),
-						namedObject);
+						Object.class,
+						optionalOf (
+							namedObject));
 
 				} else {
 
@@ -921,41 +929,48 @@ class DataFromXmlImplementation
 
 			if (field.getType () == String.class) {
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					object,
 					field.getName (),
-					stringValue);
+					String.class,
+					optionalOf (
+						stringValue));
 
 				return true;
 
 			} else if (field.getType () == Integer.class) {
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					object,
 					field.getName (),
-					Integer.parseInt (
-						stringValue));
+					Integer.class,
+					optionalOf (
+						toJavaIntegerRequired (
+							parseIntegerRequired (
+								stringValue))));
 
 				return true;
 
 			} else if (field.getType () == Long.class) {
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					object,
 					field.getName (),
-					Long.parseLong (
-						stringValue));
+					Long.class,
+					optionalOf (
+						parseIntegerRequired (
+							stringValue)));
 
 				return true;
 
 			} else if (field.getType () == Boolean.class) {
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					object,
 					field.getName (),
-					optionalOrNull (
-						parseBooleanYesNoEmpty (
-							stringValue)));
+					Boolean.class,
+					parseBooleanYesNoEmpty (
+						stringValue));
 
 				return true;
 
@@ -971,11 +986,13 @@ class DataFromXmlImplementation
 
 				if (optionalClassParam == Boolean.class) {
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						object,
 						field.getName (),
-						parseBooleanYesNoEmpty (
-							stringValue));
+						Optional.class,
+						optionalOf (
+							parseBooleanYesNoEmpty (
+								stringValue)));
 
 					return true;
 
@@ -993,11 +1010,11 @@ class DataFromXmlImplementation
 						hyphenToCamel (
 							stringValue));
 
-				PropertyUtils.propertySetSimple (
+				propertySetSimple (
 					object,
 					field.getName (),
-					optionalOrNull (
-						enumValueOptional));
+					Enum.class,
+					enumValueOptional);
 
 				return true;
 
@@ -1114,10 +1131,12 @@ class DataFromXmlImplementation
 
 				if (field.getType () == String.class) {
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						object,
 						field.getName (),
-						stringValue);
+						String.class,
+						optionalOf (
+							stringValue));
 
 				} else {
 
@@ -1211,12 +1230,17 @@ class DataFromXmlImplementation
 						.build (
 							taskLogger);
 
-					if (child != null) {
+					if (
+						isNotNull (
+							child)
+					) {
 
-						PropertyUtils.propertySetSimple (
+						propertySetSimple (
 							object,
 							field.getName (),
-							child);
+							Object.class,
+							optionalOf (
+								child));
 
 					}
 
@@ -1559,17 +1583,21 @@ class DataFromXmlImplementation
 
 					}
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						object,
 						field.getName (),
-						mapBuilder.build ());
+						Map.class,
+						optionalOf (
+							mapBuilder.build ()));
 
 				} else {
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						object,
 						field.getName (),
-						children);
+						List.class,
+						optionalOf (
+							children));
 
 				}
 
@@ -1623,10 +1651,12 @@ class DataFromXmlImplementation
 
 			}
 
-			PropertyUtils.propertySetSimple (
+			propertySetSimple (
 				object,
 				field.getName (),
-				childrenIndex);
+				Object.class,
+				optionalOf (
+					childrenIndex));
 
 		}
 

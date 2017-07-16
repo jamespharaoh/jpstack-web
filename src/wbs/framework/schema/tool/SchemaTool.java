@@ -12,13 +12,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.LoggingDataSource;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
@@ -54,7 +53,7 @@ class SchemaTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SchemaFromModel> schemaFromModel;
+	ComponentProvider <SchemaFromModel> schemaFromModel;
 
 	// state
 
@@ -92,6 +91,7 @@ class SchemaTool {
 
 	}
 
+	private
 	void defineTables (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -105,9 +105,7 @@ class SchemaTool {
 		) {
 
 			schema =
-				schemaFromModel.get ()
-
-				.taskLog (
+				schemaFromModel.provide (
 					taskLogger)
 
 				.enumTypes (
@@ -116,17 +114,12 @@ class SchemaTool {
 				.modelsByClass (
 					entityHelper.modelsByClass ())
 
-				.build ();
+				.build (
+					taskLogger)
 
-			if (taskLogger.errors ()) {
+			;
 
-				throw new RuntimeException (
-					stringFormat (
-						"Aborting due to %s errors",
-						integerToDecimalString (
-							taskLogger.errorCount ())));
-
-			}
+			taskLogger.makeException ();
 
 		}
 

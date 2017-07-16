@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -27,7 +25,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -49,10 +48,11 @@ class ConsoleFormTypeImplementation <Container>
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <ConsoleFormImplementation <Container>> consoleFormProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <ConsoleFormImplementation <Container>>
+		consoleFormProvider;
 
 	// properties
 
@@ -100,7 +100,10 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					value);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction,
+				consoleForm ->
+					consoleForm
 
 				.requestContext (
 					requestContext)
@@ -137,7 +140,7 @@ class ConsoleFormTypeImplementation <Container>
 				.updateResultSet (
 					updateResults)
 
-			;
+			);
 
 		}
 
@@ -163,7 +166,8 @@ class ConsoleFormTypeImplementation <Container>
 				fieldsProvider.getStaticFields (
 					transaction);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -233,7 +237,8 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					parent);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -298,7 +303,8 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					parent);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -367,7 +373,8 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					value);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -430,7 +437,8 @@ class ConsoleFormTypeImplementation <Container>
 				fieldsProvider.getStaticFields (
 					transaction);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -500,7 +508,8 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					parent);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)
@@ -565,7 +574,8 @@ class ConsoleFormTypeImplementation <Container>
 					transaction,
 					parent);
 
-			return consoleFormProvider.get ()
+			return consoleFormProvider.provide (
+				transaction)
 
 				.requestContext (
 					requestContext)

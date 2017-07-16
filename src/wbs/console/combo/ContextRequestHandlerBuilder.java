@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -24,6 +22,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -46,7 +45,7 @@ class ContextRequestHandlerBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
@@ -88,6 +87,7 @@ class ContextRequestHandlerBuilder <
 			for (
 				ResolvedConsoleContextExtensionPoint extensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 
@@ -116,7 +116,8 @@ class ContextRequestHandlerBuilder <
 
 			consoleModule.addContextFile (
 				fileName,
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getHandlerName (
 						taskLogger,

@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import java.util.List;
 

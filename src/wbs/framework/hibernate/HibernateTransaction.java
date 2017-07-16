@@ -25,6 +25,8 @@ import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.WbsConnection;
@@ -40,10 +42,15 @@ public
 class HibernateTransaction
 	implements OwnedTransaction {
 
-	// singleton components
+	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	ComponentProvider <HibernateInterceptor> hibernateInterceptorProvider;
 
 	// properties
 
@@ -125,7 +132,8 @@ class HibernateTransaction
 				hibernateDatabase.sessionFactory.withOptions ()
 
 				.interceptor (
-					hibernateDatabase.hibernateInterceptorProvider.get ())
+					hibernateInterceptorProvider.provide (
+						taskLogger))
 
 				.openSession ();
 

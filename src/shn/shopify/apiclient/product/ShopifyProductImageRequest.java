@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -10,10 +10,14 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ShopifyProductOptionRequest {
+class ShopifyProductImageRequest {
 
 	@DataAttribute (
-		name = "name")
-	String name;
+		name = "attachment")
+	String attachment;
+
+	@DataAttribute (
+		name = "src")
+	String src;
 
 }

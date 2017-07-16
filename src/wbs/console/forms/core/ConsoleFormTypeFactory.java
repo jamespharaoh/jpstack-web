@@ -3,8 +3,6 @@ package wbs.console.forms.core;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -16,7 +14,8 @@ import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -27,7 +26,7 @@ public
 class ConsoleFormTypeFactory <Container>
 	implements ComponentFactory <ConsoleFormType <Container>> {
 
-	// singleton components
+	// singleton dependencies
 
 	@SingletonDependency
 	ConsoleFormBuilder consoleFormBuilder;
@@ -35,10 +34,10 @@ class ConsoleFormTypeFactory <Container>
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitalized components
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <ConsoleFormTypeImplementation <Container>>
+	@StrongPrototypeDependency
+	ComponentProvider <ConsoleFormTypeImplementation <Container>>
 		consoleFormTypeProvider;
 
 	// properties
@@ -74,7 +73,10 @@ class ConsoleFormTypeFactory <Container>
 
 		) {
 
-			return consoleFormTypeProvider.get ()
+			return consoleFormTypeProvider.provide (
+				taskLogger,
+				consoleFormType ->
+					consoleFormType
 
 				.containerClass (
 					genericCastUnchecked (
@@ -92,7 +94,7 @@ class ConsoleFormTypeFactory <Container>
 				.fieldsProvider (
 					fieldsProvider)
 
-			;
+			);
 
 		}
 

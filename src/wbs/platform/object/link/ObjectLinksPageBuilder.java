@@ -140,6 +140,7 @@ class ObjectLinksPageBuilder <
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 

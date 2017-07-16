@@ -12,8 +12,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -26,6 +24,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -46,10 +45,12 @@ class ConsoleFormManagerImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFormTypeImplementation <?>> consoleFormTypeProvider;
+	ComponentProvider <ConsoleFormTypeImplementation <?>>
+		consoleFormTypeProvider;
 
 	@PrototypeDependency
-	Provider <StaticFieldsProvider <?, ?>> staticFieldsProviderProvider;
+	ComponentProvider <StaticFieldsProvider <?, ?>>
+		staticFieldsProviderProvider;
 
 	// public implementation
 
@@ -122,7 +123,8 @@ class ConsoleFormManagerImplementation
 
 			StaticFieldsProvider <Type, Object> fieldsProvider =
 				genericCastUnchecked (
-					staticFieldsProviderProvider.get ()
+					staticFieldsProviderProvider.provide (
+						taskLogger)
 
 				.containerClass (
 					genericCastUnchecked (
@@ -154,7 +156,8 @@ class ConsoleFormManagerImplementation
 			);
 
 			return genericCastUnchecked (
-				consoleFormTypeProvider.get ()
+				consoleFormTypeProvider.provide (
+					taskLogger)
 
 				.formName (
 					formName)
@@ -199,7 +202,8 @@ class ConsoleFormManagerImplementation
 		) {
 
 			return genericCastUnchecked (
-				consoleFormTypeProvider.get ()
+				consoleFormTypeProvider.provide (
+					taskLogger)
 
 				.formName (
 					formName)
@@ -246,7 +250,8 @@ class ConsoleFormManagerImplementation
 
 			StaticFieldsProvider <Type, Object> fieldsProvider =
 				genericCastUnchecked (
-					staticFieldsProviderProvider.get ()
+					staticFieldsProviderProvider.provide (
+						taskLogger)
 
 				.containerClass (
 					genericCastUnchecked (

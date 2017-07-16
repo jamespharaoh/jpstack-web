@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 
@@ -10,10 +10,13 @@ import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 
+import shn.shopify.apiclient.ShopifyApiResponse;
+
 @Accessors (fluent = true)
 @Data
 public
-class ShopifyProductResponse {
+class ShopifyProductResponse
+	implements ShopifyApiResponse {
 
 	@DataAttribute (
 		name = "id")

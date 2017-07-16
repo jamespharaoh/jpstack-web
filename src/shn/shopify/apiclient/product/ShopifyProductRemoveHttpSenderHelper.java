@@ -1,13 +1,9 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
-import static wbs.utils.collection.CollectionUtils.singletonList;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
-import static wbs.utils.etc.OptionalUtils.presentInstancesMap;
-import static wbs.utils.string.StringUtils.joinWithComma;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
@@ -15,34 +11,34 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.apiclient.GenericHttpSender.Method;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
+import wbs.framework.data.tools.DataToJson;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("shopifyProductListHttpSenderHelper")
+@PrototypeComponent ("shopifyProductRemoveHttpSenderHelper")
 public
-class ShopifyProductListHttpSenderHelper
+class ShopifyProductRemoveHttpSenderHelper
 	implements GenericHttpSenderHelper <
-		ShopifyProductListRequest,
-		ShopifyProductListResponse
+		ShopifyProductRemoveRequest,
+		ShopifyProductRemoveResponse
 	> {
 
 	// properties
 
 	@Getter @Setter
-	ShopifyProductListRequest request;
+	ShopifyProductRemoveRequest request;
 
 	@Getter @Setter
-	ShopifyProductListResponse response;
+	ShopifyProductRemoveResponse response;
 
 	@Getter @Setter
 	Long responseStatusCode;
@@ -54,6 +50,9 @@ class ShopifyProductListHttpSenderHelper
 	Map <String, List <String>> responseHeaders;
 
 	@Getter @Setter
+	String requestBody;
+
+	@Getter @Setter
 	String responseBody;
 
 	// details
@@ -61,7 +60,7 @@ class ShopifyProductListHttpSenderHelper
 	@Override
 	public
 	Method method () {
-		return Method.get;
+		return Method.delete;
 	}
 
 	@Override
@@ -69,8 +68,10 @@ class ShopifyProductListHttpSenderHelper
 	String url () {
 
 		return stringFormat (
-			"https://%s.myshopify.com/admin/products.json",
-			request.credentials ().storeName ());
+			"https://%s.myshopify.com/admin/products/%s.json",
+			request.credentials ().storeName (),
+			integerToDecimalString (
+				request.id ()));
 
 	}
 
@@ -78,50 +79,7 @@ class ShopifyProductListHttpSenderHelper
 	public
 	Map <String, List <String>> requestParameters () {
 
-		return presentInstancesMap (
-
-			Pair.of (
-				"ids",
-				optionalMapRequired (
-					optionalFromNullable (
-						request.ids ()),
-					ids ->
-						singletonList (
-							joinWithComma (
-								integerToDecimalString (
-									ids))))),
-
-			Pair.of (
-				"limit",
-				optionalMapRequired (
-					optionalFromNullable (
-						request.limit ()),
-					limit ->
-						singletonList (
-							integerToDecimalString (
-								limit)))),
-
-			Pair.of (
-				"page",
-				optionalMapRequired (
-					optionalFromNullable (
-						request.page ()),
-					page ->
-						singletonList (
-							integerToDecimalString (
-								page + 1)))),
-
-			Pair.of (
-				"fields",
-				optionalMapRequired (
-					optionalFromNullable (
-						request.fields ()),
-					fields ->
-						singletonList (
-							joinWithComma (
-								fields))))
-
-		);
+		return emptyMap ();
 
 	}
 
@@ -148,14 +106,6 @@ class ShopifyProductListHttpSenderHelper
 
 	@Override
 	public
-	String requestBody () {
-
-		return "";
-
-	}
-
-	@Override
-	public
 	void verify () {
 
 		doNothing ();
@@ -166,7 +116,15 @@ class ShopifyProductListHttpSenderHelper
 	public
 	void encode () {
 
-		doNothing ();
+		DataToJson dataToJson =
+			new DataToJson ();
+
+		JsonElement jsonValue =
+			dataToJson.toJson (
+				request);
+
+		requestBody =
+			jsonValue.toString ();
 
 	}
 
@@ -179,7 +137,7 @@ class ShopifyProductListHttpSenderHelper
 
 		response =
 			dataFromJson.fromJson (
-				ShopifyProductListResponse.class,
+				ShopifyProductRemoveResponse.class,
 				responseBody);
 
 	}

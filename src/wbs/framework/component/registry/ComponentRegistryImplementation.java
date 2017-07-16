@@ -1,6 +1,7 @@
 package wbs.framework.component.registry;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.collection.IterableUtils.iterableChainToList;
 import static wbs.utils.collection.IterableUtils.iterableCount;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
@@ -22,7 +23,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.etc.TypeUtils.classInSafe;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
@@ -54,7 +55,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.inject.Provider;
 import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
@@ -81,7 +81,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.manager.ComponentManagerImplementation;
@@ -1428,10 +1427,6 @@ class ComponentRegistryImplementation
 					field.getAnnotation (
 						WeakSingletonDependency.class);
 
-				UninitializedDependency uninitializedDependencyAnnotation =
-					field.getAnnotation (
-						UninitializedDependency.class);
-
 				long numAnnotations =
 					iterableCount (
 						presentInstances (
@@ -1443,8 +1438,6 @@ class ComponentRegistryImplementation
 								singletonDependencyAnnotation),
 							optionalFromNullable (
 								strongPrototypeDependencyAnnotation),
-							optionalFromNullable (
-								uninitializedDependencyAnnotation),
 							optionalFromNullable (
 								weakSingletonDependencyAnnotation)));
 
@@ -1469,17 +1462,11 @@ class ComponentRegistryImplementation
 					isNotNull (
 						weakPrototypeDependencyAnnotation)
 					|| isNotNull (
-						uninitializedDependencyAnnotation)
-					|| isNotNull (
 						strongPrototypeDependencyAnnotation);
 
 				Boolean scoped =
 					isNotNull (
 						classSingletonDependencyAnnotation);
-
-				Boolean initialized =
-					isNull (
-						uninitializedDependencyAnnotation);
 
 				Boolean weak =
 					isNotNull (
@@ -1512,7 +1499,6 @@ class ComponentRegistryImplementation
 						targetComponentName,
 						field,
 						prototype,
-						initialized,
 						weak);
 
 				} else if (scoped) {
@@ -1531,7 +1517,6 @@ class ComponentRegistryImplementation
 						targetComponentName,
 						field,
 						prototype,
-						initialized,
 						weak);
 
 				} else {
@@ -1571,10 +1556,6 @@ class ComponentRegistryImplementation
 
 						.field (
 							field)
-
-						.initialized (
-							isNull (
-								uninitializedDependencyAnnotation))
 
 						.weak (
 							weak);
@@ -1718,7 +1699,6 @@ class ComponentRegistryImplementation
 			@NonNull String targetComponentName,
 			@NonNull Field field,
 			@NonNull Boolean prototype,
-			@NonNull Boolean initialized,
 			@NonNull Boolean weak) {
 
 		TaskLogger taskLogger =
@@ -1771,11 +1751,8 @@ class ComponentRegistryImplementation
 				.prototype (
 					prototype)
 
-				.initialized (
-					initialized)
-
 				.targetComponentNames (
-					Collections.singletonList (
+					singletonList (
 						targetComponentName))
 
 				.weak (
@@ -1921,10 +1898,9 @@ class ComponentRegistryImplementation
 			boolean isProvider;
 
 			if (
-				classInSafe (
+				classEqualSafe (
 					injectClass,
-					ComponentProvider.class,
-					Provider.class)
+					ComponentProvider.class)
 			) {
 
 				if (parameterizedInjectType == null) {

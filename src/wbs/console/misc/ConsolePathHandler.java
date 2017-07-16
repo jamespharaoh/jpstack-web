@@ -1,13 +1,12 @@
 package wbs.console.misc;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.HiddenComponent;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -26,10 +25,10 @@ class ConsolePathHandler
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <DelegatingPathHandler> delegatingPathHandlerProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <DelegatingPathHandler> delegatingPathHandlerProvider;
 
 	// implementation
 
@@ -47,7 +46,8 @@ class ConsolePathHandler
 
 		) {
 
-			return delegatingPathHandlerProvider.get ();
+			return delegatingPathHandlerProvider.provide (
+				taskLogger);
 
 		}
 

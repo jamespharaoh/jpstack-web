@@ -9,8 +9,6 @@ import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -21,6 +19,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -47,7 +46,7 @@ class ConsoleHelperProviderFactory <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <GenericConsoleHelperProvider <RecordType>>
+	ComponentProvider <GenericConsoleHelperProvider <RecordType>>
 		genericConsoleHelperProviderProvider;
 
 	// properties
@@ -94,7 +93,8 @@ class ConsoleHelperProviderFactory <
 					classForNameRequired (
 						consoleHelperClassName));
 
-			return genericConsoleHelperProviderProvider.get ()
+			return genericConsoleHelperProviderProvider.provide (
+				taskLogger)
 
 				.spec (
 					spec)

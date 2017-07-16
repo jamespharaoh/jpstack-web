@@ -2,8 +2,6 @@ package wbs.framework.builder;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.TaskLogger;
 
@@ -19,7 +17,7 @@ interface BuilderFactory <
 	Factory addBuilder (
 			TaskLogger parentTaskLogger,
 			Class <?> builderClass,
-			Provider <?> builderProvider);
+			ComponentProvider <?> builderProvider);
 
 	<Type>
 	Factory addBuilders (

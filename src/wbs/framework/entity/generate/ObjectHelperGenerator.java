@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -40,6 +38,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
@@ -74,13 +73,13 @@ class ObjectHelperGenerator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JavaAnnotationWriter> javaAnnotationWriterProvider;
+	ComponentProvider <JavaAnnotationWriter> javaAnnotationWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaClassWriter> javaClassWriterProvider;
+	ComponentProvider <JavaClassWriter> javaClassWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+	ComponentProvider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	// properties
 
@@ -330,7 +329,8 @@ class ObjectHelperGenerator {
 		) {
 
 			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
+				javaClassUnitWriterProvider.provide (
+					taskLogger)
 
 				.formatWriter (
 					formatWriter)
@@ -340,13 +340,15 @@ class ObjectHelperGenerator {
 					packageName);
 
 			JavaClassWriter classWriter =
-				javaClassWriterProvider.get ()
+				javaClassWriterProvider.provide (
+					taskLogger)
 
 				.className (
 					objectHelperImplementationName)
 
 				.addClassAnnotation (
-					javaAnnotationWriterProvider.get ()
+					javaAnnotationWriterProvider.provide (
+						taskLogger)
 
 					.name (
 						"java.lang.SuppressWarnings")
@@ -727,7 +729,16 @@ class ObjectHelperGenerator {
 			"databaseHelper =");
 
 		formatWriter.writeLineFormat (
-			"\tobjectDatabaseHelperProvider.get ()");
+			"\tobjectDatabaseHelperProvider.provide (");
+
+		formatWriter.writeLineFormat (
+			"\t\ttaskLogger,");
+
+		formatWriter.writeLineFormat (
+			"\t\tnestedObjectDatabaseHelper ->");
+
+		formatWriter.writeLineFormat (
+			"\t\t\tnestedObjectDatabaseHelper");
 
 		formatWriter.writeNewline ();
 
@@ -735,7 +746,11 @@ class ObjectHelperGenerator {
 			"\t.objectModel (");
 
 		formatWriter.writeLineFormat (
-			"\t\tobjectModel);");
+			"\t\tobjectModel)");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormat (");");
 
 		formatWriter.writeNewline ();
 
@@ -751,11 +766,20 @@ class ObjectHelperGenerator {
 				componentName);
 
 			formatWriter.writeLineFormat (
-				"\t%s.get ()",
+				"\t%s.provide (",
 				stringFormat (
 					"objectHelper%sImplementationProvider",
 					capitalise (
 						componentName)));
+
+			formatWriter.writeLineFormat (
+				"\t\ttaskLogger,");
+
+			formatWriter.writeLineFormat (
+				"\t\tnestedObjectHelperImplementation ->");
+
+			formatWriter.writeLineFormat (
+				"\t\t\tnestedObjectHelperImplementation");
 
 			formatWriter.writeNewline ();
 
@@ -779,7 +803,12 @@ class ObjectHelperGenerator {
 				"\t.objectModel (");
 
 			formatWriter.writeLineFormat (
-				"\t\tobjectModel);");
+				"\t\tobjectModel)");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				");");
 
 			formatWriter.writeNewline ();
 

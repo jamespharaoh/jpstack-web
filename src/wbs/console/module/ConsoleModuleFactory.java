@@ -2,8 +2,6 @@ package wbs.console.module;
 
 import static wbs.utils.string.StringUtils.hyphenToSpaces;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -13,6 +11,7 @@ import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -35,7 +34,7 @@ class ConsoleModuleFactory <ObjectType extends Record <ObjectType>>
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleModuleImplementation> consoleModuleProvider;
+	ComponentProvider <ConsoleModuleImplementation> consoleModuleProvider;
 
 	// properties
 
@@ -59,7 +58,8 @@ class ConsoleModuleFactory <ObjectType extends Record <ObjectType>>
 		) {
 
 			ConsoleModuleImplementation consoleModule =
-				consoleModuleProvider.get ()
+				consoleModuleProvider.provide (
+					taskLogger)
 
 				.name (
 					consoleModuleSpec.name ())

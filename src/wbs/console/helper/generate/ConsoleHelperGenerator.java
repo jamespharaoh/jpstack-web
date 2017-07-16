@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -49,6 +47,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.generate.ObjectHelperGenerator;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
@@ -79,18 +78,15 @@ class ConsoleHelperGenerator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JavaAssignmentWriter> javaAssignmentWriterProvider;
+	ComponentProvider <JavaAssignmentWriter> javaAssignmentWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaClassWriter> javaClassWriterProvider;
+	ComponentProvider <JavaClassWriter> javaClassWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+	ComponentProvider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	// properties
-
-	@Getter @Setter
-	TaskLogger taskLogger;
 
 	@Getter @Setter
 	Model <?> model;
@@ -136,10 +132,24 @@ class ConsoleHelperGenerator {
 	// implementation
 
 	public
-	void generateHelper () {
+	void generateHelper (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		init ();
-		writeClass ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"generateHelper");
+
+		) {
+
+			init ();
+
+			writeClass (
+				taskLogger);
+
+		}
 
 	}
 
@@ -355,9 +365,15 @@ class ConsoleHelperGenerator {
 	}
 
 	private
-	void writeClass () {
+	void writeClass (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeClass");
 
 			AtomicFileWriter formatWriter =
 				new AtomicFileWriter (
@@ -366,7 +382,8 @@ class ConsoleHelperGenerator {
 		) {
 
 			JavaClassUnitWriter classUnitWriter =
-				javaClassUnitWriterProvider.get ()
+				javaClassUnitWriterProvider.provide (
+					taskLogger)
 
 				.formatWriter (
 					formatWriter)
@@ -376,7 +393,8 @@ class ConsoleHelperGenerator {
 					packageName);
 
 			classWriter =
-				javaClassWriterProvider.get ()
+				javaClassWriterProvider.provide (
+					taskLogger)
 
 				.className (
 					consoleHelperImplementationName)
@@ -511,7 +529,7 @@ class ConsoleHelperGenerator {
 
 	void addPrototypeDependencies () {
 
-		classWriter.addUninitializedDependency (
+		classWriter.addPrototypeDependency (
 			imports ->
 				stringFormat (
 					"%s <%s>",
@@ -661,13 +679,14 @@ class ConsoleHelperGenerator {
 
 			// console helper implementation
 
-			javaAssignmentWriterProvider.get ()
+			javaAssignmentWriterProvider.provide (
+				taskLogger)
 
 				.variableName (
 					"consoleHelperImplementation")
 
-				.value (
-					"consoleHelperImplementationProvider.get ()")
+				.provider (
+					"consoleHelperImplementationProvider")
 
 				.propertyFormat (
 					"objectHelper",

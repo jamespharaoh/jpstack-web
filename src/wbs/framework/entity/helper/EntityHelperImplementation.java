@@ -9,8 +9,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
@@ -50,7 +49,7 @@ class EntityHelperImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ModelBuilder <?>> modelBuilder;
+	ComponentProvider <ModelBuilder <?>> modelBuilder;
 
 	// properties
 
@@ -238,7 +237,8 @@ class EntityHelperImplementation
 				}
 
 				Model <?> model =
-					modelBuilder.get ()
+					modelBuilder.provide (
+						taskLogger)
 
 					.modelMeta (
 						modelMeta)

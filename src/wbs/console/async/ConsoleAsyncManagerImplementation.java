@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -20,6 +18,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -45,7 +44,7 @@ class ConsoleAsyncManagerImplementation
 	// prototype depedencies
 
 	@PrototypeDependency
-	Provider <ConsoleAsyncConnection> consoleAsyncConnectionProvider;
+	ComponentProvider <ConsoleAsyncConnection> consoleAsyncConnectionProvider;
 
 	// state
 
@@ -136,22 +135,34 @@ class ConsoleAsyncManagerImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleAsyncConnectionProvider connectionProvider) {
 
-		ConsoleAsyncConnection connection =
-			consoleAsyncConnectionProvider.get ()
+		try (
 
-			.connectionId (
-				randomLogic.generateLowercase (20))
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"newConnection");
 
-			.connectionProvider (
-				connectionProvider)
+		) {
 
-		;
+			ConsoleAsyncConnection connection =
+				consoleAsyncConnectionProvider.provide (
+					taskLogger)
 
-		connectionsByConnectionId.put (
-			connection.connectionId (),
-			connection);
+				.connectionId (
+					randomLogic.generateLowercase (20))
 
-		return connection;
+				.connectionProvider (
+					connectionProvider)
+
+			;
+
+			connectionsByConnectionId.put (
+				connection.connectionId (),
+				connection);
+
+			return connection;
+
+		}
 
 	}
 

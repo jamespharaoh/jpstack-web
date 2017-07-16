@@ -2,8 +2,6 @@ package wbs.console.combo;
 
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleBuilderComponent;
@@ -19,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -36,7 +35,7 @@ class SimpleFileBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFileProvider;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
@@ -98,22 +97,25 @@ class SimpleFileBuilder
 
 			consoleModule.addFile (
 				path,
-				consoleFileProvider.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
-					.getResponderName (
-						taskLogger,
-						optionalFromNullable (
-							getResponderName))
+				.getResponderName (
+					taskLogger,
+					optionalFromNullable (
+						getResponderName))
 
-					.getActionName (
-						parentTaskLogger,
-						optionalFromNullable (
-							getActionName))
+				.getActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						getActionName))
 
-					.postActionName (
-						parentTaskLogger,
-						optionalFromNullable (
-							postActionName)));
+				.postActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						postActionName))
+
+			);
 
 		}
 

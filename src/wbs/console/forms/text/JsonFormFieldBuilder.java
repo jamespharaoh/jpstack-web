@@ -6,8 +6,6 @@ import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.ChainedFormFieldNativeMapping;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -54,32 +53,29 @@ class JsonFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ChainedFormFieldNativeMapping>
-	chainedFormFieldNativeMappingProvider;
+	ComponentProvider <ChainedFormFieldNativeMapping>
+		chainedFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <HtmlFormFieldRenderer>
-	htmlFormFieldRendererProvider;
+	ComponentProvider <HtmlFormFieldRenderer> htmlFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <JsonFormFieldNativeMapping>
-	jsonFormFieldNativeMappingProvider;
+	ComponentProvider <JsonFormFieldNativeMapping>
+		jsonFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <JsonFormFieldInterfaceMapping>
-	jsonFormFieldInterfaceMappingProvider;
+	ComponentProvider <JsonFormFieldInterfaceMapping>
+		jsonFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <Utf8StringFormFieldNativeMapping>
-	utf8StringFormFieldNativeMappingProvider;
+	ComponentProvider <Utf8StringFormFieldNativeMapping>
+		utf8StringFormFieldNativeMappingProvider;
 
 	// builder
 
@@ -130,7 +126,8 @@ class JsonFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				simpleFormFieldAccessorProvider.get ()
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -147,22 +144,28 @@ class JsonFormFieldBuilder
 						byte[].class),
 
 				() ->
-					chainedFormFieldNativeMappingProvider.get ()
+					chainedFormFieldNativeMappingProvider.provide (
+						taskLogger)
 
 					.previousMapping (
-						jsonFormFieldNativeMappingProvider.get ())
+						jsonFormFieldNativeMappingProvider.provide (
+							taskLogger))
 
 					.nextMapping (
-						utf8StringFormFieldNativeMappingProvider.get ()),
+						utf8StringFormFieldNativeMappingProvider.provide (
+							taskLogger)),
 
 				() ->
-					chainedFormFieldNativeMappingProvider.get ()
+					chainedFormFieldNativeMappingProvider.provide (
+						taskLogger)
 
 					.previousMapping (
-						jsonFormFieldNativeMappingProvider.get ())
+						jsonFormFieldNativeMappingProvider.provide (
+							taskLogger))
 
 					.nextMapping (
 						formFieldPluginManager.getNativeMappingRequired (
+							taskLogger,
 							context,
 							context.containerClass (),
 							name,
@@ -174,12 +177,14 @@ class JsonFormFieldBuilder
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				jsonFormFieldInterfaceMappingProvider.get ();
+				jsonFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				htmlFormFieldRendererProvider.get ()
+				htmlFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -190,7 +195,8 @@ class JsonFormFieldBuilder
 			// form field
 
 			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+				readOnlyFormFieldProvider.provide (
+					taskLogger)
 
 				.name (
 					name)

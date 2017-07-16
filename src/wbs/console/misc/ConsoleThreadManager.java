@@ -1,12 +1,14 @@
 package wbs.console.misc;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.thread.ThreadManager;
@@ -17,10 +19,15 @@ public
 class ConsoleThreadManager
 	implements ComponentFactory <ThreadManager> {
 
-	// unitialized dependencies
+	// singleton dependencies
 
-	@UninitializedDependency
-	Provider <ThreadManagerImplementation> threadManagerImplementationProvider;
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// prototype dependencies
+
+	@StrongPrototypeDependency
+	ComponentProvider <ThreadManagerImplementation> threadManagerProvider;
 
 	// implemetation
 
@@ -29,10 +36,26 @@ class ConsoleThreadManager
 	ThreadManager makeComponent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return threadManagerImplementationProvider.get ()
+		try (
 
-			.exceptionTypeCode (
-				"console");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeComponent");
+
+		) {
+
+			return threadManagerProvider.provide (
+				taskLogger,
+				threadManager ->
+					threadManager
+
+				.exceptionTypeCode (
+					"console")
+
+			);
+
+		}
 
 	}
 

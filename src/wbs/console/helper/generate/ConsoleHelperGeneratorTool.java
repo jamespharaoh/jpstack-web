@@ -7,13 +7,12 @@ import static wbs.utils.string.StringUtils.keyEqualsString;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
@@ -34,7 +33,7 @@ class ConsoleHelperGeneratorTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleHelperGenerator> consoleHelperGeneratorProvider;
+	ComponentProvider <ConsoleHelperGenerator> consoleHelperGeneratorProvider;
 
 	// implementation
 
@@ -81,19 +80,18 @@ class ConsoleHelperGeneratorTool {
 
 				) {
 
-					consoleHelperGeneratorProvider.get ()
-
-						.taskLogger (
-							nestedTaskLogger)
+					consoleHelperGeneratorProvider.provide (
+						nestedTaskLogger)
 
 						.model (
 							model)
 
-						.generateHelper ();
+						.generateHelper (
+							nestedTaskLogger);
 
 					if (nestedTaskLogger.errors ()) {
 
-						taskLogger.errorFormat (
+						nestedTaskLogger.errorFormat (
 							"Error writing console helper for %s",
 							model.objectName ());
 

@@ -1,7 +1,5 @@
 package wbs.console.formaction;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -13,6 +11,7 @@ import wbs.console.part.PagePartFactory;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -30,13 +29,14 @@ class ConsoleFormActionPartFactory <FormState, History>
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFormActionPart <FormState, History>>
+	ComponentProvider <ConsoleFormActionPart <FormState, History>>
 		consoleFormActionPartProvider;
 
 	// properties
 
 	@Getter @Setter
-	Provider <ConsoleFormActionHelper <FormState, History>> helperProvider;
+	ComponentProvider <ConsoleFormActionHelper <FormState, History>>
+		helperProvider;
 
 	@Getter @Setter
 	ConsoleFormType <FormState> actionFormType;
@@ -78,7 +78,8 @@ class ConsoleFormActionPartFactory <FormState, History>
 
 		) {
 
-			return consoleFormActionPartProvider.get ()
+			return consoleFormActionPartProvider.provide (
+				transaction)
 
 				.name (
 					"action")
@@ -87,7 +88,8 @@ class ConsoleFormActionPartFactory <FormState, History>
 					heading)
 
 				.helper (
-					helperProvider.get ())
+					helperProvider.provide (
+						transaction))
 
 				.actionFormType (
 					actionFormType)

@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;

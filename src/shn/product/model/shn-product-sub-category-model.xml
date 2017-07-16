@@ -30,8 +30,25 @@
 
 		<!-- settings -->
 
+		<yes-no-field
+			name="active"/>
+
+		<string-field
+			name="publicHandle"
+			nullable="yes"/>
+
 		<string-field
 			name="publicTitle"
+			nullable="yes"/>
+
+		<reference-field
+			name="publicDescription"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
+			name="publicImage"
+			type="media"
 			nullable="yes"/>
 
 	</fields>

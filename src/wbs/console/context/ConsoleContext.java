@@ -15,9 +15,13 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.web.file.WebFile;
 
@@ -28,11 +32,14 @@ class ConsoleContext
 
 	// singleton dependencies
 
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
 	@WeakSingletonDependency
 	ConsoleManager consoleManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -94,64 +101,79 @@ class ConsoleContext
 
 	public
 	void initTabContext (
-			ConsoleContextStuff contextStuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleContextStuff contextStuff) {
 
-		TabList tabList =
-			contextStuff.makeContextTabs (this);
+		try (
 
-		ConsoleContext embeddedParentContext =
-			contextStuff.parentContextStuff () != null
-				? contextStuff.parentContextStuff ().consoleContext ()
-				: null;
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"initTabContext");
 
-		ConsoleContextTab embeddedParentContextTab =
-			contextStuff.embeddedParentContextTab ();
+		) {
 
-		ConsoleContext parentContext =
-			parentContext ();
+			TabList tabList =
+				contextStuff.makeContextTabs (
+					taskLogger,
+					this);
 
-		if (parentContext != null) {
+			ConsoleContext embeddedParentContext =
+				contextStuff.parentContextStuff () != null
+					? contextStuff.parentContextStuff ().consoleContext ()
+					: null;
 
-			parentContext.initTabContext (
-				contextStuff);
+			ConsoleContextTab embeddedParentContextTab =
+				contextStuff.embeddedParentContextTab ();
 
-			requestContext.addTabContext (
-				contextStuff.getTab (
-					parentContext,
-					parentContextTab (
-						contextStuff
-					).name ()),
-					titleForStuff (contextStuff),
-					tabList);
+			ConsoleContext parentContext =
+				parentContext ();
 
-		} else {
+			if (parentContext != null) {
 
-			if (embeddedParentContext != null) {
-
-				Tab tab =
-					contextStuff.parentContextStuff ().getTab (
-						embeddedParentContext,
-						embeddedParentContextTab.name ());
-
-				if (tab == null) {
-
-					tab =
-						embeddedParentContextTab.realTab (
-							contextStuff,
-							embeddedParentContext);
-
-				}
+				parentContext.initTabContext (
+					taskLogger,
+					contextStuff);
 
 				requestContext.addTabContext (
-					tab,
-					titleForStuff (contextStuff),
-					tabList);
+					contextStuff.getTab (
+						parentContext,
+						parentContextTab (
+							contextStuff
+						).name ()),
+						titleForStuff (contextStuff),
+						tabList);
 
 			} else {
 
-				requestContext.tabContext (
-					titleForStuff (contextStuff),
-					tabList);
+				if (embeddedParentContext != null) {
+
+					Tab tab =
+						contextStuff.parentContextStuff ().getTab (
+							embeddedParentContext,
+							embeddedParentContextTab.name ());
+
+					if (tab == null) {
+
+						tab =
+							embeddedParentContextTab.realTab (
+								contextStuff,
+								embeddedParentContext);
+
+					}
+
+					requestContext.addTabContext (
+						tab,
+						titleForStuff (contextStuff),
+						tabList);
+
+				} else {
+
+					requestContext.tabContext (
+						titleForStuff (contextStuff),
+						tabList);
+
+				}
 
 			}
 

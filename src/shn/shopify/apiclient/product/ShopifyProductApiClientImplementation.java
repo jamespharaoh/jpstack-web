@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.lessThan;
@@ -13,18 +13,16 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.manager.ComponentProvider;
-import wbs.framework.database.NestedTransaction;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import shn.shopify.model.ShnShopifyStoreRec;
+import shn.shopify.apiclient.ShopifyApiClientCredentials;
 
-@SingletonComponent ("shopifyApiClient")
+@SingletonComponent ("shopifyProductApiClient")
 public
-class ShopifyApiClientImplementation
-	implements ShopifyApiClient {
+class ShopifyProductApiClientImplementation
+	implements ShopifyProductApiClient {
 
 	// singleton dependencies
 
@@ -55,38 +53,6 @@ class ShopifyApiClientImplementation
 	>> productRemoveHttpSenderProvider;
 
 	// public implementation
-
-	@Override
-	public
-	ShopifyApiClientCredentials getCredentials (
-			@NonNull Transaction parentTransaction,
-			@NonNull ShnShopifyStoreRec shopifyStore) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"getCredentials");
-
-		) {
-
-			return new ShopifyApiClientCredentials ()
-
-				.storeName (
-					shopifyStore.getStoreName ())
-
-				.username (
-					shopifyStore.getApiKey ())
-
-				.password (
-					shopifyStore.getPassword ())
-
-			;
-
-		}
-
-	}
 
 	@Override
 	public
@@ -137,7 +103,7 @@ class ShopifyApiClientImplementation
 				);
 
 				builder.addAll (
-					response.products);
+					response.products ());
 
 				if (
 					lessThan (

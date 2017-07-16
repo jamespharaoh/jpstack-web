@@ -200,10 +200,12 @@ class ModelRecordGenerator {
 						: modelMeta.implementsInterfaces ()
 				) {
 
-					modelWriter.addImplementsFormat (
-						"%s.%s",
-						implementsInterface.packageName (),
-						implementsInterface.name ());
+					modelWriter.addImplementsName (
+						stringFormat (
+							"%s.%s",
+							implementsInterface.packageName (),
+							implementsInterface.name ()),
+						implementsInterface.parameters ());
 
 				}
 

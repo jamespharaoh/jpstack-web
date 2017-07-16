@@ -1,12 +1,11 @@
 package wbs.framework.entity.generate;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
@@ -27,7 +26,7 @@ class ModelGenerateExceptionLogger
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <SimpleExceptionLogger> simpleExceptionLoggerProvider;
+	ComponentProvider <SimpleExceptionLogger> simpleExceptionLoggerProvider;
 
 	// components
 
@@ -45,7 +44,8 @@ class ModelGenerateExceptionLogger
 
 		) {
 
-			return simpleExceptionLoggerProvider.get ();
+			return simpleExceptionLoggerProvider.provide (
+				taskLogger);
 
 		}
 

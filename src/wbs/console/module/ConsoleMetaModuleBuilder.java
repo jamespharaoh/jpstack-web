@@ -3,8 +3,6 @@ package wbs.console.module;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -36,7 +34,7 @@ class ConsoleMetaModuleBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@PrototypeDependency
 	Map <Class <?>, ComponentProvider <ConsoleMetaModuleBuilderComponent>>
@@ -63,7 +61,8 @@ class ConsoleMetaModuleBuilder
 		) {
 
 			builder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					TaskLogger.class)

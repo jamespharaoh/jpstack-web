@@ -32,7 +32,6 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.utils.etc.TypeUtils.classInSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -60,7 +59,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
 import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
@@ -82,7 +80,6 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.component.config.WbsConfigFactory;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
@@ -557,8 +554,7 @@ class BootstrapComponentManager
 	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass,
-			@NonNull Boolean initialized) {
+			@NonNull Class <ComponentType> componentClass) {
 
 		try (
 
@@ -568,10 +564,6 @@ class BootstrapComponentManager
 					"getComponentProvider");
 
 		) {
-
-			if (! initialized) {
-				throw new IllegalArgumentException ();
-			}
 
 			Optional <ComponentData> componentDataOptional =
 				mapItemForKey (
@@ -986,43 +978,13 @@ class BootstrapComponentManager
 
 		) {
 
-			return new ComponentProvider <Object> () {
-
-				@Override
-				public
-				Object provide (
-						TaskLogger parentTaskLogger) {
-
-					return getComponentReal (
-						parentTaskLogger,
-						componentData);
-
-
-				}
-
-				@Override
-				public
-				Object get () {
-
-					try (
-
-						OwnedTaskLogger taskLogger =
-							logContext.createTaskLogger (
-								"ComponentProvider.get",
-								keyEqualsString (
-									"componentDefinition.name",
-									componentData.name));
-
-					) {
-
-						return provide (
-							taskLogger);
-
-					}
-
-				}
-
-			};
+			return new ComponentProviderImplementation <Object> (
+				nestedTaskLogger ->
+					getComponentReal (
+						nestedTaskLogger,
+						componentData),
+				(nestedTaskLogger, component) ->
+					doNothing ());
 
 		}
 
@@ -1207,10 +1169,6 @@ class BootstrapComponentManager
 				field.getAnnotation (
 					StrongPrototypeDependency.class);
 
-			UninitializedDependency uninitializedDependencyAnnotation =
-				field.getAnnotation (
-					UninitializedDependency.class);
-
 			List <Annotation> allAnnotations =
 				ImmutableList.<Annotation> copyOf (
 					presentInstances (
@@ -1221,9 +1179,7 @@ class BootstrapComponentManager
 						optionalFromNullable (
 							singletonDependencyAnnotation),
 						optionalFromNullable (
-							strongPrototypeDependencyAnnotation),
-						optionalFromNullable (
-							uninitializedDependencyAnnotation)));
+							strongPrototypeDependencyAnnotation)));
 
 			if (
 				collectionIsEmpty (
@@ -1557,11 +1513,10 @@ class BootstrapComponentManager
 			// check for provider
 
 			if (
-				classInSafe (
+				classEqualSafe (
 					rawType (
 						valueInjectionType),
-					ComponentProvider.class,
-					Provider.class)
+					ComponentProvider.class)
 			) {
 
 				ParameterizedType parameterizedType =

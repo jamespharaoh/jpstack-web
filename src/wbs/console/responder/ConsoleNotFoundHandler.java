@@ -4,8 +4,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -21,6 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -52,13 +51,13 @@ class ConsoleNotFoundHandler
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TabbedResponder> tabbedPageProvider;
+	ComponentProvider <TabbedResponder> tabbedPageProvider;
 
 	@PrototypeDependency
-	Provider <NotFoundResponder> notFoundPageProvider;
+	ComponentProvider <NotFoundResponder> notFoundPageProvider;
 
 	@PrototypeDependency
-	Provider <NotFoundPart> notFoundPartProvider;
+	ComponentProvider <NotFoundPart> notFoundPartProvider;
 
 	// implementation
 
@@ -136,7 +135,8 @@ class ConsoleNotFoundHandler
 					tabContextOptional)
 			) {
 
-				tabbedPageProvider.get ()
+				tabbedPageProvider.provide (
+					taskLogger)
 
 					.tab (
 						notFoundTab)
@@ -145,17 +145,23 @@ class ConsoleNotFoundHandler
 						"Page not found")
 
 					.pagePart (
-						notFoundPartProvider.get ())
+						notFoundPartProvider.provide (
+							taskLogger))
 
 					.execute (
-						taskLogger);
+						taskLogger)
+
+				;
 
 			} else {
 
-				notFoundPageProvider.get ()
+				notFoundPageProvider.provide (
+					taskLogger)
 
 					.execute (
-						taskLogger);
+						taskLogger)
+
+				;
 
 			}
 

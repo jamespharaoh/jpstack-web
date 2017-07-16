@@ -4,8 +4,6 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.Iterables;
 
 import lombok.NonNull;
@@ -13,6 +11,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -34,10 +33,11 @@ class ModelGeneratorTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ModelRecordGenerator> modelRecordGeneratorProvider;
+	ComponentProvider <ModelRecordGenerator> modelRecordGeneratorProvider;
 
 	@PrototypeDependency
-	Provider <ModelInterfacesGenerator> modelInterfacesGeneratorProvider;
+	ComponentProvider <ModelInterfacesGenerator>
+		modelInterfacesGeneratorProvider;
 
 	// implementation
 
@@ -75,7 +75,8 @@ class ModelGeneratorTool {
 
 				try {
 
-					modelRecordGeneratorProvider.get ()
+					modelRecordGeneratorProvider.provide (
+						taskLogger)
 
 						.plugin (
 							plugin)
@@ -103,7 +104,8 @@ class ModelGeneratorTool {
 
 					try {
 
-						modelInterfacesGeneratorProvider.get ()
+						modelInterfacesGeneratorProvider.provide (
+							taskLogger)
 
 							.plugin (
 								plugin)

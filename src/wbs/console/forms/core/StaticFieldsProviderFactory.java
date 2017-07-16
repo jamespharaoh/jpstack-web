@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -15,7 +13,8 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -34,10 +33,10 @@ class StaticFieldsProviderFactory <Container, Parent>
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <StaticFieldsProvider <Container, Parent>>
+	@StrongPrototypeDependency
+	ComponentProvider <StaticFieldsProvider <Container, Parent>>
 		staticFieldsProviderProvider;
 
 	// properties
@@ -73,7 +72,10 @@ class StaticFieldsProviderFactory <Container, Parent>
 
 		) {
 
-			return staticFieldsProviderProvider.get ()
+			return staticFieldsProviderProvider.provide (
+				taskLogger,
+				staticFieldsProvider ->
+					staticFieldsProvider
 
 				.containerClass (
 					containerClass)
@@ -107,7 +109,7 @@ class StaticFieldsProviderFactory <Container, Parent>
 									name),
 								rowFieldSpecsNested)))
 
-			;
+			);
 
 		}
 

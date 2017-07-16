@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -47,6 +45,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -71,44 +70,40 @@ class DateFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DereferenceFormFieldAccessor>
-	dereferenceFormFieldAccessorProvider;
+	ComponentProvider <DereferenceFormFieldAccessor>
+		dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <TimestampAsDateFormFieldNativeMapping>
-	timestampAsDateFormFieldNativeMappingProvider;
+	ComponentProvider <TimestampAsDateFormFieldNativeMapping>
+		timestampAsDateFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <DateFormFieldInterfaceMapping>
-	dateFormFieldInterfaceMappingProvider;
+	ComponentProvider <DateFormFieldInterfaceMapping>
+		dateFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -182,7 +177,8 @@ class DateFormFieldBuilder
 			if (readOnly) {
 
 				accessor =
-					dereferenceFormFieldAccessorProvider.get ()
+					dereferenceFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.path (
 						nativeFieldName);
@@ -190,7 +186,8 @@ class DateFormFieldBuilder
 			} else {
 
 				accessor =
-					simpleFormFieldAccessorProvider.get ()
+					simpleFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.name (
 						nativeFieldName)
@@ -211,7 +208,8 @@ class DateFormFieldBuilder
 			) {
 
 				nativeMapping =
-					identityFormFieldNativeMappingProvider.get ();
+					identityFormFieldNativeMappingProvider.provide (
+						taskLogger);
 
 			} else if (
 				classEqualSafe (
@@ -220,7 +218,8 @@ class DateFormFieldBuilder
 			) {
 
 				nativeMapping =
-					timestampAsDateFormFieldNativeMappingProvider.get ();
+					timestampAsDateFormFieldNativeMappingProvider.provide (
+						taskLogger);
 
 			} else {
 
@@ -236,24 +235,28 @@ class DateFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldValueConstraintValidatorProvider.get ();
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				dateFormFieldInterfaceMappingProvider.get ();
+				dateFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -268,6 +271,7 @@ class DateFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -278,7 +282,8 @@ class DateFormFieldBuilder
 
 				target.addFormItem (
 
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -306,8 +311,8 @@ class DateFormFieldBuilder
 			} else {
 
 				target.addFormItem (
-
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

@@ -1,7 +1,5 @@
 package wbs.console.responder;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -22,9 +20,7 @@ import wbs.web.responder.WebResponder;
 @PrototypeComponent ("redirectResponder")
 public
 class RedirectResponder
-	implements
-		Provider <WebResponder>,
-		WebResponder {
+	implements WebResponder {
 
 	// singleton dependencies
 
@@ -59,14 +55,6 @@ class RedirectResponder
 				targetUrl);
 
 		}
-
-	}
-
-	@Override
-	public
-	WebResponder get () {
-
-		return this;
 
 	}
 

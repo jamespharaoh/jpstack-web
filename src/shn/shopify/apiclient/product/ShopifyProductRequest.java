@@ -1,4 +1,4 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
 import java.util.List;
 
@@ -9,11 +9,14 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
+import shn.shopify.apiclient.ShopifyApiRequest;
+
 @Accessors (fluent = true)
 @Data
 @DataClass
 public
-class ShopifyProductRequest {
+class ShopifyProductRequest
+	implements ShopifyApiRequest {
 
 	@DataAttribute (
 		name = "id")

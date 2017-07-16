@@ -157,6 +157,7 @@ class ObjectSettingsPageBuilder <
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 

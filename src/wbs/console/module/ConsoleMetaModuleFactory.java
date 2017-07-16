@@ -1,7 +1,5 @@
 package wbs.console.module;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -10,10 +8,10 @@ import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -35,10 +33,8 @@ class ConsoleMetaModuleFactory
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
-
-	@PrototypeDependency
-	Provider <ConsoleMetaModuleImplementation> consoleMetaModuleProvider;
+	ComponentProvider <ConsoleMetaModuleImplementation>
+		consoleMetaModuleProvider;
 
 	// properties
 
@@ -62,7 +58,8 @@ class ConsoleMetaModuleFactory
 		) {
 
 			ConsoleMetaModuleImplementation consoleMetaModule =
-				consoleMetaModuleProvider.get ();
+				consoleMetaModuleProvider.provide (
+					taskLogger);
 
 			ConsoleContextMetaBuilderContainer contextMetaBuilderContainer =
 				new ConsoleContextMetaBuilderContainer ();

@@ -1,7 +1,5 @@
 package wbs.console.context;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleMetaModuleBuilderComponent;
@@ -15,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -32,7 +31,7 @@ class ConsoleContextLinkMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextLink> contextLinkProvider;
+	ComponentProvider <ConsoleContextLink> contextLinkProvider;
 
 	// builder
 
@@ -64,7 +63,8 @@ class ConsoleContextLinkMetaBuilder
 		) {
 
 			consoleMetaModule.addContextLink (
-				contextLinkProvider.get ()
+				contextLinkProvider.provide (
+					taskLogger)
 
 				.localName (
 					spec.localName ())

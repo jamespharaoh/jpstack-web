@@ -1,8 +1,7 @@
 package wbs.utils.string;
 
 import java.util.List;
-
-import javax.inject.Provider;
+import java.util.function.Supplier;
 
 import lombok.NonNull;
 
@@ -68,7 +67,7 @@ interface LazyString
 
 	static
 	LazyString singleton (
-			@NonNull Provider <String> value) {
+			@NonNull Supplier <String> value) {
 
 		return new LazyStringSingleton (
 			value);

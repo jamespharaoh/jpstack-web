@@ -52,8 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -79,11 +77,9 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -126,11 +122,6 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	UserSessionLogic userSessionLogic;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <TabList> tabListProvider;
 
 	// properties
 

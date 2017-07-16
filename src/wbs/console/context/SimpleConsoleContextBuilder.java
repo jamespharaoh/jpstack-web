@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -21,7 +19,6 @@ import wbs.console.module.ConsoleModuleBuilderComponent;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
-import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
 
 import wbs.framework.builder.Builder;
@@ -35,6 +32,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -64,16 +62,13 @@ class SimpleConsoleContextBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTab;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextType> contextType;
+	ComponentProvider <ConsoleContextType> contextTypeProvider;
 
 	@PrototypeDependency
-	Provider <ObjectContext> objectContext;
-
-	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleContext;
+	ComponentProvider <SimpleConsoleContext> simpleContextProvider;
 
 	// builder
 
@@ -117,11 +112,15 @@ class SimpleConsoleContextBuilder <
 
 			setDefaults ();
 
-			buildContextType ();
-			buildSimpleContext ();
+			buildContextType (
+				taskLogger);
 
-			List<ResolvedConsoleContextLink> resolvedContextLinks =
+			buildSimpleContext (
+				taskLogger);
+
+			List <ResolvedConsoleContextLink> resolvedContextLinks =
 				consoleMetaManager.resolveContextLink (
+					taskLogger,
 					name);
 
 			for (
@@ -130,6 +129,7 @@ class SimpleConsoleContextBuilder <
 			) {
 
 				buildResolvedContexts (
+					taskLogger,
 					resolvedContextLink);
 
 				buildResolvedTabs (
@@ -180,68 +180,53 @@ class SimpleConsoleContextBuilder <
 
 	}
 
-	void buildContextType () {
+	void buildContextType (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextType (
-			contextType.get ()
+		try (
 
-			.name (
-				contextTypeName));
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextType");
 
-	}
-
-	void buildSimpleContext () {
-
-		consoleModule.addContext (
-			simpleContext.get ()
-
-			.name (
-				contextName)
-
-			.typeName (
-				contextTypeName)
-
-			.pathPrefix (
-				"/" + contextName)
-
-			.global (
-				true)
-
-			.title (
-				title)
-
-			.privKeySpecs (
-				privKeySpecs)
-
-		);
-
-	}
-
-	void buildResolvedContexts (
-			@NonNull ResolvedConsoleContextLink resolvedContextLink) {
-
-		for (
-			String parentContextName
-				: resolvedContextLink.parentContextNames ()
 		) {
 
-			String resolvedContextName =
-				stringFormat (
-					"%s.%s",
-					parentContextName,
-					resolvedContextLink.localName ());
-
-			consoleModule.addContext (
-				simpleContext.get ()
+			consoleModule.addContextType (
+				contextTypeProvider.provide (
+					taskLogger)
 
 				.name (
-					resolvedContextName)
+					contextTypeName));
+
+		}
+
+	}
+
+	void buildSimpleContext (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildSimpleContext");
+
+		) {
+
+			consoleModule.addContext (
+				simpleContextProvider.provide (
+					taskLogger)
+
+				.name (
+					contextName)
 
 				.typeName (
 					contextTypeName)
 
 				.pathPrefix (
-					"/" + resolvedContextName)
+					"/" + contextName)
 
 				.global (
 					true)
@@ -252,11 +237,65 @@ class SimpleConsoleContextBuilder <
 				.privKeySpecs (
 					privKeySpecs)
 
-				.parentContextName (
-					parentContextName)
+			);
 
-				.parentContextTabName (
-					resolvedContextLink.tabName ()));
+		}
+
+	}
+
+	void buildResolvedContexts (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextLink resolvedContextLink) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResolvedContexts");
+
+		) {
+
+			for (
+				String parentContextName
+					: resolvedContextLink.parentContextNames ()
+			) {
+
+				String resolvedContextName =
+					stringFormat (
+						"%s.%s",
+						parentContextName,
+						resolvedContextLink.localName ());
+
+				consoleModule.addContext (
+					simpleContextProvider.provide (
+						taskLogger)
+
+					.name (
+						resolvedContextName)
+
+					.typeName (
+						contextTypeName)
+
+					.pathPrefix (
+						"/" + resolvedContextName)
+
+					.global (
+						true)
+
+					.title (
+						title)
+
+					.privKeySpecs (
+						privKeySpecs)
+
+					.parentContextName (
+						parentContextName)
+
+					.parentContextTabName (
+						resolvedContextLink.tabName ()));
+
+			}
 
 		}
 
@@ -278,7 +317,8 @@ class SimpleConsoleContextBuilder <
 				taskLogger,
 				contextLink.tabLocation (),
 
-				contextTab.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						contextLink.tabName ())

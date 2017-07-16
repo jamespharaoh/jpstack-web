@@ -2,16 +2,20 @@ package wbs.console.forms.basic;
 
 import static wbs.utils.etc.LogicUtils.equalSafe;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.forms.core.ConsoleFormBuilderContext;
-import wbs.console.forms.types.ConsoleFormNativeMapping;
 import wbs.console.forms.types.FormFieldPluginProvider;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("identityFormFieldPluginProvider")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -19,36 +23,53 @@ public
 class IdentityFormFieldPluginProvider
 	implements FormFieldPluginProvider {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	// implementation
 
 	@Override
 	public
 	Optional getNativeMapping (
-			ConsoleFormBuilderContext context,
-			Class containerClass,
-			String fieldName,
-			Class genericClass,
-			Class nativeClass) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleFormBuilderContext context,
+			@NonNull Class containerClass,
+			@NonNull String fieldName,
+			@NonNull Class genericClass,
+			@NonNull Class nativeClass) {
 
-		if (
-			equalSafe (
-				genericClass,
-				nativeClass)
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getNativeMapping");
+
 		) {
 
-			return Optional.of (
-				(ConsoleFormNativeMapping)
-				identityFormFieldNativeMappingProvider.get ());
+			if (
+				equalSafe (
+					genericClass,
+					nativeClass)
+			) {
 
-		} else {
+				return Optional.of (
+					identityFormFieldNativeMappingProvider.provide (
+						taskLogger));
 
-			return Optional.absent ();
+			} else {
+
+				return Optional.absent ();
+
+			}
 
 		}
 

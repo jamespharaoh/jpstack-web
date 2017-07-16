@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 public
@@ -167,9 +165,7 @@ class ImplicitArgument <Owned, Borrowed> {
 
 	public static
 	class BorrowedArgument <Owned, Borrowed>
-		implements
-			Provider <Borrowed>,
-			SafeCloseable {
+		implements SafeCloseable {
 
 		// state
 
@@ -216,9 +212,8 @@ class ImplicitArgument <Owned, Borrowed> {
 
 		}
 
-		// provider implementation
+		// public implementation
 
-		@Override
 		public
 		Borrowed get () {
 

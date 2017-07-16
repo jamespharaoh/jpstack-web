@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Duration;
@@ -43,6 +41,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -64,36 +63,32 @@ class DurationFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DurationFormFieldInterfaceMapping>
-	durationFormFieldInterfaceMapping;
+	ComponentProvider <DurationFormFieldInterfaceMapping>
+		durationFormFieldInterfaceMapping;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -152,7 +147,8 @@ class DurationFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				simpleFormFieldAccessorProvider.get ()
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -163,7 +159,8 @@ class DurationFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validators
 
@@ -173,19 +170,22 @@ class DurationFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldConstraintValidatorProvider.get ();
+				nullFormFieldConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				durationFormFieldInterfaceMapping.get ()
+				durationFormFieldInterfaceMapping.provide (
+					taskLogger)
 
 				.label (
 					label)
@@ -196,7 +196,8 @@ class DurationFormFieldBuilder
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -214,6 +215,7 @@ class DurationFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -223,7 +225,8 @@ class DurationFormFieldBuilder
 			if (! readOnly) {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -257,7 +260,8 @@ class DurationFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

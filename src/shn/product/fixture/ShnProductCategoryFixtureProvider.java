@@ -41,11 +41,6 @@ class ShnProductCategoryFixtureProvider
 
 	// singleton dependencies
 
-/*
-	@SingletonDependency
-	CurrencyLogic currencyLogic;
-*/
-
 	@SingletonDependency
 	EventFixtureLogic eventFixtureLogic;
 
@@ -55,38 +50,14 @@ class ShnProductCategoryFixtureProvider
 	@ClassSingletonDependency
 	LogContext logContext;
 
-/*
-	@SingletonDependency
-	MenuGroupObjectHelper menuGroupHelper;
-
-	@SingletonDependency
-	MenuItemObjectHelper menuItemHelper;
-*/
-
 	@SingletonDependency
 	ShnProductCategoryObjectHelper productCategoryHelper;
-
-/*
-	@SingletonDependency
-	ShnProductObjectHelper productHelper;
-*/
 
 	@SingletonDependency
 	ShnProductSubCategoryObjectHelper productSubCategoryHelper;
 
 	@SingletonDependency
 	ShnDatabaseObjectHelper shnDatabaseHelper;
-
-/*
-	@SingletonDependency
-	SliceObjectHelper sliceHelper;
-
-	@SingletonDependency
-	ShnSupplierObjectHelper supplierHelper;
-
-	@SingletonDependency
-	TextObjectHelper textHelper;
-*/
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -299,6 +270,10 @@ class ShnProductCategoryFixtureProvider
 		.put (
 			"publicTitle",
 			"{public-title}")
+
+		.put (
+			"active",
+			"yes")
 
 		.build ()
 

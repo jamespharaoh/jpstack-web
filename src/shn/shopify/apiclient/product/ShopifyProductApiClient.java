@@ -1,16 +1,11 @@
-package shn.shopify.apiclient;
+package shn.shopify.apiclient.product;
 
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
-import shn.shopify.model.ShnShopifyStoreRec;
+import shn.shopify.apiclient.ShopifyApiClientCredentials;
 
 public
-interface ShopifyApiClient {
-
-	ShopifyApiClientCredentials getCredentials (
-			Transaction parentTransaction,
-			ShnShopifyStoreRec shopifyStore);
+interface ShopifyProductApiClient {
 
 	ShopifyProductListResponse listAllProducts (
 			TaskLogger parentTaskLogger,

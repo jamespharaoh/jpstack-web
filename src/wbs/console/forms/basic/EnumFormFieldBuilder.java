@@ -15,8 +15,6 @@ import static wbs.utils.string.StringUtils.uncapitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -48,6 +46,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -76,44 +75,40 @@ class EnumFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DereferenceFormFieldAccessor>
-	dereferenceFormFieldAccessorProvider;
+	ComponentProvider <DereferenceFormFieldAccessor>
+		dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <EnumCsvFormFieldInterfaceMapping>
-	enumCsvFormFieldInterfaceMappingProvider;
+	ComponentProvider <EnumCsvFormFieldInterfaceMapping>
+		enumCsvFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <EnumFormFieldRenderer>
-	enumFormFieldRendererProvider;
+	ComponentProvider <EnumFormFieldRenderer> enumFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <HiddenFormField>
-	hiddenFormFieldProvider;
+	ComponentProvider <HiddenFormField> hiddenFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -228,7 +223,8 @@ class EnumFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				dereferenceFormFieldAccessorProvider.get ()
+				dereferenceFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.path (
 					fieldName)
@@ -239,7 +235,8 @@ class EnumFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validators
 
@@ -249,29 +246,34 @@ class EnumFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldValueConstraintValidatorProvider.get ();
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// csv mapping
 
 			FormFieldInterfaceMapping csvMapping =
-				enumCsvFormFieldInterfaceMappingProvider.get ();
+				enumCsvFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				enumFormFieldRendererProvider.get ()
+				enumFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -289,6 +291,7 @@ class EnumFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -298,7 +301,8 @@ class EnumFormFieldBuilder
 			if (hidden) {
 
 				formFieldSet.addFormItem (
-					hiddenFormFieldProvider.get ()
+					hiddenFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -320,7 +324,8 @@ class EnumFormFieldBuilder
 			} else if (readOnly) {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -348,7 +353,8 @@ class EnumFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

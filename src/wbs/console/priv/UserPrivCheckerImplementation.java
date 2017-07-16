@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -21,6 +19,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -49,7 +48,7 @@ class UserPrivCheckerImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <UserPrivCheckerBuilder> privCheckerBuilderProvider;
+	ComponentProvider <UserPrivCheckerBuilder> privCheckerBuilderProvider;
 
 	// state
 
@@ -84,7 +83,8 @@ class UserPrivCheckerImplementation
 						userIdOptional);
 
 				target =
-					privCheckerBuilderProvider.get ()
+					privCheckerBuilderProvider.provide (
+						taskLogger)
 
 					.userId (
 						userId)

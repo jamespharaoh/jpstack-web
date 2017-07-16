@@ -2,13 +2,12 @@ package wbs.framework.component.config;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -29,7 +28,7 @@ class WbsConfigFactory
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// publc interface
 
@@ -87,7 +86,8 @@ class WbsConfigFactory
 		) {
 
 			DataFromXml dataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
 				.registerBuilderClasses (
 					taskLogger,
