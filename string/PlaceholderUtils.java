@@ -80,6 +80,21 @@ class PlaceholderUtils {
 	}
 
 	public static
+	String placeholderMapCurlyBraces (
+			@NonNull String template,
+			@NonNull Map <String, String> values) {
+
+		return placeholderMap (
+			curlyBracesPlaceholderPattern,
+			template,
+			key ->
+				mapItemForKeyRequired (
+					values,
+					key));
+
+	}
+
+	public static
 	Map <String, String> placeholderMap (
 			@NonNull Pattern pattern,
 			@NonNull Map <String, String> templates,
