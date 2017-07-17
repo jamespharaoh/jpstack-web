@@ -1,6 +1,7 @@
 package wbs.console.module;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNull;
@@ -18,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -36,6 +35,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -57,7 +57,7 @@ class ConsoleMetaManagerImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ResolvedConsoleContextLink> resolvedContextLinkProvider;
+	ComponentProvider <ResolvedConsoleContextLink> resolvedContextLinkProvider;
 
 	// state
 
@@ -233,134 +233,163 @@ class ConsoleMetaManagerImplementation
 
 	@Override
 	public
-	List<ResolvedConsoleContextExtensionPoint> resolveExtensionPoint (
+	List <ResolvedConsoleContextExtensionPoint> resolveExtensionPoint (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String name) {
 
-		List<ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
-			new ArrayList<ResolvedConsoleContextExtensionPoint> ();
+		try (
 
-		List<ConsoleContextExtensionPoint> extensionPointsForName =
-			ifNull (
-				extensionPoints.get (name),
-				Collections.<ConsoleContextExtensionPoint>emptyList ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveExtensionPoint");
 
-		for (
-			ConsoleContextExtensionPoint extensionPoint
-				: extensionPointsForName
 		) {
 
-			if (extensionPoint.root ()) {
+			List <ResolvedConsoleContextExtensionPoint>
+				resolvedExtensionPoints =
+					new ArrayList<> ();
 
-				resolvedExtensionPoints.add (
-					new ResolvedConsoleContextExtensionPoint ()
-
-					.name (
-						extensionPoint.name ())
-
-					.parentContextNames (
-						ImmutableList.<String>builder ()
-
-						.addAll (
-							extensionPoint.parentContextNames ())
-
-						.addAll (
-							parentContextNames (
-								extensionPoint.contextLinkNames ()))
-
-						.build ())
-
-					.contextTypeNames (
-						extensionPoint.contextTypeNames ())
-
-					.contextLinkNames (
-						extensionPoint.contextLinkNames ()));
-
-			} else if (extensionPoint.nested ()) {
-
-				if (
-					stringEqualSafe (
-						extensionPoint.name (),
-						extensionPoint.parentExtensionPointName ())
-				) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Extension point %s is its own parent",
-							extensionPoint.name ()));
-
-				}
-
-				resolvedExtensionPoints.addAll (
-					resolveExtensionPoint (
-						extensionPoint.parentExtensionPointName ()));
-
-			} else {
-
-				throw new RuntimeException ();
-
-			}
-
-		}
-
-		return resolvedExtensionPoints;
-
-	}
-
-	List<String> parentContextNames (
-			@NonNull List<String> contextLinkNames) {
-
-		ImmutableList.Builder<String> parentContextNamesBuilder =
-			ImmutableList.<String>builder ();
-
-		for (
-			String contextLinkName
-				: contextLinkNames
-		) {
+			List <ConsoleContextExtensionPoint> extensionPointsForName =
+				ifNull (
+					extensionPoints.get (name),
+					emptyList ());
 
 			for (
-				ResolvedConsoleContextLink resolvedContextLink
-					: resolveContextLink (contextLinkName)
+				ConsoleContextExtensionPoint extensionPoint
+					: extensionPointsForName
 			) {
 
-				for (
-					String parentContextName
-						: resolvedContextLink.parentContextNames ()
-				) {
+				if (extensionPoint.root ()) {
 
-					ConsoleContextHint contextHint =
-						contextHints.get (
-							contextLinkName);
+					resolvedExtensionPoints.add (
+						new ResolvedConsoleContextExtensionPoint ()
+
+						.name (
+							extensionPoint.name ())
+
+						.parentContextNames (
+							ImmutableList.<String>builder ()
+
+							.addAll (
+								extensionPoint.parentContextNames ())
+
+							.addAll (
+								parentContextNames (
+									taskLogger,
+									extensionPoint.contextLinkNames ()))
+
+							.build ())
+
+						.contextTypeNames (
+							extensionPoint.contextTypeNames ())
+
+						.contextLinkNames (
+							extensionPoint.contextLinkNames ()));
+
+				} else if (extensionPoint.nested ()) {
 
 					if (
-						isNull (
-							contextHint)
+						stringEqualSafe (
+							extensionPoint.name (),
+							extensionPoint.parentExtensionPointName ())
 					) {
 
 						throw new RuntimeException (
 							stringFormat (
-								"No context hint for context link name: %s",
-								contextLinkName));
+								"Extension point %s is its own parent",
+								extensionPoint.name ()));
 
 					}
 
-					if (contextHint.singular ()) {
+					resolvedExtensionPoints.addAll (
+						resolveExtensionPoint (
+							taskLogger,
+							extensionPoint.parentExtensionPointName ()));
 
-						parentContextNamesBuilder.add (
-							stringFormat (
-								"%s.%s",
-								parentContextName,
-								resolvedContextLink.localName ()));
+				} else {
 
-					}
+					throw new RuntimeException ();
 
-					if (contextHint.plural ()) {
+				}
 
-						parentContextNamesBuilder.add (
-							stringFormat (
-								"%s.%s",
-								parentContextName,
-								naivePluralise (
-									resolvedContextLink.localName ())));
+			}
+
+			return resolvedExtensionPoints;
+
+		}
+
+	}
+
+	List <String> parentContextNames (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> contextLinkNames) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"parentContextNames");
+
+		) {
+
+			ImmutableList.Builder<String> parentContextNamesBuilder =
+				ImmutableList.<String>builder ();
+
+			for (
+				String contextLinkName
+					: contextLinkNames
+			) {
+
+				for (
+					ResolvedConsoleContextLink resolvedContextLink
+						: resolveContextLink (
+							taskLogger,
+							contextLinkName)
+				) {
+
+					for (
+						String parentContextName
+							: resolvedContextLink.parentContextNames ()
+					) {
+
+						ConsoleContextHint contextHint =
+							contextHints.get (
+								contextLinkName);
+
+						if (
+							isNull (
+								contextHint)
+						) {
+
+							throw new RuntimeException (
+								stringFormat (
+									"No context hint for context link name: %s",
+									contextLinkName));
+
+						}
+
+						if (contextHint.singular ()) {
+
+							parentContextNamesBuilder.add (
+								stringFormat (
+									"%s.%s",
+									parentContextName,
+									resolvedContextLink.localName ()));
+
+						}
+
+						if (contextHint.plural ()) {
+
+							parentContextNamesBuilder.add (
+								stringFormat (
+									"%s.%s",
+									parentContextName,
+									naivePluralise (
+										resolvedContextLink.localName ())));
+
+						}
 
 					}
 
@@ -368,78 +397,92 @@ class ConsoleMetaManagerImplementation
 
 			}
 
-		}
+			return parentContextNamesBuilder.build ();
 
-		return parentContextNamesBuilder.build ();
+		}
 
 	}
 
 	@Override
 	public
-	List<ResolvedConsoleContextLink> resolveContextLink (
+	List <ResolvedConsoleContextLink> resolveContextLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String contextLinkName) {
 
-		List<ResolvedConsoleContextLink> resolvedContextLinks =
-			new ArrayList<ResolvedConsoleContextLink> ();
+		try (
 
-		List<ConsoleContextLink> contextLinksForName =
-			ifNull (
-				contextLinks.get (contextLinkName),
-				Collections.<ConsoleContextLink>emptyList ());
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"resolveContextLink");
 
-		for (
-			ConsoleContextLink contextLink
-				: contextLinksForName
 		) {
 
+			List <ResolvedConsoleContextLink> resolvedContextLinks =
+				new ArrayList<> ();
+
+			List <ConsoleContextLink> contextLinksForName =
+				ifNull (
+					contextLinks.get (contextLinkName),
+					Collections.<ConsoleContextLink>emptyList ());
+
 			for (
-				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
-					: resolveExtensionPoint (
-						contextLink.extensionPointName ())
+				ConsoleContextLink contextLink
+					: contextLinksForName
 			) {
 
-				// generate
+				for (
+					ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+						: resolveExtensionPoint (
+							taskLogger,
+							contextLink.extensionPointName ())
+				) {
 
-				resolvedContextLinks.add (
-					resolvedContextLinkProvider.get ()
+					// generate
 
-					.name (
-						stringFormat (
-							"%s.%s",
-							resolvedExtensionPoint.name (),
-							contextLink.localName ()))
+					resolvedContextLinks.add (
+						resolvedContextLinkProvider.provide (
+							taskLogger)
 
-					.localName (
-						contextLink.localName ())
+						.name (
+							stringFormat (
+								"%s.%s",
+								resolvedExtensionPoint.name (),
+								contextLink.localName ()))
 
-					.tabName (
-						stringFormat (
-							"%s.%s",
-							resolvedExtensionPoint.name (),
-							contextLink.localName ()))
+						.localName (
+							contextLink.localName ())
 
-					.tabLocation (
-						contextLink.tabLocation ())
+						.tabName (
+							stringFormat (
+								"%s.%s",
+								resolvedExtensionPoint.name (),
+								contextLink.localName ()))
 
-					.tabLabel (
-						contextLink.label ())
+						.tabLocation (
+							contextLink.tabLocation ())
 
-					.tabPrivKey (
-						contextLink.privKey ())
+						.tabLabel (
+							contextLink.label ())
 
-					.tabContextTypeNames (
-						resolvedExtensionPoint.contextTypeNames ())
+						.tabPrivKey (
+							contextLink.privKey ())
 
-					.parentContextNames (
-						resolvedExtensionPoint.parentContextNames ())
+						.tabContextTypeNames (
+							resolvedExtensionPoint.contextTypeNames ())
 
-				);
+						.parentContextNames (
+							resolvedExtensionPoint.parentContextNames ())
+
+					);
+
+				}
 
 			}
 
-		}
+			return resolvedContextLinks;
 
-		return resolvedContextLinks;
+		}
 
 	}
 

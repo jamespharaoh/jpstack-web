@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -19,6 +17,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -95,7 +94,7 @@ class AutoResponderCommand
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 
@@ -186,7 +185,8 @@ class AutoResponderCommand
 			) {
 
 				MessageRec sentMessage =
-					messageSenderProvider.get ()
+					messageSenderProvider.provide (
+						transaction)
 
 					.threadId (
 						receivedMessage.getThreadId ())

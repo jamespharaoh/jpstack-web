@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.doesNotStartWithSimple;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -26,6 +24,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -124,7 +123,7 @@ class SimulatorSessionCreateEventAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// details
 
@@ -177,10 +176,13 @@ class SimulatorSessionCreateEventAction
 
 			} catch (AjaxException error) {
 
-				return jsonResponderProvider.get ()
+				return jsonResponderProvider.provide (
+					taskLogger,
+					jsonResponder ->
+						jsonResponder
 
 					.value (
-						ImmutableMap.<Object,Object>builder ()
+						ImmutableMap.<Object, Object> builder ()
 
 						.put (
 							"success",
@@ -192,7 +194,9 @@ class SimulatorSessionCreateEventAction
 
 						.build ()
 
-					);
+					)
+
+				);
 
 			} catch (RuntimeException exception) {
 
@@ -205,10 +209,13 @@ class SimulatorSessionCreateEventAction
 						userConsoleLogic.userIdRequired ()),
 					GenericExceptionResolution.ignoreWithUserWarning);
 
-				return jsonResponderProvider.get ()
+				return jsonResponderProvider.provide (
+					taskLogger,
+					jsonResponder ->
+						jsonResponder
 
 					.value (
-						ImmutableMap.<Object,Object>builder ()
+						ImmutableMap.<Object, Object> builder ()
 
 						.put (
 							"success",
@@ -220,7 +227,9 @@ class SimulatorSessionCreateEventAction
 
 						.build ()
 
-					);
+					)
+
+				);
 
 			}
 
@@ -398,11 +407,23 @@ class SimulatorSessionCreateEventAction
 
 			transaction.commit ();
 
-			return jsonResponderProvider.get ()
+			return jsonResponderProvider.provide (
+				transaction,
+				jsonResponder ->
+					jsonResponder
+
 				.value (
-					ImmutableMap.<Object,Object>builder ()
-						.put ("success", true)
-						.build ());
+					ImmutableMap.<Object, Object> builder ()
+
+					.put (
+						"success",
+						true)
+
+					.build ()
+
+				)
+
+			);
 
 		}
 
@@ -494,10 +515,13 @@ class SimulatorSessionCreateEventAction
 
 			transaction.commit ();
 
-			return jsonResponderProvider.get ()
+			return jsonResponderProvider.provide (
+				transaction,
+				jsonResponder ->
+					jsonResponder
 
 				.value (
-					ImmutableMap.<Object,Object>builder ()
+					ImmutableMap.<Object, Object> builder ()
 
 					.put (
 						"success",
@@ -505,13 +529,15 @@ class SimulatorSessionCreateEventAction
 
 					.build ()
 
-				);
+				)
+
+			);
 
 		}
 
 	}
 
-	Optional<RouteRec> resolveRoute (
+	Optional <RouteRec> resolveRoute (
 			SimulatorRec simulator,
 			String number) {
 

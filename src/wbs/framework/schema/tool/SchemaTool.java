@@ -96,6 +96,7 @@ class SchemaTool {
 
 	}
 
+	private
 	void defineTables (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -119,17 +120,11 @@ class SchemaTool {
 					entityHelper.recordModelsByClass ())
 
 				.build (
-					taskLogger);
+					taskLogger)
 
-			if (taskLogger.errors ()) {
+			;
 
-				throw new RuntimeException (
-					stringFormat (
-						"Aborting due to %s errors",
-						integerToDecimalString (
-							taskLogger.errorCount ())));
-
-			}
+			taskLogger.makeException ();
 
 		}
 

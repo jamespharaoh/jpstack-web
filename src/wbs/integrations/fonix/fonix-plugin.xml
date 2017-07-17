@@ -29,7 +29,6 @@
 	</layer>
 
 	<layer name="logic">
-		<component class="foreignapi.FonixMessageSender"/>
 		<component class="foreignapi.FonixMessageSenderHelper"/>
 		<component class="logic.FonixLogicImplementation"/>
 	</layer>

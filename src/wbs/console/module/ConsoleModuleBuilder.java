@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.core.ConsoleFormsSpec;
@@ -42,7 +40,7 @@ class ConsoleModuleBuilder
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@StrongPrototypeDependency
 	Map <Class <?>, ComponentProvider <ConsoleModuleBuilderComponent>> builders;
@@ -68,7 +66,8 @@ class ConsoleModuleBuilder
 		) {
 
 			builder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					TaskLogger.class)

@@ -5,8 +5,6 @@ import static wbs.utils.io.FileUtils.fileExistsFormat;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,6 +15,7 @@ import wbs.framework.codegen.JavaInterfaceWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -39,10 +38,10 @@ class ModelInterfacesGenerator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+	ComponentProvider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaInterfaceWriter> javaInterfaceWriterProvider;
+	ComponentProvider <JavaInterfaceWriter> javaInterfaceWriterProvider;
 
 	// properties
 
@@ -198,7 +197,8 @@ class ModelInterfacesGenerator {
 			) {
 
 				JavaClassUnitWriter classUnitWriter =
-					javaClassUnitWriterProvider.get ()
+					javaClassUnitWriterProvider.provide (
+						taskLogger)
 
 					.formatWriter (
 						formatWriter)
@@ -208,7 +208,8 @@ class ModelInterfacesGenerator {
 						plugin.packageName ());
 
 				JavaInterfaceWriter objectHelperWriter =
-					javaInterfaceWriterProvider.get ()
+					javaInterfaceWriterProvider.provide (
+						taskLogger)
 
 					.interfaceName (
 						objectHelperName)
@@ -319,7 +320,8 @@ class ModelInterfacesGenerator {
 			) {
 
 				JavaClassUnitWriter classUnitWriter =
-					javaClassUnitWriterProvider.get ()
+					javaClassUnitWriterProvider.provide (
+						taskLogger)
 
 					.formatWriter (
 						formatWriter)
@@ -329,7 +331,8 @@ class ModelInterfacesGenerator {
 						plugin.packageName ());
 
 				JavaInterfaceWriter daoWriter =
-					javaInterfaceWriterProvider.get ()
+					javaInterfaceWriterProvider.provide (
+						taskLogger)
 
 					.interfaceName (
 						daoName)
@@ -412,7 +415,8 @@ class ModelInterfacesGenerator {
 			) {
 
 				JavaClassUnitWriter classUnitWriter =
-					javaClassUnitWriterProvider.get ()
+					javaClassUnitWriterProvider.provide (
+						taskLogger)
 
 					.formatWriter (
 						formatWriter)
@@ -422,7 +426,8 @@ class ModelInterfacesGenerator {
 						plugin.packageName ());
 
 				JavaInterfaceWriter consoleHelperWriter =
-					javaInterfaceWriterProvider.get ()
+					javaInterfaceWriterProvider.provide (
+						taskLogger)
 
 					.interfaceName (
 						consoleHelperName)

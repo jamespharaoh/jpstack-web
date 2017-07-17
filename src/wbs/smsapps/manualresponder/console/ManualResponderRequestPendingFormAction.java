@@ -14,8 +14,6 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -126,15 +125,15 @@ class ManualResponderRequestPendingFormAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("manualResponderRequestPendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("queueHomeResponder")
-	Provider <WebResponder> queueHomeResponderProvider;
+	ComponentProvider <WebResponder> queueHomeResponderProvider;
 
 	// details
 
@@ -143,7 +142,19 @@ class ManualResponderRequestPendingFormAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return pendingFormResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return pendingFormResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 
@@ -239,7 +250,8 @@ class ManualResponderRequestPendingFormAction
 			requestContext.addNotice (
 				"Request ignored");
 
-			return queueHomeResponderProvider.get ();
+			return queueHomeResponderProvider.provide (
+				transaction);
 
 		}
 
@@ -528,7 +540,8 @@ class ManualResponderRequestPendingFormAction
 			) {
 
 				reply.getMessages ().add (
-					messageSenderProvider.get ()
+					messageSenderProvider.provide (
+						transaction)
 
 					.threadId (
 						request.getMessage ().getThreadId ())
@@ -684,11 +697,13 @@ class ManualResponderRequestPendingFormAction
 
 			if (sendAgain) {
 
-				return pendingFormResponderProvider.get ();
+				return pendingFormResponderProvider.provide (
+					transaction);
 
 			} else {
 
-				return queueHomeResponderProvider.get ();
+				return queueHomeResponderProvider.provide (
+					transaction);
 
 			}
 

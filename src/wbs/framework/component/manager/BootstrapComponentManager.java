@@ -32,7 +32,6 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.utils.etc.TypeUtils.classInSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -60,7 +59,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
 import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
@@ -72,7 +70,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.ComponentInterface;
@@ -82,7 +79,6 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.component.config.WbsConfigFactory;
 import wbs.framework.component.registry.ComponentRegistryImplementation;
@@ -102,6 +98,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 public
 class BootstrapComponentManager
@@ -557,8 +555,7 @@ class BootstrapComponentManager
 	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass,
-			@NonNull Boolean initialized) {
+			@NonNull Class <ComponentType> componentClass) {
 
 		try (
 
@@ -568,10 +565,6 @@ class BootstrapComponentManager
 					"getComponentProvider");
 
 		) {
-
-			if (! initialized) {
-				throw new IllegalArgumentException ();
-			}
 
 			Optional <ComponentData> componentDataOptional =
 				mapItemForKey (
@@ -986,43 +979,13 @@ class BootstrapComponentManager
 
 		) {
 
-			return new ComponentProvider <Object> () {
-
-				@Override
-				public
-				Object provide (
-						TaskLogger parentTaskLogger) {
-
-					return getComponentReal (
-						parentTaskLogger,
-						componentData);
-
-
-				}
-
-				@Override
-				public
-				Object get () {
-
-					try (
-
-						OwnedTaskLogger taskLogger =
-							logContext.createTaskLogger (
-								"ComponentProvider.get",
-								keyEqualsString (
-									"componentDefinition.name",
-									componentData.name));
-
-					) {
-
-						return provide (
-							taskLogger);
-
-					}
-
-				}
-
-			};
+			return new ComponentProviderImplementation <Object> (
+				nestedTaskLogger ->
+					getComponentReal (
+						nestedTaskLogger,
+						componentData),
+				(nestedTaskLogger, component) ->
+					doNothing ());
 
 		}
 
@@ -1155,12 +1118,12 @@ class BootstrapComponentManager
 			for (
 				Method method
 					: iterableFilter (
+						Arrays.asList (
+							component.getClass ().getMethods ()),
 						method ->
 							isNotNull (
 								method.getAnnotation (
-									NormalLifecycleSetup.class)),
-						Arrays.asList (
-							component.getClass ().getMethods ()))
+									NormalLifecycleSetup.class)))
 			) {
 
 				methodInvoke (
@@ -1209,10 +1172,6 @@ class BootstrapComponentManager
 				field.getAnnotation (
 					StrongPrototypeDependency.class);
 
-			UninitializedDependency uninitializedDependencyAnnotation =
-				field.getAnnotation (
-					UninitializedDependency.class);
-
 			List <Annotation> allAnnotations =
 				ImmutableList.<Annotation> copyOf (
 					presentInstances (
@@ -1223,9 +1182,7 @@ class BootstrapComponentManager
 						optionalFromNullable (
 							singletonDependencyAnnotation),
 						optionalFromNullable (
-							strongPrototypeDependencyAnnotation),
-						optionalFromNullable (
-							uninitializedDependencyAnnotation)));
+							strongPrototypeDependencyAnnotation)));
 
 			if (
 				collectionIsEmpty (
@@ -1481,7 +1438,7 @@ class BootstrapComponentManager
 						valueComponentsWithData);
 
 				Object valueComponent =
-					valueComponentWithData.getRight ();
+					valueComponentWithData.right ();
 
 				fieldSet (
 					field,
@@ -1559,11 +1516,10 @@ class BootstrapComponentManager
 			// check for provider
 
 			if (
-				classInSafe (
+				classEqualSafe (
 					rawType (
 						valueInjectionType),
-					ComponentProvider.class,
-					Provider.class)
+					ComponentProvider.class)
 			) {
 
 				ParameterizedType parameterizedType =

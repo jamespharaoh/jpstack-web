@@ -2,6 +2,7 @@ package wbs.framework.data.tools;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 
 import java.io.InputStream;
 import java.util.List;
@@ -81,11 +82,12 @@ interface DataFromXml {
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		return optionalGetRequired (
+		return optionalOrThrow (
 			readClasspath (
 				parentTaskLogger,
 				filename,
-				parents));
+				parents),
+			() -> parentTaskLogger.makeException ());
 
 	}
 
@@ -106,11 +108,12 @@ interface DataFromXml {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename) {
 
-		return optionalGetRequired (
+		return optionalOrThrow (
 			readClasspath (
 				parentTaskLogger,
 				filename,
-				emptyList ()));
+				emptyList ()),
+			() -> parentTaskLogger.makeException ());
 
 	}
 

@@ -5,11 +5,10 @@ import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Provider;
 
 import lombok.NonNull;
 
@@ -21,6 +20,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
@@ -31,7 +31,6 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.sms.customer.model.SmsCustomerRec;
@@ -41,8 +40,8 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingNumberNoteUpdateAction")
 public
@@ -84,7 +83,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// constants
 
@@ -220,13 +219,18 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 						newValue))
 			) {
 
-				return textResponderProvider.get ()
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 					.text (
 						newValue != null
-							? HtmlUtils.encodeNewlineToBr (
+							? htmlEncodeNewlineToBr (
 								newValue.getText ())
-							: "");
+							: "")
+
+				);
 
 			}
 
@@ -266,13 +270,18 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			transaction.commit ();
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
 
 				.text (
 					newValue != null
-						? HtmlUtils.encodeNewlineToBr (
+						? htmlEncodeNewlineToBr (
 							newValue.getText ())
-						: "");
+						: "")
+
+			);
 
 		}
 
@@ -312,13 +321,18 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 						newValue))
 			) {
 
-				return textResponderProvider.get ()
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 					.text (
 						newValue != null
-							? HtmlUtils.encodeNewlineToBr (
+							? htmlEncodeNewlineToBr (
 								newValue.getText ())
-							: "");
+							: "")
+
+				);
 
 			}
 
@@ -358,13 +372,18 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			transaction.commit ();
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
 
 				.text (
 					newValue != null
-						? HtmlUtils.encodeNewlineToBr (
+						? htmlEncodeNewlineToBr (
 							newValue.getText ())
-						: "");
+						: "")
+
+			);
 
 		}
 

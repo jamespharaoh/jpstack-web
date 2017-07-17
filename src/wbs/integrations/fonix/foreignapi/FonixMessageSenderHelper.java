@@ -14,15 +14,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 
 import wbs.utils.etc.PropertyUtils.RequiredProperty;
 
+import wbs.web.misc.HttpMethod;
 import wbs.web.misc.UrlParams;
 
 @Accessors (fluent = true)
@@ -57,13 +55,21 @@ class FonixMessageSenderHelper
 	String responseStatusReason;
 
 	@Setter
-	Map <String, String> responseHeaders;
+	Map <String, List <String>> responseHeaders;
 
 	@Setter
 	String responseBody;
 
 	@Getter
 	FonixMessageSendResponse response;
+
+	// details
+
+	@Override
+	public
+	HttpMethod method () {
+		return HttpMethod.get;
+	}
 
 	// property accessors
 
@@ -148,18 +154,13 @@ class FonixMessageSenderHelper
 	public
 	void decode () {
 
-		JSONObject jsonObject =
-			(JSONObject)
-			JSONValue.parse (
-				responseBody);
-
 		DataFromJson dataFromJson =
 			new DataFromJson ();
 
 		response =
 			dataFromJson.fromJson (
 				FonixMessageSendResponse.class,
-				jsonObject);
+				responseBody);
 
 	}
 

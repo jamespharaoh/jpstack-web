@@ -98,7 +98,7 @@ class PairFormFieldAccessor <Container, Left, Right>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Pair <Left, Right>> nativeValueOptional) {
@@ -132,6 +132,10 @@ class PairFormFieldAccessor <Container, Left, Right>
 				container,
 				optionalFromNullable (
 					nativeValue.getRight ()));
+
+			// return
+
+			return optionalAbsent ();
 
 		}
 

@@ -1,7 +1,5 @@
 package wbs.console.context;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
@@ -16,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -34,7 +33,8 @@ class ConsoleContextExtensionPointMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextNestedExtensionPoint> nestedExtensionPointProvider;
+	ComponentProvider <ConsoleContextNestedExtensionPoint>
+		nestedExtensionPointProvider;
 
 	// builder
 
@@ -66,7 +66,8 @@ class ConsoleContextExtensionPointMetaBuilder
 		) {
 
 			consoleMetaModule.addExtensionPoint (
-				nestedExtensionPointProvider.get ()
+				nestedExtensionPointProvider.provide (
+					taskLogger)
 
 				.name (
 					contextExtensionPointSpec.name ())

@@ -25,7 +25,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.web.utils.HtmlUtils.encodeNewlineToBr;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -404,7 +404,7 @@ class ImChatPendingSummaryPart
 
 			htmlParagraphWriteHtml (
 				formatWriter,
-				encodeNewlineToBr (
+				htmlEncodeNewlineToBr (
 					customer.getNotesText () != null
 						? customer.getNotesText ().getText ()
 						: ""),

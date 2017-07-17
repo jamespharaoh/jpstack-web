@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -382,6 +383,22 @@ class CompositeModelImplementation <DataType>
 	public
 	CompositeModelImplementation <DataType> typeField (
 			@NonNull ModelField typeField) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	List <ModelField> identityFields () {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	Set <ModelFieldType> identityFieldTypes () {
 
 		throw new UnsupportedOperationException ();
 

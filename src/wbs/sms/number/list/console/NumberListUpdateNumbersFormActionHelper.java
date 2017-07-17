@@ -2,8 +2,6 @@ package wbs.sms.number.list.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -14,14 +12,14 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
-import wbs.platform.text.web.TextResponder;
-
 import wbs.sms.number.list.model.NumberListUpdateRec;
 
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("numberListUpdateNumbersFormActionHelper")
@@ -40,7 +38,7 @@ class NumberListUpdateNumbersFormActionHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// public implementation
 
@@ -78,7 +76,10 @@ class NumberListUpdateNumbersFormActionHelper
 			});
 
 			return optionalOf (
-				textResponderProvider.get ()
+				textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 				.filename (
 					"numbers.txt")
@@ -86,7 +87,7 @@ class NumberListUpdateNumbersFormActionHelper
 				.text (
 					stringBuilder.toString ())
 
-			);
+			));
 
 		}
 

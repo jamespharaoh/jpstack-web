@@ -1,12 +1,11 @@
 package wbs.framework.schema.tool;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
@@ -23,10 +22,10 @@ public class SchemaToolExceptionLogger
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <SimpleExceptionLogger> simpleExceptionLoggerProvider;
+	@PrototypeDependency
+	ComponentProvider <SimpleExceptionLogger> simpleExceptionLoggerProvider;
 
 	// implementation
 
@@ -44,7 +43,8 @@ public class SchemaToolExceptionLogger
 
 		) {
 
-			return simpleExceptionLoggerProvider.get ();
+			return simpleExceptionLoggerProvider.provide (
+				taskLogger);
 
 		}
 

@@ -461,7 +461,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 
 			htmlWriter.writeFormat (
 				"%s",
-				HtmlUtils.newlineToBr (
+				HtmlUtils.htmlNewlineToBr (
 				stringFormat (
 					"%h",
 					interfaceValue.or (""))));

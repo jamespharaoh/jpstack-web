@@ -2,8 +2,6 @@ package wbs.console.formaction;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -19,9 +17,11 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.responder.WebResponder;
@@ -55,7 +55,7 @@ class ConsoleFormActionAction <FormState, History>
 	ConsoleFormActionHelper <FormState, History> formActionHelper;
 
 	@Getter @Setter
-	Provider <WebResponder> responderProvider;
+	ComponentProvider <WebResponder> responderProvider;
 
 	// implementation
 
@@ -64,7 +64,19 @@ class ConsoleFormActionAction <FormState, History>
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return responderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return responderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

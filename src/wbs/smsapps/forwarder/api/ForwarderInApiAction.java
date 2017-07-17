@@ -5,8 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -17,12 +15,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.platform.text.web.TextResponder;
 
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
@@ -30,6 +27,7 @@ import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 import wbs.web.context.RequestContext;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("forwarderInApiAction")
@@ -54,7 +52,7 @@ class ForwarderInApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -180,14 +178,17 @@ class ForwarderInApiAction
 				}
 
 				return optionalOf (
-					textResponderProvider.get ()
+					textResponderProvider.provide (
+						transaction,
+						textResponder ->
+							textResponder
 
 					.textFormat (
 						"ERROR\n",
 						"%s\n",
 						 exception.getMessage ())
 
-				);
+				));
 
 			}
 

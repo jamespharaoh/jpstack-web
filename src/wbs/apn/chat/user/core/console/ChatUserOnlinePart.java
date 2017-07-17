@@ -38,7 +38,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -99,8 +98,6 @@ class ChatUserOnlinePart
 	TimeFormatter timeFormatter;
 
 	// state
-
-	BorrowedTransaction transaction;
 
 	Collection <ChatUserRec> users;
 

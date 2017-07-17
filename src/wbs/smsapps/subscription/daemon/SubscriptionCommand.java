@@ -8,8 +8,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -21,7 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.BorrowedTransaction;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -113,7 +111,7 @@ class SubscriptionCommand
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 
@@ -130,8 +128,6 @@ class SubscriptionCommand
 	String rest;
 
 	// state
-
-	BorrowedTransaction transaction;
 
 	MessageRec message;
 	NumberRec number;
@@ -463,7 +459,8 @@ class SubscriptionCommand
 			// send response
 
 			MessageRec response =
-				messageSenderProvider.get ()
+				messageSenderProvider.provide (
+					transaction)
 
 				.threadId (
 					message.getThreadId ())

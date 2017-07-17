@@ -5,8 +5,6 @@ import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -19,9 +17,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -72,7 +72,7 @@ class BroadcastSendAction
 
 	@PrototypeDependency
 	@NamedDependency ("broadcastSendResponder")
-	Provider <WebResponder> sendResponderProvider;
+	ComponentProvider <WebResponder> sendResponderProvider;
 
 	// details
 
@@ -81,7 +81,19 @@ class BroadcastSendAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return sendResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return sendResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

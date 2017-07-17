@@ -182,7 +182,7 @@ class HtmlUtils {
 	}
 
 	public static
-	String newlineToBr (
+	String htmlNewlineToBr (
 			String source) {
 
 		return source.replaceAll (
@@ -192,10 +192,10 @@ class HtmlUtils {
 	}
 
 	public static
-	String encodeNewlineToBr (
+	String htmlEncodeNewlineToBr (
 			@NonNull String source) {
 
-		return newlineToBr (
+		return htmlNewlineToBr (
 			htmlEncode (
 				source));
 

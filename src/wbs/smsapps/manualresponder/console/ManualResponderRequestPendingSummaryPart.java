@@ -34,6 +34,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
 import static wbs.web.utils.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
@@ -102,8 +103,6 @@ import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.time.TextualInterval;
-
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingSummaryPart")
 public
@@ -797,9 +796,8 @@ class ManualResponderRequestPendingSummaryPart
 					manualResponderRequest.getNumber ().getId ())),
 			" class=\"mrNumberNoteEditable\"",
 			">%s</p>",
-			HtmlUtils.newlineToBr (
-				HtmlUtils.htmlEncode (
-					notes)));
+			htmlEncodeNewlineToBr (
+				notes));
 
 	}
 

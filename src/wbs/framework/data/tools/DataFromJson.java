@@ -1,12 +1,17 @@
 package wbs.framework.data.tools;
 
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -16,14 +21,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
 import lombok.NonNull;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
+
+import fj.data.Either;
 
 public
 class DataFromJson {
@@ -31,7 +44,26 @@ class DataFromJson {
 	public <Data>
 	Data fromJson (
 			@NonNull Class <Data> dataClass,
-			@NonNull JSONObject jsonValue) {
+			@NonNull String jsonString) {
+
+		JsonParser jsonParser =
+			new JsonParser ();
+
+		JsonObject jsonObject =
+			(JsonObject)
+			jsonParser.parse (
+				jsonString);
+
+		return fromJson (
+			dataClass,
+			jsonObject);
+
+	}
+
+	public <Data>
+	Data fromJson (
+			@NonNull Class <Data> dataClass,
+			@NonNull JsonObject jsonValue) {
 
 		Data dataValue =
 			classInstantiate (
@@ -44,14 +76,6 @@ class DataFromJson {
 
 			field.setAccessible (true);
 
-			Object fieldValue =
-				jsonValue.get (
-					field.getName ());
-
-			if (fieldValue == null) {
-				continue;
-			}
-
 			// handle data attribute
 
 			DataAttribute dataAttribute =
@@ -62,6 +86,17 @@ class DataFromJson {
 				isNotNull (
 					dataAttribute)
 			) {
+
+				JsonElement fieldValue =
+					jsonValue.get (
+						ifNull (
+							nullIfEmptyString (
+								dataAttribute.name ()),
+							field.getName ()));
+
+				if (fieldValue == null) {
+					continue;
+				}
 
 				doDataAttribute (
 					dataClass,
@@ -83,12 +118,23 @@ class DataFromJson {
 					dataChild)
 			) {
 
+				Object fieldValue =
+					jsonValue.get (
+						ifNull (
+							nullIfEmptyString (
+								dataChild.name ()),
+							field.getName ()));
+
+				if (fieldValue == null) {
+					continue;
+				}
+
 				doDataChild (
 					dataClass,
 					dataValue,
 					field,
 					dataChild,
-					(JSONObject)
+					(JsonObject)
 					fieldValue);
 
 			}
@@ -103,6 +149,16 @@ class DataFromJson {
 				isNotNull (
 					dataChildren)
 			) {
+
+				Object fieldValue =
+					jsonValue.get (
+						ifNull (
+							dataChildren.childrenElement (),
+							field.getName ()));
+
+				if (fieldValue == null) {
+					continue;
+				}
 
 				doDataChildren (
 					dataClass,
@@ -125,62 +181,17 @@ class DataFromJson {
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataAttribute dataAttribute,
-			@NonNull Object fieldValue) {
+			@NonNull JsonElement jsonValue) {
+
+		Either <Optional <Object>, String> nativeValueResult =
+			fromJsonSimple (
+				field.getType (),
+				jsonValue);
 
 		if (
-			classEqualSafe (
-				Long.class,
-				field.getType ())
+			isError (
+				nativeValueResult)
 		) {
-
-			fieldSet (
-				field,
-				dataValue,
-				optionalOf (
-					(Long)
-					fieldValue));
-
-		} else if (
-			classEqualSafe (
-				String.class,
-				field.getType ())
-		) {
-
-			fieldSet (
-				field,
-				dataValue,
-				optionalOf (
-					(String)
-					fieldValue));
-
-		} else if (
-			classEqualSafe (
-				Integer.class,
-				field.getType ())
-		) {
-
-			fieldSet (
-				field,
-				dataValue,
-				optionalOf (
-					toJavaIntegerRequired (
-						(Long)
-						fieldValue)));
-
-		} else if (
-			classEqualSafe (
-				JSONObject.class,
-				field.getType ())
-		) {
-
-			fieldSet (
-				field,
-				dataValue,
-				optionalOf (
-					(JSONObject)
-					fieldValue));
-
-		} else {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -194,6 +205,72 @@ class DataFromJson {
 
 		}
 
+		Optional <Object> nativeValueOptional =
+			resultValueRequired (
+				nativeValueResult);
+
+		fieldSet (
+			field,
+			dataValue,
+			nativeValueOptional);
+
+	}
+
+	private <Data>
+	Either <Optional <Object>, String> fromJsonSimple (
+			@NonNull Class <?> targetType,
+			@NonNull JsonElement jsonElement) {
+
+		if (jsonElement.isJsonObject ()) {
+
+			return successResultPresent (
+				jsonElement.getAsJsonObject ());
+
+		}
+
+		if (jsonElement.isJsonPrimitive ()) {
+
+			JsonPrimitive jsonPrimitive =
+				jsonElement.getAsJsonPrimitive ();
+
+			if (
+				classEqualSafe (
+					Long.class,
+					targetType)
+			) {
+
+				return successResultPresent (
+					jsonPrimitive.getAsLong ());
+
+			} else if (
+				classEqualSafe (
+					String.class,
+					targetType)
+			) {
+
+				return successResultPresent (
+					jsonPrimitive.getAsString ());
+
+			} else if (
+				classEqualSafe (
+					Integer.class,
+					targetType)
+			) {
+
+				return successResultPresent (
+					jsonPrimitive.getAsInt ());
+
+			}
+
+		}
+
+		return errorResultFormat (
+			"Don't know how to map %s as %s",
+			classNameSimple (
+				jsonElement.getClass ()),
+			classNameSimple (
+				targetType));
+
 	}
 
 	private <Data>
@@ -202,7 +279,7 @@ class DataFromJson {
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataChild dataChild,
-			@NonNull JSONObject fieldValue) {
+			@NonNull JsonObject fieldValue) {
 
 		fieldSet (
 			field,
@@ -228,8 +305,8 @@ class DataFromJson {
 				field.getType ())
 		) {
 
-			JSONArray fieldValue =
-				(JSONArray)
+			JsonArray fieldValue =
+				(JsonArray)
 				fieldValueObject;
 
 			List <Object> listValue =
@@ -248,7 +325,7 @@ class DataFromJson {
 					fromJson (
 						(Class <?>)
 							parameterizedType.getActualTypeArguments () [0],
-						(JSONObject)
+						(JsonObject)
 							jsonObject));
 
 			}

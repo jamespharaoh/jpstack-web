@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.IdentityFormFieldInterfaceMapping;
@@ -40,6 +38,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -64,44 +63,40 @@ class NameFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DelegateFormFieldAccessor>
-	delegateFormFieldAccessorProvider;
+	ComponentProvider <DelegateFormFieldAccessor>
+		delegateFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <NameFormFieldAccessor>
-	nameFormFieldAccessorProvider;
+	ComponentProvider <NameFormFieldAccessor> nameFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NameFormFieldConstraintValidator>
-	nameFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NameFormFieldConstraintValidator>
+		nameFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <NameFormFieldValueValidator>
-	nameFormFieldValueValidatorProvider;
+	ComponentProvider <NameFormFieldValueValidator>
+		nameFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -153,7 +148,8 @@ class NameFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				nameFormFieldAccessorProvider.get ()
+				nameFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.consoleHelper (
 					consoleHelper);
@@ -161,7 +157,8 @@ class NameFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validator
 
@@ -169,10 +166,12 @@ class NameFormFieldBuilder
 				new ArrayList<> ();
 
 			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+				requiredFormFieldValueValidatorProvider.provide (
+					taskLogger));
 
 			valueValidators.add (
-				nameFormFieldValueValidatorProvider.get ()
+				nameFormFieldValueValidatorProvider.provide (
+					taskLogger)
 
 				.namePattern (
 					ifNotNullThenElse (
@@ -196,17 +195,20 @@ class NameFormFieldBuilder
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nameFormFieldValueConstraintValidatorProvider.get ();
+				nameFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -221,6 +223,7 @@ class NameFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -230,7 +233,8 @@ class NameFormFieldBuilder
 			if (readOnly) {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -255,7 +259,8 @@ class NameFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

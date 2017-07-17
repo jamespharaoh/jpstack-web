@@ -9,8 +9,6 @@ import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -24,6 +22,7 @@ import wbs.console.part.PagePart;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -44,7 +43,8 @@ class ConsoleFormActionsPart
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFormActionPart <?, ?>> consoleFormActionPartProvider;
+	ComponentProvider <ConsoleFormActionPart <?, ?>>
+		consoleFormActionPartProvider;
 
 	// properties
 
@@ -90,7 +90,8 @@ class ConsoleFormActionsPart
 
 				.map (
 					showSubmitFormAction ->
-						consoleFormActionPartProvider.get ()
+						consoleFormActionPartProvider.provide (
+							transaction)
 
 					.name (
 						showSubmitFormAction.getRight ().name ())

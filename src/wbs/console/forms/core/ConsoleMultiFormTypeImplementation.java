@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -27,7 +25,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -49,10 +48,11 @@ class ConsoleMultiFormTypeImplementation <Container>
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <ConsoleFormImplementation <Container>> formContextProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <ConsoleFormImplementation <Container>>
+		consoleFormProvider;
 
 	// properties
 
@@ -114,7 +114,10 @@ class ConsoleMultiFormTypeImplementation <Container>
 
 						return Pair.of (
 							name,
-							formContextProvider.get ()
+							consoleFormProvider.provide (
+								transaction,
+								consoleForm ->
+									consoleForm
 
 							.requestContext (
 								requestContext)
@@ -148,7 +151,7 @@ class ConsoleMultiFormTypeImplementation <Container>
 							.updateResultSet (
 								updateResults)
 
-						);
+						));
 
 					})
 
@@ -212,7 +215,8 @@ class ConsoleMultiFormTypeImplementation <Container>
 
 						return Pair.of (
 							name,
-							formContextProvider.get ()
+							consoleFormProvider.provide (
+								transaction)
 
 							.requestContext (
 								requestContext)

@@ -75,7 +75,9 @@ class SchemaFromModel {
 						model)
 
 					.build (
-						taskLogger);
+						taskLogger)
+
+				;
 
 				if (schemaTable == null)
 					continue;

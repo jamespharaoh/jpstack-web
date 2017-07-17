@@ -1,5 +1,7 @@
 package wbs.smsapps.common.fixture;
 
+import static wbs.utils.etc.Misc.doNothing;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -7,7 +9,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
 
@@ -46,32 +47,7 @@ class SmsAppsCommonFixtureProvider
 
 		) {
 
-			menuGroupHelper.insert (
-				transaction,
-				menuGroupHelper.createInstance ()
-
-				.setSlice (
-					sliceHelper.findByCodeRequired (
-						transaction,
-						GlobalId.root,
-						"test"))
-
-				.setCode (
-					"facility")
-
-				.setName (
-					"Facility")
-
-				.setDescription (
-					"")
-
-				.setLabel (
-					"Facilities")
-
-				.setOrder (
-					10l)
-
-			);
+			doNothing ();
 
 		}
 

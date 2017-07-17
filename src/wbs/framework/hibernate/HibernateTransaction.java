@@ -1,7 +1,6 @@
 package wbs.framework.hibernate;
 
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -26,11 +25,11 @@ import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.WbsConnection;
-import wbs.framework.entity.record.UnsavedRecordDetector;
 import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -43,13 +42,15 @@ public
 class HibernateTransaction
 	implements OwnedTransaction {
 
-	// singleton components
+	// singleton dependencies
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	@SingletonDependency
-	UnsavedRecordDetector unsavedRecordDetector;
+	// prototype dependencies
+
+	@PrototypeDependency
+	ComponentProvider <HibernateInterceptor> hibernateInterceptorProvider;
 
 	// properties
 
@@ -89,9 +90,6 @@ class HibernateTransaction
 
 	private
 	boolean closed;
-
-	private
-	boolean unsavedRecordFrameCreated;
 
 	private
 	Session session;
@@ -134,7 +132,8 @@ class HibernateTransaction
 				hibernateDatabase.sessionFactory.withOptions ()
 
 				.interceptor (
-					hibernateDatabase.hibernateInterceptorProvider.get ())
+					hibernateInterceptorProvider.provide (
+						taskLogger))
 
 				.openSession ();
 
@@ -165,13 +164,6 @@ class HibernateTransaction
 				}
 
 			});
-
-			// create unsaved record detector frame
-
-			unsavedRecordDetector.createFrame (
-				this);
-
-			unsavedRecordFrameCreated = true;
 
 			// update state
 
@@ -232,19 +224,6 @@ class HibernateTransaction
 				isReadWrite
 					? "rw"
 					: "ro");
-
-			// verify unsaved records
-
-			if (
-				isNull (
-					realTransaction)
-			) {
-
-				unsavedRecordDetector.verifyFrame (
-					taskLogger,
-					this);
-
-			}
 
 			// do the commit
 
@@ -336,25 +315,6 @@ class HibernateTransaction
 					taskLogger.fatalFormatException (
 						exception,
 						"Error teardown session");
-
-				}
-
-				// always tidy unsaved record detector
-
-				if (unsavedRecordFrameCreated) {
-
-					try {
-
-						unsavedRecordDetector.destroyFrame (
-							this);
-
-					} catch (Exception exception) {
-
-						taskLogger.fatalFormatException (
-							exception,
-							"Error destroying unsaved record detector frame");
-
-					}
 
 				}
 

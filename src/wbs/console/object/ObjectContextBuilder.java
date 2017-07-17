@@ -14,7 +14,6 @@ import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +45,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -75,19 +75,19 @@ class ObjectContextBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
+	ComponentProvider <SimpleConsoleContext> simpleConsoleContextProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextType> contextTypeProvider;
+	ComponentProvider <ConsoleContextType> contextTypeProvider;
 
 	@PrototypeDependency
-	Provider <ObjectContext> objectContextProvider;
+	ComponentProvider <ObjectContext> objectContextProvider;
 
 	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleContextProvider;
+	ComponentProvider <SimpleConsoleContext> simpleContextProvider;
 
 	// builder
 
@@ -140,15 +140,18 @@ class ObjectContextBuilder <
 			setDefaults (
 				taskLogger);
 
-			buildContextTypes ();
+			buildContextTypes (
+				taskLogger);
 
-			buildSimpleContexts ();
+			buildSimpleContexts (
+				taskLogger);
 
 			buildSimpleTabs (
 				taskLogger);
 
 			List <ResolvedConsoleContextLink> resolvedContextLinks =
 				consoleMetaManager.resolveContextLink (
+					taskLogger,
 					name);
 
 			for (
@@ -157,6 +160,7 @@ class ObjectContextBuilder <
 			) {
 
 				buildResolvedContexts (
+					taskLogger,
 					resolvedContextLink);
 
 				buildResolvedTabs (
@@ -244,128 +248,158 @@ class ObjectContextBuilder <
 
 	}
 
-	void buildContextTypes () {
+	void buildContextTypes (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
+		try (
 
-			.name (
-				name + ":list")
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTypes");
 
-			.defaultFileName (
-				defaultFileName.orNull ()));
+		) {
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
+			consoleModule.addContextType (
+				contextTypeProvider.provide (
+					taskLogger)
 
-			.name (
-				name + ":combo")
+				.name (
+					name + ":list")
 
-			.defaultFileName (
-				defaultFileName.orNull ()));
+				.defaultFileName (
+					defaultFileName.orNull ()));
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
+			consoleModule.addContextType (
+				contextTypeProvider.provide (
+					taskLogger)
 
-			.name (
-				name + ":object")
+				.name (
+					name + ":combo")
 
-			.defaultFileName (
-				defaultFileName.orNull ()));
+				.defaultFileName (
+					defaultFileName.orNull ()));
+
+			consoleModule.addContextType (
+				contextTypeProvider.provide (
+					taskLogger)
+
+				.name (
+					name + ":object")
+
+				.defaultFileName (
+					defaultFileName.orNull ()));
+
+		}
 
 	}
 
-	void buildSimpleContexts () {
+	void buildSimpleContexts (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContext (
-			simpleContextProvider.get ()
+		try (
 
-			.name (
-				naivePluralise (
-					name))
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildSimpleContexts");
 
-			.typeName (
-				name + ":list")
+		) {
 
-			.pathPrefix (
-				"/" + naivePluralise (
-					name))
+			consoleModule.addContext (
+				simpleContextProvider.provide (
+					taskLogger)
 
-			.global (
-				true)
+				.name (
+					naivePluralise (
+						name))
 
-			.title (
-				capitalise (
-					consoleHelper.shortNamePlural ())));
+				.typeName (
+					name + ":list")
 
-		consoleModule.addContext (
-			objectContextProvider.get ()
+				.pathPrefix (
+					"/" + naivePluralise (
+						name))
 
-			.name (
-				name)
+				.global (
+					true)
 
-			.typeName (
-				name + ":combo")
+				.title (
+					capitalise (
+						consoleHelper.shortNamePlural ())));
 
-			.pathPrefix (
-				"/" + name)
+			consoleModule.addContext (
+				objectContextProvider.provide (
+					taskLogger)
 
-			.global (
-				true)
+				.name (
+					name)
 
-			.title (
-				objectTitle)
+				.typeName (
+					name + ":combo")
 
-			.defaultFileName (
-				defaultFileName)
+				.pathPrefix (
+					"/" + name)
 
-			.requestIdKey (
-				consoleHelper.idKey ())
+				.global (
+					true)
 
-			.objectLookup (
-				consoleHelper)
+				.title (
+					objectTitle)
 
-			.postProcessorName (
-				consoleHelper.objectName ())
+				.defaultFileName (
+					defaultFileName)
 
-			.cryptor (
-				cryptor));
+				.requestIdKey (
+					consoleHelper.idKey ())
 
-		consoleModule.addContext (
-			objectContextProvider.get ()
+				.objectLookup (
+					consoleHelper)
 
-			.name (
-				"link:" + name)
+				.postProcessorName (
+					consoleHelper.objectName ())
 
-			.typeName (
-				name + ":object")
+				.cryptor (
+					cryptor));
 
-			.pathPrefix (
-				"/" + name)
+			consoleModule.addContext (
+				objectContextProvider.provide (
+					taskLogger)
 
-			.global (
-				false)
+				.name (
+					"link:" + name)
 
-			.title (
-				objectTitle)
+				.typeName (
+					name + ":object")
 
-			.defaultFileName (
-				defaultFileName)
+				.pathPrefix (
+					"/" + name)
 
-			.requestIdKey (
-				consoleHelper.idKey ())
+				.global (
+					false)
 
-			.objectLookup (
-				consoleHelper)
+				.title (
+					objectTitle)
 
-			.postProcessorName (
-				consoleHelper.objectName ())
+				.defaultFileName (
+					defaultFileName)
 
-			.cryptor (
-				cryptor)
+				.requestIdKey (
+					consoleHelper.idKey ())
 
-			.parentContextTabName (
-				"link:" + name));
+				.objectLookup (
+					consoleHelper)
+
+				.postProcessorName (
+					consoleHelper.objectName ())
+
+				.cryptor (
+					cryptor)
+
+				.parentContextTabName (
+					"link:" + name));
+
+		}
 
 	}
 
@@ -385,7 +419,8 @@ class ObjectContextBuilder <
 				taskLogger,
 				"link",
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						"link:" + name)
@@ -399,7 +434,8 @@ class ObjectContextBuilder <
 				taskLogger,
 				"end",
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						stringFormat (
@@ -418,93 +454,107 @@ class ObjectContextBuilder <
 	}
 
 	void buildResolvedContexts (
-			ResolvedConsoleContextLink resolvedContextLink) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextLink resolvedContextLink) {
 
-		for (
-			String parentContextName
-				: resolvedContextLink.parentContextNames ()
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResolvedContexts");
+
 		) {
 
-			String resolvedContextName =
-				stringFormat (
-					"%s.%s",
-					parentContextName,
-					resolvedContextLink.localName ());
+			for (
+				String parentContextName
+					: resolvedContextLink.parentContextNames ()
+			) {
 
-			boolean link =
-				stringStartsWithSimple (
-					"link:",
-					resolvedContextName);
+				String resolvedContextName =
+					stringFormat (
+						"%s.%s",
+						parentContextName,
+						resolvedContextLink.localName ());
 
-			String resolvedPathPrefix =
-				joinWithoutSeparator (
-					"/",
-					link
-						? resolvedContextName.substring (5)
-						: resolvedContextName);
+				boolean link =
+					stringStartsWithSimple (
+						"link:",
+						resolvedContextName);
 
-			consoleModule.addContext (
-				simpleConsoleContextProvider.get ()
+				String resolvedPathPrefix =
+					joinWithoutSeparator (
+						"/",
+						link
+							? resolvedContextName.substring (5)
+							: resolvedContextName);
 
-				.name (
-					naivePluralise (
-						resolvedContextName))
+				consoleModule.addContext (
+					simpleConsoleContextProvider.provide (
+						taskLogger)
 
-				.typeName (
-					name + ":list")
+					.name (
+						naivePluralise (
+							resolvedContextName))
 
-				.pathPrefix (
-					naivePluralise (
-						resolvedPathPrefix))
+					.typeName (
+						name + ":list")
 
-				.global (
-					! link)
+					.pathPrefix (
+						naivePluralise (
+							resolvedPathPrefix))
 
-				.title (
-					capitalise (
-						consoleHelper.shortNamePlural ()))
+					.global (
+						! link)
 
-				.parentContextName (
-					parentContextName)
+					.title (
+						capitalise (
+							consoleHelper.shortNamePlural ()))
 
-				.parentContextTabName (
-					resolvedContextLink.tabName ()));
+					.parentContextName (
+						parentContextName)
 
-			consoleModule.addContext (
-				objectContextProvider.get ()
+					.parentContextTabName (
+						resolvedContextLink.tabName ()));
 
-				.name (
-					resolvedContextName)
+				consoleModule.addContext (
+					objectContextProvider.provide (
+						taskLogger)
 
-				.typeName (
-					name + ":combo")
+					.name (
+						resolvedContextName)
 
-				.pathPrefix (
-					resolvedPathPrefix)
+					.typeName (
+						name + ":combo")
 
-				.global (
-					! link)
+					.pathPrefix (
+						resolvedPathPrefix)
 
-				.title (
-					objectTitle)
+					.global (
+						! link)
 
-				.requestIdKey (
-					consoleHelper.idKey ())
+					.title (
+						objectTitle)
 
-				.objectLookup (
-					consoleHelper)
+					.requestIdKey (
+						consoleHelper.idKey ())
 
-				.postProcessorName (
-					consoleHelper.objectName ())
+					.objectLookup (
+						consoleHelper)
 
-				.cryptor (
-					cryptor)
+					.postProcessorName (
+						consoleHelper.objectName ())
 
-				.parentContextName (
-					parentContextName)
+					.cryptor (
+						cryptor)
 
-				.parentContextTabName (
-					resolvedContextLink.tabName ()));
+					.parentContextName (
+						parentContextName)
+
+					.parentContextTabName (
+						resolvedContextLink.tabName ()));
+
+			}
 
 		}
 
@@ -527,7 +577,8 @@ class ObjectContextBuilder <
 				taskLogger,
 				consoleContextLink.tabLocation (),
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						consoleContextLink.tabName ())
@@ -563,7 +614,7 @@ class ObjectContextBuilder <
 
 			consoleHelper =
 				genericCastUnchecked (
-					objectManager.findConsoleHelperRequired (
+					objectManager.consoleHelperForNameRequired (
 						spec.objectName ()));
 
 			name =

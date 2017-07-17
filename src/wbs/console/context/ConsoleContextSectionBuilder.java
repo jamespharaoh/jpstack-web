@@ -9,8 +9,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.Iterables;
 
 import lombok.NonNull;
@@ -31,6 +29,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -54,13 +53,13 @@ class ConsoleContextSectionBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	ComponentProvider <ConsoleContextTab> contextTabProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextType> contextTypeProvider;
+	ComponentProvider <ConsoleContextType> contextTypeProvider;
 
 	@PrototypeDependency
-	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
+	ComponentProvider <SimpleConsoleContext> simpleConsoleContextProvider;
 
 	// builder
 
@@ -105,15 +104,18 @@ class ConsoleContextSectionBuilder <
 
 			setDefaults ();
 
-			buildContextTypes ();
+			buildContextTypes (
+				taskLogger);
 
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 
 				buildResolvedContexts (
+					taskLogger,
 					resolvedExtensionPoint);
 
 				buildContextTabs (
@@ -174,87 +176,113 @@ class ConsoleContextSectionBuilder <
 
 	}
 
-	void buildContextTypes () {
+	void buildContextTypes (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		consoleModule.addContextType (
-			contextTypeProvider.get ()
+		try (
 
-			.name (
-				contextTypeName)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildContextTypes");
 
-		);
+		) {
+
+			consoleModule.addContextType (
+				contextTypeProvider.provide (
+					taskLogger)
+
+				.name (
+					contextTypeName)
+
+			);
+
+		}
 
 	}
 
 	void buildResolvedContexts (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		Map<String,Object> stuffMap =
-			new HashMap<String,Object> ();
+		try (
 
-		for (
-			ConsoleContextStuffSpec contextStuffSpec
-				: Iterables.filter (
-					spec.children (),
-					ConsoleContextStuffSpec.class)
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"buildResolvedContexts");
+
 		) {
 
-			stuffMap.put (
-				contextStuffSpec.name (),
-				contextStuffSpec.value ());
+			Map <String, Object> stuffMap =
+				new HashMap<> ();
 
-		}
+			for (
+				ConsoleContextStuffSpec contextStuffSpec
+					: Iterables.filter (
+						spec.children (),
+						ConsoleContextStuffSpec.class)
+			) {
 
-		for (
-			String parentContextName
-				: extensionPoint.parentContextNames ()
-		) {
+				stuffMap.put (
+					contextStuffSpec.name (),
+					contextStuffSpec.value ());
 
-				String resolvedContextName =
-					stringFormat (
-						"%s.%s",
-						parentContextName,
-						spec.name ());
+			}
 
-				boolean link =
-					resolvedContextName.startsWith ("link:");
+			for (
+				String parentContextName
+					: extensionPoint.parentContextNames ()
+			) {
 
-				String resolvedPathPrefix =
-					joinWithoutSeparator (
-						"/",
-						link
-							? resolvedContextName.substring (5)
-							: resolvedContextName);
+					String resolvedContextName =
+						stringFormat (
+							"%s.%s",
+							parentContextName,
+							spec.name ());
 
-			consoleModule.addContext (
-				simpleConsoleContextProvider.get ()
+					boolean link =
+						resolvedContextName.startsWith ("link:");
 
-				.name (
-					stringFormat (
-						"%s.%s",
-						parentContextName,
-						spec.name ()))
+					String resolvedPathPrefix =
+						joinWithoutSeparator (
+							"/",
+							link
+								? resolvedContextName.substring (5)
+								: resolvedContextName);
 
-				.typeName (
-					contextTypeName)
+				consoleModule.addContext (
+					simpleConsoleContextProvider.provide (
+						taskLogger)
 
-				.pathPrefix (
-					resolvedPathPrefix)
+					.name (
+						stringFormat (
+							"%s.%s",
+							parentContextName,
+							spec.name ()))
 
-				.global (
-					! link)
+					.typeName (
+						contextTypeName)
 
-				.title (
-					label)
+					.pathPrefix (
+						resolvedPathPrefix)
 
-				.parentContextName (
-					parentContextName)
+					.global (
+						! link)
 
-				.parentContextTabName (
-					tabName)
+					.title (
+						label)
 
-				.stuff (
-					stuffMap));
+					.parentContextName (
+						parentContextName)
+
+					.parentContextTabName (
+						tabName)
+
+					.stuff (
+						stuffMap));
+
+			}
 
 		}
 
@@ -277,7 +305,8 @@ class ConsoleContextSectionBuilder <
 				taskLogger,
 				container.tabLocation (),
 
-				contextTabProvider.get ()
+				contextTabProvider.provide (
+					taskLogger)
 
 					.name (
 						tabName)

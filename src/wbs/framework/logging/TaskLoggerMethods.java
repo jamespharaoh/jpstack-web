@@ -247,7 +247,7 @@ interface TaskLoggerMethods {
 	}
 
 	default
-	BorrowedTaskLogger borrow () {
+	BorrowedTaskLogger borrowTaskLogger () {
 
 		return new BorrowedTaskLogger (
 			this.taskLoggerImplementation ());

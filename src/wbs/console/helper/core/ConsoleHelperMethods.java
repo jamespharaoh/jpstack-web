@@ -85,6 +85,10 @@ interface ConsoleHelperMethods <
 			Transaction parentTransaction,
 			RecordType object);
 
+	boolean canCreateIn (
+			Transaction parentTransaction,
+			Record <?> parent);
+
 	Optional <RecordType> findFromContext (
 			Transaction parentTransaction);
 

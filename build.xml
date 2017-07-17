@@ -17,7 +17,8 @@
   <target name="daemon-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-restart"/>
   <target name="all-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-api-restart, just-console-restart, just-daemon-restart"/>
   <target name="javadoc" depends="just-javadoc"/>
-  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
+  <target name="model-fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-model-fixtures"/>
+  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-model-fixtures, just-fixture-providers"/>
   <target name="api-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-api-test"/>
   <target name="console-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-console-deploy, just-console-test"/>
   <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
@@ -67,7 +68,9 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
       <include name="wbs/web/**"/>
+      <include name="shn/**/generate/**"/>
       <include name="wbs/**/generate/**"/>
+      <include name="shn/**/metamodel/**"/>
       <include name="wbs/**/metamodel/**"/>
     </javac>
     <copy todir="work/bin">
@@ -89,10 +92,15 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
       <include name="wbs/web/**"/>
+      <include name="shn/**/generate/**"/>
       <include name="wbs/**/generate/**"/>
+      <include name="shn/**/hibernate/**"/>
       <include name="wbs/**/hibernate/**"/>
+      <include name="shn/**/metamodel/**"/>
       <include name="wbs/**/metamodel/**"/>
+      <include name="shn/**/build/**"/>
       <include name="wbs/**/build/**"/>
+      <include name="shn/**/model/**"/>
       <include name="wbs/**/model/**"/>
     </javac>
     <copy todir="work/bin">
@@ -522,16 +530,6 @@
     <copy todir="work/api-test/apps/api/host-manager">
       <fileset dir="work/api-test/webapps/host-manager"/>
     </copy>
-    <delete dir="work/api-test/apps/api/ROOT"/>
-    <copy todir="work/api-test/apps/api/ROOT">
-      <fileset dir="work/api/root"/>
-    </copy>
-    <copy todir="work/api-test/apps/api/manager">
-      <fileset dir="work/api-test/webapps/manager"/>
-    </copy>
-    <copy todir="work/api-test/apps/api/host-manager">
-      <fileset dir="work/api-test/webapps/host-manager"/>
-    </copy>
     <exec failonerror="false" executable="work/api-test/bin/catalina.sh">
       <env key="WBS_CONFIG_XML" value="config/wbs-api-config.xml"/>
       <arg line="run"/>
@@ -707,7 +705,7 @@
       <arg value="schemaCreate"/>
     </java>
   </target>
-  <target name="just-fixtures">
+  <target name="just-model-fixtures">
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
@@ -716,6 +714,8 @@
       <arg value="wbs.framework.entity.fixtures.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
+  </target>
+  <target name="just-fixture-providers">
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>

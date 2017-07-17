@@ -187,6 +187,25 @@ writeBuildFile world = do
 
 			],
 
+			makeComboTarget "model-fixtures" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-object-helpers",
+				"generate-console-helpers",
+				"build-rest",
+
+				"db-drop",
+				"db-create",
+				"schema-create",
+				"sql-schema",
+				"sql-data",
+				"model-fixtures"
+
+			],
+
 			makeComboTarget "fixtures" [
 
 				"build-framework",
@@ -202,7 +221,8 @@ writeBuildFile world = do
 				"schema-create",
 				"sql-schema",
 				"sql-data",
-				"fixtures"
+				"model-fixtures",
+				"fixture-providers"
 
 			],
 
@@ -392,6 +412,16 @@ writeBuildFile world = do
 			sattr "tofile" tofile
 		] []
 
+	let makeIncludeName name =
+		mkelem "include" [
+			sattr "name" name
+		] []
+
+	let makeSrcPath path =
+		mkelem "src" [
+			sattr "path" path
+		] []
+
 	let makeBuildTargets =
 		[
 
@@ -399,25 +429,13 @@ writeBuildFile world = do
 				makeMkdir "work/bin",
 				makeJavacTask [] [
 
-					mkelem "include" [
-						sattr "name" "wbs/api/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/console/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/framework/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/utils/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/web/**"
-					] [],
+					makeIncludeName "wbs/api/**",
+					makeIncludeName "wbs/console/**",
+					makeIncludeName "wbs/framework/**",
+					makeIncludeName "wbs/utils/**",
+					makeIncludeName "wbs/web/**",
 
-					mkelem "src" [
-						sattr "path" "src"
-					] []
+					makeSrcPath "src"
 
 				]
 			],
@@ -428,21 +446,11 @@ writeBuildFile world = do
 					sattr "basedir" "work/bin"
 				] [
 
-					mkelem "include" [
-						sattr "name" "wbs/api/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/console/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/framework/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/utils/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/web/**"
-					] [],
+					makeIncludeName "wbs/api/**",
+					makeIncludeName "wbs/console/**",
+					makeIncludeName "wbs/framework/**",
+					makeIncludeName "wbs/utils/**",
+					makeIncludeName "wbs/web/**",
 
 					mkelem "service" [
 						sattr "type" "javax.annotation.processing.Processor",
@@ -456,35 +464,20 @@ writeBuildFile world = do
 			makeSimpleTarget "build-meta" [
 				makeJavacTask [] [
 
-					mkelem "src" [
-						sattr "path" "src"
-					] [],
-					mkelem "src" [
-						sattr "path" "work/bin"
-					] [],
+					makeSrcPath "src",
+					makeSrcPath "work/bin",
 
-					mkelem "include" [
-						sattr "name" "wbs/api/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/console/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/framework/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/utils/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/web/**"
-					] [],
+					makeIncludeName "wbs/api/**",
+					makeIncludeName "wbs/console/**",
+					makeIncludeName "wbs/framework/**",
+					makeIncludeName "wbs/utils/**",
+					makeIncludeName "wbs/web/**",
 
-					mkelem "include" [
-						sattr "name" "wbs/**/generate/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/**/metamodel/**"
-					] []
+					makeIncludeName "shn/**/generate/**",
+					makeIncludeName "wbs/**/generate/**",
+
+					makeIncludeName "shn/**/metamodel/**",
+					makeIncludeName "wbs/**/metamodel/**"
 
 				],
 				makeCopyToDir "work/bin" [
@@ -499,48 +492,30 @@ writeBuildFile world = do
 			makeSimpleTarget "build-entity" [
 				makeJavacTask [] [
 
-					mkelem "src" [
-						sattr "path" "src"
-					] [],
-					mkelem "src" [
-						sattr "path" "work/bin"
-					] [],
-					mkelem "src" [
-						sattr "path" "work/generated"
-					] [],
+					makeSrcPath "src",
+					makeSrcPath "work/bin",
+					makeSrcPath "work/generated",
 
-					mkelem "include" [
-						sattr "name" "wbs/api/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/console/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/framework/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/utils/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/web/**"
-					] [],
+					makeIncludeName "wbs/api/**",
+					makeIncludeName "wbs/console/**",
+					makeIncludeName "wbs/framework/**",
+					makeIncludeName "wbs/utils/**",
+					makeIncludeName "wbs/web/**",
 
-					mkelem "include" [
-						sattr "name" "wbs/**/generate/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/**/hibernate/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/**/metamodel/**"
-					] [],
+					makeIncludeName "shn/**/generate/**",
+					makeIncludeName "wbs/**/generate/**",
 
-					mkelem "include" [
-						sattr "name" "wbs/**/build/**"
-					] [],
-					mkelem "include" [
-						sattr "name" "wbs/**/model/**"
-					] []
+					makeIncludeName "shn/**/hibernate/**",
+					makeIncludeName "wbs/**/hibernate/**",
+
+					makeIncludeName "shn/**/metamodel/**",
+					makeIncludeName "wbs/**/metamodel/**",
+
+					makeIncludeName "shn/**/build/**",
+					makeIncludeName "wbs/**/build/**",
+
+					makeIncludeName "shn/**/model/**",
+					makeIncludeName "wbs/**/model/**"
 
 				],
 				makeCopyToDir "work/bin" [
@@ -555,15 +530,9 @@ writeBuildFile world = do
 			makeSimpleTarget "build-rest" [
 				makeJavacTask [] [
 
-					mkelem "src" [
-						sattr "path" "src"
-					] [],
-					mkelem "src" [
-						sattr "path" "work/bin"
-					] [],
-					mkelem "src" [
-						sattr "path" "work/generated"
-					] []
+					makeSrcPath "src",
+					makeSrcPath "work/bin",
+					makeSrcPath "work/generated"
 
 				],
 				makeCopyToDir "work/bin" [
@@ -730,21 +699,7 @@ writeBuildFile world = do
 				(tomcatDir ++ "/webapps/host-manager")
 				(tomcatDir ++ "/apps/api/host-manager"),
 
-			-- deploy api
-
-			makeDeleteDir $ tomcatDir ++ "/apps/api/ROOT",
-
-			makeCopyDirToDir
-				("work/api/root")
-				(tomcatDir ++ "/apps/api/ROOT"),
-
-			makeCopyDirToDir
-				(tomcatDir ++ "/webapps/manager")
-				(tomcatDir ++ "/apps/api/manager"),
-
-			makeCopyDirToDir
-				(tomcatDir ++ "/webapps/host-manager")
-				(tomcatDir ++ "/apps/api/host-manager"),
+			-- start tomcat
 
 			makeExec (tomcatDir ++ "/bin/catalina.sh") [
 				makeEnvKeyValue "WBS_CONFIG_XML" "config/wbs-api-config.xml",
@@ -1060,7 +1015,7 @@ writeBuildFile world = do
 	let makeFixtureTargets =
 		[
 
-			makeSimpleTarget "fixtures" [
+			makeSimpleTarget "model-fixtures" [
 
 				mkelem "java" [
 					sattr "classname"
@@ -1076,7 +1031,11 @@ writeBuildFile world = do
 					makeArgValue (
 						"wbs.framework.entity.fixtures.ModelFixtureCreator"),
 					makeArgValue "runModelFixtureCreators"
-				],
+				]
+
+			],
+
+			makeSimpleTarget "fixture-providers" [
 
 				mkelem "java" [
 					sattr "classname"
@@ -1094,6 +1053,7 @@ writeBuildFile world = do
 				]
 
 			]
+
 		]
 
 	let makeCodeStyleTargets =

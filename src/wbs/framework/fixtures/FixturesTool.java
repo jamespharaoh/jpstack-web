@@ -1,15 +1,15 @@
 package wbs.framework.fixtures;
 
+import static wbs.framework.logging.TaskLogUtils.writeTaskLogToStandardError;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -18,6 +18,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginFixtureSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -48,7 +49,8 @@ class FixturesTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Map <Class <?>, Provider <FixtureProvider>> fixtureProviderProviders;
+	Map <Class <?>, ComponentProvider <FixtureProvider>>
+		fixtureProviderProviders;
 
 	// implementation
 
@@ -113,7 +115,13 @@ class FixturesTool {
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"runFixtureProvider (pluginFixtureSpec)");
+					"runFixtureProvider",
+					keyEqualsString (
+						"pluginName",
+						plugin.name ()),
+					keyEqualsString (
+						"fixtureName",
+						fixture.name ()));
 
 		) {
 
@@ -154,12 +162,13 @@ class FixturesTool {
 				optionalGetRequired (
 					fixtureProviderClassOptional);
 
-			Provider <FixtureProvider> fixtureProviderProvider =
+			ComponentProvider <FixtureProvider> fixtureProviderProvider =
 				fixtureProviderProviders.get (
 					fixtureProviderClass);
 
 			FixtureProvider fixtureProvider =
-				fixtureProviderProvider.get ();
+				fixtureProviderProvider.provide (
+					taskLogger);
 
 			try {
 
@@ -174,6 +183,9 @@ class FixturesTool {
 					"Error creating fixture %s from %s",
 					fixture.name (),
 					plugin.name ());
+
+				writeTaskLogToStandardError (
+					taskLogger);
 
 			}
 

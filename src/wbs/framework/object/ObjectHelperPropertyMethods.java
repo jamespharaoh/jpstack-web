@@ -139,7 +139,7 @@ interface ObjectHelperPropertyMethods <
 			RecordType object,
 			String name);
 
-	void setDynamic (
+	Optional <String> setDynamic (
 			Transaction parentTransaction,
 			RecordType object,
 			String name,

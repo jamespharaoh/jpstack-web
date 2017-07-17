@@ -46,7 +46,7 @@ class ParentFormFieldAccessor <
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Parent> nativeValue) {

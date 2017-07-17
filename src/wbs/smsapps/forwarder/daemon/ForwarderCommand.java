@@ -157,7 +157,8 @@ class ForwarderCommand
 					transaction,
 					forwarder,
 					"forwarder"),
-				message.getThreadId (),
+				optionalOf (
+					message.getThreadId ()),
 				message.getNumber (),
 				defaultService);
 

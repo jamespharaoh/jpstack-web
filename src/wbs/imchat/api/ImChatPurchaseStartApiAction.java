@@ -12,14 +12,9 @@ import static wbs.utils.string.StringUtils.uppercase;
 
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import wbs.api.mvc.ApiAction;
 
@@ -27,6 +22,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -113,7 +109,7 @@ class ImChatPurchaseStartApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// state
 
@@ -194,15 +190,10 @@ class ImChatPurchaseStartApiAction
 			DataFromJson dataFromJson =
 				new DataFromJson ();
 
-			JSONObject jsonValue =
-				(JSONObject)
-				JSONValue.parse (
-					requestContext.requestBodyString ());
-
 			purchaseRequest =
 				dataFromJson.fromJson (
 					ImChatPurchaseStartRequest.class,
-					jsonValue);
+					requestContext.requestBodyString ());
 
 		}
 
@@ -254,13 +245,16 @@ class ImChatPurchaseStartApiAction
 						"The session secret is invalid or the session is no " +
 						"longer active");
 
-				return Optional.of (
-					jsonResponderProvider.get ()
+				return optionalOf (
+					jsonResponderProvider.provide (
+						transaction,
+						jsonResponder ->
+							jsonResponder
 
 					.value (
 						failureResponse)
 
-				);
+				));
 
 			}
 
@@ -306,13 +300,16 @@ class ImChatPurchaseStartApiAction
 					.message (
 						"The price point id is invalid");
 
-				return Optional.of (
-					jsonResponderProvider.get ()
+				return optionalOf (
+					jsonResponderProvider.provide (
+						transaction,
+						jsonResponder ->
+							jsonResponder
 
 					.value (
 						failureResponse)
 
-				);
+				));
 
 			}
 
@@ -591,12 +588,15 @@ class ImChatPurchaseStartApiAction
 			// return
 
 			return optionalOf (
-				jsonResponderProvider.get ()
+				jsonResponderProvider.provide (
+					transaction,
+					jsonResponder ->
+						jsonResponder
 
 				.value (
 					successResponse)
 
-			);
+			));
 
 		}
 

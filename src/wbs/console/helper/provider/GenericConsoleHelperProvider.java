@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
@@ -13,8 +14,10 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.ResultUtils.resultValue;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.naivePluralise;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -90,7 +93,7 @@ class GenericConsoleHelperProvider <
 	// required properties
 
 	@Getter @Setter
-	ConsoleHelperProviderSpec consoleHelperProviderSpec;
+	ConsoleHelperProviderSpec spec;
 
 	@Getter @Setter
 	ObjectHelper <RecordType> objectHelper;
@@ -119,10 +122,16 @@ class GenericConsoleHelperProvider <
 	String defaultObjectContextName;
 
 	@Getter @Setter
-	String viewDelegateField;
+	String viewPrivDelegate;
 
 	@Getter @Setter
-	String viewDelegatePrivCode;
+	String viewPrivCode;
+
+	@Getter @Setter
+	String createPrivDelegate;
+
+	@Getter @Setter
+	String createPrivCode;
 
 	// state
 
@@ -145,7 +154,7 @@ class GenericConsoleHelperProvider <
 
 			// check required properties
 
-			if (consoleHelperProviderSpec == null)
+			if (spec == null)
 				throw new NullPointerException ("consoleHelperProviderSpec");
 
 			if (objectHelper == null)
@@ -163,40 +172,42 @@ class GenericConsoleHelperProvider <
 				objectHelper.objectName ());
 
 			idKey (
-				consoleHelperProviderSpec.idKey ());
+				spec.idKey ());
 
 			defaultListContextName (
 				ifNull (
-					consoleHelperProviderSpec.defaultListContextName (),
+					spec.defaultListContextName (),
 					naivePluralise (
 						objectName ())));
 
 			defaultObjectContextName (
 				ifNull (
-					consoleHelperProviderSpec.defaultObjectContextName (),
+					spec.defaultObjectContextName (),
 					objectHelper.objectName ()));
 
 			if (
 				isNotNull (
-					consoleHelperProviderSpec.viewPriv ())
+					spec.viewPriv ())
 			) {
 
 				List <String> viewPrivParts =
 					stringSplitColon (
-						consoleHelperProviderSpec.viewPriv ());
+						spec.viewPriv ());
 
 				if (viewPrivParts.size () == 1) {
 
-					viewDelegateField (
+					viewPrivCode (
 						viewPrivParts.get (0));
 
 				} else if (viewPrivParts.size () == 2) {
 
-					viewDelegateField (
-						viewPrivParts.get (0));
+					viewPrivDelegate (
+						nullIfEmptyString (
+							viewPrivParts.get (0)));
 
-					viewDelegatePrivCode (
-						viewPrivParts.get (1));
+					viewPrivCode (
+						nullIfEmptyString (
+							viewPrivParts.get (1)));
 
 				} else {
 
@@ -206,12 +217,12 @@ class GenericConsoleHelperProvider <
 
 			}
 
-			if (consoleHelperProviderSpec.cryptorBeanName () != null) {
+			if (spec.cryptorBeanName () != null) {
 
 				cryptor (
 					componentManager.getComponentRequired (
 						taskLogger,
-						consoleHelperProviderSpec.cryptorBeanName (),
+						spec.cryptorBeanName (),
 						Cryptor.class));
 
 			}
@@ -225,7 +236,7 @@ class GenericConsoleHelperProvider <
 
 			for (
 				PrivKeySpec privKeySpec
-					: consoleHelperProviderSpec.privKeys ()
+					: spec.privKeys ()
 			) {
 
 				if (
@@ -245,6 +256,54 @@ class GenericConsoleHelperProvider <
 
 				viewPrivKeySpecs.add (
 					privKeySpec);
+
+			}
+
+			// handle create priv
+
+			if (
+				isNotNull (
+					spec.createPriv ())
+			) {
+
+				List <String> createPrivParts =
+					stringSplitColon (
+						spec.createPriv());
+
+				if (
+					collectionHasOneItem (
+						createPrivParts)
+				) {
+
+					createPrivCode =
+						listFirstElementRequired (
+							createPrivParts);
+
+				} else if (
+					collectionHasTwoItems (
+						createPrivParts)
+				) {
+
+					createPrivDelegate =
+						listFirstElementRequired (
+							createPrivParts);
+
+					createPrivCode =
+						listSecondElementRequired (
+							createPrivParts);
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
+			} else {
+
+				createPrivCode =
+					stringFormat (
+						"%s_create",
+						objectHelper.objectTypeCode ());
 
 			}
 
@@ -291,7 +350,7 @@ class GenericConsoleHelperProvider <
 
 			for (
 				ConsoleContextStuffSpec contextStuffSpec
-					: consoleHelperProviderSpec.contextStuffs ()
+					: spec.contextStuffs ()
 			) {
 
 				if (
@@ -329,7 +388,7 @@ class GenericConsoleHelperProvider <
 
 			for (
 				PrivKeySpec privKeySpec
-					: consoleHelperProviderSpec.privKeys ()
+					: spec.privKeys ()
 			) {
 
 				List <String> privCodeParts =
@@ -391,7 +450,7 @@ class GenericConsoleHelperProvider <
 
 			for (
 				RunPostProcessorSpec runPostProcessorSpec
-					: consoleHelperProviderSpec.runPostProcessors ()
+					: spec.runPostProcessors ()
 			) {
 
 				consoleManager.runPostProcessors (
@@ -704,18 +763,8 @@ class GenericConsoleHelperProvider <
 
 			if (
 				isNotNull (
-					viewDelegateField)
+					viewPrivDelegate)
 			) {
-
-				// special keyword 'public'
-
-				if (
-					stringEqualSafe (
-						viewDelegateField,
-						"public")
-				) {
-					return true;
-				}
 
 				// lookup delegate
 
@@ -726,7 +775,7 @@ class GenericConsoleHelperProvider <
 								objectManager.dereferenceOrError (
 									transaction,
 									object,
-									viewDelegateField))));
+									viewPrivDelegate))));
 
 				if (
 					optionalIsNotPresent (
@@ -735,7 +784,7 @@ class GenericConsoleHelperProvider <
 
 					transaction.debugFormat (
 						"Object is not visible because view delegate %s ",
-						viewDelegateField,
+						viewPrivDelegate,
 						"is not present");
 
 					return false;
@@ -750,28 +799,29 @@ class GenericConsoleHelperProvider <
 
 				if (
 					isNotNull (
-						viewDelegatePrivCode)
+						viewPrivCode)
 				) {
 
 					transaction.debugFormat (
 						"Delegating to %s priv %s",
-						viewDelegateField,
-						viewDelegatePrivCode);
+						viewPrivDelegate,
+						viewPrivCode);
 
 					return privChecker.canRecursive (
 						transaction,
 						delegate,
-						viewDelegatePrivCode);
+						viewPrivCode);
 
 				} else {
 
 					ConsoleHelper <?> delegateHelper =
-						consoleObjectManager.findConsoleHelperRequired (
-							delegate);
+						consoleObjectManager.consoleHelperForObjectRequired (
+							genericCastUnchecked (
+								delegate));
 
 					transaction.debugFormat (
 						"Delegating to %s",
-						viewDelegateField);
+						viewPrivDelegate);
 
 					return delegateHelper.canView (
 						transaction,
@@ -779,6 +829,34 @@ class GenericConsoleHelperProvider <
 							delegate));
 
 				}
+
+			}
+
+			// check view priv
+
+			if (
+				isNotNull (
+					viewPrivCode)
+			) {
+
+				// special keyword 'public'
+
+				if (
+					stringEqualSafe (
+						viewPrivCode,
+						"public")
+				) {
+					return true;
+				}
+
+				transaction.debugFormat (
+					"Checking view priv: %s",
+					viewPrivCode);
+
+				return privChecker.canRecursive (
+					transaction,
+					object,
+					viewPrivCode);
 
 			}
 
@@ -822,6 +900,43 @@ class GenericConsoleHelperProvider <
 						objectHelper.find (
 							transaction,
 							objectId))));
+
+		}
+
+	}
+
+	@Override
+	public
+	boolean canCreateIn (
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> parent) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"canCreateIn");
+
+		) {
+
+			Record <?> delegate =
+				dynamicCastRequired (
+					Record.class,
+					ifNotNullThenElse (
+						createPrivDelegate,
+						() ->
+							objectManager.dereferenceRequired (
+								transaction,
+								parent,
+								createPrivDelegate),
+						() ->
+							parent));
+
+			return privChecker.canRecursive (
+				transaction,
+				delegate,
+				createPrivCode);
 
 		}
 

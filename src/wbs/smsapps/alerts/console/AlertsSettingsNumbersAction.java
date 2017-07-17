@@ -14,8 +14,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -29,6 +27,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -89,7 +88,7 @@ class AlertsSettingsNumbersAction
 
 	@PrototypeDependency
 	@NamedDependency ("alertsSettingsNumbersResponder")
-	Provider <WebResponder> numbersResponderProvider;
+	ComponentProvider <WebResponder> numbersResponderProvider;
 
 	// details
 
@@ -108,7 +107,8 @@ class AlertsSettingsNumbersAction
 		) {
 
 			return optionalOf (
-				numbersResponderProvider.get ());
+				numbersResponderProvider.provide (
+					taskLogger));
 
 		}
 

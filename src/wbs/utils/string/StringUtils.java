@@ -316,7 +316,7 @@ class StringUtils {
 
 	public static
 	LazyString joinWithCommaAndSpaceLazy (
-			@NonNull Iterable <CharSequence> parts) {
+			@NonNull Iterable <? extends CharSequence> parts) {
 
 		return LazyString.singleton (
 			() -> joinWithSeparator (
@@ -329,7 +329,7 @@ class StringUtils {
 
 	public static
 	LazyString joinWithCommaAndSpaceLazy (
-			@NonNull String ... parts) {
+			@NonNull CharSequence ... parts) {
 
 		return LazyString.singleton (
 			() -> joinWithSeparator (
@@ -535,6 +535,18 @@ class StringUtils {
 			string,
 			"_",
 			" ");
+
+	}
+
+	public static
+	String underscoreToSpacesCapitalise (
+			@NonNull String string) {
+
+		return capitalise (
+			replaceAll (
+				string,
+				"_",
+				" "));
 
 	}
 

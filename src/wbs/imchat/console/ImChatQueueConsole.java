@@ -1,7 +1,5 @@
 package wbs.imchat.console;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContext;
@@ -13,6 +11,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -42,7 +41,7 @@ class ImChatQueueConsole
 
 	@PrototypeDependency
 	@NamedDependency ("imChatPendingFormResponder")
-	Provider <WebResponder> pendingFormResponderProvider;
+	ComponentProvider <WebResponder> pendingFormResponderProvider;
 
 	// details
 
@@ -77,7 +76,8 @@ class ImChatQueueConsole
 				targetContext,
 				"/" + queueItem.getRefObjectId ());
 
-			return pendingFormResponderProvider.get ();
+			return pendingFormResponderProvider.provide (
+				taskLogger);
 
 		}
 

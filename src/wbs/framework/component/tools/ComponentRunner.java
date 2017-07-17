@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.uncapitalise;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.BootstrapComponentManager;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.logging.Log4jLogTargetFactory;
 import wbs.framework.logging.LogContext;
@@ -48,7 +47,7 @@ class ComponentRunner {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ComponentManagerBuilder> componentManagerBuilderProvider;
+	ComponentProvider <ComponentManagerBuilder> componentManagerBuilderProvider;
 
 	// properties
 
@@ -267,7 +266,8 @@ class ComponentRunner {
 
 		) {
 
-			return componentManagerBuilderProvider.get ()
+			return componentManagerBuilderProvider.provide (
+				taskLogger)
 
 				.primaryProjectName (
 					primaryProjectName)

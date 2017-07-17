@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -25,6 +23,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -38,7 +37,6 @@ import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.core.RpcType;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.core.model.MessageStatus;
 
@@ -51,6 +49,7 @@ import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 import wbs.web.context.RequestContext;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @SingletonComponent ("forwarderApiLogic")
@@ -78,7 +77,7 @@ class ForwarderApiLogicImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -193,10 +192,15 @@ class ForwarderApiLogicImplementation
 
 			if (forwarderMessageIn == null) {
 
-				return textResponderProvider.get ()
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 					.text (
-						"NONE\n");
+						"NONE\n")
+
+				);
 
 			}
 
@@ -214,12 +218,17 @@ class ForwarderApiLogicImplementation
 				.setProcessedTime (
 					transaction.now ());
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
 
 				.text (
 					printMessageIn (
 						requestContext,
-						forwarderMessageIn));
+						forwarderMessageIn))
+
+			);
 
 		}
 
@@ -255,8 +264,15 @@ class ForwarderApiLogicImplementation
 
 			if (forwarderMessageIn == null) {
 
-				return textResponderProvider.get ()
-					.text ("NONE\n");
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
+
+					.text (
+						"NONE\n")
+
+				);
 
 			}
 
@@ -266,11 +282,17 @@ class ForwarderApiLogicImplementation
 					transaction.now ().plus (
 						Duration.standardMinutes (10)));
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
+
 				.text (
 					printMessageIn (
 						requestContext,
-						forwarderMessageIn));
+						forwarderMessageIn))
+
+			);
 
 		}
 
@@ -304,10 +326,15 @@ class ForwarderApiLogicImplementation
 
 			if (tempString == null) {
 
-				return textResponderProvider.get ()
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 					.text (
-						"ERROR\nNo id supplied\n");
+						"ERROR\nNo id supplied\n")
+
+				);
 
 			}
 
@@ -362,8 +389,15 @@ class ForwarderApiLogicImplementation
 
 			}
 
-			return textResponderProvider.get ()
-				.text ("OK\n");
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
+
+				.text (
+					"OK\n")
+
+			);
 
 		}
 

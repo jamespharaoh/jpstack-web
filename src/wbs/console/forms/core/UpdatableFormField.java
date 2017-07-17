@@ -869,10 +869,11 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			// set the new value
 
-			accessor.write (
-				transaction,
-				container,
-				newNativeValue);
+			Optional <String> updatedFieldName =
+				accessor.write (
+					transaction,
+					container,
+					newNativeValue);
 
 			return new FormUpdateResult <Generic, Native> ()
 
@@ -890,6 +891,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 				.newNativeValue (
 					newNativeValue)
+
+				.updatedFieldName (
+					updatedFieldName)
 
 				.error (
 					optionalAbsent ());

@@ -1,7 +1,10 @@
 package wbs.console.helper.core;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
+import java.util.Map;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Ordering;
@@ -13,6 +16,15 @@ import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleHooks <RecordType extends Record <RecordType>> {
+
+	default
+	Map <String, String> getContextData (
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
+
+		return emptyMap ();
+
+	}
 
 	default
 	Optional <String> getHtml (

@@ -13,4 +13,7 @@ public
 	String value ()
 	default "";
 
+	boolean element ()
+	default false;
+
 }

@@ -5,6 +5,7 @@ import static wbs.utils.collection.ArrayUtils.arrayMap;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSlice;
@@ -43,8 +44,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Data;
@@ -63,7 +62,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -114,10 +113,6 @@ class JavaClassWriter
 		new ArrayList<> ();
 
 	@Getter @Setter
-	List <Dependency> uninitializedDependencies =
-		new ArrayList<> ();
-
-	@Getter @Setter
 	List <State> states =
 		new ArrayList<> ();
 
@@ -165,11 +160,10 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addImplements (
-			@NonNull Function <JavaImportRegistry, String>
-				implementsInterface) {
+			@NonNull Function <JavaImportRegistry, String> value) {
 
 		implementsInterfaces.add (
-			implementsInterface);
+			value);
 
 		return this;
 
@@ -177,12 +171,35 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addImplementsName (
-			@NonNull String interfaceName) {
+			@NonNull String interfaceName,
+			@NonNull List <String> parameters) {
 
-		return addImplements (
-			imports ->
-				imports.register (
-					interfaceName));
+		if (
+			collectionIsNotEmpty (
+				parameters)
+		) {
+
+			return addImplements (
+				imports ->
+					stringFormat (
+						"%s <%s>",
+						imports.register (
+							interfaceName),
+						joinWithCommaAndSpace (
+							iterableMap (
+								parameters,
+								parameter ->
+									imports.register (
+										parameter)))));
+
+		} else {
+
+			return addImplements (
+				imports ->
+					imports.register (
+						interfaceName));
+
+		}
 
 	}
 
@@ -192,7 +209,8 @@ class JavaClassWriter
 
 		return addImplementsName (
 			stringFormatArray (
-				arguments));
+				arguments),
+			emptyList ());
 
 	}
 
@@ -201,7 +219,8 @@ class JavaClassWriter
 			@NonNull Class <?> interfaceClass) {
 
 		return addImplementsName (
-			interfaceClass.getName ());
+			interfaceClass.getName (),
+			emptyList ());
 
 	}
 
@@ -437,93 +456,6 @@ class JavaClassWriter
 			@NonNull String variableName) {
 
 		return addPrototypeDependency (
-			classNameSupplier,
-			variableName,
-			false);
-
-	}
-
-	// prototype dependencies
-
-	public
-	JavaClassWriter addUninitializedDependency (
-			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
-			@NonNull String variableName,
-			@NonNull Boolean named) {
-
-		uninitializedDependencies.add (
-			new Dependency ()
-
-			.annotationClass (
-				UninitializedDependency.class)
-
-			.classNameSupplier (
-				classNameSupplier)
-
-			.memberName (
-				variableName)
-
-			.provider (
-				true)
-
-			.named (
-				named)
-
-		);
-
-		return this;
-
-	}
-
-	public
-	JavaClassWriter addUninitializedDependency (
-			@NonNull String typeName,
-			@NonNull String variableName) {
-
-		return addUninitializedDependency (
-			imports ->
-				imports.register (
-					typeName),
-			variableName,
-			false);
-
-	}
-
-	public
-	JavaClassWriter addNamedUninitializedDependency (
-			@NonNull String typeName,
-			@NonNull String variableName) {
-
-		return addUninitializedDependency (
-			imports ->
-				imports.register (
-					typeName),
-			variableName,
-			true);
-
-	}
-
-	public
-	JavaClassWriter addUninitializedDependency (
-			@NonNull Class <?> dependencyClass) {
-
-		return addUninitializedDependency (
-			imports ->
-				imports.register (
-					dependencyClass),
-			variableNameForDependency (
-				PrototypeComponent.class,
-				dependencyClass),
-			false);
-
-	}
-
-	public
-	JavaClassWriter addUninitializedDependency (
-			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
-			@NonNull String variableName) {
-
-		return addUninitializedDependency (
 			classNameSupplier,
 			variableName,
 			false);
@@ -835,12 +767,6 @@ class JavaClassWriter
 				"prototype dependencies",
 				prototypeDependencies);
 
-			writeDependencies (
-				imports,
-				formatWriter,
-				"uninitialized dependencies",
-				uninitializedDependencies);
-
 			writeState (
 				imports,
 				formatWriter);
@@ -941,7 +867,7 @@ class JavaClassWriter
 				formatWriter.writeLineFormat (
 					"%s <%s> %sProvider;",
 					imports.register (
-						Provider.class),
+						ComponentProvider.class),
 					dependency.classNameSupplier ().apply (
 						imports),
 					dependency.memberName);

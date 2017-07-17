@@ -7,8 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
@@ -21,9 +19,11 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -96,7 +96,7 @@ class BroadcastNumbersAction
 
 	@PrototypeDependency
 	@NamedDependency ("broadcastNumbersResponder")
-	Provider <WebResponder> numbersResponderProvider;
+	ComponentProvider <WebResponder> numbersResponderProvider;
 
 	// details
 
@@ -105,7 +105,19 @@ class BroadcastNumbersAction
 	WebResponder backupResponder (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return numbersResponderProvider.get ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"backupResponder");
+
+		) {
+
+			return numbersResponderProvider.provide (
+				taskLogger);
+
+		}
 
 	}
 

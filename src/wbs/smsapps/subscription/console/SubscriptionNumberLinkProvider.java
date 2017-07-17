@@ -3,14 +3,11 @@ package wbs.smsapps.subscription.console;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Transaction;
@@ -35,11 +32,6 @@ class SubscriptionNumberLinkProvider
 
 	@SingletonDependency
 	SubscriptionSubObjectHelper subscriptionSubHelper;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <SubscriptionNumberAdvice> subscriptionNumberAdviceProvider;
 
 	// details
 

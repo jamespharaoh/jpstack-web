@@ -24,7 +24,6 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -35,6 +34,7 @@ import wbs.apn.chat.namednote.console.ChatNoteNameConsoleHelper;
 import wbs.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 import wbs.web.utils.HtmlUtils;
 

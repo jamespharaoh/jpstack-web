@@ -41,6 +41,8 @@ interface FieldsProvider <Container, Parent> {
 			Transaction parentTransaction,
 			Container container);
 
+	// data structures
+
 	@Accessors (fluent = true)
 	@Data
 	public static

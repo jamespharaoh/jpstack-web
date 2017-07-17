@@ -1,7 +1,5 @@
 package wbs.console.part;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -9,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -26,7 +25,7 @@ class TextPartFactory
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextPart> textPartProvider;
+	ComponentProvider <TextPart> textPartProvider;
 
 	// properties
 
@@ -49,7 +48,8 @@ class TextPartFactory
 
 		) {
 
-			return textPartProvider.get ()
+			return textPartProvider.provide (
+				transaction)
 
 				.text (
 					text)

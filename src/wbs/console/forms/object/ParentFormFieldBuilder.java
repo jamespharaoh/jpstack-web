@@ -3,12 +3,9 @@ package wbs.console.forms.object;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Provider;
 
 import lombok.NonNull;
 
@@ -43,6 +40,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -70,40 +68,35 @@ class ParentFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <ObjectFormFieldRenderer>
-	objectFormFieldRendererProvider;
+	ComponentProvider <ObjectFormFieldRenderer> objectFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <ParentFormFieldAccessor>
-	parentFormFieldAccessorProvider;
+	ComponentProvider <ParentFormFieldAccessor> parentFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <ParentFormFieldConstraintValidator>
-	parentFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <ParentFormFieldConstraintValidator>
+		parentFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -158,24 +151,8 @@ class ParentFormFieldBuilder
 
 			ConsoleHelper <?> parentHelper =
 				consoleHelper.parentTypeIsFixed ()
-					? objectManager.findConsoleHelperRequired (
+					? objectManager.consoleHelperForClassRequired (
 						consoleHelper.parentClassRequired ())
-					: null;
-
-			String createPrivDelegate =
-				parentHelper != null
-					? spec.createPrivDelegate ()
-					: null;
-
-			String createPrivCode =
-				parentHelper != null
-					? ifNull (
-						spec.createPrivCode (),
-						readOnly
-							? null
-							: stringFormat (
-								"%s_create",
-								consoleHelper.objectTypeCode ()))
 					: null;
 
 			// accessor
@@ -184,55 +161,59 @@ class ParentFormFieldBuilder
 				ifThenElse (
 					consoleHelper.canGetParent (),
 
-				() -> simpleFormFieldAccessorProvider.get ()
+				() -> simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 					.name (
 						consoleHelper.parentFieldName ())
 
 					.nativeClass (
-						consoleHelper.parentClassRequired ()),
+						consoleHelper.parentClassRequired ())
 
-				() -> parentFormFieldAccessorProvider.get ()
+				,
+
+				() -> parentFormFieldAccessorProvider.provide (
+					taskLogger)
 
 			);
 
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validator
 
-			List<FormFieldValueValidator> valueValidators =
+			List <FormFieldValueValidator> valueValidators =
 				new ArrayList<> ();
 
 			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+				requiredFormFieldValueValidatorProvider.provide (
+					taskLogger));
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				parentHelper != null
+				parentFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger)
 
-				? parentFormFieldValueConstraintValidatorProvider.get ()
+				.consoleHelper (
+					consoleHelper)
 
-					.createPrivDelegate (
-						createPrivDelegate)
-
-					.createPrivCode (
-						createPrivCode)
-
-				: null;
+			;
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				objectFormFieldRendererProvider.get ()
+				objectFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -243,16 +224,22 @@ class ParentFormFieldBuilder
 				.entityFinder (
 					parentHelper)
 
+				.rootFieldName (
+					spec.rootPath ())
+
 				.mini (
 					consoleHelper.parentTypeIsFixed ())
 
 				.nullable (
-					false);
+					false)
+
+			;
 
 			// update hook
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -267,7 +254,8 @@ class ParentFormFieldBuilder
 				// read only field
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -308,7 +296,8 @@ class ParentFormFieldBuilder
 				}
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

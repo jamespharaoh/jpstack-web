@@ -7,17 +7,18 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.apiclient.GenericHttpSender;
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -27,7 +28,6 @@ import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.oxygenate.foreignapi.OxygenateSmsSendRequest;
 import wbs.integrations.oxygenate.foreignapi.OxygenateSmsSendResponse;
-import wbs.integrations.oxygenate.foreignapi.OxygenateSmsSender;
 import wbs.integrations.oxygenate.model.OxygenateNetworkObjectHelper;
 import wbs.integrations.oxygenate.model.OxygenateNetworkRec;
 import wbs.integrations.oxygenate.model.OxygenateRouteOutObjectHelper;
@@ -42,7 +42,10 @@ import wbs.sms.route.core.model.RouteRec;
 @SingletonComponent ("oxygenateSmsSenderServiceHelper")
 public
 class OxygenateSmsSenderServiceHelper
-	implements SmsSenderHelper <OxygenateSmsSender> {
+	implements SmsSenderHelper <GenericHttpSender <
+		OxygenateSmsSendRequest,
+		OxygenateSmsSendResponse
+	>> {
 
 	// singleton dependencies
 
@@ -64,7 +67,11 @@ class OxygenateSmsSenderServiceHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <OxygenateSmsSender> oxygenateSmsSenderProvider;
+	@NamedDependency ("oxygenateSmsSend")
+	ComponentProvider <GenericHttpSender <
+		OxygenateSmsSendRequest,
+		OxygenateSmsSendResponse
+	>> oxygenateSmsSendProvider;
 
 	// details
 
@@ -78,7 +85,10 @@ class OxygenateSmsSenderServiceHelper
 
 	@Override
 	public
-	SetupRequestResult <OxygenateSmsSender> setupRequest (
+	SetupRequestResult <GenericHttpSender <
+		OxygenateSmsSendRequest,
+		OxygenateSmsSendResponse
+	>> setupRequest (
 			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec smsOutbox) {
 
@@ -111,7 +121,10 @@ class OxygenateSmsSenderServiceHelper
 					oxygenateRouteOutOptional)
 			) {
 
-				return new SetupRequestResult <OxygenateSmsSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					OxygenateSmsSendRequest,
+					OxygenateSmsSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.configError)
@@ -138,14 +151,19 @@ class OxygenateSmsSenderServiceHelper
 					oxygenateNetworkOptional)
 			) {
 
-				return new SetupRequestResult <OxygenateSmsSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					OxygenateSmsSendRequest,
+					OxygenateSmsSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.configError)
 
 					.statusMessageFormat (
 						"Oxygen8 network not found for %s",
-						smsMessage.getNumber ().getNetwork ().getCode ());
+						smsMessage.getNumber ().getNetwork ().getCode ())
+
+				;
 
 			}
 
@@ -159,7 +177,10 @@ class OxygenateSmsSenderServiceHelper
 					smsMessage.getText ().getText ())
 			) {
 
-				return new SetupRequestResult <OxygenateSmsSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					OxygenateSmsSendRequest,
+					OxygenateSmsSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.validationError)
@@ -184,7 +205,10 @@ class OxygenateSmsSenderServiceHelper
 				&& ! allowMultipart
 			) {
 
-				return new SetupRequestResult <OxygenateSmsSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					OxygenateSmsSendRequest,
+					OxygenateSmsSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.validationError)
@@ -253,21 +277,31 @@ class OxygenateSmsSenderServiceHelper
 
 			// create sender
 
-			OxygenateSmsSender sender =
-				oxygenateSmsSenderProvider.get ()
+			GenericHttpSender <
+				OxygenateSmsSendRequest,
+				OxygenateSmsSendResponse
+			> sender =
+				oxygenateSmsSendProvider.provide (
+					transaction,
+					nestedSender ->
+						nestedSender
 
 				.request (
 					request)
 
-			;
+			);
 
 			// encode request
 
-			sender.encode ();
+			sender.encode (
+				transaction);
 
 			// return
 
-			return new SetupRequestResult <OxygenateSmsSender> ()
+			return new SetupRequestResult <GenericHttpSender <
+				OxygenateSmsSendRequest,
+				OxygenateSmsSendResponse
+			>> ()
 
 				.status (
 					SetupRequestStatus.success)
@@ -276,7 +310,9 @@ class OxygenateSmsSenderServiceHelper
 					sender.requestTrace ())
 
 				.state (
-					sender);
+					sender)
+
+			;
 
 		}
 
@@ -286,7 +322,10 @@ class OxygenateSmsSenderServiceHelper
 	public
 	PerformSendResult performSend (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull OxygenateSmsSender sender) {
+			@NonNull GenericHttpSender <
+				OxygenateSmsSendRequest,
+				OxygenateSmsSendResponse
+			> sender) {
 
 		try (
 
@@ -304,9 +343,11 @@ class OxygenateSmsSenderServiceHelper
 
 			try {
 
-				sender.send ();
+				sender.send (
+					taskLogger);
 
-				sender.receive ();
+				sender.receive (
+					taskLogger);
 
 				result.responseTrace (
 					sender.responseTrace ());
@@ -339,7 +380,10 @@ class OxygenateSmsSenderServiceHelper
 	public
 	ProcessResponseResult processSend (
 			@NonNull Transaction parentTransaction,
-			@NonNull OxygenateSmsSender sender) {
+			@NonNull GenericHttpSender <
+				OxygenateSmsSendRequest,
+				OxygenateSmsSendResponse
+			> sender) {
 
 		try (
 

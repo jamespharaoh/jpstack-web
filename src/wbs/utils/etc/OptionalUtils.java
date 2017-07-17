@@ -1,5 +1,6 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.IterableUtils.iterableFilterMap;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
@@ -18,11 +19,14 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import wbs.utils.data.Pair;
 
 public
 class OptionalUtils {
@@ -908,6 +912,24 @@ class OptionalUtils {
 		return ImmutableSet.copyOf (
 			Optional.presentInstances (
 				arguments));
+
+	}
+
+	@SafeVarargs
+	public static <Key, Value>
+	Map <Key, Value> presentInstancesMap (
+			Pair <Key, Optional <Value>> ... arguments) {
+
+		return ImmutableMap.copyOf (
+			iterableFilterMap (
+				Arrays.asList (
+					arguments),
+				(left, right) ->
+					right.isPresent (),
+				(left, right) ->
+					new AbstractMap.SimpleEntry <Key, Value> (
+						left,
+						right.get ())));
 
 	}
 

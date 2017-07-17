@@ -8,14 +8,9 @@ import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import wbs.api.mvc.ApiAction;
 
@@ -23,6 +18,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -83,7 +79,7 @@ class ImChatConversationEndApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -107,15 +103,10 @@ class ImChatConversationEndApiAction
 			DataFromJson dataFromJson =
 				new DataFromJson ();
 
-			JSONObject jsonValue =
-				(JSONObject)
-				JSONValue.parse (
-					requestContext.requestBodyString ());
-
 			ImChatConversationEndRequest endRequest =
 				dataFromJson.fromJson (
 					ImChatConversationEndRequest.class,
-					jsonValue);
+					requestContext.requestBodyString ());
 
 			// lookup objects
 
@@ -212,12 +203,15 @@ class ImChatConversationEndApiAction
 			transaction.commit ();
 
 			return optionalOf (
-				jsonResponderProvider.get ()
+				jsonResponderProvider.provide (
+					transaction,
+					jsonResponder ->
+						jsonResponder
 
 				.value (
 					successResponse)
 
-			);
+			));
 
 		}
 

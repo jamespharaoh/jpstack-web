@@ -5,8 +5,7 @@ import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.List;
-
-import javax.inject.Provider;
+import java.util.function.Supplier;
 
 import lombok.NonNull;
 
@@ -17,7 +16,7 @@ class LazyStringSingleton
 	// state
 
 	private
-	Provider <String> provider;
+	Supplier <String> valueSupplier;
 
 	private
 	String value;
@@ -26,10 +25,10 @@ class LazyStringSingleton
 
 	public
 	LazyStringSingleton (
-			@NonNull Provider <String> provider) {
+			@NonNull Supplier <String> valueSupplier) {
 
-		this.provider =
-			provider;
+		this.valueSupplier =
+			valueSupplier;
 
 	}
 
@@ -57,9 +56,9 @@ class LazyStringSingleton
 
 			value =
 				requiredValue (
-					provider.get ());
+					valueSupplier.get ());
 
-			provider =
+			valueSupplier =
 				null;
 
 		}

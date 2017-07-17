@@ -3,8 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-
-import javax.inject.Provider;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
 
 import lombok.NonNull;
 
@@ -15,6 +14,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -23,15 +23,14 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
-import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("imChatPendingCustomerNoteUpdateAction")
 public
@@ -67,7 +66,7 @@ class ImChatPendingCustomerNoteUpdateAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// details
 
@@ -126,13 +125,18 @@ class ImChatPendingCustomerNoteUpdateAction
 						newValue))
 			) {
 
-				return textResponderProvider.get ()
+				return textResponderProvider.provide (
+					transaction,
+					textResponder ->
+						textResponder
 
 					.text (
 						newValue != null
-							? HtmlUtils.encodeNewlineToBr (
+							? htmlEncodeNewlineToBr (
 								newValue.getText ())
-							: "");
+							: "")
+
+				);
 
 			}
 
@@ -172,13 +176,18 @@ class ImChatPendingCustomerNoteUpdateAction
 
 			transaction.commit ();
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				transaction,
+				textResponder ->
+					textResponder
 
 				.text (
 					newValue != null
-						? HtmlUtils.encodeNewlineToBr (
+						? htmlEncodeNewlineToBr (
 							newValue.getText ())
-						: "");
+						: "")
+
+			);
 
 		}
 

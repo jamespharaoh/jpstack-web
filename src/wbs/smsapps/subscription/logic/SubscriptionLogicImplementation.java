@@ -4,8 +4,6 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.NullUtils.ifNull;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -14,6 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -77,7 +76,7 @@ class SubscriptionLogicImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
+	ComponentProvider <SmsMessageSender> messageSenderProvider;
 
 	// implementation
 
@@ -144,7 +143,8 @@ class SubscriptionLogicImplementation
 			// send message
 
 			MessageRec freeMessage =
-				messageSenderProvider.get ()
+				messageSenderProvider.provide (
+					transaction)
 
 				.number (
 					subscriptionNumber.getNumber ())
@@ -306,7 +306,8 @@ class SubscriptionLogicImplementation
 				);
 
 				MessageRec billedMessage =
-					messageSenderProvider.get ()
+					messageSenderProvider.provide (
+						transaction)
 
 					.number (
 						subscriptionNumber.getNumber ())

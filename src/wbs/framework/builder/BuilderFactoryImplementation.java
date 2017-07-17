@@ -5,20 +5,16 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.Misc.fullClassName;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,7 +31,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -44,7 +40,7 @@ import wbs.framework.logging.TaskLogger;
 @PrototypeComponent ("builderFactory")
 @Accessors (fluent = true)
 public
-class BuilderFactoryImplementation <Context>
+class BuilderFactoryImplementation <Context extends TaskLogger>
 	implements BuilderFactory <
 		BuilderFactoryImplementation <Context>,
 		Context
@@ -57,8 +53,8 @@ class BuilderFactoryImplementation <Context>
 
 	// prototype dependencies
 
-	@PrototypeDependency
-	Provider <BuilderImplementation <Context>> builderImplementationProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <BuilderImplementation <Context>> builderProvider;
 
 	// properties
 
@@ -77,7 +73,7 @@ class BuilderFactoryImplementation <Context>
 	BuilderFactoryImplementation <Context> addBuilder (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <?> builderClass,
-			@NonNull Provider <?> builderProvider) {
+			@NonNull ComponentProvider <?> builderProvider) {
 
 		try (
 
@@ -87,8 +83,6 @@ class BuilderFactoryImplementation <Context>
 					"addBuilder");
 
 		) {
-
-			checkContextClassIsNotNull ();
 
 			BuilderInfo builderInfo =
 				new BuilderInfo ();
@@ -269,8 +263,6 @@ class BuilderFactoryImplementation <Context>
 
 		) {
 
-			checkContextClassIsNotNull ();
-
 			for (
 				Map.Entry <Class <?>, ComponentProvider <Type>> builderEntry
 					: buildersMap.entrySet ()
@@ -294,10 +286,6 @@ class BuilderFactoryImplementation <Context>
 	Builder <Context> create (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		checkContextClassIsNotNull ();
-
-		parentTaskLogger.makeException ();
-
 		try (
 
 			OwnedTaskLogger taskLogger =
@@ -307,7 +295,10 @@ class BuilderFactoryImplementation <Context>
 
 		) {
 
-			return builderImplementationProvider.get ()
+			return builderProvider.provide (
+				taskLogger,
+				builder ->
+					builder
 
 				.contextClass (
 					contextClass)
@@ -315,26 +306,7 @@ class BuilderFactoryImplementation <Context>
 				.builderInfos (
 					builderInfos)
 
-			;
-
-		}
-
-	}
-
-	// private implementation
-
-	private
-	void checkContextClassIsNotNull () {
-
-		if (
-			isNull (
-				contextClass)
-		) {
-
-			throw new NullPointerException (
-				stringFormat (
-					"BuilderFactoryImplementation.contextClass must be ",
-					"specified."));
+			);
 
 		}
 

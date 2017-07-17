@@ -2,8 +2,6 @@ package wbs.console.forms.scriptref;
 
 import java.util.Collections;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.core.ConsoleFormBuilderComponent;
@@ -20,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,7 +36,8 @@ class JqueryScriptRefFormFieldBuilder <Container>
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ScriptRefFormField <Container>> scriptRefFormFieldProvider;
+	ComponentProvider <ScriptRefFormField <Container>>
+		scriptRefFormFieldProvider;
 
 	// builder
 
@@ -69,7 +69,8 @@ class JqueryScriptRefFormFieldBuilder <Container>
 		) {
 
 			formFieldSet.addFormItem (
-				scriptRefFormFieldProvider.get ()
+				scriptRefFormFieldProvider.provide (
+					taskLogger)
 
 				.scriptRefs (
 					Collections.<ScriptRef> singleton (

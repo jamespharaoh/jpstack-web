@@ -267,7 +267,7 @@ class ComponentManagerBuilder {
 					(componentName, componentClassAndValue) -> {
 
 					Class <?> interfaceClass =
-						componentClassAndValue.getLeft ();
+						componentClassAndValue.left ();
 
 					if (
 						classEqualSafe (
@@ -278,7 +278,7 @@ class ComponentManagerBuilder {
 					}
 
 					Object component =
-						componentClassAndValue.getRight ();
+						componentClassAndValue.right ();
 
 					componentRegistry.registerUnmanagedSingleton (
 						taskLogger,

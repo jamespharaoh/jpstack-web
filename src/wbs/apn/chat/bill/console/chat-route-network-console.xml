@@ -3,7 +3,8 @@
 
 	<console-helper-provider
 		object-name="chatRouteNetwork"
-		view-priv="chatRoute.chat:manage">
+		view-priv="chatRoute.chat:manage"
+		create-priv="chat:manage">
 
 		<context-stuff
 			name="chatRouteNetworkName"
@@ -32,9 +33,7 @@
 				form="list"/>
 
 			<object-create-page
-				form="create"
-				create-priv-delegate="parent"
-				create-priv-code="manage"/>
+				form="create"/>
 
 		</list>
 

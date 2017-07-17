@@ -1642,12 +1642,20 @@ class HibernateSessionFactoryBuilder {
 
 				} else {
 
-					if (valueFieldTypes.contains (referencedClass))
+					if (
+						contains (
+							valueFieldTypes,
+							referencedClass)
+					) {
 						throw new RuntimeException ();
+					}
 
 					String manyToManyColumnSql =
 						sqlLogic.quoteIdentifier (
-							sqlEntityNames.idColumnName (referencedClass));
+							ifNull (
+							modelField.foreignColumnName (),
+								sqlEntityNames.idColumnName (
+									referencedClass)));
 
 					setElement
 

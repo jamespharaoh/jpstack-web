@@ -27,6 +27,7 @@ class JavaPropertyWriter
 	Function <JavaImportRegistry, String> setterTypeName;
 	String setterConversion;
 	String propertyName;
+	String setUpdatedFieldName;
 	Function <JavaImportRegistry, String> defaultValue;
 
 	// this class name
@@ -238,6 +239,26 @@ class JavaPropertyWriter
 
 	}
 
+	// set updated field name
+
+	public
+	JavaPropertyWriter setUpdatedFieldName (
+			@NonNull String setUpdatedFieldName) {
+
+		if (
+			isNotNull (
+				this.setUpdatedFieldName)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		this.setUpdatedFieldName =
+			setUpdatedFieldName;
+
+		return this;
+
+	}
+
 	// default value
 
 	public
@@ -358,10 +379,12 @@ class JavaPropertyWriter
 					imports)),
 			propertyName);
 
+		formatWriter.increaseIndent ();
+
 		formatWriter.writeNewline ();
 
 		formatWriter.writeLineFormat (
-			"\tthis.%s =",
+			"this.%s =",
 			propertyName);
 
 		if (
@@ -370,29 +393,42 @@ class JavaPropertyWriter
 		) {
 
 			formatWriter.writeLineFormat (
-				"\t\t%s (",
+				"\t%s (",
 				setterConversion);
 
 			formatWriter.writeLineFormat (
-				"\t\t\t%s);",
+				"\t\t%s);",
 				propertyName);
 
 		} else {
 
 			formatWriter.writeLineFormat (
-				"\t\t%s;",
+				"\t%s;",
 				propertyName);
 
 		}
 
 		formatWriter.writeNewline ();
 
+		if (
+			isNotNull (
+				setUpdatedFieldName)
+		) {
+
+			formatWriter.writeLineFormat (
+				"%s = true;",
+				setUpdatedFieldName);
+
+			formatWriter.writeNewline ();
+
+		}
+
 		formatWriter.writeLineFormat (
-			"\treturn this;");
+			"return this;");
 
 		formatWriter.writeNewline ();
 
-		formatWriter.writeLineFormat (
+		formatWriter.writeLineFormatDecreaseIndent (
 			"}");
 
 		formatWriter.writeNewline ();

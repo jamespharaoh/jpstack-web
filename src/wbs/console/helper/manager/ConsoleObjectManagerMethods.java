@@ -25,30 +25,31 @@ public
 interface ConsoleObjectManagerMethods {
 
 	<RecordType extends Record <RecordType>>
-	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
+	Optional <ConsoleHelper <RecordType>> consoleHelperForObject (
 			Record <?> object);
 
 	default
-	ConsoleHelper <?> findConsoleHelperRequired (
-			@NonNull Record <?> object) {
+	<RecordType extends Record <RecordType>>
+	ConsoleHelper <RecordType> consoleHelperForObjectRequired (
+			@NonNull RecordType object) {
 
 		return optionalGetRequired (
-			findConsoleHelper (
+			consoleHelperForObject (
 				object));
 
 	}
 
 	<ObjectType extends Record <ObjectType>>
-	Optional <ConsoleHelper <ObjectType>> findConsoleHelper (
+	Optional <ConsoleHelper <ObjectType>> consoleHelperForClass (
 			Class <?> objectClass);
 
 	default
 	<ObjectType extends Record <ObjectType>>
-	ConsoleHelper <ObjectType> findConsoleHelperRequired (
+	ConsoleHelper <ObjectType> consoleHelperForClassRequired (
 			@NonNull Class <?> objectClass) {
 
 		return optionalOrThrow (
-			findConsoleHelper (
+			consoleHelperForClass (
 				objectClass),
 			() -> new NoSuchElementException (
 				stringFormat (
@@ -58,15 +59,15 @@ interface ConsoleObjectManagerMethods {
 
 	}
 
-	Optional <ConsoleHelper <?>> findConsoleHelper (
+	Optional <ConsoleHelper <?>> consoleHelperForName (
 			String objectTypeName);
 
 	default
-	ConsoleHelper <?> findConsoleHelperRequired (
+	ConsoleHelper <?> consoleHelperForNameRequired (
 			@NonNull String objectTypeName) {
 
 		return optionalOrThrow (
-			findConsoleHelper (
+			consoleHelperForName (
 				objectTypeName),
 			() -> new NoSuchElementException (
 				stringFormat (

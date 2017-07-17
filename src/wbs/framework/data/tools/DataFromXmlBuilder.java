@@ -1,5 +1,6 @@
 package wbs.framework.data.tools;
 
+import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -49,6 +51,9 @@ class DataFromXmlBuilder {
 	Map <String, List <DataClassInfo>> dataClassesMap =
 		new HashMap<> ();
 
+	List <DataClassInfo> elementDataClasses =
+		new ArrayList<> ();
+
 	Map <String, Map <String, ?>> namedObjectCollections =
 		new HashMap<> ();
 
@@ -59,7 +64,11 @@ class DataFromXmlBuilder {
 			@NonNull String collectionName,
 			@NonNull Map <String, ?> namedObjectCollection) {
 
-		if (namedObjectCollection.containsKey (collectionName)) {
+		if (
+			mapContainsKey (
+				namedObjectCollection,
+				collectionName)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -265,19 +274,39 @@ class DataFromXmlBuilder {
 
 			}
 
-			dataClassInfos.add (
-				new DataClassInfo ()
+			if (dataClassAnnotation.element ()) {
 
-				.parentClass (
-					parentClass)
+				elementDataClasses.add (
+					new DataClassInfo ()
 
-				.dataClass (
-					dataClass)
+					.parentClass (
+						parentClass)
 
-				.provider (
-					builderProvider)
+					.dataClass (
+						dataClass)
 
-			);
+					.provider (
+						builderProvider)
+
+				);
+
+			} else {
+
+				dataClassInfos.add (
+					new DataClassInfo ()
+
+					.parentClass (
+						parentClass)
+
+					.dataClass (
+						dataClass)
+
+					.provider (
+						builderProvider)
+
+				);
+
+			}
 
 			return this;
 
@@ -333,6 +362,10 @@ class DataFromXmlBuilder {
 				.dataClassesMap (
 					ImmutableMap.copyOf (
 						dataClassesMap))
+
+				.elementDataClasses (
+					ImmutableList.copyOf (
+						elementDataClasses))
 
 				.namedObjectCollections (
 					namedObjectCollections)

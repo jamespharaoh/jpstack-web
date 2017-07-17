@@ -8,8 +8,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -20,11 +18,13 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.logic.FonixLogic;
@@ -34,7 +34,6 @@ import wbs.integrations.fonix.model.FonixRouteInObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteInRec;
 
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -45,6 +44,7 @@ import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("fonixRouteInApiLoggingAction")
@@ -90,7 +90,7 @@ class FonixRouteInApiLoggingAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// state
 
@@ -250,10 +250,26 @@ class FonixRouteInApiLoggingAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		return textResponderProvider.get ()
+		try (
 
-			.text (
-				"OK");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
+
+		) {
+
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
+	
+				.text (
+					"OK")
+
+			);
+
+		}
 
 	}
 

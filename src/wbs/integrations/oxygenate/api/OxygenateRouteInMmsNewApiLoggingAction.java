@@ -25,8 +25,6 @@ import static wbs.utils.string.StringUtils.utf8ToString;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -37,6 +35,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
@@ -54,7 +53,6 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -66,6 +64,7 @@ import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpUnprocessableEntityException;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("oxygenateRouteInMmsNewApiLoggingAction")
@@ -111,7 +110,7 @@ class OxygenateRouteInMmsNewApiLoggingAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// state
 
@@ -283,8 +282,8 @@ class OxygenateRouteInMmsNewApiLoggingAction
 			for (
 				MediaRec textMedia
 					: iterableFilter (
-						mediaLogic::isText,
-						medias)
+						medias,
+						mediaLogic::isText)
 			) {
 
 				String mediaString =
@@ -352,20 +351,36 @@ class OxygenateRouteInMmsNewApiLoggingAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		debugWriter.writeLineFormat (
-			"===== RESPONSE =====");
+		try (
 
-		debugWriter.writeNewline ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
 
-		debugWriter.writeLineFormat (
-			"SUCCESS");
+		) {
 
-		debugWriter.writeNewline ();
+			debugWriter.writeLineFormat (
+				"===== RESPONSE =====");
+	
+			debugWriter.writeNewline ();
+	
+			debugWriter.writeLineFormat (
+				"SUCCESS");
+	
+			debugWriter.writeNewline ();
+	
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
+	
+				.text (
+					"SUCCESS\n")
 
-		return textResponderProvider.get ()
+			);
 
-			.text (
-				"SUCCESS\n");
+		}
 
 	}
 

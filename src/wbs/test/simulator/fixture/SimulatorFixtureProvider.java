@@ -5,6 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -66,6 +67,9 @@ class SimulatorFixtureProvider
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	@SingletonDependency
+	WbsConfig wbsConfig;
+
 	// implementation
 
 	@Override
@@ -113,7 +117,7 @@ class SimulatorFixtureProvider
 					menuGroupHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test",
+						wbsConfig.defaultSlice (),
 						"test"))
 
 				.setCode (
@@ -162,7 +166,7 @@ class SimulatorFixtureProvider
 					sliceHelper.findByCodeRequired (
 						transaction,
 						GlobalId.root,
-						"test"))
+						wbsConfig.defaultSlice ()))
 
 				.setCode (
 					"test")
@@ -181,7 +185,7 @@ class SimulatorFixtureProvider
 				routeHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"free");
 
 			freeRoute
@@ -198,7 +202,7 @@ class SimulatorFixtureProvider
 				routeHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"bill");
 
 			billRoute
@@ -242,7 +246,7 @@ class SimulatorFixtureProvider
 				routeHelper.findByCodeRequired (
 					transaction,
 					GlobalId.root,
-					"test",
+					wbsConfig.defaultSlice (),
 					"inbound");
 
 			simulatorRouteHelper.insert (
@@ -279,11 +283,9 @@ class SimulatorFixtureProvider
 					transaction.now ())
 
 				.setCreatedUser (
-					userHelper.findByCodeRequired (
+					userHelper.findRequired (
 						transaction,
-						GlobalId.root,
-						"test",
-						"test0"))
+						1l))
 
 			);
 

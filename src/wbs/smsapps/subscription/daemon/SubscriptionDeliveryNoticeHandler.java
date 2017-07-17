@@ -5,15 +5,12 @@ import static wbs.utils.etc.NullUtils.isNotNull;
 
 import java.util.Collection;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -26,7 +23,6 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.outbox.logic.SmsMessageSender;
 
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
@@ -59,11 +55,6 @@ class SubscriptionDeliveryNoticeHandler
 
 	@SingletonDependency
 	SubscriptionLogic subscriptionLogic;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 

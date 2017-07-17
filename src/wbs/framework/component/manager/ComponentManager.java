@@ -17,9 +17,9 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 public
 interface ComponentManager
@@ -32,22 +32,7 @@ interface ComponentManager
 	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			TaskLogger parentTaskLogger,
 			String componentName,
-			Class <ComponentType> componentClass,
-			Boolean initialized);
-
-	default <ComponentType>
-	Optional <ComponentProvider <ComponentType>> getComponentProvider (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass) {
-
-		return getComponentProvider (
-			parentTaskLogger,
-			componentName,
-			componentClass,
-			true);
-
-	}
+			Class <ComponentType> componentClass);
 
 	default <ComponentType>
 	Optional <ComponentType> getComponent (
@@ -61,8 +46,7 @@ interface ComponentManager
 				getComponentProvider (
 					taskLogger,
 					componentName,
-					componentClass,
-					initialized);
+					componentClass);
 
 		if (
 			optionalIsNotPresent (
@@ -75,9 +59,19 @@ interface ComponentManager
 			optionalGetRequired (
 				componentProviderOptional);
 
-		return optionalOf (
-			componentProvider.provide (
-				taskLogger));
+		if (initialized) {
+
+			return optionalOf (
+				componentProvider.provide (
+					taskLogger));
+
+		} else {
+
+			return optionalOf (
+				componentProvider.provideUninitialised (
+					taskLogger));
+
+		}
 
 	}
 
@@ -107,8 +101,7 @@ interface ComponentManager
 				getComponentProvider (
 					parentTaskLogger,
 					componentName,
-					componentClass,
-					initialise);
+					componentClass);
 
 		if (
 			optionalIsNotPresent (
@@ -128,8 +121,17 @@ interface ComponentManager
 			optionalGetRequired (
 				componentProviderOptional);
 
-		return componentProvider.provide (
-			parentTaskLogger);
+		if (initialise) {
+
+			return componentProvider.provide (
+				parentTaskLogger);
+
+		} else {
+
+			return componentProvider.provideUninitialised (
+				parentTaskLogger);
+
+		}
 
 	}
 

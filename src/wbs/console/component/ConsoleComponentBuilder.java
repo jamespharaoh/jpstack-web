@@ -5,8 +5,6 @@ import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.module.ConsoleModuleSpec;
@@ -35,7 +33,7 @@ class ConsoleComponentBuilder
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	@StrongPrototypeDependency
 	Map <Class <?>, ComponentProvider <ConsoleComponentBuilderComponent>>
@@ -62,7 +60,8 @@ class ConsoleComponentBuilder
 		) {
 
 			builder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					TaskLogger.class)

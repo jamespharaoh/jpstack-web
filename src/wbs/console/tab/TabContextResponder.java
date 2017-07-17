@@ -1,9 +1,6 @@
 package wbs.console.tab;
 
 import static wbs.utils.etc.NullUtils.isNull;
-import static wbs.utils.string.StringUtils.stringFormat;
-
-import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.database.Database;
@@ -35,9 +33,7 @@ import wbs.web.responder.WebResponder;
 @DataClass ("tab-context-responder")
 public
 class TabContextResponder
-	implements
-		Provider <WebResponder>,
-		WebResponder {
+	implements WebResponder {
 
 	// singleton dependencies
 
@@ -56,7 +52,7 @@ class TabContextResponder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TabbedResponder> tabbedPageProvider;
+	ComponentProvider <TabbedResponder> tabbedPageProvider;
 
 	// properties
 
@@ -76,9 +72,9 @@ class TabContextResponder
 
 	public
 	TabContextResponder pagePartName (
-			String pagePartName) {
+			@NonNull String pagePartName) {
 
-		PagePartFactory factory =
+		return pagePartFactory (
 			parentTransaction -> {
 
 			try (
@@ -90,37 +86,14 @@ class TabContextResponder
 
 			) {
 
-				Object bean =
-					componentManager.getComponentRequired (
-						transaction,
-						pagePartName,
-						Object.class);
-
-				if (bean instanceof PagePart) {
-					return (PagePart) bean;
-				}
-
-				if (bean instanceof Provider) {
-
-					Provider<?> provider =
-						(Provider<?>) bean;
-
-					return (PagePart)
-						provider.get ();
-
-				}
-
-				throw new ClassCastException (
-					stringFormat (
-						"Cannot cast %s to PagePart or Provider<PagePart>",
-						bean.getClass ().getName ()));
+				return componentManager.getComponentRequired (
+					transaction,
+					pagePartName,
+					PagePart.class);
 
 			}
 
-		};
-
-		return pagePartFactory (
-			factory);
+		});
 
 	}
 
@@ -159,14 +132,6 @@ class TabContextResponder
 
 	}
 
-	@Override
-	public
-	WebResponder get () {
-
-		return this;
-
-	}
-
 	// private implementation
 
 	private
@@ -193,7 +158,8 @@ class TabContextResponder
 
 			}
 
-			return tabbedPageProvider.get ()
+			return tabbedPageProvider.provide (
+				transaction)
 
 				.tab (
 					requestContext.consoleContextStuffRequired ().getTab (

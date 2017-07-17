@@ -6,15 +6,10 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import wbs.api.mvc.ApiAction;
 
@@ -22,6 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
@@ -70,7 +66,7 @@ class ImChatMessageListApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -94,15 +90,10 @@ class ImChatMessageListApiAction
 			DataFromJson dataFromJson =
 				new DataFromJson ();
 
-			JSONObject jsonValue =
-				(JSONObject)
-				JSONValue.parse (
-					requestContext.requestBodyString ());
-
 			ImChatMessageListRequest request =
 				dataFromJson.fromJson (
 					ImChatMessageListRequest.class,
-					jsonValue);
+					requestContext.requestBodyString ());
 
 			// lookup session
 
@@ -190,12 +181,15 @@ class ImChatMessageListApiAction
 			}
 
 			return optionalOf (
-				jsonResponderProvider.get ()
+				jsonResponderProvider.provide (
+					transaction,
+					jsonResponder ->
+						jsonResponder
 
 				.value (
 					messageListSuccessResponse)
 
-			);
+			));
 
 		}
 

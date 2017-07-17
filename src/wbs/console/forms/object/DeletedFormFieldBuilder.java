@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.IdentityFormFieldInterfaceMapping;
@@ -41,6 +39,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -62,40 +61,36 @@ class DeletedFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <YesNoCsvFormFieldInterfaceMapping>
-	yesNoCsvFormFieldInterfaceMappingProvider;
+	ComponentProvider <YesNoCsvFormFieldInterfaceMapping>
+		yesNoCsvFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <YesNoFormFieldRenderer>
-	yesNoFormFieldRendererProvider;
+	ComponentProvider <YesNoFormFieldRenderer> yesNoFormFieldRendererProvider;
 
 	// builder
 
@@ -158,7 +153,8 @@ class DeletedFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				simpleFormFieldAccessorProvider.get ()
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -169,30 +165,35 @@ class DeletedFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validators
 
-			List<FormFieldValueValidator> valueValidators =
+			List <FormFieldValueValidator> valueValidators =
 				new ArrayList<> ();
 
 			valueValidators.add (
-				requiredFormFieldValueValidatorProvider.get ());
+				requiredFormFieldValueValidatorProvider.provide (
+					taskLogger));
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldValueConstraintValidatorProvider.get ();
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// csv mapping
 
 			FormFieldInterfaceMapping csvMapping =
-				yesNoCsvFormFieldInterfaceMappingProvider.get ()
+				yesNoCsvFormFieldInterfaceMappingProvider.provide (
+					taskLogger)
 
 				.nullable (
 					false);
@@ -200,7 +201,8 @@ class DeletedFormFieldBuilder
 			// render
 
 			FormFieldRenderer renderer =
-				yesNoFormFieldRendererProvider.get ()
+				yesNoFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -221,6 +223,7 @@ class DeletedFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -230,7 +233,8 @@ class DeletedFormFieldBuilder
 			if (! readOnly) {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -267,7 +271,8 @@ class DeletedFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

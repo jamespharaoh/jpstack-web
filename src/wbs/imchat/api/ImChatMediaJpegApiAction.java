@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.awt.image.BufferedImage;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -25,6 +23,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -78,10 +77,10 @@ class ImChatMediaJpegApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ImChatMediaResponder> imChatMediaResponderProvider;
+	ComponentProvider <ImChatMediaResponder> imChatMediaResponderProvider;
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// properties
 
@@ -192,7 +191,10 @@ class ImChatMediaJpegApiAction
 			// create response
 
 			return optionalOf (
-				imChatMediaResponderProvider.get ()
+				imChatMediaResponderProvider.provide (
+					transaction,
+					imChatMediaResponder ->
+						imChatMediaResponder
 
 				.data (
 					resizedImageJpeg)
@@ -200,7 +202,7 @@ class ImChatMediaJpegApiAction
 				.contentType (
 					"image/jpeg")
 
-			);
+			));
 
 		}
 

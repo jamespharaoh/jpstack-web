@@ -1,6 +1,8 @@
 package wbs.console.forms.basic;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.PropertyUtils.propertySetAuto;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
@@ -104,7 +106,7 @@ class SimpleFormFieldAccessor <Container, Native>
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
@@ -143,10 +145,14 @@ class SimpleFormFieldAccessor <Container, Native>
 
 			// set property
 
-			PropertyUtils.propertySetAuto (
+			propertySetAuto (
 				container,
 				name,
 				nativeValue.orNull ());
+
+			// return
+
+			return optionalAbsent ();
 
 		}
 

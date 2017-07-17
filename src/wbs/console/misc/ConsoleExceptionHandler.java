@@ -10,8 +10,6 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.priv.UserPrivChecker;
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
@@ -68,7 +67,7 @@ class ConsoleExceptionHandler
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ErrorResponder> errorPageProvider;
+	ComponentProvider <ErrorResponder> errorPageProvider;
 
 	// implementation
 
@@ -203,7 +202,8 @@ class ConsoleExceptionHandler
 
 					requestContext.reset ();
 
-					errorPageProvider.get ()
+					errorPageProvider.provide (
+						taskLogger)
 
 						.exception (
 							throwable)

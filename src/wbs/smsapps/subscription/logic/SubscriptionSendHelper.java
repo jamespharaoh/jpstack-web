@@ -5,14 +5,11 @@ import static wbs.utils.etc.NullUtils.isNull;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -32,7 +29,6 @@ import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
-import wbs.sms.message.outbox.logic.SmsMessageSender;
 
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
@@ -113,11 +109,6 @@ class SubscriptionSendHelper
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 

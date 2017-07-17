@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
@@ -21,6 +19,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -63,7 +62,7 @@ class ImChatProfileListApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -129,12 +128,15 @@ class ImChatProfileListApiAction
 			}
 
 			return optionalOf (
-				jsonResponderProvider.get ()
+				jsonResponderProvider.provide (
+					transaction,
+					jsonResponder ->
+						jsonResponder
 
 				.value (
 					profileDatas)
 
-			);
+			));
 
 		}
 

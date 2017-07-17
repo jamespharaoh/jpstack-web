@@ -11,8 +11,6 @@ import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
@@ -30,6 +29,7 @@ import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.logic.FonixLogic;
@@ -39,8 +39,6 @@ import wbs.integrations.fonix.model.FonixInboundLogObjectHelper;
 import wbs.integrations.fonix.model.FonixInboundLogType;
 import wbs.integrations.fonix.model.FonixRouteOutObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteOutRec;
-
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -53,6 +51,7 @@ import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("fonixRouteReportApiLoggingAction")
@@ -101,7 +100,7 @@ class FonixRouteReportApiLoggingAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// state
 
@@ -326,30 +325,46 @@ class FonixRouteReportApiLoggingAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		// encode response
+		try (
 
-		String responseString = "OK";
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
 
-		// write to debug log
+		) {
 
-		debugWriter.writeString (
-			"== RESPONSE BODY ==\n\n");
-
-		debugWriter.writeString (
-			responseString);
-
-		debugWriter.writeString (
-			"\n\n");
-
-		// create responder
-
-		return textResponderProvider.get ()
-
-			.contentType (
-				"text/plain")
-
-			.text (
+			// encode response
+	
+			String responseString = "OK";
+	
+			// write to debug log
+	
+			debugWriter.writeString (
+				"== RESPONSE BODY ==\n\n");
+	
+			debugWriter.writeString (
 				responseString);
+	
+			debugWriter.writeString (
+				"\n\n");
+	
+			// create responder
+	
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
+	
+				.contentType (
+					"text/plain")
+	
+				.text (
+					responseString)
+
+			);
+
+		}
 
 	}
 

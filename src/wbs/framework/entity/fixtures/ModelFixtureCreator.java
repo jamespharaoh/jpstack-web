@@ -3,8 +3,6 @@ package wbs.framework.entity.fixtures;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -46,7 +44,7 @@ class ModelFixtureCreator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <BuilderFactory <?, Transaction>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, Transaction>> builderFactoryProvider;
 
 	@PrototypeDependency
 	@ModelMetaBuilderHandler
@@ -95,7 +93,8 @@ class ModelFixtureCreator {
 		) {
 
 			fixtureBuilder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					Transaction.class)

@@ -3,8 +3,6 @@ package wbs.imchat.api;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -15,6 +13,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -56,7 +55,7 @@ class ImChatServiceGetApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -98,12 +97,15 @@ class ImChatServiceGetApiAction
 			// return
 
 			return optionalOf (
-				jsonResponderProvider.get ()
+				jsonResponderProvider.provide (
+					transaction,
+					jsonResponder ->
+						jsonResponder
 
 				.value (
 					serviceData)
 
-			);
+			));
 
 		}
 

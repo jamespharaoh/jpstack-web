@@ -1,10 +1,22 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.ArrayUtils.arrayFirstItemRequired;
+import static wbs.utils.collection.CollectionUtils.arrayLength;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.notEqualToOne;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -12,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Optional;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -142,13 +156,48 @@ class PropertyUtils {
 
 		try {
 
-			Class<?> objectClass =
+			Class <?> objectClass =
 				object.getClass ();
 
 			Method setter =
 				propertySetMethodAuto (
 					objectClass,
 					propertyName);
+
+			Class <?> propertyClass =
+				setter.getParameterTypes () [0];
+
+			if (
+				isNotNull (
+					newValue)
+			) {
+
+				Class <?> valueClass =
+					newValue.getClass ();
+
+				if (
+					isNotSubclassOf (
+						propertyClass,
+						valueClass)
+				) {
+
+					throw new ClassCastException (
+						stringFormat (
+							"Cannot set property %s.%s ",
+							classNameFull (
+								objectClass),
+							propertyName,
+							"of type %s ",
+							classNameFull (
+								propertyClass),
+							"to %s",
+							classNameFull (
+								valueClass)));
+
+
+				}
+
+			}
 
 			setter.invoke (
 				object,
@@ -217,7 +266,8 @@ class PropertyUtils {
 	void propertySetSimple (
 			@NonNull Object object,
 			@NonNull String propertyName,
-			Object newValue) {
+			@NonNull Class <?> propertyClass,
+			@NonNull Optional <?> newValueOpional) {
 
 		try {
 
@@ -227,43 +277,126 @@ class PropertyUtils {
 			Method[] methods =
 				objectClass.getMethods ();
 
+			if (
+				optionalIsPresent (
+					newValueOpional)
+
+				&& isNotInstanceOf (
+					propertyClass,
+					optionalGetRequired (
+						newValueOpional))
+
+			) {
+
+				Object newValue =
+					optionalGetRequired (
+						newValueOpional);
+
+				throw new ClassCastException (
+					stringFormat (
+						"New value class %s ",
+						classNameSimple (
+							newValue.getClass ()),
+						"is not instance of %s",
+						classNameSimple (
+							propertyClass)));
+
+			}
+
 			for (
 				Method method
 					: methods
 			) {
 
-				if (method.getParameterTypes ().length != 1)
+				if (
+					stringNotEqualSafe (
+						method.getName (),
+						propertyName)
+				) {
 					continue;
+				}
 
-				if (! method.getName ().equals (propertyName))
+				if (
+					notEqualToOne (
+						arrayLength (
+							method.getParameterTypes ()))
+				) {
 					continue;
+				}
 
-				if (! method.getParameterTypes () [0].isInstance (newValue))
+				Class <?> parameterClass =
+					arrayFirstItemRequired (
+						method.getParameterTypes ());
+
+				if (
+
+					isNotSubclassOf (
+						parameterClass,
+						propertyClass)
+
+					&& isNotSubclassOf (
+						propertyClass,
+						parameterClass)
+
+				) {
 					continue;
+				}
+
+				if (
+
+					optionalIsPresent (
+						newValueOpional)
+
+					&& isNotInstanceOf (
+						parameterClass,
+						optionalGetRequired (
+							newValueOpional))
+
+				) {
+
+					Object newValue =
+						optionalGetRequired (
+							newValueOpional);
+
+					throw new ClassCastException (
+						stringFormat (
+							"Setter %s.%s (%s) ",
+							classNameFull (
+								objectClass),
+							propertyName,
+							classNameSimple (
+								parameterClass),
+							"can't be set to %s",
+							classNameSimple (
+								newValue.getClass ())));
+
+				}
 
 				method.invoke (
 					object,
-					newValue);
+					optionalOrNull (
+						newValueOpional));
 
 				return;
 
 			}
 
-			throw new RuntimeException (
+			throw new RuntimeNoSuchMethodException (
 				stringFormat (
 					"Method %s.%s (%s) not found",
 					objectClass.getName (),
 					propertyName,
-					newValue.getClass ().getSimpleName ()));
+					classNameSimple (
+						propertyClass)));
 
 		} catch (IllegalAccessException exception) {
 
-			throw new RuntimeException (
+			throw new RuntimeIllegalAccessException (
 				exception);
 
 		} catch (InvocationTargetException exception) {
 
-			throw new RuntimeException (
+			throw new RuntimeInvocationTargetException (
 				exception);
 
 		}

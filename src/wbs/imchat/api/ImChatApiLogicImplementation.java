@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -33,6 +31,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -94,7 +93,7 @@ class ImChatApiLogicImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JsonResponder> jsonResponderProvider;
+	ComponentProvider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -883,12 +882,15 @@ class ImChatApiLogicImplementation
 
 			;
 
-			return jsonResponderProvider.get ()
+			return jsonResponderProvider.provide (
+				taskLogger,
+				jsonResponder ->
+					jsonResponder
 
 				.value (
 					failureResponse)
 
-			;
+			);
 
 		}
 

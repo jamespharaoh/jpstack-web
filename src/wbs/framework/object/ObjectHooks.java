@@ -65,7 +65,7 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 	}
 
 	default
-	void setDynamic (
+	Optional <String> setDynamic (
 			@NonNull Transaction parentTransaction,
 			@NonNull RecordType object,
 			@NonNull String name,

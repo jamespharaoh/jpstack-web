@@ -5,8 +5,6 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -24,6 +22,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -42,10 +41,11 @@ class ConsoleContextSectionMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextLink> contextLinkProvider;
+	ComponentProvider <ConsoleContextLink> contextLinkProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	ComponentProvider <ConsoleContextRootExtensionPoint>
+		rootExtensionPointProvider;
 
 	// builder
 
@@ -87,7 +87,8 @@ class ConsoleContextSectionMetaBuilder
 			// link to parent
 
 			consoleMetaModule.addContextLink (
-				contextLinkProvider.get ()
+				contextLinkProvider.provide (
+					taskLogger)
 
 				.localName (
 					spec.name ())
@@ -107,7 +108,8 @@ class ConsoleContextSectionMetaBuilder
 			// extension point for children
 
 			consoleMetaModule.addExtensionPoint (
-				rootExtensionPointProvider.get ()
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
 				.name (
 					"section:" + structuralName)

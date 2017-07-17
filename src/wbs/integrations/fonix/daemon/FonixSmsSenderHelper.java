@@ -9,18 +9,19 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.apiclient.GenericHttpSender;
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -30,7 +31,6 @@ import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.fonix.foreignapi.FonixMessageSendRequest;
 import wbs.integrations.fonix.foreignapi.FonixMessageSendResponse;
-import wbs.integrations.fonix.foreignapi.FonixMessageSender;
 import wbs.integrations.fonix.model.FonixRouteOutObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteOutRec;
 
@@ -45,8 +45,12 @@ import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
 
 @SingletonComponent ("fonixSmsSenderHelper")
-public class FonixSmsSenderHelper
-	implements SmsSenderHelper <FonixMessageSender> {
+public
+class FonixSmsSenderHelper
+	implements SmsSenderHelper <GenericHttpSender <
+		FonixMessageSendRequest,
+		FonixMessageSendResponse
+	>> {
 
 	// singleton dependencies
 
@@ -71,7 +75,11 @@ public class FonixSmsSenderHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <FonixMessageSender> fonixMessageSenderProvider;
+	@NamedDependency ("fonixMessageSender")
+	ComponentProvider <GenericHttpSender <
+		FonixMessageSendRequest,
+		FonixMessageSendResponse
+	>> fonixMessageSenderProvider;
 
 	// details
 
@@ -85,7 +93,10 @@ public class FonixSmsSenderHelper
 
 	@Override
 	public
-	SetupRequestResult <FonixMessageSender> setupRequest (
+	SetupRequestResult <GenericHttpSender <
+		FonixMessageSendRequest,
+		FonixMessageSendResponse
+	>> setupRequest (
 			@NonNull Transaction parentTransaction,
 			@NonNull OutboxRec smsOutbox) {
 
@@ -118,7 +129,10 @@ public class FonixSmsSenderHelper
 					fonixRouteOutOptional)
 			) {
 
-				return new SetupRequestResult <FonixMessageSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					FonixMessageSendRequest,
+					FonixMessageSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.configError)
@@ -126,7 +140,9 @@ public class FonixSmsSenderHelper
 					.statusMessage (
 						stringFormat (
 							"Fonix outbound route not found for %s",
-							smsRoute.getCode ()));
+							smsRoute.getCode ()))
+
+				;
 
 			}
 
@@ -140,13 +156,18 @@ public class FonixSmsSenderHelper
 					smsMessage.getText ().getText ())
 			) {
 
-				return new SetupRequestResult <FonixMessageSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					FonixMessageSendRequest,
+					FonixMessageSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.validationError)
 
 					.statusMessage (
-						"The message text contains non-GSM characters");
+						"The message text contains non-GSM characters")
+
+				;
 
 			}
 
@@ -163,7 +184,10 @@ public class FonixSmsSenderHelper
 					gsmParts)
 			) {
 
-				return new SetupRequestResult <FonixMessageSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					FonixMessageSendRequest,
+					FonixMessageSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.validationError)
@@ -176,7 +200,9 @@ public class FonixSmsSenderHelper
 							"and so would be split into %s parts ",
 							integerToDecimalString (
 								gsmParts),
-							"but the maximum is one"));
+							"but the maximum is one"))
+
+				;
 
 			}
 
@@ -192,7 +218,10 @@ public class FonixSmsSenderHelper
 
 			} else {
 
-				return new SetupRequestResult <FonixMessageSender> ()
+				return new SetupRequestResult <GenericHttpSender <
+					FonixMessageSendRequest,
+					FonixMessageSendResponse
+				>> ()
 
 					.status (
 						SetupRequestStatus.unknownError)
@@ -200,7 +229,9 @@ public class FonixSmsSenderHelper
 					.statusMessage (
 						stringFormat (
 							"Don't know what to do with a %s",
-							smsMessage.getMessageType ().getCode ()));
+							smsMessage.getMessageType ().getCode ()))
+
+				;
 
 			}
 
@@ -233,19 +264,32 @@ public class FonixSmsSenderHelper
 
 			// create sender
 
-			FonixMessageSender fonixSender =
-				fonixMessageSenderProvider.get ()
+			GenericHttpSender <
+				FonixMessageSendRequest,
+				FonixMessageSendResponse
+			>
+				fonixSender =
+					fonixMessageSenderProvider.provide (
+						transaction,
+						nestedFonixSender ->
+							nestedFonixSender
 
 				.request (
-					fonixRequest);
+					fonixRequest)
+
+			);
 
 			// encode request
 
-			fonixSender.encode ();
+			fonixSender.encode (
+				transaction);
 
 			// return
 
-			return new SetupRequestResult <FonixMessageSender> ()
+			return new SetupRequestResult <GenericHttpSender <
+				FonixMessageSendRequest,
+				FonixMessageSendResponse
+			>> ()
 
 				.status (
 					SetupRequestStatus.success)
@@ -254,7 +298,9 @@ public class FonixSmsSenderHelper
 					fonixSender.requestTrace ())
 
 				.state (
-					fonixSender);
+					fonixSender)
+
+			;
 
 		}
 
@@ -264,7 +310,10 @@ public class FonixSmsSenderHelper
 	public
 	PerformSendResult performSend (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FonixMessageSender fonixSender) {
+			@NonNull GenericHttpSender <
+				FonixMessageSendRequest,
+				FonixMessageSendResponse
+			> fonixSender) {
 
 		try (
 
@@ -282,9 +331,11 @@ public class FonixSmsSenderHelper
 
 			try {
 
-				fonixSender.send ();
+				fonixSender.send (
+					taskLogger);
 
-				fonixSender.receive ();
+				fonixSender.receive (
+					taskLogger);
 
 				result.responseTrace (
 					fonixSender.responseTrace ());
@@ -317,56 +368,70 @@ public class FonixSmsSenderHelper
 	public
 	ProcessResponseResult processSend (
 			@NonNull Transaction parentTransaction,
-			@NonNull FonixMessageSender fonixSender) {
+			@NonNull GenericHttpSender <
+				FonixMessageSendRequest,
+				FonixMessageSendResponse
+			> fonixSender) {
 
-		// check for generic error
+		try (
 
-		if (
-			optionalIsPresent (
-				fonixSender.errorMessage ())
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"processSend");
+
 		) {
 
+			// check for generic error
+	
+			if (
+				optionalIsPresent (
+					fonixSender.errorMessage ())
+			) {
+	
+				return new ProcessResponseResult ()
+	
+					.status (
+						ProcessResponseStatus.remoteError)
+	
+					.statusMessage (
+						fonixSender.errorMessage ().get ())
+	
+					.failureType (
+						FailureType.temporary);
+	
+			}
+	
+			// check for fonix error
+	
+			FonixMessageSendResponse fonixResponse =
+				fonixSender.response ();
+	
+			if (
+				isNotNull (
+					fonixResponse.failure ())
+			) {
+	
+				return handleGeneralError (
+					fonixResponse);
+	
+			}
+	
+			// success response
+	
+			FonixMessageSendResponse.Success fonixSuccess =
+				fonixResponse.success ();
+	
 			return new ProcessResponseResult ()
-
+	
 				.status (
-					ProcessResponseStatus.remoteError)
-
-				.statusMessage (
-					fonixSender.errorMessage ().get ())
-
-				.failureType (
-					FailureType.temporary);
+					ProcessResponseStatus.success)
+	
+				.otherIds (
+					ImmutableList.of (
+						fonixSuccess.txguid ()));
 
 		}
-
-		// check for fonix error
-
-		FonixMessageSendResponse fonixResponse =
-			fonixSender.response ();
-
-		if (
-			isNotNull (
-				fonixResponse.failure ())
-		) {
-
-			return handleGeneralError (
-				fonixResponse);
-
-		}
-
-		// success response
-
-		FonixMessageSendResponse.Success fonixSuccess =
-			fonixResponse.success ();
-
-		return new ProcessResponseResult ()
-
-			.status (
-				ProcessResponseStatus.success)
-
-			.otherIds (
-				ImmutableList.of (
-					fonixSuccess.txguid ()));
 
 	}
 

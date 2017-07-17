@@ -91,23 +91,6 @@ loadBuild = do
 			bplPackage = package
 		}
 
-	let getGitLink = atTag "git-link" >>> proc gitLinkTag -> do
-
-		name <- getAttrValue "name" -< gitLinkTag
-		source <- getAttrValue "source" -< gitLinkTag
-		target <- getAttrValue "target" -< gitLinkTag
-		local <- getAttrValue "local" -< gitLinkTag
-
-		paths <- getAttrArray "path" "name" -< gitLinkTag
-
-		returnA -< BuildGitLink {
-			bglName = name,
-			bglSource = source,
-			bglTarget = target,
-			bglLocal = local,
-			bglPaths = paths
-		}
-
 	let getBuild = atTag "wbs-build" >>> proc buildTag -> do
 
 		name <- getAttrValue "name" -< buildTag
@@ -115,13 +98,9 @@ loadBuild = do
 		pluginsTag <- atTag "plugins" -< buildTag
 		plugins <- listA getPlugins -< pluginsTag
 
-		gitLinksTag <- atTag "git-links" -< buildTag
-		gitLinks <- listA getGitLink -< gitLinksTag
-
 		returnA -< Build {
 			bldName = name,
-			bldPlugins = plugins,
-			bldGitLinks = gitLinks
+			bldPlugins = plugins
 		}
 
 	[ build ] <-

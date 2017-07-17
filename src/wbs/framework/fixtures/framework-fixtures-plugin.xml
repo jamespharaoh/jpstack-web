@@ -6,6 +6,8 @@
 
 		<bootstrap-component class="FixtureComponentPlugin"/>
 
+		<component class="CodifyFixtureMappingPlugin"/>
+		<component class="FixturesLogicImplementation"/>
 		<component class="FixturesSpecialConfig"/>
 		<component class="FixturesTestAccounts"/>
 		<component class="FixturesThreadManager"/>

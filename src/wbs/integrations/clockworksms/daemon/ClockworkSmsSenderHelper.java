@@ -11,8 +11,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -23,6 +21,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -74,7 +73,8 @@ class ClockworkSmsSenderHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ClockworkSmsMessageSender> clockworkSmsMessageSenderProvider;
+	ComponentProvider <ClockworkSmsMessageSender>
+		clockworkSmsMessageSenderProvider;
 
 	// details
 
@@ -283,7 +283,10 @@ class ClockworkSmsSenderHelper
 			// create sender
 
 			ClockworkSmsMessageSender clockworkSender =
-				clockworkSmsMessageSenderProvider.get ()
+				clockworkSmsMessageSenderProvider.provide (
+					transaction,
+					clockworkSmsMessageSender ->
+						clockworkSmsMessageSender
 
 				.url (
 					clockworkSmsRouteOut.getUrl ())
@@ -292,7 +295,9 @@ class ClockworkSmsSenderHelper
 					clockworkSmsRouteOut.getSimulateMultipart ())
 
 				.request (
-					clockworkRequest);
+					clockworkRequest)
+
+			);
 
 			// encode request
 

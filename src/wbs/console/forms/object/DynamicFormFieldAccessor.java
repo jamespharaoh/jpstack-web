@@ -69,7 +69,7 @@ class DynamicFormFieldAccessor <
 			// get native object
 
 			ConsoleHelper <?> consoleHelper =
-				consoleObjectManager.findConsoleHelperRequired (
+				consoleObjectManager.consoleHelperForObjectRequired (
 					container);
 
 			Object nativeObject =
@@ -113,7 +113,7 @@ class DynamicFormFieldAccessor <
 
 	@Override
 	public
-	void write (
+	Optional <String> write (
 			@NonNull Transaction parentTransaction,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValueOptional) {
@@ -151,10 +151,10 @@ class DynamicFormFieldAccessor <
 			// set property
 
 			ConsoleHelper <?> consoleHelper =
-				consoleObjectManager.findConsoleHelperRequired (
+				consoleObjectManager.consoleHelperForObjectRequired (
 					container);
 
-			consoleHelper.setDynamic (
+			return consoleHelper.setDynamic (
 				transaction,
 				genericCastUnchecked (
 					container),

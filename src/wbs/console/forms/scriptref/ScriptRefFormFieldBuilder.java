@@ -1,7 +1,5 @@
 package wbs.console.forms.scriptref;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
@@ -20,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -37,8 +36,8 @@ class ScriptRefFormFieldBuilder <Container>
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ScriptRefFormField <Container>>
-	scriptRefFormFieldProvider;
+	ComponentProvider <ScriptRefFormField <Container>>
+		scriptRefFormFieldProvider;
 
 	// builder
 
@@ -70,7 +69,8 @@ class ScriptRefFormFieldBuilder <Container>
 		) {
 
 			formFieldSet.addFormItem (
-				scriptRefFormFieldProvider.get ()
+				scriptRefFormFieldProvider.provide (
+					taskLogger)
 
 				.scriptRefs (
 					ImmutableSet.<ScriptRef> of (

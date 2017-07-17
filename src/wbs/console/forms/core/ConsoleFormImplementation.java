@@ -1132,12 +1132,27 @@ class ConsoleFormImplementation <Container>
 					formatWriter,
 					formField.label ());
 
-				formField.renderTableCellProperties (
-					transaction,
-					formatWriter,
-					this,
-					object,
-					1l);
+				try {
+
+					formField.renderTableCellProperties (
+						transaction,
+						formatWriter,
+						this,
+						object,
+						1l);
+
+				} catch (Exception exception) {
+
+					transaction.errorFormatException (
+						exception,
+						"Error rendering field %s",
+						formField.name ());
+
+					htmlTableCellWrite (
+						formatWriter,
+						"ERROR");
+
+				}
 
 				htmlTableRowClose (
 					formatWriter);

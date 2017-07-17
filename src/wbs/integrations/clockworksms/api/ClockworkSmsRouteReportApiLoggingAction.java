@@ -16,8 +16,6 @@ import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.io.ByteArrayInputStream;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -29,6 +27,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
@@ -50,8 +49,6 @@ import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogType;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
 
-import wbs.platform.text.web.TextResponder;
-
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -63,6 +60,7 @@ import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("clockworkSmsRouteReportApiLoggingAction")
@@ -116,7 +114,7 @@ class ClockworkSmsRouteReportApiLoggingAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// state
 
@@ -474,13 +472,18 @@ class ClockworkSmsRouteReportApiLoggingAction
 
 			// create responder
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
 
 				.contentType (
 					"application/xml")
 
 				.text (
-					responseString);
+					responseString)
+
+			);
 
 		}
 

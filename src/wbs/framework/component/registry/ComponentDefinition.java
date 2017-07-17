@@ -21,13 +21,13 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
+
+import wbs.utils.data.Pair;
 
 @Accessors (fluent = true)
 @DataClass

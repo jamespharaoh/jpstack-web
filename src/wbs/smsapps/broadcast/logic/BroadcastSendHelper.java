@@ -4,8 +4,6 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -14,6 +12,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -78,7 +77,7 @@ class BroadcastSendHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <SmsMessageSender> smsMessageSenderProvider;
+	ComponentProvider <SmsMessageSender> smsMessageSenderProvider;
 
 	// details
 
@@ -471,7 +470,8 @@ class BroadcastSendHelper
 					"broadcast");
 
 			MessageRec message =
-				smsMessageSenderProvider.get ()
+				smsMessageSenderProvider.provide (
+					transaction)
 
 				.batch (
 					broadcastBatch)

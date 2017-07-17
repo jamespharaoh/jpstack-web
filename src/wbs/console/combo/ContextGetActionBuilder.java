@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -24,6 +22,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -47,7 +46,7 @@ class ContextGetActionBuilder <
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFile> consoleFile;
+	ComponentProvider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
@@ -89,6 +88,7 @@ class ContextGetActionBuilder <
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: consoleMetaManager.resolveExtensionPoint (
+						taskLogger,
 						container.extensionPointName ())
 			) {
 
@@ -104,7 +104,7 @@ class ContextGetActionBuilder <
 
 	void buildContextFile (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		try (
 
@@ -117,13 +117,14 @@ class ContextGetActionBuilder <
 
 			consoleModule.addContextFile (
 				contextFileName,
-				consoleFile.get ()
+				consoleFileProvider.provide (
+					taskLogger)
 
 					.getActionName (
 						parentTaskLogger,
 						actionName),
 
-				resolvedExtensionPoint.contextTypeNames ());
+				extensionPoint.contextTypeNames ());
 
 		}
 

@@ -20,6 +20,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginRecordModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.ReferenceFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -116,6 +117,9 @@ class ReferenceFieldWriter
 					ifNull (
 						spec.name (),
 						spec.typeName ()))
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
 
 				.writeBlock (
 					taskLogger,

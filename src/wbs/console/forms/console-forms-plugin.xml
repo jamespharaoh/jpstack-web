@@ -21,6 +21,7 @@
 		<bootstrap-component class="object.IndexFormFieldSpec"/>
 		<bootstrap-component class="object.NameFormFieldSpec"/>
 		<bootstrap-component class="object.ObjectFormFieldSpec"/>
+		<bootstrap-component class="object.ObjectFieldsProviderComponentWrapper"/>
 		<bootstrap-component class="object.ParentFormFieldSpec"/>
 
 		<bootstrap-component class="scriptref.JqueryScriptRefFormFieldSpec"/>
@@ -68,6 +69,7 @@
 		<component class="basic.YesNoFormFieldRenderer"/>
 
 		<component class="core.ConsoleFormBuilder"/>
+		<component class="core.ConsoleFormHintsLogicImplementation"/>
 		<component class="core.ConsoleFormImplementation"/>
 		<component class="core.ConsoleFormManagerImplementation"/>
 		<component class="core.ConsoleFormPluginManagerImplementation"/>

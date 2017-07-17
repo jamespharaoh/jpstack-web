@@ -5,11 +5,13 @@ import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpaceLazy;
 import static wbs.utils.string.StringUtils.keyEqualsDecimalInteger;
+import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -174,7 +176,17 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"findByParentAndCode");
+					"findByParentAndCode",
+					keyEqualsString (
+						"parentGlobalId",
+						joinWithCommaAndSpaceLazy (
+							integerToDecimalString (
+								parentGlobalId.typeId ()),
+							integerToDecimalString (
+								parentGlobalId.objectId ()))),
+					keyEqualsString (
+						"code",
+						code));
 
 		) {
 
@@ -189,7 +201,19 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new UnsupportedOperationException (
 					stringFormat (
 						"Object type %s must be looked up by type code",
-						getClass ().getSimpleName ()));
+						objectModel.objectName ()));
+
+			}
+
+			if (
+				isNull (
+					objectModel.codeField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"Object type %s has no code field",
+						objectModel.objectName ()));
 
 			}
 
@@ -211,7 +235,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				}
 
-				List<?> list =
+				List <?> list =
 					session.createQuery (
 
 					stringFormat (

@@ -98,6 +98,9 @@ class ModelField {
 	String joinColumnName;
 
 	@DataAttribute
+	String foreignColumnName;
+
+	@DataAttribute
 	String listIndexColumnName;
 
 	@DataAttribute

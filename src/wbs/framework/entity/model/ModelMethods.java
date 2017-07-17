@@ -4,6 +4,7 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import wbs.framework.entity.meta.cachedview.CachedViewSpec;
 import wbs.framework.entity.record.Record;
@@ -39,6 +40,9 @@ interface ModelMethods <DataType> {
 
 	List <ModelField> fields ();
 	Map <String, ModelField> fieldsByName ();
+
+	List <ModelField> identityFields ();
+	Set <ModelFieldType> identityFieldTypes ();
 
 	ModelField field (
 			String name);

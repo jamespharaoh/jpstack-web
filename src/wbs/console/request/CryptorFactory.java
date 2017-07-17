@@ -7,14 +7,18 @@ import java.security.SecureRandom;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("cryptorFactory")
 public
@@ -22,21 +26,32 @@ class CryptorFactory {
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	WbsConfig wbsConfig;
 
-	// unitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <CryptorImplementation> cryptorProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <CryptorImplementation> cryptorProvider;
 
 	// implementation
 
 	public
 	Cryptor makeCryptor (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String name) {
 
-		try {
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeCryptor");
+
+		) {
 
 			KeyGenerator keyGenerator =
 				KeyGenerator.getInstance (
@@ -60,10 +75,15 @@ class CryptorFactory {
 			SecretKey secretKey =
 				keyGenerator.generateKey ();
 
-			return cryptorProvider.get ()
+			return cryptorProvider.provide (
+				taskLogger,
+				cryptor ->
+					cryptor
 
 				.secretKey (
-					secretKey);
+					secretKey)
+
+			);
 
 		} catch (Exception exception) {
 

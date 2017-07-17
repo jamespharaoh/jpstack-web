@@ -350,6 +350,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forForeignId (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
@@ -405,13 +406,17 @@ class SchemaTableFromModel {
 						"integer")
 
 					.nullable (
-						false))
+						false)
+
+				)
 
 				.primaryKey (
 					new SchemaPrimaryKey ()
 
 					.addColumn (
-						modelField.columnName ()))
+						modelField.columnName ())
+
+				)
 
 				.addForeignKey (
 					new SchemaForeignKey ()
@@ -420,7 +425,11 @@ class SchemaTableFromModel {
 						modelField.columnName ())
 
 					.targetTable (
-						targetModel.tableName ()));
+						targetModel.tableName ())
+
+				)
+
+			;
 
 		}
 
@@ -439,31 +448,8 @@ class SchemaTableFromModel {
 
 		) {
 
-			List <String> typeNames;
-
-			if (modelField.columnSqlTypes () != null) {
-
-				typeNames =
-					modelField.columnSqlTypes ();
-
-			} else {
-
-				typeNames =
-					schemaTypesHelper.fieldTypeNames ().get (
-						modelField.valueType ());
-
-				if (typeNames == null) {
-
-					taskLogger.errorFormat (
-						"Can't map type %s for %s",
-						modelField.valueType ().getSimpleName (),
-						modelField.fullName ());
-
-					return;
-
-				}
-
-			}
+			List <String> typeNames =
+				modelField.columnSqlTypes ();
 
 			if (
 				integerNotEqualSafe (
@@ -519,6 +505,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forReference (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
@@ -560,7 +547,9 @@ class SchemaTableFromModel {
 						"integer")
 
 					.nullable (
-						modelField.nullable ()))
+						modelField.nullable ())
+
+				)
 
 				.addForeignKey (
 					new SchemaForeignKey ()
@@ -569,12 +558,17 @@ class SchemaTableFromModel {
 						modelField.columnName ())
 
 					.targetTable (
-						targetModel.tableName ()));
+						targetModel.tableName ())
+
+				)
+
+			;
 
 		}
 
 	}
 
+	private
 	void forCompositeId (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
@@ -617,6 +611,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forCompositeIdField (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
@@ -658,6 +653,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forCompositeIdReference (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
@@ -699,7 +695,9 @@ class SchemaTableFromModel {
 						"integer")
 
 					.nullable (
-						false))
+						false)
+
+				)
 
 				.addForeignKey (
 					new SchemaForeignKey ()
@@ -708,12 +706,18 @@ class SchemaTableFromModel {
 						compositeIdModelField.columnName ())
 
 					.targetTable (
-						targetModel.tableName ()));
+						targetModel.tableName ())
+
+				)
+
+			;
 
 			schemaTable.primaryKey ()
 
 				.addColumn (
-					compositeIdModelField.columnName ());
+					compositeIdModelField.columnName ())
+
+			;
 
 		}
 
@@ -748,6 +752,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forComponent (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField) {
@@ -839,6 +844,7 @@ class SchemaTableFromModel {
 
 	}
 
+	private
 	void forComponentReference (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ModelField modelField,
@@ -881,7 +887,9 @@ class SchemaTableFromModel {
 						"integer")
 
 					.nullable (
-						false))
+						false)
+
+				)
 
 				.addForeignKey (
 					new SchemaForeignKey ()
@@ -890,7 +898,11 @@ class SchemaTableFromModel {
 						componentModelField.columnName ())
 
 					.targetTable (
-						targetModel.tableName ()));
+						targetModel.tableName ())
+
+				)
+
+			;
 
 		}
 

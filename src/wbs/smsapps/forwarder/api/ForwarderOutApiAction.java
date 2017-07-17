@@ -11,8 +11,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -24,12 +22,11 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.platform.text.web.TextResponder;
 
 import wbs.smsapps.forwarder.logic.ForwarderLogic;
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
@@ -42,6 +39,7 @@ import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 import wbs.web.context.RequestContext;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("forwarderOutApiAction")
@@ -72,10 +70,10 @@ class ForwarderOutApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ApiErrorResponder> errorResponderProvider;
+	ComponentProvider <ApiErrorResponder> errorResponderProvider;
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -329,7 +327,10 @@ class ForwarderOutApiAction
 					// TODO log this, not an exception
 
 					return optionalOf (
-						textResponderProvider.get ()
+						textResponderProvider.provide (
+							transaction,
+							textResponder ->
+								textResponder
 
 						.text (
 							stringFormat (
@@ -338,7 +339,7 @@ class ForwarderOutApiAction
 								"This message id has already been used for a ",
 									"different message"))
 
-					);
+					));
 
 				}
 
@@ -347,7 +348,10 @@ class ForwarderOutApiAction
 				if (forwarderMessageOut == null) {
 
 					return optionalOf (
-						textResponderProvider.get ()
+						textResponderProvider.provide (
+							transaction,
+							textResponder ->
+								textResponder
 
 						.text (
 							stringFormat (
@@ -356,12 +360,15 @@ class ForwarderOutApiAction
 								"This user's number is being blocked by a report ",
 									"tracker"))
 
-					);
+					));
 
 				}
 
 				return optionalOf (
-					textResponderProvider.get ()
+					textResponderProvider.provide (
+						transaction,
+						textResponder ->
+							textResponder
 
 					.text (
 						stringFormat (
@@ -370,7 +377,7 @@ class ForwarderOutApiAction
 							integerToDecimalString (
 								forwarderMessageOut.getId ())))
 
-				);
+				));
 
 			} catch (ReportableException exception) {
 
@@ -404,12 +411,15 @@ class ForwarderOutApiAction
 				}
 
 				return optionalOf (
-					textResponderProvider.get ()
+					textResponderProvider.provide (
+						transaction,
+						textResponder ->
+							textResponder
 
 					.text (
 						"ERROR\n" + exception.getMessage () + "\n")
 
-				);
+				));
 
 			}
 

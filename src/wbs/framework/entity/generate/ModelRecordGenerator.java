@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
@@ -24,10 +22,12 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
@@ -81,10 +81,13 @@ class ModelRecordGenerator {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <JavaClassWriter> javaClassWriterProvider;
+	ComponentProvider <JavaClassWriter> javaClassWriterProvider;
 
 	@PrototypeDependency
-	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+	ComponentProvider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+
+	@PrototypeDependency
+	ComponentProvider <JavaPropertyWriter> javaPropertyWriterProvider;
 
 	// properties
 
@@ -160,7 +163,8 @@ class ModelRecordGenerator {
 			) {
 
 				JavaClassUnitWriter classUnitWriter =
-					javaClassUnitWriterProvider.get ()
+					javaClassUnitWriterProvider.provide (
+						taskLogger)
 
 					.formatWriter (
 						formatWriter)
@@ -170,7 +174,8 @@ class ModelRecordGenerator {
 						plugin.packageName ());
 
 				JavaClassWriter modelWriter =
-					javaClassWriterProvider.get ()
+					javaClassWriterProvider.provide (
+						taskLogger)
 
 					.className (
 						recordClassName)
@@ -195,10 +200,12 @@ class ModelRecordGenerator {
 						: modelMeta.implementsInterfaces ()
 				) {
 
-					modelWriter.addImplementsFormat (
-						"%s.%s",
-						implementsInterface.packageName (),
-						implementsInterface.name ());
+					modelWriter.addImplementsName (
+						stringFormat (
+							"%s.%s",
+							implementsInterface.packageName (),
+							implementsInterface.name ()),
+						implementsInterface.parameters ());
 
 				}
 
@@ -206,6 +213,9 @@ class ModelRecordGenerator {
 
 					.addBlock (
 						this::writeConstructor)
+
+					.addBlock (
+						this::writeInternalFields)
 
 					.addBlock (
 						this::writeFields)
@@ -325,6 +335,52 @@ class ModelRecordGenerator {
 			"}");
 
 		formatWriter.writeNewline ();
+
+	}
+
+	private
+	void writeInternalFields (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"writeFields");
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"// internal fields");
+
+			formatWriter.writeNewline ();
+
+			javaPropertyWriterProvider.provide (
+				taskLogger)
+
+				.thisClassName (
+					recordClassName)
+
+				.typeClass (
+					Boolean.class)
+
+				.propertyName (
+					recordUpdatedFieldName)
+
+				.defaultValue (
+					"false")
+
+				.writeBlock (
+					taskLogger,
+					imports,
+					formatWriter)
+
+			;
+
+		}
 
 	}
 
@@ -1192,5 +1248,11 @@ class ModelRecordGenerator {
 		formatWriter.writeNewline ();
 
 	}
+
+	// data
+
+	public final static
+	String recordUpdatedFieldName =
+		"recordUpdated";
 
 }

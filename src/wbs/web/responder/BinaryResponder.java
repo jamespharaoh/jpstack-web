@@ -1,9 +1,11 @@
-package wbs.platform.text.web;
+package wbs.web.responder;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatArray;
+
+import java.io.OutputStream;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,18 +19,13 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
-import wbs.utils.string.FormatWriter;
-
 import wbs.web.context.RequestContext;
-import wbs.web.responder.BufferedTextResponder;
-
-// TODO this belongs elsewhere
 
 @Accessors (fluent = true)
-@PrototypeComponent ("textResponder")
-public final
-class TextResponder
-	extends BufferedTextResponder {
+@PrototypeComponent ("binaryResponder")
+public
+class BinaryResponder
+	extends BufferedResponder {
 
 	// singleton dependencies
 
@@ -41,26 +38,14 @@ class TextResponder
 	// properties
 
 	@Getter @Setter
-	String text;
+	byte[] data;
 
 	@Getter @Setter
 	String contentType =
-		"text/plain";
+		"application/octet-stream";
 
 	@Getter @Setter
 	String filename;
-
-	// property setters
-
-	public
-	TextResponder textFormat (
-			@NonNull CharSequence ... arguments) {
-
-		return text (
-			stringFormatArray (
-				arguments));
-
-	}
 
 	// implementation
 
@@ -111,7 +96,7 @@ class TextResponder
 	protected
 	void render (
 			@NonNull Transaction parentTransaction,
-			@NonNull FormatWriter formatWriter) {
+			@NonNull OutputStream outputStream) {
 
 		try (
 
@@ -121,8 +106,9 @@ class TextResponder
 					"render");
 		) {
 
-			formatWriter.writeString (
-				text);
+			writeBytes (
+				outputStream,
+				data);
 
 		}
 

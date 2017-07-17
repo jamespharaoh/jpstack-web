@@ -1,11 +1,16 @@
 package wbs.test.simulator.console;
 
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import wbs.console.part.PagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
@@ -16,8 +21,11 @@ class SimulatorRouteSummaryAdditionalPartFactory
 
 	// prototype dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@PrototypeDependency
-	Provider <SimulatorRouteSummaryAdditionalPart>
+	ComponentProvider <SimulatorRouteSummaryAdditionalPart>
 		simulatorRouteSummaryAdditionalPartProvider;
 
 	// details
@@ -37,9 +45,22 @@ class SimulatorRouteSummaryAdditionalPartFactory
 	@Override
 	public
 	PagePart getPagePart (
-			String senderCode) {
+			@NonNull Transaction parentTransaction,
+			@NonNull String senderCode) {
 
-		return simulatorRouteSummaryAdditionalPartProvider.get ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getPagePart");
+
+		) {
+
+			return simulatorRouteSummaryAdditionalPartProvider.provide (
+				transaction);
+
+		}
 
 	}
 

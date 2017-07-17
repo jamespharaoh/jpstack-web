@@ -5,8 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -19,6 +17,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.TransactionMethods;
@@ -43,10 +42,7 @@ class HibernateDatabase
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <HibernateInterceptor> hibernateInterceptorProvider;
-
-	@PrototypeDependency
-	Provider <HibernateTransaction> hibernateTransactionProvider;
+	ComponentProvider <HibernateTransaction> hibernateTransactionProvider;
 
 	// properties
 
@@ -122,7 +118,8 @@ class HibernateDatabase
 		) {
 
 			HibernateTransaction newTransaction =
-				hibernateTransactionProvider.get ()
+				hibernateTransactionProvider.provide (
+					taskLogger)
 
 				.hibernateDatabase (
 					this)

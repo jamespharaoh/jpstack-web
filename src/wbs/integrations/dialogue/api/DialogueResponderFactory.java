@@ -2,20 +2,18 @@ package wbs.integrations.dialogue.api;
 
 import static wbs.utils.string.StringUtils.joinWithNewline;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.platform.text.web.TextResponder;
-
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("dialogueResponder")
@@ -28,10 +26,10 @@ class DialogueResponderFactory
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <TextResponder> textResponderProvider;
+	@PrototypeDependency
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -49,7 +47,10 @@ class DialogueResponderFactory
 
 		) {
 
-			return textResponderProvider.get ()
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
 
 				.text (
 					joinWithNewline (
@@ -58,7 +59,7 @@ class DialogueResponderFactory
 						"</HTML>",
 						""))
 
-			;
+			);
 
 		}
 

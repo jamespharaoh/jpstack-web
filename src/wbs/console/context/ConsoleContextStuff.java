@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -23,9 +21,14 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.AbstractStringSubstituter;
 
@@ -42,10 +45,13 @@ class ConsoleContextStuff {
 	@SingletonDependency
 	ConsoleManager consoleManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TabList> tabListProvider;
+	ComponentProvider <TabList> tabListProvider;
 
 	// properties
 
@@ -94,35 +100,48 @@ class ConsoleContextStuff {
 
 	public
 	TabList makeContextTabs (
-			ConsoleContext consoleContext) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleContext consoleContext) {
 
-		Map<String, Tab> tabsByName =
-			new HashMap<String, Tab>();
+		try (
 
-		TabList tabList =
-			tabListProvider.get ();
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeContextTabs");
 
-		tabsByNameByContext.put (
-			consoleContext,
-			tabsByName);
+		) {
 
-		for (ConsoleContextTab contextTab
-				: consoleContext.contextTabs ().values ()) {
+			Map <String, Tab> tabsByName =
+				new HashMap<> ();
 
-			Tab realTab =
-				contextTab.realTab (
-					this,
-					consoleContext);
+			TabList tabList =
+				tabListProvider.provide (
+					taskLogger);
 
-			tabsByName.put (
-				contextTab.name (),
-				realTab);
+			tabsByNameByContext.put (
+				consoleContext,
+				tabsByName);
 
-			tabList.add (realTab);
+			for (ConsoleContextTab contextTab
+					: consoleContext.contextTabs ().values ()) {
+
+				Tab realTab =
+					contextTab.realTab (
+						this,
+						consoleContext);
+
+				tabsByName.put (
+					contextTab.name (),
+					realTab);
+
+				tabList.add (realTab);
+
+			}
+
+			return tabList;
 
 		}
-
-		return tabList;
 
 	}
 

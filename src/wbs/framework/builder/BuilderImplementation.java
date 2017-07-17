@@ -14,11 +14,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("builderImplementation")
 @Accessors (fluent = true)
 public
-class BuilderImplementation <Context>
+class BuilderImplementation <Context extends TaskLogger>
 	implements Builder <Context> {
 
 	// properties
@@ -98,7 +99,8 @@ class BuilderImplementation <Context>
 		// instantiate
 
 		Object builderObject =
-			builderInfo.builderProvider.get ();
+			builderInfo.builderProvider.provide (
+				context);
 
 		// inject context
 

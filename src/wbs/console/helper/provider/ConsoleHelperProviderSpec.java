@@ -55,6 +55,9 @@ class ConsoleHelperProviderSpec
 	@DataAttribute
 	String viewPriv;
 
+	@DataAttribute
+	String createPriv;
+
 	@DataAttribute (
 		name = "cryptor")
 	String cryptorBeanName;

@@ -15,8 +15,6 @@ import static wbs.utils.string.StringUtils.utf8ToStringSafe;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -28,6 +26,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
@@ -43,7 +42,6 @@ import wbs.integrations.clockworksms.model.ClockworkSmsRouteInObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteInRec;
 
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -54,6 +52,7 @@ import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("clockworkSmsRouteInApiLoggingAction")
@@ -96,10 +95,10 @@ class ClockworkSmsRouteInApiLoggingAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	@PrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// state
 
@@ -126,15 +125,17 @@ class ClockworkSmsRouteInApiLoggingAction
 		) {
 
 			dataFromXml =
-				dataFromXmlBuilderProvider.get ()
+				dataFromXmlBuilderProvider.provide (
+					taskLogger)
 
 				.registerBuilderClasses (
 					taskLogger,
 					ClockworkSmsRouteInRequest.class)
 
 				.build (
-					taskLogger);
+					taskLogger)
 
+			;
 
 		}
 
@@ -367,10 +368,26 @@ class ClockworkSmsRouteInApiLoggingAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		return textResponderProvider.get ()
+		try (
 
-			.text (
-				"OK");
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
+
+		) {
+
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
+	
+				.text (
+					"OK")
+
+			);
+
+		}
 
 	}
 

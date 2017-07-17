@@ -27,6 +27,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 
+import wbs.web.misc.HttpMethod;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("oxygenateSmsSendHelper")
 public
@@ -37,6 +39,12 @@ class OxygenateSmsSendHelper
 	> {
 
 	// request properties
+
+	@Override
+	public
+	HttpMethod method () {
+		return HttpMethod.get;
+	}
 
 	@Getter @Setter
 	Map <String, String> requestHeaders;
@@ -59,7 +67,7 @@ class OxygenateSmsSendHelper
 	String responseStatusReason;
 
 	@Getter @Setter
-	Map <String, String> responseHeaders;
+	Map <String, List <String>> responseHeaders;
 
 	@Getter @Setter
 	String responseBody;

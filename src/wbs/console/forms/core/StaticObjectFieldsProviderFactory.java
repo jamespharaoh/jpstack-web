@@ -8,8 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,7 +17,8 @@ import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -42,10 +41,10 @@ class StaticObjectFieldsProviderFactory <
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <StaticFieldsProvider <Container, Parent>>
+	@StrongPrototypeDependency
+	ComponentProvider <StaticFieldsProvider <Container, Parent>>
 		staticFieldsProviderProvider;
 
 	// properties
@@ -83,7 +82,10 @@ class StaticObjectFieldsProviderFactory <
 					optionalOrNull (
 						consoleHelper.parentClass ()));
 
-			return staticFieldsProviderProvider.get ()
+			return staticFieldsProviderProvider.provide (
+				taskLogger,
+				staticFieldsProvider ->
+					staticFieldsProvider
 
 				.containerClass (
 					consoleHelper.objectClass ())
@@ -117,7 +119,7 @@ class StaticObjectFieldsProviderFactory <
 									name),
 								rowFieldSpecsNested)))
 
-			;
+			);
 
 		}
 

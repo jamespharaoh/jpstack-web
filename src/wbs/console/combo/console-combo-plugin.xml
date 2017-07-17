@@ -17,7 +17,7 @@
 		<bootstrap-component class="ContextResponderPageSpec"/>
 		<bootstrap-component class="ContextTabResponderPageComponentBuilder"/>
 		<bootstrap-component class="ContextTabResponderPageSpec"/>
-i		<bootstrap-component class="ContextTabResponderComponentBuilder"/>
+		<bootstrap-component class="ContextTabResponderComponentBuilder"/>
 		<bootstrap-component class="ContextTabResponderSpec"/>
 		<bootstrap-component class="ContextTabActionPageComponentBuilder"/>
 		<bootstrap-component class="ContextTabActionPageSpec"/>

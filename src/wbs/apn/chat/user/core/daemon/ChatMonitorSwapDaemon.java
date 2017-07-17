@@ -1,7 +1,6 @@
 package wbs.apn.chat.user.core.daemon;
 
-import static wbs.utils.collection.IterableUtils.iterableFilter;
-import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.IterableUtils.iterableFilterMapToList;
 import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -136,14 +135,13 @@ class ChatMonitorSwapDaemon
 
 		) {
 
-			return iterableMapToList (
-				iterableFilter (
-					chat ->
-						chatNeedsMonitorSwap (
-							transaction,
-							chat),
-					chatHelper.findNotDeleted (
-						transaction)),
+			return iterableFilterMapToList (
+				chatHelper.findNotDeleted (
+					transaction),
+				chat ->
+					chatNeedsMonitorSwap (
+						transaction,
+						chat),
 				ChatRec::getId);
 
 		}

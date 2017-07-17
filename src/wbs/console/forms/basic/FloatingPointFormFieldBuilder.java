@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.core.ConsoleFormBuilderComponent;
@@ -37,6 +35,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -58,44 +57,41 @@ class FloatingPointFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DelegateFormFieldAccessor>
-	delegateFormFieldAccessorProvider;
+	ComponentProvider <DelegateFormFieldAccessor>
+		delegateFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <FloatingPointFormFieldInterfaceMapping>
-	floatingPointFormFieldInterfaceMappingProvider;
+	ComponentProvider <FloatingPointFormFieldInterfaceMapping>
+		floatingPointFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <FloatingPointFormFieldValueValidator>
-	floatingPointFormFieldValueValidatorProvider;
+	ComponentProvider <FloatingPointFormFieldValueValidator>
+		floatingPointFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	ComponentProvider <NullFormFieldConstraintValidator>
+		nullFormFieldValueConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
-	requiredFormFieldValueValidatorProvider;
+	ComponentProvider <RequiredFormFieldValueValidator>
+		requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <DereferenceFormFieldAccessor>
-	dereferenceFormFieldAccessorProvider;
+	ComponentProvider <DereferenceFormFieldAccessor>
+		dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
-	updatableFormFieldProvider;
+	ComponentProvider <UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -164,7 +160,8 @@ class FloatingPointFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				dereferenceFormFieldAccessorProvider.get ()
+				dereferenceFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.path (
 					fieldName)
@@ -175,7 +172,8 @@ class FloatingPointFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// value validators
 
@@ -185,12 +183,14 @@ class FloatingPointFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			valueValidators.add (
-				floatingPointFormFieldValueValidatorProvider.get ()
+				floatingPointFormFieldValueValidatorProvider.provide (
+					taskLogger)
 
 				.label (
 					label)
@@ -206,17 +206,20 @@ class FloatingPointFormFieldBuilder
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				nullFormFieldValueConstraintValidatorProvider.get ();
+				nullFormFieldValueConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				floatingPointFormFieldInterfaceMappingProvider.get ();
+				floatingPointFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -233,6 +236,7 @@ class FloatingPointFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -242,7 +246,8 @@ class FloatingPointFormFieldBuilder
 			if (! readOnly) {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -276,7 +281,8 @@ class FloatingPointFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

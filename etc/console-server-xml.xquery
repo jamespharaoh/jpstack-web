@@ -1,4 +1,16 @@
-<Server port="8180" shutdown="SHUTDOWN">
+declare variable $project external;
+
+declare variable $server-port :=
+	if ($project eq "wbs-hades-dev") then "8180"
+	else if ($project eq "shopping-nation-dev") then "7180"
+	else "ERROR";
+
+declare variable $http-port :=
+	if ($project eq "wbs-hades-dev") then "8080"
+	else if ($project eq "shopping-nation-dev") then "7080"
+	else "ERROR";
+
+<Server port="{ $server-port }" shutdown="SHUTDOWN">
 
 	<Listener
 		className="org.apache.catalina.core.AprLifecycleListener"
@@ -25,7 +37,7 @@
 			minSpareThreads="4"/>
 
 		<Connector
-			port="8080"
+			port="{ $http-port }"
 			protocol="HTTP/1.1"
 			connectionTimeout="20000"/>
 

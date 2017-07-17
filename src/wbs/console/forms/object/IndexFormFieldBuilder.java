@@ -3,8 +3,6 @@ package wbs.console.forms.object;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.IdentityFormFieldNativeMapping;
@@ -29,6 +27,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -47,24 +46,21 @@ class IndexFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	ComponentProvider <IdentityFormFieldNativeMapping>
+		identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <IntegerFormFieldInterfaceMapping>
-	integerFormFieldInterfaceMappingProvider;
+	ComponentProvider <IntegerFormFieldInterfaceMapping>
+		integerFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	ComponentProvider <TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	// builder
 
@@ -112,7 +108,8 @@ class IndexFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				simpleFormFieldAccessorProvider.get ()
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -123,17 +120,20 @@ class IndexFormFieldBuilder
 			// native mapping
 
 			ConsoleFormNativeMapping nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+				identityFormFieldNativeMappingProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				integerFormFieldInterfaceMappingProvider.get ();
+				integerFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				textFormFieldRendererProvider.get ()
+				textFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -147,7 +147,8 @@ class IndexFormFieldBuilder
 			// field
 
 			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+				readOnlyFormFieldProvider.provide (
+					taskLogger)
 
 				.name (
 					name)

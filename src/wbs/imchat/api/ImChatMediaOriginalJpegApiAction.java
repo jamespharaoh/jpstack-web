@@ -1,14 +1,13 @@
 package wbs.imchat.api;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -24,10 +23,11 @@ class ImChatMediaOriginalJpegApiAction
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <ImChatMediaJpegApiAction> imChatMediaJpegApiActionProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <ImChatMediaJpegApiAction>
+		imChatMediaJpegApiActionProvider;
 
 	// implementation
 
@@ -45,7 +45,8 @@ class ImChatMediaOriginalJpegApiAction
 
 		) {
 
-			return imChatMediaJpegApiActionProvider.get ();
+			return imChatMediaJpegApiActionProvider.provide (
+				taskLogger);
 
 		}
 

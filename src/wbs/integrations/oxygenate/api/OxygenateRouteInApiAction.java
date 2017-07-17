@@ -4,8 +4,6 @@ import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -17,6 +15,7 @@ import wbs.framework.component.annotations.NamedDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
@@ -53,15 +52,15 @@ class OxygenateRouteInApiAction
 
 	@PrototypeDependency
 	@NamedDependency ("oxygenateRouteInMmsNewAction")
-	Provider <WebAction> routeInMmsNewActionProvider;
+	ComponentProvider <WebAction> routeInMmsNewActionProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("oxygenateRouteInMmsOldAction")
-	Provider <WebAction> routeInMmsOldActionProvider;
+	ComponentProvider <WebAction> routeInMmsOldActionProvider;
 
 	@PrototypeDependency
 	@NamedDependency ("oxygenateRouteInSmsAction")
-	Provider <WebAction> routeInSmsActionProvider;
+	ComponentProvider <WebAction> routeInSmsActionProvider;
 
 	// public implementation
 
@@ -118,15 +117,18 @@ class OxygenateRouteInApiAction
 
 			case mms1:
 
-				return routeInMmsOldActionProvider.get ();
+				return routeInMmsOldActionProvider.provide (
+					transaction);
 
 			case mms2:
 
-				return routeInMmsNewActionProvider.get ();
+				return routeInMmsNewActionProvider.provide (
+					transaction);
 
 			case sms:
 
-				return routeInSmsActionProvider.get ();
+				return routeInSmsActionProvider.provide (
+					transaction);
 
 			default:
 

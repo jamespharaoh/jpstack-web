@@ -11,6 +11,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.DeletedFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -74,6 +75,9 @@ class DeletedFieldWriter
 
 				.defaultValue (
 					"false")
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
 
 				.writeBlock (
 					taskLogger,

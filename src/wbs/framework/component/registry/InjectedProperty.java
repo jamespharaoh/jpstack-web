@@ -50,10 +50,6 @@ class InjectedProperty {
 
 	@DataAttribute
 	@Getter @Setter
-	Boolean initialized;
-
-	@DataAttribute
-	@Getter @Setter
 	Boolean weak;
 
 	@DataChildren

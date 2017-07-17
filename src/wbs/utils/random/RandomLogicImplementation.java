@@ -3,6 +3,8 @@ package wbs.utils.random;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -89,6 +91,16 @@ class RandomLogicImplementation
 				"TODO");
 
 		}
+
+	}
+
+	@Override
+	public
+	boolean randomBoolean (
+			long numerator,
+			long denominator) {
+
+		return randomInteger (denominator) < numerator;
 
 	}
 
@@ -190,6 +202,31 @@ class RandomLogicImplementation
 
 		return options.get (
 			index);
+
+	}
+
+	@Override
+	public <Type>
+	List <Type> shuffleToList (
+			@NonNull Iterable <Type> input) {
+
+		List <Type> items =
+			new ArrayList <Type> ();
+
+		for (
+			Type item
+				: input
+		) {
+
+			items.add (
+				item);
+
+		}
+
+		Collections.shuffle (
+			items);
+
+		return items;
 
 	}
 

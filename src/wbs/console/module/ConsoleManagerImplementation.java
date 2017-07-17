@@ -1177,6 +1177,7 @@ class ConsoleManagerImplementation
 				contextStuff);
 
 			context.initTabContext (
+				transaction,
 				contextStuff);
 
 			transaction.close ();
@@ -1209,7 +1210,7 @@ class ConsoleManagerImplementation
 		) {
 
 			ConsoleHelper <?> consoleHelper =
-				objectManager.findConsoleHelperRequired (
+				objectManager.consoleHelperForNameRequired (
 					name);
 
 			ConsoleHelperProvider <?> consoleHelperProvider =
@@ -1347,6 +1348,7 @@ class ConsoleManagerImplementation
 						contextStuff);
 
 					consoleContext.initTabContext (
+						transaction,
 						contextStuff);
 
 					transaction.debugFormat (

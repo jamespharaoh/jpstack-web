@@ -35,6 +35,14 @@ class AssociativeCollectionSpec
 	String tableName;
 
 	@DataAttribute (
+		name = "join-column")
+	String joinColumnName;
+
+	@DataAttribute (
+		name = "foreign-column")
+	String foreignColumnName;
+
+	@DataAttribute (
 		name = "value-column")
 	String valueColumnName;
 

@@ -1,11 +1,16 @@
 package wbs.integrations.digitalselect.console;
 
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import wbs.console.part.PagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
@@ -14,10 +19,15 @@ public
 class DigitalSelectRouteSummaryAdditionalPartFactory
 	implements RouteSummaryAdditionalPartFactory {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DigitalSelectRouteSummaryAdditionalPart>
+	ComponentProvider <DigitalSelectRouteSummaryAdditionalPart>
 		digitalSelectRouteSummaryAdditionalPartProvider;
 
 	// details
@@ -37,9 +47,22 @@ class DigitalSelectRouteSummaryAdditionalPartFactory
 	@Override
 	public
 	PagePart getPagePart (
-			String senderCode) {
+			@NonNull Transaction parentTransaction,
+			@NonNull String senderCode) {
 
-		return digitalSelectRouteSummaryAdditionalPartProvider.get ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getPagePart");
+
+		) {
+
+			return digitalSelectRouteSummaryAdditionalPartProvider.provide (
+				transaction);
+
+		}
 
 	}
 

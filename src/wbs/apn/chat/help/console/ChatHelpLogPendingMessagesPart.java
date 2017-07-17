@@ -10,7 +10,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.web.utils.HtmlUtils.encodeNewlineToBr;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
 
 import java.util.List;
 
@@ -214,7 +214,7 @@ class ChatHelpLogPendingMessagesPart
 
 				htmlTableCellWrite (
 					formatWriter,
-					encodeNewlineToBr (
+					htmlEncodeNewlineToBr (
 						message.getText ().getText ()),
 					htmlColumnSpanAttribute (
 						4l));

@@ -1,12 +1,11 @@
 package wbs.framework.fixtures;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
@@ -25,10 +24,10 @@ class FixturesThreadManager
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialized components
+	// prototype components
 
-	@UninitializedDependency
-	Provider <ThreadManagerImplementation> threadManagerImplemetationProvider;
+	@StrongPrototypeDependency
+	ComponentProvider <ThreadManagerImplementation> threadManagerProvider;
 
 	// implementation
 
@@ -46,7 +45,8 @@ class FixturesThreadManager
 
 		) {
 
-			return threadManagerImplemetationProvider.get ();
+			return threadManagerProvider.provide (
+				taskLogger);
 
 		}
 

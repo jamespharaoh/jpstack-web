@@ -1,7 +1,5 @@
 package wbs.console.context;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -18,6 +16,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -35,7 +34,8 @@ class SimpleConsoleContextMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	ComponentProvider <ConsoleContextRootExtensionPoint>
+		rootExtensionPointProvider;
 
 	// builder
 
@@ -75,7 +75,8 @@ class SimpleConsoleContextMetaBuilder
 			// extension point
 
 			metaModule.addExtensionPoint (
-				rootExtensionPointProvider.get ()
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeName)

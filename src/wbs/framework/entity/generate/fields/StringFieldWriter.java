@@ -11,6 +11,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.StringFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -72,7 +73,12 @@ class StringFieldWriter
 
 				.propertyNameFormat (
 					"%s",
-					spec.name ());
+					spec.name ())
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
+
+			;
 
 			if (spec.defaultValue () != null) {
 

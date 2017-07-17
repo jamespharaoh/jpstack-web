@@ -1,12 +1,11 @@
 package wbs.integrations.clockworksms.foreignapi;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.StrongPrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -27,7 +26,7 @@ class ClockworkSmsForeignApiDataFromXml
 	// prototype dependencies
 
 	@StrongPrototypeDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// components
 
@@ -45,7 +44,8 @@ class ClockworkSmsForeignApiDataFromXml
 
 		) {
 
-			return dataFromXmlBuilderProvider.get ()
+			return dataFromXmlBuilderProvider.provide (
+				taskLogger)
 
 				.registerBuilderClasses (
 					taskLogger,

@@ -6,8 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -27,6 +25,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -44,7 +43,8 @@ class ObjectContextMetaBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	ComponentProvider <ConsoleContextRootExtensionPoint>
+		rootExtensionPointProvider;
 
 	// builder
 
@@ -91,7 +91,8 @@ class ObjectContextMetaBuilder
 			// extension points
 
 			metaModule.addExtensionPoint (
-				rootExtensionPointProvider.get ()
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeName + ":list")
@@ -100,11 +101,11 @@ class ObjectContextMetaBuilder
 					listContextTypeNames)
 
 				.contextLinkNames (
-					ImmutableList.<String>of (
+					ImmutableList.of (
 						contextTypeName))
 
 				.parentContextNames (
-					ImmutableList.<String>of (
+					ImmutableList.of (
 						naivePluralise (
 							contextTypeName),
 						contextTypeName))
@@ -112,7 +113,8 @@ class ObjectContextMetaBuilder
 			);
 
 			metaModule.addExtensionPoint (
-				rootExtensionPointProvider.get ()
+				rootExtensionPointProvider.provide (
+					taskLogger)
 
 				.name (
 					contextTypeName + ":object")

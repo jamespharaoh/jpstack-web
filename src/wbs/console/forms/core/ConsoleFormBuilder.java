@@ -3,8 +3,6 @@ package wbs.console.forms.core;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.types.FormField;
@@ -40,7 +38,7 @@ class ConsoleFormBuilder {
 		builderProviders;
 
 	@StrongPrototypeDependency
-	Provider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
+	ComponentProvider <BuilderFactory <?, TaskLogger>> builderFactoryProvider;
 
 	// state
 
@@ -63,7 +61,8 @@ class ConsoleFormBuilder {
 		) {
 
 			builder =
-				builderFactoryProvider.get ()
+				builderFactoryProvider.provide (
+					taskLogger)
 
 				.contextClass (
 					TaskLogger.class)

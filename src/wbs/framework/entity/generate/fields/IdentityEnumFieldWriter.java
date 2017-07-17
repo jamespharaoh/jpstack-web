@@ -20,6 +20,7 @@ import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.identities.IdentityEnumFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -118,8 +119,7 @@ class IdentityEnumFieldWriter
 
 			// write field
 
-			JavaPropertyWriter propertyWriter =
-				new JavaPropertyWriter ()
+			new JavaPropertyWriter ()
 
 				.thisClassNameFormat (
 					"%s.model.%s",
@@ -130,12 +130,17 @@ class IdentityEnumFieldWriter
 					fullFieldTypeName)
 
 				.propertyName (
-					fieldName);
+					fieldName)
 
-			propertyWriter.writeBlock (
-				taskLogger,
-				target.imports (),
-				target.formatWriter ());
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
+
+				.writeBlock (
+					taskLogger,
+					target.imports (),
+					target.formatWriter ())
+
+			;
 
 		}
 

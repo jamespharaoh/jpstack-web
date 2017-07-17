@@ -1,12 +1,11 @@
 package wbs.integrations.clockworksms.api;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.UninitializedDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -24,10 +23,10 @@ class ClockworkSmsRouteReportRequestReader
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	// uninitialised dependencies
+	// prototype dependencies
 
-	@UninitializedDependency
-	Provider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
+	@PrototypeDependency
+	ComponentProvider <DataFromXmlBuilder> dataFromXmlBuilderProvider;
 
 	// implementation
 
@@ -45,7 +44,8 @@ class ClockworkSmsRouteReportRequestReader
 
 		) {
 
-			return dataFromXmlBuilderProvider.get ()
+			return dataFromXmlBuilderProvider.provide (
+				taskLogger)
 
 				.registerBuilderClasses (
 					taskLogger,

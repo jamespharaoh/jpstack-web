@@ -18,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.TimestampFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -91,6 +92,9 @@ class TimestampFieldWriter
 						"toInstantNullSafe",
 						ImmutableList.of (
 							ReadableInstant.class)))
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
 
 				.writeBlock (
 					taskLogger,

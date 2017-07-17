@@ -4,6 +4,10 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.collection.MapUtils.mapIsEmpty;
+import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
+import static wbs.utils.etc.Misc.todo;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.Arrays;
@@ -31,6 +35,9 @@ class JavaAssignmentWriter {
 
 	@Getter @Setter
 	String variableName;
+
+	@Getter @Setter
+	String provider;
 
 	@Getter @Setter
 	String value;
@@ -130,7 +137,15 @@ class JavaAssignmentWriter {
 				"\t%s;",
 				value);
 
-		} else {
+		} else if (
+
+			isNotNull (
+				value)
+
+			&& isNull (
+				provider)
+
+		) {
 
 			formatWriter.writeLineFormat (
 				"\t%s",
@@ -208,6 +223,60 @@ class JavaAssignmentWriter {
 
 			formatWriter.writeLineFormat (
 				";");
+
+		} else if (
+
+			isNull (
+				value)
+
+			&& isNotNull (
+				provider)
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"\t%s.provide (",
+				provider);
+
+			formatWriter.writeLineFormat (
+				"\t\ttaskLogger,");
+
+			formatWriter.writeLineFormat (
+				"\t\t%s ->",
+				variableName);
+
+			formatWriter.writeLineFormat (
+				"\t\t\t%s",
+				variableName);
+
+			formatWriter.writeNewline ();
+
+			for (
+				Map.Entry <String, String> propertyEntry
+					: properties.entrySet ()
+			) {
+
+				formatWriter.writeLineFormat (
+					"\t.%s (",
+					propertyEntry.getKey ());
+
+				formatWriter.writeLineFormat (
+					"\t\t%s)",
+					propertyEntry.getValue ());
+
+				formatWriter.writeNewline ();
+
+			}
+
+			if (
+				mapIsNotEmpty (
+					calls)
+			) {
+				throw todo ();
+			}
+
+			formatWriter.writeLineFormat (
+				");");
 
 		}
 

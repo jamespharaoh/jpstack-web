@@ -134,6 +134,16 @@ interface ConsoleForm <Container> {
 			Transaction parentTransaction,
 			Container object);
 
+	default
+	void setDefaults (
+			Transaction parentTransaction) {
+
+		setDefaults (
+			parentTransaction,
+			value ());
+
+	}
+
 	void update (
 			Transaction parentTransaction,
 			Container object);

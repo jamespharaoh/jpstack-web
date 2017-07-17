@@ -10,6 +10,9 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.dynamicCast;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,7 @@ import com.google.common.collect.Streams;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
+import wbs.utils.data.Pair;
 
 public
 class IterableUtils {
@@ -76,12 +79,12 @@ class IterableUtils {
 
 	public static <InLeftType, InRightType, OutType>
 	Iterable <OutType> iterableMap (
+			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable,
 			@NonNull BiFunction <
 				? super InLeftType,
 				? super InRightType,
 				OutType
-			> mapFunction,
-			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable) {
+			> mapFunction) {
 
 		return () ->
 			Streams.stream (
@@ -90,8 +93,8 @@ class IterableUtils {
 			.map (
 				pair ->
 					mapFunction.apply (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.iterator ();
 
@@ -123,8 +126,8 @@ class IterableUtils {
 
 		return ImmutableList.copyOf (
 			iterableMap (
-				mapFunction,
-				input));
+				input,
+				mapFunction));
 
 	}
 
@@ -152,11 +155,11 @@ class IterableUtils {
 
 			builder.put (
 				keyFunction.apply (
-					item.getLeft (),
-					item.getRight ()),
+					item.left (),
+					item.right ()),
 				valueFunction.apply (
-					item.getLeft (),
-					item.getRight ()));
+					item.left (),
+					item.right ()));
 
 		}
 
@@ -179,6 +182,106 @@ class IterableUtils {
 
 	}
 
+	public static <In, Out>
+	Iterable <Pair <Long, Out>> iterableMapWithIndex (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, Out> mapFunction) {
+
+		return () ->
+			new Iterator <Pair <Long, Out>> () {
+
+			Iterator <? extends In> iterator =
+				iterable.iterator ();
+
+			long index = 0;
+
+			@Override
+			public
+			boolean hasNext () {
+				return iterator.hasNext ();
+			}
+
+			@Override
+			public
+			Pair <Long, Out> next () {
+
+				Pair <Long, Out> value =
+					new Pair <Long, Out> (
+						index,
+						mapFunction.apply (
+							index,
+							iterator.next ()));
+
+				index ++;
+
+				return value;
+
+			}
+
+		};
+
+	}
+
+	public static <In, OutKey, OutValue>
+	Map <OutKey, OutValue> iterableMapWithIndexToMap (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, OutKey> keyFunction,
+			@NonNull BiFunction <Long, ? super In, OutValue> valueFunction) {
+
+		ImmutableMap.Builder <OutKey, OutValue> builder =
+			ImmutableMap.builder ();
+
+		long index = 0;
+
+		for (
+			In item
+				: iterable
+		) {
+
+			builder.put (
+				keyFunction.apply (
+					index,
+					item),
+				valueFunction.apply (
+					index,
+					item));
+
+			index ++;
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <In, Out>
+	List <Out> iterableMapWithIndexToList (
+			@NonNull Iterable <? extends In> iterable,
+			@NonNull BiFunction <Long, ? super In, Out> mapFunction) {
+
+		ImmutableList.Builder <Out> builder =
+			ImmutableList.builder ();
+
+		long index = 0;
+
+		for (
+			In item
+				: iterable
+		) {
+
+			builder.add (
+				mapFunction.apply (
+					index,
+					item));
+
+			index ++;
+
+		}
+
+		return builder.build ();
+
+	}
+
 	public static <Type>
 	Set <Type> iterableToSet (
 			@NonNull Iterable <Type> input) {
@@ -190,8 +293,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	Iterable <ItemType> iterableFilter (
-			@NonNull Predicate <? super ItemType> predicate,
-			@NonNull Iterable <ItemType> input) {
+			@NonNull Iterable <ItemType> input,
+			@NonNull Predicate <? super ItemType> predicate) {
 
 		return () ->
 			iterableStream (
@@ -219,8 +322,8 @@ class IterableUtils {
 			.filter (
 				pair ->
 					predicate.test (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.iterator ();
 
@@ -271,6 +374,34 @@ class IterableUtils {
 
 			.map (
 				mapping::apply)
+
+			.iterator ()
+
+		;
+
+	}
+
+	public static <InLeft, InRight, Out>
+	Iterable <Out> iterableFilterMap (
+			@NonNull Iterable <Pair <? extends InLeft, ? extends InRight>> iterable,
+			@NonNull BiPredicate <? super InLeft, ? super InRight> predicate,
+			@NonNull BiFunction <? super InLeft, ? super InRight, Out> mapping) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.filter (
+				pair ->
+					predicate.test (
+						pair.left (),
+						pair.right ()))
+
+			.map (
+				pair ->
+					mapping.apply (
+						pair.left (),
+						pair.right ()))
 
 			.iterator ()
 
@@ -334,8 +465,8 @@ class IterableUtils {
 
 	public static <ItemType>
 	Optional <ItemType> iterableFindFirst (
-			@NonNull Predicate <ItemType> predicate,
-			@NonNull Iterable <ItemType> iterable) {
+			@NonNull Iterable <ItemType> iterable,
+			@NonNull Predicate <ItemType> predicate) {
 
 		for (
 			ItemType item
@@ -594,6 +725,122 @@ class IterableUtils {
 				Collectors.toList ())
 
 		;
+
+	}
+
+	public static
+	long iterableSize (
+			@NonNull Iterable <?> iterable) {
+
+		long size = 0;
+
+		Iterator <?> iterator =
+			iterable.iterator ();
+
+		while (iterator.hasNext ()) {
+
+			size ++;
+
+			iterator.next ();
+
+		}
+
+		return size;
+
+	}
+
+	public static
+	boolean iterableIsEmpty (
+			@NonNull Iterable <?> iterable) {
+
+		return ! iterable.iterator ().hasNext ();
+
+	}
+
+	public static
+	boolean iterableIsNotEmpty (
+			@NonNull Iterable <?> iterable) {
+
+		return iterable.iterator ().hasNext ();
+
+	}
+
+	public static <Item>
+	List <Item> iterableOrderToList (
+			@NonNull Iterable <? extends Item> iterable,
+			@NonNull Comparator <? super Item> comparator) {
+
+		List <Item> list =
+			new ArrayList<> ();
+
+		for (
+			Item item
+				: iterable
+		) {
+
+			list.add (
+				item);
+
+		}
+
+		Collections.sort (
+			list,
+			comparator);
+
+		return list;
+
+	}
+
+	public static <Left, Right>
+	Iterable <Pair <Left, Right>> iterableZipRequired (
+			@NonNull Iterable <? extends Left> leftIterable,
+			@NonNull Iterable <? extends Right> rightIterable) {
+
+		return () -> {
+
+			Iterator <? extends Left> leftIterator =
+				leftIterable.iterator ();
+
+			Iterator <? extends Right> rightIterator =
+				rightIterable.iterator ();
+
+			return new Iterator <Pair <Left, Right>> () {
+
+				@Override
+				public
+				boolean hasNext () {
+
+					boolean leftHasNext =
+						leftIterator.hasNext ();
+
+					boolean rightHasNext =
+						rightIterator.hasNext ();
+
+					if (leftHasNext && rightHasNext) {
+						return true;
+					}
+
+					if (! leftHasNext && ! rightHasNext) {
+						return false;
+					}
+
+					throw new RuntimeException ();
+
+				}
+
+				@Override
+				public
+				Pair <Left, Right> next () {
+
+					return new Pair <Left, Right> (
+						leftIterator.next (),
+						rightIterator.next ());
+
+				}
+
+			};
+
+		};
 
 	}
 

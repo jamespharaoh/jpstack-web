@@ -1,11 +1,16 @@
 package wbs.integrations.oxygenate.console;
 
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import wbs.console.part.PagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
@@ -14,11 +19,16 @@ public
 class OxygenateRouteSummaryAdditionalPartFactory
 	implements RouteSummaryAdditionalPartFactory {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <OxygenateRouteSummaryAdditionalPart>
-	oxygen8RouteSummaryAdditionalPartProvider;
+	ComponentProvider <OxygenateRouteSummaryAdditionalPart>
+		oxygen8RouteSummaryAdditionalPartProvider;
 
 	// details
 
@@ -37,9 +47,22 @@ class OxygenateRouteSummaryAdditionalPartFactory
 	@Override
 	public
 	PagePart getPagePart (
-			String senderCode) {
+			@NonNull Transaction parentTransaction,
+			@NonNull String senderCode) {
 
-		return oxygen8RouteSummaryAdditionalPartProvider.get ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"getPagePart");
+
+		) {
+
+			return oxygen8RouteSummaryAdditionalPartProvider.provide (
+				transaction);
+
+		}
 
 	}
 

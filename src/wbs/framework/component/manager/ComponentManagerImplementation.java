@@ -16,8 +16,10 @@ import static wbs.utils.collection.MapUtils.mapTransformToMap;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -73,8 +75,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
 import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
@@ -93,7 +93,7 @@ import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.utils.etc.PropertyUtils;
+import wbs.utils.data.Pair;
 
 @Accessors (fluent = true)
 public
@@ -304,8 +304,7 @@ class ComponentManagerImplementation
 	Optional <ComponentProvider <ComponentType>> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass,
-			@NonNull Boolean initialise) {
+			@NonNull Class <ComponentType> componentClass) {
 
 		try (
 
@@ -352,12 +351,10 @@ class ComponentManagerImplementation
 			}
 
 			return optionalOf (
-				genericCastUnchecked (
-					getComponentProvider (
-						taskLogger,
-						componentDefinition,
-						initialise,
-						false)));
+				getComponentProvider (
+					taskLogger,
+					componentDefinition,
+					false));
 
 		}
 
@@ -368,8 +365,7 @@ class ComponentManagerImplementation
 	ComponentProvider <ComponentType> getComponentProviderRequired (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
-			@NonNull Class <ComponentType> componentClass,
-			@NonNull Boolean initialise) {
+			@NonNull Class <ComponentType> componentClass) {
 
 		try (
 
@@ -424,7 +420,6 @@ class ComponentManagerImplementation
 				getComponentProvider (
 					taskLogger,
 					componentDefinition,
-					initialise,
 					false));
 
 		}
@@ -1184,7 +1179,9 @@ class ComponentManagerImplementation
 					optionalGetRequired (
 						componentData.optionalComponent),
 					valuePropertyEntry.getKey (),
-					valuePropertyEntry.getValue ());
+					Object.class,
+					optionalOf (
+						valuePropertyEntry.getValue ()));
 
 			}
 
@@ -1223,10 +1220,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				String targetName =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1240,11 +1237,13 @@ class ComponentManagerImplementation
 							targetName,
 							Object.class);
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						target);
+						Object.class,
+						optionalOf (
+							target));
 
 				} else if (
 					stringEqualSafe (
@@ -1262,7 +1261,9 @@ class ComponentManagerImplementation
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						targetProvider);
+						ComponentProvider.class,
+						optionalOf (
+							targetProvider));
 
 				} else {
 
@@ -1307,10 +1308,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				List <String> targetNames =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1327,11 +1328,13 @@ class ComponentManagerImplementation
 									targetName,
 									Object.class));
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						targets);
+						List.class,
+						optionalOf (
+							targets));
 
 				} else if (
 					stringEqualSafe (
@@ -1352,7 +1355,9 @@ class ComponentManagerImplementation
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						targetProviders);
+						List.class,
+						optionalOf (
+							targetProviders));
 
 				} else {
 
@@ -1397,10 +1402,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				Map <Object, String> targetMap =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1419,11 +1424,13 @@ class ComponentManagerImplementation
 									targetName,
 									Object.class));
 
-					PropertyUtils.propertySetSimple (
+					propertySetSimple (
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						targets);
+						Map.class,
+						optionalOf (
+							targets));
 
 				} else if (
 					stringEqualSafe (
@@ -1446,7 +1453,9 @@ class ComponentManagerImplementation
 						optionalGetRequired (
 							componentData.optionalComponent),
 						entry.getKey (),
-						targetProviders);
+						Map.class,
+						optionalOf (
+							targetProviders));
 
 				} else {
 
@@ -1573,9 +1582,9 @@ class ComponentManagerImplementation
 						iterableTransformToMap (
 							targetComponents,
 							item ->
-								item.getLeft ().componentClass (),
+								item.left ().componentClass (),
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1588,9 +1597,9 @@ class ComponentManagerImplementation
 						iterableTransformToMap (
 							targetComponents,
 							item ->
-								item.getLeft ().name (),
+								item.left ().name (),
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1603,7 +1612,7 @@ class ComponentManagerImplementation
 						iterableMapToList (
 							targetComponents,
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1627,7 +1636,7 @@ class ComponentManagerImplementation
 
 					}
 
-					return targetComponents.get (0).getRight ();
+					return targetComponents.get (0).right ();
 
 				};
 
@@ -1735,12 +1744,7 @@ class ComponentManagerImplementation
 								getComponentProvider (
 									taskLogger,
 									targetDefinition,
-									injection
-										.injectedProperty
-										.initialized (),
-									injection
-										.injectedProperty
-										.weak ())));
+									injection.injectedProperty.weak ())));
 
 			List <String> missingRawValueNames =
 				iterableMapToList (
@@ -1750,7 +1754,7 @@ class ComponentManagerImplementation
 								rawValue),
 						targetProviders),
 					unaggregatedValue ->
-						unaggregatedValue.getLeft ().name ());
+						unaggregatedValue.left ().name ());
 
 			if (
 				collectionIsNotEmpty (
@@ -2172,11 +2176,10 @@ class ComponentManagerImplementation
 
 	}
 
-	private
-	ComponentProvider <?> getComponentProvider (
+	private <Component>
+	ComponentProvider <Component> getComponentProvider (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Boolean initialise,
 			@NonNull Boolean weak) {
 
 		try (
@@ -2186,41 +2189,47 @@ class ComponentManagerImplementation
 
 		) {
 
-			return new ComponentProvider <Object> () {
+			if (
+				stringEqualSafe (
+					componentDefinition.scope (),
+					"singleton")
+			) {
 
-				@Override
-				public
-				Object provide (
-						TaskLogger parentTaskLogger) {
+				return new ComponentProviderImplementation <Component> (
+					nestedTaskLogger ->
+						genericCastUnchecked (
+							getComponentReal (
+								nestedTaskLogger,
+								componentDefinition,
+								false,
+								weak)),
+					(nestedTaskLogger, component) ->
+						doNothing ());
 
-					return getComponentReal (
-						parentTaskLogger,
-						componentDefinition,
-						initialise,
-						weak);
+			} else if (
+				stringEqualSafe (
+					componentDefinition.scope (),
+					"prototype")
+			) {
 
-				}
+				return new ComponentProviderImplementation <Component> (
+					nestedTaskLogger ->
+						genericCastUnchecked (
+							getComponentReal (
+								nestedTaskLogger,
+								componentDefinition,
+								false,
+								weak)),
+					(nestedTaskLogger, component) ->
+						initializeComponent (
+							nestedTaskLogger,
+							component));
 
-				@Override
-				public
-				Object get () {
+			} else {
 
-					try (
+				throw shouldNeverHappen ();
 
-						OwnedTaskLogger taskLogger =
-							logContext.createTaskLogger (
-								"ComponentProvider.get");
-
-					) {
-
-						return provide (
-							taskLogger);
-
-					}
-
-				}
-
-			};
+			}
 
 		}
 

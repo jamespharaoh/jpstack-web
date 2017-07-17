@@ -3,7 +3,8 @@
 
 	<console-helper-provider
 		object-name="fonixNetwork"
-		view-priv="root:manage">
+		view-priv="root:manage"
+		create-priv="root:manage">
 
 		<priv-key
 			name="fonixNetwork.manage"
@@ -32,9 +33,7 @@
 				form="list"/>
 
 			<object-create-page
-				form="create"
-				create-priv-delegate="root"
-				create-priv-code="manage"/>
+				form="create"/>
 
 		</list>
 

@@ -5,13 +5,12 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
@@ -32,7 +31,7 @@ class ObjectHelperGeneratorTool {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ObjectHelperGenerator> objectHelperGeneratorProvider;
+	ComponentProvider <ObjectHelperGenerator> objectHelperGeneratorProvider;
 
 	// implementation
 
@@ -69,7 +68,8 @@ class ObjectHelperGeneratorTool {
 
 				try {
 
-					objectHelperGeneratorProvider.get ()
+					objectHelperGeneratorProvider.provide (
+						taskLogger)
 
 						.model (
 							model)

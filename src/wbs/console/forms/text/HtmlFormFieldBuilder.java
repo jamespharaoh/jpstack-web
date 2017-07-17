@@ -4,8 +4,6 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.console.forms.basic.IdentityFormFieldInterfaceMapping;
@@ -29,6 +27,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -52,20 +51,17 @@ class HtmlFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
+		identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	ComponentProvider <ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	ComponentProvider <SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <HtmlFormFieldRenderer>
-	htmlFormFieldRendererProvider;
+	ComponentProvider <HtmlFormFieldRenderer> htmlFormFieldRendererProvider;
 
 	// builder
 
@@ -116,7 +112,8 @@ class HtmlFormFieldBuilder
 			// accessor
 
 			FormFieldAccessor accessor =
-				simpleFormFieldAccessorProvider.get ()
+				simpleFormFieldAccessorProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -133,6 +130,7 @@ class HtmlFormFieldBuilder
 
 			ConsoleFormNativeMapping nativeMapping =
 				formFieldPluginManager.getNativeMappingRequired (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name,
@@ -142,12 +140,14 @@ class HtmlFormFieldBuilder
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// renderer
 
 			FormFieldRenderer renderer =
-				htmlFormFieldRendererProvider.get ()
+				htmlFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -158,7 +158,8 @@ class HtmlFormFieldBuilder
 			// form field
 
 			formFieldSet.addFormItem (
-				readOnlyFormFieldProvider.get ()
+				readOnlyFormFieldProvider.provide (
+					taskLogger)
 
 				.name (
 					name)

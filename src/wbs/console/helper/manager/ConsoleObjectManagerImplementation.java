@@ -110,17 +110,17 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public <RecordType extends Record <RecordType>>
-	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
+	Optional <ConsoleHelper <RecordType>> consoleHelperForObject (
 			@NonNull Record <?> dataObject) {
 
-		return findConsoleHelper (
+		return consoleHelperForClass (
 			dataObject.getClass ());
 
 	}
 
 	@Override
 	public <RecordType extends Record <RecordType>>
-	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
+	Optional <ConsoleHelper <RecordType>> consoleHelperForClass (
 			@NonNull Class <?> objectClass) {
 
 		Class <?> tempClass =
@@ -158,7 +158,7 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Optional <ConsoleHelper <?>> findConsoleHelper (
+	Optional <ConsoleHelper <?>> consoleHelperForName (
 			@NonNull String objectTypeName) {
 
 		return optionalFromNullable (
@@ -188,8 +188,9 @@ class ConsoleObjectManagerImplementation
 		) {
 
 			ConsoleHelper <?> objectHelper =
-				findConsoleHelperRequired (
-					object);
+				consoleHelperForObjectRequired (
+					genericCastUnchecked (
+						object));
 
 			String path =
 				objectManager.objectPathMini (
@@ -282,8 +283,9 @@ class ConsoleObjectManagerImplementation
 			}
 
 			ConsoleHelper <?> objectHelper =
-				findConsoleHelperRequired (
-					object);
+				consoleHelperForObjectRequired (
+					genericCastUnchecked (
+						object));
 
 			objectHelper.writeHtmlGeneric (
 				transaction,
@@ -373,8 +375,9 @@ class ConsoleObjectManagerImplementation
 		) {
 
 			ConsoleHelper <?> objectHelper =
-				findConsoleHelperRequired (
-					object);
+				consoleHelperForObjectRequired (
+					genericCastUnchecked (
+						object));
 
 			return objectHelper.canView (
 				transaction,
@@ -392,8 +395,9 @@ class ConsoleObjectManagerImplementation
 			@NonNull Record <?> object) {
 
 		ConsoleHelper<?> objectHelper =
-			findConsoleHelperRequired (
-				object);
+			consoleHelperForObjectRequired (
+				genericCastUnchecked (
+					object));
 
 		if (objectHelper.typeCodeExists ()) {
 
@@ -428,8 +432,9 @@ class ConsoleObjectManagerImplementation
 		) {
 
 			ConsoleHelper <?> objectHelper =
-				findConsoleHelperRequired (
-					object);
+				consoleHelperForObjectRequired (
+					genericCastUnchecked (
+						object));
 
 			return requestContext.resolveContextUrl (
 				objectHelper.getDefaultContextPathGeneric (
@@ -456,8 +461,9 @@ class ConsoleObjectManagerImplementation
 		) {
 
 			ConsoleHelper <?> objectHelper =
-				findConsoleHelperRequired (
-					object);
+				consoleHelperForObjectRequired (
+					genericCastUnchecked (
+						object));
 
 			return requestContext.resolveLocalUrl (
 				objectHelper.getDefaultLocalPathGeneric (

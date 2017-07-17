@@ -6,8 +6,6 @@ import static wbs.utils.thread.ConcurrentUtils.futureValue;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Provider;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -27,6 +25,9 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
+import wbs.framework.database.BorrowedTransaction;
+import wbs.framework.database.CloseableTransaction;
 import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -36,6 +37,8 @@ import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
 
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
+
+import wbs.utils.etc.ImplicitArgument.BorrowedArgument;
 
 @SingletonComponent ("manualResponderStatusLine")
 public
@@ -62,16 +65,16 @@ class ManualResponderStatusLine
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ManualResponderNumThisHourCache>
-	manualResponderNumThisHourCacheProvider;
+	ComponentProvider <ManualResponderNumThisHourCache>
+		manualResponderNumThisHourCacheProvider;
 
 	@PrototypeDependency
-	Provider <ManualResponderNumTodayCache>
-	manualResponderNumTodayCacheProvider;
+	ComponentProvider <ManualResponderNumTodayCache>
+		manualResponderNumTodayCacheProvider;
 
 	@PrototypeDependency
-	Provider <ManualResponderStatusLinePart>
-	manualResponderStatusLinePartProvider;
+	ComponentProvider <ManualResponderStatusLinePart>
+		manualResponderStatusLinePartProvider;
 
 	// state
 
@@ -93,17 +96,44 @@ class ManualResponderStatusLine
 			PerOperatorCaches load (
 					@NonNull Long userId) {
 
-				return new PerOperatorCaches ()
+				try (
 
-					.numThisHourCache (
-						manualResponderNumThisHourCacheProvider.get ()
-							.userId (userId))
+					BorrowedArgument <CloseableTransaction, BorrowedTransaction>
+						transactionProvider =
+							Transaction.implicitArgument.borrow ();
 
-					.numTodayCache (
-						manualResponderNumTodayCacheProvider.get ()
-							.userId (userId))
+				) {
 
-				;
+					BorrowedTransaction transaction =
+						transactionProvider.get ();
+
+					return new PerOperatorCaches ()
+	
+						.numThisHourCache (
+							manualResponderNumThisHourCacheProvider.provide (
+								transaction,
+								cache ->
+									cache
+
+							.userId (
+								userId)
+
+						))
+	
+						.numTodayCache (
+							manualResponderNumTodayCacheProvider.provide (
+								transaction,
+								cache ->
+									cache
+
+							.userId (
+								userId)
+
+						))
+	
+					;
+
+				}
 
 			}
 
@@ -124,7 +154,19 @@ class ManualResponderStatusLine
 	PagePart createPagePart (
 			@NonNull Transaction parentTransaction) {
 
-		return manualResponderStatusLinePartProvider.get ();
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"createPagePart");
+
+		) {
+
+			return manualResponderStatusLinePartProvider.provide (
+				transaction);
+
+		}
 
 	}
 
@@ -171,30 +213,24 @@ class ManualResponderStatusLine
 			PerOperatorCaches caches =
 				cacheGet (
 					cachesByUserId,
-					privChecker.userIdRequired ());
-
-			if (caches == null) {
-
-				caches =
-					new PerOperatorCaches ();
-
-				cachesByUserId.put (
 					privChecker.userIdRequired (),
-					caches);
-
-			}
+					() -> new PerOperatorCaches ());
 
 			// return update script
 
 			updateData.addProperty (
 				"numToday",
-				caches.numTodayCache.get (
-					transaction));
+				Transaction.implicitArgument.storeAndInvoke (
+					transaction,
+					() -> caches.numTodayCache.get (
+						transaction)));
 
 			updateData.addProperty (
 				"numThisHour",
-				caches.numThisHourCache.get (
-					transaction));
+				Transaction.implicitArgument.storeAndInvoke (
+					transaction,
+					() -> caches.numThisHourCache.get (
+						transaction)));
 
 			return futureValue (
 				updateData);

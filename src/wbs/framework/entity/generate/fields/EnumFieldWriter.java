@@ -20,6 +20,7 @@ import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
+import wbs.framework.entity.generate.ModelRecordGenerator;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.EnumFieldSpec;
 import wbs.framework.logging.LogContext;
@@ -130,7 +131,12 @@ class EnumFieldWriter
 					fullFieldTypeName)
 
 				.propertyName (
-					fieldName);
+					fieldName)
+
+				.setUpdatedFieldName (
+					ModelRecordGenerator.recordUpdatedFieldName)
+
+			;
 
 			if (spec.defaultValue () != null) {
 

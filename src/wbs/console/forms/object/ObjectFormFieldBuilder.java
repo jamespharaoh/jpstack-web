@@ -3,8 +3,11 @@ package wbs.console.forms.object;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -12,8 +15,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -48,6 +49,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
@@ -72,47 +74,51 @@ class ObjectFormFieldBuilder
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <DereferenceFormFieldAccessor>
+	ComponentProvider <DereferenceFormFieldAccessor>
 	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldInterfaceMapping>
+	ComponentProvider <DynamicFormFieldAccessor>
+	dynamicFormFieldAccessorProvider;
+
+	@PrototypeDependency
+	ComponentProvider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
+	ComponentProvider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <ObjectCsvFormFieldInterfaceMapping>
+	ComponentProvider <ObjectCsvFormFieldInterfaceMapping>
 	objectCsvFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <ObjectFormFieldRenderer>
+	ComponentProvider <ObjectFormFieldRenderer>
 	objectFormFieldRendererProvider;
 
 	@PrototypeDependency
-	Provider <ObjectIdFormFieldNativeMapping>
+	ComponentProvider <ObjectIdFormFieldNativeMapping>
 	objectIdFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
-	Provider <ReadOnlyFormField>
+	ComponentProvider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	@PrototypeDependency
-	Provider <RequiredFormFieldValueValidator>
+	ComponentProvider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
+	ComponentProvider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
-	Provider <ObjectFormFieldConstraintValidator>
+	ComponentProvider <ObjectFormFieldConstraintValidator>
 	objectFormFieldConstraintValidatorProvider;
 
 	@PrototypeDependency
-	Provider <UpdatableFormField>
+	ComponentProvider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder
@@ -173,28 +179,26 @@ class ObjectFormFieldBuilder
 					spec.readOnly (),
 					false);
 
-			/*
 			Boolean dynamic =
 				ifNull (
-					spec.dynamic(),
+					spec.dynamic (),
 					false);
-			*/
 
-			Optional <ConsoleHelper <?>> consoleHelper;
+			Optional <ConsoleHelper <?>> consoleHelperOptional;
 
 			if (
 				isNotNull (
 					spec.objectTypeName ())
 			) {
 
-				consoleHelper =
+				consoleHelperOptional =
 					optionalOf (
-						objectManager.findConsoleHelperRequired (
+						objectManager.consoleHelperForNameRequired (
 							spec.objectTypeName ()));
 
 				if (
 					optionalIsNotPresent (
-						consoleHelper)
+						consoleHelperOptional)
 				) {
 
 					throw new RuntimeException (
@@ -206,7 +210,7 @@ class ObjectFormFieldBuilder
 
 			} else {
 
-				consoleHelper =
+				consoleHelperOptional =
 					optionalAbsent ();
 
 			}
@@ -216,25 +220,69 @@ class ObjectFormFieldBuilder
 
 			// field type
 
-			Optional <Class <?>> propertyClassOptional =
-				objectManager.dereferenceType (
-					taskLogger,
-					optionalOf (
-						context.containerClass ()),
-					optionalOf (
-						fieldName));
+			Optional <Class <?>> propertyClassOptional;
+
+			if (dynamic) {
+
+				if (
+					optionalIsPresent (
+						consoleHelperOptional)
+				) {
+
+					ConsoleHelper <?> consoleHelper =
+						optionalGetRequired (
+							consoleHelperOptional);
+
+					propertyClassOptional =
+						optionalOf (
+							consoleHelper.objectClass ());
+
+				} else {
+
+					propertyClassOptional =
+						optionalAbsent ();
+
+				}
+
+			} else {
+
+				propertyClassOptional =
+					objectManager.dereferenceType (
+						taskLogger,
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							fieldName));
+
+			}
 
 			// accessor
 
 			FormFieldAccessor accessor;
 
-			if (
+			if (dynamic) {
+
+				accessor =
+					dynamicFormFieldAccessorProvider.provide (
+						taskLogger)
+
+					.name (
+						fieldName)
+
+					.nativeClass (
+						optionalOrNull (
+							propertyClassOptional))
+
+				;
+
+			} else if (
 				isNotNull (
 					spec.fieldName ())
 			) {
 
 				accessor =
-					dereferenceFormFieldAccessorProvider.get ()
+					dereferenceFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.path (
 						spec.fieldName ());
@@ -242,7 +290,8 @@ class ObjectFormFieldBuilder
 			} else {
 
 				accessor =
-					simpleFormFieldAccessorProvider.get ()
+					simpleFormFieldAccessorProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -263,15 +312,17 @@ class ObjectFormFieldBuilder
 			) {
 
 				nativeMapping =
-					objectIdFormFieldNativeMappingProvider.get ()
+					objectIdFormFieldNativeMappingProvider.provide (
+						taskLogger)
 
 					.consoleHelper (
-						consoleHelper.orNull ());
+						consoleHelperOptional.orNull ());
 
 			} else {
 
 				nativeMapping =
-					identityFormFieldNativeMappingProvider.get ();
+					identityFormFieldNativeMappingProvider.provide (
+						taskLogger);
 
 			}
 
@@ -283,24 +334,28 @@ class ObjectFormFieldBuilder
 			if (! nullable) {
 
 				valueValidators.add (
-					requiredFormFieldValueValidatorProvider.get ());
+					requiredFormFieldValueValidatorProvider.provide (
+						taskLogger));
 
 			}
 
 			// constraint validator
 
 			FormFieldConstraintValidator constraintValidator =
-				objectFormFieldConstraintValidatorProvider.get ();
+				objectFormFieldConstraintValidatorProvider.provide (
+					taskLogger);
 
 			// interface mapping
 
 			FormFieldInterfaceMapping interfaceMapping =
-				identityFormFieldInterfaceMappingProvider.get ();
+				identityFormFieldInterfaceMappingProvider.provide (
+					taskLogger);
 
 			// csv mapping
 
 			FormFieldInterfaceMapping csvMapping =
-				objectCsvFormFieldInterfaceMappingProvider.get ()
+				objectCsvFormFieldInterfaceMappingProvider.provide (
+					taskLogger)
 
 				.rootFieldName (
 					rootFieldName);
@@ -308,7 +363,8 @@ class ObjectFormFieldBuilder
 			// renderer
 
 			FormFieldRenderer renderer =
-				objectFormFieldRendererProvider.get ()
+				objectFormFieldRendererProvider.provide (
+					taskLogger)
 
 				.name (
 					name)
@@ -323,7 +379,7 @@ class ObjectFormFieldBuilder
 					rootFieldName)
 
 				.entityFinder (
-					consoleHelper.orNull ())
+					consoleHelperOptional.orNull ())
 
 				.mini (
 					isNotNull (
@@ -333,6 +389,7 @@ class ObjectFormFieldBuilder
 
 			FormFieldUpdateHook updateHook =
 				formFieldPluginManager.getUpdateHook (
+					taskLogger,
 					context,
 					context.containerClass (),
 					name);
@@ -342,7 +399,8 @@ class ObjectFormFieldBuilder
 			if (! readOnly) {
 
 				formFieldSet.addFormItem (
-					updatableFormFieldProvider.get ()
+					updatableFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)
@@ -385,7 +443,8 @@ class ObjectFormFieldBuilder
 			} else {
 
 				formFieldSet.addFormItem (
-					readOnlyFormFieldProvider.get ()
+					readOnlyFormFieldProvider.provide (
+						taskLogger)
 
 					.name (
 						name)

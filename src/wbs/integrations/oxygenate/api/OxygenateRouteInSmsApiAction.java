@@ -14,8 +14,6 @@ import static wbs.utils.time.TimeUtils.secondsToInstant;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -26,6 +24,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.exception.ExceptionUtils;
@@ -43,7 +42,6 @@ import wbs.integrations.oxygenate.model.OxygenateRouteInObjectHelper;
 import wbs.integrations.oxygenate.model.OxygenateRouteInRec;
 
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -51,6 +49,7 @@ import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
 import wbs.web.context.RequestContext;
+import wbs.web.responder.TextResponder;
 import wbs.web.responder.WebResponder;
 
 @PrototypeComponent ("oxygenateRouteInSmsApiAction")
@@ -99,7 +98,7 @@ class OxygenateRouteInSmsApiAction
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <TextResponder> textResponderProvider;
+	ComponentProvider <TextResponder> textResponderProvider;
 
 	// state
 
@@ -147,7 +146,8 @@ class OxygenateRouteInSmsApiAction
 					taskLogger);
 
 				return optionalOf (
-					createResponse ());
+					createResponse (
+						taskLogger));
 
 			} catch (RuntimeException exception) {
 
@@ -457,10 +457,29 @@ class OxygenateRouteInSmsApiAction
 
 	}
 
-	WebResponder createResponse () {
+	WebResponder createResponse (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return textResponderProvider.get ()
-			.text ("success");
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createResponse");
+
+		) {
+
+			return textResponderProvider.provide (
+				taskLogger,
+				textResponder ->
+					textResponder
+
+				.text (
+					"success")
+
+			);
+
+		}
 
 	}
 

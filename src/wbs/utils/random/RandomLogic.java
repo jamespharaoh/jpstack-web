@@ -11,6 +11,10 @@ interface RandomLogic {
 	long randomInteger (
 			long limit);
 
+	boolean randomBoolean (
+			long numerator,
+			long denominator);
+
 	String generateString (
 			String chars,
 			int length);
@@ -33,6 +37,10 @@ interface RandomLogic {
 
 	<Type>
 	Type sample (
-			List<Type> options);
+			List <Type> options);
+
+	<Type>
+	List <Type> shuffleToList (
+			Iterable <Type> input);
 
 }
