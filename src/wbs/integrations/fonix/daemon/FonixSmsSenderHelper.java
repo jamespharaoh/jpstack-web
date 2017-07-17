@@ -75,7 +75,7 @@ class FonixSmsSenderHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	@NamedDependency ("fonixMessageSender")
+	@NamedDependency ("fonixMessageHttpSender")
 	ComponentProvider <GenericHttpSender <
 		FonixMessageSendRequest,
 		FonixMessageSendResponse
@@ -383,50 +383,50 @@ class FonixSmsSenderHelper
 		) {
 
 			// check for generic error
-	
+
 			if (
 				optionalIsPresent (
 					fonixSender.errorMessage ())
 			) {
-	
+
 				return new ProcessResponseResult ()
-	
+
 					.status (
 						ProcessResponseStatus.remoteError)
-	
+
 					.statusMessage (
 						fonixSender.errorMessage ().get ())
-	
+
 					.failureType (
 						FailureType.temporary);
-	
+
 			}
-	
+
 			// check for fonix error
-	
+
 			FonixMessageSendResponse fonixResponse =
 				fonixSender.response ();
-	
+
 			if (
 				isNotNull (
 					fonixResponse.failure ())
 			) {
-	
+
 				return handleGeneralError (
 					fonixResponse);
-	
+
 			}
-	
+
 			// success response
-	
+
 			FonixMessageSendResponse.Success fonixSuccess =
 				fonixResponse.success ();
-	
+
 			return new ProcessResponseResult ()
-	
+
 				.status (
 					ProcessResponseStatus.success)
-	
+
 				.otherIds (
 					ImmutableList.of (
 						fonixSuccess.txguid ()));

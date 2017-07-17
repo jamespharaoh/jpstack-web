@@ -263,7 +263,7 @@ class FonixRouteInApiLoggingAction
 				taskLogger,
 				textResponder ->
 					textResponder
-	
+
 				.text (
 					"OK")
 

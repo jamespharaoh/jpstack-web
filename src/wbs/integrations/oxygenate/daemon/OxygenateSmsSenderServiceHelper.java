@@ -67,11 +67,11 @@ class OxygenateSmsSenderServiceHelper
 	// prototype dependencies
 
 	@PrototypeDependency
-	@NamedDependency ("oxygenateSmsSend")
+	@NamedDependency ("oxygenateSmsHttpSender")
 	ComponentProvider <GenericHttpSender <
 		OxygenateSmsSendRequest,
 		OxygenateSmsSendResponse
-	>> oxygenateSmsSendProvider;
+	>> oxygenateSmsHttpSenderProvider;
 
 	// details
 
@@ -281,7 +281,7 @@ class OxygenateSmsSenderServiceHelper
 				OxygenateSmsSendRequest,
 				OxygenateSmsSendResponse
 			> sender =
-				oxygenateSmsSendProvider.provide (
+				oxygenateSmsHttpSenderProvider.provide (
 					transaction,
 					nestedSender ->
 						nestedSender

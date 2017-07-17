@@ -12,6 +12,10 @@
 		<!-- framework -->
 
 		<plugin
+			name="framework-api-client"
+			package="wbs.framework.apiclient"/>
+
+		<plugin
 			name="framework-builder"
 			package="wbs.framework.builder"/>
 

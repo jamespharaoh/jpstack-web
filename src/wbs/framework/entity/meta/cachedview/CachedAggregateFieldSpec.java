@@ -6,4 +6,10 @@ public
 interface CachedAggregateFieldSpec
 	extends ModelDataSpec {
 
+	String name ();
+
+	String fieldName ();
+
+	String when ();
+
 }

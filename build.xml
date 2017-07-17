@@ -139,6 +139,7 @@
     <mkdir dir="work/api/root/WEB-INF/lib"/>
     <copy todir="work/api/root" failonerror="false">
       <fileset dir="src/wbs/utils/api/files"/>
+      <fileset dir="src/wbs/framework/apiclient/api/files"/>
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/codegen/api/files"/>
       <fileset dir="src/wbs/framework/component/api/files"/>
@@ -323,6 +324,7 @@
     <mkdir dir="work/console/root/WEB-INF/lib"/>
     <copy todir="work/console/root" failonerror="false">
       <fileset dir="src/wbs/utils/console/files"/>
+      <fileset dir="src/wbs/framework/apiclient/console/files"/>
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/codegen/console/files"/>
       <fileset dir="src/wbs/framework/component/console/files"/>

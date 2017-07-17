@@ -12,15 +12,23 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("implements-interfaces")
-@PrototypeComponent ("modelImplementsInterfacesSpec")
+@DataClass ("partitioning")
+@PrototypeComponent ("modelPartitioningSpec")
 public
-class ModelImplementsInterfacesSpec
+class ModelPartitioningSpec
 	implements ModelDataSpec {
 
 	@DataChildren (
-		direct = true)
-	List <ModelImplementsInterfaceSpec> implementsInterfaces =
+		childrenElement = "partition-columns",
+		childElement = "column",
+		valueAttribute = "name")
+	List <String> partitionColumns =
+		new ArrayList<> ();
+
+	@DataChildren (
+		direct = true,
+		childElement = "unique-index")
+	List <ModelPartitioningUniqueIndexSpec> uniqueIndexes =
 		new ArrayList<> ();
 
 }

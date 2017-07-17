@@ -362,19 +362,19 @@ class OxygenateRouteInMmsNewApiLoggingAction
 
 			debugWriter.writeLineFormat (
 				"===== RESPONSE =====");
-	
+
 			debugWriter.writeNewline ();
-	
+
 			debugWriter.writeLineFormat (
 				"SUCCESS");
-	
+
 			debugWriter.writeNewline ();
-	
+
 			return textResponderProvider.provide (
 				taskLogger,
 				textResponder ->
 					textResponder
-	
+
 				.text (
 					"SUCCESS\n")
 

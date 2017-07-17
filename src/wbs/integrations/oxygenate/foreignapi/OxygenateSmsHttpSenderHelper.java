@@ -30,9 +30,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.web.misc.HttpMethod;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("oxygenateSmsSendHelper")
+@PrototypeComponent ("oxygenateSmsHttpSenderHelper")
 public
-class OxygenateSmsSendHelper
+class OxygenateSmsHttpSenderHelper
 	implements GenericHttpSenderHelper <
 		OxygenateSmsSendRequest,
 		OxygenateSmsSendResponse

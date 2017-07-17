@@ -381,7 +381,7 @@ class ClockworkSmsRouteInApiLoggingAction
 				taskLogger,
 				textResponder ->
 					textResponder
-	
+
 				.text (
 					"OK")
 

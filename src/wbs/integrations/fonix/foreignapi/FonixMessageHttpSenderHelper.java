@@ -24,9 +24,9 @@ import wbs.web.misc.HttpMethod;
 import wbs.web.misc.UrlParams;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("fonixMessageSenderHelper")
+@PrototypeComponent ("fonixMessageHttpSenderHelper")
 public
-class FonixMessageSenderHelper
+class FonixMessageHttpSenderHelper
 	implements GenericHttpSenderHelper <
 		FonixMessageSendRequest,
 		FonixMessageSendResponse

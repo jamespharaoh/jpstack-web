@@ -108,7 +108,7 @@ class ManualResponderStatusLine
 						transactionProvider.get ();
 
 					return new PerOperatorCaches ()
-	
+
 						.numThisHourCache (
 							manualResponderNumThisHourCacheProvider.provide (
 								transaction,
@@ -119,7 +119,7 @@ class ManualResponderStatusLine
 								userId)
 
 						))
-	
+
 						.numTodayCache (
 							manualResponderNumTodayCacheProvider.provide (
 								transaction,
@@ -130,7 +130,7 @@ class ManualResponderStatusLine
 								userId)
 
 						))
-	
+
 					;
 
 				}
@@ -211,10 +211,11 @@ class ManualResponderStatusLine
 			// find or create per-operator caches
 
 			PerOperatorCaches caches =
-				cacheGet (
-					cachesByUserId,
-					privChecker.userIdRequired (),
-					() -> new PerOperatorCaches ());
+				Transaction.implicitArgument.storeAndInvoke (
+					transaction,
+					() -> cacheGet (
+						cachesByUserId,
+						privChecker.userIdRequired ()));
 
 			// return update script
 

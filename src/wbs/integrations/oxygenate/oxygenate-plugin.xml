@@ -43,7 +43,7 @@
 	</layer>
 
 	<layer name="logic">
-		<component class="foreignapi.OxygenateSmsSendHelper"/>
+		<component class="foreignapi.OxygenateSmsHttpSenderHelper"/>
 	</layer>
 
 	<api-modules>

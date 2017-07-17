@@ -55,6 +55,9 @@ class ModelMetaSpec
 
 	// children
 
+	@DataChild
+	ModelPartitioningSpec partitioning;
+
 	@DataChildren (
 		childrenElement = "implements-interfaces")
 	List <ModelImplementsInterfaceSpec> implementsInterfaces =

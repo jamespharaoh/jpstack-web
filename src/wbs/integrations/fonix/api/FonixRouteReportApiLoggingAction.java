@@ -335,30 +335,30 @@ class FonixRouteReportApiLoggingAction
 		) {
 
 			// encode response
-	
+
 			String responseString = "OK";
-	
+
 			// write to debug log
-	
+
 			debugWriter.writeString (
 				"== RESPONSE BODY ==\n\n");
-	
+
 			debugWriter.writeString (
 				responseString);
-	
+
 			debugWriter.writeString (
 				"\n\n");
-	
+
 			// create responder
-	
+
 			return textResponderProvider.provide (
 				taskLogger,
 				textResponder ->
 					textResponder
-	
+
 				.contentType (
 					"text/plain")
-	
+
 				.text (
 					responseString)
 
