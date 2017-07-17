@@ -1,6 +1,6 @@
 package shn.shopify.apiclient;
 
 public
-interface ShopifyApiResponse {
+interface ShopifyApiRequestItem {
 
 }

@@ -70,7 +70,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.ComponentInterface;
@@ -99,6 +98,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 public
 class BootstrapComponentManager
@@ -1435,7 +1436,7 @@ class BootstrapComponentManager
 						valueComponentsWithData);
 
 				Object valueComponent =
-					valueComponentWithData.getRight ();
+					valueComponentWithData.right ();
 
 				fieldSet (
 					field,

@@ -20,13 +20,13 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
-import shn.shopify.apiclient.ShopifyApiResponse;
+import shn.shopify.apiclient.ShopifyApiResponseItem;
 
 @SingletonComponent ("shnShopifySynchronisationComponentWrapper")
 public
 class ShnShopifySynchronisationComponentWrapper <
 	Local extends Record <Local>,
-	Remote extends ShopifyApiResponse
+	Remote extends ShopifyApiResponseItem
 >
 	implements ComponentWrapper <
 		ShnShopifySynchronisationHelper <Local, Remote>

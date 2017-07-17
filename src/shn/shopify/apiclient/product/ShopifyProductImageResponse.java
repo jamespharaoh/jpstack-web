@@ -1,11 +1,7 @@
 package shn.shopify.apiclient.product;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import org.joda.time.Instant;
 
 import wbs.framework.data.annotations.DataAttribute;
 
@@ -28,18 +24,14 @@ class ShopifyProductImageResponse {
 
 	@DataAttribute (
 		name = "created_at")
-	Instant createdAt;
+	String createdAt;
 
 	@DataAttribute (
 		name = "updated_at")
-	Instant updatedAt;
+	String updatedAt;
 
 	@DataAttribute (
 		name = "src")
 	String src;
-
-	@DataAttribute (
-		name = "variant_ids")
-	List <Long> variantIds;
 
 }

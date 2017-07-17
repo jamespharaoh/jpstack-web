@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.joda.time.Duration;
 
-import wbs.framework.apiclient.GenericHttpSender.Method;
+import wbs.web.misc.HttpMethod;
 
 public
 interface GenericHttpSenderHelper <
@@ -23,7 +23,7 @@ interface GenericHttpSenderHelper <
 
 	// request information getters
 
-	Method method ();
+	HttpMethod method ();
 	String url ();
 	Map <String, String> requestHeaders ();
 	Map <String, List <String>> requestParameters ();

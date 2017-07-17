@@ -10,6 +10,9 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.dynamicCast;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,7 @@ import com.google.common.collect.Streams;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
+import wbs.utils.data.Pair;
 
 public
 class IterableUtils {
@@ -76,12 +79,12 @@ class IterableUtils {
 
 	public static <InLeftType, InRightType, OutType>
 	Iterable <OutType> iterableMap (
+			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable,
 			@NonNull BiFunction <
 				? super InLeftType,
 				? super InRightType,
 				OutType
-			> mapFunction,
-			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable) {
+			> mapFunction) {
 
 		return () ->
 			Streams.stream (
@@ -90,8 +93,8 @@ class IterableUtils {
 			.map (
 				pair ->
 					mapFunction.apply (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.iterator ();
 
@@ -123,8 +126,8 @@ class IterableUtils {
 
 		return ImmutableList.copyOf (
 			iterableMap (
-				mapFunction,
-				input));
+				input,
+				mapFunction));
 
 	}
 
@@ -152,11 +155,11 @@ class IterableUtils {
 
 			builder.put (
 				keyFunction.apply (
-					item.getLeft (),
-					item.getRight ()),
+					item.left (),
+					item.right ()),
 				valueFunction.apply (
-					item.getLeft (),
-					item.getRight ()));
+					item.left (),
+					item.right ()));
 
 		}
 
@@ -203,7 +206,7 @@ class IterableUtils {
 			Pair <Long, Out> next () {
 
 				Pair <Long, Out> value =
-					Pair.of (
+					new Pair <Long, Out> (
 						index,
 						mapFunction.apply (
 							index,
@@ -319,8 +322,8 @@ class IterableUtils {
 			.filter (
 				pair ->
 					predicate.test (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.iterator ();
 
@@ -391,14 +394,14 @@ class IterableUtils {
 			.filter (
 				pair ->
 					predicate.test (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.map (
 				pair ->
 					mapping.apply (
-						pair.getLeft (),
-						pair.getRight ()))
+						pair.left (),
+						pair.right ()))
 
 			.iterator ()
 
@@ -755,6 +758,85 @@ class IterableUtils {
 			@NonNull Iterable <?> iterable) {
 
 		return iterable.iterator ().hasNext ();
+
+	}
+
+	public static <Item>
+	List <Item> iterableOrderToList (
+			@NonNull Iterable <? extends Item> iterable,
+			@NonNull Comparator <? super Item> comparator) {
+
+		List <Item> list =
+			new ArrayList<> ();
+
+		for (
+			Item item
+				: iterable
+		) {
+
+			list.add (
+				item);
+
+		}
+
+		Collections.sort (
+			list,
+			comparator);
+
+		return list;
+
+	}
+
+	public static <Left, Right>
+	Iterable <Pair <Left, Right>> iterableZipRequired (
+			@NonNull Iterable <? extends Left> leftIterable,
+			@NonNull Iterable <? extends Right> rightIterable) {
+
+		return () -> {
+
+			Iterator <? extends Left> leftIterator =
+				leftIterable.iterator ();
+
+			Iterator <? extends Right> rightIterator =
+				rightIterable.iterator ();
+
+			return new Iterator <Pair <Left, Right>> () {
+
+				@Override
+				public
+				boolean hasNext () {
+
+					boolean leftHasNext =
+						leftIterator.hasNext ();
+
+					boolean rightHasNext =
+						rightIterator.hasNext ();
+
+					if (leftHasNext && rightHasNext) {
+						return true;
+					}
+
+					if (! leftHasNext && ! rightHasNext) {
+						return false;
+					}
+
+					throw new RuntimeException ();
+
+				}
+
+				@Override
+				public
+				Pair <Left, Right> next () {
+
+					return new Pair <Left, Right> (
+						leftIterator.next (),
+						rightIterator.next ());
+
+				}
+
+			};
+
+		};
 
 	}
 

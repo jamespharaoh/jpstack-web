@@ -16,6 +16,11 @@ interface ShopifyProductApiClient {
 			ShopifyApiClientCredentials credentials,
 			ShopifyProductRequest product);
 
+	ShopifyProductResponse updateProduct (
+			TaskLogger parentTaskLogger,
+			ShopifyApiClientCredentials credentials,
+			ShopifyProductRequest product);
+
 	void removeProduct (
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials,

@@ -17,9 +17,9 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 public
 interface ComponentManager

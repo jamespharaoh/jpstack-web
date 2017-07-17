@@ -14,6 +14,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
@@ -40,6 +41,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -236,6 +238,14 @@ class GenericHttpSender <Request, Response> {
 
 				break;
 
+			case put:
+
+				httpRequest =
+					new HttpPut (
+						urlWithParams);
+
+				break;
+
 			default:
 
 				throw shouldNeverHappen ();
@@ -262,12 +272,6 @@ class GenericHttpSender <Request, Response> {
 				.build ()
 
 			);
-
-			// convert to binary representation
-
-			byte[] requestData =
-				stringToUtf8 (
-					helper.requestBody ());
 
 			// set default headers
 
@@ -300,6 +304,11 @@ class GenericHttpSender <Request, Response> {
 				break;
 
 			case post:
+			case put:
+
+				byte[] requestData =
+					stringToUtf8 (
+						helper.requestBody ());
 
 				HttpEntityEnclosingRequest httpEntityRequest =
 					(HttpEntityEnclosingRequest)
@@ -342,7 +351,8 @@ class GenericHttpSender <Request, Response> {
 
 				.put (
 					"body",
-					helper.requestBody ())
+					emptyStringIfNull (
+						helper.requestBody ()))
 
 				.build ()
 
@@ -676,13 +686,6 @@ class GenericHttpSender <Request, Response> {
 		decoded,
 		error,
 		closed;
-	}
-
-	public static
-	enum Method {
-		delete,
-		get,
-		post
 	}
 
 }

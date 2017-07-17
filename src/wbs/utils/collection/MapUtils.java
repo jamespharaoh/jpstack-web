@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
+import wbs.utils.data.Pair;
 
 public
 class MapUtils {
@@ -555,11 +555,11 @@ class MapUtils {
 
 			outMapBuilder.put (
 				keyFunction.apply (
-					inPair.getLeft (),
-					inPair.getRight ()),
+					inPair.left (),
+					inPair.right ()),
 				valueFunction.apply (
-					inPair.getLeft (),
-					inPair.getRight ()));
+					inPair.left (),
+					inPair.right ()));
 
 		}
 

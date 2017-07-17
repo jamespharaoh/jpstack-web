@@ -4,23 +4,29 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Instant;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
@@ -28,9 +34,11 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.random.RandomLogic;
+
 import shn.core.model.ShnDatabaseRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
-import shn.shopify.apiclient.ShopifyApiResponse;
+import shn.shopify.apiclient.ShopifyApiResponseItem;
 import shn.shopify.model.ShnShopifyConnectionRec;
 import shn.shopify.model.ShnShopifyRecord;
 
@@ -38,7 +46,7 @@ import shn.shopify.model.ShnShopifyRecord;
 public
 class ShnShopifySynchronisationWrapper <
 	Local extends ShnShopifyRecord <Local>,
-	Remote extends ShopifyApiResponse
+	Remote extends ShopifyApiResponseItem
 >
 	implements ShnShopifySynchronisation <
 		ShnShopifySynchronisationWrapper <Local, Remote>,
@@ -50,6 +58,9 @@ class ShnShopifySynchronisationWrapper <
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	RandomLogic randomLogic;
 
 	// properties
 
@@ -162,7 +173,12 @@ class ShnShopifySynchronisationWrapper <
 
 			// update items
 
-			// TODO
+			if (enableUpdate) {
+
+				updateItems (
+					transaction);
+
+			}
 
 			// return
 
@@ -255,7 +271,7 @@ class ShnShopifySynchronisationWrapper <
 			remoteItemsById =
 				mapWithDerivedKey (
 					remoteItems,
-					ShopifyApiResponse::id);
+					ShopifyApiResponseItem::id);
 
 			transaction.noticeFormat (
 				"Retrieved %s %s from shopify",
@@ -287,7 +303,8 @@ class ShnShopifySynchronisationWrapper <
 
 			for (
 				Remote remoteItem
-					: remoteItems
+					: randomLogic.shuffleToList (
+						remoteItems)
 			) {
 
 				if (
@@ -313,6 +330,7 @@ class ShnShopifySynchronisationWrapper <
 				helper.removeItem (
 					transaction,
 					shopifyCredentials,
+					shopifyConnection,
 					remoteItem.id ());
 
 				numRemoved ++;
@@ -348,8 +366,24 @@ class ShnShopifySynchronisationWrapper <
 
 			for (
 				Local localItem
-					: localItemsWithoutShopifyId
+					: randomLogic.shuffleToList (
+						localItems)
 			) {
+
+				// check if create is required
+
+				if (
+
+					isNotNull (
+						localItem.getShopifyId ())
+
+					&& mapContainsKey (
+						remoteItemsById,
+						localItem.getShopifyId ())
+
+				) {
+					continue;
+				}
 
 				numOperations ++;
 
@@ -357,31 +391,27 @@ class ShnShopifySynchronisationWrapper <
 					continue;
 				}
 
+				// create item
+
 				transaction.noticeFormat (
 					"Creating %s %s in shopify",
 					helper.friendlyNameSingular (),
 					integerToDecimalString (
 						localItem.getId ()));
 
-				Remote remote =
+				Remote remoteItem =
 					helper.createItem (
 						transaction,
 						shopifyCredentials,
+						shopifyConnection,
 						localItem);
 
-				localItem
+				// save changes
 
-					.setShopifyNeedsSync (
-						false)
-
-					.setShopifyId (
-						remote.id ())
-
-					.setShopifyUpdatedAt (
-						Instant.parse (
-							remote.updatedAt ()))
-
-				;
+				helper.saveShopifyData (
+					transaction,
+					localItem,
+					remoteItem);
 
 				numCreated ++;
 
@@ -392,7 +422,7 @@ class ShnShopifySynchronisationWrapper <
 						localItem.getId ()),
 					"with shopify id %s",
 					integerToDecimalString (
-						remote.id ()));
+						remoteItem.id ()));
 
 			}
 
@@ -400,6 +430,117 @@ class ShnShopifySynchronisationWrapper <
 				"Created %s %s in shopify",
 				integerToDecimalString (
 					numCreated),
+				helper.friendlyNamePlural ());
+
+		}
+
+	}
+
+	private
+	void updateItems (
+			@NonNull Transaction parentTransaction) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"updateItems");
+
+		) {
+
+			transaction.noticeFormat (
+				"About to update %s in shopify",
+				helper.friendlyNamePlural ());
+
+			for (
+				Local localItem
+					: randomLogic.shuffleToList (
+						localItems)
+			) {
+
+				// check if update is required
+
+				Optional <Remote> remoteItemOptional =
+					optionalMapOptional (
+						optionalFromNullable (
+							localItem.getShopifyId ()),
+						shopifyId ->
+							mapItemForKey (
+								remoteItemsById,
+								shopifyId));
+
+				if (
+					optionalIsNotPresent (
+						remoteItemOptional)
+				) {
+					continue;
+				}
+
+				Remote remoteItem =
+					optionalGetRequired (
+						remoteItemOptional);
+
+				if (
+
+					! localItem.getShopifyNeedsSync ()
+
+					&& helper.compareItem (
+						transaction,
+						shopifyConnection,
+						localItem,
+						remoteItem)
+
+				) {
+					continue;
+				}
+
+				numOperations ++;
+
+				if (numOperations > maxOperations) {
+					continue;
+				}
+
+				// perform update
+
+				transaction.noticeFormat (
+					"Updating %s %s in shopify",
+					helper.friendlyNameSingular (),
+					integerToDecimalString (
+						localItem.getId ()));
+
+				remoteItem =
+					helper.updateItem (
+						transaction,
+						shopifyCredentials,
+						shopifyConnection,
+						localItem,
+						remoteItem);
+
+				// save changes
+
+				helper.saveShopifyData (
+					transaction,
+					localItem,
+					remoteItem);
+
+				numUpdated ++;
+
+				transaction.noticeFormat (
+					"Updated %s %s in shopify ",
+					helper.friendlyNameSingular (),
+					integerToDecimalString (
+						localItem.getId ()),
+					"with shopify id %s",
+					integerToDecimalString (
+						remoteItem.id ()));
+
+			}
+
+			transaction.noticeFormat (
+				"Updated %s %s in shopify",
+				integerToDecimalString (
+					numUpdated),
 				helper.friendlyNamePlural ());
 
 		}

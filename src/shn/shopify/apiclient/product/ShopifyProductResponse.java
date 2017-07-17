@@ -10,13 +10,13 @@ import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 
-import shn.shopify.apiclient.ShopifyApiResponse;
+import shn.shopify.apiclient.ShopifyApiResponseItem;
 
 @Accessors (fluent = true)
 @Data
 public
 class ShopifyProductResponse
-	implements ShopifyApiResponse {
+	implements ShopifyApiResponseItem {
 
 	@DataAttribute (
 		name = "id")
@@ -27,12 +27,29 @@ class ShopifyProductResponse
 	String title;
 
 	@DataAttribute (
+		name = "body_html")
+	String bodyHtml;
+
+	@DataAttribute (
+		name = "vendor")
+	String vendor;
+
+	@DataAttribute (
+		name = "product_type")
+	String productType;
+
+	@DataAttribute (
 		name = "updated_at")
 	String updatedAt;
 
 	@DataChildren (
-		childElement = "images")
+		childrenElement = "images")
 	List <ShopifyProductImageResponse> images =
+		emptyList ();
+
+	@DataChildren (
+		childrenElement = "variants")
+	List <ShopifyProductVariantResponse> variants =
 		emptyList ();
 
 }

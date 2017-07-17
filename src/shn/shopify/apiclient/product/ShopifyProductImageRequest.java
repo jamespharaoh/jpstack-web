@@ -13,6 +13,10 @@ public
 class ShopifyProductImageRequest {
 
 	@DataAttribute (
+		name = "id")
+	Long id;
+
+	@DataAttribute (
 		name = "attachment")
 	String attachment;
 

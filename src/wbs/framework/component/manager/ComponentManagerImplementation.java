@@ -75,8 +75,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
 import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
@@ -94,6 +92,8 @@ import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 @Accessors (fluent = true)
 public
@@ -1220,10 +1220,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				String targetName =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1308,10 +1308,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				List <String> targetNames =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1402,10 +1402,10 @@ class ComponentManagerImplementation
 					entry.getKey ());
 
 				String targetScope =
-					entry.getValue ().getLeft ();
+					entry.getValue ().left ();
 
 				Map <Object, String> targetMap =
-					entry.getValue ().getRight ();
+					entry.getValue ().right ();
 
 				if (
 					stringEqualSafe (
@@ -1582,9 +1582,9 @@ class ComponentManagerImplementation
 						iterableTransformToMap (
 							targetComponents,
 							item ->
-								item.getLeft ().componentClass (),
+								item.left ().componentClass (),
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1597,9 +1597,9 @@ class ComponentManagerImplementation
 						iterableTransformToMap (
 							targetComponents,
 							item ->
-								item.getLeft ().name (),
+								item.left ().name (),
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1612,7 +1612,7 @@ class ComponentManagerImplementation
 						iterableMapToList (
 							targetComponents,
 							item ->
-								item.getRight ());
+								item.right ());
 
 			} else if (
 				enumEqualSafe (
@@ -1636,7 +1636,7 @@ class ComponentManagerImplementation
 
 					}
 
-					return targetComponents.get (0).getRight ();
+					return targetComponents.get (0).right ();
 
 				};
 
@@ -1754,7 +1754,7 @@ class ComponentManagerImplementation
 								rawValue),
 						targetProviders),
 					unaggregatedValue ->
-						unaggregatedValue.getLeft ().name ());
+						unaggregatedValue.left ().name ());
 
 			if (
 				collectionIsNotEmpty (

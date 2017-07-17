@@ -9,14 +9,14 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
-import shn.shopify.apiclient.ShopifyApiRequest;
+import shn.shopify.apiclient.ShopifyApiRequestItem;
 
 @Accessors (fluent = true)
 @Data
 @DataClass
 public
 class ShopifyProductRequest
-	implements ShopifyApiRequest {
+	implements ShopifyApiRequestItem {
 
 	@DataAttribute (
 		name = "id")

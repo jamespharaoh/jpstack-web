@@ -424,6 +424,10 @@ class ShnProductFixtureProvider
 			"{description}")
 
 		.put (
+			"public-contents",
+			"(no contents data provided)")
+
+		.put (
 			"supplier",
 			"shn.test.{codify:supplier-name}")
 

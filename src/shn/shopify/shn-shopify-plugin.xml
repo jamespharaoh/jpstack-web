@@ -26,10 +26,8 @@
 
 		<bootstrap-component class="logic.ShnShopifySynchronisationComponentWrapper"/>
 
+		<component class="apiclient.ShopifyHttpSenderHelper"/>
 		<component class="apiclient.product.ShopifyProductApiClientImplementation"/>
-		<component class="apiclient.product.ShopifyProductCreateHttpSenderHelper"/>
-		<component class="apiclient.product.ShopifyProductListHttpSenderHelper"/>
-		<component class="apiclient.product.ShopifyProductRemoveHttpSenderHelper"/>
 
 		<component class="logic.ShnShopifyLogicImplementation"/>
 		<component class="logic.ShnShopifyProductSynchronisationHelper"/>

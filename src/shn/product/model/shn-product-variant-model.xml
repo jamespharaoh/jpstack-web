@@ -87,6 +87,16 @@
 			name="shopifyId"
 			nullable="yes"/>
 
+		<timestamp-field
+			name="shopifyCreatedAt"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifyUpdatedAt"
+			column-type="postgresql"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

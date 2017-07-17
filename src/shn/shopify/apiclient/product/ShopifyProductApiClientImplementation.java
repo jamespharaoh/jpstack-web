@@ -2,6 +2,7 @@ package shn.shopify.apiclient.product;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.collect.ImmutableList;
 
@@ -18,6 +19,8 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.ShopifyApiRequest;
+import shn.shopify.apiclient.ShopifyApiResponse;
 
 @SingletonComponent ("shopifyProductApiClient")
 public
@@ -32,25 +35,11 @@ class ShopifyProductApiClientImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	@NamedDependency ("shopifyProductCreateHttpSender")
+	@NamedDependency ("shopifyHttpSender")
 	ComponentProvider <GenericHttpSender <
-		ShopifyProductCreateRequest,
-		ShopifyProductCreateResponse
-	>> productCreateHttpSenderProvider;
-
-	@PrototypeDependency
-	@NamedDependency ("shopifyProductListHttpSender")
-	ComponentProvider <GenericHttpSender <
-		ShopifyProductListRequest,
-		ShopifyProductListResponse
-	>> productListHttpSenderProvider;
-
-	@PrototypeDependency
-	@NamedDependency ("shopifyProductRemoveHttpSender")
-	ComponentProvider <GenericHttpSender <
-		ShopifyProductRemoveRequest,
-		ShopifyProductRemoveResponse
-	>> productRemoveHttpSenderProvider;
+		ShopifyApiRequest,
+		ShopifyApiResponse
+	>> shopifyHttpSenderProvider;
 
 	// public implementation
 
@@ -79,14 +68,15 @@ class ShopifyProductApiClientImplementation
 			) {
 
 				ShopifyProductListResponse response =
-					productListHttpSenderProvider.provide (
-						taskLogger)
+					genericCastUnchecked (
+						shopifyHttpSenderProvider.provide (
+							taskLogger)
 
 					.allInOne (
 						taskLogger,
 						new ShopifyProductListRequest ()
 
-					.credentials (
+					.httpCredentials (
 						credentials)
 
 					.limit (
@@ -95,12 +85,7 @@ class ShopifyProductApiClientImplementation
 					.page (
 						page)
 
-					.fields (
-						ImmutableList.of (
-							"id",
-							"updated_at"))
-
-				);
+				));
 
 				builder.addAll (
 					response.products ());
@@ -144,20 +129,60 @@ class ShopifyProductApiClientImplementation
 		) {
 
 			ShopifyProductCreateResponse response =
-				productCreateHttpSenderProvider.provide (
-					taskLogger)
+				genericCastUnchecked (
+					shopifyHttpSenderProvider.provide (
+						taskLogger)
 
 				.allInOne (
 					taskLogger,
 					new ShopifyProductCreateRequest ()
 
-				.credentials (
+				.httpCredentials (
 					credentials)
 
 				.product (
 					product)
 
-			);
+			));
+
+			return response.product ();
+
+		}
+
+	}
+
+	@Override
+	public
+	ShopifyProductResponse updateProduct (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ShopifyApiClientCredentials credentials,
+			@NonNull ShopifyProductRequest product) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createProduct");
+
+		) {
+
+			ShopifyProductUpdateResponse response =
+				genericCastUnchecked (
+					shopifyHttpSenderProvider.provide (
+						taskLogger)
+
+				.allInOne (
+					taskLogger,
+					new ShopifyProductUpdateRequest ()
+
+				.httpCredentials (
+					credentials)
+
+				.product (
+					product)
+
+			));
 
 			return response.product ();
 
@@ -181,14 +206,14 @@ class ShopifyProductApiClientImplementation
 
 		) {
 
-			productRemoveHttpSenderProvider.provide (
+			shopifyHttpSenderProvider.provide (
 				taskLogger)
 
 				.allInOne (
 					taskLogger,
 					new ShopifyProductRemoveRequest ()
 
-				.credentials (
+				.httpCredentials (
 					credentials)
 
 				.id (

@@ -130,12 +130,26 @@
 		<children-collection
 			name="variants"
 			type="shnProductVariant"
-			join-column="product_id"/>
+			join-column="product_id"
+			order-sql="item_number"/>
+
+		<children-collection
+			name="variantsNotDeleted"
+			type="shnProductVariant"
+			join-column="product_id"
+			where-sql="not deleted"
+			order-sql="item_number"/>
 
 		<children-list
 			name="images"
 			type="shnProductImage"
 			join-column="product_id"/>
+
+		<children-list
+			name="imagesNotDeleted"
+			type="shnProductImage"
+			join-column="product_id"
+			where-sql="not deleted"/>
 
 	</collections>
 

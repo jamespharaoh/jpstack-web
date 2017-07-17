@@ -1,5 +1,8 @@
 package shn.shopify.apiclient.product;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -15,7 +18,7 @@ import wbs.web.misc.HttpMethod;
 @Data
 @DataClass
 public
-class ShopifyProductCreateRequest
+class ShopifyProductUpdateRequest
 	implements ShopifyApiRequest {
 
 	ShopifyApiClientCredentials httpCredentials;
@@ -29,19 +32,24 @@ class ShopifyProductCreateRequest
 	@Override
 	public
 	HttpMethod httpMethod () {
-		return HttpMethod.post;
+		return HttpMethod.put;
 	}
 
 	@Override
 	public
 	String httpPath () {
-		return "/admin/products.json";
+
+		return stringFormat (
+			"/admin/products/%s.json",
+			integerToDecimalString (
+				product.id ()));
+
 	}
 
 	@Override
 	public
 	Class <? extends ShopifyApiResponse> httpResponseClass () {
-		return ShopifyProductCreateResponse.class;
+		return ShopifyProductUpdateResponse.class;
 	}
 
 }

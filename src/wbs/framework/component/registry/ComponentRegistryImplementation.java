@@ -70,7 +70,6 @@ import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
@@ -105,6 +104,8 @@ import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.LoggingLogic;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.data.Pair;
 
 @PrototypeComponent ("componentRegistry")
 @Accessors (fluent = true)
@@ -1354,21 +1355,21 @@ class ComponentRegistryImplementation
 			componentDefinition.strongDependencies ().addAll (
 				iterableMapToList (
 					componentDefinition.referenceProperties ().values (),
-					Pair::getRight));
+					Pair::right));
 
 			componentDefinition.strongDependencies ().addAll (
 				iterableChainToList (
 					iterableMap (
+						componentDefinition.referenceListProperties ().values (),
 						(name, values) ->
-							values,
-						componentDefinition.referenceListProperties ().values ())));
+							values)));
 
 			componentDefinition.strongDependencies ().addAll (
 				iterableChainToList (
 					iterableMap (
+						componentDefinition.referenceMapProperties ().values (),
 						(name, values) ->
-							values.values (),
-						componentDefinition.referenceMapProperties ().values ())));
+							values.values ())));
 
 			initComponentDefinitionFields (
 				taskLogger,

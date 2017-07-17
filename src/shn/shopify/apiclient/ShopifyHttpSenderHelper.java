@@ -1,9 +1,8 @@
-package shn.shopify.apiclient.product;
+package shn.shopify.apiclient;
 
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
@@ -11,34 +10,37 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.apiclient.GenericHttpSender.Method;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.data.tools.DataToJson;
 
+import wbs.web.misc.HttpMethod;
+
 @Accessors (fluent = true)
-@PrototypeComponent ("shopifyProductRemoveHttpSenderHelper")
+@PrototypeComponent ("shopifyHttpSenderHelper")
 public
-class ShopifyProductRemoveHttpSenderHelper
+class ShopifyHttpSenderHelper
 	implements GenericHttpSenderHelper <
-		ShopifyProductRemoveRequest,
-		ShopifyProductRemoveResponse
+		ShopifyApiRequest,
+		ShopifyApiResponse
 	> {
 
 	// properties
 
 	@Getter @Setter
-	ShopifyProductRemoveRequest request;
+	ShopifyApiRequest request;
 
 	@Getter @Setter
-	ShopifyProductRemoveResponse response;
+	ShopifyApiResponse response;
 
 	@Getter @Setter
 	Long responseStatusCode;
@@ -59,8 +61,8 @@ class ShopifyProductRemoveHttpSenderHelper
 
 	@Override
 	public
-	Method method () {
-		return Method.delete;
+	HttpMethod method () {
+		return request.httpMethod ();
 	}
 
 	@Override
@@ -68,19 +70,16 @@ class ShopifyProductRemoveHttpSenderHelper
 	String url () {
 
 		return stringFormat (
-			"https://%s.myshopify.com/admin/products/%s.json",
-			request.credentials ().storeName (),
-			integerToDecimalString (
-				request.id ()));
+			"https://%s.myshopify.com%s",
+			request.httpCredentials ().storeName (),
+			request.httpPath ());
 
 	}
 
 	@Override
 	public
 	Map <String, List <String>> requestParameters () {
-
-		return emptyMap ();
-
+		return request.httpParameters ();
 	}
 
 	@Override
@@ -97,8 +96,12 @@ class ShopifyProductRemoveHttpSenderHelper
 						stringToUtf8 (
 							stringFormat (
 								"%s:%s",
-								request.credentials ().username (),
-								request.credentials ().password ())))))
+								request.httpCredentials ().username (),
+								request.httpCredentials ().password ())))))
+
+			.put (
+				"Content-Type",
+				"application/json; charset=utf-8")
 
 			.build ();
 
@@ -116,12 +119,28 @@ class ShopifyProductRemoveHttpSenderHelper
 	public
 	void encode () {
 
+		if (
+			enumNotInSafe (
+				request.httpMethod (),
+				HttpMethod.post,
+				HttpMethod.put)
+		) {
+			return;
+		}
+
 		DataToJson dataToJson =
 			new DataToJson ();
 
 		JsonElement jsonValue =
 			dataToJson.toJson (
 				request);
+
+Gson gson =
+	new GsonBuilder ()
+		.setPrettyPrinting ()
+		.create ();
+
+System.out.println ("SEND: " + gson.toJson (jsonValue));
 
 		requestBody =
 			jsonValue.toString ();
@@ -137,8 +156,17 @@ class ShopifyProductRemoveHttpSenderHelper
 
 		response =
 			dataFromJson.fromJson (
-				ShopifyProductRemoveResponse.class,
+				request.httpResponseClass (),
 				responseBody);
+
+Gson gson =
+	new GsonBuilder ()
+		.setPrettyPrinting ()
+		.create ();
+
+System.out.println ("RECEIVE: " + gson.toJson (gson.fromJson (
+	responseBody,
+	JsonElement.class)));
 
 	}
 
