@@ -1,33 +1,31 @@
 package wbs.web.responder;
 
-import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.string.StringUtils.stringToUtf8;
-
-import java.io.OutputStream;
+import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.json.simple.JSONValue;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataToSimple;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.string.FormatWriter;
+
 import wbs.web.context.RequestContext;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("jsonResponder")
-public
-class JsonResponder
-	extends BufferedResponder {
+@PrototypeComponent ("textResponder")
+public final
+class TextResponder
+	extends BufferedTextResponder {
 
 	// singleton dependencies
 
@@ -40,7 +38,26 @@ class JsonResponder
 	// properties
 
 	@Getter @Setter
-	Object value;
+	String text;
+
+	@Getter @Setter
+	String contentType =
+		"text/plain";
+
+	@Getter @Setter
+	String filename;
+
+	// property setters
+
+	public
+	TextResponder textFormat (
+			@NonNull CharSequence ... arguments) {
+
+		return text (
+			stringFormatArray (
+				arguments));
+
+	}
 
 	// implementation
 
@@ -49,56 +66,7 @@ class JsonResponder
 	void prepare (
 			@NonNull Transaction parentTransaction) {
 
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"prepare");
-
-		) {
-
-			doNothing ();
-
-		}
-
-	}
-
-	@Override
-	public
-	void render (
-			@NonNull Transaction parentTransaction,
-			@NonNull OutputStream outputStream) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"render");
-
-		) {
-
-			DataToSimple dataToJson =
-				new DataToSimple ();
-
-			Object jsonValue =
-				dataToJson.toJson (
-					value);
-
-			String stringValue =
-				JSONValue.toJSONString (
-					jsonValue);
-
-			byte[] bytesValue =
-				stringToUtf8 (
-					stringValue);
-
-			writeBytes (
-				outputStream,
-				bytesValue);
-
-		}
+		doNothing ();
 
 	}
 
@@ -117,8 +85,41 @@ class JsonResponder
 		) {
 
 			requestContext.contentType (
-				"application/json",
-				"utf-8");
+				contentType);
+
+			if (
+				isNotNull (
+					filename)
+			) {
+
+				requestContext.setHeader (
+					"Content-Disposition",
+					stringFormat (
+						"attachment; filename=%s",
+						filename));
+
+			}
+
+		}
+
+	}
+
+	@Override
+	protected
+	void render (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"render");
+		) {
+
+			formatWriter.writeString (
+				text);
 
 		}
 
