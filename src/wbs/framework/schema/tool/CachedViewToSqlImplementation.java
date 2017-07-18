@@ -892,7 +892,7 @@ class CachedViewToSqlImplementation
 			formatWriter.writeLineFormat (
 				"CREATE OR REPLACE FUNCTION %s ()",
 				stringFormat (
-					"%s_update_log_process",
+					"%s_updates_pending_process",
 					model.tableName ()));
 
 			formatWriter.writeLineFormat (
