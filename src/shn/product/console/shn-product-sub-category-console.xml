@@ -84,10 +84,6 @@
 					name="active"/>
 
 				<text-field
-					name="publicHandle"
-					nullable="yes"/>
-
-				<text-field
 					name="publicTitle"
 					nullable="yes"/>
 
@@ -120,9 +116,6 @@
 					name="active"/>
 
 				<text-field
-					name="publicHandle"/>
-
-				<text-field
 					name="publicTitle"/>
 
 				<text-area-field
@@ -148,10 +141,6 @@
 
 				<yes-no-field
 					name="active"/>
-
-				<text-field
-					name="publicHandle"
-					nullable="yes"/>
 
 				<text-field
 					name="publicTitle"

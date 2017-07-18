@@ -34,10 +34,6 @@
 			name="active"/>
 
 		<string-field
-			name="publicHandle"
-			nullable="yes"/>
-
-		<string-field
 			name="publicTitle"
 			nullable="yes"/>
 
