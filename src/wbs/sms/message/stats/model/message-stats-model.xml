@@ -25,6 +25,11 @@
 		<group-fields>
 
 			<group-field
+				name="date"
+				field="messageStatsId.date"
+				source="date"/>
+
+			<group-field
 				name="service"
 				field="messageStatsId.service"
 				source="service"/>
@@ -48,11 +53,6 @@
 				name="network"
 				field="messageStatsId.network"
 				source="network"/>
-
-			<group-field
-				name="date"
-				field="messageStatsId.date"
-				source="date"/>
 
 		</group-fields>
 

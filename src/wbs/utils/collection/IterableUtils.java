@@ -183,12 +183,12 @@ class IterableUtils {
 	}
 
 	public static <In, Out>
-	Iterable <Pair <Long, Out>> iterableMapWithIndex (
+	Iterable <Out> iterableMapWithIndex (
 			@NonNull Iterable <? extends In> iterable,
 			@NonNull BiFunction <Long, ? super In, Out> mapFunction) {
 
 		return () ->
-			new Iterator <Pair <Long, Out>> () {
+			new Iterator <Out> () {
 
 			Iterator <? extends In> iterator =
 				iterable.iterator ();
@@ -203,14 +203,12 @@ class IterableUtils {
 
 			@Override
 			public
-			Pair <Long, Out> next () {
+			Out next () {
 
-				Pair <Long, Out> value =
-					new Pair <Long, Out> (
+				Out value =
+					mapFunction.apply (
 						index,
-						mapFunction.apply (
-							index,
-							iterator.next ()));
+						iterator.next ());
 
 				index ++;
 

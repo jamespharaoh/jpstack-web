@@ -1,6 +1,5 @@
 package wbs.framework.apiclient;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -58,10 +57,6 @@ class GenericHttpSenderComponentWrapper <Request, Response>
 					"wrapComponent");
 
 		) {
-
-debugFormat (
-	"GENERIC HTTP SENDER COMPONENT WRAPPER: %s",
-	componentDefinition.name ());
 
 			// sanity check
 

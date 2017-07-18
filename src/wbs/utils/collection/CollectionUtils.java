@@ -631,4 +631,21 @@ class CollectionUtils {
 
 	}
 
+	public static <Item>
+	void collectionAddAll (
+			@NonNull Collection <? super Item> collection,
+			@NonNull Iterable <? extends Item> items) {
+
+		for (
+			Item item
+				: items
+		) {
+
+			collection.add (
+				item);
+
+		}
+
+	}
+
 }

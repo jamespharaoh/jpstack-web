@@ -1,13 +1,12 @@
 package wbs.framework.entity.build;
 
+import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -127,13 +126,18 @@ class IdentityReferenceModelFieldBuilder
 					false)
 
 				.columnNames (
-					ImmutableList.<String>of (
+					singletonList (
 						ifNull (
 							spec.columnName (),
 							stringFormat (
 								"%s_id",
 								camelToUnderscore (
-									fieldName)))));
+									fieldName)))))
+				.columnSqlTypes (
+					singletonList (
+						"bigint"))
+
+			;
 
 			// store field
 

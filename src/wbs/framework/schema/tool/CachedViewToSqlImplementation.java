@@ -1,16 +1,23 @@
 package wbs.framework.schema.tool;
 
+import static wbs.utils.collection.CollectionUtils.collectionAddAll;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneItem;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoItems;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
-import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
-import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableMapWithIndex;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.FormatWriterUtils.writeLines;
+import static wbs.utils.string.FormatWriterUtils.writeLinesWithCommaAlways;
+import static wbs.utils.string.FormatWriterUtils.writeLinesWithCommaExceptLastLine;
+import static wbs.utils.string.StringUtils.joinWithSeparator;
 import static wbs.utils.string.StringUtils.keyEqualsString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
@@ -19,7 +26,9 @@ import static wbs.utils.string.StringUtils.stringSplitFullStop;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -35,7 +44,6 @@ import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.sql.SqlLogic;
 
-import wbs.utils.data.Pair;
 import wbs.utils.string.LazyFormatWriter;
 
 @SingletonComponent ("cachedViewToSql")
@@ -104,11 +112,6 @@ class CachedViewToSqlImplementation
 			CachedViewSpec cachedView =
 				model.cachedView ();
 
-			Model <?> sourceModel =
-				mapItemForKeyRequired (
-					entityHelper.recordModelsByName (),
-					cachedView.sourceObjectName ());
-
 			// collect column data
 
 			List <String> columnDefinitions =
@@ -121,10 +124,10 @@ class CachedViewToSqlImplementation
 						"%s_updates_pending_id_seq",
 						model.tableName ())));
 
-			List <String> triggerIndexColumns =
+			List <IndexColumn> indexColumns =
 				new ArrayList<> ();
 
-			List <Pair <String, String>> triggerValueColumns =
+			List <ValueColumn> valueColumns =
 				new ArrayList<> ();
 
 			for (
@@ -192,9 +195,17 @@ class CachedViewToSqlImplementation
 									columnName),
 								columnSqlType));
 
-						triggerIndexColumns.add (
-							sqlLogic.quoteIdentifier (
-								columnName));
+						indexColumns.add (
+							new IndexColumn ()
+
+							.sqlColumnName (
+								sqlLogic.quoteIdentifier (
+									columnName))
+
+							.sqlColumnType (
+								columnSqlType)
+
+						);
 
 					}
 
@@ -271,11 +282,20 @@ class CachedViewToSqlImplementation
 									columnName),
 								columnSqlType));
 
-						triggerValueColumns.add (
-							Pair.of (
+						valueColumns.add (
+							new ValueColumn ()
+
+							.sqlColumnName (
 								sqlLogic.quoteIdentifier (
-									columnName),
-								aggregateField.when ()));
+									columnName))
+
+							.sqlColumnType (
+								columnSqlType)
+
+							.sqlWhen (
+								aggregateField.when ())
+
+						);
 
 					}
 
@@ -287,248 +307,323 @@ class CachedViewToSqlImplementation
 
 			}
 
-			// create sequence
+			// create sql
 
-			try (
+			createSequence (
+				taskLogger,
+				sqlStatements,
+				model);
 
-				LazyFormatWriter formatWriter =
-					new LazyFormatWriter ("  ");
+			createTable (
+				taskLogger,
+				sqlStatements,
+				model,
+				columnDefinitions);
 
-			) {
+			createUpdatesPendingInsertFunction (
+				taskLogger,
+				sqlStatements,
+				model,
+				indexColumns,
+				valueColumns);
 
-				formatWriter.writeLineFormat (
-					"CREATE SEQUENCE %s;",
-					sqlLogic.quoteIdentifierFormat (
+			createUpdateFunction (
+				taskLogger,
+				sqlStatements,
+				model,
+				indexColumns,
+				valueColumns);
+
+			createProcessFunction (
+				taskLogger,
+				sqlStatements,
+				model,
+				indexColumns,
+				valueColumns);
+
+			createRecalculateOneFunction (
+				taskLogger,
+				sqlStatements,
+				model,
+				indexColumns,
+				valueColumns);
+
+			createRecalculateRangeFunction (
+				taskLogger,
+				sqlStatements,
+				model,
+				indexColumns,
+				valueColumns);
+
+			createUpdatesPendingInsertTriggers (
+				taskLogger,
+				sqlStatements,
+				model);
+
+		}
+
+	}
+
+	private
+	void createSequence (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createSequence");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"CREATE SEQUENCE %s;",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending_id_seq",
+					model.tableName ()));
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	private
+	void createTable (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <String> columnDefinitions) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createTable");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"CREATE TABLE %s (",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			writeLines (
+				formatWriter,
+				"%s",
+				"%s,",
+				"%s,",
+				"%s",
+				columnDefinitions);
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	private
+	void createUpdatesPendingInsertFunction (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <IndexColumn> indexColumns,
+			@NonNull List <ValueColumn> valueColumns) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createUpdatesPendingInsertFunction");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			formatWriter.writeLineFormat (
+				"CREATE OR REPLACE FUNCTION %s ()",
+				stringFormat (
+					"%s_updates_pending_insert",
+					model.tableName ()));
+
+			formatWriter.writeLineFormat (
+				"RETURNS trigger AS $$");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"BEGIN");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"IF TG_OP IN ('UPDATE', 'DELETE') THEN");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"INSERT INTO %s VALUES (",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			List <String> minusValues =
+				new ArrayList<> ();
+
+			minusValues.add (
+				stringFormat (
+					"nextval (%s)",
+					sqlLogic.quoteStringFormat (
 						"%s_updates_pending_id_seq",
-						model.tableName ()));
+						model.tableName ())));
 
-				sqlStatements.add (
-					formatWriter.toString ());
-
-			}
-
-			// create table
-
-			try (
-
-				LazyFormatWriter formatWriter =
-					new LazyFormatWriter ("  ");
-
-			) {
-
-				formatWriter.writeLineFormatIncreaseIndent (
-					"CREATE TABLE %s (",
-					sqlLogic.quoteIdentifierFormat (
-						"%s_updates_pending",
-						model.tableName ()));
-
-				for (
-					String columnDefinition
-						: listSliceAllButLastItemRequired (
-							columnDefinitions)
-				) {
-
-					formatWriter.writeLineFormat (
-						"%s,",
-						columnDefinition);
-
-				}
-
-				formatWriter.writeLineFormat (
-					"%s",
-					listLastItemRequired (
-						columnDefinitions));
-
-				formatWriter.writeLineFormatDecreaseIndent (
-					");");
-
-				sqlStatements.add (
-					formatWriter.toString ());
-
-			}
-
-			// create trigger
-
-			try (
-
-				LazyFormatWriter formatWriter =
-					new LazyFormatWriter ("  ");
-
-			) {
-
-				formatWriter.writeLineFormat (
-					"CREATE OR REPLACE FUNCTION %s ()",
-					stringFormat (
-						"%s_update_log_insert",
-						model.tableName ()));
-
-				formatWriter.writeLineFormat (
-					"RETURNS trigger AS $$");
-
-				formatWriter.writeLineFormatIncreaseIndent (
-					"BEGIN");
-
-				formatWriter.writeNewline ();
-
-				formatWriter.writeLineFormatIncreaseIndent (
-					"IF TG_OP IN ('UPDATE', 'DELETE') THEN");
-
-				formatWriter.writeNewline ();
-
-				formatWriter.writeLineFormatIncreaseIndent (
-					"INSERT INTO %s VALUES (",
-					sqlLogic.quoteIdentifierFormat (
-						"%s_updates_pending",
-						model.tableName ()));
-
-				List <String> minusValues =
-					new ArrayList<> ();
-
-				minusValues.add (
-					"DEFAULT");
-
-				for (
-					String triggerIndexColumn
-						: triggerIndexColumns
-				) {
-
-					minusValues.add (
+			collectionAddAll (
+				minusValues,
+				iterableMap (
+					indexColumns,
+					indexColumn ->
 						stringFormat (
 							"OLD.%s",
-							triggerIndexColumn));
+							indexColumn.sqlColumnName)));
 
-				}
-
-				for (
-					Pair <String, String> triggerValueColumn
-						: triggerValueColumns
-				) {
-
-					minusValues.add (
+			collectionAddAll (
+				minusValues,
+				iterableMap (
+					valueColumns,
+					valueColumn ->
 						stringFormat (
 							"CASE WHEN %s THEN -1 ELSE 0 END",
 							stringReplaceAllSimple (
 								"$",
 								"OLD",
-								triggerValueColumn.right ())));
+								valueColumn.sqlWhen ()))));
 
-				}
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				minusValues);
 
-				for (
-					String minusValue
-						: listSliceAllButLastItemRequired (
-							minusValues)
-				) {
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
 
-					formatWriter.writeLineFormat (
-						"%s,",
-						minusValue);
+			formatWriter.writeNewline ();
 
-				}
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END IF;");
 
-				formatWriter.writeLineFormat (
-					"%s",
-					listLastItemRequired (
-						minusValues));
+			formatWriter.writeNewline ();
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					");");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"IF TG_OP IN ('INSERT', 'UPDATE') THEN");
 
-				formatWriter.writeNewline ();
+			formatWriter.writeNewline ();
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					"END IF;");
+			formatWriter.writeLineFormatIncreaseIndent (
+				"INSERT INTO %s VALUES (",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
 
-				formatWriter.writeNewline ();
+			List <String> plusValues =
+				new ArrayList<> ();
 
-				formatWriter.writeLineFormatIncreaseIndent (
-					"IF TG_OP IN ('INSERT', 'UPDATE') THEN");
+			plusValues.add (
+				stringFormat (
+					"nextval (%s)",
+					sqlLogic.quoteStringFormat (
+						"%s_updates_pending_id_seq",
+						model.tableName ())));
 
-				formatWriter.writeNewline ();
-
-				formatWriter.writeLineFormatIncreaseIndent (
-					"INSERT INTO %s VALUES (",
-					sqlLogic.quoteIdentifierFormat (
-						"%s_updates_pending",
-						model.tableName ()));
-
-				List <String> plusValues =
-					new ArrayList<> ();
-
-				plusValues.add (
-					"DEFAULT");
-
-				for (
-					String triggerIndexColumn
-						: triggerIndexColumns
-				) {
-
-					plusValues.add (
+			collectionAddAll (
+				plusValues,
+				iterableMap (
+					indexColumns,
+					indexColumn ->
 						stringFormat (
 							"NEW.%s",
-							triggerIndexColumn));
+							indexColumn.sqlColumnName)));
 
-				}
-
-				for (
-					Pair <String, String> triggerValueColumn
-						: triggerValueColumns
-				) {
-
-					plusValues.add (
+			collectionAddAll (
+				plusValues,
+				iterableMap (
+					valueColumns,
+					valueColumn ->
 						stringFormat (
 							"CASE WHEN %s THEN 1 ELSE 0 END",
 							stringReplaceAllSimple (
 								"$",
 								"NEW",
-								triggerValueColumn.right ())));
+								valueColumn.sqlWhen ()))));
 
-				}
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				plusValues);
 
-				for (
-					String plugValue
-						: listSliceAllButLastItemRequired (
-							plusValues)
-				) {
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
 
-					formatWriter.writeLineFormat (
-						"%s,",
-						plugValue);
+			formatWriter.writeNewline ();
 
-				}
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END IF;");
 
-				formatWriter.writeLineFormat (
-					"%s",
-					listLastItemRequired (
-						plusValues));
+			formatWriter.writeNewline ();
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					");");
+			formatWriter.writeLineFormat (
+				"RETURN NULL;");
 
-				formatWriter.writeNewline ();
+			formatWriter.writeNewline ();
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					"END IF;");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END;");
 
-				formatWriter.writeNewline ();
+			formatWriter.writeLineFormatDecreaseIndent (
+				"$$ LANGUAGE 'plpgsql';");
 
-				formatWriter.writeLineFormat (
-					"RETURN NULL;");
+			sqlStatements.add (
+				formatWriter.toString ());
 
-				formatWriter.writeNewline ();
+		}
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					"END;");
+	}
 
-				formatWriter.writeLineFormatDecreaseIndent (
-					"$$ LANGUAGE 'plpgsql';");
+	private
+	void createUpdatesPendingInsertTriggers (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model) {
 
-				sqlStatements.add (
-					formatWriter.toString ());
+		try (
 
-			}
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createUpdatesPendingInsertTriggers");
 
-			// create triggers
+		) {
+
+			CachedViewSpec cachedView =
+				model.cachedView ();
+
+			Model <?> sourceModel =
+				mapItemForKeyRequired (
+					entityHelper.recordModelsByName (),
+					cachedView.sourceObjectName ());
 
 			sqlStatements.add (
 				stringFormat (
@@ -543,7 +638,7 @@ class CachedViewToSqlImplementation
 					"FOR EACH ROW\n",
 					"EXECUTE PROCEDURE %s ();\n",
 					sqlLogic.quoteIdentifierFormat (
-						"%s_update_log_insert",
+						"%s_updates_pending_insert",
 						model.tableName ())));
 
 			sqlStatements.add (
@@ -559,7 +654,7 @@ class CachedViewToSqlImplementation
 					"FOR EACH ROW\n",
 					"EXECUTE PROCEDURE %s ();\n",
 					sqlLogic.quoteIdentifierFormat (
-						"%s_update_log_insert",
+						"%s_updates_pending_insert",
 						model.tableName ())));
 
 			sqlStatements.add (
@@ -575,11 +670,711 @@ class CachedViewToSqlImplementation
 					"FOR EACH ROW\n",
 					"EXECUTE PROCEDURE %s ();\n",
 					sqlLogic.quoteIdentifierFormat (
-						"%s_update_log_insert",
+						"%s_updates_pending_insert",
 						model.tableName ())));
 
 		}
 
+	}
+
+	private
+	void createUpdateFunction (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <IndexColumn> indexColumns,
+			@NonNull List <ValueColumn> valueColumns) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createUpdateFunction");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			// open function declaration
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"CREATE OR REPLACE FUNCTION %s (",
+				stringFormat (
+					"%s_update",
+					model.tableName ()));
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnType));
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					valueColumns,
+					ValueColumn::sqlColumnType));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				") RETURNS void AS $$");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"BEGIN");
+
+			formatWriter.writeNewline ();
+
+			// attempt update
+
+			formatWriter.writeLineFormat (
+				"UPDATE %s",
+				sqlLogic.quoteIdentifier (
+					model.tableName ()));
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"SET");
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMapWithIndex (
+					valueColumns,
+					(columnIndex, valueColumn) ->
+						stringFormat (
+							"%s = %s + $%s",
+							valueColumn.sqlColumnName (),
+							valueColumn.sqlColumnName (),
+							integerToDecimalString (
+								sum (
+									collectionSize (
+										indexColumns),
+									columnIndex,
+									1l)))));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"WHERE");
+
+			formatWriter.writeNewline ();
+
+			writeLines (
+				formatWriter,
+				"%s",
+				"%s",
+				"AND %s",
+				"AND %s",
+				iterableMapWithIndex (
+					indexColumns,
+					(columnIndex, indexColumn) ->
+						stringFormat (
+							"%s = $%s",
+							indexColumn.sqlColumnName (),
+							integerToDecimalString (
+								columnIndex + 1))));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				";");
+
+			formatWriter.writeNewline ();
+
+			// insert if update failed
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"IF NOT FOUND THEN");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"INSERT INTO %s (",
+				sqlLogic.quoteIdentifier (
+					model.tableName ()));
+
+			formatWriter.writeLineFormat (
+				"id,");
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnName));
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					valueColumns,
+					ValueColumn::sqlColumnName));
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				") VALUES (");
+
+			formatWriter.writeLineFormat (
+				"nextval (%s),",
+				sqlLogic.quoteStringFormat (
+					"%s_id_seq",
+					model.tableName ()));
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMapWithIndex (
+					indexColumns,
+					(columnIndex, indexColumn) ->
+						stringFormat (
+							"$%s",
+							integerToDecimalString (
+								columnIndex + 1))));
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMapWithIndex (
+					valueColumns,
+					(columnIndex, valueColumn) ->
+						stringFormat (
+							"$%s",
+							integerToDecimalString (
+								sum (
+									collectionSize (
+										indexColumns),
+									columnIndex,
+									1l)))));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END IF;");
+
+			formatWriter.writeNewline ();
+
+			// close function declaration
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"$$ LANGUAGE 'plpgsql';");
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	private
+	void createProcessFunction (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <IndexColumn> indexColumns,
+			@NonNull List <ValueColumn> valueColumns) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createProcessFunction");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			// open function declaration
+
+			formatWriter.writeLineFormat (
+				"CREATE OR REPLACE FUNCTION %s ()",
+				stringFormat (
+					"%s_update_log_process",
+					model.tableName ()));
+
+			formatWriter.writeLineFormat (
+				"RETURNS text AS $$");
+
+			// declare variables
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"DECLARE");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"row RECORD;");
+
+			formatWriter.writeLineFormat (
+				"update_counter int;");
+
+			formatWriter.writeLineFormat (
+				"row_counter int;");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"BEGIN");
+
+			formatWriter.writeNewline ();
+
+			// set row counter
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"row_counter := (");
+
+			formatWriter.writeLineFormat (
+				"SELECT count (*)");
+
+			formatWriter.writeLineFormat (
+				"FROM %s",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
+
+			formatWriter.writeNewline ();
+
+			// initialise update counter
+
+			formatWriter.writeLineFormat (
+				"update_counter := 0;");
+
+			formatWriter.writeNewline ();
+
+			// iterate grouped rows
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"FOR row IN");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"SELECT");
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnName));
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					valueColumns,
+					valueColumn ->
+						stringFormat (
+							"sum (%s)::%s AS %s",
+							valueColumn.sqlColumnName (),
+							valueColumn.sqlColumnType (),
+							valueColumn.sqlColumnName ())));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"FROM %s",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"GROUP BY");
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnName));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.decreaseIndent ();
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"LOOP");
+
+			formatWriter.writeNewline ();
+
+			// perform update
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"PERFORM %s (",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_update",
+					model.tableName ()));
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					indexColumn ->
+						stringFormat (
+							"row.%s",
+							indexColumn.sqlColumnName ())));
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					valueColumns,
+					valueColumn ->
+						stringFormat (
+							"row.%s",
+							valueColumn.sqlColumnName ())));
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				");");
+
+			formatWriter.writeNewline ();
+
+			// close loop
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END LOOP;");
+
+			formatWriter.writeNewline ();
+
+			// delete updates pending
+
+			formatWriter.writeLineFormat (
+				"DELETE FROM %s;",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			formatWriter.writeNewline ();
+
+			// return
+
+			formatWriter.writeLineFormat (
+				"RETURN %s;",
+				joinWithSeparator (
+					" || ",
+					sqlLogic.quoteString (
+						"Processed "),
+					sqlLogic.quoteIdentifier (
+						"row_counter"),
+					sqlLogic.quoteString (
+						" rows in "),
+					sqlLogic.quoteIdentifier (
+						"update_counter"),
+					sqlLogic.quoteString (
+						" updates")));
+
+			formatWriter.writeNewline ();
+
+			// close function declaration
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"$$ LANGUAGE 'plpgsql';");
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	private
+	void createRecalculateOneFunction (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <IndexColumn> indexColumns,
+			@NonNull List <ValueColumn> valueColumns) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRecalculateOneFunction");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			CachedViewSpec cachedView =
+				model.cachedView ();
+
+			Model <?> sourceModel =
+				mapItemForKeyRequired (
+					entityHelper.recordModelsByName (),
+					cachedView.sourceObjectName ());
+
+			// open function declaration
+
+			IndexColumn firstIndexColumn =
+				listFirstElementRequired (
+					indexColumns);
+
+			formatWriter.writeLineFormat (
+				"CREATE OR REPLACE FUNCTION %s (%s)",
+				stringFormat (
+					"%s_recalculate",
+					model.tableName ()),
+				firstIndexColumn.sqlColumnType ());
+
+			formatWriter.writeLineFormat (
+				"RETURNS text AS $$");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"BEGIN");
+
+			formatWriter.writeNewline ();
+
+			// delete from target
+
+			formatWriter.writeLineFormat (
+				"DELETE FROM %s",
+				sqlLogic.quoteIdentifier (
+					model.tableName ()));
+
+			formatWriter.writeLineFormat (
+				"WHERE %s = $1;",
+				firstIndexColumn.sqlColumnName ());
+
+			formatWriter.writeNewline ();
+
+			// delete from updates_pending
+
+			formatWriter.writeLineFormat (
+				"DELETE FROM %s",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_updates_pending",
+					model.tableName ()));
+
+			formatWriter.writeLineFormat (
+				"WHERE %s = $1;",
+				firstIndexColumn.sqlColumnName ());
+
+			formatWriter.writeNewline ();
+
+			// insert new values
+
+			formatWriter.writeLineFormat (
+				"INSERT INTO %s",
+				sqlLogic.quoteIdentifier (
+					model.tableName ()));
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"SELECT");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"nextval (%s),",
+				sqlLogic.quoteStringFormat (
+					"%s_id_seq",
+					model.tableName ()));
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaAlways (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnName));
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					valueColumns,
+					valueColumn ->
+						stringFormat (
+							"sum (%s)::%s",
+							stringFormat (
+								"CASE WHEN %s THEN 1 ELSE 0 END",
+								stringReplaceAllSimple (
+									"$.",
+									"",
+									valueColumn.sqlWhen ())),
+							valueColumn.sqlColumnType ())));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"FROM %s",
+				sqlLogic.quoteIdentifier (
+					sourceModel.tableName ()));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"WHERE %s = $1",
+				firstIndexColumn.sqlColumnName ());
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"GROUP BY");
+
+			formatWriter.writeNewline ();
+
+			writeLinesWithCommaExceptLastLine (
+				formatWriter,
+				iterableMap (
+					indexColumns,
+					IndexColumn::sqlColumnName));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				";");
+
+			formatWriter.writeNewline ();
+
+			// return
+
+			formatWriter.writeLineFormat (
+				"RETURN 'TODO - useful information here';");
+
+			// close function declaration
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"$$ LANGUAGE 'plpgsql';");
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	private
+	void createRecalculateRangeFunction (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull List <String> sqlStatements,
+			@NonNull Model <?> model,
+			@NonNull List <IndexColumn> indexColumns,
+			@NonNull List <ValueColumn> valueColumns) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createRecalculateRangeFunction");
+
+			LazyFormatWriter formatWriter =
+				new LazyFormatWriter ("  ");
+
+		) {
+
+			// open function declaration
+
+			IndexColumn firstIndexColumn =
+				listFirstElementRequired (
+					indexColumns);
+
+			formatWriter.writeLineFormat (
+				"CREATE OR REPLACE FUNCTION %s (%s, %s)",
+				stringFormat (
+					"%s_recalculate",
+					model.tableName ()),
+				firstIndexColumn.sqlColumnType (),
+				firstIndexColumn.sqlColumnType ());
+
+			formatWriter.writeLineFormat (
+				"RETURNS text AS $$");
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"DECLARE");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"current_value %s;",
+				firstIndexColumn.sqlColumnType ());
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIncreaseIndent (
+				"BEGIN");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"current_value := $1;");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"WHILE current_value < $2 LOOP");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"PERFORM %s (current_value);",
+				sqlLogic.quoteIdentifierFormat (
+					"%s_recalculate",
+					model.tableName ()));
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END LOOP;");
+
+			formatWriter.writeNewline ();
+
+			formatWriter.writeLineFormat (
+				"RETURN 'TODO - useful information here';");
+
+			formatWriter.writeNewline ();
+
+			// close function declaration
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"END;");
+
+			formatWriter.writeLineFormatDecreaseIndent (
+				"$$ LANGUAGE 'plpgsql';");
+
+			sqlStatements.add (
+				formatWriter.toString ());
+
+		}
+
+	}
+
+	// data classes
+
+	@Accessors (fluent = true)
+	@Data
+	private static
+	class IndexColumn {
+		String sqlColumnName;
+		String sqlColumnType;
+	}
+
+	@Accessors (fluent = true)
+	@Data
+	private static
+	class ValueColumn {
+		String sqlColumnName;
+		String sqlColumnType;
+		String sqlWhen;
 	}
 
 }
