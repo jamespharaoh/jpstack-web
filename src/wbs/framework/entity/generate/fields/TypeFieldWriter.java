@@ -82,7 +82,7 @@ class TypeFieldWriter
 					fieldTypeName);
 
 			PluginRecordModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
+				pluginManager.pluginRecordModelsByName ().get (
 					fieldTypeName);
 
 			PluginSpec fieldTypePlugin =

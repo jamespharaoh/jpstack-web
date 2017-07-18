@@ -82,7 +82,7 @@ class ChildrenCollectionWriter
 						spec.typeName ()));
 
 			PluginRecordModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
+				pluginManager.pluginRecordModelsByName ().get (
 					spec.typeName ());
 
 			if (

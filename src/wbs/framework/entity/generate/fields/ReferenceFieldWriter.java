@@ -71,7 +71,7 @@ class ReferenceFieldWriter
 		) {
 
 			PluginRecordModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
+				pluginManager.pluginRecordModelsByName ().get (
 					spec.typeName ());
 
 			if (

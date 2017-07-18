@@ -2,6 +2,7 @@ package wbs.framework.entity.model;
 
 import static wbs.utils.collection.IterableUtils.iterableFilterMapToSet;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -328,9 +329,11 @@ class RecordModelImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	ModelField field (
-			String name) {
+			@NonNull String name) {
 
-		return fieldsByName.get (name);
+		return mapItemForKeyRequired (
+			fieldsByName,
+			name);
 
 	}
 

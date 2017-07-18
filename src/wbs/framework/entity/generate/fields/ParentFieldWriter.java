@@ -70,7 +70,7 @@ class ParentFieldWriter
 		) {
 
 			PluginRecordModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
+				pluginManager.pluginRecordModelsByName ().get (
 					spec.typeName ());
 
 			PluginSpec fieldTypePlugin =

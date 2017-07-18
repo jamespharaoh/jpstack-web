@@ -10,9 +10,9 @@ import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
-@DataClass ("component")
+@DataClass ("composite")
 public
-class PluginComponentModelSpec
+class PluginCompositeModelSpec
 	implements PluginModelSpec {
 
 	@DataAncestor

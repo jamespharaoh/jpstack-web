@@ -108,7 +108,7 @@ class PluginManagerFactory
 					PluginApiModuleSpec.class,
 					PluginBootstrapComponentSpec.class,
 					PluginComponentSpec.class,
-					PluginComponentModelSpec.class,
+					PluginCompositeModelSpec.class,
 					PluginConsoleModuleSpec.class,
 					PluginCustomTypeSpec.class,
 					PluginEnumTypeSpec.class,
@@ -217,16 +217,20 @@ class PluginManagerFactory
 				ImmutableList.builder ();
 
 			ImmutableMap.Builder <String, PluginRecordModelSpec>
-			pluginModelsByNameBuilder =
-				ImmutableMap.builder ();
+				pluginRecordModelsByNameBuilder =
+					ImmutableMap.builder ();
+
+			ImmutableMap.Builder <String, PluginCompositeModelSpec>
+				pluginCompositeModelsByNameBuilder =
+					ImmutableMap.builder ();
 
 			ImmutableMap.Builder <String, PluginEnumTypeSpec>
-			pluginEnumTypesByNameBuilder =
-				ImmutableMap.builder ();
+				pluginEnumTypesByNameBuilder =
+					ImmutableMap.builder ();
 
 			ImmutableMap.Builder <String, PluginCustomTypeSpec>
-			pluginCustomTypesByNameBuilder =
-				ImmutableMap.builder ();
+				pluginCustomTypesByNameBuilder =
+					ImmutableMap.builder ();
 
 			Set <String> donePluginNames =
 				new HashSet<> ();
@@ -260,15 +264,25 @@ class PluginManagerFactory
 					pluginsBuilder.add (
 						plugin);
 
-
 					for (
-						PluginRecordModelSpec pluginModel
+						PluginRecordModelSpec pluginRecordModel
 							: plugin.models ().models ()
 					) {
 
-						pluginModelsByNameBuilder.put (
-							pluginModel.name (),
-							pluginModel);
+						pluginRecordModelsByNameBuilder.put (
+							pluginRecordModel.name (),
+							pluginRecordModel);
+
+					}
+
+					for (
+						PluginCompositeModelSpec pluginCompositeModel
+							: plugin.models ().compositeTypes ()
+					) {
+
+						pluginCompositeModelsByNameBuilder.put (
+							pluginCompositeModel.name (),
+							pluginCompositeModel);
 
 					}
 
@@ -337,8 +351,11 @@ class PluginManagerFactory
 				.plugins (
 					pluginsBuilder.build ())
 
-				.pluginModelsByName (
-					pluginModelsByNameBuilder.build ())
+				.pluginRecordModelsByName (
+					pluginRecordModelsByNameBuilder.build ())
+
+				.pluginCompositeModelsByName (
+					pluginCompositeModelsByNameBuilder.build ())
 
 				.pluginEnumTypesByName (
 					pluginEnumTypesByNameBuilder.build ())

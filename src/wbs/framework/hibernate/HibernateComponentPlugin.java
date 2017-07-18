@@ -47,7 +47,7 @@ class HibernateComponentPlugin
 
 			iterableChainArguments (
 				plugin.models ().models (),
-				plugin.models ().componentTypes ()
+				plugin.models ().compositeTypes ()
 			).forEach (
 				projectModelSpec ->
 					registerDaoHibernate (

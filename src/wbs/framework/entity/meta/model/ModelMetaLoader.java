@@ -71,7 +71,7 @@ class ModelMetaLoader {
 	Map <String, ModelMetaSpec> recordModelMetas;
 
 	@Getter
-	Map <String, ModelMetaSpec> componentMetas;
+	Map <String, ModelMetaSpec> compositeMetas;
 
 	// state
 
@@ -154,7 +154,7 @@ class ModelMetaLoader {
 			ImmutableMap.Builder <String, ModelMetaSpec> recordBuilder =
 				ImmutableMap.builder ();
 
-			ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
+			ImmutableMap.Builder <String, ModelMetaSpec> compositeBuilder =
 				ImmutableMap.builder ();
 
 			pluginManager.plugins ().forEach (
@@ -171,7 +171,7 @@ class ModelMetaLoader {
 					PluginModelSpec pluginModelSpec
 						: iterableChainArguments (
 							pluginSpec.models ().models (),
-							pluginSpec.models ().componentTypes ())
+							pluginSpec.models ().compositeTypes ())
 				) {
 
 					Optional <ModelMetaSpec> modelMetaOptional =
@@ -203,7 +203,7 @@ class ModelMetaLoader {
 
 					} else if (modelMeta.type.component ()) {
 
-						componentBuilder.put (
+						compositeBuilder.put (
 							modelMeta.name (),
 							modelMeta);
 
@@ -233,8 +233,8 @@ class ModelMetaLoader {
 			recordModelMetas =
 				recordBuilder.build ();
 
-			componentMetas =
-				componentBuilder.build ();
+			compositeMetas =
+				compositeBuilder.build ();
 
 		}
 

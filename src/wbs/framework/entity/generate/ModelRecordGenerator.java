@@ -224,7 +224,9 @@ class ModelRecordGenerator {
 						this::writeCollections)
 
 					.addBlock (
-						this::writeEquals);
+						this::writeEquals)
+
+				;
 
 				if (modelMeta.type ().record ()) {
 
@@ -234,7 +236,9 @@ class ModelRecordGenerator {
 							this::writeCompareTo)
 
 						.addBlock (
-							this::writeToString);
+							this::writeToString)
+
+					;
 
 				}
 
@@ -415,7 +419,9 @@ class ModelRecordGenerator {
 					modelMeta)
 
 				.recordClassName (
-					recordClassName);
+					recordClassName)
+
+			;
 
 			ModelFieldWriterTarget nextTarget =
 				new ModelFieldWriterTarget ()
@@ -424,7 +430,9 @@ class ModelRecordGenerator {
 					imports)
 
 				.formatWriter (
-					formatWriter);
+					formatWriter)
+
+			;
 
 			modelWriterBuilder.write (
 				taskLogger,

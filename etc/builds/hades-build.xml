@@ -321,12 +321,24 @@
 		<!-- sms -->
 
 		<plugin
-			name="sms-core"
-			package="wbs.sms.core"/>
+			name="command"
+			package="wbs.sms.command"/>
+
+		<plugin
+			name="gazetteer"
+			package="wbs.sms.gazetteer"/>
 
 		<plugin
 			name="gsm"
 			package="wbs.sms.gsm"/>
+
+		<plugin
+			name="keyword"
+			package="wbs.sms.keyword"/>
+
+		<plugin
+			name="message-delivery"
+			package="wbs.sms.message.delivery"/>
 
 		<plugin
 			name="network"
@@ -349,28 +361,16 @@
 			package="wbs.sms.route.core"/>
 
 		<plugin
-			name="gazetteer"
-			package="wbs.sms.gazetteer"/>
-
-		<plugin
-			name="command"
-			package="wbs.sms.command"/>
-
-		<plugin
-			name="message-delivery"
-			package="wbs.sms.message.delivery"/>
-
-		<plugin
 			name="route-http"
 			package="wbs.sms.route.http"/>
 
 		<plugin
-			name="message-inbox"
-			package="wbs.sms.message.inbox"/>
+			name="sms-core"
+			package="wbs.sms.core"/>
 
 		<plugin
-			name="keyword"
-			package="wbs.sms.keyword"/>
+			name="message-inbox"
+			package="wbs.sms.message.inbox"/>
 
 		<plugin
 			name="locator"
@@ -385,12 +385,8 @@
 			package="wbs.sms.message.batch"/>
 
 		<plugin
-			name="sms-message-core"
-			package="wbs.sms.message.core"/>
-
-		<plugin
-			name="object-messages"
-			package="wbs.sms.object.messages"/>
+			name="message-outbox"
+			package="wbs.sms.message.outbox"/>
 
 		<plugin
 			name="message-report"
@@ -413,20 +409,24 @@
 			package="wbs.sms.message.ticker"/>
 
 		<plugin
+			name="modem-poll"
+			package="wbs.sms.modempoll"/>
+
+		<plugin
 			name="number-blacklist"
 			package="wbs.sms.number.blacklist"/>
+
+		<plugin
+			name="object-messages"
+			package="wbs.sms.object.messages"/>
 
 		<plugin
 			name="object-stats"
 			package="wbs.sms.object.stats"/>
 
 		<plugin
-			name="message-outbox"
-			package="wbs.sms.message.outbox"/>
-
-		<plugin
-			name="modem-poll"
-			package="wbs.sms.modempoll"/>
+			name="sms-message-core"
+			package="wbs.sms.message.core"/>
 
 		<plugin
 			name="number-list"
@@ -453,20 +453,24 @@
 			package="wbs.sms.smpp"/>
 
 		<plugin
+			name="sms-customer"
+			package="wbs.sms.customer"/>
+
+		<plugin
+			name="sms-number-stats"
+			package="wbs.sms.number.stats"/>
+
+		<plugin
+			name="sms-spend-limit"
+			package="wbs.sms.spendlimit"/>
+
+		<plugin
 			name="tracker"
 			package="wbs.sms.tracker"/>
 
 		<plugin
 			name="wap-push"
 			package="wbs.sms.message.wap"/>
-
-		<plugin
-			name="sms-customer"
-			package="wbs.sms.customer"/>
-
-		<plugin
-			name="sms-spend-limit"
-			package="wbs.sms.spendlimit"/>
 
 		<!-- sms apps -->
 

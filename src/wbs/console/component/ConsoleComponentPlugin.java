@@ -615,7 +615,7 @@ class ConsoleComponentPlugin
 			Class <?> formClass =
 				ifNotNullThenElse (
 					formSpec.objectTypeName (),
-					() -> pluginManager.modelClass (
+					() -> pluginManager.recordModelClass (
 						formSpec.objectTypeName ()),
 					() -> classForNameRequired (
 						formSpec.className ()));

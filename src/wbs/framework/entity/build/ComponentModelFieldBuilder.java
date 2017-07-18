@@ -1,7 +1,7 @@
 package wbs.framework.entity.build;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -82,13 +82,18 @@ class ComponentModelFieldBuilder
 				capitalise (
 					spec.typeName ());
 
+			ModelMetaSpec compositeModel =
+				mapItemForKeyRequired (
+					modelMetaLoader.compositeMetas (),
+					spec.typeName ());
+
 			String fullFieldTypeName =
 				stringFormat (
 					"%s.model.%s",
-					context.modelMeta ().plugin ().packageName (),
+					compositeModel.plugin ().packageName (),
 					fieldTypeName);
 
-			Class<?> fieldTypeClass =
+			Class <?> fieldTypeClass =
 				classForNameRequired (
 					fullFieldTypeName);
 
@@ -151,23 +156,10 @@ class ComponentModelFieldBuilder
 				.fieldsByName (
 					modelField.fieldsByName ());
 
-			ModelMetaSpec componentMeta =
-				modelMetaLoader.componentMetas ().get (
-					spec.typeName ());
-
-			if (
-				isNull (
-					componentMeta)
-			) {
-
-				throw new RuntimeException ();
-
-			}
-
 			modelBuilderManager.build (
 				taskLogger,
 				nextContext,
-				componentMeta.fields (),
+				compositeModel.fields (),
 				nextTarget);
 
 			// store field

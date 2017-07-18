@@ -78,7 +78,7 @@ class IdentityReferenceModelFieldBuilder
 					spec.typeName ());
 
 			PluginRecordModelSpec fieldTypePluginModel =
-				pluginManager.pluginModelsByName ().get (
+				pluginManager.pluginRecordModelsByName ().get (
 					spec.typeName ());
 
 			PluginSpec fieldTypePlugin =
