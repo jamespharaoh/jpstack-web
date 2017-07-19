@@ -15,6 +15,9 @@
 			name="fixturesSeed"
 			nullable="yes"/>
 
+		<integer-field
+			name="installationId"/>
+
 	</fields>
 
 	<priv-types>
