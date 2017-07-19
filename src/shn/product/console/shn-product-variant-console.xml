@@ -51,6 +51,33 @@
 
 	</object-context>
 
+	<object-context
+		name="shnProductVariantSearch"
+		object-name="shnProductVariant">
+
+		<list>
+
+			<object-search-page
+				search-class="shn.product.model.ShnProductVariantSearch"
+				search-form="search"
+				results-form="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				form="summary"/>
+
+			<object-settings-page
+				form="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
 	<forms>
 
 		<form
@@ -68,6 +95,89 @@
 
 				<yes-no-field
 					name="active"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="search"
+			class="shn.product.model.ShnProductVariantSearch"
+			type="search">
+
+			<columns>
+
+				<object-field
+					name="productCategoryId"
+					object-type="shnProductCategory"
+					root-field="product.database"
+					nullable="yes"/>
+
+				<object-field
+					name="productSubCategoryId"
+					object-type="shnProductSubCategory"
+					root-field="product.database"
+					nullable="yes"/>
+
+				<text-field
+					name="itemNumber"
+					nullable="yes"/>
+
+				<text-field
+					name="description"
+					nullable="yes"/>
+
+				<yes-no-field
+					name="deleted"
+					nullable="yes"
+					default="no"/>
+
+				<yes-no-field
+					name="active"
+					nullable="yes"/>
+
+				<text-field
+					name="publicTitle"
+					nullable="yes"/>
+
+				<integer-field
+					name="stockQuantity"
+					nullable="yes"/>
+
+			</columns>
+
+		</form>
+
+		<form
+			name="results"
+			object-type="shn-product-variant"
+			type="read-only">
+
+			<columns>
+
+				<text-field
+					name="category"
+					field="product.subCategory.category.code"/>
+
+				<text-field
+					name="subCategory"
+					field="product.subCategory.code"/>
+
+				<code-field/>
+				<description-field/>
+
+				<text-field
+					name="publicTitle"/>
+
+				<text-field
+					name="supplier"
+					field="product.supplier.name"/>
+
+				<yes-no-field
+					name="active"/>
+
+				<integer-field
+					name="stockQuantity"/>
 
 			</columns>
 

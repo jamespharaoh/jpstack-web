@@ -44,6 +44,11 @@
 					label="Products"/>
 
 				<context-link
+					name="productVariant"
+					link="shnProductVariantSearch"
+					label="Variants"/>
+
+				<context-link
 					name="category"
 					link="shnProductCategory"
 					label="Categories"/>
