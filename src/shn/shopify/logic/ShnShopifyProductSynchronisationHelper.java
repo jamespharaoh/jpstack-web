@@ -9,7 +9,6 @@ import static wbs.utils.collection.CollectionUtils.listSecondElement;
 import static wbs.utils.collection.CollectionUtils.listThirdElement;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.iterable;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.sum;
@@ -22,7 +21,6 @@ import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.PropertyUtils.propertySetSimple;
-import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -343,13 +341,6 @@ class ShnShopifyProductSynchronisationHelper
 						remoteValue);
 
 				if (! equal) {
-debugFormat (
-	"NOT EQUAL: %s: %s != %s",
-	attribute.friendlyName (),
-	objectToString (
-		localValue),
-	objectToString (
-		remoteValue));
 					return false;
 				}
 

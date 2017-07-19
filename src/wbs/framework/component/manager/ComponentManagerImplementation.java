@@ -676,9 +676,17 @@ class ComponentManagerImplementation
 					taskLogger,
 					componentData);
 
-				initializeComponentReal (
-					taskLogger,
-					componentData);
+				if (
+					enumEqualSafe (
+						componentData.state (),
+						ComponentState.uninitialized)
+				) {
+
+					initializeComponentReal (
+						taskLogger,
+						componentData);
+
+				}
 
 				performPendingWeakInjectionsReal (
 					taskLogger,
@@ -934,10 +942,32 @@ class ComponentManagerImplementation
 							optionalGetRequired (
 								componentData.optionalComponent));
 
+					Object component =
+						componentFactory.makeComponent (
+							taskLogger);
+
+					Optional <ComponentData> factoryComponentDataOptional =
+						mapItemForKey (
+							componentDatas,
+							component);
+
+					if (
+						optionalIsPresent (
+							factoryComponentDataOptional)
+					) {
+
+						ComponentData factoryComponentData =
+							optionalGetRequired (
+								factoryComponentDataOptional);
+
+						componentData.state =
+							factoryComponentData.state;
+
+					}
+
 					componentData.optionalComponent =
 						optionalOf (
-							componentFactory.makeComponent (
-								taskLogger));
+							component);
 
 				}
 
@@ -960,8 +990,24 @@ class ComponentManagerImplementation
 					componentData.optionalComponent),
 				componentData);
 
-			componentData.state =
-				ComponentState.uninitialized;
+			if (
+				enumEqualSafe (
+					componentData.state (),
+					ComponentState.creation)
+			) {
+
+				componentData.state =
+					ComponentState.uninitialized;
+
+			} else if (
+				enumNotEqualSafe (
+					componentData.state (),
+					ComponentState.active)
+			) {
+
+				throw new RuntimeException ();
+
+			}
 
 			taskLogger.debugFormat (
 				"Component %s instantiated successfully",

@@ -4,7 +4,6 @@ public
 enum ComponentState {
 	none,
 	creation,
-	injection,
 	uninitialized,
 	active,
 	tornDown,
