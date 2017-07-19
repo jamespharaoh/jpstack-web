@@ -96,6 +96,14 @@ class RandomLogicImplementation
 
 	@Override
 	public
+	long randomInteger () {
+
+		return random.nextLong ();
+
+	}
+
+	@Override
+	public
 	boolean randomBoolean (
 			long numerator,
 			long denominator) {

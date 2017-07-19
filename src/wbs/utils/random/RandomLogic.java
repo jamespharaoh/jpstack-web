@@ -11,6 +11,8 @@ interface RandomLogic {
 	long randomInteger (
 			long limit);
 
+	long randomInteger ();
+
 	boolean randomBoolean (
 			long numerator,
 			long denominator);

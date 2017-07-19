@@ -138,6 +138,11 @@
 					name="postageAndPackaging"
 					currency="product.subCategory.category.database.currency"/>
 
+				<!-- inventory -->
+
+				<integer-field
+					name="stockQuantity"/>
+
 				<!-- statistics -->
 
 				<integer-field
@@ -206,6 +211,11 @@
 					name="postageAndPackaging"
 					currency="product.subCategory.category.database.currency"
 					nullable="yes"/>
+
+				<!-- inventory -->
+
+				<integer-field
+					name="stockQuantity"/>
 
 			</columns>
 

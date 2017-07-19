@@ -665,6 +665,17 @@ class GenericHttpSender <Request, Response> {
 			decode (
 				taskLogger);
 
+			if (
+				optionalIsPresent (
+					errorMessage)
+			) {
+
+				throw new RuntimeException (
+					optionalGetRequired (
+						errorMessage));
+
+			}
+
 			return response ();
 
 		}

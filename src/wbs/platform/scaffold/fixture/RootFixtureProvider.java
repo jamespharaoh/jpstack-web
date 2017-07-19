@@ -60,6 +60,9 @@ class RootFixtureProvider
 					randomLogic.generateLowercase (
 						20))
 
+				.setInstallationId (
+					randomLogic.randomInteger ())
+
 			);
 
 		}

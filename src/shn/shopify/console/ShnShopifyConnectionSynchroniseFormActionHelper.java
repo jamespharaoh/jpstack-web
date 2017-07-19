@@ -260,6 +260,18 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			}
 
 			if (
+				moreThanZero (
+					productionSynchronisation.numErrors ())
+			) {
+
+				requestContext.addErrorFormat (
+					"%s data mismatch errors creating or updating products",
+					integerToDecimalString (
+						productionSynchronisation.numErrors ()));
+
+			}
+
+			if (
 				moreThan (
 					productionSynchronisation.numOperations (),
 					formState.maxOperations ())

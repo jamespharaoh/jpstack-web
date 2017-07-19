@@ -71,13 +71,13 @@ class ShnShopifySynchronisationComponentWrapper <
 			if (
 				stringNotEqualSafe (
 					componentDefinition.scope (),
-					"prototype")
+					"singleton")
 			) {
 
 				taskLogger.errorFormat (
 					"SHN shopify synchronisation helper component %s ",
 					componentDefinition.name (),
-					"has non-prototype scope: %s",
+					"has non-singleton scope: %s",
 					componentDefinition.scope ());
 
 				return;
@@ -123,8 +123,8 @@ class ShnShopifySynchronisationComponentWrapper <
 					ShnShopifySynchronisationWrapper.class)
 
 				.addReferenceProperty (
-					"helperProvider",
-					"prototype",
+					"helper",
+					"singleton",
 					componentDefinition.name ())
 
 			);

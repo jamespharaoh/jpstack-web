@@ -1,6 +1,7 @@
 package shn.shopify.apiclient;
 
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -86,24 +87,50 @@ class ShopifyHttpSenderHelper
 	public
 	Map <String, String> requestHeaders () {
 
-		return ImmutableMap.<String, String> builder ()
+		if (
+			enumInSafe (
+				request.httpMethod (),
+				HttpMethod.post,
+				HttpMethod.put)
+		) {
 
-			.put (
-				"Authorization",
-				stringFormat (
-					"Basic %s",
-					bytesToBase64 (
-						stringToUtf8 (
-							stringFormat (
-								"%s:%s",
-								request.httpCredentials ().username (),
-								request.httpCredentials ().password ())))))
+			return ImmutableMap.<String, String> builder ()
 
-			.put (
-				"Content-Type",
-				"application/json; charset=utf-8")
+				.put (
+					"Authorization",
+					stringFormat (
+						"Basic %s",
+						bytesToBase64 (
+							stringToUtf8 (
+								stringFormat (
+									"%s:%s",
+									request.httpCredentials ().username (),
+									request.httpCredentials ().password ())))))
 
-			.build ();
+				.put (
+					"Content-Type",
+					"application/json; charset=utf-8")
+
+				.build ();
+
+		} else {
+
+			return ImmutableMap.<String, String> builder ()
+
+				.put (
+					"Authorization",
+					stringFormat (
+						"Basic %s",
+						bytesToBase64 (
+							stringToUtf8 (
+								stringFormat (
+									"%s:%s",
+									request.httpCredentials ().username (),
+									request.httpCredentials ().password ())))))
+
+				.build ();
+
+		}
 
 	}
 

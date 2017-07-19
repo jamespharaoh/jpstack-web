@@ -25,20 +25,19 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.OwnedTaskLogger;
-import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.event.logic.EventLogic;
 
 import wbs.utils.random.RandomLogic;
 
 import shn.core.model.ShnDatabaseRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
 import shn.shopify.apiclient.ShopifyApiResponseItem;
+import shn.shopify.logic.ShnShopifySynchronisationHelper.EventType;
 import shn.shopify.model.ShnShopifyConnectionRec;
 import shn.shopify.model.ShnShopifyRecord;
 
@@ -56,6 +55,9 @@ class ShnShopifySynchronisationWrapper <
 
 	// singleton dependencies
 
+	@SingletonDependency
+	EventLogic eventLogic;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -65,8 +67,7 @@ class ShnShopifySynchronisationWrapper <
 	// properties
 
 	@Getter @Setter
-	ComponentProvider <ShnShopifySynchronisationHelper <Local, Remote>>
-		helperProvider;
+	ShnShopifySynchronisationHelper <Local, Remote> helper;
 
 	@Getter @Setter
 	Boolean enableCreate;
@@ -87,8 +88,6 @@ class ShnShopifySynchronisationWrapper <
 	ShopifyApiClientCredentials shopifyCredentials;
 
 	// state
-
-	ShnShopifySynchronisationHelper <Local, Remote> helper;
 
 	ShnDatabaseRec shnDatabase;
 
@@ -111,29 +110,8 @@ class ShnShopifySynchronisationWrapper <
 	@Getter
 	long numOperations = 0;
 
-	// life cycle
-
-	@NormalLifecycleSetup
-	public
-	void setup (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		try (
-
-			OwnedTaskLogger taskLogger =
-				logContext.nestTaskLogger (
-					parentTaskLogger,
-					"setup");
-
-		) {
-
-			helper =
-				helperProvider.provide (
-					taskLogger);
-
-		}
-
-	}
+	@Getter
+	long numErrors = 0;
 
 	// public implementation
 
@@ -333,6 +311,14 @@ class ShnShopifySynchronisationWrapper <
 					shopifyConnection,
 					remoteItem.id ());
 
+				eventLogic.createEvent (
+					transaction,
+					helper.eventCode (
+						EventType.remove),
+					remoteItem.id (),
+					shopifyConnection.getStore (),
+					shopifyConnection);
+
 				numRemoved ++;
 
 			}
@@ -412,6 +398,36 @@ class ShnShopifySynchronisationWrapper <
 					transaction,
 					localItem,
 					remoteItem);
+
+				eventLogic.createEvent (
+					transaction,
+					helper.eventCode (
+						EventType.create),
+					localItem,
+					shopifyConnection.getStore (),
+					shopifyConnection);
+
+				// verify update
+
+				boolean updateMatches =
+					helper.compareItem (
+						transaction,
+						shopifyConnection,
+						localItem,
+						remoteItem);
+
+				if (updateMatches) {
+
+					localItem.setShopifyNeedsSync (
+						false);
+
+				} else {
+
+					numErrors ++;
+
+				}
+
+				// update counter
 
 				numCreated ++;
 
@@ -523,6 +539,36 @@ class ShnShopifySynchronisationWrapper <
 					transaction,
 					localItem,
 					remoteItem);
+
+				eventLogic.createEvent (
+					transaction,
+					helper.eventCode (
+						EventType.update),
+					localItem,
+					shopifyConnection.getStore (),
+					shopifyConnection);
+
+				// verify update
+
+				boolean updateMatches =
+					helper.compareItem (
+						transaction,
+						shopifyConnection,
+						localItem,
+						remoteItem);
+
+				if (updateMatches) {
+
+					localItem.setShopifyNeedsSync (
+						false);
+
+				} else {
+
+					numErrors ++;
+
+				}
+
+				// update counter
 
 				numUpdated ++;
 

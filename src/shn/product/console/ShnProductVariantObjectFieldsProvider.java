@@ -168,7 +168,7 @@ class ShnProductVariantObjectFieldsProvider
 				transaction,
 				columnFields,
 				productVariant,
-				10l);
+				3l);
 
 			return new FormFieldSetPair <ShnProductVariantRec> ()
 

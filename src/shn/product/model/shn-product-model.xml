@@ -153,4 +153,23 @@
 
 	</collections>
 
+	<event-types>
+
+		<event-type
+			name="Shopping Nation product created in Shopify"
+			text="%0 created in %1 via %2"
+			admin="no"/>
+
+		<event-type
+			name="Shopping Nation product updated in Shopify"
+			text="%0 updated in %1 via %2"
+			admin="no"/>
+
+		<event-type
+			name="Shopping Nation product removed in Shopify"
+			text="Shopify product %0 removed in %1 via %2"
+			admin="no"/>
+
+	</event-types>
+
 </model-meta>

@@ -39,6 +39,8 @@ interface ShnShopifySynchronisation <
 	long numUpdated ();
 	long numRemoved ();
 
+	long numErrors ();
+
 	long numOperations ();
 
 }

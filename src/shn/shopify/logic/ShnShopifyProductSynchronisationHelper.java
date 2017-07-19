@@ -2,34 +2,32 @@ package shn.shopify.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.listFirstElement;
 import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
-import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.CollectionUtils.listSecondElement;
+import static wbs.utils.collection.CollectionUtils.listThirdElement;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.collection.IterableUtils.iterableZipRequired;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
-import static wbs.utils.etc.LogicUtils.allOf;
-import static wbs.utils.etc.LogicUtils.booleanEqual;
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
-import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.iterable;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NullUtils.isNull;
-import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.PropertyUtils.propertySetSimple;
-import static wbs.utils.string.StringUtils.joinWithComma;
-import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -38,7 +36,7 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
@@ -46,8 +44,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.currency.logic.CurrencyLogic;
-
-import wbs.utils.function.QuadPredicate;
 
 import shn.core.model.ShnDatabaseRec;
 import shn.product.logic.ShnProductLogic;
@@ -69,7 +65,7 @@ import shn.shopify.apiclient.product.ShopifyProductVariantRequest;
 import shn.shopify.apiclient.product.ShopifyProductVariantResponse;
 import shn.shopify.model.ShnShopifyConnectionRec;
 
-@PrototypeComponent ("shnShopifyProductSynchronisationHelper")
+@SingletonComponent ("shnShopifyProductSynchronisationHelper")
 public
 class ShnShopifyProductSynchronisationHelper
 	implements ShnShopifySynchronisationHelper <
@@ -112,6 +108,36 @@ class ShnShopifyProductSynchronisationHelper
 	public
 	String friendlyNamePlural () {
 		return "products";
+	}
+
+	@Override
+	public
+	String eventCode (
+			@NonNull EventType eventType) {
+
+		switch (eventType) {
+
+		case create:
+
+			return stringFormat (
+				"shopping_nation_product_created_in_shopify");
+
+		case update:
+
+			return stringFormat (
+				"shopping_nation_product_updated_in_shopify");
+
+		case remove:
+
+			return stringFormat (
+				"shopping_nation_product_removed_in_shopify");
+
+		default:
+
+			throw shouldNeverHappen ();
+
+		}
+
 	}
 
 	// public implementation
@@ -265,12 +291,71 @@ class ShnShopifyProductSynchronisationHelper
 
 		) {
 
-			return QuadPredicate.allTrue (
-				productComparisons,
-				transaction,
-				connection,
-				localProduct,
-				remoteProduct);
+			ShopifySynchronisationAttribute.Context <
+				ShnProductRec,
+				ShopifyProductRequest,
+				ShopifyProductResponse
+			> context =
+				new ShopifySynchronisationAttribute.Context <
+					ShnProductRec,
+					ShopifyProductRequest,
+					ShopifyProductResponse
+				> ()
+
+				.transaction (
+					transaction)
+
+				.connection (
+					connection)
+
+				.local (
+					localProduct)
+
+				.remoteResponse (
+					remoteProduct)
+
+			;
+
+			for (
+				ShopifySynchronisationAttribute <
+					ShnProductRec,
+					ShopifyProductRequest,
+					ShopifyProductResponse
+				> attribute
+					: productAttributes
+			) {
+
+				if (! attribute.compare ()) {
+					continue;
+				}
+
+				Optional <Object> localValue =
+					attribute.localGetOperation ().apply (
+						context);
+
+				Optional <Object> remoteValue =
+					attribute.remoteGetOperation ().apply (
+						context);
+
+				boolean equal =
+					attribute.compareOperation ().test (
+						localValue,
+						remoteValue);
+
+				if (! equal) {
+debugFormat (
+	"NOT EQUAL: %s: %s != %s",
+	attribute.friendlyName (),
+	objectToString (
+		localValue),
+	objectToString (
+		remoteValue));
+					return false;
+				}
+
+			}
+
+			return true;
 
 		}
 
@@ -449,14 +534,14 @@ class ShnShopifyProductSynchronisationHelper
 					shopifyVariantRequest
 
 						.price (
-							currencyLogic.toFloat (
+							currencyLogic.formatSimple (
 								shnDatabase.getCurrency (),
 								sum (
 									localVariant.getPromotionalPrice (),
 									localVariant.getPostageAndPackaging ())))
 
 						.compareAtPrice (
-							currencyLogic.toFloat (
+							currencyLogic.formatSimple (
 								shnDatabase.getCurrency (),
 								sum (
 									localVariant.getShoppingNationPrice (),
@@ -469,7 +554,7 @@ class ShnShopifyProductSynchronisationHelper
 					shopifyVariantRequest
 
 						.price (
-							currencyLogic.toFloat (
+							currencyLogic.formatSimple (
 								shnDatabase.getCurrency (),
 								sum (
 									localVariant.getShoppingNationPrice (),
@@ -538,9 +623,6 @@ class ShnShopifyProductSynchronisationHelper
 		) {
 
 			localProduct
-
-				.setShopifyNeedsSync (
-					false)
 
 				.setShopifyId (
 					remoteProduct.id ())
@@ -613,252 +695,300 @@ class ShnShopifyProductSynchronisationHelper
 
 	// data
 
-	List <QuadPredicate <
-		Transaction,
-		ShnShopifyConnectionRec,
+	ShopifySynchronisationAttribute.Factory <
 		ShnProductVariantRec,
+		ShopifyProductVariantRequest,
 		ShopifyProductVariantResponse
-	>>
-		variantComparisons =
-			ImmutableList.<QuadPredicate <
-				Transaction,
-				ShnShopifyConnectionRec,
-				ShnProductVariantRec,
-				ShopifyProductVariantResponse
-			>> of (
+	> variantAttributeFactory =
+		new ShopifySynchronisationAttribute.Factory<> ();
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			integerEqualSafe (
-				localVariant.getShopifyId (),
-				remoteVariant.id ()),
+	List <ShopifySynchronisationAttribute <
+		ShnProductVariantRec,
+		ShopifyProductVariantRequest,
+		ShopifyProductVariantResponse
+	>> variantAttributes =
+		ImmutableList.of (
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				localVariant.getPublicTitle (),
-				remoteVariant.title ()),
+		// general
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				localVariant.getItemNumber (),
-				remoteVariant.sku ()),
+		variantAttributeFactory.remoteIdSimple (
+			Long.class,
+			"shopify id",
+			ShopifyProductVariantResponse::id,
+			ShnProductVariantRec::setShopifyId,
+			ShnProductVariantRec::getShopifyId,
+			ShopifyProductVariantRequest::id),
 
-		// TODO barcode
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"public title",
+			ShnProductVariantRec::getPublicTitle,
+			ShopifyProductVariantRequest::title,
+			ShopifyProductVariantResponse::title),
 
-		// TODO image_id
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"item number",
+			ShnProductVariantRec::getItemNumber,
+			ShopifyProductVariantRequest::sku,
+			ShopifyProductVariantResponse::sku),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"price",
+			localVariant ->
 				currencyLogic.formatSimple (
 					localVariant.getDatabase ().getCurrency (),
 					ifNull (
 						localVariant.getPromotionalPrice (),
 						localVariant.getShoppingNationPrice ())),
-				remoteVariant.price ()),
+			ShopifyProductVariantRequest::price,
+			ShopifyProductVariantResponse::price),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			ifNotNullThenElse (
-				localVariant.getPromotionalPrice (),
-				() -> stringEqualSafe (
-					currencyLogic.formatSimple (
-						localVariant.getDatabase ().getCurrency (),
-						localVariant.getShoppingNationPrice ()),
-					remoteVariant.compareAtPrice ()),
-				() -> isNull (
-					remoteVariant.compareAtPrice ())),
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"compare at price",
+			localVariant ->
+				optionalOrNull (
+					optionalMapRequired (
+						optionalFromNullable (
+							localVariant.getPromotionalPrice ()),
+						promotionalPrice ->
+							currencyLogic.formatText (
+								localVariant.getDatabase ().getCurrency (),
+								localVariant.getShoppingNationPrice ()))),
+			ShopifyProductVariantRequest::compareAtPrice,
+			ShopifyProductVariantResponse::compareAtPrice),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			booleanEqual (
-				true,
-				remoteVariant.taxable ()),
+		variantAttributeFactory.sendSimple (
+			Boolean.class,
+			"taxable",
+			localVariant -> true,
+			ShopifyProductVariantRequest::taxable,
+			ShopifyProductVariantResponse::taxable),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				"shopify",
-				remoteVariant.inventoryManagement ()),
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"inventory management",
+			localVariant -> "shopify",
+			ShopifyProductVariantRequest::inventoryManagement,
+			ShopifyProductVariantResponse::inventoryManagement),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				"deny",
-				remoteVariant.inventoryPolicy ()),
-
-
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				"shopify",
-				remoteVariant.inventoryManagement ()),
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"inventory policy",
+			localVariant -> "deny",
+			ShopifyProductVariantRequest::inventoryPolicy,
+			ShopifyProductVariantResponse::inventoryPolicy),
 
 		// TODO inventory quantity (or not?)
 		// TODO grams, weight, weightUnit (or not?)
 
-		(translations, connecion, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				"manual",
-				remoteVariant.fulfillmentService ()),
+		// delivery
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			booleanEqual (
-				true,
-				remoteVariant.requiresShipping ()),
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"fulfullment service",
+			localVariant -> "manual",
+			ShopifyProductVariantRequest::fulfillmentService,
+			ShopifyProductVariantResponse::fulfillmentService),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				"shopify",
-				remoteVariant.inventoryManagement ()),
+		variantAttributeFactory.sendSimple (
+			Boolean.class,
+			"requires shipping",
+			localVariant -> true,
+			ShopifyProductVariantRequest::requiresShipping,
+			ShopifyProductVariantResponse::requiresShipping),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			stringEqualSafe (
-				joinWithComma (
-					iterableMapToList (
-						productLogic.sortVariantValues (
-							localVariant.getVariantValues ()),
-						ShnProductVariantValueRec::getPublicTitle)),
-				joinWithComma (
-					presentInstances (
-						optionalFromNullable (
-							remoteVariant.option1 ()),
-						optionalFromNullable (
-							remoteVariant.option2 ()),
-						optionalFromNullable (
-							remoteVariant.option3 ())))),
+		// options
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			optionalEqualAndPresentWithClass (
-				Instant.class,
-				optionalFromNullable (
-					localVariant.getShopifyCreatedAt ()),
-				optionalOf (
-					Instant.parse (
-						remoteVariant.createdAt ()))),
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"option 1",
+			localVariant ->
+				optionalOrNull (
+					listFirstElement (
+						iterableMapToList (
+							productLogic.sortVariantValues (
+								localVariant.getVariantValues ()),
+							ShnProductVariantValueRec::getPublicTitle))),
+			ShopifyProductVariantRequest::option1,
+			ShopifyProductVariantResponse::option1),
 
-		(transaction, connection, localVariant, remoteVariant) ->
-			optionalEqualAndPresentWithClass (
-				Instant.class,
-				optionalFromNullable (
-					localVariant.getShopifyUpdatedAt ()),
-				optionalOf (
-					Instant.parse (
-						remoteVariant.updatedAt ())))
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"option 2",
+			localVariant ->
+				optionalOrNull (
+					listSecondElement (
+						iterableMapToList (
+							productLogic.sortVariantValues (
+								localVariant.getVariantValues ()),
+							ShnProductVariantValueRec::getPublicTitle))),
+			ShopifyProductVariantRequest::option2,
+			ShopifyProductVariantResponse::option2),
+
+		variantAttributeFactory.sendSimple (
+			String.class,
+			"option 3",
+			localVariant ->
+				optionalOrNull (
+					listThirdElement (
+						iterableMapToList (
+							productLogic.sortVariantValues (
+								localVariant.getVariantValues ()),
+							ShnProductVariantValueRec::getPublicTitle))),
+			ShopifyProductVariantRequest::option3,
+			ShopifyProductVariantResponse::option3),
+
+		// miscellaneous
+
+		variantAttributeFactory.receiveSimple (
+			Instant.class,
+			"created at",
+			remoteVariant ->
+				Instant.parse (
+					remoteVariant.createdAt ()),
+			ShnProductVariantRec::setShopifyCreatedAt,
+			ShnProductVariantRec::getShopifyCreatedAt),
+
+		variantAttributeFactory.receiveSimple (
+			Instant.class,
+			"updated at",
+			remoteVariant ->
+				Instant.parse (
+					remoteVariant.updatedAt ()),
+			ShnProductVariantRec::setShopifyUpdatedAt,
+			ShnProductVariantRec::getShopifyUpdatedAt)
 
 	);
 
-	List <QuadPredicate <
-		Transaction,
-		ShnShopifyConnectionRec,
+	ShopifySynchronisationAttribute.Factory <
 		ShnProductImageRec,
+		ShopifyProductImageRequest,
 		ShopifyProductImageResponse
-	>>
-		imageComparisons =
-			ImmutableList.of (
+	> imageAttributeFactory =
+		new ShopifySynchronisationAttribute.Factory<> ();
 
-		(transaction, connection, localImage, remoteImage) ->
-			integerEqualSafe (
-				localImage.getShopifyId (),
-				remoteImage.id ()),
+	List <ShopifySynchronisationAttribute <
+		ShnProductImageRec,
+		ShopifyProductImageRequest,
+		ShopifyProductImageResponse
+	>> imageAttributes =
+		ImmutableList.of (
 
-		(transaction, connection, localImage, remoteImage) ->
-			integerEqualSafe (
-				localImage.getIndex (),
-				remoteImage.position () - 1),
+		// general
 
-		(transaction, connection, localImage, remoteImage) ->
-			referenceEqualWithClass (
-				Instant.class,
-				localImage.getShopifyCreatedAt (),
+		imageAttributeFactory.remoteIdSimple (
+			Long.class,
+			"shopify id",
+			ShopifyProductImageResponse::id,
+			ShnProductImageRec::setShopifyId,
+			ShnProductImageRec::getShopifyId,
+			ShopifyProductImageRequest::id),
+
+		// TODO position?
+
+		// TODO attachment
+
+		imageAttributeFactory.receiveSimple (
+			String.class,
+			"src",
+			ShopifyProductImageResponse::src,
+			ShnProductImageRec::setShopifySrc,
+			ShnProductImageRec::getShopifySrc),
+
+		// miscellaneous
+
+		imageAttributeFactory.receiveSimple (
+			Instant.class,
+			"created at",
+			remoteImage ->
 				Instant.parse (
-					remoteImage.createdAt ())),
+					remoteImage.createdAt ()),
+			ShnProductImageRec::setShopifyCreatedAt,
+			ShnProductImageRec::getShopifyCreatedAt),
 
-		(transaction, connection, localImage, remoteImage) ->
-			referenceEqualWithClass (
-				Instant.class,
-				localImage.getShopifyUpdatedAt (),
+		imageAttributeFactory.receiveSimple (
+			Instant.class,
+			"updated at",
+			remoteImage ->
 				Instant.parse (
-					remoteImage.updatedAt ())),
-
-		(transaction, connection, localImage, remoteImage) ->
-			stringEqualSafe (
-				localImage.getShopifySrc (),
-				remoteImage.src ())
+					remoteImage.updatedAt ()),
+			ShnProductImageRec::setShopifyUpdatedAt,
+			ShnProductImageRec::getShopifyUpdatedAt)
 
 	);
 
-	List <QuadPredicate <
-		Transaction,
-		ShnShopifyConnectionRec,
+	ShopifySynchronisationAttribute.Factory <
 		ShnProductRec,
+		ShopifyProductRequest,
 		ShopifyProductResponse
-	>>
-		productComparisons =
-			ImmutableList.of (
+	> productAttributeFactory =
+		new ShopifySynchronisationAttribute.Factory<> ();
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			integerEqualSafe (
-				localProduct.getShopifyId (),
-				remoteProduct.id ()),
+	List <ShopifySynchronisationAttribute <
+		ShnProductRec,
+		ShopifyProductRequest,
+		ShopifyProductResponse
+	>> productAttributes =
+		ImmutableList.of (
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			stringEqualSafe (
-				localProduct.getPublicTitle (),
-				remoteProduct.title ()),
+		// general
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			stringEqualSafe (
-				shopifyLogic.productDescription (
-					transaction,
-					connection,
-						localProduct),
-				remoteProduct.bodyHtml ()),
+		productAttributeFactory.remoteIdSimple (
+			Long.class,
+			"shopify id",
+			ShopifyProductResponse::id,
+			ShnProductRec::setShopifyId,
+			ShnProductRec::getShopifyId,
+			ShopifyProductRequest::id),
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			stringEqualSafe (
+		productAttributeFactory.sendSimple (
+			String.class,
+			"public title",
+			ShnProductRec::getPublicTitle,
+			ShopifyProductRequest::title,
+			ShopifyProductResponse::title),
+
+		productAttributeFactory.send (
+			String.class,
+			"body html",
+			context ->
+				optionalOf (
+					shopifyLogic.productDescription (
+						context.transaction (),
+						context.connection (),
+						context.local ())),
+			(context, value) ->
+				context.remoteRequest ().bodyHtml (
+					(String)
+					optionalGetRequired (
+						value)),
+			context ->
+				optionalFromNullable (
+					context.remoteResponse ().bodyHtml ())),
+
+		productAttributeFactory.sendSimple (
+			String.class,
+			"vendor",
+			localProduct ->
 				localProduct.getSupplier ().getPublicName (),
-				remoteProduct.vendor ()),
+			ShopifyProductRequest::vendor,
+			ShopifyProductResponse::vendor),
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			stringEqualSafe (
+		productAttributeFactory.sendSimple (
+			String.class,
+			"product type",
+			localProduct ->
 				localProduct.getSubCategory ().getPublicTitle (),
-				remoteProduct.productType ()),
+			ShopifyProductRequest::productType,
+			ShopifyProductResponse::productType)
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			integerEqualSafe (
-				collectionSize (
-					localProduct.getVariantsNotDeleted ()),
-				collectionSize (
-					remoteProduct.variants ())),
+		// collections
 
-		(transaction, connection, localProduct, remoteProduct) ->
-			integerEqualSafe (
-				collectionSize (
-					localProduct.getImagesNotDeleted ()),
-				collectionSize (
-					remoteProduct.images ())),
-
-		(transaction, connection, localProduct, remoteProduct) ->
-			allOf (
-				iterableMap (
-					iterableZipRequired (
-						localProduct.getVariantsNotDeleted (),
-						remoteProduct.variants ()),
-					(localVariant, remoteVariant) ->
-						() -> QuadPredicate.allTrue (
-							variantComparisons,
-							transaction,
-							connection,
-							localVariant,
-							remoteVariant))),
-
-		(transaction, connection, localProduct, remoteProduct) ->
-			allOf (
-				iterableMap (
-					iterableZipRequired (
-						localProduct.getImagesNotDeleted (),
-						remoteProduct.images ()),
-					(localImage, remoteImage) ->
-						() -> QuadPredicate.allTrue (
-							imageComparisons,
-							transaction,
-							connection,
-							localImage,
-							remoteImage)))
+		// TODO variants
+		// TODO images
 
 	);
 

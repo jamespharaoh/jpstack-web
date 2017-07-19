@@ -7,6 +7,7 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
 import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
@@ -199,7 +200,10 @@ class DataFromJson {
 					classNameSimple (
 						field.getDeclaringClass ()),
 					field.getName (),
-					"of type %s",
+					"of type %s ",
+					classNameSimple (
+						jsonValue.getClass ()),
+					"to field with type %s",
 					classNameSimple (
 						field.getType ())));
 
@@ -220,6 +224,10 @@ class DataFromJson {
 	Either <Optional <Object>, String> fromJsonSimple (
 			@NonNull Class <?> targetType,
 			@NonNull JsonElement jsonElement) {
+
+		if (jsonElement.isJsonNull ()) {
+			return successResultAbsent ();
+		}
 
 		if (jsonElement.isJsonObject ()) {
 
@@ -259,6 +267,24 @@ class DataFromJson {
 
 				return successResultPresent (
 					jsonPrimitive.getAsInt ());
+
+			} else if (
+				classEqualSafe (
+					Boolean.class,
+					targetType)
+			) {
+
+				return successResultPresent (
+					jsonPrimitive.getAsBoolean ());
+
+			} else if (
+				classEqualSafe (
+					Double.class,
+					targetType)
+			) {
+
+				return successResultPresent (
+					jsonPrimitive.getAsDouble ());
 
 			}
 

@@ -28,11 +28,15 @@ class ShopifyProductVariantRequest {
 
 	@DataAttribute (
 		name = "price")
-	Double price;
+	String price;
 
 	@DataAttribute (
 		name = "compare_at_price")
-	Double compareAtPrice;
+	String compareAtPrice;
+
+	@DataAttribute (
+		name = "taxable")
+	Boolean taxable;
 
 	// inventory
 
@@ -55,6 +59,16 @@ class ShopifyProductVariantRequest {
 	@DataAttribute (
 		name = "inventory_quantity_adjustment")
 	Long inventoryQuantityAdjustment;
+
+	// delivery
+
+	@DataAttribute (
+		name = "fulfillment_service")
+	String fulfillmentService;
+
+	@DataAttribute (
+		name = "requires_shippint")
+	Boolean requiresShipping;
 
 	// options
 

@@ -137,13 +137,15 @@ class ShopifyProductApiClientImplementation
 					taskLogger,
 					new ShopifyProductCreateRequest ()
 
-				.httpCredentials (
-					credentials)
+					.httpCredentials (
+						credentials)
 
-				.product (
-					product)
+					.product (
+						product)
 
-			));
+				)
+
+			);
 
 			return response.product ();
 

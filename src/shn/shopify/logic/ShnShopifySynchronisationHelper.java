@@ -16,8 +16,10 @@ interface ShnShopifySynchronisationHelper <
 > {
 
 	String friendlyNameSingular ();
-
 	String friendlyNamePlural ();
+
+	String eventCode (
+			EventType eventType);
 
 	List <Local> findLocalItems (
 			Transaction parentTransaction);
@@ -55,5 +57,12 @@ interface ShnShopifySynchronisationHelper <
 			Transaction parentTransaction,
 			Local localItem,
 			Remote remoteItem);
+
+	static
+	enum EventType {
+		create,
+		update,
+		remove;
+	}
 
 }
