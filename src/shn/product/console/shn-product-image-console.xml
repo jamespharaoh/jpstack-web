@@ -123,11 +123,9 @@
 
 				<description-field/>
 
-				<image-field
-					name="originalMedia"/>
-
 				<yes-no-field
 					name="active"/>
+
 			</columns>
 
 		</form>
