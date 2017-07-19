@@ -222,7 +222,8 @@
 					name="active"/>
 
 				<image-field
-					name="primaryImage"/>
+					name="primaryImage"
+					field="primaryImage.originalMedia"/>
 
 				<!-- statistics -->
 

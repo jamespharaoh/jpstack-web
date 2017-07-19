@@ -44,6 +44,9 @@ class ConsoleHelperProviderSpec
 	@DataAttribute
 	String idKey;
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		name = "default-list-context")
 	String defaultListContextName;

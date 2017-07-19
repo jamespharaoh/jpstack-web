@@ -39,6 +39,17 @@
 			name="supplierReference"
 			nullable="yes"/>
 
+		<reference-field
+			name="image"
+			type="shnProductImage"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="active"
+			default="no"/>
+
+		<!-- pricing -->
+
 		<integer-field
 			name="recommendedRetailPrice"
 			nullable="yes"/>
@@ -59,13 +70,11 @@
 			name="postageAndPackaging"
 			nullable="yes"/>
 
+		<!-- inventory -->
+
 		<integer-field
 			name="stockQuantity"
 			default="0"/>
-
-		<yes-no-field
-			name="active"
-			default="no"/>
 
 		<!-- statistics -->
 

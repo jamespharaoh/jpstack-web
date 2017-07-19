@@ -383,7 +383,12 @@ class ObjectFormFieldBuilder
 
 				.mini (
 					isNotNull (
-						spec.objectTypeName ()));
+						spec.objectTypeName ()))
+
+				.optionLabel (
+					spec.optionLabel ())
+
+			;
 
 			// update hook
 

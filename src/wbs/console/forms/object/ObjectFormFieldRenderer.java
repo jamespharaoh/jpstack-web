@@ -1,6 +1,7 @@
 package wbs.console.forms.object;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -14,6 +15,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
 import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -45,6 +47,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.object.ObjectHelper;
 
+import wbs.utils.data.ComparablePair;
+import wbs.utils.data.Pair;
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
 
@@ -83,6 +87,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 	@Getter @Setter
 	Boolean mini;
+
+	@Getter @Setter
+	String optionLabel;
 
 	// implementation
 
@@ -236,7 +243,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 			// sort options by path
 
-			Map <String, Record <?>> sortedOptions =
+			Map <Pair <String, Long>, Record <?>> sortedOptions =
 				new TreeMap<> ();
 
 			for (
@@ -244,11 +251,25 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					: filteredOptions
 			) {
 
+				ComparablePair <String, Long> key =
+					ComparablePair.of (
+						ifNotNullThenElse (
+							optionLabel,
+							() -> dynamicCastRequired (
+								String.class,
+								objectManager.dereferenceRequired (
+									transaction,
+									option,
+									optionLabel)),
+							() -> objectManager.objectPathMiniPreload (
+								transaction,
+								option,
+								root)),
+						option.getId ());
+
+
 				sortedOptions.put (
-					objectManager.objectPathMiniPreload (
-						transaction,
-						option,
-						root),
+					key,
 					option);
 
 			}
@@ -293,12 +314,12 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			// value options
 
 			for (
-				Map.Entry <String, Record <?>> optionEntry
+				Map.Entry <Pair <String, Long>, Record <?>> optionEntry
 					: sortedOptions.entrySet ()
 			) {
 
 				String optionLabel =
-					optionEntry.getKey ();
+					optionEntry.getKey ().left ();
 
 				Record <?> optionValue =
 					optionEntry.getValue ();

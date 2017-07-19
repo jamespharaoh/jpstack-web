@@ -55,6 +55,9 @@ class ObjectFormFieldSpec
 		name = "manage-priv")
 	String managePrivCode;
 
+	@DataAttribute
+	String optionLabel;
+
 	@DataAttribute (
 		name = "feature")
 	String featureCode;

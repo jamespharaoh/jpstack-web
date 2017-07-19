@@ -206,7 +206,7 @@ class IterableUtils {
 			Pair <Long, Out> next () {
 
 				Pair <Long, Out> value =
-					new Pair <Long, Out> (
+					Pair.of (
 						index,
 						mapFunction.apply (
 							index,
@@ -828,7 +828,7 @@ class IterableUtils {
 				public
 				Pair <Left, Right> next () {
 
-					return new Pair <Left, Right> (
+					return Pair.of (
 						leftIterator.next (),
 						rightIterator.next ());
 

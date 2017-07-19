@@ -179,6 +179,11 @@
 				<integer-field
 					name="stockQuantity"/>
 
+				<object-field
+					name="image"
+					object-type="shnProductImage"
+					root-field="product"/>
+
 			</columns>
 
 		</form>
@@ -225,6 +230,12 @@
 
 				<text-field
 					name="supplierReference"/>
+
+				<object-field
+					name="image"
+					object-type="shnProductImage"
+					root-field="product"
+					nullable="yes"/>
 
 				<!-- pricing -->
 
@@ -294,6 +305,13 @@
 				<text-field
 					name="supplierReference"
 					nullable="yes"/>
+
+				<object-field
+					name="image"
+					object-type="shnProductImage"
+					root-field="product"
+					nullable="yes"
+					option-label="description"/>
 
 				<!-- pricing -->
 
