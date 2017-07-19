@@ -316,6 +316,29 @@ class CollectionUtils {
 	}
 
 	public static <Type>
+	Optional <Type> listSecondElement (
+			@NonNull List <Type> list) {
+
+		if (list.size () < 2) {
+			return optionalAbsent ();
+		}
+
+		Type value =
+			list.get (1);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return optionalOf (
+			value);
+
+	}
+
+	public static <Type>
 	Type listSecondElementRequired (
 			@NonNull List <Type> list) {
 
@@ -335,6 +358,29 @@ class CollectionUtils {
 
 		return value;
 
+
+	}
+
+	public static <Type>
+	Optional <Type> listThirdElement (
+			@NonNull List <Type> list) {
+
+		if (list.size () < 3) {
+			return optionalAbsent ();
+		}
+
+		Type value =
+			list.get (2);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return optionalOf (
+			value);
 
 	}
 
@@ -361,15 +407,15 @@ class CollectionUtils {
 	}
 
 	public static <Type>
-	Optional <Type> listThirdElement (
+	Optional <Type> listFourthElement (
 			@NonNull List <Type> list) {
 
-		if (list.size () < 3) {
+		if (list.size () < 4) {
 			return optionalAbsent ();
 		}
 
 		Type value =
-			list.get (2);
+			list.get (3);
 
 		if (
 			isNull (
