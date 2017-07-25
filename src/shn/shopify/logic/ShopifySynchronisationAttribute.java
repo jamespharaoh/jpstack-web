@@ -207,6 +207,101 @@ class ShopifySynchronisationAttribute <
 			Local,
 			RemoteRequest,
 			RemoteResponse
+		> sendOnly (
+				@NonNull Class <?> valueClass,
+				@NonNull String friendlyName,
+				@NonNull Function <
+					Context <Local, RemoteRequest, RemoteResponse>,
+					Optional <Object>
+				> localGetOperation,
+				@NonNull BiConsumer <
+					Context <Local, RemoteRequest, RemoteResponse>,
+					Optional <Object>
+				> remoteSetOperation) {
+
+			return new ShopifySynchronisationAttribute <
+				Local,
+				RemoteRequest,
+				RemoteResponse
+			> ()
+
+				.localClass (
+					localClass)
+
+				.remoteRequestClass (
+					remoteRequestClass)
+
+				.remoteResponseClass (
+					remoteResponseClass)
+
+				.valueClass (
+					valueClass)
+
+				.friendlyName (
+					friendlyName)
+
+				.send (
+					true)
+
+				.receive (
+					false)
+
+				.compare (
+					false)
+
+				.localId (
+					false)
+
+				.remoteId (
+					false)
+
+				.localGetOperation (
+					localGetOperation)
+
+				.remoteSetOperation (
+					remoteSetOperation)
+
+			;
+
+		}
+
+		public <Value>
+		ShopifySynchronisationAttribute <
+			Local,
+			RemoteRequest,
+			RemoteResponse
+		> sendOnlySimple (
+				@NonNull Class <Value> valueClass,
+				@NonNull String friendlyName,
+				@NonNull Function <Local, Value> localGetter,
+				@NonNull BiConsumer <RemoteRequest, Value> remoteSetter) {
+
+			return sendOnly (
+				valueClass,
+				friendlyName,
+
+				context ->
+					optionalFromNullable (
+						localGetter.apply (
+							context.local ())),
+
+				(context, value) ->
+					remoteSetter.accept (
+						context.remoteRequest (),
+						optionalOrNull (
+							optionalCast (
+								valueClass,
+								value)))
+
+			);
+
+		}
+
+		public
+		ShopifySynchronisationAttribute <
+			Local,
+			RemoteRequest,
+			RemoteResponse
 		> receive (
 				@NonNull Class <?> valueClass,
 				@NonNull String friendlyName,
@@ -366,7 +461,7 @@ class ShopifySynchronisationAttribute <
 					friendlyName)
 
 				.send (
-					false)
+					true)
 
 				.receive (
 					true)

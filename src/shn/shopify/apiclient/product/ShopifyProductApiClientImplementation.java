@@ -215,13 +215,15 @@ class ShopifyProductApiClientImplementation
 					taskLogger,
 					new ShopifyProductRemoveRequest ()
 
-				.httpCredentials (
-					credentials)
+					.httpCredentials (
+						credentials)
 
-				.id (
-					id)
+					.id (
+						id)
 
-			);
+				)
+
+			;
 
 		}
 

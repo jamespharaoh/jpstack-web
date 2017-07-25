@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 import lombok.Getter;
@@ -162,13 +160,6 @@ class ShopifyHttpSenderHelper
 			dataToJson.toJson (
 				request);
 
-Gson gson =
-	new GsonBuilder ()
-		.setPrettyPrinting ()
-		.create ();
-
-System.out.println ("SEND: " + gson.toJson (jsonValue));
-
 		requestBody =
 			jsonValue.toString ();
 
@@ -185,15 +176,6 @@ System.out.println ("SEND: " + gson.toJson (jsonValue));
 			dataFromJson.fromJson (
 				request.httpResponseClass (),
 				responseBody);
-
-Gson gson =
-	new GsonBuilder ()
-		.setPrettyPrinting ()
-		.create ();
-
-System.out.println ("RECEIVE: " + gson.toJson (gson.fromJson (
-	responseBody,
-	JsonElement.class)));
 
 	}
 

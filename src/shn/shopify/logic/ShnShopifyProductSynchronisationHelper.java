@@ -1,9 +1,8 @@
 package shn.shopify.logic;
 
-import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listFirstElement;
-import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElement;
 import static wbs.utils.collection.CollectionUtils.listThirdElement;
@@ -11,21 +10,17 @@ import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
 import static wbs.utils.etc.Misc.iterable;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
-import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.NullUtils.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.etc.PropertyUtils.propertySetSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -42,8 +37,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.media.logic.MediaLogic;
 
-import shn.core.model.ShnDatabaseRec;
 import shn.product.logic.ShnProductLogic;
 import shn.product.model.ShnProductImageRec;
 import shn.product.model.ShnProductObjectHelper;
@@ -78,6 +73,9 @@ class ShnShopifyProductSynchronisationHelper
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	MediaLogic mediaLogic;
 
 	@SingletonDependency
 	ShnProductObjectHelper productHelper;
@@ -274,7 +272,7 @@ class ShnShopifyProductSynchronisationHelper
 
 	@Override
 	public
-	boolean compareItem (
+	List <String> compareItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnShopifyConnectionRec connection,
 			@NonNull ShnProductRec localProduct,
@@ -289,64 +287,40 @@ class ShnShopifyProductSynchronisationHelper
 
 		) {
 
-			ShopifySynchronisationAttribute.Context <
-				ShnProductRec,
-				ShopifyProductRequest,
-				ShopifyProductResponse
-			> context =
-				new ShopifySynchronisationAttribute.Context <
-					ShnProductRec,
-					ShopifyProductRequest,
-					ShopifyProductResponse
-				> ()
+			return ImmutableList.<String> builder ()
 
-				.transaction (
-					transaction)
+				.addAll (
+					shopifyLogic.compareAttributes (
+						transaction,
+						connection,
+						productAttributes,
+						localProduct,
+						remoteProduct))
 
-				.connection (
-					connection)
+				.addAll (
+					shopifyLogic.compareCollection (
+						transaction,
+						connection,
+						variantAttributes,
+						ImmutableList.copyOf (
+							localProduct.getVariants ()),
+						remoteProduct.variants (),
+						"variant",
+						"variants"))
 
-				.local (
-					localProduct)
+				.addAll (
+					shopifyLogic.compareCollection (
+						transaction,
+						connection,
+						imageAttributes,
+						localProduct.getImages (),
+						remoteProduct.images (),
+						"image",
+						"images"))
 
-				.remoteResponse (
-					remoteProduct)
+				.build ()
 
 			;
-
-			for (
-				ShopifySynchronisationAttribute <
-					ShnProductRec,
-					ShopifyProductRequest,
-					ShopifyProductResponse
-				> attribute
-					: productAttributes
-			) {
-
-				if (! attribute.compare ()) {
-					continue;
-				}
-
-				Optional <Object> localValue =
-					attribute.localGetOperation ().apply (
-						context);
-
-				Optional <Object> remoteValue =
-					attribute.remoteGetOperation ().apply (
-						context);
-
-				boolean equal =
-					attribute.compareOperation ().test (
-						localValue,
-						remoteValue);
-
-				if (! equal) {
-					return false;
-				}
-
-			}
-
-			return true;
 
 		}
 
@@ -369,229 +343,35 @@ class ShnShopifyProductSynchronisationHelper
 
 		) {
 
-			ShnDatabaseRec shnDatabase =
-				localProduct.getDatabase ();
+			return shopifyLogic.createRequest (
+				transaction,
+				connection,
+				productAttributes,
+				localProduct,
+				ShopifyProductRequest.class)
 
-			ShopifyProductRequest shopifyProductRequest =
-				new ShopifyProductRequest ()
-
-				.id (
-					localProduct.getShopifyId ())
-
-				.title (
-					localProduct.getPublicTitle ())
-
-				.bodyHtml (
-					shopifyLogic.productDescription (
+				.images (
+					shopifyLogic.createRequestCollection (
 						transaction,
 						connection,
+						imageAttributes,
+						localProduct.getImagesNotDeleted (),
+						ShopifyProductImageRequest.class))
+
+				.variants (
+					shopifyLogic.createRequestCollection (
+						transaction,
+						connection,
+						variantAttributes,
+						localProduct.getVariantsNotDeleted (),
+						ShopifyProductVariantRequest.class))
+
+				.options (
+					productRequestOptions (
+						transaction,
 						localProduct))
 
-				.vendor (
-					localProduct.getSupplier ().getPublicName ())
-
-				.productType (
-					localProduct.getSubCategory ().getPublicTitle ())
-
 			;
-
-			// add options
-
-			List <ShnProductVariantTypeRec> localVariantTypes =
-				ImmutableList.copyOf (
-					iterable (
-						localProduct.getVariants ().stream ()
-
-				.flatMap (
-					localProductVariant ->
-						localProductVariant.getVariantValues ().stream ())
-
-				.map (
-					localVariantValue ->
-						localVariantValue.getType ())
-
-				.distinct ()
-
-				.sorted (
-					Ordering.natural ().onResultOf (
-						ShnProductVariantTypeRec::getCode))
-
-				.iterator ()
-
-			));
-
-			if (
-				collectionIsNotEmpty (
-					localVariantTypes)
-			) {
-
-				ImmutableList.Builder <ShopifyProductOptionRequest>
-					shopifyOptionsBuilder =
-						ImmutableList.builder ();
-
-				for (
-					ShnProductVariantTypeRec localVariantType
-						: localVariantTypes
-				) {
-
-					shopifyOptionsBuilder.add (
-						new ShopifyProductOptionRequest ()
-
-						.name (
-							localVariantType.getPublicTitle ())
-
-					);
-
-				}
-
-				shopifyProductRequest.options (
-					shopifyOptionsBuilder.build ());
-
-			}
-
-			// add images
-
-			ImmutableList.Builder <ShopifyProductImageRequest>
-				shopifyImagesBuilder =
-					ImmutableList.builder ();
-
-			for (
-				ShnProductImageRec localImage
-					: localProduct.getImages ()
-			) {
-
-				ShopifyProductImageRequest shopifyImageRequest =
-					new ShopifyProductImageRequest ()
-
-					.id (
-						localImage.getShopifyId ())
-
-					.attachment (
-						bytesToBase64 (
-							localImage
-								.getOriginalMedia ()
-								.getContent ()
-								.getData ()))
-
-				;
-
-				shopifyImagesBuilder.add (
-					shopifyImageRequest);
-
-			}
-
-			shopifyProductRequest.images (
-				shopifyImagesBuilder.build ());
-
-			// add variants
-
-			ImmutableList.Builder <ShopifyProductVariantRequest>
-				shopifyVariantsBuilder =
-					ImmutableList.builder ();
-
-			for (
-				ShnProductVariantRec localVariant
-					: localProduct.getVariants ()
-			) {
-
-				ShopifyProductVariantRequest shopifyVariantRequest =
-					new ShopifyProductVariantRequest ()
-
-					.id (
-						localVariant.getShopifyId ())
-
-					.sku (
-						localVariant.getItemNumber ())
-
-					.title (
-						localVariant.getPublicTitle ())
-
-					.inventoryManagement (
-						"shopify")
-
-					.inventoryPolicy (
-						"deny")
-
-					.inventoryQuantity (
-						localVariant.getStockQuantity ())
-
-				;
-
-				if (
-					isNotNull (
-						localVariant.getPromotionalPrice ())
-				) {
-
-					shopifyVariantRequest
-
-						.price (
-							currencyLogic.formatSimple (
-								shnDatabase.getCurrency (),
-								sum (
-									localVariant.getPromotionalPrice (),
-									localVariant.getPostageAndPackaging ())))
-
-						.compareAtPrice (
-							currencyLogic.formatSimple (
-								shnDatabase.getCurrency (),
-								sum (
-									localVariant.getShoppingNationPrice (),
-									localVariant.getPostageAndPackaging ())))
-
-					;
-
-				} else {
-
-					shopifyVariantRequest
-
-						.price (
-							currencyLogic.formatSimple (
-								shnDatabase.getCurrency (),
-								sum (
-									localVariant.getShoppingNationPrice (),
-									localVariant.getPostageAndPackaging ())))
-
-						.compareAtPrice (
-							null)
-
-					;
-
-				}
-
-				for (
-					ShnProductVariantValueRec localVariantValue
-						: productLogic.sortVariantValues (
-							localVariant.getVariantValues ())
-				) {
-
-					long optionIndex =
-						listIndexOfRequired (
-							localVariantTypes,
-							localVariantValue.getType ());
-
-					propertySetSimple (
-						shopifyVariantRequest,
-						stringFormat (
-							"option%s",
-							integerToDecimalString (
-								optionIndex + 1)),
-						String.class,
-						optionalOf (
-							localVariantValue.getPublicTitle ()));
-
-				}
-
-				shopifyVariantsBuilder.add (
-					shopifyVariantRequest);
-
-			}
-
-			shopifyProductRequest.variants (
-				shopifyVariantsBuilder.build ());
-
-			// return
-
-			return shopifyProductRequest;
 
 		}
 
@@ -643,8 +423,19 @@ class ShnShopifyProductSynchronisationHelper
 
 				localImage
 
+					.setShopifySrc (
+						remoteImage.src ())
+
 					.setShopifyId (
 						remoteImage.id ())
+
+					.setShopifyCreatedAt (
+						Instant.parse (
+							remoteImage.createdAt ()))
+
+					.setShopifyUpdatedAt (
+						Instant.parse (
+							remoteImage.updatedAt ()))
 
 				;
 
@@ -676,9 +467,90 @@ class ShnShopifyProductSynchronisationHelper
 					.setShopifyId (
 						remoteVariant.id ())
 
+					.setShopifyCreatedAt (
+						Instant.parse (
+							remoteVariant.createdAt ()))
+
+					.setShopifyUpdatedAt (
+						Instant.parse (
+							remoteVariant.updatedAt ()))
+
 				;
 
 			}
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	List <ShopifyProductOptionRequest> productRequestOptions (
+			@NonNull Transaction parentTransaction,
+			@NonNull ShnProductRec localProduct) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"productRequestOptions");
+
+		) {
+
+			// add options
+
+			List <ShnProductVariantTypeRec> localVariantTypes =
+				ImmutableList.copyOf (
+					iterable (
+						localProduct.getVariants ().stream ()
+
+				.flatMap (
+					localProductVariant ->
+						localProductVariant.getVariantValues ().stream ())
+
+				.map (
+					localVariantValue ->
+						localVariantValue.getType ())
+
+				.distinct ()
+
+				.sorted (
+					Ordering.natural ().onResultOf (
+						ShnProductVariantTypeRec::getCode))
+
+				.iterator ()
+
+			));
+
+			if (
+				collectionIsEmpty (
+					localVariantTypes)
+			) {
+				return null;
+			}
+
+			ImmutableList.Builder <ShopifyProductOptionRequest>
+				shopifyOptionsBuilder =
+					ImmutableList.builder ();
+
+			for (
+				ShnProductVariantTypeRec localVariantType
+					: localVariantTypes
+			) {
+
+				shopifyOptionsBuilder.add (
+					new ShopifyProductOptionRequest ()
+
+					.name (
+						localVariantType.getPublicTitle ())
+
+				);
+
+			}
+
+			return shopifyOptionsBuilder.build ();
 
 		}
 
@@ -712,13 +584,6 @@ class ShnShopifyProductSynchronisationHelper
 
 		variantAttributeFactory.sendSimple (
 			String.class,
-			"public title",
-			ShnProductVariantRec::getPublicTitle,
-			ShopifyProductVariantRequest::title,
-			ShopifyProductVariantResponse::title),
-
-		variantAttributeFactory.sendSimple (
-			String.class,
 			"item number",
 			ShnProductVariantRec::getItemNumber,
 			ShopifyProductVariantRequest::sku,
@@ -745,7 +610,7 @@ class ShnShopifyProductSynchronisationHelper
 						optionalFromNullable (
 							localVariant.getPromotionalPrice ()),
 						promotionalPrice ->
-							currencyLogic.formatText (
+							currencyLogic.formatSimple (
 								localVariant.getDatabase ().getCurrency (),
 								localVariant.getShoppingNationPrice ()))),
 			ShopifyProductVariantRequest::compareAtPrice,
@@ -797,12 +662,13 @@ class ShnShopifyProductSynchronisationHelper
 			String.class,
 			"option 1",
 			localVariant ->
-				optionalOrNull (
+				optionalOr (
 					listFirstElement (
 						iterableMapToList (
 							productLogic.sortVariantValues (
 								localVariant.getVariantValues ()),
-							ShnProductVariantValueRec::getPublicTitle))),
+							ShnProductVariantValueRec::getPublicTitle)),
+				"Default Title"),
 			ShopifyProductVariantRequest::option1,
 			ShopifyProductVariantResponse::option1),
 
@@ -879,6 +745,23 @@ class ShnShopifyProductSynchronisationHelper
 			ShopifyProductImageRequest::id),
 
 		// TODO position?
+
+		imageAttributeFactory.sendOnly (
+			byte[].class,
+			"attachment",
+			context ->
+				optionalOf (
+					context.
+						local ()
+						.getOriginalMedia ()
+						.getContent ()
+						.getData ()),
+			(context, value) ->
+				context.remoteRequest ().attachment (
+					bytesToBase64 (
+						(byte[])
+						optionalGetRequired (
+							value)))),
 
 		// TODO attachment
 
@@ -975,11 +858,6 @@ class ShnShopifyProductSynchronisationHelper
 				localProduct.getSubCategory ().getPublicTitle (),
 			ShopifyProductRequest::productType,
 			ShopifyProductResponse::productType)
-
-		// collections
-
-		// TODO variants
-		// TODO images
 
 	);
 

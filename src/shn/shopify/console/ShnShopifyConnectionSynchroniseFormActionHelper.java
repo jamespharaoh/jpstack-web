@@ -225,6 +225,30 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			if (
 				moreThanZero (
+					productionSynchronisation.numRemoved ())
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s products removed",
+					integerToDecimalString (
+						productionSynchronisation.numRemoved ()));
+
+			}
+
+			if (
+				moreThanZero (
+					productionSynchronisation.numNotRemoved ())
+			) {
+
+				requestContext.addWarningFormat (
+					"%s products not removed",
+					integerToDecimalString (
+						productionSynchronisation.numNotRemoved ()));
+
+			}
+
+			if (
+				moreThanZero (
 					productionSynchronisation.numCreated ())
 			) {
 
@@ -232,6 +256,18 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 					"%s products created",
 					integerToDecimalString (
 						productionSynchronisation.numCreated ()));
+
+			}
+
+			if (
+				moreThanZero (
+					productionSynchronisation.numNotCreated ())
+			) {
+
+				requestContext.addWarningFormat (
+					"%s products not created",
+					integerToDecimalString (
+						productionSynchronisation.numNotCreated ()));
 
 			}
 
@@ -249,13 +285,13 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			if (
 				moreThanZero (
-					productionSynchronisation.numRemoved ())
+					productionSynchronisation.numNotUpdated ())
 			) {
 
-				requestContext.addNoticeFormat (
-					"%s products removed",
+				requestContext.addWarningFormat (
+					"%s products not updated",
 					integerToDecimalString (
-						productionSynchronisation.numRemoved ()));
+						productionSynchronisation.numNotUpdated ()));
 
 			}
 

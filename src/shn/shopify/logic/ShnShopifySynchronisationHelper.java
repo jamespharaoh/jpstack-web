@@ -47,7 +47,7 @@ interface ShnShopifySynchronisationHelper <
 			Local localItem,
 			Remote remoteItem);
 
-	boolean compareItem (
+	List <String> compareItem (
 			Transaction parentTransaction,
 			ShnShopifyConnectionRec connection,
 			Local localItem,

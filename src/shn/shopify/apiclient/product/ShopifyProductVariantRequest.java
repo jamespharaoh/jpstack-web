@@ -20,10 +20,6 @@ class ShopifyProductVariantRequest {
 		name = "sku")
 	String sku;
 
-	@DataAttribute (
-		name = "title")
-	String title;
-
 	// pricing
 
 	@DataAttribute (
@@ -67,7 +63,7 @@ class ShopifyProductVariantRequest {
 	String fulfillmentService;
 
 	@DataAttribute (
-		name = "requires_shippint")
+		name = "requires_shipping")
 	Boolean requiresShipping;
 
 	// options

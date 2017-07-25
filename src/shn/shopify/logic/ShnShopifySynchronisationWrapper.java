@@ -1,5 +1,6 @@
 package shn.shopify.logic;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
@@ -102,10 +103,19 @@ class ShnShopifySynchronisationWrapper <
 	long numCreated = 0l;
 
 	@Getter
+	long numNotCreated = 0l;
+
+	@Getter
 	long numUpdated = 0l;
 
 	@Getter
+	long numNotUpdated = 0l;
+
+	@Getter
 	long numRemoved = 0l;
+
+	@Getter
+	long numNotRemoved = 0l;
 
 	@Getter
 	long numOperations = 0;
@@ -296,7 +306,11 @@ class ShnShopifySynchronisationWrapper <
 				numOperations ++;
 
 				if (numOperations > maxOperations) {
+
+					numNotRemoved ++;
+
 					continue;
+
 				}
 
 				transaction.noticeFormat (
@@ -374,7 +388,11 @@ class ShnShopifySynchronisationWrapper <
 				numOperations ++;
 
 				if (numOperations > maxOperations) {
+
+					numNotCreated ++;
+
 					continue;
+
 				}
 
 				// create item
@@ -409,19 +427,28 @@ class ShnShopifySynchronisationWrapper <
 
 				// verify update
 
-				boolean updateMatches =
+				List <String> mismatches =
 					helper.compareItem (
 						transaction,
 						shopifyConnection,
 						localItem,
 						remoteItem);
 
-				if (updateMatches) {
+				if (
+					collectionIsEmpty (
+						mismatches)
+				) {
 
 					localItem.setShopifyNeedsSync (
 						false);
 
 				} else {
+
+					mismatches.forEach (
+						mismatch ->
+							transaction.errorFormat (
+								"Created item mismatch: %s",
+								mismatch));
 
 					numErrors ++;
 
@@ -501,11 +528,12 @@ class ShnShopifySynchronisationWrapper <
 
 					! localItem.getShopifyNeedsSync ()
 
-					&& helper.compareItem (
-						transaction,
-						shopifyConnection,
-						localItem,
-						remoteItem)
+					&& collectionIsEmpty (
+						helper.compareItem (
+							transaction,
+							shopifyConnection,
+							localItem,
+							remoteItem))
 
 				) {
 					continue;
@@ -514,7 +542,11 @@ class ShnShopifySynchronisationWrapper <
 				numOperations ++;
 
 				if (numOperations > maxOperations) {
+
+					numNotUpdated ++;
+
 					continue;
+
 				}
 
 				// perform update
@@ -550,19 +582,28 @@ class ShnShopifySynchronisationWrapper <
 
 				// verify update
 
-				boolean updateMatches =
+				List <String> mismatches =
 					helper.compareItem (
 						transaction,
 						shopifyConnection,
 						localItem,
 						remoteItem);
 
-				if (updateMatches) {
+				if (
+					collectionIsEmpty (
+						mismatches)
+				) {
 
 					localItem.setShopifyNeedsSync (
 						false);
 
 				} else {
+
+					mismatches.forEach (
+						mismatch ->
+							transaction.errorFormat (
+								"Updated item mismatch: %s",
+								mismatch));
 
 					numErrors ++;
 
