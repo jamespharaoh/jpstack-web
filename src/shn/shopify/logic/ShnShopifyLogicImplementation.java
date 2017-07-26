@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
@@ -100,13 +101,19 @@ class ShnShopifyLogicImplementation
 
 				.put (
 					"description",
-					htmlEncodeNewlineToBr (
-						product.getPublicDescription ().getText ()))
+					ifNotNullThenElse (
+						product.getPublicDescription (),
+						() -> htmlEncodeNewlineToBr (
+							product.getPublicDescription ().getText ()),
+						() -> ""))
 
 				.put (
 					"contents",
-					htmlEncodeNewlineToBr (
-						product.getPublicContents ().getText ()))
+					ifNotNullThenElse (
+						product.getPublicContents (),
+						() -> htmlEncodeNewlineToBr (
+							product.getPublicContents ().getText ()),
+						() -> ""))
 
 				.build ()
 
