@@ -1,7 +1,6 @@
 package shn.shopify.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
@@ -9,6 +8,7 @@ import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.Misc.minus;
 import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -329,7 +329,15 @@ class ShnShopifySynchronisationWrapper <
 
 				.collect (
 					Collectors.toList ())
+
 			;
+
+			numNotRemoved +=
+				minus (
+					collectionSize (
+						remoteItems),
+					collectionSize (
+						selectedRemoteItems));
 
 			selectedRemoteItems.parallelStream ()
 

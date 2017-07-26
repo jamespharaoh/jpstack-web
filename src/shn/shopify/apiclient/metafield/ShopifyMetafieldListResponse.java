@@ -1,4 +1,4 @@
-package shn.shopify.apiclient.collect;
+package shn.shopify.apiclient.metafield;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 
@@ -11,19 +11,13 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 import shn.shopify.apiclient.ShopifyApiResponse;
-import shn.shopify.apiclient.metafield.ShopifyMetafieldResponse;
 
 @Accessors (fluent = true)
 @Data
 @DataClass
 public
-class ShopifyCollectListResponse
+class ShopifyMetafieldListResponse
 	implements ShopifyApiResponse {
-
-	@DataChildren (
-		childrenElement = "collects")
-	List <ShopifyCollectResponse> collects =
-		emptyList ();
 
 	@DataChildren (
 		childrenElement = "metafields")

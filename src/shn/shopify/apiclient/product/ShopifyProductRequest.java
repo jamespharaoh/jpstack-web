@@ -10,6 +10,7 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 import shn.shopify.apiclient.ShopifyApiRequestItem;
+import shn.shopify.apiclient.metafield.ShopifyMetafieldRequest;
 
 @Accessors (fluent = true)
 @Data
@@ -49,5 +50,9 @@ class ShopifyProductRequest
 	@DataChildren (
 		childrenElement = "variants")
 	List <ShopifyProductVariantRequest> variants;
+
+	@DataChildren (
+		childrenElement = "metafields")
+	List <ShopifyMetafieldRequest> metafields;
 
 }

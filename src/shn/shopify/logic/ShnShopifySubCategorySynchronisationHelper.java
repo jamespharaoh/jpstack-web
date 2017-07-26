@@ -1,9 +1,15 @@
 package shn.shopify.logic;
 
+import static wbs.utils.collection.MapUtils.mapFilterByKeyToList;
+import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -18,13 +24,17 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
+import wbs.utils.data.Pair;
+
 import shn.product.model.ShnProductSubCategoryObjectHelper;
 import shn.product.model.ShnProductSubCategoryRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionApiClient;
-import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionListResponse;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionRequest;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionResponse;
+import shn.shopify.apiclient.metafield.ShopifyMetafieldApiClient;
+import shn.shopify.apiclient.metafield.ShopifyMetafieldRequest;
+import shn.shopify.apiclient.metafield.ShopifyMetafieldResponse;
 import shn.shopify.model.ShnShopifyConnectionRec;
 
 @SingletonComponent ("shnShopifySubCategorySynchronisationHelper")
@@ -42,6 +52,9 @@ class ShnShopifySubCategorySynchronisationHelper
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ShopifyMetafieldApiClient metafieldApiClient;
 
 	@SingletonDependency
 	ShnProductSubCategoryObjectHelper subCategoryHelper;
@@ -160,12 +173,58 @@ class ShnShopifySubCategorySynchronisationHelper
 
 		) {
 
-			ShopifyCustomCollectionListResponse shopifyCollectionListResponse =
+			List <ShopifyCustomCollectionResponse> customCollections =
 				collectionApiClient.listAll (
 					transaction,
 					credentials);
 
-			return shopifyCollectionListResponse.collections ();
+			Map <Pair <Long, String>, ShopifyMetafieldResponse> metafields =
+				mapWithDerivedKey (
+					metafieldApiClient.listByNamespaceAndOwnerResource (
+						transaction,
+						credentials,
+						"shn-backend",
+						"custom_collection"
+					),
+					metafield ->
+						Pair.of (
+							metafield.ownerId (),
+							metafield.key ()));
+
+metafields.values ().forEach (
+	metafield ->
+		debugFormat (
+			"METAFIELD %s",
+			integerToDecimalString (
+				metafield.id ())));
+
+			customCollections.forEach (
+				customColection ->
+					customColection.metafields (
+						mapFilterByKeyToList (
+							metafields,
+							(id, key) ->
+								integerEqualSafe (
+									id,
+									customColection.id ()))));
+
+customCollections.forEach (
+	customCollection -> {
+
+	debugFormat (
+		"CUSTOM COLLECTION %s",
+		customCollection.title ());
+
+	customCollection.metafields ().forEach (
+		metafield ->
+			debugFormat (
+				"  %s = %s",
+				metafield.key (),
+				metafield.value ()));
+
+});
+
+			return customCollections;
 
 		}
 
@@ -313,7 +372,24 @@ class ShnShopifySubCategorySynchronisationHelper
 				connection,
 				subCategoryAttributes,
 				localSubCategory,
-				ShopifyCustomCollectionRequest.class);
+				ShopifyCustomCollectionRequest.class)
+
+				.metafields (
+					ImmutableList.of (
+
+					ShopifyMetafieldRequest.of (
+						"shn-backend",
+						"type",
+						"sub-category"),
+
+					ShopifyMetafieldRequest.of (
+						"shn-backend",
+						"local-id",
+						localSubCategory.getId ())
+
+				))
+
+			;
 
 		}
 

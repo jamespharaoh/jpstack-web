@@ -1,6 +1,7 @@
 package wbs.framework.apiclient;
 
 import static wbs.utils.collection.ArrayUtils.arrayStream;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doNothing;
@@ -301,12 +302,21 @@ class GenericHttpSender <Request, Response> {
 			case delete:
 			case get:
 
+debugFormat (
+	"SEND %s",
+	urlWithParams);
+
 				doNothing ();
 
 				break;
 
 			case post:
 			case put:
+
+debugFormat (
+	"SEND %s: %s",
+	urlWithParams,
+	helper.requestBody ());
 
 				byte[] requestData =
 					stringToUtf8 (
@@ -466,6 +476,10 @@ class GenericHttpSender <Request, Response> {
 					ioException);
 
 			}
+
+debugFormat (
+	"RECEIVE: %s",
+	responseBody);
 
 			// store raw response
 

@@ -47,6 +47,7 @@ import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantTypeRec;
 import shn.product.model.ShnProductVariantValueRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.metafield.ShopifyMetafieldRequest;
 import shn.shopify.apiclient.product.ShopifyProductApiClient;
 import shn.shopify.apiclient.product.ShopifyProductImageRequest;
 import shn.shopify.apiclient.product.ShopifyProductImageResponse;
@@ -399,6 +400,21 @@ class ShnShopifyProductSynchronisationHelper
 					productRequestOptions (
 						transaction,
 						localProduct))
+
+				.metafields (
+					ImmutableList.of (
+
+					ShopifyMetafieldRequest.of (
+						"shn-backend",
+						"type",
+						"product"),
+
+					ShopifyMetafieldRequest.of (
+						"shn-backend",
+						"local-id",
+						localProduct.getId ())
+
+				))
 
 			;
 

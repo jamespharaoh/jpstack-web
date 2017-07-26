@@ -1,7 +1,6 @@
 package shn.shopify.logic;
 
 import static wbs.utils.etc.Misc.shouldNeverHappen;
-import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package shn.shopify.apiclient.customcollection;
+package shn.shopify.apiclient.metafield;
 
 import java.util.List;
 
@@ -7,21 +7,27 @@ import wbs.framework.logging.TaskLogger;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
 
 public
-interface ShopifyCustomCollectionApiClient {
+interface ShopifyMetafieldApiClient {
 
-	List <ShopifyCustomCollectionResponse> listAll (
+	List <ShopifyMetafieldResponse> listAll (
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials);
 
-	ShopifyCustomCollectionResponse create (
+	List <ShopifyMetafieldResponse> listByNamespaceAndOwnerResource (
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials,
-			ShopifyCustomCollectionRequest request);
+			String namespace,
+			String ownerResource);
 
-	ShopifyCustomCollectionResponse update (
+	ShopifyMetafieldResponse create (
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials,
-			ShopifyCustomCollectionRequest request);
+			ShopifyMetafieldRequest request);
+
+	ShopifyMetafieldResponse update (
+			TaskLogger parentTaskLogger,
+			ShopifyApiClientCredentials credentials,
+			ShopifyMetafieldRequest request);
 
 	void remove (
 			TaskLogger parentTaskLogger,

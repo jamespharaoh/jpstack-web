@@ -1,7 +1,9 @@
-package shn.shopify.apiclient.customcollection;
+package shn.shopify.apiclient.metafield;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.List;
@@ -24,10 +26,10 @@ import shn.shopify.apiclient.ShopifyApiClientCredentials;
 import shn.shopify.apiclient.ShopifyApiRequest;
 import shn.shopify.apiclient.ShopifyApiResponse;
 
-@SingletonComponent ("shopifyCustomCollectionApiClient")
+@SingletonComponent ("shopifyMetafieldApiClient")
 public
-class ShopifyCustomCollectionApiClientImplementation
-	implements ShopifyCustomCollectionApiClient {
+class ShopifyMetafieldApiClientImplementation
+	implements ShopifyMetafieldApiClient {
 
 	// singleton dependencies
 
@@ -47,7 +49,7 @@ class ShopifyCustomCollectionApiClientImplementation
 
 	@Override
 	public
-	List <ShopifyCustomCollectionResponse> listAll (
+	List <ShopifyMetafieldResponse> listAll (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ShopifyApiClientCredentials credentials) {
 
@@ -60,7 +62,7 @@ class ShopifyCustomCollectionApiClientImplementation
 
 		) {
 
-			ImmutableList.Builder <ShopifyCustomCollectionResponse> builder =
+			ImmutableList.Builder <ShopifyMetafieldResponse> builder =
 				ImmutableList.builder ();
 
 			for (
@@ -69,14 +71,14 @@ class ShopifyCustomCollectionApiClientImplementation
 				page ++
 			) {
 
-				ShopifyCustomCollectionListResponse response =
+				ShopifyMetafieldListResponse response =
 					genericCastUnchecked (
 						shopifyHttpSenderProvider.provide (
 							taskLogger)
 
 					.allInOne (
 						taskLogger,
-						new ShopifyCustomCollectionListRequest ()
+						new ShopifyMetafieldListRequest ()
 
 						.httpCredentials (
 							credentials)
@@ -92,12 +94,12 @@ class ShopifyCustomCollectionApiClientImplementation
 				);
 
 				builder.addAll (
-					response.collections ());
+					response.metafields ());
 
 				if (
 					lessThan (
 						collectionSize (
-							response.collections ()),
+							response.metafields ()),
 						250l)
 				) {
 					break;
@@ -113,10 +115,90 @@ class ShopifyCustomCollectionApiClientImplementation
 
 	@Override
 	public
-	ShopifyCustomCollectionResponse create (
+	List <ShopifyMetafieldResponse> listByNamespaceAndOwnerResource (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShopifyCustomCollectionRequest collection) {
+			@NonNull String namespace,
+			@NonNull String ownerResource) {
+
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"listAll");
+
+		) {
+
+			ImmutableList.Builder <ShopifyMetafieldResponse> builder =
+				ImmutableList.builder ();
+
+			for (
+				long page = 0l;
+				true;
+				page ++
+			) {
+
+				ShopifyMetafieldListResponse response =
+					genericCastUnchecked (
+						shopifyHttpSenderProvider.provide (
+							taskLogger)
+
+					.allInOne (
+						taskLogger,
+						new ShopifyMetafieldListRequest ()
+
+						.httpCredentials (
+							credentials)
+
+						.limit (
+							250l)
+
+						.page (
+							page)
+
+						.namespace (
+							namespace)
+
+						.metafieldOwnerResource (
+							ownerResource)
+
+					)
+
+				);
+
+debugFormat (
+	"GOT %s METAFIELDS",
+	integerToDecimalString (
+		collectionSize (
+			response.metafields ())));
+
+				builder.addAll (
+					response.metafields ());
+
+				if (
+					lessThan (
+						collectionSize (
+							response.metafields ()),
+						250l)
+				) {
+					break;
+				}
+
+			}
+
+			return builder.build ();
+
+		}
+
+	}
+
+	@Override
+	public
+	ShopifyMetafieldResponse create (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ShopifyApiClientCredentials credentials,
+			@NonNull ShopifyMetafieldRequest request) {
 
 		try (
 
@@ -127,26 +209,26 @@ class ShopifyCustomCollectionApiClientImplementation
 
 		) {
 
-			ShopifyCustomCollectionCreateResponse response =
+			ShopifyMetafieldCreateResponse response =
 				genericCastUnchecked (
 					shopifyHttpSenderProvider.provide (
 						taskLogger)
 
 				.allInOne (
 					taskLogger,
-					new ShopifyCustomCollectionCreateRequest ()
+					new ShopifyMetafieldCreateRequest ()
 
 					.httpCredentials (
 						credentials)
 
-					.collection (
-						collection)
+					.metafield (
+						request)
 
 				)
 
 			);
 
-			return response.collection ();
+			return response.metafield ();
 
 		}
 
@@ -154,10 +236,10 @@ class ShopifyCustomCollectionApiClientImplementation
 
 	@Override
 	public
-	ShopifyCustomCollectionResponse update (
+	ShopifyMetafieldResponse update (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShopifyCustomCollectionRequest collection) {
+			@NonNull ShopifyMetafieldRequest metafield) {
 
 		try (
 
@@ -168,26 +250,26 @@ class ShopifyCustomCollectionApiClientImplementation
 
 		) {
 
-			ShopifyCustomCollectionUpdateResponse response =
+			ShopifyMetafieldUpdateResponse response =
 				genericCastUnchecked (
 					shopifyHttpSenderProvider.provide (
 						taskLogger)
 
 				.allInOne (
 					taskLogger,
-					new ShopifyCustomCollectionUpdateRequest ()
+					new ShopifyMetafieldUpdateRequest ()
 
 					.httpCredentials (
 						credentials)
 
-					.customCollection (
-						collection)
+					.metafield (
+						metafield)
 
 				)
 
 			);
 
-			return response.customCollection ();
+			return response.metafield ();
 
 		}
 
@@ -214,7 +296,7 @@ class ShopifyCustomCollectionApiClientImplementation
 
 				.allInOne (
 					taskLogger,
-					new ShopifyCustomCollectionRemoveRequest ()
+					new ShopifyMetafieldRemoveRequest ()
 
 					.httpCredentials (
 						credentials)

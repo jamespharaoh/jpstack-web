@@ -29,6 +29,7 @@
 		<component class="apiclient.ShopifyHttpSenderHelper"/>
 		<component class="apiclient.collect.ShopifyCollectApiClientImplementation"/>
 		<component class="apiclient.customcollection.ShopifyCustomCollectionApiClientImplementation"/>
+		<component class="apiclient.metafield.ShopifyMetafieldApiClientImplementation"/>
 		<component class="apiclient.product.ShopifyProductApiClientImplementation"/>
 
 		<component class="logic.ShnShopifyLogicImplementation"/>
