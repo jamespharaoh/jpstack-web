@@ -8,15 +8,18 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
@@ -476,6 +479,65 @@ class MapUtils {
 
 			builder.put (
 				entry);
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <Key, Value>
+	List <Value> mapFilterByKeyToList (
+			@NonNull Map <Key, Value> input,
+			@NonNull Predicate <Key> predicate) {
+
+		ImmutableList.Builder <Value> builder =
+			ImmutableList.builder ();
+
+		for (
+			Map.Entry <Key, Value> entry
+				: input.entrySet ()
+		) {
+
+			if (
+				! predicate.test (
+					entry.getKey ())
+			) {
+				continue;
+			}
+
+			builder.add (
+				entry.getValue ());
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <KeyLeft, KeyRight, Value>
+	List <Value> mapFilterByKeyToList (
+			@NonNull Map <Pair <KeyLeft, KeyRight>, Value> input,
+			@NonNull BiPredicate <KeyLeft, KeyRight> predicate) {
+
+		ImmutableList.Builder <Value> builder =
+			ImmutableList.builder ();
+
+		for (
+			Map.Entry <Pair <KeyLeft, KeyRight>, Value> entry
+				: input.entrySet ()
+		) {
+
+			if (
+				! predicate.test (
+					entry.getKey ().left (),
+					entry.getKey ().right ())
+			) {
+				continue;
+			}
+
+			builder.add (
+				entry.getValue ());
 
 		}
 
