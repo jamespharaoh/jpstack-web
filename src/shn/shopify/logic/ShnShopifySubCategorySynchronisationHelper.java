@@ -3,6 +3,7 @@ package shn.shopify.logic;
 import static wbs.utils.collection.MapUtils.mapFilterByKeyToList;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.DebugUtils.debugFormat;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -463,7 +464,10 @@ customCollections.forEach (
 			String.class,
 			"body html",
 			localSubCategory ->
-				localSubCategory.getPublicDescription ().getText (),
+				ifNotNullThenElse (
+					localSubCategory.getPublicDescription (),
+					() -> localSubCategory.getPublicDescription ().getText (),
+					() -> ""),
 			ShopifyCustomCollectionRequest::bodyHtml,
 			ShopifyCustomCollectionResponse::bodyHtml),
 
