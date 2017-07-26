@@ -21,6 +21,16 @@ interface ShnShopifySynchronisationHelper <
 	String eventCode (
 			EventType eventType);
 
+	Long getShopifyId (
+			Local localItem);
+
+	Boolean getShopifyNeedsSync (
+			Local localItem);
+
+	void setShopifyNeedsSync (
+			Local localItem,
+			Boolean value);
+
 	List <Local> findLocalItems (
 			Transaction parentTransaction);
 

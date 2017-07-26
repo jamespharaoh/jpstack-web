@@ -155,7 +155,7 @@ class ShopifyProductApiClientImplementation
 
 	@Override
 	public
-	ShopifyProductResponse updateProduct (
+	ShopifyProductResponse update (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ShopifyApiClientCredentials credentials,
 			@NonNull ShopifyProductRequest product) {
@@ -165,7 +165,7 @@ class ShopifyProductApiClientImplementation
 			OwnedTaskLogger taskLogger =
 				logContext.nestTaskLogger (
 					parentTaskLogger,
-					"createProduct");
+					"upadte");
 
 		) {
 

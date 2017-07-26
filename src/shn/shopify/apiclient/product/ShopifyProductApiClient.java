@@ -16,7 +16,7 @@ interface ShopifyProductApiClient {
 			ShopifyApiClientCredentials credentials,
 			ShopifyProductRequest product);
 
-	ShopifyProductResponse updateProduct (
+	ShopifyProductResponse update (
 			TaskLogger parentTaskLogger,
 			ShopifyApiClientCredentials credentials,
 			ShopifyProductRequest product);

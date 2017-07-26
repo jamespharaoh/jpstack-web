@@ -1,6 +1,7 @@
 package shn.shopify.logic;
 
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -61,6 +62,35 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 	public
 	String friendlyNamePlural () {
 		return "product sub categories";
+	}
+
+	@Override
+	public
+	Long getShopifyId (
+			@NonNull ShnProductRec localItem) {
+
+		return localItem.getShopifySubCategoryCollectId ();
+
+	}
+
+	@Override
+	public
+	Boolean getShopifyNeedsSync (
+			@NonNull ShnProductRec localItem) {
+
+		return localItem.getShopifySubCategoryCollectNeedsSync ();
+
+	}
+
+	@Override
+	public
+	void setShopifyNeedsSync (
+			@NonNull ShnProductRec localItem,
+			@NonNull Boolean value) {
+
+		localItem.setShopifySubCategoryCollectNeedsSync (
+			value);
+
 	}
 
 	@Override
@@ -318,9 +348,6 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 				.setShopifySubCategoryCollectUpdatedAt (
 					Instant.parse (
 						remoteCollect.updatedAt ()))
-
-				.setShopifySubCategoryCollectNeedsSync (
-					false)
 
 			;
 

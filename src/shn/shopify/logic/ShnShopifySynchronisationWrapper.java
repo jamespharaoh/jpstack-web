@@ -1,6 +1,7 @@
 package shn.shopify.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
@@ -225,15 +226,17 @@ class ShnShopifySynchronisationWrapper <
 						localItems,
 						localItem ->
 							isNotNull (
-								localItem.getShopifyId ())),
-					ShnShopifyRecord::getShopifyId);
+								helper.getShopifyId (
+									localItem))),
+					helper::getShopifyId);
 
 			localItemsWithoutShopifyId =
 				iterableFilterToList (
 					localItems,
 					localItem ->
 						isNull (
-							localItem.getShopifyId ()));
+							helper.getShopifyId (
+								localItem)));
 
 			transaction.noticeFormat (
 				"Found %s %s total, ",
@@ -423,11 +426,13 @@ class ShnShopifySynchronisationWrapper <
 				if (
 
 					isNotNull (
-						localItem.getShopifyId ())
+						helper.getShopifyId (
+							localItem))
 
 					&& mapContainsKey (
 						remoteItemsById,
-						localItem.getShopifyId ())
+						helper.getShopifyId (
+							localItem))
 
 				) {
 					continue;
@@ -487,7 +492,8 @@ class ShnShopifySynchronisationWrapper <
 						mismatches)
 				) {
 
-					localItem.setShopifyNeedsSync (
+					helper.setShopifyNeedsSync (
+						localItem,
 						false);
 
 				} else {
@@ -555,7 +561,8 @@ class ShnShopifySynchronisationWrapper <
 				Optional <Remote> remoteItemOptional =
 					optionalMapOptional (
 						optionalFromNullable (
-							localItem.getShopifyId ()),
+							helper.getShopifyId (
+								localItem)),
 						shopifyId ->
 							mapItemForKey (
 								remoteItemsById,
@@ -574,7 +581,8 @@ class ShnShopifySynchronisationWrapper <
 
 				if (
 
-					! localItem.getShopifyNeedsSync ()
+					! helper.getShopifyNeedsSync (
+						localItem)
 
 					&& collectionIsEmpty (
 						helper.compareItem (
@@ -642,7 +650,8 @@ class ShnShopifySynchronisationWrapper <
 						mismatches)
 				) {
 
-					localItem.setShopifyNeedsSync (
+					helper.setShopifyNeedsSync (
+						localItem,
 						false);
 
 				} else {

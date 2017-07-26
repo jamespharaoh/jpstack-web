@@ -2,7 +2,6 @@ package shn.shopify.apiclient.collect;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.lessThan;
-import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.collect.ImmutableList;
@@ -163,7 +162,37 @@ class ShopifyCollectApiClientImplementation
 			@NonNull ShopifyApiClientCredentials credentials,
 			@NonNull ShopifyCollectRequest request) {
 
-		throw todo ();
+		try (
+
+			OwnedTaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"update");
+
+		) {
+
+			ShopifyCollectUpdateResponse response =
+				genericCastUnchecked (
+					shopifyHttpSenderProvider.provide (
+						taskLogger)
+
+				.allInOne (
+					taskLogger,
+					new ShopifyCollectUpdateRequest ()
+
+					.httpCredentials (
+						credentials)
+
+					.collect (
+						request)
+
+				)
+
+			);
+
+			return response.collect ();
+
+		}
 
 	}
 

@@ -65,6 +65,35 @@ class ShnShopifySubCategorySynchronisationHelper
 
 	@Override
 	public
+	Long getShopifyId (
+			@NonNull ShnProductSubCategoryRec localItem) {
+
+		return localItem.getShopifyId ();
+
+	}
+
+	@Override
+	public
+	Boolean getShopifyNeedsSync (
+			@NonNull ShnProductSubCategoryRec localItem) {
+
+		return localItem.getShopifyNeedsSync ();
+
+	}
+
+	@Override
+	public
+	void setShopifyNeedsSync (
+			@NonNull ShnProductSubCategoryRec localItem,
+			@NonNull Boolean value) {
+
+		localItem.setShopifyNeedsSync (
+			value);
+
+	}
+
+	@Override
+	public
 	String eventCode (
 			@NonNull EventType eventType) {
 

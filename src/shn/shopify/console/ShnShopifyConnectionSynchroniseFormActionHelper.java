@@ -1,5 +1,6 @@
 package shn.shopify.console;
 
+import static wbs.utils.etc.Misc.minus;
 import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
@@ -219,7 +220,8 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			Long remainingOperations =
 				formState.maxOperations ();
 
-			Long numOperations = 0l;
+			Long totalOperations = 0l;
+			Long performedOperations = 0l;
 
 			// synchronise items
 
@@ -273,7 +275,13 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 					- synchronisation.numUpdated (),
 					- synchronisation.numRemoved ());
 
-				numOperations +=
+				performedOperations = sum (
+					performedOperations,
+					synchronisation.numCreated (),
+					synchronisation.numUpdated (),
+					synchronisation.numRemoved ());
+
+				totalOperations +=
 					synchronisation.numOperations ();
 
 			}
@@ -295,19 +303,21 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			if (
 				moreThan (
-					numOperations,
-					formState.maxOperations ())
+					totalOperations,
+					performedOperations)
 			) {
 
 				requestContext.addWarningFormat (
 					"Only performed %s out of %s operations, ",
 					integerToDecimalString (
-						formState.maxOperations ()),
+						performedOperations),
 					integerToDecimalString (
-						numOperations),
+						totalOperations),
 					"%s operations remaining",
 					integerToDecimalString (
-						remainingOperations));
+						minus (
+							totalOperations,
+							performedOperations)));
 
 			}
 

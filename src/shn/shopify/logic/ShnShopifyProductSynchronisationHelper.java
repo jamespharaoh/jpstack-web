@@ -108,6 +108,35 @@ class ShnShopifyProductSynchronisationHelper
 
 	@Override
 	public
+	Long getShopifyId (
+			@NonNull ShnProductRec localItem) {
+
+		return localItem.getShopifyId ();
+
+	}
+
+	@Override
+	public
+	Boolean getShopifyNeedsSync (
+			@NonNull ShnProductRec localItem) {
+
+		return localItem.getShopifyNeedsSync ();
+
+	}
+
+	@Override
+	public
+	void setShopifyNeedsSync (
+			@NonNull ShnProductRec localItem,
+			@NonNull Boolean value) {
+
+		localItem.setShopifyNeedsSync (
+			value);
+
+	}
+
+	@Override
+	public
 	String eventCode (
 			@NonNull EventType eventType) {
 
@@ -258,7 +287,7 @@ class ShnShopifyProductSynchronisationHelper
 
 		) {
 
-			return productApiClient.updateProduct (
+			return productApiClient.update (
 				transaction,
 				credentials,
 				productRequest (

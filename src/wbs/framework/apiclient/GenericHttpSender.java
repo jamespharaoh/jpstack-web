@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -669,6 +671,20 @@ class GenericHttpSender <Request, Response> {
 				optionalIsPresent (
 					errorMessage)
 			) {
+
+				Gson gson =
+					new GsonBuilder ().create ();
+
+				taskLogger.errorFormat (
+					"Decode error: %s\n",
+					optionalGetRequired (
+						errorMessage),
+					"Trace: %s\n",
+					gson.toJson (
+						requestTrace),
+					"Response: %s",
+					gson.toJson (
+						responseTrace));
 
 				throw new RuntimeException (
 					optionalGetRequired (

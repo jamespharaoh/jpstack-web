@@ -20,7 +20,7 @@ class ShopifyCollectListResponse
 	implements ShopifyApiResponse {
 
 	@DataChildren (
-		childrenElement = "collect")
+		childrenElement = "collects")
 	List <ShopifyCollectResponse> collects =
 		emptyList ();
 
