@@ -33,14 +33,18 @@ import wbs.framework.database.WbsConnection;
 import wbs.framework.logging.CloseableTaskLogger;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
+import wbs.framework.logging.ParentTaskLogger;
+import wbs.framework.logging.RealTaskLogger;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.logging.TaskLoggerImplementation;
+import wbs.framework.logging.TaskLoggerDefault;
 
 @PrototypeComponent ("hibernateTransaction")
 @Accessors (fluent = true)
 public
 class HibernateTransaction
-	implements OwnedTransaction {
+	implements
+		OwnedTransaction,
+		TaskLoggerDefault {
 
 	// singleton dependencies
 
@@ -504,16 +508,20 @@ class HibernateTransaction
 				dynamicContextName,
 				dynamicContextParameters,
 				optionalAbsent ()
-			).taskLoggerImplementation ());
+			).realTaskLogger ());
 
 	}
 
 	@Override
 	public
-	TaskLoggerImplementation taskLoggerImplementation () {
+	RealTaskLogger realTaskLogger () {
+		return transactionTaskLogger.realTaskLogger ();
+	}
 
-		return transactionTaskLogger.taskLoggerImplementation ();
-
+	@Override
+	public
+	ParentTaskLogger parentTaskLogger () {
+		return transactionTaskLogger.realTaskLogger ();
 	}
 
 }

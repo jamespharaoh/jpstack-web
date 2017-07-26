@@ -17,39 +17,37 @@ interface TaskLogger
 	@Override
 	default
 	Long eventId () {
-		return taskLoggerImplementation ().eventId ();
+		return realTaskLogger ().eventId ();
 	}
 
 	@Override
 	default
 	LogSeverity eventSeverity () {
-		return taskLoggerImplementation ().eventSeverity ();
+		return realTaskLogger ().eventSeverity ();
 	}
 
 	@Override
 	default
 	String eventText () {
-		return taskLoggerImplementation ().eventText ();
+		return realTaskLogger ().eventText ();
 	}
 
 	@Override
 	default
 	Instant eventStartTime () {
-		return taskLoggerImplementation ().eventStartTime ();
+		return realTaskLogger ().eventStartTime ();
 	}
 
 	@Override
 	default
 	Instant eventEndTime () {
-		return taskLoggerImplementation ().eventEndTime ();
+		return realTaskLogger ().eventEndTime ();
 	}
 
 	@Override
 	default
 	List <TaskLogEvent> eventChildren () {
-
-		return taskLoggerImplementation ().eventChildren ();
-
+		return realTaskLogger ().eventChildren ();
 	}
 
 	// implicit argument

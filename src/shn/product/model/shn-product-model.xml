@@ -112,7 +112,8 @@
 		<!-- shopify data -->
 
 		<yes-no-field
-			name="shopifyNeedsSync"/>
+			name="shopifyNeedsSync"
+			default="yes"/>
 
 		<integer-field
 			name="shopifyId"
@@ -120,6 +121,26 @@
 
 		<timestamp-field
 			name="shopifyUpdatedAt"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<!-- shopify sub category data -->
+
+		<yes-no-field
+			name="shopifySubCategoryCollectNeedsSync"
+			default="yes"/>
+
+		<integer-field
+			name="shopifySubCategoryCollectId"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifySubCategoryCollectCreatedAt"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="shopifySubCategoryCollectUpdatedAt"
 			column-type="postgresql"
 			nullable="yes"/>
 
@@ -168,6 +189,21 @@
 		<event-type
 			name="Shopping Nation product removed in Shopify"
 			text="Shopify product %0 removed in %1 via %2"
+			admin="no"/>
+
+		<event-type
+			name="Shopping Nation product sub category created in Shopify"
+			text="%0 created in %1 via %2"
+			admin="no"/>
+
+		<event-type
+			name="Shopping Nation product sub category updated in Shopify"
+			text="%0 updated in %1 via %2"
+			admin="no"/>
+
+		<event-type
+			name="Shopping Nation product sub category removed in Shopify"
+			text="Shopify product sub category %0 removed in %1 via %2"
 			admin="no"/>
 
 	</event-types>

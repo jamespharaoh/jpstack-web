@@ -9,11 +9,15 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLoggerImplementation;
+import wbs.framework.logging.ParentTaskLogger;
+import wbs.framework.logging.RealTaskLogger;
+import wbs.framework.logging.TaskLoggerDefault;
 
 public
 class BorrowedTransaction
-	implements Transaction {
+	implements
+		TaskLoggerDefault,
+		Transaction {
 
 	private
 	OwnedTransaction ownedTransaction;
@@ -99,7 +103,15 @@ class BorrowedTransaction
 
 	@Override
 	public
-	TaskLoggerImplementation taskLoggerImplementation () {
+	RealTaskLogger realTaskLogger () {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	ParentTaskLogger parentTaskLogger () {
 
 		throw new UnsupportedOperationException ();
 

@@ -820,7 +820,7 @@ class ShnShopifyProductSynchronisationHelper
 
 		productAttributeFactory.sendSimple (
 			String.class,
-			"public title",
+			"title",
 			ShnProductRec::getPublicTitle,
 			ShopifyProductRequest::title,
 			ShopifyProductResponse::title),

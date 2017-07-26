@@ -39,6 +39,10 @@ class ShopifyProductResponse
 	String productType;
 
 	@DataAttribute (
+		name = "created_at")
+	String createdAt;
+
+	@DataAttribute (
 		name = "updated_at")
 	String updatedAt;
 

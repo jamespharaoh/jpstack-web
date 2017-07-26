@@ -5,6 +5,7 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
+import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.NullUtils.isNotNull;
@@ -17,6 +18,7 @@ import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
@@ -27,9 +29,12 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
 import wbs.framework.database.NestedTransaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 
@@ -55,6 +60,9 @@ class ShnShopifySynchronisationWrapper <
 	> {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	Database database;
 
 	@SingletonDependency
 	EventLogic eventLogic;
@@ -124,6 +132,18 @@ class ShnShopifySynchronisationWrapper <
 	long numErrors = 0;
 
 	// public implementation
+
+	@Override
+	public
+	String friendlyNameSingular () {
+		return helper.friendlyNameSingular ();
+	}
+
+	@Override
+	public
+	String friendlyNamePlural () {
+		return helper.friendlyNamePlural ();
+	}
 
 	@Override
 	public
@@ -289,59 +309,87 @@ class ShnShopifySynchronisationWrapper <
 				"About to remove %s from shopify",
 				helper.friendlyNamePlural ());
 
-			for (
-				Remote remoteItem
-					: randomLogic.shuffleToList (
-						remoteItems)
-			) {
+			List <Remote> selectedRemoteItems =
+				randomLogic.shuffleToList (
+					remoteItems)
 
-				if (
-					mapContainsKey (
-						localItemsByShopifyId,
-						remoteItem.id ())
-				) {
-					continue;
-				}
+				.stream ()
 
-				numOperations ++;
+				.filter (
+					remoteItem ->
+						mapDoesNotContainKey (
+							localItemsByShopifyId,
+							remoteItem.id ()))
 
-				if (numOperations > maxOperations) {
+				.limit (
+					maxOperations)
 
-					numNotRemoved ++;
+				.collect (
+					Collectors.toList ())
+			;
 
-					continue;
+			selectedRemoteItems.parallelStream ()
 
-				}
+				.forEach (
+					remoteItem ->
+						removeItem (
+							transaction.parallel (),
+							remoteItem))
 
-				transaction.noticeFormat (
-					"Removing %s %s from shopify",
-					helper.friendlyNameSingular (),
-					integerToDecimalString (
-						remoteItem.id ()));
-
-				helper.removeItem (
-					transaction,
-					shopifyCredentials,
-					shopifyConnection,
-					remoteItem.id ());
-
-				eventLogic.createEvent (
-					transaction,
-					helper.eventCode (
-						EventType.remove),
-					remoteItem.id (),
-					shopifyConnection.getStore (),
-					shopifyConnection);
-
-				numRemoved ++;
-
-			}
+			;
 
 			transaction.noticeFormat (
 				"Removed %s %s from shopify",
 				integerToDecimalString (
 					numRemoved),
 				helper.friendlyNamePlural ());
+
+		}
+
+	}
+
+	private
+	void removeItem (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Remote remoteItem) {
+
+		try (
+
+			OwnedTransaction transaction =
+				database.beginReadWrite (
+					logContext,
+					parentTaskLogger,
+					"removeItems");
+
+		) {
+
+			synchronized (this) {
+				numOperations ++;
+			}
+
+			transaction.noticeFormat (
+				"Removing %s %s from shopify",
+				helper.friendlyNameSingular (),
+				integerToDecimalString (
+					remoteItem.id ()));
+
+			helper.removeItem (
+				transaction,
+				shopifyCredentials,
+				shopifyConnection,
+				remoteItem.id ());
+
+			eventLogic.createEvent (
+				transaction,
+				helper.eventCode (
+					EventType.remove),
+				remoteItem.id (),
+				shopifyConnection.getStore (),
+				shopifyConnection);
+
+			synchronized (this) {
+				numRemoved ++;
+			}
 
 		}
 

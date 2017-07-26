@@ -37,8 +37,11 @@ import org.joda.time.Instant;
 import wbs.utils.string.LazyString;
 
 public
-class TaskLoggerImplementation
-	implements OwnedTaskLogger {
+class RealTaskLoggerImplementation
+	implements
+		OwnedTaskLogger,
+		RealTaskLogger,
+		TaskLoggerDefault {
 
 	// state
 
@@ -49,7 +52,7 @@ class TaskLoggerImplementation
 	Long eventId;
 
 	private final
-	Optional <TaskLoggerImplementation> parentOptional;
+	Optional <ParentTaskLogger> parentOptional;
 
 	private final
 	LogTarget logTarget;
@@ -98,9 +101,9 @@ class TaskLoggerImplementation
 	// constructors
 
 	public
-	TaskLoggerImplementation (
+	RealTaskLoggerImplementation (
 			@NonNull LoggingLogic loggingLogic,
-			@NonNull Optional <TaskLoggerImplementation> parentOptional,
+			@NonNull Optional <ParentTaskLogger> parentOptional,
 			@NonNull LogTarget logTarget,
 			@NonNull String staticContextName,
 			@NonNull String dynamicContextName,
@@ -119,7 +122,7 @@ class TaskLoggerImplementation
 		this.nesting =
 			optionalMapRequiredOrDefault (
 				parent ->
-					parent.nesting + 1l,
+					parent.nesting () + 1l,
 				parentOptional,
 				0l);
 
@@ -148,7 +151,7 @@ class TaskLoggerImplementation
 
 			this.debugEnabled =
 				optionalMapRequiredOrDefault (
-					TaskLoggerImplementation::debugEnabled,
+					ParentTaskLogger::debugEnabled,
 					parentOptional,
 					true);
 
@@ -231,24 +234,37 @@ class TaskLoggerImplementation
 	@SuppressWarnings ("resource")
 	@Override
 	public
-	TaskLoggerImplementation findRoot () {
+	RealTaskLogger findRoot () {
 
-		TaskLoggerImplementation currentTaskLogger =
+		RealTaskLogger currentTaskLogger =
 			this;
 
 		while (
 			optionalIsPresent (
-				currentTaskLogger.parentOptional)
+				currentTaskLogger.parentOptional ())
 		) {
 
 			currentTaskLogger =
 				optionalGetRequired (
-					currentTaskLogger.parentOptional);
+					currentTaskLogger.parentOptional ()
+				).realTaskLogger ();
 
 		}
 
 		return currentTaskLogger;
 
+	}
+
+	@Override
+	public
+	Long nesting () {
+		return nesting;
+	}
+
+	@Override
+	public
+	Optional <ParentTaskLogger> parentOptional () {
+		return parentOptional;
 	}
 
 	@Override
@@ -289,6 +305,7 @@ class TaskLoggerImplementation
 
 	}
 
+	@Override
 	public
 	void addChild (
 			@NonNull OwnedTaskLogger child) {
@@ -793,9 +810,8 @@ class TaskLoggerImplementation
 
 	}
 
-	// private implementation
-
-	private
+	@Override
+	public
 	void writeFirstError () {
 
 		// recurse up through parents
@@ -841,58 +857,63 @@ class TaskLoggerImplementation
 
 	}
 
-	private
+	@Override
+	public
 	void increaseErrorCount () {
 
 		errorCount ++;
 
 		optionalDo (
 			parentOptional,
-			TaskLoggerImplementation::increaseErrorCount);
+			ParentTaskLogger::increaseErrorCount);
 
 	}
 
-	private
+	@Override
+	public
 	void increaseWarningCount () {
 
 		warningCount ++;
 
 		optionalDo (
 			parentOptional,
-			TaskLoggerImplementation::increaseWarningCount);
+			ParentTaskLogger::increaseWarningCount);
 
 	}
 
-	private
+	@Override
+	public
 	void increaseNoticeCount () {
 
 		noticeCount ++;
 
 		optionalDo (
 			parentOptional,
-			TaskLoggerImplementation::increaseNoticeCount);
+			ParentTaskLogger::increaseNoticeCount);
 
 	}
 
-	private
+	@Override
+	public
 	void increaseLogicCount () {
 
 		logicCount ++;
 
 		optionalDo (
 			parentOptional,
-			TaskLoggerImplementation::increaseLogicCount);
+			ParentTaskLogger::increaseLogicCount);
 
 	}
 
-	private
+	@Override
+	public
 	void increaseDebugCount () {
 
 		debugCount ++;
 
 		optionalDo (
 			parentOptional,
-			TaskLoggerImplementation::increaseDebugCount);
+			ParentTaskLogger::increaseDebugCount);
 
 	}
 
@@ -921,7 +942,7 @@ class TaskLoggerImplementation
 
 	@Override
 	public
-	boolean debugEnabled () {
+	Boolean debugEnabled () {
 
 		return (
 			logTarget.debugEnabled ()
@@ -998,10 +1019,14 @@ class TaskLoggerImplementation
 
 	@Override
 	public
-	TaskLoggerImplementation taskLoggerImplementation () {
-
+	RealTaskLogger realTaskLogger () {
 		return this;
+	}
 
+	@Override
+	public
+	ParentTaskLogger parentTaskLogger () {
+		return this;
 	}
 
 }

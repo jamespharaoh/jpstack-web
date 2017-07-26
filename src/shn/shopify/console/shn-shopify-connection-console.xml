@@ -141,13 +141,13 @@
 			<columns>
 
 				<yes-no-field
-					name="createProducts"/>
+					name="create"/>
 
 				<yes-no-field
-					name="updateProducts"/>
+					name="update"/>
 
 				<yes-no-field
-					name="removeProducts"/>
+					name="remove"/>
 
 				<integer-field
 					name="maxOperations"/>

@@ -8,9 +8,9 @@ import lombok.experimental.Accessors;
 public
 class ShnShopifyConnectionSynchroniseForm {
 
-	Boolean createProducts;
-	Boolean updateProducts;
-	Boolean removeProducts;
+	Boolean create;
+	Boolean update;
+	Boolean remove;
 
 	Long maxOperations;
 

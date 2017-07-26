@@ -1,12 +1,17 @@
 package shn.shopify.console;
 
+import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
+import java.util.List;
+
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -27,7 +32,10 @@ import wbs.framework.logging.LogContext;
 import wbs.utils.string.FormatWriter;
 
 import shn.product.model.ShnProductRec;
+import shn.product.model.ShnProductSubCategoryRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.collect.ShopifyCollectResponse;
+import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionResponse;
 import shn.shopify.apiclient.product.ShopifyProductResponse;
 import shn.shopify.logic.ShnShopifyLogic;
 import shn.shopify.logic.ShnShopifySynchronisation;
@@ -62,12 +70,28 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	// prototype dependencies
 
 	@PrototypeDependency
+	@NamedDependency ("shnShopifyProductSubCategorySynchronisation")
+	ComponentProvider <ShnShopifySynchronisation <
+		?,
+		ShnProductRec,
+		ShopifyCollectResponse
+	>> productSubCategorySynchronisationProvider;
+
+	@PrototypeDependency
 	@NamedDependency ("shnShopifyProductSynchronisation")
 	ComponentProvider <ShnShopifySynchronisation <
 		?,
 		ShnProductRec,
 		ShopifyProductResponse
 	>> productSynchronisationProvider;
+
+	@PrototypeDependency
+	@NamedDependency ("shnShopifySubCategorySynchronisation")
+	ComponentProvider <ShnShopifySynchronisation <
+		?,
+		ShnProductSubCategoryRec,
+		ShopifyCustomCollectionResponse
+	>> subCategorySynchronisationProvider;
 
 	// public implementation
 
@@ -150,13 +174,13 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			return new ShnShopifyConnectionSynchroniseForm ()
 
-				.createProducts (
+				.create (
 					true)
 
-				.updateProducts (
+				.update (
 					true)
 
-				.removeProducts (
+				.remove (
 					true)
 
 				.maxOperations (
@@ -192,137 +216,219 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 					transaction,
 					shopifyConnection.getStore ());
 
-			ShnShopifySynchronisation <?, ?, ?> productionSynchronisation =
+			Long remainingOperations =
+				formState.maxOperations ();
+
+			Long numOperations = 0l;
+
+			// synchronise items
+
+			List <ShnShopifySynchronisation <?, ?, ?>> synchronisations =
+				ImmutableList.of (
+
+				subCategorySynchronisationProvider.provide (
+					transaction),
+
 				productSynchronisationProvider.provide (
+					transaction),
+
+				productSubCategorySynchronisationProvider.provide (
 					transaction)
 
-				.enableCreate (
-					formState.createProducts ())
+			);
 
-				.enableUpdate (
-					formState.updateProducts ())
+			for (
+				ShnShopifySynchronisation <?, ?, ?> synchronisation
+					: synchronisations
+			) {
 
-				.enableRemove (
-					formState.removeProducts ())
+				synchronisation
 
-				.maxOperations (
-					formState.maxOperations ())
+					.enableCreate (
+						formState.create ())
 
-				.shopifyConnection (
-					shopifyConnection)
+					.enableUpdate (
+						formState.update ())
 
-				.shopifyCredentials (
-					shopifyCredentials)
+					.enableRemove (
+						formState.remove ())
 
-				.synchronise (
-					transaction)
+					.maxOperations (
+						remainingOperations)
 
-			;
+					.shopifyConnection (
+						shopifyConnection)
+
+					.shopifyCredentials (
+						shopifyCredentials)
+
+					.synchronise (
+						transaction)
+
+				;
+
+				remainingOperations = sum (
+					remainingOperations,
+					- synchronisation.numCreated (),
+					- synchronisation.numUpdated (),
+					- synchronisation.numRemoved ());
+
+				numOperations +=
+					synchronisation.numOperations ();
+
+			}
 
 			// commit and return
 
 			transaction.commit ();
 
-			if (
-				moreThanZero (
-					productionSynchronisation.numRemoved ())
+			for (
+				ShnShopifySynchronisation <?, ?, ?> synchronisation
+					: synchronisations
 			) {
 
-				requestContext.addNoticeFormat (
-					"%s products removed",
-					integerToDecimalString (
-						productionSynchronisation.numRemoved ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numNotRemoved ())
-			) {
-
-				requestContext.addWarningFormat (
-					"%s products not removed",
-					integerToDecimalString (
-						productionSynchronisation.numNotRemoved ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numCreated ())
-			) {
-
-				requestContext.addNoticeFormat (
-					"%s products created",
-					integerToDecimalString (
-						productionSynchronisation.numCreated ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numNotCreated ())
-			) {
-
-				requestContext.addWarningFormat (
-					"%s products not created",
-					integerToDecimalString (
-						productionSynchronisation.numNotCreated ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numUpdated ())
-			) {
-
-				requestContext.addNoticeFormat (
-					"%s products updated",
-					integerToDecimalString (
-						productionSynchronisation.numUpdated ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numNotUpdated ())
-			) {
-
-				requestContext.addWarningFormat (
-					"%s products not updated",
-					integerToDecimalString (
-						productionSynchronisation.numNotUpdated ()));
-
-			}
-
-			if (
-				moreThanZero (
-					productionSynchronisation.numErrors ())
-			) {
-
-				requestContext.addErrorFormat (
-					"%s data mismatch errors creating or updating products",
-					integerToDecimalString (
-						productionSynchronisation.numErrors ()));
+				addNotices (
+					transaction,
+					synchronisation);
 
 			}
 
 			if (
 				moreThan (
-					productionSynchronisation.numOperations (),
+					numOperations,
 					formState.maxOperations ())
 			) {
 
 				requestContext.addWarningFormat (
-					"Only performed %s out of %s operations, please repeat",
+					"Only performed %s out of %s operations, ",
 					integerToDecimalString (
 						formState.maxOperations ()),
 					integerToDecimalString (
-						productionSynchronisation.numOperations ()));
+						numOperations),
+					"%s operations remaining",
+					integerToDecimalString (
+						remainingOperations));
 
 			}
 
 			return optionalAbsent ();
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void addNotices (
+			@NonNull Transaction parentTransaction,
+			@NonNull ShnShopifySynchronisation <?, ?, ?> synchronisation) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"addNotices");
+
+		) {
+
+			if (
+				moreThanZero (
+					synchronisation.numRemoved ())
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s removed",
+					pluralise (
+						synchronisation.numRemoved (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numNotRemoved ())
+			) {
+
+				requestContext.addWarningFormat (
+					"%s not removed",
+					pluralise (
+						synchronisation.numNotRemoved (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numCreated ())
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s created",
+					pluralise (
+						synchronisation.numCreated (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numNotCreated ())
+			) {
+
+				requestContext.addWarningFormat (
+					"%s not created",
+					pluralise (
+						synchronisation.numNotCreated (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numUpdated ())
+			) {
+
+				requestContext.addNoticeFormat (
+					"%s updated",
+					pluralise (
+						synchronisation.numUpdated (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numNotUpdated ())
+			) {
+
+				requestContext.addWarningFormat (
+					"%s not updated",
+					pluralise (
+						synchronisation.numNotUpdated (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numErrors ())
+			) {
+
+				requestContext.addErrorFormat (
+					"%s data mismatch errors creating or updating %s",
+					integerToDecimalString (
+						synchronisation.numErrors ()),
+					synchronisation.friendlyNamePlural ());
+
+			}
 
 		}
 

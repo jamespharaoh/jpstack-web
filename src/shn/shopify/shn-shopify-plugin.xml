@@ -27,10 +27,14 @@
 		<bootstrap-component class="logic.ShnShopifySynchronisationComponentWrapper"/>
 
 		<component class="apiclient.ShopifyHttpSenderHelper"/>
+		<component class="apiclient.collect.ShopifyCollectApiClientImplementation"/>
+		<component class="apiclient.customcollection.ShopifyCustomCollectionApiClientImplementation"/>
 		<component class="apiclient.product.ShopifyProductApiClientImplementation"/>
 
 		<component class="logic.ShnShopifyLogicImplementation"/>
 		<component class="logic.ShnShopifyProductSynchronisationHelper"/>
+		<component class="logic.ShnShopifyProductSubCategorySynchronisationHelper"/>
+		<component class="logic.ShnShopifySubCategorySynchronisationHelper"/>
 
 	</layer>
 

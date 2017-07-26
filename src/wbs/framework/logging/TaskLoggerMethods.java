@@ -4,254 +4,89 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import lombok.NonNull;
-
 public
-interface TaskLoggerMethods {
+interface TaskLoggerMethods
+	extends TaskLoggerCoreMethods {
 
-	TaskLoggerImplementation taskLoggerImplementation ();
-
-	default
 	FatalErrorException fatalFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		return taskLoggerImplementation ().fatalFormat (
-			arguments);
-
-	}
-
-	default
 	FatalErrorException fatalFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		return taskLoggerImplementation ().fatalFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	void errorFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().errorFormat (
-			arguments);
-
-	}
-
-	default
 	LoggedErrorsException errorFormatThrow (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().errorFormat (
-			arguments);
-
-		throw taskLoggerImplementation ().makeException ();
-
-	}
-
-	default
 	void errorFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().errorFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	LoggedErrorsException errorFormatExceptionThrow (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().errorFormatException (
-			exception,
-			arguments);
-
-		throw taskLoggerImplementation ().makeException ();
-
-	}
-
-	default
 	void firstErrorFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().firstErrorFormat (
-			arguments);
-
-	}
-
-	default
 	void warningFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().warningFormat (
-			arguments);
-
-	}
-
-	default
 	void warningFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().warningFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	void noticeFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().noticeFormat (
-			arguments);
-
-	}
-
-	default
 	void noticeFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().noticeFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	void logicFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().logicFormat (
-			arguments);
-
-	}
-
-	default
 	void logicFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().logicFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	void traceFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().traceFormat (
-			arguments);
-
-	}
-
-	default
 	void traceFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().traceFormatException (
-			exception,
-			arguments);
-
-	}
-
-	default
 	void debugFormat (
-			@NonNull CharSequence ... arguments) {
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().debugFormat (
-			arguments);
-
-	}
-
-	default
 	void debugFormatException (
-			@NonNull Throwable exception,
-			@NonNull CharSequence ... arguments) {
+			Throwable exception,
+			CharSequence ... arguments);
 
-		taskLoggerImplementation ().debugFormatException (
-			exception,
-			arguments);
+	RuntimeException makeException ();
 
-	}
-
-	default
-	boolean debugEnabled () {
-
-		return taskLoggerImplementation ().debugEnabled ();
-
-	}
-
-	default
-	RuntimeException makeException () {
-
-		return taskLoggerImplementation ().makeException ();
-
-	}
-
-	default
 	RuntimeException makeException (
-			@NonNull Supplier <RuntimeException> exceptionSupplier) {
+			Supplier <RuntimeException> exceptionSupplier);
 
-		return taskLoggerImplementation ().makeException (
-			exceptionSupplier);
+	RealTaskLogger findRoot ();
 
-	}
+	boolean errors ();
 
-	default
-	TaskLoggerImplementation findRoot () {
+	long errorCount ();
 
-		return taskLoggerImplementation ().findRoot ();
-
-	}
-
-	default
-	boolean errors () {
-
-		return taskLoggerImplementation ().errors ();
-
-	}
-
-	default
-	long errorCount () {
-
-		return taskLoggerImplementation ().errorCount ();
-
-	}
-
-	default <Type>
+	<Type>
 	Type wrap (
-			@NonNull Function <TaskLogger, Type> function) {
+			Function <TaskLogger, Type> function);
 
-		return taskLoggerImplementation ().wrap (
-			function);
-
-	}
-
-	default
 	void wrap (
-			@NonNull Consumer <TaskLogger> function) {
+			Consumer <TaskLogger> function);
 
-		taskLoggerImplementation ().wrap (
-			function);
+	BorrowedTaskLogger borrow ();
 
-	}
-
-	default
-	BorrowedTaskLogger borrow () {
-
-		return new BorrowedTaskLogger (
-			this.taskLoggerImplementation ());
-
-	}
+	TaskLogger parallel ();
 
 }

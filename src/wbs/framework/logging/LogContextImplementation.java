@@ -52,7 +52,7 @@ class LogContextImplementation
 			@NonNull List <CharSequence> dynamicContextParameters,
 			@NonNull Optional <Boolean> debugEnabled) {
 
-		return new TaskLoggerImplementation (
+		return new RealTaskLoggerImplementation (
 			loggingLogic,
 			optionalAbsent (),
 			logTarget,
@@ -71,11 +71,11 @@ class LogContextImplementation
 			@NonNull List <CharSequence> dynamicContextParameters,
 			@NonNull Optional <Boolean> debugEnabled) {
 
-		return new TaskLoggerImplementation (
+		return new RealTaskLoggerImplementation (
 			loggingLogic,
 			optionalMapRequired (
 				parent,
-				TaskLogger::taskLoggerImplementation),
+				TaskLogger::realTaskLogger),
 			logTarget,
 			staticContextName,
 			dynamicContextName,

@@ -14,6 +14,9 @@ interface ShnShopifySynchronisation <
 	Remote extends ShopifyApiResponseItem
 > {
 
+	String friendlyNameSingular ();
+	String friendlyNamePlural ();
+
 	Self enableCreate (
 			Boolean enableCreate);
 

@@ -4,21 +4,23 @@ import lombok.NonNull;
 
 public
 class BorrowedTaskLogger
-	implements TaskLogger {
+	implements
+		TaskLogger,
+		TaskLoggerDefault {
 
 	// state
 
 	private final
-	TaskLoggerImplementation taskLoggerImplementation;
+	RealTaskLogger realTaskLogger;
 
 	// constructors
 
 	public
 	BorrowedTaskLogger (
-			@NonNull TaskLoggerImplementation taskLoggerImplementation) {
+			@NonNull RealTaskLogger realTaskLogger) {
 
-		this.taskLoggerImplementation =
-			taskLoggerImplementation;
+		this.realTaskLogger =
+			realTaskLogger;
 
 	}
 
@@ -26,10 +28,14 @@ class BorrowedTaskLogger
 
 	@Override
 	public
-	TaskLoggerImplementation taskLoggerImplementation () {
+	RealTaskLogger realTaskLogger () {
+		return realTaskLogger;
+	}
 
-		return taskLoggerImplementation;
-
+	@Override
+	public
+	ParentTaskLogger parentTaskLogger () {
+		return realTaskLogger;
 	}
 
 }

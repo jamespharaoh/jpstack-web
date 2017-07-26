@@ -16,7 +16,7 @@ interface CloseableTaskLogger
 	default
 	void close () {
 
-		taskLoggerImplementation ().close ();
+		realTaskLogger ().close ();
 
 	}
 

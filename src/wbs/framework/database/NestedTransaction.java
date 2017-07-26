@@ -9,11 +9,15 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLoggerImplementation;
+import wbs.framework.logging.ParentTaskLogger;
+import wbs.framework.logging.RealTaskLogger;
+import wbs.framework.logging.TaskLoggerDefault;
 
 public
 class NestedTransaction
-	implements CloseableTransaction {
+	implements
+		CloseableTransaction,
+		TaskLoggerDefault {
 
 	// state
 
@@ -21,20 +25,20 @@ class NestedTransaction
 	OwnedTransaction ownedTransaction;
 
 	private final
-	TaskLoggerImplementation taskLoggerImplementation;
+	RealTaskLogger realTaskLogger;
 
 	// constructors
 
 	public
 	NestedTransaction (
 			@NonNull OwnedTransaction ownedTransaction,
-			@NonNull TaskLoggerImplementation taskLoggerImplementation) {
+			@NonNull RealTaskLogger realTaskLogger) {
 
 		this.ownedTransaction =
 			ownedTransaction;
 
-		this.taskLoggerImplementation =
-			taskLoggerImplementation;
+		this.realTaskLogger =
+			realTaskLogger;
 
 	}
 
@@ -42,8 +46,14 @@ class NestedTransaction
 
 	@Override
 	public
-	TaskLoggerImplementation taskLoggerImplementation () {
-		return taskLoggerImplementation;
+	RealTaskLogger realTaskLogger () {
+		return realTaskLogger;
+	}
+
+	@Override
+	public
+	ParentTaskLogger parentTaskLogger () {
+		return realTaskLogger;
 	}
 
 	@Override
@@ -73,18 +83,18 @@ class NestedTransaction
 			ownedTransaction (),
 			logContext.nestTaskLogger (
 				optionalOf (
-					taskLoggerImplementation ()),
+					realTaskLogger ()),
 				dynamicContextName,
 				dynamicContextParameters,
 				debugEnabled
-			).taskLoggerImplementation ());
+			).realTaskLogger ());
 
 	}
 
 	@Override
 	public
 	void close () {
-		taskLoggerImplementation.close ();
+		realTaskLogger.close ();
 	}
 
 }

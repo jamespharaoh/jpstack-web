@@ -47,6 +47,9 @@ class ShnProductHooks
 				.setShopifyNeedsSync (
 					true)
 
+				.setShopifySubCategoryCollectNeedsSync (
+					true)
+
 			;
 
 		}

@@ -272,6 +272,10 @@ class ShnProductCategoryFixtureProvider
 			"{public-title}")
 
 		.put (
+			"publicDescription",
+			"{description}")
+
+		.put (
 			"active",
 			"yes")
 
