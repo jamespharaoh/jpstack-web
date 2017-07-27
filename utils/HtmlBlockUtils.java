@@ -1,6 +1,7 @@
 package wbs.web.utils;
 
 import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.stringFormatLazyArray;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 
@@ -313,6 +314,18 @@ class HtmlBlockUtils {
 		formatWriter.writeLineFormat (
 			"<h3>%h</h3>",
 			label);
+
+	}
+
+	public static
+	void htmlHeadingThreeWriteFormat (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String ... arguments) {
+
+		formatWriter.writeLineFormat (
+			"<h3>%h</h3>",
+			stringFormatLazyArray (
+				arguments));
 
 	}
 
