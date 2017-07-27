@@ -1,5 +1,6 @@
 package wbs.utils.collection;
 
+import static wbs.utils.etc.Misc.min;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -628,6 +629,20 @@ class CollectionUtils {
 		return list.subList (
 			0,
 			list.size () - 2);
+
+	}
+
+	public static <Type>
+	List <Type> listSliceFromStart (
+			@NonNull List <Type> list,
+			long maxItems) {
+
+		return list.subList (
+			0,
+			min (
+				list.size (),
+				toJavaIntegerRequired (
+					maxItems)));
 
 	}
 
