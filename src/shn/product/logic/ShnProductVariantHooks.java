@@ -9,6 +9,7 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.Misc.todo;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.parseInteger;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -425,8 +426,13 @@ class ShnProductVariantHooks
 			}
 
 			if (
+
 				isNull (
 					variant.getShoppingNationPrice ())
+
+				|| equalToZero (
+					variant.getShoppingNationPrice ())
+
 			) {
 
 				errorsBuilder.add (
@@ -439,8 +445,13 @@ class ShnProductVariantHooks
 			}
 
 			if (
+
 				isNull (
 					variant.getCostPrice ())
+
+				|| equalToZero (
+					variant.getCostPrice ())
+
 			) {
 
 				errorsBuilder.add (

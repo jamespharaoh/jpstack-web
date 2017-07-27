@@ -32,6 +32,14 @@ class ShopifyCustomCollectionRequest
 		name = "body_html")
 	String bodyHtml;
 
+	@DataAttribute (
+		name = "published")
+	Boolean published;
+
+	@DataAttribute (
+		name = "published_scope")
+	String publishedScope;
+
 	@DataChild (
 		name = "image")
 	ShopifyCustomCollectionImageRequest image;

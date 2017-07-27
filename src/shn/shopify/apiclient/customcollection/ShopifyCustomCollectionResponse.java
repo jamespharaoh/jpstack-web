@@ -36,6 +36,14 @@ class ShopifyCustomCollectionResponse
 		name = "body_html")
 	String bodyHtml;
 
+	@DataAttribute (
+		name = "published_scope")
+	String publishedScope;
+
+	@DataAttribute (
+		name = "published_at")
+	String publishedAt;
+
 	@DataChild (
 		name = "image")
 	ShopifyCustomCollectionImageResponse image;

@@ -2,6 +2,7 @@ package shn.shopify.logic;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -509,6 +510,22 @@ customCollections.forEach (
 					() -> ""),
 			ShopifyCustomCollectionRequest::bodyHtml,
 			ShopifyCustomCollectionResponse::bodyHtml),
+
+		subCategoryAttributeFactory.sendSimple (
+			Boolean.class,
+			"published",
+			ShnProductSubCategoryRec::getActive,
+			ShopifyCustomCollectionRequest::published,
+			response ->
+				isNotNull (
+					response.publishedAt ())),
+
+		subCategoryAttributeFactory.sendSimple (
+			String.class,
+			"published scope",
+			subCategory -> "global",
+			ShopifyCustomCollectionRequest::publishedScope,
+			ShopifyCustomCollectionResponse::publishedScope),
 
 		// miscellaneous
 
