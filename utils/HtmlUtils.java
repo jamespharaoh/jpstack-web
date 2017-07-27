@@ -130,23 +130,8 @@ class HtmlUtils {
 
 			default:
 
-				if (character < 128) {
-
-					dest.append (
-						character);
-
-				} else {
-
-					dest.append (
-						"&#");
-
-					dest.append (
-						(int) character);
-
-					dest.append (
-						';');
-
-				}
+				dest.append (
+					character);
 
 			}
 
