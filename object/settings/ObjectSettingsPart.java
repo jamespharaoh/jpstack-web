@@ -2,7 +2,9 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.SetUtils.emptySet;
-import static wbs.utils.etc.NullUtils.isNotNull;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWriteFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -13,6 +15,8 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,11 +35,13 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 
+import wbs.platform.object.summary.ObjectSummaryErrorsPart;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -63,6 +69,10 @@ class ObjectSettingsPart <
 	@SingletonDependency
 	RootObjectHelper rootHelper;
 
+	@SingletonDependency
+	ComponentProvider <ObjectSummaryErrorsPart <ObjectType, ?>>
+		errorsPartProvider;
+
 	// properties
 
 	@Getter @Setter
@@ -89,26 +99,9 @@ class ObjectSettingsPart <
 
 	ConsoleForm <ObjectType> form;
 
+	ObjectSummaryErrorsPart <ObjectType, ?> errorsPart;
+
 	// implementation
-
-	@Override
-	public
-	Set <ScriptRef> scriptRefs () {
-
-		if (
-			isNotNull (
-				form)
-		) {
-
-			return form.allFields ().scriptRefs ();
-
-		} else {
-
-			return emptySet ();
-
-		}
-
-	}
 
 	@Override
 	public
@@ -141,7 +134,40 @@ class ObjectSettingsPart <
 						transaction,
 						requestContext.consoleContextStuffRequired ()));
 
+			errorsPart =
+				errorsPartProvider.provide (
+					transaction)
+
+				.consoleHelper (
+					consoleHelper)
+
+			;
+
+			errorsPart.prepare (
+				transaction);
+
 		}
+
+	}
+
+	@Override
+	public
+	Set <ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef> builder ()
+
+			.addAll (
+				errorsPart.scriptRefs ())
+
+			.addAll (
+				ifNotNullThenElse (
+					form,
+					() -> form.allFields ().scriptRefs (),
+					() -> emptySet ()))
+
+			.build ()
+
+		;
 
 	}
 
@@ -159,6 +185,16 @@ class ObjectSettingsPart <
 					"renderHtmlBodyContent");
 
 		) {
+
+			errorsPart.renderHtmlBodyContent (
+				transaction,
+				formatWriter);
+
+			htmlHeadingThreeWriteFormat (
+				formatWriter,
+				"%s settings",
+				capitalise (
+					consoleHelper.friendlyName ()));
 
 			if (canEdit) {
 
@@ -239,6 +275,29 @@ class ObjectSettingsPart <
 				}
 
 			}
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlHeadContent (
+			@NonNull Transaction parentTransaction,
+			@NonNull FormatWriter formatWriter) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"renderHtmlHeadContent");
+
+		) {
+
+			errorsPart.renderHtmlHeadContent (
+				transaction,
+				formatWriter);
 
 		}
 

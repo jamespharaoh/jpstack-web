@@ -16,6 +16,7 @@
 		<component class="ObjectSummaryPageBuilder"/>
 		<component class="ObjectSummaryPart"/>
 		<component class="ObjectSummaryBeanPartBuilder"/>
+		<component class="ObjectSummaryErrorsPart"/>
 		<component class="ObjectSummaryFieldsBuilder"/>
 		<component class="ObjectSummaryFieldsPart"/>
 		<component class="ObjectSummaryHeadingBuilder"/>
