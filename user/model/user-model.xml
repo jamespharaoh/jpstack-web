@@ -22,6 +22,7 @@
 			name="details"/>
 
 		<deleted-field/>
+		<active-field/>
 
 		<!-- settings -->
 
@@ -31,9 +32,6 @@
 		<string-field
 			name="password"
 			nullable="yes"/>
-
-		<yes-no-field
-			name="active"/>
 
 		<string-field
 			name="defaultTimezone"
