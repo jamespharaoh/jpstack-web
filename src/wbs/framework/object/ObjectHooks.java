@@ -13,6 +13,8 @@ import lombok.NonNull;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 
+import wbs.utils.data.Pair;
+
 public
 interface ObjectHooks <RecordType extends Record <RecordType>> {
 
@@ -55,9 +57,10 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 	}
 
 	default
-	List <String> verifyData (
+	List <Pair <Record <?>, String>> verifyData (
 			@NonNull Transaction parentTransaction,
-			@NonNull RecordType object) {
+			@NonNull RecordType object,
+			@NonNull Boolean recurse) {
 
 		return emptyList ();
 

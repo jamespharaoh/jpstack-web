@@ -10,6 +10,7 @@ import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -66,6 +67,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.data.Pair;
 import wbs.utils.etc.PropertyUtils;
 
 import fj.data.Either;
@@ -1365,6 +1367,38 @@ class ObjectManagerImplementation
 						currentObject);
 
 			}
+
+		}
+
+	}
+
+	@Override
+	public
+	List <Pair <Record <?>, String>> verifyData (
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Boolean recurse) {
+
+debugFormat ("VERIFY DATA");
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"verifyData");
+
+		) {
+
+			ObjectHelper <?> objectHelper =
+				objectHelperForObjectRequired (
+					object);
+
+			return objectHelper.hooks ().verifyData (
+				transaction,
+				genericCastUnchecked (
+					object),
+				recurse);
 
 		}
 

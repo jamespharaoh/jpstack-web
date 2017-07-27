@@ -29,6 +29,8 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.data.Pair;
+
 import fj.data.Either;
 
 public
@@ -213,6 +215,11 @@ interface ObjectManagerMethods {
 			Transaction parentTransaction,
 			Record <?> object,
 			Set <ObjectType> parents);
+
+	List <Pair <Record <?>, String>> verifyData (
+			Transaction parentTransaction,
+			Record <?> object,
+			Boolean recurse);
 
 	// object paths
 

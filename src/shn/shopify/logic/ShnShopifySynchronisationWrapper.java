@@ -514,7 +514,8 @@ class ShnShopifySynchronisationWrapper <
 					collectionIsNotEmpty (
 						helper.objectHelper ().hooks ().verifyData (
 							transaction,
-							localItem))
+							localItem,
+							true))
 				) {
 
 					numDataErrors ++;
@@ -791,7 +792,8 @@ class ShnShopifySynchronisationWrapper <
 					collectionIsNotEmpty (
 						helper.objectHelper ().hooks ().verifyData (
 							transaction,
-							localItem))
+							localItem,
+							true))
 				) {
 
 					synchronized (this) {

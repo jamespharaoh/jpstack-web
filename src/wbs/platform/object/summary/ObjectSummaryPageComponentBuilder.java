@@ -115,6 +115,67 @@ class ObjectSummaryPageComponentBuilder
 
 			;
 
+			// create summary errors part
+
+			target.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.nameFormat (
+					"%sSummaryPart%s",
+					parentContext.newComponentNamePrefix (),
+					integerToDecimalString (
+						childContext.numParts ()))
+
+				.scope (
+					"prototype")
+
+				.componentClass (
+					ObjectSummaryErrorsPart.class)
+
+				.hide (
+					true)
+
+				.addReferencePropertyFormat (
+					"consoleHelper",
+					"singleton",
+					"%sConsoleHelper",
+					hyphenToCamel (
+						parentContext.objectType ()))
+
+			);
+
+			target.registerDefinition (
+				taskLogger,
+				new ComponentDefinition ()
+
+				.nameFormat (
+					"%sSummaryPartFactory%s",
+					parentContext.newComponentNamePrefix (),
+					integerToDecimalString (
+						childContext.numParts ()))
+
+				.scope (
+					"singleton")
+
+				.componentClass (
+					ProviderPagePartFactory.class)
+
+				.addReferencePropertyFormat (
+					"pagePartProvider",
+					"prototype",
+					"%sSummaryPart%s",
+					parentContext.newComponentNamePrefix (),
+					integerToDecimalString (
+						childContext.numParts ()))
+
+			);
+
+			childContext.numParts (
+				childContext.numParts () + 1);
+
+			// add create summary details part
+
 			if (
 				isNotNull (
 					spec.formTypeName ())
@@ -125,8 +186,10 @@ class ObjectSummaryPageComponentBuilder
 					new ComponentDefinition ()
 
 					.nameFormat (
-						"%sSummaryPart0",
-						parentContext.newComponentNamePrefix ())
+						"%sSummaryPart%s",
+						parentContext.newComponentNamePrefix (),
+						integerToDecimalString (
+							childContext.numParts ()))
 
 					.scope (
 						"prototype")
@@ -153,6 +216,12 @@ class ObjectSummaryPageComponentBuilder
 						hyphenToCamelCapitalise (
 							spec.formTypeName ()))
 
+					.addValuePropertyFormat (
+						"heading",
+						"%s details",
+						capitalise (
+							parentContext.friendlyName ()))
+
 				);
 
 				target.registerDefinition (
@@ -160,8 +229,10 @@ class ObjectSummaryPageComponentBuilder
 					new ComponentDefinition ()
 
 					.nameFormat (
-						"%sSummaryPartFactory0",
-						parentContext.newComponentNamePrefix ())
+						"%sSummaryPartFactory%s",
+						parentContext.newComponentNamePrefix (),
+						integerToDecimalString (
+							childContext.numParts ()))
 
 					.scope (
 						"singleton")
@@ -172,8 +243,10 @@ class ObjectSummaryPageComponentBuilder
 					.addReferencePropertyFormat (
 						"pagePartProvider",
 						"prototype",
-						"%sSummaryPart0",
-						parentContext.newComponentNamePrefix ())
+						"%sSummaryPart%s",
+						parentContext.newComponentNamePrefix (),
+						integerToDecimalString (
+							childContext.numParts ()))
 
 				);
 
@@ -182,12 +255,16 @@ class ObjectSummaryPageComponentBuilder
 
 			}
 
+			// add custom parts
+
 			builder.descend (
 				taskLogger,
 				childContext,
 				spec.builders (),
 				target,
 				MissingBuilderBehaviour.error);
+
+			// create summary part
 
 			target.registerDefinition (
 				taskLogger,

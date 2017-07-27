@@ -77,6 +77,28 @@ class IterableUtils {
 
 	}
 
+	public static <InputType, OutputType>
+	Iterable <OutputType> iterableFlatMap (
+			@NonNull Iterable <? extends InputType> iterable,
+			@NonNull Function <
+				? super InputType,
+				Iterable <OutputType>
+			> mapFunction) {
+
+		return () ->
+			Streams.stream (
+				iterable)
+
+			.flatMap (
+				item ->
+					iterableStream (
+						mapFunction.apply (
+							item)))
+
+			.iterator ();
+
+	}
+
 	public static <InLeftType, InRightType, OutType>
 	Iterable <OutType> iterableMap (
 			@NonNull Iterable <Pair <InLeftType, InRightType>> iterable,

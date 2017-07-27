@@ -1,11 +1,14 @@
 package wbs.platform.object.settings;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
+import java.util.List;
 
 import com.google.common.base.Optional;
 
@@ -36,6 +39,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.utils.data.Pair;
 import wbs.utils.etc.PropertyUtils;
 
 import wbs.web.responder.WebResponder;
@@ -155,18 +159,6 @@ class ObjectSettingsAction <
 
 			// perform update
 
-			/*
-			if (formFieldsProvider != null) {
-
-				prepareParent (
-					transaction);
-
-				prepareFieldSet (
-					transaction);
-
-			}
-			*/
-
 			ConsoleForm <ObjectType> form =
 				formType.buildAction (
 					transaction,
@@ -184,6 +176,35 @@ class ObjectSettingsAction <
 				return null;
 
 			}
+
+			// perform data validation
+
+			List <Pair <Record <?>, String>> errors =
+				consoleHelper.hooks ().verifyData (
+					transaction,
+					object,
+					false);
+
+			if (
+				collectionIsNotEmpty (
+					errors)
+			) {
+
+				for (
+					Pair <Record <?>, String> error
+						: errors
+				) {
+
+					requestContext.addError (
+						error.right ());
+
+				}
+
+				return null;
+
+			}
+
+			// check changes were made
 
 			if (! form.updates ()) {
 

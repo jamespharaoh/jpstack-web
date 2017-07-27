@@ -41,6 +41,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 
+import wbs.utils.data.Pair;
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
@@ -941,6 +942,20 @@ class ConsoleObjectManagerImplementation
 
 		return objectManager.objectClassForTypeCode (
 			typeCode);
+
+	}
+
+	@Override
+	public
+	List <Pair <Record <?>, String>> verifyData (
+			@NonNull Transaction parentTransaction,
+			@NonNull Record <?> object,
+			@NonNull Boolean recurse) {
+
+		return objectManager.verifyData (
+			parentTransaction,
+			object,
+			recurse);
 
 	}
 

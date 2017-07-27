@@ -1,8 +1,10 @@
 package wbs.platform.object.summary;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.NullUtils.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
@@ -63,6 +65,9 @@ class ObjectSummaryFieldsPart <
 	@Getter @Setter
 	ConsoleFormType <ObjectType> formType;
 
+	@Getter @Setter
+	String heading;
+
 	// state
 
 	ObjectType object;
@@ -90,18 +95,6 @@ class ObjectSummaryFieldsPart <
 				consoleHelper.lookupObject (
 					transaction,
 					requestContext.consoleContextStuffRequired ());
-
-			/*
-			if (formFieldsProvider != null) {
-
-				prepareParent (
-					transaction);
-
-				prepareFieldSet (
-					transaction);
-
-			}
-			*/
 
 			form =
 				formType.buildResponse (
@@ -165,18 +158,6 @@ class ObjectSummaryFieldsPart <
 
 	}
 
-	/*
-	void prepareFieldSet (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		formFieldSet =
-			formFieldsProvider.getFieldsForObject (
-				parentTaskLogger,
-				object);
-
-	}
-	*/
-
 	@Override
 	public
 	void renderHtmlBodyContent (
@@ -191,6 +172,17 @@ class ObjectSummaryFieldsPart <
 					"renderHtmlBodyContent");
 
 		) {
+
+			if (
+				isNotNull (
+					heading)
+			) {
+
+				htmlHeadingThreeWrite (
+					formatWriter,
+					heading);
+
+			}
 
 			htmlTableOpenDetails (
 				formatWriter);
