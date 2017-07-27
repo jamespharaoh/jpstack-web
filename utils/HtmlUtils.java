@@ -95,6 +95,68 @@ class HtmlUtils {
 	}
 
 	public static
+	String htmlEncodeSimple (
+			@NonNull String source) {
+
+		StringBuilder dest =
+			new StringBuilder (
+				source.length () * 2);
+
+		for (
+			int index = 0;
+			index < source.length ();
+			index ++
+		) {
+
+			char character =
+				source.charAt (
+					index);
+
+			switch (character) {
+
+			case '<':
+
+				dest.append (
+					"&lt;");
+
+				break;
+
+			case '&':
+
+				dest.append (
+					"&amp;");
+
+				break;
+
+			default:
+
+				if (character < 128) {
+
+					dest.append (
+						character);
+
+				} else {
+
+					dest.append (
+						"&#");
+
+					dest.append (
+						(int) character);
+
+					dest.append (
+						';');
+
+				}
+
+			}
+
+		}
+
+		return dest.toString ();
+
+	}
+
+	public static
 	String javascriptStringEscape (
 			String source) {
 
@@ -197,6 +259,16 @@ class HtmlUtils {
 
 		return htmlNewlineToBr (
 			htmlEncode (
+				source));
+
+	}
+
+	public static
+	String htmlEncodeSimpleNewlineToBr (
+			@NonNull String source) {
+
+		return htmlNewlineToBr (
+			htmlEncodeSimple (
 				source));
 
 	}
