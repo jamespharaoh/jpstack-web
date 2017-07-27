@@ -32,8 +32,8 @@
 		<!-- details -->
 
 		<description-field/>
-
 		<deleted-field/>
+		<active-field/>
 
 		<!-- settings -->
 
@@ -59,10 +59,6 @@
 			name="supplier"
 			type="shnSupplier"
 			nullable="yes"/>
-
-		<yes-no-field
-			name="active"
-			default="no"/>
 
 		<!-- statistics -->
 

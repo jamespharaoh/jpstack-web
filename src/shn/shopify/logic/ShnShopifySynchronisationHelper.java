@@ -4,16 +4,21 @@ import java.util.List;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.object.ObjectHelper;
 
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.ShopifyApiRequestItem;
 import shn.shopify.apiclient.ShopifyApiResponseItem;
 import shn.shopify.model.ShnShopifyConnectionRec;
 
 public
 interface ShnShopifySynchronisationHelper <
 	Local extends Record <Local>,
-	Remote extends ShopifyApiResponseItem
+	Request extends ShopifyApiRequestItem,
+	Response extends ShopifyApiResponseItem
 > {
+
+	ObjectHelper <Local> objectHelper ();
 
 	String friendlyNameSingular ();
 	String friendlyNamePlural ();
@@ -34,9 +39,14 @@ interface ShnShopifySynchronisationHelper <
 	List <Local> findLocalItems (
 			Transaction parentTransaction);
 
-	List <Remote> findRemoteItems (
+	List <Response> findRemoteItems (
 			Transaction parentTransaction,
 			ShopifyApiClientCredentials credentials);
+
+	Request localToRequest (
+			Transaction parentTransaction,
+			ShnShopifyConnectionRec connection,
+			Local localItem);
 
 	void removeItem (
 			Transaction parentTransaction,
@@ -44,29 +54,26 @@ interface ShnShopifySynchronisationHelper <
 			ShnShopifyConnectionRec connection,
 			Long id);
 
-	Remote createItem (
+	Response createRemoteItem (
 			Transaction parentTransaction,
 			ShopifyApiClientCredentials credentials,
-			ShnShopifyConnectionRec connection,
-			Local localItem);
+			Request request);
 
-	Remote updateItem (
+	Response updateItem (
 			Transaction parentTransaction,
 			ShopifyApiClientCredentials credentials,
-			ShnShopifyConnectionRec connection,
-			Local localItem,
-			Remote remoteItem);
+			Request request);
 
 	List <String> compareItem (
 			Transaction parentTransaction,
 			ShnShopifyConnectionRec connection,
 			Local localItem,
-			Remote remoteItem);
+			Response remoteItem);
 
-	void saveShopifyData (
+	void updateLocalItem (
 			Transaction parentTransaction,
 			Local localItem,
-			Remote remoteItem);
+			Response remoteItem);
 
 	static
 	enum EventType {

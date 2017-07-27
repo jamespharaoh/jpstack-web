@@ -3,15 +3,17 @@ package shn.shopify.logic;
 import wbs.framework.database.Transaction;
 
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.ShopifyApiRequestItem;
 import shn.shopify.apiclient.ShopifyApiResponseItem;
 import shn.shopify.model.ShnShopifyConnectionRec;
 import shn.shopify.model.ShnShopifyRecord;
 
 public
 interface ShnShopifySynchronisation <
-	Self extends ShnShopifySynchronisation <Self, Local, Remote>,
+	Self extends ShnShopifySynchronisation <Self, Local, Request, Response>,
 	Local extends ShnShopifyRecord <Local>,
-	Remote extends ShopifyApiResponseItem
+	Request extends ShopifyApiRequestItem,
+	Response extends ShopifyApiResponseItem
 > {
 
 	String friendlyNameSingular ();
@@ -46,7 +48,9 @@ interface ShnShopifySynchronisation <
 	long numNotUpdated ();
 	long numNotRemoved ();
 
-	long numErrors ();
+	long numDataErrors ();
+	long numEncodeErrors ();
+	long numMismatchErrors ();
 
 	long numOperations ();
 

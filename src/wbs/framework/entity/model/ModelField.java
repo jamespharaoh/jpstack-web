@@ -160,18 +160,19 @@ class ModelField {
 
 		return enumInSafe (
 			type,
-			ModelFieldType.generatedId,
+			ModelFieldType.active,
 			ModelFieldType.assignedId,
-			ModelFieldType.foreignId,
-			ModelFieldType.simple,
-			ModelFieldType.name,
-			ModelFieldType.description,
-			ModelFieldType.deleted,
-			ModelFieldType.typeCode,
 			ModelFieldType.code,
+			ModelFieldType.deleted,
+			ModelFieldType.description,
+			ModelFieldType.foreignId,
+			ModelFieldType.generatedId,
+			ModelFieldType.identitySimple,
 			ModelFieldType.index,
+			ModelFieldType.name,
 			ModelFieldType.parentId,
-			ModelFieldType.identitySimple);
+			ModelFieldType.simple,
+			ModelFieldType.typeCode);
 
 	}
 

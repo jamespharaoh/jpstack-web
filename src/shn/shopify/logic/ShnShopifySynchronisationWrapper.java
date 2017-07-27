@@ -1,6 +1,7 @@
 package shn.shopify.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
@@ -43,6 +44,7 @@ import wbs.utils.random.RandomLogic;
 
 import shn.core.model.ShnDatabaseRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.ShopifyApiRequestItem;
 import shn.shopify.apiclient.ShopifyApiResponseItem;
 import shn.shopify.logic.ShnShopifySynchronisationHelper.EventType;
 import shn.shopify.model.ShnShopifyConnectionRec;
@@ -52,12 +54,14 @@ import shn.shopify.model.ShnShopifyRecord;
 public
 class ShnShopifySynchronisationWrapper <
 	Local extends ShnShopifyRecord <Local>,
-	Remote extends ShopifyApiResponseItem
+	Request extends ShopifyApiRequestItem,
+	Response extends ShopifyApiResponseItem
 >
 	implements ShnShopifySynchronisation <
-		ShnShopifySynchronisationWrapper <Local, Remote>,
+		ShnShopifySynchronisationWrapper <Local, Request, Response>,
 		Local,
-		Remote
+		Request,
+		Response
 	> {
 
 	// singleton dependencies
@@ -77,7 +81,7 @@ class ShnShopifySynchronisationWrapper <
 	// properties
 
 	@Getter @Setter
-	ShnShopifySynchronisationHelper <Local, Remote> helper;
+	ShnShopifySynchronisationHelper <Local, Request, Response> helper;
 
 	@Getter @Setter
 	Boolean enableCreate;
@@ -105,8 +109,8 @@ class ShnShopifySynchronisationWrapper <
 	Map <Long, Local> localItemsByShopifyId;
 	List <Local> localItemsWithoutShopifyId;
 
-	List <Remote> remoteItems;
-	Map <Long, Remote> remoteItemsById;
+	List <Response> remoteItems;
+	Map <Long, Response> remoteItemsById;
 
 	@Getter
 	long numCreated = 0l;
@@ -130,7 +134,13 @@ class ShnShopifySynchronisationWrapper <
 	long numOperations = 0;
 
 	@Getter
-	long numErrors = 0;
+	long numDataErrors = 0;
+
+	@Getter
+	long numEncodeErrors = 0;
+
+	@Getter
+	long numMismatchErrors = 0;
 
 	// public implementation
 
@@ -148,7 +158,7 @@ class ShnShopifySynchronisationWrapper <
 
 	@Override
 	public
-	ShnShopifySynchronisationWrapper <Local, Remote> synchronise (
+	ShnShopifySynchronisationWrapper <Local, Request, Response> synchronise (
 			@NonNull Transaction parentTransaction) {
 
 		try (
@@ -312,7 +322,7 @@ class ShnShopifySynchronisationWrapper <
 				"About to remove %s from shopify",
 				helper.friendlyNamePlural ());
 
-			List <Remote> selectedRemoteItems =
+			List <Response> removableRemoteItems =
 				randomLogic.shuffleToList (
 					remoteItems)
 
@@ -323,6 +333,16 @@ class ShnShopifySynchronisationWrapper <
 						mapDoesNotContainKey (
 							localItemsByShopifyId,
 							remoteItem.id ()))
+
+				.collect (
+					Collectors.toList ())
+
+			;
+
+			List <Response> selectedRemoteItems =
+				removableRemoteItems
+
+				.stream ()
 
 				.limit (
 					maxOperations)
@@ -335,7 +355,7 @@ class ShnShopifySynchronisationWrapper <
 			numNotRemoved +=
 				minus (
 					collectionSize (
-						remoteItems),
+						removableRemoteItems),
 					collectionSize (
 						selectedRemoteItems));
 
@@ -362,7 +382,7 @@ class ShnShopifySynchronisationWrapper <
 	private
 	void removeItem (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Remote remoteItem) {
+			@NonNull Response remoteItem) {
 
 		try (
 
@@ -446,6 +466,19 @@ class ShnShopifySynchronisationWrapper <
 					continue;
 				}
 
+				if (
+					collectionIsNotEmpty (
+						helper.objectHelper ().hooks ().verifyData (
+							transaction,
+							localItem))
+				) {
+
+					numDataErrors ++;
+
+					continue;
+
+				}
+
 				numOperations ++;
 
 				if (numOperations > maxOperations) {
@@ -464,19 +497,43 @@ class ShnShopifySynchronisationWrapper <
 					integerToDecimalString (
 						localItem.getId ()));
 
-				Remote remoteItem =
-					helper.createItem (
+				Request remoteRequest;
+
+				try {
+
+					remoteRequest =
+						helper.localToRequest (
+							transaction,
+							shopifyConnection,
+							localItem);
+
+				} catch (Exception exception) {
+
+					transaction.errorFormatException (
+						exception,
+						"Error encoding data for %s %s",
+						helper.friendlyNameSingular (),
+						integerToDecimalString (
+							localItem.getId ()));
+
+					numEncodeErrors ++;
+
+					continue;
+
+				}
+
+				Response remoteResponse =
+					helper.createRemoteItem (
 						transaction,
 						shopifyCredentials,
-						shopifyConnection,
-						localItem);
+						remoteRequest);
 
 				// save changes
 
-				helper.saveShopifyData (
+				helper.updateLocalItem (
 					transaction,
 					localItem,
-					remoteItem);
+					remoteResponse);
 
 				eventLogic.createEvent (
 					transaction,
@@ -493,7 +550,7 @@ class ShnShopifySynchronisationWrapper <
 						transaction,
 						shopifyConnection,
 						localItem,
-						remoteItem);
+						remoteResponse);
 
 				if (
 					collectionIsEmpty (
@@ -512,7 +569,7 @@ class ShnShopifySynchronisationWrapper <
 								"Created item mismatch: %s",
 								mismatch));
 
-					numErrors ++;
+					numMismatchErrors ++;
 
 				}
 
@@ -527,7 +584,7 @@ class ShnShopifySynchronisationWrapper <
 						localItem.getId ()),
 					"with shopify id %s",
 					integerToDecimalString (
-						remoteItem.id ()));
+						remoteResponse.id ()));
 
 			}
 
@@ -566,7 +623,7 @@ class ShnShopifySynchronisationWrapper <
 
 				// check if update is required
 
-				Optional <Remote> remoteItemOptional =
+				Optional <Response> remoteItemOptional =
 					optionalMapOptional (
 						optionalFromNullable (
 							helper.getShopifyId (
@@ -583,7 +640,7 @@ class ShnShopifySynchronisationWrapper <
 					continue;
 				}
 
-				Remote remoteItem =
+				Response remoteItem =
 					optionalGetRequired (
 						remoteItemOptional);
 
@@ -621,20 +678,43 @@ class ShnShopifySynchronisationWrapper <
 					integerToDecimalString (
 						localItem.getId ()));
 
-				remoteItem =
+				Request remoteRequest;
+
+				try {
+
+					remoteRequest =
+						helper.localToRequest (
+							transaction,
+							shopifyConnection,
+							localItem);
+
+				} catch (Exception exception) {
+
+					transaction.errorFormatException (
+						exception,
+						"Error encoding data for %s %s",
+						helper.friendlyNameSingular (),
+						integerToDecimalString (
+							localItem.getId ()));
+
+					numEncodeErrors ++;
+
+					continue;
+
+				}
+
+				Response remoteResponse =
 					helper.updateItem (
 						transaction,
 						shopifyCredentials,
-						shopifyConnection,
-						localItem,
-						remoteItem);
+						remoteRequest);
 
 				// save changes
 
-				helper.saveShopifyData (
+				helper.updateLocalItem (
 					transaction,
 					localItem,
-					remoteItem);
+					remoteResponse);
 
 				eventLogic.createEvent (
 					transaction,
@@ -651,7 +731,7 @@ class ShnShopifySynchronisationWrapper <
 						transaction,
 						shopifyConnection,
 						localItem,
-						remoteItem);
+						remoteResponse);
 
 				if (
 					collectionIsEmpty (
@@ -670,7 +750,7 @@ class ShnShopifySynchronisationWrapper <
 								"Updated item mismatch: %s",
 								mismatch));
 
-					numErrors ++;
+					numMismatchErrors ++;
 
 				}
 
@@ -685,7 +765,7 @@ class ShnShopifySynchronisationWrapper <
 						localItem.getId ()),
 					"with shopify id %s",
 					integerToDecimalString (
-						remoteItem.id ()));
+						remoteResponse.id ()));
 
 			}
 

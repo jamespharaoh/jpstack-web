@@ -20,8 +20,8 @@
 		<!-- details -->
 
 		<description-field/>
-
 		<deleted-field/>
+		<active-field/>
 
 		<!-- cached data -->
 
@@ -43,10 +43,6 @@
 			name="image"
 			type="shnProductImage"
 			nullable="yes"/>
-
-		<yes-no-field
-			name="active"
-			default="no"/>
 
 		<!-- pricing -->
 

@@ -19,17 +19,14 @@
 		<!-- details -->
 
 		<description-field/>
-
 		<deleted-field/>
+		<active-field/>
 
 		<!-- settings -->
 
 		<reference-field
 			name="originalMedia"
 			type="media"/>
-
-		<yes-no-field
-			name="active"/>
 
 		<!-- statistics -->
 

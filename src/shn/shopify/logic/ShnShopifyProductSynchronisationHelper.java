@@ -35,6 +35,7 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.object.ObjectHelper;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -47,7 +48,6 @@ import shn.product.model.ShnProductVariantRec;
 import shn.product.model.ShnProductVariantTypeRec;
 import shn.product.model.ShnProductVariantValueRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
-import shn.shopify.apiclient.metafield.ShopifyMetafieldRequest;
 import shn.shopify.apiclient.product.ShopifyProductApiClient;
 import shn.shopify.apiclient.product.ShopifyProductImageRequest;
 import shn.shopify.apiclient.product.ShopifyProductImageResponse;
@@ -64,6 +64,7 @@ public
 class ShnShopifyProductSynchronisationHelper
 	implements ShnShopifySynchronisationHelper <
 		ShnProductRec,
+		ShopifyProductRequest,
 		ShopifyProductResponse
 	> {
 
@@ -94,6 +95,12 @@ class ShnShopifyProductSynchronisationHelper
 	WbsConfig wbsConfig;
 
 	// details
+
+	@Override
+	public
+	ObjectHelper <ShnProductRec> objectHelper () {
+		return productHelper;
+	}
 
 	@Override
 	public
@@ -243,11 +250,10 @@ class ShnShopifyProductSynchronisationHelper
 
 	@Override
 	public
-	ShopifyProductResponse createItem (
+	ShopifyProductResponse createRemoteItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductRec localProduct) {
+			@NonNull ShopifyProductRequest request) {
 
 		try (
 
@@ -261,10 +267,7 @@ class ShnShopifyProductSynchronisationHelper
 			return productApiClient.createProduct (
 				transaction,
 				credentials,
-				productRequest (
-					transaction,
-					connection,
-					localProduct));
+				request);
 
 		}
 
@@ -275,9 +278,7 @@ class ShnShopifyProductSynchronisationHelper
 	ShopifyProductResponse updateItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductRec localItem,
-			@NonNull ShopifyProductResponse remoteItem) {
+			@NonNull ShopifyProductRequest request) {
 
 		try (
 
@@ -291,10 +292,7 @@ class ShnShopifyProductSynchronisationHelper
 			return productApiClient.update (
 				transaction,
 				credentials,
-				productRequest (
-					transaction,
-					connection,
-					localItem));
+				request);
 
 		}
 
@@ -356,10 +354,9 @@ class ShnShopifyProductSynchronisationHelper
 
 	}
 
-	// private implementation
-
-	private
-	ShopifyProductRequest productRequest (
+	@Override
+	public
+	ShopifyProductRequest localToRequest (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnShopifyConnectionRec connection,
 			@NonNull ShnProductRec localProduct) {
@@ -369,7 +366,7 @@ class ShnShopifyProductSynchronisationHelper
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"productRequest");
+					"localToRequest");
 
 		) {
 
@@ -401,6 +398,7 @@ class ShnShopifyProductSynchronisationHelper
 						transaction,
 						localProduct))
 
+/*
 				.metafields (
 					ImmutableList.of (
 
@@ -415,6 +413,7 @@ class ShnShopifyProductSynchronisationHelper
 						localProduct.getId ())
 
 				))
+*/
 
 			;
 
@@ -424,7 +423,7 @@ class ShnShopifyProductSynchronisationHelper
 
 	@Override
 	public
-	void saveShopifyData (
+	void updateLocalItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnProductRec localProduct,
 			@NonNull ShopifyProductResponse remoteProduct) {

@@ -6,11 +6,14 @@ import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 
+import shn.shopify.apiclient.ShopifyApiRequestItem;
+
 @Accessors (fluent = true)
 @Data
 @DataClass
 public
-class ShopifyCollectRequest {
+class ShopifyCollectRequest
+	implements ShopifyApiRequestItem {
 
 	@DataAttribute (
 		name = "id")

@@ -1,7 +1,10 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringFormat;
+
+import java.util.List;
 
 import com.google.common.base.Optional;
 
@@ -48,6 +51,15 @@ interface ObjectHooks <RecordType extends Record <RecordType>> {
 			@NonNull RecordType object) {
 
 		doNothing ();
+
+	}
+
+	default
+	List <String> verifyData (
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
+
+		return emptyList ();
 
 	}
 

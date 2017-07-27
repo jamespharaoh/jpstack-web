@@ -17,6 +17,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.object.ObjectHelper;
 
 import shn.product.model.ShnProductObjectHelper;
 import shn.product.model.ShnProductRec;
@@ -32,6 +33,7 @@ public
 class ShnShopifyProductSubCategorySynchronisationHelper
 	implements ShnShopifySynchronisationHelper <
 		ShnProductRec,
+		ShopifyCollectRequest,
 		ShopifyCollectResponse
 	> {
 
@@ -50,6 +52,12 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 	ShnShopifyLogic shopifyLogic;
 
 	// details
+
+	@Override
+	public
+	ObjectHelper <ShnProductRec> objectHelper () {
+		return productHelper;
+	}
 
 	@Override
 	public
@@ -199,11 +207,37 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 
 	@Override
 	public
-	ShopifyCollectResponse createItem (
+	ShopifyCollectRequest localToRequest (
 			@NonNull Transaction parentTransaction,
-			@NonNull ShopifyApiClientCredentials credentials,
 			@NonNull ShnShopifyConnectionRec connection,
 			@NonNull ShnProductRec localProduct) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"localToRequest");
+
+		) {
+
+			return shopifyLogic.createRequest (
+				transaction,
+				connection,
+				productSubCategoryAttributes,
+				localProduct,
+				ShopifyCollectRequest.class);
+
+		}
+
+	}
+
+	@Override
+	public
+	ShopifyCollectResponse createRemoteItem (
+			@NonNull Transaction parentTransaction,
+			@NonNull ShopifyApiClientCredentials credentials,
+			@NonNull ShopifyCollectRequest request) {
 
 		try (
 
@@ -217,10 +251,7 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 			return collectApiClient.create (
 				transaction,
 				credentials,
-				productSubCollectionRequest (
-					transaction,
-					connection,
-					localProduct));
+				request);
 
 		}
 
@@ -231,9 +262,7 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 	ShopifyCollectResponse updateItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductRec localItem,
-			@NonNull ShopifyCollectResponse remoteItem) {
+			@NonNull ShopifyCollectRequest request) {
 
 		try (
 
@@ -247,10 +276,7 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 			return collectApiClient.update (
 				transaction,
 				credentials,
-				productSubCollectionRequest (
-					transaction,
-					connection,
-					localItem));
+				request);
 
 		}
 
@@ -293,35 +319,9 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 
 	// private implementation
 
-	private
-	ShopifyCollectRequest productSubCollectionRequest (
-			@NonNull Transaction parentTransaction,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductRec localProduct) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"productRequest");
-
-		) {
-
-			return shopifyLogic.createRequest (
-				transaction,
-				connection,
-				productSubCategoryAttributes,
-				localProduct,
-				ShopifyCollectRequest.class);
-
-		}
-
-	}
-
 	@Override
 	public
-	void saveShopifyData (
+	void updateLocalItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnProductRec localProduct,
 			@NonNull ShopifyCollectResponse remoteCollect) {

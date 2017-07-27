@@ -31,8 +31,8 @@
 		<!-- details -->
 
 		<description-field/>
-
 		<deleted-field/>
+		<active-field/>
 
 		<!-- cached data -->
 
@@ -41,9 +41,6 @@
 			type="shnDatabase"/>
 
 		<!-- settings -->
-
-		<yes-no-field
-			name="active"/>
 
 		<string-field
 			name="publicTitle"

@@ -3,30 +3,35 @@ package wbs.framework.entity.model;
 public
 enum ModelFieldType {
 
-	generatedId,
 	assignedId,
-	foreignId,
-	simple,
-	reference,
-	parent,
-	grandParent,
-	greatGrandParent,
-	parentType,
-	parentId,
-	typeCode,
-	code,
-	index,
-	deleted,
 	compositeId,
-	component,
-	collection,
-	associative,
-	description,
-	name,
-	type,
+	foreignId,
+	generatedId,
+	identityReference,
+	identitySimple,
 	master,
 	slave,
-	identityReference,
-	identitySimple;
+
+	code,
+	grandParent,
+	greatGrandParent,
+	index,
+	parent,
+	parentId,
+	parentType,
+	type,
+	typeCode,
+
+	component,
+	reference,
+	simple,
+
+	active,
+	deleted,
+	name,
+	description,
+
+	associative,
+	collection;
 
 }

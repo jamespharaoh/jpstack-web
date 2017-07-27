@@ -10,6 +10,7 @@
 		<component class="meta.collections.ChildrenListSpec"/>
 		<component class="meta.collections.ChildrenMappingSpec"/>
 
+		<component class="meta.fields.ActiveFieldSpec"/>
 		<component class="meta.fields.BinaryFieldSpec"/>
 		<component class="meta.fields.ComponentFieldSpec"/>
 		<component class="meta.fields.DateFieldSpec"/>
@@ -72,6 +73,7 @@
 		<component class="generate.collections.ChildrenListWriter"/>
 		<component class="generate.collections.ChildrenMappingWriter"/>
 
+		<component class="generate.fields.ActiveFieldWriter"/>
 		<component class="generate.fields.AssignedIdFieldWriter"/>
 		<component class="generate.fields.BinaryFieldWriter"/>
 		<component class="generate.fields.ComponentFieldWriter"/>
@@ -114,6 +116,7 @@
 
 	<layer name="entity">
 
+		<component class="build.ActiveModelFieldBuilder"/>
 		<component class="build.AssignedIdModelFieldBuilder"/>
 		<component class="build.AssociativeCollectionModelFieldBuilder"/>
 		<component class="build.AssociativeListModelFieldBuilder"/>

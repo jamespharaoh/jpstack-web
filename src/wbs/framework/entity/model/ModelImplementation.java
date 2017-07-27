@@ -61,10 +61,28 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 	// fields
 
 	@DataReference
+	ModelField activeField;
+
+	@DataReference
+	ModelField codeField;
+
+	@DataReference
+	ModelField deletedField;
+
+	@DataReference
+	ModelField descriptionField;
+
+	@DataReference
 	ModelField idField;
 
 	@DataReference
-	ModelField timestampField;
+	ModelField indexField;
+
+	@DataReference
+	ModelField masterField;
+
+	@DataReference
+	ModelField nameField;
 
 	@DataReference
 	ModelField parentField;
@@ -76,25 +94,10 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 	ModelField parentIdField;
 
 	@DataReference
-	ModelField masterField;
+	ModelField timestampField;
 
 	@DataReference
 	ModelField typeCodeField;
-
-	@DataReference
-	ModelField codeField;
-
-	@DataReference
-	ModelField indexField;
-
-	@DataReference
-	ModelField nameField;
-
-	@DataReference
-	ModelField descriptionField;
-
-	@DataReference
-	ModelField deletedField;
 
 	@DataReference
 	ModelField typeField;

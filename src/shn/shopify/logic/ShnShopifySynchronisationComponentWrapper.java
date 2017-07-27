@@ -20,16 +20,18 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.OwnedTaskLogger;
 import wbs.framework.logging.TaskLogger;
 
+import shn.shopify.apiclient.ShopifyApiRequestItem;
 import shn.shopify.apiclient.ShopifyApiResponseItem;
 
 @SingletonComponent ("shnShopifySynchronisationComponentWrapper")
 public
 class ShnShopifySynchronisationComponentWrapper <
 	Local extends Record <Local>,
-	Remote extends ShopifyApiResponseItem
+	Request extends ShopifyApiRequestItem,
+	Response extends ShopifyApiResponseItem
 >
 	implements ComponentWrapper <
-		ShnShopifySynchronisationHelper <Local, Remote>
+		ShnShopifySynchronisationHelper <Local, Request, Response>
 	> {
 
 	// singleton dependencies
@@ -41,7 +43,11 @@ class ShnShopifySynchronisationComponentWrapper <
 
 	@Override
 	public
-	Class <ShnShopifySynchronisationHelper <Local, Remote>> componentClass () {
+	Class <ShnShopifySynchronisationHelper <
+		Local,
+		Request,
+		Response
+	>> componentClass () {
 
 		return genericCastUnchecked (
 			ShnShopifySynchronisationHelper.class);

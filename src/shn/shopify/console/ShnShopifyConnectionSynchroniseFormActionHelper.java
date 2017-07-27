@@ -35,8 +35,11 @@ import wbs.utils.string.FormatWriter;
 import shn.product.model.ShnProductRec;
 import shn.product.model.ShnProductSubCategoryRec;
 import shn.shopify.apiclient.ShopifyApiClientCredentials;
+import shn.shopify.apiclient.collect.ShopifyCollectRequest;
 import shn.shopify.apiclient.collect.ShopifyCollectResponse;
+import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionRequest;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionResponse;
+import shn.shopify.apiclient.product.ShopifyProductRequest;
 import shn.shopify.apiclient.product.ShopifyProductResponse;
 import shn.shopify.logic.ShnShopifyLogic;
 import shn.shopify.logic.ShnShopifySynchronisation;
@@ -75,6 +78,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	ComponentProvider <ShnShopifySynchronisation <
 		?,
 		ShnProductRec,
+		ShopifyCollectRequest,
 		ShopifyCollectResponse
 	>> productSubCategorySynchronisationProvider;
 
@@ -83,6 +87,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	ComponentProvider <ShnShopifySynchronisation <
 		?,
 		ShnProductRec,
+		ShopifyProductRequest,
 		ShopifyProductResponse
 	>> productSynchronisationProvider;
 
@@ -91,6 +96,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	ComponentProvider <ShnShopifySynchronisation <
 		?,
 		ShnProductSubCategoryRec,
+		ShopifyCustomCollectionRequest,
 		ShopifyCustomCollectionResponse
 	>> subCategorySynchronisationProvider;
 
@@ -225,7 +231,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			// synchronise items
 
-			List <ShnShopifySynchronisation <?, ?, ?>> synchronisations =
+			List <ShnShopifySynchronisation <?, ?, ?, ?>> synchronisations =
 				ImmutableList.of (
 
 				subCategorySynchronisationProvider.provide (
@@ -240,7 +246,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			);
 
 			for (
-				ShnShopifySynchronisation <?, ?, ?> synchronisation
+				ShnShopifySynchronisation <?, ?, ?, ?> synchronisation
 					: synchronisations
 			) {
 
@@ -291,7 +297,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			transaction.commit ();
 
 			for (
-				ShnShopifySynchronisation <?, ?, ?> synchronisation
+				ShnShopifySynchronisation <?, ?, ?, ?> synchronisation
 					: synchronisations
 			) {
 
@@ -332,7 +338,7 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 	private
 	void addNotices (
 			@NonNull Transaction parentTransaction,
-			@NonNull ShnShopifySynchronisation <?, ?, ?> synchronisation) {
+			@NonNull ShnShopifySynchronisation <?, ?, ?, ?> synchronisation) {
 
 		try (
 
@@ -429,13 +435,41 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 
 			if (
 				moreThanZero (
-					synchronisation.numErrors ())
+					synchronisation.numDataErrors ())
+			) {
+
+				requestContext.addErrorFormat (
+					"%s could not be synchronised due to invalid data",
+					pluralise (
+						synchronisation.numDataErrors (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numEncodeErrors ())
+			) {
+
+				requestContext.addErrorFormat (
+					"%s could not be encoded due to invalid data",
+					pluralise (
+						synchronisation.numDataErrors (),
+						synchronisation.friendlyNameSingular (),
+						synchronisation.friendlyNamePlural ()));
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numMismatchErrors ())
 			) {
 
 				requestContext.addErrorFormat (
 					"%s data mismatch errors creating or updating %s",
 					integerToDecimalString (
-						synchronisation.numErrors ()),
+						synchronisation.numMismatchErrors ()),
 					synchronisation.friendlyNamePlural ());
 
 			}

@@ -1,16 +1,10 @@
 package shn.shopify.logic;
 
-import static wbs.utils.collection.MapUtils.mapFilterByKeyToList;
-import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
-import static wbs.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -24,8 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
-
-import wbs.utils.data.Pair;
+import wbs.framework.object.ObjectHelper;
 
 import shn.product.model.ShnProductSubCategoryObjectHelper;
 import shn.product.model.ShnProductSubCategoryRec;
@@ -34,8 +27,6 @@ import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionApiClient;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionRequest;
 import shn.shopify.apiclient.customcollection.ShopifyCustomCollectionResponse;
 import shn.shopify.apiclient.metafield.ShopifyMetafieldApiClient;
-import shn.shopify.apiclient.metafield.ShopifyMetafieldRequest;
-import shn.shopify.apiclient.metafield.ShopifyMetafieldResponse;
 import shn.shopify.model.ShnShopifyConnectionRec;
 
 @SingletonComponent ("shnShopifySubCategorySynchronisationHelper")
@@ -43,6 +34,7 @@ public
 class ShnShopifySubCategorySynchronisationHelper
 	implements ShnShopifySynchronisationHelper <
 		ShnProductSubCategoryRec,
+		ShopifyCustomCollectionRequest,
 		ShopifyCustomCollectionResponse
 	> {
 
@@ -64,6 +56,12 @@ class ShnShopifySubCategorySynchronisationHelper
 	ShnShopifyLogic shopifyLogic;
 
 	// details
+
+	@Override
+	public
+	ObjectHelper <ShnProductSubCategoryRec> objectHelper () {
+		return subCategoryHelper;
+	}
 
 	@Override
 	public
@@ -179,6 +177,7 @@ class ShnShopifySubCategorySynchronisationHelper
 					transaction,
 					credentials);
 
+/*
 			Map <Pair <Long, String>, ShopifyMetafieldResponse> metafields =
 				mapWithDerivedKey (
 					metafieldApiClient.listByNamespaceAndOwnerResource (
@@ -224,6 +223,7 @@ customCollections.forEach (
 				metafield.value ()));
 
 });
+*/
 
 			return customCollections;
 
@@ -259,11 +259,10 @@ customCollections.forEach (
 
 	@Override
 	public
-	ShopifyCustomCollectionResponse createItem (
+	ShopifyCustomCollectionResponse createRemoteItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductSubCategoryRec localSubCategory) {
+			@NonNull ShopifyCustomCollectionRequest request) {
 
 		try (
 
@@ -277,10 +276,7 @@ customCollections.forEach (
 			return collectionApiClient.create (
 				transaction,
 				credentials,
-				subCategoryRequest (
-					transaction,
-					connection,
-					localSubCategory));
+				request);
 
 		}
 
@@ -291,9 +287,7 @@ customCollections.forEach (
 	ShopifyCustomCollectionResponse updateItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShopifyApiClientCredentials credentials,
-			@NonNull ShnShopifyConnectionRec connection,
-			@NonNull ShnProductSubCategoryRec localItem,
-			@NonNull ShopifyCustomCollectionResponse remoteItem) {
+			@NonNull ShopifyCustomCollectionRequest request) {
 
 		try (
 
@@ -307,10 +301,7 @@ customCollections.forEach (
 			return collectionApiClient.update (
 				transaction,
 				credentials,
-				subCategoryRequest (
-					transaction,
-					connection,
-					localItem));
+				request);
 
 		}
 
@@ -351,10 +342,9 @@ customCollections.forEach (
 
 	}
 
-	// private implementation
-
-	private
-	ShopifyCustomCollectionRequest subCategoryRequest (
+	@Override
+	public
+	ShopifyCustomCollectionRequest localToRequest (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnShopifyConnectionRec connection,
 			@NonNull ShnProductSubCategoryRec localSubCategory) {
@@ -364,7 +354,7 @@ customCollections.forEach (
 			NestedTransaction transaction =
 				parentTransaction.nestTransaction (
 					logContext,
-					"subCategoryRequest");
+					"localToRequest");
 
 		) {
 
@@ -375,6 +365,7 @@ customCollections.forEach (
 				localSubCategory,
 				ShopifyCustomCollectionRequest.class)
 
+/*
 				.metafields (
 					ImmutableList.of (
 
@@ -389,6 +380,7 @@ customCollections.forEach (
 						localSubCategory.getId ())
 
 				))
+*/
 
 			;
 
@@ -398,7 +390,7 @@ customCollections.forEach (
 
 	@Override
 	public
-	void saveShopifyData (
+	void updateLocalItem (
 			@NonNull Transaction parentTransaction,
 			@NonNull ShnProductSubCategoryRec localSubCategory,
 			@NonNull ShopifyCustomCollectionResponse remoteCollection) {

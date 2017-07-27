@@ -1,9 +1,11 @@
 package wbs.console.helper.core;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
@@ -69,6 +71,15 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 			@NonNull RecordType object) {
 
 		doNothing ();
+
+	}
+
+	default
+	List <String> verifyData (
+			@NonNull Transaction parentTransaction,
+			@NonNull RecordType object) {
+
+		return emptyList ();
 
 	}
 
