@@ -13,7 +13,7 @@ import static wbs.utils.string.PlaceholderUtils.placeholderMapCurlyBraces;
 import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.web.utils.HtmlUtils.htmlEncodeNewlineToBr;
+import static wbs.web.utils.HtmlUtils.htmlEncodeSimpleNewlineToBr;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,7 +103,7 @@ class ShnShopifyLogicImplementation
 					"description",
 					ifNotNullThenElse (
 						product.getPublicDescription (),
-						() -> htmlEncodeNewlineToBr (
+						() -> htmlEncodeSimpleNewlineToBr (
 							product.getPublicDescription ().getText ()),
 						() -> ""))
 
@@ -111,7 +111,7 @@ class ShnShopifyLogicImplementation
 					"contents",
 					ifNotNullThenElse (
 						product.getPublicContents (),
-						() -> htmlEncodeNewlineToBr (
+						() -> htmlEncodeSimpleNewlineToBr (
 							product.getPublicContents ().getText ()),
 						() -> ""))
 
