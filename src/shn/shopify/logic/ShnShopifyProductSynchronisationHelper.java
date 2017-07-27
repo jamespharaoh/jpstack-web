@@ -8,7 +8,6 @@ import static wbs.utils.collection.CollectionUtils.listSecondElement;
 import static wbs.utils.collection.CollectionUtils.listThirdElement;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.BinaryUtils.bytesToBase64;
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.iterable;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -683,14 +682,12 @@ class ShnShopifyProductSynchronisationHelper
 			String.class,
 			"price",
 			localVariant ->
-				ifNotNullThenElse (
-					localVariant.getShoppingNationPrice (),
-					() -> currencyLogic.formatSimple (
-						localVariant.getDatabase ().getCurrency (),
-						ifNull (
-							localVariant.getPromotionalPrice (),
-							localVariant.getShoppingNationPrice ())),
-					() -> null),
+				currencyLogic.formatSimple (
+					localVariant.getDatabase ().getCurrency (),
+					ifNull (
+						localVariant.getPromotionalPrice (),
+						localVariant.getShoppingNationPrice (),
+						0l)),
 			ShopifyProductVariantRequest::price,
 			ShopifyProductVariantResponse::price),
 
