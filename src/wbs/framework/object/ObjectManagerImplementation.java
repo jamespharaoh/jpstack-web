@@ -10,7 +10,6 @@ import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -1378,8 +1377,6 @@ class ObjectManagerImplementation
 			@NonNull Transaction parentTransaction,
 			@NonNull Record <?> object,
 			@NonNull Boolean recurse) {
-
-debugFormat ("VERIFY DATA");
 
 		try (
 

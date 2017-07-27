@@ -1,9 +1,7 @@
 package shn.shopify.apiclient.metafield;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.lessThan;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.List;
@@ -166,12 +164,6 @@ class ShopifyMetafieldApiClientImplementation
 					)
 
 				);
-
-debugFormat (
-	"GOT %s METAFIELDS",
-	integerToDecimalString (
-		collectionSize (
-			response.metafields ())));
 
 				builder.addAll (
 					response.metafields ());
