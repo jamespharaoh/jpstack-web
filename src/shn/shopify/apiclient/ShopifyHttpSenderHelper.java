@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Duration;
+
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
@@ -57,6 +59,12 @@ class ShopifyHttpSenderHelper
 	String responseBody;
 
 	// details
+
+	@Override
+	public
+	Duration defaultTimeout () {
+		return Duration.standardSeconds (30);
+	}
 
 	@Override
 	public

@@ -49,18 +49,23 @@ interface GenericHttpSenderHelper <
 	}
 
 	default
-	Duration connectionRequestTimeout () {
+	Duration defaultTimeout () {
 		return Duration.standardSeconds (10);
+	}
+
+	default
+	Duration connectionRequestTimeout () {
+		return defaultTimeout ();
 	}
 
 	default
 	Duration connectTimeout () {
-		return Duration.standardSeconds (10);
+		return defaultTimeout ();
 	}
 
 	default
 	Duration socketTimeout () {
-		return Duration.standardSeconds (10);
+		return defaultTimeout ();
 	}
 
 	// response information setters
