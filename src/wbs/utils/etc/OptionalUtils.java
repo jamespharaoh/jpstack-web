@@ -1305,4 +1305,23 @@ class OptionalUtils {
 
 	}
 
+	public static
+	Optional <Exception> optionalCatchException (
+			@NonNull Runnable runnable) {
+
+		try {
+
+			runnable.run ();
+
+			return optionalAbsent ();
+
+		} catch (Exception exception) {
+
+			return optionalOf (
+				exception);
+
+		}
+
+	}
+
 }

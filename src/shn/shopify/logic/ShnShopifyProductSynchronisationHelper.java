@@ -11,8 +11,10 @@ import static wbs.utils.etc.BinaryUtils.bytesToBase64;
 import static wbs.utils.etc.Misc.iterable;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
@@ -21,6 +23,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 
@@ -174,6 +177,48 @@ class ShnShopifyProductSynchronisationHelper
 	}
 
 	// public implementation
+
+	@Override
+	public
+	Optional <ShnProductRec> findLocalItem (
+			@NonNull Transaction parentTransaction,
+			@NonNull Long id) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findLocalItem");
+
+		) {
+
+			Optional <ShnProductRec> productOptional =
+				productHelper.find (
+					transaction,
+					id);
+
+			if (
+				optionalIsNotPresent (
+					productOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ShnProductRec product =
+				optionalGetRequired (
+					productOptional);
+
+			if (product.getDeleted ()) {
+				return optionalAbsent ();
+			}
+
+			return optionalOf (
+				product);
+
+		}
+
+	}
 
 	@Override
 	public

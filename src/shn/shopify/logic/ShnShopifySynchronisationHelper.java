@@ -2,6 +2,8 @@ package shn.shopify.logic;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
@@ -35,6 +37,10 @@ interface ShnShopifySynchronisationHelper <
 	void setShopifyNeedsSync (
 			Local localItem,
 			Boolean value);
+
+	Optional <Local> findLocalItem (
+			Transaction parentTransaction,
+			Long id);
 
 	List <Local> findLocalItems (
 			Transaction parentTransaction);

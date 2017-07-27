@@ -207,15 +207,16 @@ class SchemaTableFromModel {
 
 				break;
 
-			case simple:
-			case name:
-			case description:
-			case deleted:
-			case typeCode:
+			case active:
 			case code:
-			case index:
-			case parentId:
+			case deleted:
+			case description:
 			case identitySimple:
+			case index:
+			case name:
+			case parentId:
+			case simple:
+			case typeCode:
 
 				forField (
 					taskLogger,

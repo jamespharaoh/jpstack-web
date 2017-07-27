@@ -1,10 +1,15 @@
 package shn.shopify.logic;
 
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -131,6 +136,48 @@ class ShnShopifyProductSubCategorySynchronisationHelper
 	}
 
 	// public implementation
+
+	@Override
+	public
+	Optional <ShnProductRec> findLocalItem (
+			@NonNull Transaction parentTransaction,
+			@NonNull Long id) {
+
+		try (
+
+			NestedTransaction transaction =
+				parentTransaction.nestTransaction (
+					logContext,
+					"findLocalItem");
+
+		) {
+
+			Optional <ShnProductRec> productOptional =
+				productHelper.find (
+					transaction,
+					id);
+
+			if (
+				optionalIsNotPresent (
+					productOptional)
+			) {
+				return optionalAbsent ();
+			}
+
+			ShnProductRec product =
+				optionalGetRequired (
+					productOptional);
+
+			if (product.getDeleted ()) {
+				return optionalAbsent ();
+			}
+
+			return optionalOf (
+				product);
+
+		}
+
+	}
 
 	@Override
 	public

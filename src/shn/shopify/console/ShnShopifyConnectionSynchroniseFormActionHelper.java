@@ -439,11 +439,12 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			) {
 
 				requestContext.addErrorFormat (
-					"%s could not be synchronised due to invalid data",
+					"%s creating or updating %s",
 					pluralise (
 						synchronisation.numDataErrors (),
-						synchronisation.friendlyNameSingular (),
-						synchronisation.friendlyNamePlural ()));
+						"local data error",
+						"local data errors"),
+					synchronisation.friendlyNameSingular ());
 
 			}
 
@@ -453,11 +454,27 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			) {
 
 				requestContext.addErrorFormat (
-					"%s could not be encoded due to invalid data",
+					"%s creating or updating %s",
 					pluralise (
-						synchronisation.numDataErrors (),
-						synchronisation.friendlyNameSingular (),
-						synchronisation.friendlyNamePlural ()));
+						synchronisation.numEncodeErrors (),
+						"API encode error",
+						"API encode errors"),
+					synchronisation.friendlyNameSingular ());
+
+			}
+
+			if (
+				moreThanZero (
+					synchronisation.numApiErrors ())
+			) {
+
+				requestContext.addErrorFormat (
+					"%s creating or updating %s",
+					pluralise (
+						synchronisation.numApiErrors (),
+						"API error",
+						"API errors"),
+					synchronisation.friendlyNamePlural ());
 
 			}
 
@@ -467,9 +484,11 @@ class ShnShopifyConnectionSynchroniseFormActionHelper
 			) {
 
 				requestContext.addErrorFormat (
-					"%s data mismatch errors creating or updating %s",
-					integerToDecimalString (
-						synchronisation.numMismatchErrors ()),
+					"%s creating or updating %s",
+					pluralise (
+						synchronisation.numMismatchErrors (),
+						"data mismatch error",
+						"data mismatch errors"),
 					synchronisation.friendlyNamePlural ());
 
 			}

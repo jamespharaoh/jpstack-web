@@ -51,6 +51,7 @@ interface ShnShopifySynchronisation <
 	long numDataErrors ();
 	long numEncodeErrors ();
 	long numMismatchErrors ();
+	long numApiErrors ();
 
 	long numOperations ();
 
