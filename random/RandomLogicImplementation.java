@@ -1,5 +1,6 @@
 package wbs.utils.random;
 
+import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Random;
 
 import lombok.NonNull;
+
+import org.joda.time.Duration;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
@@ -109,6 +112,32 @@ class RandomLogicImplementation
 			long denominator) {
 
 		return randomInteger (denominator) < numerator;
+
+	}
+
+	@Override
+	public
+	Duration randomDuration (
+			@NonNull Duration limit) {
+
+		return Duration.millis (
+			randomInteger (
+				limit.getMillis ()));
+
+	}
+
+	@Override
+	public
+	Duration randomDuration (
+			@NonNull Duration limit,
+			@NonNull Duration variance) {
+
+		return Duration.millis (
+			sum (
+				+ limit.getMillis (),
+				- variance.getMillis (),
+				+ randomInteger (
+					2 * variance.getMillis ())));
 
 	}
 

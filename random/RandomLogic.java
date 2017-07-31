@@ -2,6 +2,8 @@ package wbs.utils.random;
 
 import java.util.List;
 
+import org.joda.time.Duration;
+
 public
 interface RandomLogic {
 
@@ -16,6 +18,13 @@ interface RandomLogic {
 	boolean randomBoolean (
 			long numerator,
 			long denominator);
+
+	Duration randomDuration (
+			Duration limit);
+
+	Duration randomDuration (
+			Duration limit,
+			Duration variance);
 
 	String generateString (
 			String chars,

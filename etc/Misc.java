@@ -6,6 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.utils.string.StringUtils.joinWithSpace;
@@ -44,6 +45,8 @@ import lombok.NonNull;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+
+import org.joda.time.Duration;
 
 import wbs.framework.logging.TaskLogger;
 
@@ -1096,6 +1099,30 @@ class Misc {
 			Object object) {
 
 		doNothing ();
+
+	}
+
+	public static
+	void sleepForDuration (
+			@NonNull Duration duration)
+		throws InterruptedException {
+
+		Thread.sleep (
+			duration.getMillis ());
+
+	}
+
+	public static
+	UnsupportedOperationException unsupportedOperation (
+			@NonNull Object object,
+			@NonNull String methodName) {
+
+		return new UnsupportedOperationException (
+			stringFormat (
+				"%s.%s",
+				classNameFull (
+					object.getClass ()),
+				methodName));
 
 	}
 

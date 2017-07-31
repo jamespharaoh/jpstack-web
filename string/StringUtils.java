@@ -1761,6 +1761,16 @@ class StringUtils {
 	}
 
 	public static
+	boolean stringDoesNotContain (
+			@NonNull CharSequence substring,
+			@NonNull CharSequence string) {
+
+		return ! string.toString ().contains (
+			substring);
+
+	}
+
+	public static
 	CharSequence keyEqualsClassSimple (
 			@NonNull CharSequence key,
 			@NonNull Class <?> value) {
