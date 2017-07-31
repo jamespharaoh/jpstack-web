@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="ticketState"
 	type="minor">
 
@@ -60,4 +60,4 @@
 
 	</queue-types>
 
-</model-meta>
+</record>

@@ -1,5 +1,5 @@
-<model-meta
-	name="ticketFieldType"
+<record
+	name="ticketTemplate"
 	type="minor">
 
 	<fields>
@@ -25,20 +25,14 @@
 
 		<!-- settings -->
 
-		<yes-no-field
-			name="required"/>
-
-		<enum-field
-			name="dataType"
-			type="ticketFieldDataType"/>
-
 		<reference-field
-			type="objectType"
+			type="ticketState"
 			nullable="yes"/>
 
-		<yes-no-field
-			name="visible"/>
+		<timestamp-field
+			name="timestamp"
+			column-type="iso"/>
 
 	</fields>
 
-</model-meta>
+</record>

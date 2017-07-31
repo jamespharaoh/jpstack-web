@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="ticket"
 	type="common">
 
@@ -66,4 +66,4 @@
 
 	</background-processes>
 
-</model-meta>
+</record>

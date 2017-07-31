@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="ticketNote"
 	type="minor">
 
@@ -25,4 +25,4 @@
 
 	</fields>
 
-</model-meta>
+</record>

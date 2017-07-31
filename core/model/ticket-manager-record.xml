@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="ticketManager"
 	type="major">
 
@@ -44,4 +44,4 @@
 
 	</priv-types>
 
-</model-meta>
+</record>
