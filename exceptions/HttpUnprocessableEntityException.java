@@ -8,7 +8,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpUnprocessableEntityException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpUnprocessableEntityException (

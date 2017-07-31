@@ -14,7 +14,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpNotFoundException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpNotFoundException (

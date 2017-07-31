@@ -12,7 +12,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpMethodNotAllowedException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpMethodNotAllowedException (

@@ -14,7 +14,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpTooManyRequestsException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpTooManyRequestsException (

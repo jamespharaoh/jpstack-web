@@ -12,7 +12,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpForbiddenException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpForbiddenException (

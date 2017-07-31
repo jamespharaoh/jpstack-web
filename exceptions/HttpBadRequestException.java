@@ -14,7 +14,7 @@ import wbs.web.misc.HttpStatus;
 
 public
 class HttpBadRequestException
-	extends HttpClientErrorException {
+	extends HttpClientException {
 
 	public
 	HttpBadRequestException (
