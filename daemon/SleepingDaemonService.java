@@ -2,7 +2,6 @@ package wbs.platform.daemon;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.time.TimeUtils.millisecondsToDuration;
 
 import lombok.NonNull;
 
@@ -115,7 +114,7 @@ class SleepingDaemonService
 		// work out initial delay
 
 		Duration delay =
-			calculateFirstDelay ();
+			helper.calculateFirstDelay ();
 
 		for (;;) {
 
@@ -186,30 +185,11 @@ class SleepingDaemonService
 				// work out next delay
 
 				delay =
-					calculateSubsequentDelay ();
+					helper.calculateSubsequentDelay ();
 
 			}
 
 		}
-
-	}
-
-	private
-	Duration calculateFirstDelay () {
-
-		return millisecondsToDuration (
-			randomLogic.randomInteger (
-				helper.frequency ().getMillis ()));
-
-	}
-
-	private
-	Duration calculateSubsequentDelay () {
-
-		return millisecondsToDuration (
-			helper.frequency ().getMillis () * 3 / 4).plus (
-				randomLogic.randomInteger (
-					helper.frequency ().getMillis () / 2));
 
 	}
 

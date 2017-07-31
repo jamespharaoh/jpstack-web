@@ -40,7 +40,7 @@ import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.OwnedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
-import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.entity.meta.model.RecordSpec;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
@@ -135,7 +135,7 @@ class QueueConsoleLogicImplementation
 				ImmutableMap.builder ();
 
 			for (
-				ModelMetaSpec modelMeta
+				RecordSpec modelMeta
 					: modelMetaLoader.modelMetas ().values ()
 			) {
 

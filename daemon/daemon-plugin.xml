@@ -4,6 +4,7 @@
 
 	<layer name="daemon">
 
+		<bootstrap-component class="ObjectDaemonComponentWrapper"/>
 		<bootstrap-component class="RemovalDaemonComponentWrapper"/>
 
 		<component class="DaemonSpecialConfig"/>

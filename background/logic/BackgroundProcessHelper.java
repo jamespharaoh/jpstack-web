@@ -13,6 +13,19 @@ interface BackgroundProcessHelper {
 
 	Duration frequency ();
 
+	default
+	Duration frequencyVariance () {
+
+		return frequency ()
+			.multipliedBy (1)
+			.dividedBy (4);
+
+	}
+
+	Duration calculateFirstDelay ();
+
+	Duration calculateSubsequentDelay ();
+
 	boolean setBackgroundProcessStart (
 			TaskLogger parentTaskLogger);
 

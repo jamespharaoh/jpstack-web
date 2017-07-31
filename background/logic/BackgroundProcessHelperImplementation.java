@@ -68,6 +68,9 @@ class BackgroundProcessHelperImplementation
 	Duration backgroundProcessFrequency;
 
 	@Getter @Setter
+	Duration backgroundProcessFrequencyVariance;
+
+	@Getter @Setter
 	Boolean backgroundProcessDebugEnabled;
 
 	// state
@@ -86,6 +89,12 @@ class BackgroundProcessHelperImplementation
 	public
 	Duration frequency () {
 		return backgroundProcessFrequency;
+	}
+
+	@Override
+	public
+	Duration frequencyVariance () {
+		return backgroundProcessFrequencyVariance;
 	}
 
 	// implementation
@@ -215,6 +224,12 @@ class BackgroundProcessHelperImplementation
 				return;
 			}
 
+			backgroundProcessFrequency =
+				backgroundProcess.getFrequency ();
+
+			backgroundProcessFrequencyVariance =
+				backgroundProcess.getFrequency ().dividedBy (4l);
+
 			backgroundProcess
 
 				.setNumConsecutiveFailures (
@@ -262,6 +277,27 @@ class BackgroundProcessHelperImplementation
 		}
 
 	}
+
+	@Override
+	public
+	Duration calculateFirstDelay () {
+
+		return randomLogic.randomDuration (
+			backgroundProcessFrequency);
+
+	}
+
+	@Override
+	public
+	Duration calculateSubsequentDelay () {
+
+		return randomLogic.randomDuration (
+			backgroundProcessFrequency,
+			backgroundProcessFrequencyVariance);
+
+	}
+
+	// private implementation
 
 	private
 	String taskLog (

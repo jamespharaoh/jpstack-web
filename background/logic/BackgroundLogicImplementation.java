@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.hyphenToUnderscore;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
@@ -39,6 +40,8 @@ import wbs.platform.background.model.BackgroundProcessRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
+import wbs.utils.random.RandomLogic;
+
 @SingletonComponent ("backgroundLogic")
 public
 class BackgroundLogicImplementation
@@ -60,6 +63,9 @@ class BackgroundLogicImplementation
 
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
+
+	@SingletonDependency
+	RandomLogic randomLogic;
 
 	// prototype components
 
@@ -98,7 +104,12 @@ class BackgroundLogicImplementation
 				! collectionHasTwoItems (
 					backgroundProcessNameParts)
 			) {
-				throw new RuntimeException ();
+
+				throw new RuntimeException (
+					stringFormat (
+						"Invalid background process name: %s",
+						backgroundProcessName));
+
 			}
 
 			String parentTypeCode =
@@ -157,6 +168,9 @@ class BackgroundLogicImplementation
 				.backgroundProcessFrequency (
 					backgroundProcessData.frequency ())
 
+				.backgroundProcessFrequencyVariance (
+					backgroundProcessData.frequency ().dividedBy (4l))
+
 				.backgroundProcessDebugEnabled (
 					backgroundProcessData.debugEnabled ())
 
@@ -190,11 +204,16 @@ class BackgroundLogicImplementation
 						parentTypeCode));
 
 			BackgroundProcessRec backgroundProcess =
-				backgroundProcessHelper.findByCodeRequired (
+				backgroundProcessHelper.findByCodeOrThrow (
 					transaction,
 					parentType,
 					hyphenToUnderscore (
-						backgroundProcessCode));
+						backgroundProcessCode),
+					() -> new RuntimeException (
+						stringFormat (
+							"Background process not found: %s.%s",
+							parentTypeCode,
+							backgroundProcessCode)));
 
 			BackgroundProcessData backgroundProcessData =
 				new BackgroundProcessData ()
@@ -221,6 +240,8 @@ class BackgroundLogicImplementation
 		}
 
 	}
+
+	// data classes
 
 	@Accessors (fluent = true)
 	@Data
