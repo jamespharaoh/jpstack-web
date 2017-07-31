@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="walletService"
 	type="major">
 
@@ -34,4 +34,4 @@
 
 	</priv-types>
 
-</model-meta>
+</record>

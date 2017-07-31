@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="wallet"
 	type="common">
 
@@ -17,4 +17,4 @@
 
 	</fields>
 
-</model-meta>
+</record>
