@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="messageTemplateFieldValue"
 	type="ephemeral">
 
@@ -27,4 +27,4 @@
 
 	</fields>
 
-</model-meta>
+</record>

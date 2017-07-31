@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="messageTemplateEntryValue"
 	type="minor">
 
@@ -32,4 +32,4 @@
 
 	</collections>
 
-</model-meta>
+</record>

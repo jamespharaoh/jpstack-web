@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="messageTemplateParameter"
 	type="minor">
 
@@ -34,4 +34,4 @@
 
 	</fields>
 
-</model-meta>
+</record>

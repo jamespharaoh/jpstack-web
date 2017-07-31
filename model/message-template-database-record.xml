@@ -1,4 +1,4 @@
-<model-meta
+<record
 	name="messageTemplateDatabase"
 	type="major">
 
@@ -50,4 +50,4 @@
 
 	</priv-types>
 
-</model-meta>
+</record>
