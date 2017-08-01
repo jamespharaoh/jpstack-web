@@ -234,7 +234,7 @@ class BackgroundProcessHelperImplementation
 
 				.setNumConsecutiveFailures (
 					ifThenElse (
-						transaction.findRoot ().errors (),
+						transaction.getRoot ().errors (),
 						() -> 1l +
 							backgroundProcess.getNumConsecutiveFailures (),
 						() -> 0l))
@@ -243,7 +243,7 @@ class BackgroundProcessHelperImplementation
 					backgroundProcess.getRunningStartTime ())
 
 				.setLastRunSuccess (
-					! transaction.findRoot ().errors ())
+					! transaction.getRoot ().errors ())
 
 				.setLastRunDuration (
 					new Duration (
@@ -252,7 +252,7 @@ class BackgroundProcessHelperImplementation
 
 				.setLastTaskLog (
 					taskLog (
-						transaction.findRoot ()))
+						transaction.getRoot ()))
 
 				.setRunning (
 					false)

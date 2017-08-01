@@ -214,6 +214,10 @@ class ObjectDaemonWrapper <IdType> {
 						: objectIds
 				) {
 
+					if (Thread.interrupted ()) {
+						break;
+					}
+
 					processObject (
 						taskLogger,
 						objectId);
