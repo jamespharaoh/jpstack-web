@@ -45,6 +45,15 @@ class TimeUtils {
 	}
 
 	public static
+	Instant dateToInstant (
+			@NonNull Date date) {
+
+		return new Instant (
+			date);
+
+	}
+
+	public static
 	Instant dateToInstantNullSafe (
 			Date date) {
 
@@ -116,6 +125,14 @@ class TimeUtils {
 	}
 
 	// ---------- instant conversion
+
+	public static
+	Date instantToDate (
+			@NonNull ReadableInstant instant) {
+
+		return instant.toInstant ().toDate ();
+
+	}
 
 	public static
 	Date instantToDateNullSafe (
@@ -535,9 +552,9 @@ class TimeUtils {
 
 	public static
 	String isoTimestampString (
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
-		return instant.toString (
+		return instant.toInstant ().toString (
 			isoDateTimeFormat);
 
 	}
