@@ -11,8 +11,9 @@
 
 		<component class="thread.ThreadManagerImplementation"/>
 
-		<component class="time.DurationFormatterImplementation"/>
-		<component class="time.TimeFormatterImplementation"/>
+		<component class="time.core.DefaultTimeFormatterFactory"/>
+		<component class="time.core.TimeFormatterManager"/>
+		<component class="time.duration.DurationFormatterImplementation"/>
 
 	</layer>
 

@@ -654,6 +654,26 @@ class CollectionUtils {
 
 	}
 
+	public static <Type>
+	Optional <Type> iterableFirstElement (
+			@NonNull Iterable <Type> iterable) {
+
+		Iterator <Type> iterator =
+			iterable.iterator ();
+
+		if (iterator.hasNext ()) {
+
+			return optionalOf (
+				iterator.next ());
+
+		} else {
+
+			return optionalAbsent ();
+
+		}
+
+	}
+
 	public static <Type extends Comparable <? super Type>>
 	List <Type> listSorted (
 			@NonNull Iterable <Type> iterable) {

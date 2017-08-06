@@ -1,4 +1,4 @@
-package wbs.utils.time;
+package wbs.utils.time.interval;
 
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveThreeElements;
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
@@ -41,13 +41,18 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
+import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.MutableInterval;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.ReadableInstant;
+import org.joda.time.ReadableInterval;
 import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -56,7 +61,9 @@ import org.joda.time.format.DateTimeFormatter;
 @Value
 public
 class TextualInterval
-	implements Serializable {
+	implements
+		ReadableInterval,
+		Serializable {
 
 	String sourceText;
 	String genericText;
@@ -807,6 +814,18 @@ class TextualInterval
 	}
 
 	public static
+	Optional <TextualInterval> parse (
+			@NonNull DateTimeZone timezone,
+			@NonNull String orignalSource) {
+
+		return parse (
+			timezone,
+			orignalSource,
+			0l);
+
+	}
+
+	public static
 	TextualInterval parseRequired (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
@@ -817,6 +836,19 @@ class TextualInterval
 				timeZone,
 				string,
 				hourOffset));
+
+	}
+
+	public static
+	TextualInterval parseRequired (
+			@NonNull DateTimeZone timeZone,
+			@NonNull String string) {
+
+		return optionalGetRequired (
+			parse (
+				timeZone,
+				string,
+				0l));
 
 	}
 
@@ -842,7 +874,7 @@ class TextualInterval
 	public static
 	TextualInterval after (
 			@NonNull DateTimeZone timezone,
-			@NonNull Instant startTime) {
+			@NonNull ReadableInstant startTime) {
 
 		return forInterval (
 			timezone,
@@ -856,7 +888,7 @@ class TextualInterval
 	public static
 	TextualInterval before (
 			@NonNull DateTimeZone timezone,
-			@NonNull Instant endTime) {
+			@NonNull ReadableInstant endTime) {
 
 		return forInterval (
 			timezone,
@@ -954,8 +986,8 @@ class TextualInterval
 	// accessors
 
 	public
-	Instant start () {
-		return value.getStart ().toInstant ();
+	DateTime start () {
+		return value.getStart ();
 	}
 
 	public
@@ -968,8 +1000,8 @@ class TextualInterval
 	}
 
 	public
-	Instant end () {
-		return value.getEnd ().toInstant ();
+	DateTime end () {
+		return value.getEnd ();
 	}
 
 	public
@@ -978,6 +1010,148 @@ class TextualInterval
 		return integerNotEqualSafe (
 			value.getEndMillis (),
 			Long.MAX_VALUE);
+
+	}
+
+	// readable interval duration
+
+	@Override
+	public
+	Chronology getChronology () {
+		return value.getChronology ();
+	}
+
+	@Override
+	public
+	long getStartMillis () {
+		return value.getStartMillis ();
+	}
+
+	@Override
+	public
+	DateTime getStart () {
+		return value.getStart ();
+	}
+
+	@Override
+	public
+	long getEndMillis () {
+		return value.getEndMillis ();
+	}
+
+	@Override
+	public
+	DateTime getEnd () {
+		return value.getEnd ();
+	}
+
+	@Override
+	public
+	boolean contains (
+			@NonNull ReadableInstant instant) {
+
+		return value.contains (
+			instant);
+
+	}
+
+	@Override
+	public
+	boolean contains (
+			@NonNull ReadableInterval interval) {
+
+		return value.contains (
+			interval);
+
+	}
+
+	@Override
+	public
+	boolean overlaps (
+			@NonNull ReadableInterval interval) {
+
+		return value.overlaps (
+			interval);
+
+	}
+
+	@Override
+	public
+	boolean isAfter (
+			@NonNull ReadableInstant instant) {
+
+		return value.isAfter (
+			instant);
+
+	}
+
+	@Override
+	public
+	boolean isAfter (
+			@NonNull ReadableInterval interval) {
+
+		return value.isAfter (
+			interval);
+
+	}
+
+	@Override
+	public
+	boolean isBefore (
+			@NonNull ReadableInstant instant) {
+
+		return value.isBefore (
+			instant);
+
+	}
+
+	@Override
+	public
+	boolean isBefore (
+			@NonNull ReadableInterval interval) {
+
+		return value.isBefore (
+			interval);
+
+	}
+
+	@Override
+	public
+	Interval toInterval () {
+		return value;
+	}
+
+	@Override
+	public
+	MutableInterval toMutableInterval () {
+		return value.toMutableInterval ();
+	}
+
+	@Override
+	public
+	Duration toDuration () {
+		return value.toDuration ();
+	}
+
+	@Override
+	public
+	long toDurationMillis () {
+		return value.toDurationMillis ();
+	}
+
+	@Override
+	public
+	Period toPeriod () {
+		return value.toPeriod ();
+	}
+
+	@Override
+	public
+	Period toPeriod (
+			@NonNull PeriodType type) {
+
+		return value.toPeriod (
+			type);
 
 	}
 

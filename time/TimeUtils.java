@@ -10,10 +10,13 @@ import lombok.NonNull;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.joda.time.ReadableDateTime;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
+import org.joda.time.ReadableInterval;
 import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -21,16 +24,7 @@ import org.joda.time.format.DateTimeFormatter;
 public
 class TimeUtils {
 
-	// ---------- instant construction
-
-	public static
-	String isoDate (
-			@NonNull Instant instant) {
-
-		return instant.toString (
-			isoDateFormat);
-
-	}
+	// ---------- instant
 
 	public static
 	Instant toInstant (
@@ -86,6 +80,38 @@ class TimeUtils {
 
 		return millisToInstant (
 			timestamp.getTime ());
+
+	}
+
+	public static
+	Instant earliest (
+			Instant... instants) {
+
+		Instant earliest =
+			null;
+
+		for (
+			Instant instant
+				: instants
+		) {
+
+			if (
+
+				earliest == null
+
+				|| instant.isBefore (
+					earliest)
+
+			) {
+
+				earliest =
+					instant;
+
+			}
+
+		}
+
+		return earliest;
 
 	}
 
@@ -276,8 +302,8 @@ class TimeUtils {
 
 	public static
 	LocalDate localDate (
-			@NonNull ReadableInstant instant,
-			@NonNull DateTimeZone timezone) {
+			@NonNull DateTimeZone timezone,
+			@NonNull ReadableInstant instant) {
 
 		return instant
 
@@ -287,38 +313,6 @@ class TimeUtils {
 				timezone)
 
 			.toLocalDate ();
-
-	}
-
-	public static
-	Instant earliest (
-			Instant... instants) {
-
-		Instant earliest =
-			null;
-
-		for (
-			Instant instant
-				: instants
-		) {
-
-			if (
-
-				earliest == null
-
-				|| instant.isBefore (
-					earliest)
-
-			) {
-
-				earliest =
-					instant;
-
-			}
-
-		}
-
-		return earliest;
 
 	}
 
@@ -369,6 +363,8 @@ class TimeUtils {
 		}
 
 	}
+
+	// ---------- local time
 
 	public static
 	LocalTime localTime (
@@ -456,6 +452,38 @@ class TimeUtils {
 	}
 
 	public static
+	LocalTime localTime (
+			@NonNull ReadableDateTime dateTime) {
+
+		return dateTime
+
+			.toDateTime ()
+
+			.toLocalTime ()
+
+		;
+
+	}
+
+	public static
+	LocalTime localTime (
+			@NonNull DateTimeZone timezone,
+			@NonNull ReadableInstant instant) {
+
+		return instant
+
+			.toInstant ()
+
+			.toDateTime (
+				timezone)
+
+			.toLocalTime ()
+
+		;
+
+	}
+
+	public static
 	long calculateAgeInYears (
 			@NonNull LocalDate birthDate,
 			@NonNull Instant now,
@@ -493,8 +521,39 @@ class TimeUtils {
 
 	}
 
+	// interval construction
+
 	public static
-	DateTimeFormatter isoDateFormat =
+	Interval toInterval (
+			@NonNull ReadableInterval interval) {
+
+		return interval.toInterval ();
+
+	}
+
+	// iso timestamps
+
+	public static
+	String isoTimestampString (
+			@NonNull Instant instant) {
+
+		return instant.toString (
+			isoDateTimeFormat);
+
+	}
+
+	public static
+	Instant isoTimestampParseRequired (
+			@NonNull String string) {
+
+		return toInstant (
+			isoDateTimeFormat.parseDateTime (
+				string));
+
+	}
+
+	public static
+	DateTimeFormatter isoDateTimeFormat =
 		DateTimeFormat.forPattern (
 			"yyyy-MM-dd'T'HH:mm:ss'Z'")
 

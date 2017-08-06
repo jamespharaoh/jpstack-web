@@ -1,5 +1,6 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.ArrayUtils.arrayStream;
 import static wbs.utils.collection.IterableUtils.iterableFilterMap;
 import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.dynamicCastRequired;
@@ -794,7 +795,7 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances (
+	Iterable <Type> presentInstances (
 			Optional <Type> argument0,
 			Optional <Type> argument1,
 			Optional <Type> argument2,
@@ -812,11 +813,38 @@ class OptionalUtils {
 	@SafeVarargs
 	public static <Type>
 	Iterable <Type> presentInstances (
-			Optional <Type>... arguments) {
+			Optional <Type> ... arguments) {
 
 		return Optional.presentInstances (
 			Arrays.asList (
 				arguments));
+
+	}
+
+	@SafeVarargs
+	public static <Type>
+	Iterable <Type> presentInstances (
+			Supplier <Optional <? extends Type>> ... suppliers) {
+
+		return () ->
+			arrayStream (
+				suppliers)
+
+			.map (
+				Supplier::get)
+
+			.filter (
+				Optional::isPresent)
+
+			.map (
+				valueOptional ->
+					(Type)
+					optionalGetRequired (
+						valueOptional))
+
+			.iterator ()
+
+		;
 
 	}
 
@@ -1225,6 +1253,25 @@ class OptionalUtils {
 		} else {
 
 			return defaultValue;
+
+		}
+
+	}
+
+	public static <From, To>
+	To optionalMapRequiredOrThrow (
+			Optional <From> optionalValue,
+			Function <? super From, ? extends To> mappingFunction,
+			Supplier <? extends RuntimeException> orThrow) {
+
+		if (optionalValue.isPresent ()) {
+
+			return mappingFunction.apply (
+				optionalValue.get ());
+
+		} else {
+
+			throw orThrow.get ();
 
 		}
 
