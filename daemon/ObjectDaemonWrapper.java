@@ -3,7 +3,9 @@ package wbs.platform.daemon;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.sleepForDuration;
+import static wbs.utils.etc.NumberUtils.notEqualToZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -203,6 +205,8 @@ class ObjectDaemonWrapper <IdType> {
 				return;
 			}
 
+			long numProcessed = 0;
+
 			try {
 
 				List <IdType> objectIds =
@@ -222,9 +226,25 @@ class ObjectDaemonWrapper <IdType> {
 						taskLogger,
 						objectId);
 
+					numProcessed ++;
+
 				}
 
 			} finally {
+
+				if (
+					notEqualToZero (
+						numProcessed)
+				) {
+
+					taskLogger.noticeFormat (
+						"Processed %s",
+						pluralise (
+							numProcessed,
+							objectDaemon.itemNameSingular (),
+							objectDaemon.itemNamePlural ()));
+
+				}
 
 				backgroundProcessHelper.setBackgroundProcessStop (
 					taskLogger);
