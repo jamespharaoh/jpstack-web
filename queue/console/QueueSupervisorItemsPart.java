@@ -1,6 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.time.TimeUtils.toInterval;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
@@ -37,7 +38,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.time.TimeFormatter;
+import wbs.utils.time.interval.TextualInterval;
 
 @PrototypeComponent ("queueSupervisorItemsPart")
 public
@@ -59,9 +60,6 @@ class QueueSupervisorItemsPart
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
-	TimeFormatter timeFormatter;
-
-	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
@@ -69,7 +67,7 @@ class QueueSupervisorItemsPart
 
 	// state
 
-	Set<QueueItemRec> queueItems;
+	Set <QueueItemRec> queueItems;
 
 	UserRec user;
 
@@ -90,9 +88,14 @@ class QueueSupervisorItemsPart
 		) {
 
 			Interval interval =
-				timeFormatter.isoStringToInterval (
-					requestContext.parameterRequired (
-						"interval"));
+				toInterval (
+					TextualInterval.parseRequired (
+						userConsoleLogic.timezone (
+							transaction),
+						requestContext.parameterRequired (
+							"interval"),
+						userConsoleLogic.hourOffset (
+							transaction)));
 
 			user =
 				userHelper.findRequired (

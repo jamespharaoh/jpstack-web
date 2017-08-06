@@ -6,7 +6,7 @@ import java.util.Collection;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.utils.time.TextualInterval;
+import wbs.utils.time.interval.TextualInterval;
 
 @Accessors (fluent = true)
 @Data

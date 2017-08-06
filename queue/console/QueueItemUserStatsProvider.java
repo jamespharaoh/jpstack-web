@@ -29,7 +29,7 @@ import wbs.platform.queue.model.QueueItemUserStats;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
-import wbs.utils.time.TextualInterval;
+import wbs.utils.time.interval.TextualInterval;
 
 @PrototypeComponent ("queueItemUserStatsProvider")
 public

@@ -39,7 +39,7 @@ import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.user.model.UserRec;
 
-import wbs.utils.time.TimeFormatter;
+import wbs.utils.time.core.DefaultTimeFormatter;
 
 @SingletonComponent ("statusUpdateAsyncHelper")
 public
@@ -61,7 +61,7 @@ class StatusUpdateAsyncHelper
 	StatusLineManager statusLineManager;
 
 	@SingletonDependency
-	TimeFormatter timeFormatter;
+	DefaultTimeFormatter timeFormatter;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -240,8 +240,8 @@ class StatusUpdateAsyncHelper
 
 			update.addProperty (
 				"timestamp",
-				timeFormatter.timestampTimezoneString (
-					timeFormatter.timezone (
+				timeFormatter.timestampTimezoneSecondString (
+					timeFormatter.timezoneParseRequired (
 						ifNull (
 							user.getDefaultTimezone (),
 							user.getSlice ().getDefaultTimezone (),

@@ -33,7 +33,7 @@ import wbs.platform.background.model.BackgroundProcessObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
-import wbs.utils.time.DurationFormatter;
+import wbs.utils.time.duration.DurationFormatter;
 
 @PrototypeComponent ("backgroundProcessBuilder")
 public

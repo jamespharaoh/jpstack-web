@@ -28,7 +28,7 @@ import wbs.platform.queue.model.QueueItemStats;
 import wbs.platform.queue.model.QueueItemStatsSearch;
 import wbs.platform.user.console.UserConsoleLogic;
 
-import wbs.utils.time.TextualInterval;
+import wbs.utils.time.interval.TextualInterval;
 
 @PrototypeComponent ("queueItemQueueStatsProvider")
 public

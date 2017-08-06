@@ -42,8 +42,6 @@ import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
-import wbs.utils.time.TimeFormatter;
-
 @PrototypeComponent ("consoleAsyncSubscription")
 @Accessors (fluent = true)
 public
@@ -63,9 +61,6 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 	@SingletonDependency
 	RootConsoleHelper rootHelper;
-
-	@SingletonDependency
-	TimeFormatter timeFormatter;
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;

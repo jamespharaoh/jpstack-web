@@ -49,7 +49,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.time.TimeFormatter;
+import wbs.utils.time.duration.DurationFormatter;
 
 @PrototypeComponent ("queueUsersPart")
 public
@@ -57,6 +57,9 @@ class QueueUsersPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	DurationFormatter durationFormatter;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -72,9 +75,6 @@ class QueueUsersPart
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	TimeFormatter timeFormatter;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -215,7 +215,7 @@ class QueueUsersPart
 
 				htmlTableCellWrite (
 					formatWriter,
-					timeFormatter.prettyDuration (
+					durationFormatter.durationStringApproximate (
 						userData.oldest,
 						transaction.now ()));
 

@@ -3,6 +3,7 @@ package wbs.platform.core.console;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HttpTimeUtils.httpTimestampString;
 
 import lombok.NonNull;
 
@@ -19,8 +20,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.time.TimeFormatter;
-
 import wbs.web.responder.BufferedTextResponder;
 
 @PrototypeComponent ("coreFrameSetResponder")
@@ -35,9 +34,6 @@ class CoreFrameSetResponder
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	TimeFormatter timeFormatter;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -104,7 +100,7 @@ class CoreFrameSetResponder
 
 			requestContext.setHeader (
 				"Expiry",
-				timeFormatter.httpTimestampString (
+				httpTimestampString (
 					Instant.now ()));
 
 		}

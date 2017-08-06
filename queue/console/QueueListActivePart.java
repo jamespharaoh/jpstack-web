@@ -45,7 +45,7 @@ import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.time.TimeFormatter;
+import wbs.utils.time.duration.DurationFormatter;
 
 @PrototypeComponent ("queueListActivePart")
 public
@@ -60,6 +60,9 @@ class QueueListActivePart
 	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
+	@SingletonDependency
+	DurationFormatter durationFormatter;
+
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -68,9 +71,6 @@ class QueueListActivePart
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	TimeFormatter timeFormatter;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -257,7 +257,7 @@ class QueueListActivePart
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.availableItems ()),
-						() -> timeFormatter.prettyDuration (
+						() -> durationFormatter.durationStringApproximate (
 							queueInfo.oldestAvailable (),
 							transaction.now ())));
 
@@ -273,7 +273,7 @@ class QueueListActivePart
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.claimedItems ()),
-						() -> timeFormatter.prettyDuration (
+						() -> durationFormatter.durationStringApproximate (
 							queueInfo.oldestClaimed (),
 							transaction.now ())));
 
@@ -289,7 +289,7 @@ class QueueListActivePart
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.totalUnavailableItems ()),
-						() -> timeFormatter.prettyDuration (
+						() -> durationFormatter.durationStringApproximate (
 							queueInfo.oldestUnavailable (),
 							transaction.now ())));
 
@@ -305,7 +305,7 @@ class QueueListActivePart
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.waitingItems ()),
-						() -> timeFormatter.prettyDuration (
+						() -> durationFormatter.durationStringApproximate (
 							queueInfo.oldestWaiting (),
 							transaction.now ())));
 
@@ -321,7 +321,7 @@ class QueueListActivePart
 					ifThenElseEmDash (
 						moreThanZero (
 							queueInfo.totalItems ()),
-						() -> timeFormatter.prettyDuration (
+						() -> durationFormatter.durationStringApproximate (
 							queueInfo.oldest (),
 							transaction.now ())));
 

@@ -22,7 +22,6 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
 
@@ -44,7 +43,8 @@ import wbs.platform.user.model.UserRec;
 
 import wbs.utils.etc.NumberUtils;
 import wbs.utils.random.RandomLogic;
-import wbs.utils.time.TimeFormatter;
+import wbs.utils.time.core.DefaultTimeFormatter;
+import wbs.utils.time.duration.DurationFormatter;
 
 @SingletonComponent ("userConsoleLogic")
 public
@@ -54,6 +54,9 @@ class UserConsoleLogicImplementation
 		UserConsoleLogic {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	DurationFormatter durationFormatter;
 
 	@SingletonDependency
 	FeatureConsoleHelper featureHelper;
@@ -68,7 +71,7 @@ class UserConsoleLogicImplementation
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
-	TimeFormatter timeFormatter;
+	DefaultTimeFormatter timeFormatter;
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
@@ -200,7 +203,7 @@ class UserConsoleLogicImplementation
 		) {
 
 			DateTimeZone timezone =
-				timeFormatter.timezone (
+				timeFormatter.timezoneParseRequired (
 					ifNull (
 						() ->
 							userRequired (
@@ -301,7 +304,7 @@ class UserConsoleLogicImplementation
 			@NonNull Transaction parentTransaction,
 			@NonNull ReadableInstant timestamp) {
 
-		return timeFormatter.timestampTimezoneString (
+		return timeFormatter.timestampTimezoneSecondString (
 			timezone (
 				parentTransaction),
 			timestamp);
@@ -314,7 +317,7 @@ class UserConsoleLogicImplementation
 			@NonNull Transaction parentTransaction,
 			@NonNull ReadableInstant timestamp) {
 
-		return timeFormatter.timestampString (
+		return timeFormatter.timestampSecondString (
 			timezone (
 				parentTransaction),
 			timestamp);
@@ -327,32 +330,8 @@ class UserConsoleLogicImplementation
 			@NonNull Transaction parentTransaction,
 			@NonNull ReadableDuration duration) {
 
-		return timeFormatter.prettyDuration (
+		return durationFormatter.durationStringApproximate (
 			duration);
-
-	}
-
-	@Override
-	public
-	Instant timestampStringToInstant (
-			@NonNull Transaction parentTransaction,
-			@NonNull String string) {
-
-		try (
-
-			NestedTransaction transaction =
-				parentTransaction.nestTransaction (
-					logContext,
-					"timestampStringToInstant");
-
-		) {
-
-			return timeFormatter.timestampStringToInstant (
-				timezone (
-					transaction),
-				string);
-
-		}
 
 	}
 
@@ -371,7 +350,7 @@ class UserConsoleLogicImplementation
 
 		) {
 
-			return timeFormatter.timestampString (
+			return timeFormatter.timestampSecondString (
 				timezone (
 					transaction),
 				timestamp);

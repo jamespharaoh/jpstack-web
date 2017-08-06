@@ -2,6 +2,7 @@ package wbs.platform.queue.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.joinWithNewline;
+import static wbs.web.utils.HttpTimeUtils.httpTimestampString;
 
 import lombok.NonNull;
 
@@ -20,7 +21,6 @@ import wbs.framework.logging.LogContext;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.time.TimeFormatter;
 
 import wbs.web.responder.BufferedTextResponder;
 
@@ -39,9 +39,6 @@ class QueueFilterResponder
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	TimeFormatter timeFormatter;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -122,7 +119,7 @@ class QueueFilterResponder
 
 			requestContext.setHeader (
 				"Expiry",
-				timeFormatter.httpTimestampString (
+				httpTimestampString (
 					Instant.now ()));
 
 		}
