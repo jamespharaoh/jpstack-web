@@ -125,12 +125,22 @@
 					object-type="user"/>
 
 				<yes-no-field
+					name="alert"/>
+
+				<yes-no-field
 					name="fatal"/>
+
+				<enum-field
+					name="resolution"/>
+
+			</columns>
+
+			<rows>
 
 				<text-area-field
 					name="summary"/>
 
-			</columns>
+			</rows>
 
 		</form>
 

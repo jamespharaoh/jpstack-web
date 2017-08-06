@@ -1,6 +1,6 @@
 <record
 	name="exceptionLog"
-	type="ephemeral"
+	type="event"
 	table="exception">
 
 	<fields>
