@@ -349,11 +349,13 @@ class DeploymentAgent
 	void restartService (
 			@NonNull String serviceName) {
 
-		try {
+		try (
 
 			DBusConnection dbus =
 				DBusConnection.getConnection (
 					DBusConnection.SYSTEM);
+
+		) {
 
 			SystemdManagerDbus systemd =
 				SystemdManagerDbus.get (
@@ -390,11 +392,11 @@ class DeploymentAgent
 						"serviceName",
 						serviceName));
 
-		) {
-
 			DBusConnection dbus =
 				DBusConnection.getConnection (
 					DBusConnection.SYSTEM);
+
+		) {
 
 			SystemdManagerDbus systemd =
 				SystemdManagerDbus.get (

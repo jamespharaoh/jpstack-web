@@ -39,7 +39,7 @@
 
 		<timestamp-field
 			name="stateTimestamp"
-			column-type="sql"
+			column-type="postgresql"
 			nullable="yes"/>
 
 		<yes-no-field

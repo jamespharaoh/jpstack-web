@@ -19,11 +19,11 @@
 
 		<timestamp-field
 			name="createdTime"
-			column-type="sql"/>
+			column-type="postgresql"/>
 
 		<timestamp-field
 			name="expiryTime"
-			column-type="sql"/>
+			column-type="postgresql"/>
 
 		<!-- state -->
 

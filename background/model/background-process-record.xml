@@ -59,12 +59,12 @@
 
 		<timestamp-field
 			name="lastRunTime"
-			column-type="sql"
+			column-type="postgresql"
 			nullable="yes"/>
 
 		<timestamp-field
 			name="nextRunTime"
-			column-type="sql"
+			column-type="postgresql"
 			nullable="yes"/>
 
 		<duration-field
@@ -86,12 +86,12 @@
 
 		<timestamp-field
 			name="runningStartTime"
-			column-type="sql"
+			column-type="postgresql"
 			nullable="yes"/>
 
 		<timestamp-field
 			name="runningWatchdogTime"
-			column-type="sql"
+			column-type="postgresql"
 			nullable="yes"/>
 
 		<string-field
