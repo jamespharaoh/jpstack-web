@@ -210,6 +210,7 @@ class ObjectSummaryPrivPart
 				if (
 					! objectManager.canView (
 						transaction,
+						privChecker,
 						user)
 				) {
 					continue;
@@ -232,6 +233,7 @@ class ObjectSummaryPrivPart
 				if (
 					! objectManager.canView (
 						transaction,
+						privChecker,
 						group)
 				) {
 					continue;

@@ -76,6 +76,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -113,6 +114,9 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -700,6 +704,7 @@ class ObjectSearchResultsPart <
 
 					&& ! consoleHelper.canView (
 						transaction,
+						privChecker,
 						genericCastUnchecked (
 							result))
 

@@ -2,12 +2,14 @@ package wbs.platform.core.console;
 
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
 import com.google.gson.JsonObject;
 
 import lombok.Data;
@@ -46,7 +48,7 @@ import wbs.platform.user.model.UserRec;
 @Accessors (fluent = true)
 public
 class ConsoleAsyncSubscription <SubscriberState>
-	implements ConsoleAsyncEndpoint {
+	implements ConsoleAsyncEndpoint <JsonObject> {
 
 	// singleton dependencies
 
@@ -91,6 +93,12 @@ class ConsoleAsyncSubscription <SubscriberState>
 	public
 	String endpointPath () {
 		return helper.endpointPath ();
+	}
+
+	@Override
+	public
+	Class <JsonObject> requestClass () {
+		return JsonObject.class;
 	}
 
 	// life cycle
@@ -169,7 +177,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 
 	@Override
 	public
-	void message (
+	Optional <JsonObject> message (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleAsyncConnectionHandle connectionHandle,
 			@NonNull Long userId,
@@ -196,7 +204,7 @@ class ConsoleAsyncSubscription <SubscriberState>
 						"Duplicate subscription for connection id: %s",
 						connectionHandle.connectionId ());
 
-					return;
+					return optionalAbsent ();
 
 				}
 
@@ -215,6 +223,8 @@ class ConsoleAsyncSubscription <SubscriberState>
 							taskLogger))
 
 				);
+
+				return optionalAbsent ();
 
 			}
 

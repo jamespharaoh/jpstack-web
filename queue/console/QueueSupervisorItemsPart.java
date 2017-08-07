@@ -20,6 +20,7 @@ import org.joda.time.Interval;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -55,6 +56,9 @@ class QueueSupervisorItemsPart
 
 	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -172,6 +176,7 @@ class QueueSupervisorItemsPart
 					objectManager.writeTdForObjectMiniLink (
 						transaction,
 						formatWriter,
+						privChecker,
 						user));
 
 			// close table
@@ -239,17 +244,20 @@ class QueueSupervisorItemsPart
 				objectManager.writeTdForObjectLink (
 					transaction,
 					formatWriter,
+					privChecker,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
 					formatWriter,
+					privChecker,
 					queue,
 					parent);
 
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
 					formatWriter,
+					privChecker,
 					queueItem,
 					queue);
 

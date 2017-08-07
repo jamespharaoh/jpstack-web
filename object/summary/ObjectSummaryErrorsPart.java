@@ -24,6 +24,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -53,6 +54,9 @@ class ObjectSummaryErrorsPart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -188,6 +192,7 @@ class ObjectSummaryErrorsPart <
 					objectManager.writeTdForObjectLink (
 						transaction,
 						formatWriter,
+						privChecker,
 						errorObject,
 						object);
 

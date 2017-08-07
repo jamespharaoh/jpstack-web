@@ -15,6 +15,7 @@ import wbs.console.context.ConsoleContextType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -61,6 +62,9 @@ class ObjectRemoveAction
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	// properties
 
@@ -169,6 +173,7 @@ class ObjectRemoveAction
 
 			consoleManager.changeContext (
 				transaction,
+				privChecker,
 				targetContext,
 				"/" + parentObject.getId ());
 

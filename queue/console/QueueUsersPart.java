@@ -203,6 +203,7 @@ class QueueUsersPart
 				objectManager.writeTdForObjectMiniLink (
 					transaction,
 					formatWriter,
+					privChecker,
 					userData.user);
 
 				htmlTableCellWrite (

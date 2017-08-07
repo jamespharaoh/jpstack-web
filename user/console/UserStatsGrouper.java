@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGrouper;
 
@@ -36,6 +37,9 @@ class UserStatsGrouper
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	UserObjectHelper userHelper;
@@ -78,6 +82,7 @@ class UserStatsGrouper
 			consoleObjectManager.writeTdForObjectMiniLink (
 				transaction,
 				formatWriter,
+				privChecker,
 				user);
 
 		}

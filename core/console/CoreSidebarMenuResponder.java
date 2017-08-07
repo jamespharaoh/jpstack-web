@@ -25,6 +25,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleHtmlResponder;
 
@@ -64,6 +65,9 @@ class CoreSidebarMenuResponder
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -188,6 +192,7 @@ class CoreSidebarMenuResponder
 					if (
 						! objectManager.canView (
 							transaction,
+							privChecker,
 							menu)
 					) {
 						continue;

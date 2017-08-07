@@ -27,6 +27,7 @@ import wbs.console.forms.core.ConsoleForm;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
@@ -163,6 +164,27 @@ class ObjectSettingsPart <
 				ifNotNullThenElse (
 					form,
 					() -> form.allFields ().scriptRefs (),
+					() -> emptySet ()))
+
+			.build ()
+
+		;
+
+	}
+
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink> builder ()
+
+			.addAll (
+				errorsPart.links ())
+
+			.addAll (
+				ifNotNullThenElse (
+					form,
+					() -> form.allFields ().styles (),
 					() -> emptySet ()))
 
 			.build ()

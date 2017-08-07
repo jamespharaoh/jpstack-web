@@ -673,6 +673,7 @@ class ObjectListPart <
 				if (
 					! consoleHelper.canView (
 						transaction,
+						privChecker,
 						object)
 				) {
 

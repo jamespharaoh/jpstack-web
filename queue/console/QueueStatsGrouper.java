@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGrouper;
 
@@ -35,6 +36,9 @@ class QueueStatsGrouper
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	QueueConsoleHelper queueHelper;
@@ -76,6 +80,7 @@ class QueueStatsGrouper
 			consoleObjectManager.writeTdForObjectMiniLink (
 				transaction,
 				formatWriter,
+				privChecker,
 				queue);
 
 		}

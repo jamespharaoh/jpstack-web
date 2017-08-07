@@ -1,7 +1,9 @@
 package wbs.platform.status.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
+import com.google.common.base.Optional;
 import com.google.gson.JsonObject;
 
 import lombok.NonNull;
@@ -21,7 +23,7 @@ import wbs.platform.user.console.UserSessionLogic;
 @SingletonComponent ("statusKeepaliveAsyncEndpoint")
 public
 class StatusKeepaliveAsyncEndpoint
-	implements ConsoleAsyncEndpoint {
+	implements ConsoleAsyncEndpoint <JsonObject> {
 
 	// singleton dependencies
 
@@ -39,11 +41,17 @@ class StatusKeepaliveAsyncEndpoint
 		return "/status/keepalive";
 	}
 
+	@Override
+	public
+	Class <JsonObject> requestClass () {
+		return JsonObject.class;
+	}
+
 	// implementation
 
 	@Override
 	public
-	void message (
+	Optional <JsonObject> message (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleAsyncConnectionHandle connectionHandle,
 			@NonNull Long userId,
@@ -63,9 +71,11 @@ class StatusKeepaliveAsyncEndpoint
 				integerToDecimalString (
 					userId));
 
-			// we do nothing further, since the console async manager will already
-			// verify the user's identity and perform any action necessary to keep
-			// their session alive
+			// we do nothing further, since the console async manager will
+			// already verify the user's identity and perform any action
+			// necessary to keep their session alive
+
+			return optionalAbsent ();
 
 		}
 

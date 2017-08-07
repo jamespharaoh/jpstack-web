@@ -24,6 +24,7 @@ import wbs.console.forms.core.ConsoleFormHintsLogic;
 import wbs.console.forms.core.ConsoleFormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -91,25 +92,6 @@ class ObjectCreatePart <
 	ConsoleForm <ObjectType> form;
 
 	// implementation
-
-	@Override
-	public
-	Set <ScriptRef> scriptRefs () {
-
-		if (
-			isNotNull (
-				form)
-		) {
-
-			return form.scriptRefs ();
-
-		} else {
-
-			return emptySet ();
-
-		}
-
-	}
 
 	@Override
 	public
@@ -243,6 +225,44 @@ class ObjectCreatePart <
 
 			formHints =
 				formHintsBuilder.build ();
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <ScriptRef> scriptRefs () {
+
+		if (
+			isNotNull (
+				form)
+		) {
+
+			return form.scriptRefs ();
+
+		} else {
+
+			return emptySet ();
+
+		}
+
+	}
+
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		if (
+			isNotNull (
+				form)
+		) {
+
+			return form.styles ();
+
+		} else {
+
+			return emptySet ();
 
 		}
 

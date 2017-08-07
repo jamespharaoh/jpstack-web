@@ -460,6 +460,7 @@ class ObjectCreateAction <
 
 				consoleManager.changeContext (
 					transaction,
+					privChecker,
 					targetContext,
 					"/" + form.value ().getId ());
 
@@ -494,6 +495,7 @@ class ObjectCreateAction <
 
 				consoleManager.changeContext (
 					transaction,
+					privChecker,
 					targetContext,
 					"/" + form.value ().getId ());
 
