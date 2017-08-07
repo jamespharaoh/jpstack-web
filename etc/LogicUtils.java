@@ -90,6 +90,59 @@ class LogicUtils {
 
 	}
 
+	@SafeVarargs
+	public static <Type>
+	Predicate <Type> predicatesCombineAll (
+			@NonNull Predicate <Type> ... predicates) {
+
+		return value -> {
+
+			for (
+				Predicate <Type> predicate
+					: predicates
+			) {
+
+				if (
+					! predicate.test (
+						value)
+				) {
+					return false;
+				}
+
+			}
+
+			return true;
+
+		};
+
+	}
+
+	public static <Type>
+	Predicate <Type> predicatesCombineAny (
+			@NonNull Iterable <Predicate <Type>> predicates) {
+
+		return value -> {
+
+			for (
+				Predicate <Type> predicate
+					: predicates
+			) {
+
+				if (
+					predicate.test (
+						value)
+				) {
+					return true;
+				}
+
+			}
+
+			return false;
+
+		};
+
+	}
+
 	public static
 	boolean anyOf (
 			@NonNull Iterable <Supplier <Boolean>> conditions) {

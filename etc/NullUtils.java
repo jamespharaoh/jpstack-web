@@ -240,6 +240,25 @@ class NullUtils {
 	}
 
 	public static
+	boolean allAreNotNull (
+			Object ... objects) {
+
+		for (
+			Object object
+				: objects
+		) {
+
+			if (object == null) {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	}
+
+	public static
 	String isNullString (
 			Object object) {
 
