@@ -59,8 +59,7 @@ case "$1" in
 			--prefix "$subtree_path" \
 			"$subtree_repo" \
 			"master" \
-			--message "Merge master of $subtree_name" \
-			--squash
+			--message "Merge master of $subtree_name"
 
 	done
 
@@ -74,10 +73,14 @@ case "$1" in
 
 		subtree_repo="git@github.com:$subtree_owner/$subtree_name"
 
-		git subtree push \
-			--prefix "$subtree_path" \
-			"$subtree_repo" \
-			"$project_name"
+		commit_id=$(
+			git subtree split \
+				--prefix "$subtree_path" \
+				--rejoin
+		)
+
+		echo git push "$subtree_repo" "$commit_id:refs/heads/$project_name"
+		git push "$subtree_repo" "$commit_id:refs/heads/$project_name"
 
 	done
 
