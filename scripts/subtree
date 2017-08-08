@@ -55,8 +55,12 @@ case "$1" in
 
 		subtree_repo="git@github.com:$subtree_owner/$subtree_name"
 
-		git subtree pull --prefix "$subtree_path" "$subtree_repo" "master" \
-			--message "Merge master of $subtree_name"
+		git subtree pull \
+			--prefix "$subtree_path" \
+			"$subtree_repo" \
+			"master" \
+			--message "Merge master of $subtree_name" \
+			--squash
 
 	done
 
@@ -70,7 +74,10 @@ case "$1" in
 
 		subtree_repo="git@github.com:$subtree_owner/$subtree_name"
 
-		git subtree push --prefix "$subtree_path" "$subtree_repo" "$project_name"
+		git subtree push \
+			--prefix "$subtree_path" \
+			"$subtree_repo" \
+			"$project_name"
 
 	done
 
