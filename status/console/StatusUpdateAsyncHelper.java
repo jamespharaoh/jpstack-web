@@ -240,7 +240,7 @@ class StatusUpdateAsyncHelper
 
 			update.addProperty (
 				"timestamp",
-				timeFormatter.timestampTimezoneSecondString (
+				timeFormatter.timestampTimezoneSecondShortString (
 					timeFormatter.timezoneParseRequired (
 						ifNull (
 							user.getDefaultTimezone (),
