@@ -1,0 +1,20 @@
+<plugin
+	name="console-object"
+	package="wbs.console.object">
+
+	<layer name="console">
+
+		<bootstrap-component class="ExtendContextComponentBuilder"/>
+		<bootstrap-component class="ExtendContextSpec"/>
+		<bootstrap-component class="ObjectContextComponentBuilder"/>
+		<bootstrap-component class="ObjectContextSpec"/>
+
+		<component class="ExtendContextBuilder"/>
+		<component class="ExtendContextMetaBuilder"/>
+		<component class="ObjectContext"/>
+		<component class="ObjectContextBuilder"/>
+		<component class="ObjectContextMetaBuilder"/>
+
+	</layer>
+
+</plugin>
