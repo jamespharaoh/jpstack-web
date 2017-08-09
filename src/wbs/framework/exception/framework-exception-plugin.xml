@@ -1,0 +1,10 @@
+<plugin
+	name="framework-exception"
+	package="wbs.framework.exception">
+
+	<layer name="utils">
+		<component class="ExceptionUtilsImplementation"/>
+		<component class="SimpleExceptionLogger"/>
+	</layer>
+
+</plugin>
