@@ -1,6 +1,6 @@
 package wbs.web.utils;
 
-import static wbs.utils.string.StringUtils.replaceAll;
+import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 
 import java.io.UnsupportedEncodingException;
@@ -283,12 +283,12 @@ class HtmlUtils {
 
 		try {
 
-			return replaceAll (
+			return stringReplaceAllSimple (
+				"+",
+				"%20",
 				URLEncoder.encode (
 					source,
-					"utf-8"),
-				"+",
-				"%20");
+					"utf-8"));
 
 		} catch (UnsupportedEncodingException exception) {
 
