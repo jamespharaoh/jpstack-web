@@ -3,20 +3,20 @@ package wbs.web.responder;
 import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringToUtf8;
+import static wbs.web.utils.JsonUtils.jsonEncode;
 
 import java.io.OutputStream;
+
+import com.google.gson.JsonObject;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.json.simple.JSONValue;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataToSimple;
 import wbs.framework.database.NestedTransaction;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -40,7 +40,7 @@ class JsonResponder
 	// properties
 
 	@Getter @Setter
-	Object value;
+	JsonObject value;
 
 	// implementation
 
@@ -79,16 +79,9 @@ class JsonResponder
 
 		) {
 
-			DataToSimple dataToJson =
-				new DataToSimple ();
-
-			Object jsonValue =
-				dataToJson.toJson (
-					value);
-
 			String stringValue =
-				JSONValue.toJSONString (
-					jsonValue);
+				jsonEncode (
+					value);
 
 			byte[] bytesValue =
 				stringToUtf8 (

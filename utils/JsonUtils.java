@@ -5,6 +5,7 @@ import static wbs.utils.string.FormatWriterUtils.formatWriterConsumerToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.google.gson.JsonElement;
@@ -17,6 +18,8 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
+
+import wbs.framework.data.tools.DataToJson;
 
 import wbs.utils.string.FormatWriter;
 
@@ -279,6 +282,25 @@ class JsonUtils {
 			@NonNull JsonElement jsonElement) {
 
 		return jsonElement.toString ();
+
+	}
+
+	public static
+	JsonElement toJson (
+			@NonNull Object object) {
+
+		return new DataToJson ().toJson (
+			object);
+
+	}
+
+	public static
+	JsonObject toJson (
+			@NonNull Map <?, ?> object) {
+
+		return (JsonObject)
+			toJson (
+				object);
 
 	}
 
