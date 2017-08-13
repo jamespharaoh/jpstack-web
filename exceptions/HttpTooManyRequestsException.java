@@ -2,6 +2,7 @@ package wbs.web.exceptions;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import java.util.List;
@@ -25,7 +26,7 @@ class HttpTooManyRequestsException
 			HttpStatus.httpTooManyRequests,
 			optionalOr (
 				statusMessage,
-				"Too many equests"),
+				"Too many requests"),
 			errors);
 
 	}
@@ -35,6 +36,17 @@ class HttpTooManyRequestsException
 
 		this (
 			optionalAbsent (),
+			emptyList ());
+
+	}
+
+	public
+	HttpTooManyRequestsException (
+			@NonNull String statusMessage) {
+
+		this (
+			optionalOf (
+				statusMessage),
 			emptyList ());
 
 	}
