@@ -140,9 +140,27 @@ class HttpStatusException
 		ImmutableMap.<Long, Class <? extends HttpStatusException>> builder ()
 
 		.put (
+			HttpStatus.httpBadRequest,
+			HttpBadRequestException.class)
+
+		.put (
+			HttpStatus.httpMethodNotAllowed,
+			HttpMethodNotAllowedException.class)
+
+		.put (
+			HttpStatus.httpNotFound,
+			HttpNotFoundException.class)
+
+		.put (
 			HttpStatus.httpTooManyRequests,
 			HttpTooManyRequestsException.class)
 
-		.build ();
+		.put (
+			HttpStatus.httpUnprocessableEntity,
+			HttpUnprocessableEntityException.class)
+
+		.build ()
+
+	;
 
 }
