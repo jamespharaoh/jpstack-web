@@ -171,6 +171,9 @@ class HtmlTableUtils {
 			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
+			"<div class=\"layout-container\">");
+
+		formatWriter.writeLineFormat (
 			"<table class=\"layout\">");
 
 		formatWriter.increaseIndent ();
@@ -209,6 +212,20 @@ class HtmlTableUtils {
 
 		formatWriter.writeLineFormat (
 			"</table>");
+
+	}
+
+	public static
+	void htmlTableCloseLayout (
+			@NonNull FormatWriter formatWriter) {
+
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</table>");
+
+		formatWriter.writeLineFormat (
+			"</div>");
 
 	}
 
