@@ -1,12 +1,16 @@
 package wbs.web.utils;
 
+import static wbs.utils.collection.CollectionUtils.singletonList;
+import static wbs.utils.collection.IterableUtils.iterableChainArguments;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlTypeAttribute;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import lombok.NonNull;
@@ -18,6 +22,168 @@ import wbs.web.utils.HtmlAttributeUtils.ToHtmlAttribute;
 
 public
 class HtmlInputUtils {
+
+	// input elements
+
+	public static
+	void htmlInputWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		formatWriter.writeIndent ();
+
+		formatWriter.writeFormat (
+			"<input");
+
+		htmlAttributesWrite (
+			formatWriter,
+			attributes);
+
+		formatWriter.writeFormat (
+			">");
+
+		formatWriter.writeNewline ();
+
+	}
+
+	public static
+	void htmlInputWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			Arrays.asList (
+				attributes));
+
+
+	}
+
+	public static
+	void htmlInputWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String type,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						type)),
+				attributes));
+
+	}
+
+	public static
+	void htmlInputWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String type,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						type)),
+				Arrays.asList (
+					attributes)));
+
+	}
+
+	public static
+	void htmlInputHiddenWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"hidden")),
+				attributes));
+
+	}
+
+	public static
+	void htmlInputHiddenWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"hidden")),
+				Arrays.asList (
+					attributes)));
+
+	}
+
+	public static
+	void htmlInputSubmitWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"submit")),
+				attributes));
+
+	}
+
+	public static
+	void htmlInputSubmitWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"submit")),
+				Arrays.asList (
+					attributes)));
+
+	}
+
+	public static
+	void htmlInputTextWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"text")),
+				attributes));
+
+	}
+
+	public static
+	void htmlInputTextWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				singletonList (
+					htmlTypeAttribute (
+						"text")),
+				Arrays.asList (
+					attributes)));
+
+	}
 
 	// select elements
 

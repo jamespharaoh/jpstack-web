@@ -2,15 +2,16 @@ package wbs.web.context;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
@@ -198,6 +199,15 @@ interface RequestContextParameterMethods
 
 	}
 
+	default
+	boolean parameterExists (
+			@NonNull String key) {
+
+		return optionalIsPresent (
+			parameter (
+				key));
+
+	}
 
 	default
 	String parameterRequired (

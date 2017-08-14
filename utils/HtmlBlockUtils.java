@@ -307,6 +307,18 @@ class HtmlBlockUtils {
 	}
 
 	public static
+	void htmlHeadingTwoWriteFormat (
+			@NonNull FormatWriter formatWriter,
+			@NonNull CharSequence ... arguments) {
+
+		htmlHeadingTwoWrite (
+			formatWriter,
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public static
 	void htmlHeadingThreeWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String label) {
