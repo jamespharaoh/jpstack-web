@@ -1,5 +1,7 @@
 package wbs.web.exceptions;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import java.util.List;
@@ -25,6 +27,17 @@ class HttpForbiddenException
 				statusMessage,
 				"Forbidden"),
 			errors);
+
+	}
+
+	public
+	HttpForbiddenException (
+			@NonNull String statusMessage) {
+
+		this (
+			optionalOf (
+				statusMessage),
+			emptyList ());
 
 	}
 

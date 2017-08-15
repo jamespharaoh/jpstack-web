@@ -21,4 +21,23 @@ class HttpClientException
 
 	}
 
+	public
+	HttpClientException (
+			@NonNull HttpClientException cause) {
+
+		super (
+			cause);
+
+	}
+
+	public
+	HttpClientException (
+			@NonNull Throwable cause) {
+
+		super (
+			(HttpClientException)
+			cause);
+
+	}
+
 }

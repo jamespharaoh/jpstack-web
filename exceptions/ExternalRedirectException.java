@@ -1,6 +1,7 @@
 package wbs.web.exceptions;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 public
 class ExternalRedirectException
@@ -11,13 +12,22 @@ class ExternalRedirectException
 
 	public
 	ExternalRedirectException (
-			String newLocation) {
+			@NonNull String newLocation) {
 
 		super (
 			newLocation);
 
 		location =
 			newLocation;
+
+	}
+
+	public
+	ExternalRedirectException (
+			@NonNull Throwable cause) {
+
+		super (
+			cause);
 
 	}
 

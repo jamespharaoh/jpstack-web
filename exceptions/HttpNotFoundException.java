@@ -2,6 +2,7 @@ package wbs.web.exceptions;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import java.util.List;
@@ -27,6 +28,17 @@ class HttpNotFoundException
 				statusMessage,
 				"Not found"),
 			errors);
+
+	}
+
+	public
+	HttpNotFoundException (
+			@NonNull String statusMessage) {
+
+		this (
+			optionalOf (
+				statusMessage),
+			emptyList ());
 
 	}
 

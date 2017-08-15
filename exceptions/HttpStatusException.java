@@ -37,6 +37,29 @@ class HttpStatusException
 
 	public
 	HttpStatusException (
+			HttpStatusException cause) {
+
+		super (
+			stringFormat (
+				"%s: %s",
+				integerToDecimalString (
+					cause.statusCode ()),
+				cause.statusMessage ()),
+			cause);
+
+		this.statusCode =
+			cause.statusCode ();
+
+		this.statusMessage =
+			cause.statusMessage ();
+
+		this.errors =
+			emptyList ();
+
+	}
+
+	public
+	HttpStatusException (
 			@NonNull Long statusCode,
 			@NonNull String statusMessage,
 			@NonNull List <String> errors) {

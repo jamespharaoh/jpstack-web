@@ -21,4 +21,23 @@ class HttpRedirectionException
 
 	}
 
+	public
+	HttpRedirectionException (
+			@NonNull HttpRedirectionException cause) {
+
+		super (
+			cause);
+
+	}
+
+	public
+	HttpRedirectionException (
+			@NonNull Throwable cause) {
+
+		super (
+			(HttpRedirectionException)
+			cause);
+
+	}
+
 }
