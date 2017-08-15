@@ -26,15 +26,19 @@ class HtmlUtils {
 			new StringBuilder (
 				source.length () * 2);
 
-		for (
-			int index = 0;
-			index < source.length ();
-			index ++
-		) {
+		int index = 0;
 
-			char character =
-				source.charAt (
+		while (index < source.length ()) {
+
+			int character =
+				source.codePointAt (
 					index);
+
+			if (character > Character.MAX_VALUE) {
+				index += 2;
+			} else {
+				index += 1;
+			}
 
 			switch (character) {
 
@@ -71,7 +75,7 @@ class HtmlUtils {
 				if (character < 128) {
 
 					dest.append (
-						character);
+						(char) character);
 
 				} else {
 
@@ -79,7 +83,7 @@ class HtmlUtils {
 						"&#");
 
 					dest.append (
-						(int) character);
+						character);
 
 					dest.append (
 						';');

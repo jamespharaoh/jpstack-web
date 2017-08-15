@@ -214,6 +214,17 @@ class HtmlAttributeUtils {
 	}
 
 	public static
+	HtmlAttribute htmlNameAttributeFormat (
+			@NonNull String ... arguments) {
+
+		return HtmlAttribute.of (
+			"name",
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public static
 	ToHtmlAttribute htmlRowSpanAttribute (
 			@NonNull Long value) {
 

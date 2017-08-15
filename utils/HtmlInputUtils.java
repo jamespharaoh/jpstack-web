@@ -8,10 +8,14 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlNameAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlTypeAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlValueAttribute;
 
 import java.util.Arrays;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -118,6 +122,49 @@ class HtmlInputUtils {
 				singletonList (
 					htmlTypeAttribute (
 						"hidden")),
+				Arrays.asList (
+					attributes)));
+
+	}
+
+	public static
+	void htmlInputHiddenWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				ImmutableList.of (
+					htmlTypeAttribute (
+						"hidden"),
+					htmlNameAttribute (
+						name),
+					htmlValueAttribute (
+						value)),
+				attributes));
+
+	}
+
+	public static
+	void htmlInputHiddenWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlInputWrite (
+			formatWriter,
+			iterableChainArguments (
+				ImmutableList.of (
+					htmlTypeAttribute (
+						"hidden"),
+					htmlNameAttribute (
+						name),
+					htmlValueAttribute (
+						value)),
 				Arrays.asList (
 					attributes)));
 
