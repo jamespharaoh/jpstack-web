@@ -2,6 +2,8 @@ package wbs.web.utils;
 
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributesWrite;
 
+import java.util.Arrays;
+
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
@@ -149,7 +151,7 @@ class HtmlFormUtils {
 			@NonNull String method,
 			@NonNull String action,
 			@NonNull String encoding,
-			@NonNull ToHtmlAttribute ... attributes) {
+			@NonNull Iterable <? extends ToHtmlAttribute> attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -178,6 +180,24 @@ class HtmlFormUtils {
 		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
+
+	}
+
+	public static
+	void htmlFormOpenMethodActionEncoding (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String method,
+			@NonNull String action,
+			@NonNull String encoding,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlFormOpenMethodActionEncoding (
+			formatWriter,
+			method,
+			action,
+			encoding,
+			Arrays.asList (
+				attributes));
 
 	}
 

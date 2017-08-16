@@ -2,6 +2,7 @@ package wbs.web.exceptions;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import java.util.List;
@@ -31,11 +32,31 @@ class HttpBadRequestException
 	}
 
 	public
+	HttpBadRequestException (
+			@NonNull String statusMessage) {
+
+		this (
+			optionalOf (
+				statusMessage),
+			emptyList ());
+
+	}
+
+	public
 	HttpBadRequestException () {
 
 		this (
 			optionalAbsent (),
 			emptyList ());
+
+	}
+
+	public
+	HttpBadRequestException (
+			@NonNull HttpBadRequestException cause) {
+
+		super (
+			cause);
 
 	}
 

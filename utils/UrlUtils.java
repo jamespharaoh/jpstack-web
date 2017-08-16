@@ -1,6 +1,8 @@
 package wbs.web.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +79,26 @@ class UrlUtils {
 		}
 
 		return stringBuilder.toString ();
+
+	}
+
+	public static
+	String urlPath (
+			@NonNull String url) {
+
+		try {
+
+			URI urlObject =
+				new URI (url);
+
+			return urlObject.getPath ();
+
+		} catch (URISyntaxException uriSyntaxException) {
+
+			throw new IllegalArgumentException (
+				uriSyntaxException);
+
+		}
 
 	}
 

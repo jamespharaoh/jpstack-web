@@ -1,12 +1,13 @@
 package wbs.web.context;
 
+import static wbs.utils.etc.NullUtils.isNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElseRequired;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
-import static wbs.utils.etc.NullUtils.isNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.function.Supplier;
@@ -219,6 +220,16 @@ interface RequestContextRequestAttributesMethods
 
 		return (String)
 			requestValue;
+
+	}
+
+	default
+	Long requestStringAsIntegerRequired (
+			@NonNull String key) {
+
+		return parseIntegerRequired (
+			requestStringRequired (
+				key));
 
 	}
 

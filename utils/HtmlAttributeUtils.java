@@ -13,6 +13,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import com.google.common.base.Optional;
 
@@ -45,7 +46,7 @@ class HtmlAttributeUtils {
 	public static
 	void htmlAttributesWrite (
 			@NonNull FormatWriter formatWriter,
-			@NonNull Iterable <ToHtmlAttribute> attributes) {
+			@NonNull Iterable <? extends ToHtmlAttribute> attributes) {
 
 		iterableStream (
 			attributes)
@@ -84,9 +85,9 @@ class HtmlAttributeUtils {
 			@NonNull String name,
 			@NonNull String value) {
 
-		return new HtmlAttribute ()
-			.name (name)
-			.value (value);
+		return HtmlAttribute.of (
+			name,
+			value);
 
 	}
 
@@ -95,59 +96,34 @@ class HtmlAttributeUtils {
 			@NonNull String name,
 			@NonNull String ... arguments) {
 
-		return new HtmlAttribute ()
-
-			.name (
-				name)
-
-			.value (
-				stringFormatArray (
-					arguments));
+		return HtmlAttribute.of (
+			name,
+			stringFormatArray (
+				arguments));
 
 	}
 
 	// specific constructors
 
 	public static
-	HtmlAttribute htmlIdAttribute (
-			@NonNull String value) {
+	HtmlAttribute htmlClassAttribute (
+			@NonNull Iterable <String> classNames) {
 
-		return new HtmlAttribute ()
-
-			.name (
-				"id")
-
-			.value (
-				value);
+		return HtmlAttribute.of (
+			"class",
+			joinWithSpace (
+				classNames));
 
 	}
 
 	public static
-	HtmlAttribute htmlIdAttributeFormat (
-			@NonNull String ... arguments) {
+	HtmlAttribute htmlClassAttribute (
+			@NonNull String ... classNames) {
 
-		return new HtmlAttribute ()
-
-			.name (
-				"id")
-
-			.value (
-				stringFormatArray (
-					arguments));
-
-	}
-
-	public static
-	HtmlAttribute htmlNameAttribute (
-			@NonNull String value) {
-
-		return new HtmlAttribute ()
-
-			.name (
-				"name")
-
-			.value (
-				value);
+		return HtmlAttribute.of (
+			"class",
+			joinWithSpace (
+				classNames));
 
 	}
 
@@ -171,16 +147,81 @@ class HtmlAttributeUtils {
 
 		} else {
 
-			return new HtmlAttribute ()
-
-				.name (
-					"colspan")
-
-				.value (
-					integerToDecimalString (
-						value));
+			return HtmlAttribute.of (
+				"colspan",
+				integerToDecimalString (
+					value));
 
 		}
+
+	}
+
+	public static
+	HtmlAttribute htmlDataAttribute (
+			@NonNull String name,
+			@NonNull String value) {
+
+		return HtmlAttribute.of (
+			stringFormat (
+				"data-%s",
+				name),
+			value);
+
+	}
+
+	public static
+	HtmlAttribute htmlDataAttributeFormat (
+			@NonNull String name,
+			@NonNull String ... value) {
+
+		return HtmlAttribute.of (
+			stringFormat (
+				"data-%s",
+				name),
+			stringFormatArray (
+				value));
+
+	}
+
+	public static
+	HtmlAttribute htmlIdAttribute (
+			@NonNull String value) {
+
+		return HtmlAttribute.of (
+			"id",
+			value);
+
+	}
+
+	public static
+	HtmlAttribute htmlIdAttributeFormat (
+			@NonNull String ... arguments) {
+
+		return HtmlAttribute.of (
+			"id",
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public static
+	HtmlAttribute htmlNameAttribute (
+			@NonNull String value) {
+
+		return HtmlAttribute.of (
+			"name",
+			value);
+
+	}
+
+	public static
+	HtmlAttribute htmlNameAttributeFormat (
+			@NonNull String ... arguments) {
+
+		return HtmlAttribute.of (
+			"name",
+			stringFormatArray (
+				arguments));
 
 	}
 
@@ -204,46 +245,12 @@ class HtmlAttributeUtils {
 
 		} else {
 
-			return new HtmlAttribute ()
-
-				.name (
-					"rowspan")
-
-				.value (
-					integerToDecimalString (
-						value));
+			return HtmlAttribute.of (
+				"rowspan",
+				integerToDecimalString (
+					value));
 
 		}
-
-	}
-
-	public static
-	HtmlAttribute htmlClassAttribute (
-			@NonNull Iterable <String> classNames) {
-
-		return new HtmlAttribute ()
-
-			.name (
-				"class")
-
-			.value (
-				joinWithSpace (
-					classNames));
-
-	}
-
-	public static
-	HtmlAttribute htmlClassAttribute (
-			@NonNull String ... classNames) {
-
-		return new HtmlAttribute ()
-
-			.name (
-				"class")
-
-			.value (
-				joinWithSpace (
-					classNames));
 
 	}
 
@@ -251,21 +258,17 @@ class HtmlAttributeUtils {
 	HtmlAttribute htmlStyleAttribute (
 			@NonNull Iterable <HtmlStyleRuleEntry> styles) {
 
-		return new HtmlAttribute ()
-
-			.name (
-				"style")
-
-			.value (
-				joinWithSemicolonAndSpace (
-					iterableMap (
-						styles,
-						entry ->
-							stringFormat (
-								"%s: %s",
-								entry.name (),
-								joinWithSpace (
-									entry.values ())))))
+		return HtmlAttribute.of (
+			"style",
+			joinWithSemicolonAndSpace (
+				iterableMap (
+					styles,
+					entry ->
+						stringFormat (
+							"%s: %s",
+							entry.name (),
+							joinWithSpace (
+								entry.values ())))))
 
 		;
 
@@ -282,37 +285,39 @@ class HtmlAttributeUtils {
 	}
 
 	public static
-	HtmlAttribute htmlDataAttribute (
-			@NonNull String name,
-			@NonNull String value) {
+	HtmlAttribute htmlTargetAttribute (
+			@NonNull String target) {
 
-		return new HtmlAttribute ()
-
-			.name (
-				stringFormat (
-					"data-%s",
-					name))
-
-			.value (
-				value);
+		return HtmlAttribute.of (
+			"target",
+			target);
 
 	}
 
 	public static
-	HtmlAttribute htmlDataAttributeFormat (
-			@NonNull String name,
-			@NonNull String ... value) {
+	Function <String, HtmlAttribute> htmlTargetAttribute () {
 
-		return new HtmlAttribute ()
+		return HtmlAttributeUtils::htmlTargetAttribute;
 
-			.name (
-				stringFormat (
-					"data-%s",
-					name))
+	}
 
-			.value (
-				stringFormatArray (
-					value));
+	public static
+	HtmlAttribute htmlTypeAttribute (
+			@NonNull String type) {
+
+		return htmlAttribute (
+			"type",
+			type);
+
+	}
+
+	public static
+	HtmlAttribute htmlValueAttribute (
+			@NonNull String value) {
+
+		return HtmlAttribute.of (
+			"value",
+			value);
 
 	}
 
@@ -348,8 +353,35 @@ class HtmlAttributeUtils {
 	class HtmlAttribute
 		implements ToHtmlAttribute {
 
+		private final
 		String name;
+
+		private final
 		String value;
+
+		public
+		HtmlAttribute (
+				@NonNull String name,
+				@NonNull String value) {
+
+			this.name =
+				name;
+
+			this.value =
+				value;
+
+		}
+
+		public static
+		HtmlAttribute of (
+				@NonNull String name,
+				@NonNull String value) {
+
+			return new HtmlAttribute (
+				name,
+				value);
+
+		}
 
 		@Override
 		public
