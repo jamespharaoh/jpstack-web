@@ -13,6 +13,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import com.google.common.base.Optional;
 
@@ -280,6 +281,23 @@ class HtmlAttributeUtils {
 		return htmlStyleAttribute (
 			Arrays.asList (
 				styles));
+
+	}
+
+	public static
+	HtmlAttribute htmlTargetAttribute (
+			@NonNull String target) {
+
+		return HtmlAttribute.of (
+			"target",
+			target);
+
+	}
+
+	public static
+	Function <String, HtmlAttribute> htmlTargetAttribute () {
+
+		return HtmlAttributeUtils::htmlTargetAttribute;
 
 	}
 
