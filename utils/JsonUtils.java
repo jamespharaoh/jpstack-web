@@ -286,7 +286,7 @@ class JsonUtils {
 	}
 
 	public static
-	JsonElement toJson (
+	JsonElement objectToJson (
 			@NonNull Object object) {
 
 		return new DataToJson ().toJson (
@@ -295,12 +295,33 @@ class JsonUtils {
 	}
 
 	public static
-	JsonObject toJson (
+	JsonObject objectToJson (
+			@NonNull DataObject object) {
+
+		return (JsonObject)
+			new DataToJson ().toJson (
+				object);
+
+	}
+
+	public static
+	JsonObject objectToJson (
 			@NonNull Map <?, ?> object) {
 
 		return (JsonObject)
-			toJson (
+			new DataToJson ().toJson (
 				object);
+
+	}
+
+	public static
+	String objectToJsonEncode (
+			@NonNull Object object) {
+
+		return jsonEncode (
+			(JsonObject)
+			new DataToJson ().toJson (
+				object));
 
 	}
 

@@ -4,15 +4,17 @@ import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.web.utils.JsonUtils.jsonEncode;
+import static wbs.web.utils.JsonUtils.objectToJson;
 
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -22,8 +24,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 
 import wbs.web.context.RequestContext;
+import wbs.web.utils.DataObject;
 
-@Accessors (fluent = true)
 @PrototypeComponent ("jsonResponder")
 public
 class JsonResponder
@@ -39,8 +41,77 @@ class JsonResponder
 
 	// properties
 
-	@Getter @Setter
-	JsonObject value;
+	JsonElement value;
+
+	// property getters
+
+	public
+	JsonElement value () {
+		return value;
+	}
+
+	// property setters
+
+	public
+	JsonResponder value (
+			@NonNull JsonObject value) {
+
+		this.value =
+			value;
+
+		return this;
+
+	}
+
+	public
+	JsonResponder value (
+			@NonNull DataObject value) {
+
+		this.value =
+			objectToJson (
+				value);
+
+		return this;
+
+	}
+
+	public
+	JsonResponder value (
+			@NonNull Map <String, ?> value) {
+
+		this.value =
+			objectToJson (
+				value);
+
+		return this;
+
+	}
+
+	@Deprecated
+	public
+	JsonResponder value (
+			@NonNull JsonElement value) {
+
+		this.value =
+			value;
+
+		return this;
+
+	}
+
+	@Deprecated
+	public
+	JsonResponder value (
+			@NonNull List <?> value) {
+
+		this.value =
+			(JsonArray)
+			objectToJson (
+				value);
+
+		return this;
+
+	}
 
 	// implementation
 
